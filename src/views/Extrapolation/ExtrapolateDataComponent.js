@@ -308,8 +308,11 @@ export default class ExtrapolateDataComponent extends React.Component {
             bulkExtrapolation: false,
             optimizeTESAndARIMA: false,
             missingTESAndARIMA: false,
+            missingTESAndARIMAFlag: false,
             regionValues: [],
             planningUnitValues: [],
+            missingPlanningUnitValues: [],
+            missingPlanningUnitMultiList: [],
             isDisabled: false,
             onlyDownloadedProgram: false,
             jsonDataMovingAvg: [],
@@ -358,16 +361,16 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             seasonality: event.target.checked ? 1 : 0,
             arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
-            arimaDisabled: (event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+            arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
         }, () => {
-            this.handleRangeDissmiss2(this.state.rangeValue1)
+            this.getDateDifference();
+            // this.handleRangeDissmiss2(this.state.rangeValue1)
         });
     }
     /**
      * Retrieves the forecast program list from indexed db on component mount
      */
     componentDidMount = function () {
-        // let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.forecastProgramId.toString()], "ROLE_FORECAST_VIEWER");
         let hasRole = false;
         AuthenticationService.getLoggedInUserRole().map(c => {
             if (c.roleId == 'ROLE_FORECAST_VIEWER') {
@@ -393,8 +396,6 @@ export default class ExtrapolateDataComponent extends React.Component {
         var isExtrapolation = localStorage.getItem("isExtrapolation")
         if (isExtrapolation == "true") {
             this.setState({
-                forecastProgramId: localStorage.getItem("sesDatasetId"),
-                versionId: localStorage.getItem("sesVersionId"),
                 messageColor: localStorage.getItem("messageColor"),
                 message: localStorage.getItem("message"),
                 isChanged1: false
@@ -557,8 +558,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         downloadedProgramData.push(forecastProgramJson);
                     }
                 }
-                var lang = this.state.lang;
                 if (proList.length == 1) {
+                    event.target.value = proList[0].id;
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {
                             a = (a.name).toLowerCase();
@@ -573,8 +574,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                             return a < b ? -1 : a > b ? 1 : 0;
                         })
                     }, () => {
-                        this.filterVersion();
+                        this.setForecastProgramId(event);
                     })
+                } else if (localStorage.getItem("sesDatasetId") != "" && proList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                    event.target.value = localStorage.getItem("sesDatasetId");
+                    this.setForecastProgramId(event);
                 } else {
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {
@@ -597,9 +601,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             }.bind(this);
         }.bind(this);
     }
-    getPUListForTesAndArimaExtrapolationWhileOffline = () => {
+    getPUListForTesAndArimaExtrapolationWhileOffline = (programId, versionId) => {
         // this.setState({ loading: true })
-        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        var tempForecastProgramId = programId + "_v" + versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -613,17 +617,57 @@ export default class ExtrapolateDataComponent extends React.Component {
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                if (myResult != undefined && (myResult.region != "" || myResult.planningUnit != "")) {
+                if (myResult != undefined && (myResult.region != "" || myResult.planningUnit != "") && myResult.planningUnit.length != 0) {
                     this.setState({ showMissingTESANDARIMA: true });
                     if (myResult.region != "") {
                         this.setState({ regionValues: myResult.region });
                     }
                     if (myResult.planningUnit != "") {
-                        this.setState({ planningUnitValues: myResult.planningUnit })
+                        this.setState({
+                            planningUnitValues: myResult.planningUnit,
+                            missingPlanningUnitValues: myResult.planningUnit
+                        })
                     }
                 } else {
                     this.setState({ showMissingTESANDARIMA: false });
                 }
+            }.bind(this);
+        }.bind(this);
+    }
+
+    /**
+     * Deletes the saved PU for bulk extrapolation after calculations via Missing ARIMA and TES modal
+     */
+    deletesPUListForTesAndArimaExtrapolation = (puId) => {
+        // this.setState({ loading: true })
+        var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['planningUnitBulkExtrapolation'], 'readwrite');
+            var planningUnitBulkExtrapolationTransaction = transaction.objectStore('planningUnitBulkExtrapolation');
+            var planningUnitBulkExtrapolationRequest = planningUnitBulkExtrapolationTransaction.get(tempForecastProgramId);
+            planningUnitBulkExtrapolationRequest.onerror = function (event) {
+            }.bind(this);
+            planningUnitBulkExtrapolationRequest.onsuccess = function (event) {
+                var myResult = planningUnitBulkExtrapolationRequest.result;
+                const puArray = myResult.planningUnit.filter(c => c !== Number(puId));
+                var obj = {
+                    region: myResult.region,
+                    planningUnit: puArray,
+                    programId: tempForecastProgramId
+                }
+                planningUnitBulkExtrapolationTransaction.put(obj);
+                planningUnitBulkExtrapolationTransaction.oncomplete = function (event) {
+                    if (puArray != "") {
+                        this.setState({
+                            missingPlanningUnitMultiList: this.state.planningUnitMultiList.filter(c => c.planningUnit.id !== puId),
+                            missingPlanningUnitValues: this.state.planningUnitValues.filter(c => c.value != puId)
+                        })
+                    }
+                }.bind(this);
             }.bind(this);
         }.bind(this);
     }
@@ -660,8 +704,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                 })
             }, 0)
         })
@@ -712,7 +756,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     planningUnitMultiList: puObj,
                     regionMultiList: regionObj,
                     planningUnitValues: planningUnitValues,
-                    regionValues: regionValues
+                    regionValues: regionValues,
+                    missingPlanningUnitMultiList: puObj
                 })
             }, 0)
         })
@@ -834,17 +879,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.movingAverages'),
-                        type: this.state.movingAvgId && movingAvgDataFilter.length > 0 && movingAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.movingAvgId && movingAvgDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.semiAverages'),
-                        type: this.state.semiAvgId && semiAvgDataFilter.length > 0 && semiAvgDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.semiAvgId && semiAvgDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
                         title: i18n.t('static.extrapolation.linearRegression'),
-                        type: this.state.linearRegressionId && linearRegressionDataFilter.length > 0 && linearRegressionDataFilter[0].forecast != null ? 'numeric' : 'hidden',
+                        type: this.state.linearRegressionId && linearRegressionDataFilter.length > 0 ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -854,7 +899,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.tes'),
-                        type: this.state.smoothingId && (tesDataFilter.length > 0 && tesDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
+                        type: this.state.smoothingId && (tesDataFilter.length > 0) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -864,7 +909,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     },
                     {
                         title: i18n.t('static.extrapolation.arima'),
-                        type: this.state.arimaId && (arimaDataFilter.length > 0 && arimaDataFilter[0].forecast != null) ? 'numeric' : 'hidden',
+                        type: this.state.arimaId && (arimaDataFilter.length > 0) ? 'numeric' : 'hidden',
                         mask: '#,##.00', decimal: '.'
                     },
                     {
@@ -1512,7 +1557,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             var forecastProgramId = document.getElementById("forecastProgramId").value;
             var versionId = document.getElementById("versionId").value;
             if (forecastProgramId != "" && versionId != "") {
-                this.getPUListForTesAndArimaExtrapolationWhileOffline();
+                this.getPUListForTesAndArimaExtrapolationWhileOffline(forecastProgramId, versionId);
             }
             if (forecastProgramId != "" && versionId.includes("Local")) {
                 var forecastProgramListFilter = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)[0]
@@ -1679,6 +1724,8 @@ export default class ExtrapolateDataComponent extends React.Component {
      */
     saveForecastConsumptionExtrapolation() {
         var tempForecastProgramId = this.state.forecastProgramId + "_v" + this.state.versionId.split(" (")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+        localStorage.setItem("sesDatasetId", this.state.forecastProgramId);
+        localStorage.setItem("sesVersionId", this.state.versionId);
         if (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) {
             var cont = false;
             var cf = window.confirm(i18n.t("static.extrapolation.confirmmsg"));
@@ -1726,6 +1773,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                             (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexSemiAvg].notes = this.state.extrapolationNotes;
                         if (consumptionExtrapolationIndexMovingAvg != -1)
                             (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexMovingAvg].notes = this.state.extrapolationNotes;
+                        var pu = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)[0]
+                        this.deletesPUListForTesAndArimaExtrapolation(pu.planningUnit.id);
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
@@ -1982,6 +2031,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 extrapolateClicked: false,
                                 notesChanged: false
                             }, () => {
+                                this.deletesPUListForTesAndArimaExtrapolation(planningUnitObj.id);
                                 hideFirstComponent();
                                 this.componentDidMount()
                             })
@@ -2099,6 +2149,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var monthArray = [];
                 var curDate1 = startDate1;
                 var monthsForMovingAverage = this.state.monthsForMovingAverage;
+                console.log("consumptionExtrapolationList1", consumptionExtrapolationList)
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
@@ -2177,7 +2228,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var alpha = this.state.alpha;
                 var beta = this.state.beta;
                 var gamma = this.state.gamma;
-                if (consumptionExtrapolationTESM.length > 0) {
+                if (consumptionExtrapolationTESM.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevel = consumptionExtrapolationTESM[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESM[0].jsonProperties.seasonality;
                     alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha;
@@ -2189,7 +2240,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var p = this.state.p;
                 var d = this.state.d;
                 var q = this.state.q;
-                if (consumptionExtrapolationArima.length > 0) {
+                if (consumptionExtrapolationArima.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevelArima = consumptionExtrapolationArima[0].jsonProperties.confidenceLevel;
                     p = consumptionExtrapolationArima[0].jsonProperties.p;
                     d = consumptionExtrapolationArima[0].jsonProperties.d;
@@ -2248,6 +2299,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                 let endDate = moment(rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate()).format("YYYY-MM");
                 const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
                 let tempMonthsDiff = Math.round(monthsDiff) + 1;
+
                 this.setState({
                     actualConsumptionList: actualConsumptionList,
                     extrapolationNotes: (extrapolationNotes == "" || extrapolationNotes == undefined || extrapolationNotes == null) ? "" : extrapolationNotes,
@@ -2277,8 +2329,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                    arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                    tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    arimaDisabled: (((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2))) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     noDataMessage: "",
                     showDate: true,
                     minDate: minDate,
@@ -2326,8 +2378,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         movingAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         semiAvgDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
                         linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && tempMonthsDiff >= 3 ? false : true,
-                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 ? false : true,
-                        arimaDisabled: (this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2) ? false : true,
+                        tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && tempMonthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
+                        arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && tempMonthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && tempMonthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
                     }, () => {
                         this.getDateDifference();
                     })
@@ -2539,10 +2591,9 @@ export default class ExtrapolateDataComponent extends React.Component {
      * @param {Object} id defines which submit has been clicked on
      * @param {Object} event contains the Extrapolated modal parameters 
      */
-    ExtrapolatedParameters(id, event) {
-        event.stopPropagation();
+    ExtrapolatedParameters(id) {
         var regionList = this.state.regionValues;
-        var listOfPlanningUnits = this.state.planningUnitValues;
+        var listOfPlanningUnits = this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues;
         var puObj = [];
         var regionObj = []
         var count = 0;
@@ -2596,30 +2647,46 @@ export default class ExtrapolateDataComponent extends React.Component {
                             const noOfMonthsForProjection = (monthsDiff + 1) - inputDataMovingAvg.length;
                             //2 and 3 - Optimise TES and ARIMA, 5 - Extrapolate ARIMA & TES using default parameters
                             if (id == 2 || id == 3 || id == 5) {
-                                if (id == 2) {
-                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                if ((id == 2 || id == 5) && this.state.missingTESAndARIMA) {
+                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
                                         count++;
-                                        calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
                                     }
-                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                    if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
                                         count++;
-                                        calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
                                     }
-                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                    this.setState({ missingTESAndARIMAFlag: true })
+                                } else {
+                                    this.setState({ missingTESAndARIMAFlag: false })
+
+                                    if (id == 2) {
+                                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                            count++;
+                                            calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        }
+                                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                            count++;
+                                            calculateSemiAverages(inputDataSemiAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        }
+                                        if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
+                                            count++;
+                                            calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        }
+                                    }
+                                    if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
                                         count++;
-                                        calculateLinearRegression(inputDataLinearRegression, this.state.confidenceLevelIdLinearRegression, noOfMonthsForProjection, this, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                        calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
                                     }
-                                }
-                                if (inputDataMovingAvg.filter(c => c.actual != null).length >= 24 && localStorage.getItem("sessionType") === 'Online') {
-                                    count++;
-                                    calculateTES(inputDataTes, this.state.alpha, this.state.beta, this.state.gamma, this.state.confidenceLevelId, noOfMonthsForProjection, this, minDate, false, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
-                                }
-                                if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
-                                    count++;
-                                    calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                    if (((this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 13) || (!this.state.seasonality && inputDataMovingAvg.filter(c => c.actual != null).length >= 2)) && localStorage.getItem("sessionType") === 'Online') {
+                                        count++;
+                                        calculateArima(inputDataArima, this.state.p, this.state.d, this.state.q, this.state.confidenceLevelIdArima, noOfMonthsForProjection, this, minDate, false, this.state.seasonality, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
+                                    }
                                 }
 
                             } else {//Extrapolate all methods using default parameters
+                                this.setState({ missingTESAndARIMAFlag: false })
+
                                 if (inputDataMovingAvg.filter(c => c.actual != null).length >= 3) {
                                     count++;
                                     calculateMovingAvg(inputDataMovingAvg, this.state.monthsForMovingAverage, noOfMonthsForProjection, this, "bulkExtrapolation", regionList[i].value, listOfPlanningUnits[pu].value);
@@ -2654,16 +2721,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (regionObj != "" && puObj != "") {
                     this.addPUForArimaAndTesWhileOffline(regionObj, puObj);
                 }
-                console.log("count1", count)
-
                 this.setState({
                     count: count,
                     totalExtrapolatedCount: count,
-                    estimatedTime: count * 3
+                    estimatedTime: count * 10
                 }, () => {
                     this.setModalValues(this.state.bulkExtrapolation ? 1 : (this.state.optimizeTESAndARIMA ? 2 : this.state.missingTESAndARIMA ? 3 : ""))
-                    console.log("count3", count)
-
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
@@ -2884,7 +2947,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
                         for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                             for (var r = 0; r < regionList.length; r++) {
-                                var consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value)));
+                                if (!this.state.missingTESAndARIMAFlag) {
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value)));
+                                } else {
+                                    consumptionExtrapolationList = consumptionExtrapolationList.filter(c =>
+                                        c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value && (c.extrapolationMethod.id != 2 && c.extrapolationMethod.id != 4)))
+                                    );
+                                }
                                 var a = consumptionExtrapolationDataUnFiltered.length > 0 ? Math.max(...consumptionExtrapolationDataUnFiltered.map(o => o.consumptionExtrapolationId)) + 1 : 1;
                                 var b = consumptionExtrapolationList.length > 0 ? Math.max(...consumptionExtrapolationList.map(o => o.consumptionExtrapolationId)) + 1 : 1
                                 var id = a > b ? a : b;
@@ -2906,25 +2975,30 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonSemi.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonSemi[i].forecast != null ? (jsonSemi[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
-                                            "jsonProperties": {
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 6 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 6)[0],
+                                        "jsonProperties": {
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
@@ -2934,28 +3008,33 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataMoving.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataMoving[i].forecast != null ? (jsonDataMoving[i].forecast).toFixed(4) : null, ci: null })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
-                                            "jsonProperties": {
-                                                months: this.state.monthsForMovingAverage,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 7 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 7)[0],
+                                        "jsonProperties": {
+                                            months: this.state.monthsForMovingAverage,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
+                                    id += 1;
                                 }
-                                id += 1;
                                 var data = [];
                                 var jsonDataLinearFilter = this.state.jsonDataLinearRegression.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                                 if (jsonDataLinearFilter.length > 0) {
@@ -2963,96 +3042,113 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     for (var i = 0; i < jsonDataLinear.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataLinear[i].forecast != null ? (jsonDataLinear[i].forecast).toFixed(4) : null, ci: (jsonDataLinear[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdLinearRegression,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 5 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 5)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdLinearRegression,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
                                 var jsonDataTesFilter = this.state.jsonDataTes.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
-                                if (jsonDataTesFilter.length > 0) {
+                                if (jsonDataTesFilter.length > 0 && localStorage.getItem("sessionType") === "Online") {
                                     var jsonDataTes = jsonDataTesFilter[0].data;
                                     for (var i = 0; i < jsonDataTes.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataTes[i].forecast != null ? Number(jsonDataTes[i].forecast).toFixed(4) : null, ci: (jsonDataTes[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelId,
-                                                seasonality: this.state.noOfMonthsForASeason,
-                                                alpha: jsonDataTesFilter[0].alpha,
-                                                beta: jsonDataTesFilter[0].beta,
-                                                gamma: jsonDataTesFilter[0].gamma,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 2 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 2)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelId,
+                                            seasonality: this.state.noOfMonthsForASeason,
+                                            alpha: jsonDataTesFilter[0].alpha,
+                                            beta: jsonDataTesFilter[0].beta,
+                                            gamma: jsonDataTesFilter[0].gamma,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                                 var data = [];
                                 var jsonDataArimaFilter = this.state.jsonDataArima.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
-                                if (jsonDataArimaFilter.length > 0) {
+                                if (jsonDataArimaFilter.length > 0 && localStorage.getItem("sessionType") === "Online") {
                                     var jsonDataArima = jsonDataArimaFilter[0].data;
                                     for (var i = 0; i < jsonDataArima.length; i++) {
                                         data.push({ month: moment(minDate).add(i, 'months').format("YYYY-MM-DD"), amount: jsonDataArima[i].forecast != null ? Number(jsonDataArima[i].forecast).toFixed(4) : null, ci: (jsonDataArima[i].ci) })
                                     }
-                                    consumptionExtrapolationList.push(
-                                        {
-                                            "consumptionExtrapolationId": id,
-                                            "planningUnit": planningUnitObj,
-                                            "region": {
-                                                id: regionObj.regionId,
-                                                label: regionObj.label
-                                            },
-                                            "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
-                                            "jsonProperties": {
-                                                confidenceLevel: this.state.confidenceLevelIdArima,
-                                                seasonality: this.state.seasonality,
-                                                p: jsonDataArimaFilter[0].p,
-                                                d: jsonDataArimaFilter[0].d,
-                                                q: jsonDataArimaFilter[0].q,
-                                                startDate: moment(minDate).format("YYYY-MM-DD"),
-                                                stopDate: moment(maxDate).format("YYYY-MM-DD")
-                                            },
-                                            "createdBy": {
-                                                "userId": curUser
-                                            },
-                                            "createdDate": curDate,
-                                            "extrapolationDataList": data
-                                        })
+                                    const index = consumptionExtrapolationList.findIndex(item => item.extrapolationMethod.id == 4 && item.planningUnit.id == listOfPlanningUnits[pu].value && item.region.id == regionList[r].value);
+                                    var obj = {
+                                        "consumptionExtrapolationId": id,
+                                        "planningUnit": planningUnitObj,
+                                        "region": {
+                                            id: regionObj.regionId,
+                                            label: regionObj.label
+                                        },
+                                        "extrapolationMethod": extrapolationMethodList.filter(c => c.id == 4)[0],
+                                        "jsonProperties": {
+                                            confidenceLevel: this.state.confidenceLevelIdArima,
+                                            seasonality: this.state.seasonality,
+                                            p: jsonDataArimaFilter[0].p,
+                                            d: jsonDataArimaFilter[0].d,
+                                            q: jsonDataArimaFilter[0].q,
+                                            startDate: moment(minDate).format("YYYY-MM-DD"),
+                                            stopDate: moment(maxDate).format("YYYY-MM-DD")
+                                        },
+                                        "createdBy": {
+                                            "userId": curUser
+                                        },
+                                        "createdDate": curDate,
+                                        "extrapolationDataList": data
+                                    }
+                                    if (index !== -1) {
+                                        consumptionExtrapolationList[index] = obj;
+                                    } else {
+                                        consumptionExtrapolationList.push(obj);
+                                    }
                                     id += 1;
                                 }
                             }
                         }
+                        // console.log("consumptionExtrapolationList", consumptionExtrapolationList)
                         datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
                         datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
                         myResult.programData = datasetData;
@@ -3060,6 +3156,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         putRequest.onerror = function (event) {
                         }.bind(this);
                         putRequest.onsuccess = function (event) {
+                            if (localStorage.getItem("sessionType") === "Online") {
+                                var list = this.state.planningUnitValues;
+                                for (var pu = 0; pu < list.length; pu++) {
+                                    this.deletesPUListForTesAndArimaExtrapolation(list[pu].value);
+                                }
+                            }
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
                             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
@@ -3593,6 +3695,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     handlePlanningUnitChange = (planningUnitIds) => {
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
+            missingPlanningUnitValues: planningUnitIds.map(ele => ele)
         })
     }
     /**
@@ -3843,8 +3946,13 @@ export default class ExtrapolateDataComponent extends React.Component {
             )
         }, this);
         const { planningUnitMultiList } = this.state;
+        const { missingPlanningUnitMultiList } = this.state;
         let planningUnitMultiLists = planningUnitMultiList.length > 0
             && planningUnitMultiList.map((item, i) => {
+                return ({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id })
+            }, this);
+        let missingPlanningUnitMultiLists = missingPlanningUnitMultiList.length > 0
+            && missingPlanningUnitMultiList.map((item, i) => {
                 return ({ value: item.planningUnit.id, label: getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id })
             }, this);
         const { regionList } = this.state;
@@ -4270,41 +4378,16 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <div className="card-header-actions">
                             <div className="Card-header-reporticon">
                                 <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>
+                                <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
                                 <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataentry/consumptionDataEntryAndAdjustment" className="supplyplanformulas">{i18n.t('static.dashboard.dataEntryAndAdjustments')}</a></span>
-                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT')
-                                    || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_VIEW_COMPARE_AND_SELECT')) &&
-                                    <div>
-                                        <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                                        <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
-                                    </div>
-                                }
+                                <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/report/compareAndSelectScenario" className="supplyplanformulas">{i18n.t('static.dashboard.compareAndSelect')}</a></span><br />
                             </div>
                         </div>
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
-                            <div className="Card-header-reporticon pb-0">
-                                <div className="card-header-actions">
-                                    {this.state.forecastProgramId &&
-                                        <a className="card-header-action">
-                                            <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
-                                        </a>
-                                    }
-                                    {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' &&
-                                        <a className="card-header-action">
-                                            <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
-                                        </a>
-                                    }
-                                    {/* {this.state.forecastProgramId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
-                                    </a>
-                                } */}
-                                    <a className="card-header-action">
-                                        <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
-                                    </a>
-                                    {this.state.showData && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
-                                </div>
+                        <div className="Card-header-reporticon pb-0">
+                            <div className="card-header-actions">
+                                {this.state.showData && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </div>
-                        }
+                        </div>
                         <CardBody className="pb-lg-0 pt-lg-0">
                             <div className="row">
                                 <div className="col-md-12">
@@ -4314,8 +4397,27 @@ export default class ExtrapolateDataComponent extends React.Component {
                             <Form name='simpleForm'>
                                 <div className=" pl-0">
                                     <div className="row">
-                                        <FormGroup className="col-md-3 ">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                        <FormGroup className="col-md-3">
+                                            <div className="d-flex align-items-center">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') && localStorage.getItem("sessionType") === "Online" &&
+                                                    <div className="d-flex align-items-center ml-3 col-md-12">
+                                                        <Input
+                                                            className="form-check-input MarginTopCheck"
+                                                            type="checkbox"
+                                                            id="onlyDownloadedProgram"
+                                                            name="onlyDownloadedProgram"
+                                                            checked={this.state.onlyDownloadedProgram}
+                                                            onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label"
+                                                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                            {i18n.t('static.common.onlyDownloadedProgram')}
+                                                        </Label>
+                                                    </div>
+                                                }
+                                            </div>
                                             <div className="controls ">
                                                 <Input
                                                     type="select"
@@ -4330,7 +4432,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Input>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3 pl-lg-2">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.versionFinal*')}</Label>
                                             <div className="controls ">
                                                 <Input
@@ -4343,6 +4445,39 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 >
                                                     <option value="-1">{i18n.t('static.common.select')}</option>
                                                     {versionList}
+                                                </Input>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-6 pl-lg-3 pt-lg-4">
+                                            {this.state.forecastProgramId && this.state.versionId && this.state.versionId.toString().includes('Local') && 
+                                                <a className="card-header-action">
+                                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
+                                                </a>
+                                            }
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.versionId.toString().includes('Local') && 
+                                                <a className="card-header-action">
+                                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
+                                                </a>
+                                            }
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA && this.state.versionId.toString().includes('Local') && 
+                                                <a className="card-header-action">
+                                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
+                                                </a>
+                                            }
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3 ">
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
+                                            <div className="controls ">
+                                                <Input
+                                                    type="select"
+                                                    name="regionId"
+                                                    id="regionId"
+                                                    bsSize="sm"
+                                                    value={this.state.regionId}
+                                                    onChange={(e) => { this.setRegionId(e); }}
+                                                >
+                                                    <option value="">{i18n.t('static.common.select')}</option>
+                                                    {regions}
                                                 </Input>
                                             </div>
                                         </FormGroup>
@@ -4362,41 +4497,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                 </Input>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3 ">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
-                                            <div className="controls ">
-                                                <Input
-                                                    type="select"
-                                                    name="regionId"
-                                                    id="regionId"
-                                                    bsSize="sm"
-                                                    value={this.state.regionId}
-                                                    onChange={(e) => { this.setRegionId(e); }}
-                                                >
-                                                    <option value="">{i18n.t('static.common.select')}</option>
-                                                    {regions}
-                                                </Input>
-                                            </div>
-                                        </FormGroup>
-                                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
-                                            <FormGroup className="col-md-3" style={{ marginTop: '30px' }}>
-                                                <div className="tab-ml-1 ml-lg-3">
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        id="onlyDownloadedProgram"
-                                                        name="onlyDownloadedProgram"
-                                                        checked={this.state.onlyDownloadedProgram}
-                                                        onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        {i18n.t('static.common.onlyDownloadedProgram')}
-                                                    </Label>
-                                                </div>
-                                            </FormGroup>
-                                        }
                                         {this.state.forecastProgramId != 0 && this.state.showDate && <><FormGroup className="col-md-12">
                                             <h5>
                                                 {this.state.planningUnitId > 0 && i18n.t('static.common.for')}{" "}<b>{this.state.planningUnitId > 0 &&
@@ -4792,7 +4892,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                             type="checkbox"
                                                                             id="seasonality"
                                                                             name="seasonality"
-                                                                            disabled={this.state.isDisabled}
+                                                                            disabled={this.state.isDisabled || localStorage.getItem("sessionType") === "Offline"}
                                                                             checked={this.state.seasonality}
                                                                             onClick={(e) => { this.seasonalityCheckbox(e); }}
                                                                         />
@@ -4907,151 +5007,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <div className="row pl-lg-3">
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenArima} target="Popover5" trigger="hover" toggle={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.arima')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
-                                                                <div className="pt-lg-2 col-md-7">
-                                                                    <Input
-                                                                        className="form-check-input"
-                                                                        type="checkbox"
-                                                                        id="arimaId"
-                                                                        name="arimaId"
-                                                                        disabled={this.state.isDisabled || this.state.arimaDisabled}
-                                                                        checked={this.state.arimaId}
-                                                                        onClick={(e) => { this.setArimaId(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        <b>{i18n.t('static.extrapolation.arimaFull')}</b>
-                                                                        <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={() => this.toggle('popoverOpenArima', !this.state.popoverOpenArima)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                    </Label>
-                                                                </div>
-                                                                <div className="col-md-2 tab-ml-1 ml-lg-5 ExtraCheckboxFieldWidth" style={{ marginTop: '9px' }}>
-                                                                    <Input
-                                                                        className="form-check-input checkboxMargin"
-                                                                        type="checkbox"
-                                                                        id="seasonality"
-                                                                        name="seasonality"
-                                                                        disabled={this.state.isDisabled}
-                                                                        checked={this.state.seasonality}
-                                                                        onClick={(e) => { this.seasonalityCheckbox(e); }}
-                                                                    />
-                                                                    <Label
-                                                                        className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                                        <b>{i18n.t('static.extrapolation.seasonality')}</b>
-                                                                    </Label>
-                                                                </div>
-                                                                <div className="row col-md-12 pt-lg-2" style={{ display: this.state.arimaId ? '' : 'none' }}>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenConfidenceLevel2} target="Popover62" trigger="hover" toggle={this.toggleConfidenceLevel2}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.confidenceLevel')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.confidenceLevel')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover62" onClick={this.toggleConfidenceLevel2} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="select"
-                                                                            bsSize="sm"
-                                                                            id="confidenceLevelIdArima"
-                                                                            name="confidenceLevelIdArima"
-                                                                            disabled={this.state.isDisabled}
-                                                                            value={this.state.confidenceLevelIdArima}
-                                                                            valid={!errors.confidenceLevelIdArima && this.state.confidenceLevelIdArima != null ? this.state.confidenceLevelIdArima : '' != ''}
-                                                                            invalid={touched.confidenceLevelIdArima && !!errors.confidenceLevelIdArima}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setConfidenceLevelIdArima(e) }}
-                                                                        >
-                                                                            <option value="0.85">85%</option>
-                                                                            <option value="0.90">90%</option>
-                                                                            <option value="0.95">95%</option>
-                                                                            <option value="0.99">99%</option>
-                                                                            <option value="0.995">99.5%</option>
-                                                                            <option value="0.999">99.9%</option>
-                                                                        </Input>
-                                                                        <FormFeedback>{errors.confidenceLevelIdArima}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenP} target="Popover11" trigger="hover" toggle={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.p')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.p')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover11" onClick={() => this.toggle('popoverOpenP', !this.state.popoverOpenP)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="pId"
-                                                                            bsSize="sm"
-                                                                            name="pId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.p}
-                                                                            valid={!errors.pId && this.state.p != null ? this.state.p : '' != ''}
-                                                                            invalid={touched.pId && !!errors.pId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setPId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.pId}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenD} target="Popover14" trigger="hover" toggle={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.d')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.d')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover14" onClick={() => this.toggle('popoverOpenD', !this.state.popoverOpenD)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="dId"
-                                                                            bsSize="sm"
-                                                                            name="dId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.d}
-                                                                            valid={!errors.dId && this.state.d != null ? this.state.d : '' != ''}
-                                                                            invalid={touched.dId && !!errors.dId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setDId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.dId}</FormFeedback>
-                                                                    </div>
-                                                                    <div>
-                                                                        <Popover placement="top" isOpen={this.state.popoverOpenQ} target="Popover12" trigger="hover" toggle={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)}>
-                                                                            <PopoverBody>{i18n.t('static.tooltip.q')}</PopoverBody>
-                                                                        </Popover>
-                                                                    </div>
-                                                                    <div className="col-md-3">
-                                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.q')}
-                                                                            <i class="fa fa-info-circle icons pl-lg-2" id="Popover12" onClick={() => this.toggle('popoverOpenQ', !this.state.popoverOpenQ)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                                                        </Label>
-                                                                        <Input
-                                                                            className="controls"
-                                                                            type="number"
-                                                                            id="qId"
-                                                                            bsSize="sm"
-                                                                            name="qId"
-                                                                            readOnly={this.state.isDisabled}
-                                                                            value={this.state.q}
-                                                                            valid={!errors.qId && this.state.q != null ? this.state.q : '' != ''}
-                                                                            invalid={touched.qId && !!errors.qId}
-                                                                            onBlur={handleBlur}
-                                                                            onChange={(e) => { handleChange(e); this.setQId(e) }}
-                                                                        />
-                                                                        <FormFeedback>{errors.qId}</FormFeedback>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="col-md-12 mt-2">
-                                                                    <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
-                                                                </div>
+                                                            <div className="col-md-12 mt-2">
+                                                                <h5 className={"red"} id="div9">{this.state.noDataMessage1}</h5>
                                                             </div>
                                                         </div>
                                                         <div className=" col-md-4 pt-lg-0">
@@ -5084,7 +5041,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </div>
                                                     </div>
                                                 </>}
-                                                {(this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                {
+                                                    // (this.state.offlineTES || this.state.offlineArima) && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
+                                                    (localStorage.getItem("sessionType") === "Offline") && <h5 className={"red"} id="div8">To extrapolate using ARIMA or TES, please go online.</h5>}
                                                 <div style={{ display: !this.state.loading ? "block" : "none" }}>
                                                     {this.state.showData &&
                                                         <>
@@ -5348,7 +5307,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <div>
                                         <ModalBody className="ModalBodyPadding">
                                             <div className="col-md-12">
-                                                <div className='row'>
+                                                <div className='row pt-lg-4 pb-lg-4'>
                                                     <FormGroup className="col-md-7">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                                         <div className="controls edit">
@@ -5369,7 +5328,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
                                                         </div>
                                                     </FormGroup>
-                                                    <FormGroup className="col-md-3">
+                                                    {localStorage.getItem("sessionType") === "Online" && <FormGroup className="col-md-3">
                                                         <div className="tab-ml-1 ml-lg-5" style={{ marginTop: '28px' }}>
                                                             <Input
                                                                 className="form-check-input checkboxMargin"
@@ -5387,6 +5346,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </Label>
                                                         </div>
                                                     </FormGroup>
+                                                    }
                                                 </div>
                                                 <div className='row'>
                                                     <FormGroup className="col-md-6">
@@ -5396,9 +5356,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                 name="planningUnit"
                                                                 id="planningUnit"
                                                                 bsSize="sm"
-                                                                value={this.state.planningUnitValues}
+                                                                value={this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues}
                                                                 onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : []}
+                                                                options={this.state.missingTESAndARIMA ? (missingPlanningUnitMultiLists && missingPlanningUnitMultiLists.length > 0 ? missingPlanningUnitMultiLists : []) :
+                                                                    (planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : [])}
                                                                 labelledBy={i18n.t('static.mt.selectPlanninfUnit')}
                                                             />
                                                         </div>
@@ -5458,7 +5419,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}<span className="float-right">{i18n.t('static.extrapolation.estimateTime')}{this.state.estimatedTime}</span></strong>
                                 </CardHeader>
                                 <CardBody>
-                                    <div className="text-center">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>
+                                    <div className="text-center text-blackD">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>
                                     <Progress value={this.state.syncedExtrapolations} max={this.state.totalExtrapolatedCount} />
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1 mt-3" onClick={(e) => this.cancelExtrapolation(e)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </CardBody>
