@@ -1333,8 +1333,13 @@ class StockStatus extends Component {
               })
             });
           }
+          const mediaQuery = window.matchMedia('(min-width: 1920px)')
           if (programCount > 10) {
-            height = 400 + (21 * programCount);
+            if (mediaQuery.matches) {
+              height = 400 + (10 * programCount);
+            } else {
+              height = 400 + (21 * programCount);
+            }
           }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
@@ -2525,9 +2530,13 @@ class StockStatus extends Component {
         })
       }
     }
-    console.log("Program Count Test@123",programCount)
+    const mediaQuery = window.matchMedia('(min-width: 1920px)')
     if (programCount > 10) {
-      height = 400 + (21 * programCount);
+      if (mediaQuery.matches) {
+        height = 400 + (10 * programCount);
+      } else {
+        height = 400 + (21 * programCount);
+      }
     }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
