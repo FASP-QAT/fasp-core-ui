@@ -34,7 +34,11 @@ import {
   Label,
   Popover,
   Table,
-  PopoverBody
+  PopoverBody,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
@@ -138,6 +142,8 @@ class ApplicationDashboard extends Component {
     this.onTopSubmit = this.onTopSubmit.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
     this.getHealthAreaListByRealmCountryIds = this.getHealthAreaListByRealmCountryIds.bind(this);
+    this.toggleLarge=this.toggleLarge.bind(this);
+    this.actionCanceled=this.actionCanceled.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -303,6 +309,161 @@ class ApplicationDashboard extends Component {
   componentWillUnmount() {
     clearTimeout(this.timeout);
   }
+  getNotes(programId) {
+    this.toggleLarge();
+    this.setState({
+        loadingForNotes: true
+    })
+    ProgramService.getNotesHistory(programId)
+        .then(response => {
+            var data = response.data;
+            const listArray = [];
+            const grouped = data.reduce((acc, item) => {
+                acc[item.versionId] = acc[item.versionId] || [];
+                acc[item.versionId].push(item);
+                return acc;
+            }, {});
+
+            Object.values(grouped).forEach(entries => {
+                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                if (pendingEntries.length) {
+                    listArray.push(pendingEntries[0]);
+                    if (pendingEntries.length > 1) {
+                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+                    }
+                }
+                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+            });
+
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json = [];
+            for (var sb = listArray.length - 1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId;
+                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                data[3] = listArray[sb].notes;
+                data[4] = listArray[sb].lastModifiedBy.username;
+                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                json.push(data);
+            }
+            var options = {
+                data: json,
+                columnDrag: false,
+                columns: [
+                    { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                    { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                    { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                    { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                    {
+                        title: i18n.t("static.common.lastModifiedBy"),
+                        type: "text",
+                    },
+                    {
+                        title: i18n.t("static.common.lastModifiedDate"),
+                        type: "calendar",
+                        options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                    },
+                ],
+                editable: false,
+                onload: function (instance, cell) {
+                    jExcelLoadedFunction(instance, 1);
+                }.bind(this),
+                pagination: localStorage.getItem("sesRecordCount"),
+                search: true,
+                columnSorting: true,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: false,
+                // onselection: this.selected,
+                oneditionend: this.onedit,
+                copyCompatibility: true,
+                allowExport: false,
+                paginationOptions: JEXCEL_PAGINATION_OPTION,
+                position: "top",
+                filters: true,
+                license: JEXCEL_PRO_KEY,
+                contextMenu: function (obj, x, y, e) {
+                    return false;
+                }.bind(this),
+            };
+            var elVar = jexcel(document.getElementById("notesTransTable"), options);
+            this.el = elVar;
+            this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+        }).catch(
+            error => {
+                this.setState({
+                    loadingForNotes: false
+                })
+                if (error.message === "Network Error") {
+                    this.setState({
+                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                        loading: false
+                    });
+                } else {
+                    switch (error.response ? error.response.status : "") {
+                        case 401:
+                            this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
+                        case 403:
+                            this.props.history.push(`/accessDenied`)
+                            break;
+                        case 500:
+                        case 404:
+                        case 406:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        case 412:
+                            this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false
+                            });
+                            break;
+                        default:
+                            this.setState({
+                                message: 'static.unkownError',
+                                loading: false
+                            });
+                            break;
+                    }
+                }
+            }
+        );
+  }
+  /**
+     * This function is used to toggle the notes history model
+     */
+  toggleLarge() {
+    this.setState({
+        notesPopup: !this.state.notesPopup,
+    });
+  }
+  /**
+     * This function is called when cancel button for notes modal popup is clicked
+     */
+  actionCanceled() {
+    this.setState({
+        message: i18n.t('static.actionCancelled'),
+        color: "#BA0C2F",
+    }, () => {
+        hideSecondComponent();
+        this.toggleLarge();
+    })
+  }
   /**
    * Toggles the state of the dropdownOpen variable in the component's state.
    */
@@ -371,7 +532,6 @@ class ApplicationDashboard extends Component {
     if (localStorage.getItem("sessionType") === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DROPDOWN_SP') && this.state.topCountryId.length > 0) {
       DropdownService.getHealthAreaListByRealmCountryIds(this.state.topCountryId.map(x => x.value))
         .then(response => {
-          console.log("hello", response.data)
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
             // var programJson = {
@@ -779,7 +939,6 @@ class ApplicationDashboard extends Component {
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
-          console.log("hello", response.data)
           localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
           this.setState({
             dashboardTopList: response.data,
@@ -1544,14 +1703,9 @@ class ApplicationDashboard extends Component {
       labels: ['Current Stock Status'],
       datasets: [
         {
-          label: 'Overstock',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#49A4A1', // Dark Blue
-        },
-        {
-          label: 'Adequate',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
-          backgroundColor: '#118B70', // Green
+          label: 'Stockout',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc * 100).toFixed(2)] : [],
+          backgroundColor: '#BA0C2F', // Red
         },
         {
           label: 'Below Min',
@@ -1559,9 +1713,14 @@ class ApplicationDashboard extends Component {
           backgroundColor: '#EDB944', // Yellow
         },
         {
-          label: 'Stockout',
-          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#BA0C2F', // Red
+          label: 'Adequate',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
+          backgroundColor: '#118B70', // Green
+        },
+        {
+          label: 'Overstock',
+          data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
+          backgroundColor: '#49A4A1', // Dark Blue
         },
         {
           label: 'NA',
@@ -1724,8 +1883,12 @@ class ApplicationDashboard extends Component {
           }
         }
       },
+      htmlLegend: {
+        // ID of the container to put the legend in
+        containerID: 'legend-container',
+      },
       legend: {
-        display: true,
+        display: false,
         position: 'bottom',
         labels: {
           pointStyle: 'rect',
@@ -1734,6 +1897,90 @@ class ApplicationDashboard extends Component {
         }
       },
     }
+
+    const getOrCreateLegendList = (chart, id) => {
+      const legendContainer = document.getElementById(id);
+      let listContainer = legendContainer.querySelector('ul');
+   
+      if (!listContainer) {
+        listContainer = document.createElement('ul');
+        listContainer.style.display = 'flex';
+        listContainer.style.flexDirection = 'row';
+        listContainer.style.margin = 0;
+        listContainer.style.padding = 0;
+   
+        legendContainer.appendChild(listContainer);
+      }
+   
+      return listContainer;
+    };
+
+    const toggleDatasetVisibility = (chart,datasetIndex) => {
+      // const chart = chartRef.current.chartInstance; // Access the chart instance
+      // const datasetIndex = 0; // Toggle first dataset
+      console.log("Hello",chart)
+      const meta = chart.config.data.datasets[0]._meta[datasetIndex]; // Get metadata of the dataset
+      console.log("Hello1",meta)
+      meta.hidden = meta.hidden === null ? !chart.config.data.datasets[0]._meta[datasetIndex].hidden : null; // Toggle hidden property
+      chart.update(); // Update chart after changing visibility
+    };
+ 
+   
+    const htmlLegendPlugin = {
+      id: 'htmlLegend',
+      afterUpdate(chart, args, options) {
+        console.log("Test@123",chart,args,options)
+        const ul = getOrCreateLegendList(chart, "legend-container");
+   
+        // Remove old legend items
+        while (ul.firstChild) {
+          ul.firstChild.remove();
+        }
+   
+        // Reuse the built-in legendItems generator
+        const items = chart.chart.chart.options.legend.labels.generateLabels(chart);
+   
+        items.forEach(item => {
+          const li = document.createElement('li');
+          li.style.alignItems = 'center';
+          li.style.cursor = 'pointer';
+          li.style.display = 'flex';
+          li.style.flexDirection = 'row';
+          li.style.marginLeft = '10px';
+   
+          li.onclick = () => {
+            const {type} = chart.config;
+            toggleDatasetVisibility(chart.chart.chart,item.datasetIndex);
+            chart.update();
+          };
+   
+          // Color box
+          const boxSpan = document.createElement('span');
+          boxSpan.style.background = item.fillStyle;
+          boxSpan.style.borderColor = item.strokeStyle;
+          boxSpan.style.borderWidth = item.lineWidth + 'px';
+          boxSpan.style.display = 'inline-block';
+          boxSpan.style.flexShrink = 0;
+          boxSpan.style.height = '20px';
+          boxSpan.style.marginRight = '10px';
+          boxSpan.style.width = '20px';
+   
+          // Text
+          const textContainer = document.createElement('p');
+          textContainer.style.color = item.fontColor;
+          textContainer.style.margin = 0;
+          textContainer.style.padding = 0;
+          textContainer.style.textDecoration = item.hidden ? 'line-through' : '';
+   
+          const text = document.createTextNode(item.text);
+          textContainer.appendChild(text);
+   
+          li.appendChild(boxSpan);
+          li.appendChild(textContainer);
+          ul.appendChild(li);
+        });
+      }
+    };
 
     const forecastConsumptionData = {
       datasets: [{
@@ -2375,80 +2622,8 @@ class ApplicationDashboard extends Component {
                         </FormGroup>
 
                       </div>
-                      {/* <div class="col-md-5 pt-lg-2" style={{border:'1px solid #000'}}>
-                      <div class="row">
-                        <div class="col-4">
-                          <div class="border-start border-start-4 border-start-info px-3 mb-3">
-                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="newClients">New Clients</div>
-                            <div class="fs-5 fw-semibold">9.123</div>
-                          </div>
-                        </div>
-                        
-                        <div class="col-4">
-                          <div class="border-start border-start-4 border-start-danger px-3 mb-3">
-                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="recurringClients">Recurring Clients</div>
-                            <div class="fs-5 fw-semibold">22.643</div>
-                          </div>
-                        </div>
-                        <div class="col-4">
-                          <div class="border-start border-start-4 border-start-danger px-3 mb-3">
-                            <div class="small text-body-secondary text-truncate" data-coreui-i18n="recurringClients">Recurring Clients</div>
-                            <div class="fs-5 fw-semibold">22.643</div>
-                          </div>
-                        </div>
-                       
-                       
-                      </div>
-                     
-                    </div> */}
-                      {/* <div class="col-5 pl-lg-3 pt-lg-1">
-                        <ul class="list-group list-group-horizontal">
-                        <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">header1</div>
-      text
-    </div>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">header2</div>
-      text
-    </div>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">header3</div>
-      text
-    </div>
-  </li>
-  <li class="list-group-item d-flex justify-content-between align-items-start" style={{padding:'9px 1.25rem'}}>
-    <div class="ms-2 me-auto">
-      <div class="fw-bold">header4</div>
-      text
-    </div>
-  </li>
-                        </ul>
-                        {/* <div class="col">
-                          <label>header1</label>
-                          <div><span>Text</span></div>
-                        </div>
-                        <div class="col">
-                          <label>header2</label>
-                          <div><span>Text</span></div>
-                        </div>
-                        <div class="col">
-                          <label>header3</label>
-                          <div><span>Text</span></div>
-                        </div>
-                        <div class="col">
-                          <label>header4</label>
-                          <div><span>Text</span></div>
-                        </div> */}
-                      {/* </div> */} 
                     </div>
 
-
-                    {/* </div> */}
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHead tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
@@ -2470,7 +2645,7 @@ class ApplicationDashboard extends Component {
                                   <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" title="QAT Problem List" style={{ color: "blue" }} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>}
-                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code}​</td>}
+                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
@@ -2490,12 +2665,37 @@ class ApplicationDashboard extends Component {
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                                 <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td>{d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : ""} {d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "No Historical Final Uploads"}</td>
+                                <td>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}
+                                  {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                                </td>
                               </tr>)
                           })}
                         </tbody>
                       </Table>
                     </div>}
+                    <Modal isOpen={this.state.notesPopup}
+                      className={'modal-lg modalWidth ' + this.props.className}>
+                      <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                          <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                      </ModalHeader>
+                      <ModalBody>
+                          <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
+                              <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                          </div>
+                          <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
+                              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                  <div class="align-items-center">
+                                      <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                      <div class="spinner-border blue ml-4" role="status">
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </ModalBody>
+                      <ModalFooter>
+                          <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                      </ModalFooter>
+                    </Modal>
                   </div>
                 </div>
               </div>
@@ -2684,7 +2884,8 @@ class ApplicationDashboard extends Component {
                               </div>
                               <div className='row'>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={250} />
+                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={250} plugins={[htmlLegendPlugin]} />
+                                  <div id="legend-container"></div>
                                 </div>
                               </div>
                             </div>
@@ -2716,41 +2917,42 @@ class ApplicationDashboard extends Component {
                         </div>
                         <div class="card-body py-2">
                           <div className='row pt-lg-2'>
-                            <div class="col-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><h5><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
+                            <div class="col-3 container1">
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={100} />
+                                <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
                                 <center><span className='text-blackD'>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
-                            <div class="col-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><h5><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
+                            <div class="col-3 container1">
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={100} />
+                                <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
                                 <center><span className='text-blackD'>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
-                          </div>
-                          <div className='row pt-lg-2'>
-                            <div class="col-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><h5><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
+                            <div class="col-3 container1">
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={100} />
+                                <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
                                 <center><span className='text-blackD'>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
-                            <div class="col-6 container1">
-                              <div class="label-text text-center text-mutedDashboard"><h5><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h5></div>
+                            <div class="col-3 container1">
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
-                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={100} />
+                                <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
                                 <center><span className='text-blackD'>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
+                          {/* <div className='row pt-lg-2'>
+                            
+                          </div> */}
                         </div>
                       </div>
                     </div>
