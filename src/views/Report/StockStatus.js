@@ -1333,9 +1333,14 @@ class StockStatus extends Component {
               })
             });
           }
-          if (programCount > 10) {
-            height = 400 + (21 * programCount);
-          }
+          // const mediaQuery = window.matchMedia('(min-width: 1920px)')
+          // if (programCount > 10) {
+          //   if (mediaQuery.matches) {
+          //     height = 400 + (10 * programCount);
+          //   } else {
+          //     height = 400 + (21 * programCount);
+          //   }
+          // }
           var bar = {
             labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
             datasets: datasets,
@@ -2484,6 +2489,7 @@ class StockStatus extends Component {
         var count = 0;
         var programCount = 0;
         var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+        var newDatasetArray=[];
         this.state.programId.map((e, i) => {
           reportingUnitList.map((r, j) => {
             var viewBy = this.state.viewById;
@@ -2500,11 +2506,13 @@ class StockStatus extends Component {
               if (count >= 10) {
                 count = 0;
               }
-              datasets.push({
+              newDatasetArray.push({
                 label: reportingUnitList.length>1?this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label):(e.label),
                 yAxisID: 'A',
                 stack: 1,
                 order: 1,
+                programId:e.value,
+                programLabel:e.label,
                 backgroundColor: colourArray[count],
                 borderColor: colourArray[count],
                 pointBackgroundColor: colourArray[count],
@@ -2523,12 +2531,47 @@ class StockStatus extends Component {
             }
           })
         })
+        if(this.state.yaxisEquUnit!=-1){
+          var count = 0;
+          var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+          const combinedDataset = newDatasetArray.reduce((acc, item) => {
+            const existingItem = acc.find((entry) => entry.programId === item.programId);
+          
+            if (existingItem) {
+              // Sum the data arrays if the programId already exists
+              existingItem.data = existingItem.data.map((value, index) => 
+                value + (item.data[index] || 0)
+              );
+            } else {
+              item.label=item.programLabel;
+              item.backgroundColor= colourArray[count];
+              item.borderColor= colourArray[count];
+              item.pointBackgroundColor= colourArray[count];
+              item.pointBorderColor= colourArray[count];
+              item.pointHoverBackgroundColor= colourArray[count];
+              item.pointHoverBorderColor= colourArray[count];
+              // Add a new entry for the programId if it doesn't exist in the accumulator
+              acc.push({ ...item });
+              count+=1;
+            }
+          
+            return acc;
+          }, []);
+          datasets=datasets.concat(combinedDataset);
+          console.log("Combined dataset Test@123",combinedDataset);
+        }else{
+          datasets=datasets.concat(newDatasetArray);
+        }
       }
     }
-    console.log("Program Count Test@123",programCount)
-    if (programCount > 10) {
-      height = 400 + (21 * programCount);
-    }
+    const mediaQuery = window.matchMedia('(min-width: 1920px)')
+    // if (programCount > 10) {
+    //   if (mediaQuery.matches) {
+    //     height = 400 + (10 * programCount);
+    //   } else {
+    //     height = 400 + (21 * programCount);
+    //   }
+    // }
     if (this.state.stockStatusList.length > 0 && this.state.stockStatusList[0].planBasedOn == 1) {
       datasets.push({
         type: "line",
@@ -2823,18 +2866,18 @@ class StockStatus extends Component {
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.filter(c => [...new Set(this.state.ppuList).map(ele => ele.programId)].includes(c.value)).map(ele => ele.label).join(", ")) : ""}</span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.yaxisEquUnit != -1 ? ("EU: " + document.getElementById("yaxisEquUnit").selectedOptions[0].text) : (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
-                          <div className="chart-wrapper" style={{ "height": height + "px" }}>
+                          <div className="chart-wrapper chart-graph-report">
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
                           </div>
                           <div id="bars_div" style={{ display: "none" }}>
                             {this.state.isAggregate.toString() == "true" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report" ><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                             {this.state.isAggregate.toString() == "false" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.planBasedOn == 2 && <div className="chart-wrapper" style={{ "height": ele.height + "px" }}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                           </div>
                         </div>
