@@ -1884,76 +1884,59 @@ class ApplicationDashboard extends Component {
         }
       },
       htmlLegend: {
-        // ID of the container to put the legend in
         containerID: 'legend-container',
       },
       legend: {
-        display: false,
-        position: 'bottom',
-        labels: {
-          pointStyle: 'rect',
-          boxWidth: 12,
-          fontColor: fontColor,
-        }
+        display: false
       },
     }
 
-    const getOrCreateLegendList = (chart, id) => {
-      const legendContainer = document.getElementById(id);
+    function getOrCreateLegendList(chart, containerId) {
+      const legendContainer = document.getElementById(containerId);
       let listContainer = legendContainer.querySelector('ul');
-   
+    
       if (!listContainer) {
         listContainer = document.createElement('ul');
         listContainer.style.display = 'flex';
         listContainer.style.flexDirection = 'row';
+        listContainer.style.flexWrap = 'wrap';
         listContainer.style.margin = 0;
         listContainer.style.padding = 0;
-   
         legendContainer.appendChild(listContainer);
       }
-   
+    
       return listContainer;
-    };
+    }
 
-    const toggleDatasetVisibility = (chart,datasetIndex) => {
-      // const chart = chartRef.current.chartInstance; // Access the chart instance
-      // const datasetIndex = 0; // Toggle first dataset
-      console.log("Hello",chart)
-      const meta = chart.config.data.datasets[0]._meta[datasetIndex]; // Get metadata of the dataset
-      console.log("Hello1",meta)
-      meta.hidden = meta.hidden === null ? !chart.config.data.datasets[0]._meta[datasetIndex].hidden : null; // Toggle hidden property
-      chart.update(); // Update chart after changing visibility
+    const toggleDatasetVisibility = (chart, segmentIndex) => {
+      const meta = chart.getDatasetMeta(0);
+      const segment = meta.data[segmentIndex];
+      segment.hidden = !segment.hidden;
+      chart.update();
     };
- 
    
     const htmlLegendPlugin = {
       id: 'htmlLegend',
-      afterUpdate(chart, args, options) {
-        console.log("Test@123",chart,args,options)
+      afterUpdate(chart, args, options) {    
         const ul = getOrCreateLegendList(chart, "legend-container");
-   
-        // Remove old legend items
         while (ul.firstChild) {
           ul.firstChild.remove();
-        }
-   
-        // Reuse the built-in legendItems generator
-        const items = chart.chart.chart.options.legend.labels.generateLabels(chart);
-   
-        items.forEach(item => {
+        }    
+        const items = chart.config.options.legend.labels.generateLabels(chart);
+        items.forEach((item) => {
           const li = document.createElement('li');
           li.style.alignItems = 'center';
           li.style.cursor = 'pointer';
           li.style.display = 'flex';
           li.style.flexDirection = 'row';
           li.style.marginLeft = '10px';
-   
+          li.style.marginRight = '10px';
+          li.style.marginBottom = '5px';
+    
           li.onclick = () => {
-            const {type} = chart.config;
-            toggleDatasetVisibility(chart.chart.chart,item.datasetIndex);
-            chart.update();
+            toggleDatasetVisibility(chart, item.index);
           };
-   
+    
           // Color box
           const boxSpan = document.createElement('span');
           boxSpan.style.background = item.fillStyle;
@@ -1961,25 +1944,25 @@ class ApplicationDashboard extends Component {
           boxSpan.style.borderWidth = item.lineWidth + 'px';
           boxSpan.style.display = 'inline-block';
           boxSpan.style.flexShrink = 0;
-          boxSpan.style.height = '20px';
+          boxSpan.style.height = '10px';
           boxSpan.style.marginRight = '10px';
-          boxSpan.style.width = '20px';
-   
-          // Text
+          boxSpan.style.width = '10px';
+    
+          // Text for the label
           const textContainer = document.createElement('p');
           textContainer.style.color = item.fontColor;
           textContainer.style.margin = 0;
-          textContainer.style.padding = 0;
+          textContainer.style.padding = 5;
           textContainer.style.textDecoration = item.hidden ? 'line-through' : '';
-   
+    
           const text = document.createTextNode(item.text);
           textContainer.appendChild(text);
-   
+    
           li.appendChild(boxSpan);
           li.appendChild(textContainer);
           ul.appendChild(li);
         });
-      }
+      },
     };
 
     const forecastConsumptionData = {
@@ -2011,6 +1994,12 @@ class ApplicationDashboard extends Component {
         display: true,
         text: "",
         padding: 5
+      },
+      layout: {
+        padding: {
+          left: 20,
+          right: 20,
+        },
       },
     }
 
@@ -2049,6 +2038,12 @@ class ApplicationDashboard extends Component {
         text: "",
         padding: 5
       },
+      layout: {
+        padding: {
+          left: 20,
+          right: 20,
+        },
+      },
     }
 
     const actualConsumptionData = {
@@ -2085,6 +2080,12 @@ class ApplicationDashboard extends Component {
         display: true,
         text: "",
         padding: 5
+      },
+      layout: {
+        padding: {
+          left: 20,
+          right: 20,
+        },
       },
     }
 
@@ -2126,6 +2127,12 @@ class ApplicationDashboard extends Component {
         display: true,
         text: "",
         padding: 5
+      },
+      layout: {
+        padding: {
+          left: 20,
+          right: 20,
+        },
       },
     }
     let topCountryList = []
@@ -2884,8 +2891,10 @@ class ApplicationDashboard extends Component {
                               </div>
                               <div className='row'>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={250} plugins={[htmlLegendPlugin]} />
-                                  <div id="legend-container"></div>
+                                  <Col>
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} width={300} plugins={[htmlLegendPlugin]} />
+                                    <div id="legend-container" style={{marginTop:"20px"}}></div>
+                                  </Col>
                                 </div>
                               </div>
                             </div>
