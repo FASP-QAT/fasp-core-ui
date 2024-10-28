@@ -32,6 +32,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
 import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { colors } from '@material-ui/core';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -51,6 +52,7 @@ class StockStatus extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode:false,
       PlanningUnitDataForExport: [],
       loading: true,
       dropdownOpen: false,
@@ -229,7 +231,7 @@ class StockStatus extends Component {
                 : "-" + item1.primeLineNo))
           )
         }).join(' \n')).replaceAll(' ', '%20')
-          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
+          , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? Number(ele.nationalAdjustment)+Number(ele.adjustment != null ? ele.adjustment : 0) : ele.adjustment != null ? ele.adjustment : ""), ele.expiredStock != 0 ? ele.expiredStock : '', ele.closingBalance, ele.amc != null ? roundAMC(ele.amc) : "", ele.planBasedOn == 1 ? roundN(ele.mos) : roundAMC(ele.maxStock), ele.unmetDemand != 0 ? ele.unmetDemand : ''])));
         for (var i = 0; i < A.length; i++) {
           csvRow.push(A[i].join(","))
         }
@@ -361,7 +363,7 @@ class StockStatus extends Component {
                     : " | " + item1.orderNo) +
                 (item1.primeLineNo == null ? "" : "-" + item1.primeLineNo)))
           }).join(' \n')
-            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? ele.nationalAdjustment : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), ele.planBasedOn == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStock, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
+            , formatter(ele.adjustment == 0 ? ele.regionCountForStock > 0 ? ele.nationalAdjustment : "" : ele.regionCountForStock > 0 ? Number(ele.nationalAdjustment)+Number(ele.adjustment) : ele.adjustment, 0), ele.expiredStock != 0 ? formatter(ele.expiredStock, 0) : '', formatter(ele.closingBalance, 0), formatter(roundAMC(ele.amc, 0)), ele.planBasedOn == 1 ? formatter(roundN(ele.mos, 0)) : formatter(roundAMC(ele.maxStock, 0)), ele.unmetDemand != 0 ? formatter(ele.unmetDemand, 0) : '']);
         var header1 = [[{ content: i18n.t('static.common.month'), rowSpan: 2 },
         { content: i18n.t("static.report.stock"), colSpan: 1 },
         { content: i18n.t("static.supplyPlan.consumption"), colSpan: 2 },
@@ -692,6 +694,7 @@ class StockStatus extends Component {
                     let startDate = moment(new Date(this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01'));
                     let endDate = moment(new Date(this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate()));
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    var inventoryList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == planningUnitId);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.planningUnit.id && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -790,6 +793,12 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+                          var iList = inventoryList.filter(c => c.adjustmentQty != undefined && c.adjustmentQty != null && c.adjustmentQty !== "" && (c.inventoryDate >= dt && c.inventoryDate <= enddtStr))
+                          var totalAdjustment = null;
+                          iList.map(elt => {
+                            totalAdjustment = (totalAdjustment == null) ? elt.adjustmentQty : totalAdjustment + elt.adjustmentQty
+                          })
+
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -798,7 +807,7 @@ class StockStatus extends Component {
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
                             shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
+                            adjustment: totalAdjustment,
                             closingBalance: list[0].closingBalance,
                             openingBalance: list[0].openingBalance,
                             mos: list[0].mos,
@@ -843,6 +852,7 @@ class StockStatus extends Component {
                         }
                         data.push(json)
                         if (month == this.state.rangeValue.to.month && from == to) {
+                          console.log("stockStatusList Test@123",data)
                           this.setState({
                             stockStatusList: data,
                             message: '', loading: false
@@ -1091,6 +1101,7 @@ class StockStatus extends Component {
                       firstMonthRegionCountForStock = prevMonthSupplyPlan[0].regionCountForStock
                     }
                     var shipmentList = (programJson.shipmentList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && c.shipmentStatus.id != 8 && (c.accountFlag == true || c.accountFlag == "true"));
+                    var inventoryList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value);
                     var consumptionList = (programJson.consumptionList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value);
                     var inList = (programJson.inventoryList).filter(c => (c.active == true || c.active == "true") && c.planningUnit.id == pu.value && (moment(c.inventoryDate) >= startDate && moment(c.inventoryDate) <= endDate));
                     var coList = consumptionList.filter(c => (moment(c.consumptionDate) >= startDate && moment(c.consumptionDate) <= endDate));
@@ -1165,6 +1176,12 @@ class StockStatus extends Component {
                           conListAct.map(elt => {
                             totalActualConsumption = (totalActualConsumption == null) ? elt.consumptionQty : totalActualConsumption + elt.consumptionQty
                           })
+
+                          var iList = inventoryList.filter(c => c.adjustmentQty != undefined && c.adjustmentQty != null && c.adjustmentQty !== "" && (c.inventoryDate >= dt && c.inventoryDate <= enddtStr))
+                          var totalAdjustment = null;
+                          iList.map(elt => {
+                            totalAdjustment = (totalAdjustment == null) ? elt.adjustmentQty : totalAdjustment + elt.adjustmentQty
+                          })
                           var json = {
                             dt: new Date(from, month - 1),
                             forecastedConsumptionQty: Number(totalforecastConsumption),
@@ -1173,7 +1190,7 @@ class StockStatus extends Component {
                             finalConsumptionQty: list[0].consumptionQty,
                             shipmentQty: totalShipmentQty,
                             shipmentInfo: shiplist,
-                            adjustment: list[0].adjustmentQty,
+                            adjustment: totalAdjustment,
                             closingBalance: list[0].closingBalance,
                             openingBalance: list[0].openingBalance,
                             mos: list[0].mos,
@@ -2454,6 +2471,21 @@ class StockStatus extends Component {
    * Calls the get programs function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+    const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode });
+
+    // Listening for theme changes
+    const observer = new MutationObserver(() => {
+        const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode: updatedDarkMode });
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
+
     this.getPrograms();
   }
   /**
@@ -2508,10 +2540,23 @@ class StockStatus extends Component {
           </option>
         )
       }, this);
+
+      const darkModeColors = [
+        '#d4bbff',   
+    ];
+    
+    const lightModeColors = [
+        '#002F6C',  // Color 1   
+    ];
+      const { isDarkMode } = this.state;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
     const options = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1,
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
@@ -2521,11 +2566,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor: fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2539,7 +2584,8 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor ,
             lineWidth: 0
           }
         }, {
@@ -2547,12 +2593,12 @@ class StockStatus extends Component {
           position: 'right',
           scaleLabel: {
             labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-            fontColor: 'black',
+            fontColor: fontColor,
             display: true,
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2567,7 +2613,8 @@ class StockStatus extends Component {
             }
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor ,
             lineWidth: 0
           }
         }],
@@ -2575,17 +2622,18 @@ class StockStatus extends Component {
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           ticks: {
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }]
@@ -2620,14 +2668,15 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor: fontColor,
         }
       }
     }
     const options1 = {
       title: {
         display: true,
-        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1
+        text: this.state.planningUnitLabel != "" && this.state.planningUnitLabel != undefined && this.state.planningUnitLabel != null ? (this.state.programs.filter(c => c.programId == document.getElementById("programId").value)[0].programCode + " " + i18n.t("static.supplyPlan.v") + (document.getElementById("versionId").selectedOptions[0].text)) + " - " + this.state.planningUnitLabel : entityname1,
+        fontColor: fontColor
       },
       scales: {
         yAxes: [{
@@ -2637,11 +2686,11 @@ class StockStatus extends Component {
             labelString: i18n.t('static.shipment.qty'),
             display: true,
             fontSize: "12",
-            fontColor: 'black'
+            fontColor: fontColor
           },
           ticks: {
             beginAtZero: true,
-            fontColor: 'black',
+            fontColor: fontColor,
             callback: function (value) {
               var cell1 = value
               cell1 += '';
@@ -2655,7 +2704,8 @@ class StockStatus extends Component {
               return x1 + x2;
             }
           }, gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }],
@@ -2663,17 +2713,18 @@ class StockStatus extends Component {
           scaleLabel: {
             display: true,
             labelString: i18n.t('static.common.month'),
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           ticks: {
-            fontColor: 'black',
+            fontColor: fontColor,
             fontStyle: "normal",
             fontSize: "12"
           },
           gridLines: {
-            color: 'rgba(171,171,171,1)',
+            color: gridLineColor,
+            zeroLineColor: gridLineColor,
             lineWidth: 0
           }
         }]
@@ -2710,7 +2761,7 @@ class StockStatus extends Component {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          fontColor: 'black'
+          fontColor: fontColor
         }
       }
     }
@@ -2769,12 +2820,12 @@ class StockStatus extends Component {
         label: i18n.t('static.supplyPlan.delivered'),
         yAxisID: 'A',
         stack: 1,
-        backgroundColor: '#002f6c',
-        borderColor: '#002f6c',
-        pointBackgroundColor: '#002f6c',
-        pointBorderColor: '#002f6c',
-        pointHoverBackgroundColor: '#002f6c',
-        pointHoverBorderColor: '#002f6c',
+        backgroundColor: colors[0],
+        borderColor: 'rgba(179,181,198,1)',
+        pointBackgroundColor: 'rgba(179,181,198,1)',
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: 'rgba(179,181,198,1)',
         data: this.state.stockStatusList.map((item, index) => {
           let count = 0;
           (item.shipmentInfo.map((ele, index) => {
@@ -3107,7 +3158,7 @@ class StockStatus extends Component {
                         </ul>
                       </FormGroup>
                   }
-                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-striped table-bordered text-center mt-2">
+                  {this.state.show && this.state.stockStatusList.length > 0 && <Table responsive className="table-bordered text-center mt-2">
                     <thead>
                       <tr>
                         <th rowSpan="2" style={{ width: "200px" }}>{i18n.t('static.common.month')}</th>
@@ -3176,7 +3227,7 @@ class StockStatus extends Component {
                               })}</table>
                             </td>
                             <td>
-                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : this.state.stockStatusList[idx].adjustment, 0)}
+                              {formatter(this.state.stockStatusList[idx].adjustment == 0 ? this.state.stockStatusList[idx].regionCountForStock > 0 ? this.state.stockStatusList[idx].nationalAdjustment : "" : this.state.stockStatusList[idx].regionCountForStock > 0 ? Number(this.state.stockStatusList[idx].nationalAdjustment)+Number(this.state.stockStatusList[idx].adjustment) : this.state.stockStatusList[idx].adjustment, 0)}
                             </td>
                             <td>
                               {this.state.stockStatusList[idx].expiredStock != 0 ? formatter(this.state.stockStatusList[idx].expiredStock, 0) : ''}
@@ -3186,7 +3237,7 @@ class StockStatus extends Component {
                             <td>
                               {formatter(roundAMC(this.state.stockStatusList[idx].amc, 0))}
                             </td>
-                            <td style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
+                            <td className='darkModeclrblack' style={{ backgroundColor: this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos == null ? "#cfcdc9" : this.state.stockStatusList[idx].mos == 0 ? "#BA0C2F" : this.state.stockStatusList[idx].mos < this.state.stockStatusList[idx].minMos ? "#f48521" : this.state.stockStatusList[idx].mos > this.state.stockStatusList[idx].maxMos ? "#edb944" : "#118b70" : "" }}>
                               {this.state.stockStatusList[0].planBasedOn == 1 ? this.state.stockStatusList[idx].mos != null ? roundN(this.state.stockStatusList[idx].mos) : i18n.t("static.supplyPlanFormula.na") : formatter(roundAMC(this.state.stockStatusList[idx].maxStock, 0))}
                             </td>
                             <td>

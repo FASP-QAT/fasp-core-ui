@@ -62,98 +62,98 @@ import AuthenticationServiceComponent from "../Common/AuthenticationServiceCompo
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
 import FundingSourceService from "../../api/FundingSourceService.js";
 const ref = React.createRef();
-const options = {
-  title: {
-    display: true,
-    text: "Shipments",
-    fontColor: "black",
-  },
-  scales: {
-    xAxes: [
-      {
-        labelMaxWidth: 100,
-        stacked: true,
-        gridLines: {
-          display: false,
-        },
-        fontColor: "black",
-      },
-    ],
-    yAxes: [
-      {
-        scaleLabel: {
-          display: true,
-          labelString: i18n.t("static.graph.costInUSD"),
-          fontColor: "black",
-        },
-        stacked: true,
-        ticks: {
-          beginAtZero: true,
-          fontColor: "black",
-          callback: function (value) {
-            var cell1 = value;
-            cell1 += "";
-            var x = cell1.split(".");
-            var x1 = x[0];
-            var x2 = x.length > 1 ? "." + x[1] : "";
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-              x1 = x1.replace(rgx, "$1" + "," + "$2");
-            }
-            return x1 + x2;
-          },
-        },
-      },
-    ],
-  },
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips,
-    callbacks: {
-      label: function (tooltipItem, data) {
-        let value =
-          data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-        var cell1 = value;
-        cell1 += "";
-        var x = cell1.split(".");
-        var x1 = x[0];
-        var x2 = x.length > 1 ? "." + x[1] : "";
-        var rgx = /(\d+)(\d{3})/;
-        while (rgx.test(x1)) {
-          x1 = x1.replace(rgx, "$1" + "," + "$2");
-        }
-        return data.datasets[tooltipItem.datasetIndex].label + " : " + x1 + x2;
-      },
-    },
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: true,
-    position: "bottom",
-    labels: {
-      usePointStyle: true,
-      fontColor: "black",
-    },
-  },
-};
-const pickerLang = {
-  months: [
-    i18n.t("static.month.jan"),
-    i18n.t("static.month.feb"),
-    i18n.t("static.month.mar"),
-    i18n.t("static.month.apr"),
-    i18n.t("static.month.may"),
-    i18n.t("static.month.jun"),
-    i18n.t("static.month.jul"),
-    i18n.t("static.month.aug"),
-    i18n.t("static.month.sep"),
-    i18n.t("static.month.oct"),
-    i18n.t("static.month.nov"),
-    i18n.t("static.month.dec"),
-  ],
-  from: "From",
-  to: "To",
-};
+// const options = {
+//   title: {
+//     display: true,
+//     text: "Shipments",
+//     fontColor: "black",
+//   },
+//   scales: {
+//     xAxes: [
+//       {
+//         labelMaxWidth: 100,
+//         stacked: true,
+//         gridLines: {
+//           display: false,
+//         },
+//         fontColor: "black",
+//       },
+//     ],
+//     yAxes: [
+//       {
+//         scaleLabel: {
+//           display: true,
+//           labelString: i18n.t("static.graph.costInUSD"),
+//           fontColor: "black",
+//         },
+//         stacked: true,
+//         ticks: {
+//           beginAtZero: true,
+//           fontColor: "black",
+//           callback: function (value) {
+//             var cell1 = value;
+//             cell1 += "";
+//             var x = cell1.split(".");
+//             var x1 = x[0];
+//             var x2 = x.length > 1 ? "." + x[1] : "";
+//             var rgx = /(\d+)(\d{3})/;
+//             while (rgx.test(x1)) {
+//               x1 = x1.replace(rgx, "$1" + "," + "$2");
+//             }
+//             return x1 + x2;
+//           },
+//         },
+//       },
+//     ],
+//   },
+//   tooltips: {
+//     enabled: false,
+//     custom: CustomTooltips,
+//     callbacks: {
+//       label: function (tooltipItem, data) {
+//         let value =
+//           data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//         var cell1 = value;
+//         cell1 += "";
+//         var x = cell1.split(".");
+//         var x1 = x[0];
+//         var x2 = x.length > 1 ? "." + x[1] : "";
+//         var rgx = /(\d+)(\d{3})/;
+//         while (rgx.test(x1)) {
+//           x1 = x1.replace(rgx, "$1" + "," + "$2");
+//         }
+//         return data.datasets[tooltipItem.datasetIndex].label + " : " + x1 + x2;
+//       },
+//     },
+//   },
+//   maintainAspectRatio: false,
+//   legend: {
+//     display: true,
+//     position: "bottom",
+//     labels: {
+//       usePointStyle: true,
+//       fontColor: "black",
+//     },
+//   },
+// };
+// const pickerLang = {
+//   months: [
+//     i18n.t("static.month.jan"),
+//     i18n.t("static.month.feb"),
+//     i18n.t("static.month.mar"),
+//     i18n.t("static.month.apr"),
+//     i18n.t("static.month.may"),
+//     i18n.t("static.month.jun"),
+//     i18n.t("static.month.jul"),
+//     i18n.t("static.month.aug"),
+//     i18n.t("static.month.sep"),
+//     i18n.t("static.month.oct"),
+//     i18n.t("static.month.nov"),
+//     i18n.t("static.month.dec"),
+//   ],
+//   from: "From",
+//   to: "To",
+// };
 /**
  * Component for Shipment Summery Report.
  */
@@ -165,6 +165,7 @@ class ShipmentSummery extends Component {
     var dt1 = new Date();
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
+      isDarkMode:false,
       planningUnitValues: [],
       planningUnitLabels: [],
       sortType: "asc",
@@ -2075,6 +2076,22 @@ class ShipmentSummery extends Component {
    * Calls the get programs and get funding source function on page load
    */
   componentDidMount() {
+    // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
+
     this.getPrograms();
     this.getFundingSourceType();
   }
@@ -2770,6 +2787,121 @@ class ShipmentSummery extends Component {
    * @returns {JSX.Element} - Shipment Summery report table.
    */
   render() {
+    const darkModeColors = [
+      '#d4bbff',
+  ];
+  
+  const lightModeColors = [
+      '#002F6C',
+  ];
+  
+    const { isDarkMode } = this.state;
+const colors = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+    const options = {
+      title: {
+        display: true,
+        text: "Shipments",
+        fontColor:fontColor
+      },
+      scales: {
+        xAxes: [
+          {
+            labelMaxWidth: 100,
+            stacked: true,
+            gridLines: {
+              display: false, 
+            },
+            ticks: {
+              fontColor: fontColor, // Apply font color to x-axis labels
+            },
+          },
+        ],
+        yAxes: [
+          {
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t("static.graph.costInUSD"),
+              fontColor:fontColor
+            },
+            gridLines: {
+              display: true, // Ensure grid lines are displayed
+              color: gridLineColor,
+              zeroLineColor: gridLineColor,
+              lineWidth: 1, // Adjust this value as needed for visibility
+            },
+            stacked: true,
+            ticks: {
+              beginAtZero: true,
+              fontColor:fontColor,
+              callback: function (value) {
+                var cell1 = value;
+                cell1 += "";
+                var x = cell1.split(".");
+                var x1 = x[0];
+                var x2 = x.length > 1 ? "." + x[1] : "";
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, "$1" + "," + "$2");
+                }
+                return x1 + x2;
+              },
+            },
+          },
+        ],
+      },
+      tooltips: {
+        enabled: false,
+        custom: CustomTooltips,
+        callbacks: {
+          label: function (tooltipItem, data) {
+            let value =
+              data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+            var cell1 = value;
+            cell1 += "";
+            var x = cell1.split(".");
+            var x1 = x[0];
+            var x2 = x.length > 1 ? "." + x[1] : "";
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+              x1 = x1.replace(rgx, "$1" + "," + "$2");
+            }
+            return data.datasets[tooltipItem.datasetIndex].label + " : " + x1 + x2;
+          },
+        },
+      },
+      maintainAspectRatio: false,
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          fontColor:fontColor,
+        },
+      },
+    };
+    const pickerLang = {
+      months: [
+        i18n.t("static.month.jan"),
+        i18n.t("static.month.feb"),
+        i18n.t("static.month.mar"),
+        i18n.t("static.month.apr"),
+        i18n.t("static.month.may"),
+        i18n.t("static.month.jun"),
+        i18n.t("static.month.jul"),
+        i18n.t("static.month.aug"),
+        i18n.t("static.month.sep"),
+        i18n.t("static.month.oct"),
+        i18n.t("static.month.nov"),
+        i18n.t("static.month.dec"),
+      ],
+      from: "From",
+      to: "To",
+      fontColor:fontColor
+    };
+
     jexcel.setDictionary({
       Show: " ",
       entries: " ",
@@ -2818,7 +2950,7 @@ class ShipmentSummery extends Component {
         {
           label: i18n.t("static.supplyPlan.delivered"),
           stack: 1,
-          backgroundColor: "#002f6c",
+          backgroundColor: colors[0],
           borderColor: "rgba(179,181,198,1)",
           pointBackgroundColor: "rgba(179,181,198,1)",
           pointBorderColor: "#fff",
@@ -2924,7 +3056,25 @@ class ShipmentSummery extends Component {
                     style={{ height: "25px", width: "25px", cursor: "pointer" }}
                     src={pdfIcon}
                     title="Export PDF"
-                    onClick={() => this.exportPDF()}
+                    onClick={() => {
+                      var curTheme = localStorage.getItem("theme");
+                      if(curTheme == "dark") {
+                          this.setState({
+                              isDarkMode: false
+                          }, () => {
+                              setTimeout(() => {
+                                  this.exportPDF();
+                                  if(curTheme == "dark") {
+                                      this.setState({
+                                          isDarkMode: true
+                                      })
+                                  }
+                              }, 0)
+                          })
+                      } else {
+                          this.exportPDF();
+                      }
+                  }}                  
                   />
                 </a>
                 <img

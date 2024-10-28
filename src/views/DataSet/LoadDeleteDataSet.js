@@ -560,7 +560,7 @@ class LoadDeleteDataSet extends Component {
                                                                                                         </span>
                                                                                                     </span>
                                                                                                     </li>
-                                                                                                    {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div style={{ color: '#205493', cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
+                                                                                                    {count == item3.versionList.length - 1 && item3.maxPages != item3.currentPage && <div className='a_textLink' style={{cursor: 'pointer' }} onClick={() => this.getMoreVersions(item2.program.id, parseInt(item3.versionList.length / 5))}>{i18n.t('static.program.seemoreprogram')}</div>}
                                                                                                 </>
                                                                                             ))
                                                                                         ))

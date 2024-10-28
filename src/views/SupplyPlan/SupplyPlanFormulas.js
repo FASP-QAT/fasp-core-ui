@@ -820,7 +820,7 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.wapeFormula")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew1')}</p>
-                  <img className="formula-img-mr img-fluid" src={forcasterrorWAPE} /><br></br>
+                  <img className="formula-img-mr img-fluid" style={{width:'250px'}} src={forcasterrorWAPE} /><br></br>
                   <p>{i18n.t('static.report.forecastErrorMonthlyFormulaNew2')}</p>
                   <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3')} <b>{i18n.t('static.report.timeWindow')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew3a')}</p>
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>

@@ -44,6 +44,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
         dt.setMonth(dt.getMonth() - 10);
 
         this.state = {
+            isDarkMode: false,
             lang: localStorage.getItem("lang"),
             consumptionUnitShowArr: [],
             programId: '',
@@ -149,6 +150,21 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      * Calls the get programs function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
+
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
+
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
+
         this.getPrograms();
     }
     /**
@@ -378,7 +394,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -529,7 +545,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
      * @param {Object} e - Event data containing planning unit information.
      */
     setPlanningUnit(e) {
-        console.log(" 1 Test@123", e)
         if (this.state.yaxisEquUnit > 0) {
             var forecastErrorThreshold = 0;
             var showForecastThresholdLegend = false;
@@ -552,7 +567,6 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 this.fetchData();
             })
         } else {
-            console.log("2 Test@123", e.target.value)
             if (e.target.value != -1) {
                 var forecastErrorThreshold = this.state.planningUnits.filter(c => c.planningUnit.id == e.target.value)[0].forecastErrorThreshold;
                 this.setState({
@@ -620,12 +634,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 })
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
-                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == versionId)[0].cutOffDate;
                 var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                 var rangeValue = this.state.rangeValue;
                 if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                     // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                 }
                 this.setState({
@@ -1693,7 +1707,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             csvRow.push('"' + ('Show consumption adjusted for stock out' + ': ' + "No").replaceAll(' ', '%20') + '"')
         csvRow.push('"' + (i18n.t('static.report.timeWindow') + ': ' + (document.getElementById("timeWindow").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         if (document.getElementById("yaxisEquUnit").value > 0) {
-            csvRow.push('"' + ("Y-axis in equivalency unit" + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
         }
         csvRow.push('');
         var columns = [];
@@ -1972,7 +1986,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         align: 'left'
                     })
                     if (document.getElementById("yaxisEquUnit").value > 0) {
-                        doc.text("Y-axis in equivalency unit" + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
+                        doc.text(i18n.t('static.forecastReport.yAxisInEquivalencyUnit') + ': ' + document.getElementById("yaxisEquUnit").selectedOptions[0].text, doc.internal.pageSize.width / 8, (y + 20), {
                             align: 'left'
                         })
                     }
@@ -2296,7 +2310,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)}  ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);
@@ -2308,7 +2322,19 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
             }, this);
 
+        const darkModeColors = [
+            '#d4bbff', // Color 1 
+        ];
 
+        const lightModeColors = [
+            '#002F6C',  // Color 1
+        ];
+
+
+        const { isDarkMode } = this.state;
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
         var chartOptions = {
             title: {
@@ -2317,7 +2343,8 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                     this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId).length > 0 ?
                         this.state.planningUnits.filter(c => c.planningUnit.id == this.state.planningUnitId)[0].planningUnit.label.label_en : '' :
                     this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId).length > 0 ?
-                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : '')
+                        this.state.forecastingUnits.filter(c => c.id == this.state.forecastingUnitId)[0].label.label_en : ''),
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [
@@ -2326,12 +2353,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: (this.state.yaxisEquUnit > 0 ? this.state.equivalencyUnitLabel : (this.state.viewById == 1 ? i18n.t('static.product.product') : i18n.t('static.forecastingunit.forecastingunit'))),
-                            fontColor: 'black'
+                            fontColor: fontColor
                         },
                         stacked: true,//stacked
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += '';
@@ -2346,7 +2373,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             }
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'left',
                     },
@@ -2355,12 +2384,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         scaleLabel: {
                             display: true,
                             labelString: "Forecast Error",
-                            fontColor: 'black'
+                            fontColor: fontColor,
                         },
                         stacked: false,
                         ticks: {
                             beginAtZero: true,
-                            fontColor: 'black',
+                            fontColor: fontColor,
                             callback: function (value) {
                                 var cell1 = value
                                 cell1 += ' %';
@@ -2369,7 +2398,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                             // max: 100
                         },
                         gridLines: {
-                            drawBorder: true, lineWidth: 0
+                            drawBorder: true, lineWidth: 0,
+                            color: gridLineColor,
+                            zeroLineColor: gridLineColor
                         },
                         position: 'right',
 
@@ -2377,10 +2408,12 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor: fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -2416,7 +2449,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor: fontColor
                 }
             }
         }
@@ -2488,7 +2521,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                 data: consumptionForecastValue,
                 stack: 3,
                 yAxisID: 'A',
-                backgroundColor: '#002F6C',
+                backgroundColor: colors[0],
                 ticks: {
                     fontSize: 2,
                     fontColor: 'transparent',
@@ -2542,7 +2575,26 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                         {this.state.dataList.length > 0 &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
+                                        var curTheme = localStorage.getItem("theme");
+                                        if (curTheme == "dark") {
+                                            this.setState({
+                                                isDarkMode: false
+                                            }, () => {
+                                                setTimeout(() => {
+                                                    this.exportPDF();
+                                                    if (curTheme == "dark") {
+                                                        this.setState({
+                                                            isDarkMode: true
+                                                        })
+                                                    }
+                                                }, 0)
+                                            })
+                                        } else {
+                                            this.exportPDF();
+                                        }
+                                    }}
+                                    />
                                 </a>
                                 <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                             </div>
@@ -2629,6 +2681,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                         onChange={(e) => { this.setRegionVal(e) }}
                                                         // onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
+                                                        overrideStrings={{
+                                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                            selectSomeItems: i18n.t('static.common.select')
+                                                        }}
                                                         filterOptions={filterOptions}
                                                     />
                                                 </div>
@@ -2652,7 +2708,7 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
 
                                             </FormGroup>
                                             <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                                <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.forecastReport.yAxisInEquivalencyUnit')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2793,29 +2849,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                     <Label
                                                         className="form-check-label"
                                                         check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Show consumption adjusted for stock out?
+                                                        {i18n.t("static.forecastMonthlyErrorReport.showConsumption")}
                                                     </Label>
                                                 </div>
                                             </FormGroup>
-
-                                            {/* <FormGroup className="col-md-3">
-                                                <div className="tab-ml-1" style={{ marginTop: '30px' }}>
-                                                    <Input
-                                                        className="form-check-input checkboxMargin"
-                                                        type="checkbox"
-                                                        id="yaxisEquUnitCb"
-                                                        name="yaxisEquUnitCb"
-                                                        // checked={true}
-                                                        // checked={this.state.yaxisEquUnit}
-                                                        onClick={(e) => { this.yaxisEquUnitCheckbox(e); }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                        Y-axis in equivalency unit?
-                                                    </Label>
-                                                </div>
-                                            </FormGroup> */}
                                         </div>
                                     </div>
                                 </Form>
@@ -2834,9 +2871,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                         {this.state.show && this.state.dataList.length > 0 &&
                                             <div className="table-scroll">
                                                 <ul className="legendcommitversion">
-                                                    <li style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
-                                                    {this.state.showForecastThresholdLegend && <li><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
-                                                    {!this.state.showForecastThresholdLegend && <li><span className="legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThresholdNote')}</i></span></li>}
+                                                    <li className='DarkThColr' style={{ marginLeft: '40px' }}><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
+                                                    {this.state.showForecastThresholdLegend && <li className='DarkThColr'><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>}
+                                                    {!this.state.showForecastThresholdLegend && <li className='DarkThColr'><span className="legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThresholdNote')}</i></span></li>}
                                                 </ul>
                                                 <div className="table-wrap DataEntryTable table-responsive">
                                                     <Table className="table-bordered text-center mt-2 overflowhide main-table " bordered size="sm" >
@@ -2865,9 +2902,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                         let errorDataRegionData = (errorData[0].regionData.filter(arr1 => arr1.region.id == r.value));
                                                                         regionErrorTotal += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : errorDataRegionData[0].errorPerc;
                                                                         regionErrorTotalCount += (errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? 0 : (isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? 0 : 1;
-                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (errorDataRegionData[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(errorDataRegionData[0].errorPerc * 100)}</span>) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                        return (<td title={(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : "") : i18n.t("static.forecastErrorReport.noActualData")}><b>{(errorDataRegionData[0].actualQty === '' || errorDataRegionData[0].actualQty == null) ? (errorDataRegionData[0].forecastQty === '' || errorDataRegionData[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : errorDataRegionData[0].actualQty >= 0 ? ((isNaN(errorDataRegionData[0].errorPerc) || errorDataRegionData[0].errorPerc === '' || errorDataRegionData[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (errorDataRegionData[0].errorPerc * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter(errorDataRegionData[0].errorPerc * 100)}</span>) : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                     })}
-                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? <span className={this.state.showForecastThresholdLegend && ((regionErrorTotal / regionErrorTotalCount) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100)}</span> : 0}</b></td>
+                                                                    <td className="sticky-col first-col clone" align="left"><b>{regionErrorTotalCount > 0 ? <span className={this.state.showForecastThresholdLegend && ((regionErrorTotal / regionErrorTotalCount) * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter((regionErrorTotal / regionErrorTotalCount) * 100)}</span> : 0}</b></td>
                                                                 </tr>
                                                                     {/* actual */}
                                                                     {this.state.regions.filter(arr => arr.regionId == r.value).map(r1 => {
@@ -2934,9 +2971,10 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                                 let differenceRegionData = (differenceData[0].regionData.filter(arr1 => arr1.region.id == r1.regionId));
                                                                                 regionDifferenceTotal += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : isNaN(Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty)) ? 0 : Number(differenceRegionData[0].actualQty - differenceRegionData[0].forecastQty);
                                                                                 regionDifferenceTotalCount += (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 0 : 1;
-                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'black' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                                return (<td style={{ color: (differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? 'text-blackD' : (((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)) < 0 ? 'text-blackD' : 'text-blackD') }}>
+                                                                                    <NumberFormat displayType={'text'} thousandSeparator={true} />{(differenceRegionData[0].actualQty === '' || differenceRegionData[0].actualQty == null) ? '' : (Number((differenceRegionData[0].actualQty) - (isNaN(differenceRegionData[0].forecastQty) ? 0 : differenceRegionData[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                             })}
-                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'black' : 'black' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                            <td className="sticky-col first-col clone text-left" style={{ color: (regionDifferenceTotal / regionDifferenceTotalCount) < 0 ? 'text-blackD' : 'text-blackD' }}>{regionDifferenceTotalCount > 0 ? (Number(regionDifferenceTotal / regionDifferenceTotalCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                                         </tr>)
                                                                     })}
                                                                 </>)
@@ -2949,9 +2987,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : data[0].errorPerc;
                                                                     countError += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? 0 : 1;
-                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (data[0].errorPerc * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter(data[0].errorPerc * 100)}</span> : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
+                                                                    return (<td title={(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? i18n.t("static.forecastErrorReport.noData") : i18n.t("static.forecastErrorReport.noActualData") : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : "" : i18n.t("static.forecastErrorReport.noActualData")}><b>{(data[0].actualQty === '' || data[0].actualQty == null) ? (data[0].forecastQty === '' || data[0].forecastQty == null) ? <i class="fa fa-exclamation-triangle red"></i> : <i class="fa fa-exclamation-triangle red"></i> : data[0].actualQty >= 0 ? (isNaN(data[0].errorPerc) || data[0].errorPerc === '' || data[0].errorPerc == null) ? '' : <span className={this.state.showForecastThresholdLegend && (data[0].errorPerc * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter(data[0].errorPerc * 100)}</span> : <i class="fa fa-exclamation-triangle red"></i>}</b></td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? <span className={this.state.showForecastThresholdLegend && ((totalError / countError) * 100)>this.state.forecastErrorThreshold?'red':""}>{PercentageFormatter((totalError / countError) * 100)}</span> : 0}</b></td>
+                                                                <td className="sticky-col first-col clone" align="left"><b>{countError > 0 ? <span className={this.state.showForecastThresholdLegend && ((totalError / countError) * 100) > this.state.forecastErrorThreshold ? 'red' : ""}>{PercentageFormatter((totalError / countError) * 100)}</span> : 0}</b></td>
                                                             </tr>
                                                             {/* Actual */}
                                                             <tr>
@@ -2985,9 +3023,9 @@ class ConsumptionForecastErrorSupplyPlan extends Component {
                                                                     var data = this.state.dataList.filter(c => moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"))
                                                                     totalDifference += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : isNaN(Number(data[0].actualQty - data[0].forecastQty)) ? 0 : Number(data[0].actualQty - data[0].forecastQty);
                                                                     totalDifferenceCount += (data[0].actualQty === '' || data[0].actualQty == null) ? 0 : 1;
-                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'black' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'black' : 'black') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
+                                                                    return (<td style={{ color: (data[0].actualQty === '' || data[0].actualQty == null) ? 'text-blackD' : (((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)) < 0 ? 'text-blackD' : 'text-blackD') }}><NumberFormat displayType={'text'} thousandSeparator={true} />{(data[0].actualQty === '' || data[0].actualQty == null) ? '' : (Number((data[0].actualQty) - (isNaN(data[0].forecastQty) ? 0 : data[0].forecastQty)).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>)
                                                                 })}
-                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'black' : 'black' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
+                                                                <td className="sticky-col first-col clone text-left" style={{ color: (totalDifference / totalDifferenceCount) < 0 ? 'text-blackD' : 'text-blackD' }}>{totalDifferenceCount > 0 ? (Number(totalDifference / totalDifferenceCount).toFixed(2)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : 0}</td>
                                                             </tr>
                                                         </tbody>
                                                     </Table>

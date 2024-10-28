@@ -8,7 +8,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { Button, ButtonDropdown, CardBody, CardGroup, Col, Container, DropdownItem, DropdownMenu, DropdownToggle, Form, FormFeedback, Input, InputGroup, InputGroupAddon, InputGroupText, Label, Row } from 'reactstrap';
 import * as Yup from 'yup';
-import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
+// import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
 import image3 from '../../../assets/img/PEPFAR-logo.png';
 import imageHelp from '../../../assets/img/help-icon-login.png';
@@ -157,6 +157,7 @@ class Login extends Component {
    */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
+    localStorage.setItem("theme", localStorage.getItem('theme')==undefined?'light':localStorage.getItem('theme'));
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     AuthenticationService.clearUserDetails()
@@ -290,7 +291,8 @@ class Login extends Component {
   render() {
     return (
       <div className="main-content flex-row align-items-center bg-height">
-        <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}>
+        {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
+        <div className="Login-component InnerBgImg ScrollLogin">
           <Container className="container-login">
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
@@ -313,11 +315,42 @@ class Login extends Component {
                   </ButtonDropdown>
                 </div>
               </Col>
-              <Col md="12">
+              {/* <Col md="12">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+              </Col> */}
+              <Row className='pb-lg-5'>
+                <Col md="3">
+                <div className="upper-logo logo-MarginTop">
+                  <img src={image1} className="img-fluid " />
+                </div>
+                </Col>
+                <Col md="8" lg="6">
+  <div style={{ marginBottom: '20px', marginTop:'-25px',fontSize:'14px' }}>
+    {this.state.lang === 'en' ?
+      <p>IMPORTANT! <strong style={{color:'#002f6c'}}>Please upload any unsaved Supply Planning data from your local computer to the server by <strong style={{color:'#002f6c'}}><u className='red'>EOD Friday, November 1st, 2024.</u></strong></strong>
+      Once you've uploaded your data, make sure to <strong style={{color:'#002f6c'}}><u>delete</u></strong> the current version of the 
+      Supply Planning program from QAT. This step is <strong style={{color:'#002f6c'}}><u>crucial</u></strong> to avoid any 
+      issues with using an outdated program. The updated Supply Planning program <strong style={{color:'#002f6c'}}><u>must be re-downloaded</u></strong> for continued use starting <strong style={{color:'#002f6c'}}><u>November 3rd, 2024.</u></strong> Thank you for your attention!</p>:
+      this.state.lang === 'sp' ?
+      <p>¡IMPORTANTE! <strong style={{color:'#002f6c'}}>Cargue todos los datos de planificación de suministro no guardados desde su computadora local al servidor antes del <strong style={{color:'#002f6c'}}><u className='red'>EOD viernes 1 de noviembre de 2024.</u></strong></strong>
+      Una vez que hayas subido tus datos, asegúrate de <strong style={{color:'#002f6c'}}><u>eliminar</u></strong> la versión actual del 
+      Programa de planificación de suministros de QAT. Este paso es <strong style={{color:'#002f6c'}}><u>crucial</u></strong> para evitar cualquier 
+      Problemas con el uso de un programa desactualizado. El programa actualizado de planificación de suministros <strong style={{color:'#002f6c'}}><u>debe volver a descargarse</u></strong> para su uso continuo a partir del <strong style={{color:'#002f6c'}}><u>3 de noviembre de 2024.</u></strong>¡Gracias por su atención!</p>:
+      this.state.lang === 'fr' ?
+      <p>IMPORTANT ! <strong style={{color:'#002f6c'}}>Veuillez télécharger toutes les données de planification des approvisionnements non enregistrées depuis votre ordinateur local vers le serveur en <strong style={{color:'#002f6c'}}><u className='red'>EOD vendredi 1er novembre 2024.</u></strong></strong>
+      Une fois que vous avez téléchargé vos données, assurez-vous de <strong style={{color:'#002f6c'}}><u>supprimer</u></strong> la version actuelle du 
+      Programme de planification des approvisionnements de QAT. Cette étape est <strong style={{color:'#002f6c'}}><u>cruciale</u></strong> pour éviter tout 
+      problèmes liés à l'utilisation d'un programme obsolète. Le programme de planification des approvisionnements mis à jour <strong style={{color:'#002f6c'}}><u>doit être retéléchargé</u></strong> pour une utilisation continue à partir du <strong style={{color:'#002f6c'}}><u>3 novembre 2024.</u></strong> Merci de votre attention !</p> :
+      <p>IMPORTANTE! <strong style={{color:'#002f6c'}}>Faça upload de todos os dados de planejamento de fornecimento não salvos do seu computador local para o servidor até <strong style={{color:'#002f6c'}}><u className='red'>EOD sexta-feira, 1º de novembro de 2024.</u></strong></strong>
+      Depois de fazer upload dos seus dados, certifique-se de <strong style={{color:'#002f6c'}}><u>excluir</u></strong> a versão atual do 
+      Programa de planejamento de suprimentos da QAT. Esta etapa é <strong style={{color:'#002f6c'}}><u>crucial</u></strong> para evitar qualquer 
+      problemas com o uso de um programa desatualizado. O programa de planejamento de suprimentos atualizado <strong style={{color:'#002f6c'}}><u>deve ser baixado novamente</u></strong> para uso contínuo a partir de <strong style={{color:'#002f6c'}}><u>3 de novembro de 2024.</u></strong> Obrigado pela sua atenção!</p>
+    }
+  </div>
               </Col>
+              </Row>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <div className="p-4 Login-card card-marginTop" >
@@ -348,6 +381,8 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
+                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
+                                localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -407,6 +442,8 @@ class Login extends Component {
                                   localStorage.setItem('sessionType', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
+                                  localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
+                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());
@@ -441,8 +478,8 @@ class Login extends Component {
                             setTouched
                           }) => (
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
-                              <h5 id="div1">{i18n.t(this.props.match.params.message)}</h5>
-                              <h5 id="div2">{i18n.t(this.state.message)}</h5>
+                              <h5 id="div1" className='DarkFontbold'>{i18n.t(this.props.match.params.message)}</h5>
+                              <h5 id="div2" className='Colorchangetheme'>{i18n.t(this.state.message)}</h5>
                               <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
                                 <InputGroupAddon addonType="prepend">
@@ -497,18 +534,18 @@ class Login extends Component {
                                     onChange={(e) => { this.dataChangeCheckbox(e) }}
                                   />
                                   <Label
-                                    className="form-check-label ml-2"
+                                    className="form-check-label ml-2 darkModeclrblack darkModeclrblack1"
                                     check htmlFor="inline-radio2">
                                     <b>{i18n.t('static.login.loginOnline')}</b>
                                   </Label>
                                 </InputGroup>
                               </Row>}
                               <Row>
-                                <Col xs="6">
-                                  <Button type="submit" color="primary" className="px-4" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                <Col xs="6" className='DarkMode'>
+                                  <Button type="submit" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
-                                <Col xs="6" className="text-right">
-                                  <Button type="button" color="link" className="px-0" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
+                                <Col xs="6" className="text-right DarkMode">
+                                  <Button type="button" color="link" className="px-0 btn-link" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
                                 </Col>
                               </Row>
                             </Form>
@@ -519,12 +556,12 @@ class Login extends Component {
                 <div className='row align-items-center'>
                   <div className='col-md-6 col-sm-6'>
                     <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '25px', height: '25px' }} /> 
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} /> 
                       {" "+i18n.t('static.ticket.header')}
                     </a>
                   </div>
                   <div className='col-md-6 col-sm-12'>
-                    <h5 className="text-right versionColor">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
+                    <h5 className="text-right versionColor DarkFontbold">{i18n.t('static.common.version')}{APP_VERSION_REACT} | {this.state.apiVersionForDisplay}</h5>
                   </div>
                 </div>
               </Col>
@@ -537,7 +574,7 @@ class Login extends Component {
                     commodities to save lives and create a healthier future for all. The project purchases
                     and delivers health commodities, offers comprehensive technical assistance to strengthen
                     national supply chain systems, and provides global supply chain leadership. For more
-                    information, visit <a href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
+                    information, visit <a className='DarkModeTexta' href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
                     official U.S. government information and does not represent the views or positions of the
                     Agency for International Development or the U.S. government.
                   </p>

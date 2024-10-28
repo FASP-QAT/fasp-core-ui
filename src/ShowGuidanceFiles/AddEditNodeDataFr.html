@@ -42,7 +42,7 @@ a {
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
 							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
@@ -72,19 +72,19 @@ a {
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Nombre #</b></td>
 														<td>Défini à ce nœud</td>
-														<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
 													</tr>
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Pourcentage %</b></td>
 														<td>Défini comme un pourcentage du parent/source</td>
-														<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 													</tr>
 													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
 														<td>Défini comme un pourcentage de la source et des paramètres de l'unité de prévision</td>
-														<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td><b style=" color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 													</tr>
 													<tr>
@@ -158,6 +158,21 @@ a {
 											<ul style="font-size: 13px;">
 												<li><b> Forecasting Node-Type :</b> Select discrete if this product will be used for limited time, and continuous 
 													if it will be used indefinitely.</li>
+
+													<li><b>Besoin de calculer les quantités d'utilisation de produits discrets ? </b>
+														QAT a la possibilité de calculer l'utilisation discrète des produits dans les nœuds d'unité de prévision dans 
+														de deux manières : en préalimentant la quantité discrète consommée par patient au cours du mois 1 
+														(choisissez "Calculer en utilisant une distribution unique" = "Oui") ou en désagrégeant les 
+														quantité discrète consommée par patient et par mois (choisissez « Calculer en utilisant une distribution unique » = « Non »). 
+														Par défaut, QAT utilisera la méthode de chargement anticipé pour calculer l'unité de prévision discrète. 
+														quantités; cependant, les utilisateurs ont la possibilité de choisir la méthode alternative via une radio 
+														bouton. Ce calcul discret alternatif pourrait être utile pour les unités de planification (PU) 
+														qui ont de faibles habitudes de consommation sur une période donnée. Par exemple, si une femme enceinte 
+														il est nécessaire de prendre un complément nutritionnel une fois/mois pendant toute la durée de la grossesse 
+														(neuf mois), QAT calculerait actuellement neuf suppléments au cours du premier mois (frontloading). 
+														Sans préalimentation, QAT calculerait un supplément au mois 1, un supplément au mois 
+														le mois 2, un supplément le mois 3, et ainsi de suite.
+													</li>
 												<li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher 
 													levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field 
 													to indicate this delay.

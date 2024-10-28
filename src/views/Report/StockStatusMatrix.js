@@ -2749,7 +2749,7 @@ export default class StockStatusMatrix extends React.Component {
                             </td>
                             <td className="text-center">{ele.year}</td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2771,7 +2771,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2794,7 +2794,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2817,7 +2817,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2840,7 +2840,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2863,7 +2863,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2886,7 +2886,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2909,7 +2909,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2932,7 +2932,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2955,7 +2955,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -2978,7 +2978,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
@@ -3001,7 +3001,7 @@ export default class StockStatusMatrix extends React.Component {
                                     : ""}
                             </td>
                             <td
-                              className="text-center"
+                              className="text-center countZero"
                               style={this.cellStyle(
                                 ele.planBasedOn,
                                 ele.minMonthsOfStock,
