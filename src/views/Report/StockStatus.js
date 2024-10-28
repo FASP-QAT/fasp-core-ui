@@ -104,7 +104,8 @@ class StockStatus extends Component {
       isAggregate: false,
       PlanningUnitIdDataForExport: "",
       onlyShowAllPUs: false,
-      ppuList: []
+      ppuList: [],
+      graphAggregatedBy: 1,
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -118,6 +119,12 @@ class StockStatus extends Component {
     this.setIsAggregate = this.setIsAggregate.bind(this);
     this.setPlanningUnitExport = this.setPlanningUnitExport.bind(this);
     this.setRealmCountryPlanningUnitExport = this.setRealmCountryPlanningUnitExport.bind(this);
+    this.setGraphAggregatedBy = this.setGraphAggregatedBy.bind(this);
+  }
+  setGraphAggregatedBy(e) {
+    this.setState({
+      graphAggregatedBy: e.target.value
+    })
   }
   setIsAggregate(e) {
     this.setState({
@@ -1216,6 +1223,8 @@ class StockStatus extends Component {
             var count = 0;
             var programCount = 0;
             var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+            var newDatasetArray = [];
+            var graphAggregatedBy = this.state.graphAggregatedBy;
             this.state.programId.map((e, i) => {
               reportingUnitList.map((r, j) => {
                 var viewBy = this.state.viewById;
@@ -1231,11 +1240,13 @@ class StockStatus extends Component {
                   if (count >= 10) {
                     count = 0;
                   }
-                  datasets.push({
-                    label: reportingUnitList.length>1?this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label):(e.label),
+                  newDatasetArray.push({
+                    label: reportingUnitList.length > 1 ? this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label) : (e.label),
                     yAxisID: 'A',
                     stack: 1,
                     order: 1,
+                    programId: graphAggregatedBy == 1 ? e.value : r.value,
+                    programLabel: graphAggregatedBy == 1 ? e.label : r.label,
                     backgroundColor: colourArray[count],
                     borderColor: colourArray[count],
                     pointBackgroundColor: colourArray[count],
@@ -1254,6 +1265,64 @@ class StockStatus extends Component {
                 }
               })
             })
+            newDatasetArray = newDatasetArray.filter(c => c.data.some(c => c != 0));
+            if (this.state.yaxisEquUnit != -1 && (graphAggregatedBy == 1 || graphAggregatedBy == 2)) {
+              var count = 0;
+              var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+              const combinedDataset = newDatasetArray.reduce((acc, item) => {
+                const existingItem = acc.find((entry) => entry.programId === item.programId);
+    
+                if (existingItem) {
+                  // Sum the data arrays if the programId already exists
+                  existingItem.data = existingItem.data.map((value, index) =>
+                    value + (item.data[index] || 0)
+                  );
+                } else {
+                  if (count >= 10) {
+                    count = 0;
+                  }
+                  item.label = item.programLabel;
+                  item.backgroundColor = colourArray[count];
+                  item.borderColor = colourArray[count];
+                  item.pointBackgroundColor = colourArray[count];
+                  item.pointBorderColor = colourArray[count];
+                  item.pointHoverBackgroundColor = colourArray[count];
+                  item.pointHoverBorderColor = colourArray[count];
+                  // Add a new entry for the programId if it doesn't exist in the accumulator
+                  acc.push({ ...item });
+                  count += 1;
+                }
+    
+                return acc;
+              }, []);
+              datasets = datasets.concat(combinedDataset);
+              console.log("Combined dataset Test@123", combinedDataset);
+            } else {
+              var count = 0;
+              var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+              newDatasetArray.map(item => {
+                if (count >= 10) {
+                  count = 0;
+                }
+                item.backgroundColor = colourArray[count];
+                item.borderColor = colourArray[count];
+                item.pointBackgroundColor = colourArray[count];
+                item.pointBorderColor = colourArray[count];
+                item.pointHoverBackgroundColor = colourArray[count];
+                item.pointHoverBorderColor = colourArray[count];
+                count += 1;
+              })
+    
+              const mediaQuery = window.matchMedia('(min-width: 1920px)')
+              if (newDatasetArray.length > 10) {
+                if (mediaQuery.matches) {
+                  height = 400 + (10 * newDatasetArray.length);
+                } else {
+                  height = 400 + (21 * newDatasetArray.length);
+                }
+              }
+              datasets = datasets.concat(newDatasetArray);
+            }
           } else {
             graphLabel = entityname1 + " - " + (this.state.programs.filter(c => c.programId == sortedProgramList[outputIndex])[0].programCode.toString() + " - " + getLabelText(planningUnitItemFilter.reportingUnit.label, this.state.lang));
             datasets.push({
@@ -2489,7 +2558,8 @@ class StockStatus extends Component {
         var count = 0;
         var programCount = 0;
         var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-        var newDatasetArray=[];
+        var newDatasetArray = [];
+        var graphAggregatedBy = this.state.graphAggregatedBy;
         this.state.programId.map((e, i) => {
           reportingUnitList.map((r, j) => {
             var viewBy = this.state.viewById;
@@ -2507,12 +2577,12 @@ class StockStatus extends Component {
                 count = 0;
               }
               newDatasetArray.push({
-                label: reportingUnitList.length>1?this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label):(e.label),
+                label: reportingUnitList.length > 1 ? this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label) : (e.label),
                 yAxisID: 'A',
                 stack: 1,
                 order: 1,
-                programId:e.value,
-                programLabel:e.label,
+                programId: graphAggregatedBy == 1 ? e.value : r.value,
+                programLabel: graphAggregatedBy == 1 ? e.label : r.label,
                 backgroundColor: colourArray[count],
                 borderColor: colourArray[count],
                 pointBackgroundColor: colourArray[count],
@@ -2531,36 +2601,64 @@ class StockStatus extends Component {
             }
           })
         })
-        if(this.state.yaxisEquUnit!=-1){
+        newDatasetArray = newDatasetArray.filter(c => c.data.some(c => c != 0));
+        if (this.state.yaxisEquUnit != -1 && (graphAggregatedBy == 1 || graphAggregatedBy == 2)) {
           var count = 0;
           var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
           const combinedDataset = newDatasetArray.reduce((acc, item) => {
             const existingItem = acc.find((entry) => entry.programId === item.programId);
-          
+
             if (existingItem) {
               // Sum the data arrays if the programId already exists
-              existingItem.data = existingItem.data.map((value, index) => 
+              existingItem.data = existingItem.data.map((value, index) =>
                 value + (item.data[index] || 0)
               );
             } else {
-              item.label=item.programLabel;
-              item.backgroundColor= colourArray[count];
-              item.borderColor= colourArray[count];
-              item.pointBackgroundColor= colourArray[count];
-              item.pointBorderColor= colourArray[count];
-              item.pointHoverBackgroundColor= colourArray[count];
-              item.pointHoverBorderColor= colourArray[count];
+              if (count >= 10) {
+                count = 0;
+              }
+              item.label = item.programLabel;
+              item.backgroundColor = colourArray[count];
+              item.borderColor = colourArray[count];
+              item.pointBackgroundColor = colourArray[count];
+              item.pointBorderColor = colourArray[count];
+              item.pointHoverBackgroundColor = colourArray[count];
+              item.pointHoverBorderColor = colourArray[count];
               // Add a new entry for the programId if it doesn't exist in the accumulator
               acc.push({ ...item });
-              count+=1;
+              count += 1;
             }
-          
+
             return acc;
           }, []);
-          datasets=datasets.concat(combinedDataset);
-          console.log("Combined dataset Test@123",combinedDataset);
-        }else{
-          datasets=datasets.concat(newDatasetArray);
+          datasets = datasets.concat(combinedDataset);
+          console.log("Combined dataset Test@123", combinedDataset);
+        } else {
+          var count = 0;
+          var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+          newDatasetArray.map(item => {
+            if (count >= 10) {
+              count = 0;
+            }
+            item.backgroundColor = colourArray[count];
+            item.borderColor = colourArray[count];
+            item.pointBackgroundColor = colourArray[count];
+            item.pointBorderColor = colourArray[count];
+            item.pointHoverBackgroundColor = colourArray[count];
+            item.pointHoverBorderColor = colourArray[count];
+            count += 1;
+          })
+
+          const mediaQuery = window.matchMedia('(min-width: 1920px)')
+          if (newDatasetArray.length > 10) {
+            if (mediaQuery.matches) {
+              height = 400 + (10 * newDatasetArray.length);
+            } else {
+              height = 400 + (21 * newDatasetArray.length);
+            }
+          }
+
+          datasets = datasets.concat(newDatasetArray);
         }
       }
     }
@@ -2628,6 +2726,8 @@ class StockStatus extends Component {
                   <div className=" pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
+                      <div className="row">
+                      <FormGroup className="col-md-12">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
                         <div className="controls  edit">
                           <Picker
@@ -2640,6 +2740,30 @@ class StockStatus extends Component {
                           >
                             <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                           </Picker>
+                        </div>
+                      </FormGroup>
+                      {this.state.yaxisEquUnit != -1 &&
+                          <FormGroup className="col-md-12">
+                            <Label htmlFor="appendedInputButton">Graph Aggregated By</Label>
+                            <div className="controls ">
+                              <InputGroup>
+                                <Input
+                                  type="select"
+                                  name="graphAggregatedBy"
+                                  id="graphAggregatedBy"
+                                  value={this.state.graphAggregatedBy}
+                                  onChange={(e) => this.setGraphAggregatedBy(e)}
+                                  bsSize="sm"
+                                >
+                                  <option value="1">{i18n.t('static.program.programMaster')}</option>
+                                  <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
+                                  <option value="3">{i18n.t('static.supplyPlan.none')}</option>
+                                </Input>
+
+                              </InputGroup>
+                            </div>
+                          </FormGroup>
+                        }
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
@@ -2681,42 +2805,42 @@ class StockStatus extends Component {
 
                       <FormGroup className="col-md-4" >
                         <div className='row MarginTopfieldsupply'>
-                        <FormGroup check inline className='PaddingLeftSupplyReport' style={{marginTop:'-4px'}}>
-                          <Input
-                            type="radio"
-                            id="viewById"
-                            name="viewById"
-                            style={{ "margin-left": "0px" }}
-                            value={"1"}
-                            checked={this.state.viewById == 1}
-                            title={i18n.t('static.report.planningUnit')}
-                            onChange={this.setViewById}
-                          />
-                          <Label
-                            className="form-check-label"
-                            // check htmlFor="inline-radio1"
-                            title={i18n.t('static.report.planningUnit')}>
-                            {i18n.t('static.report.planningUnit')}
-                          </Label>
-                        </FormGroup>
-                        <FormGroup check inline className='PaddingLeftSupplyReport' style={{marginTop:'-4px'}}>
-                          <Input
-                            type="radio"
-                            id="viewById"
-                            name="viewById"
-                            style={{ "margin-left": "0px" }}
-                            value={"2"}
-                            checked={this.state.viewById == 2}
-                            title={i18n.t('static.planningunit.countrysku')}
-                            onChange={this.setViewById}
-                          />
-                          <Label
-                            className="form-check-label"
-                            // check htmlFor="inline-radio1"
-                            title={i18n.t('static.planningunit.countrysku')}>
-                            {i18n.t('static.planningunit.countrysku')}
-                          </Label>
-                        </FormGroup>
+                          <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
+                            <Input
+                              type="radio"
+                              id="viewById"
+                              name="viewById"
+                              style={{ "margin-left": "0px" }}
+                              value={"1"}
+                              checked={this.state.viewById == 1}
+                              title={i18n.t('static.report.planningUnit')}
+                              onChange={this.setViewById}
+                            />
+                            <Label
+                              className="form-check-label"
+                              // check htmlFor="inline-radio1"
+                              title={i18n.t('static.report.planningUnit')}>
+                              {i18n.t('static.report.planningUnit')}
+                            </Label>
+                          </FormGroup>
+                          <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
+                            <Input
+                              type="radio"
+                              id="viewById"
+                              name="viewById"
+                              style={{ "margin-left": "0px" }}
+                              value={"2"}
+                              checked={this.state.viewById == 2}
+                              title={i18n.t('static.planningunit.countrysku')}
+                              onChange={this.setViewById}
+                            />
+                            <Label
+                              className="form-check-label"
+                              // check htmlFor="inline-radio1"
+                              title={i18n.t('static.planningunit.countrysku')}>
+                              {i18n.t('static.planningunit.countrysku')}
+                            </Label>
+                          </FormGroup>
                         </div>
                         <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "8px" }}>
                           <div className="controls">
@@ -2788,23 +2912,23 @@ class StockStatus extends Component {
                           </div>
                         </FormGroup>
                         <FormGroup style={{ "marginTop": "-10px" }}>
-                        <div className="col-md-12" style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
-                          <Input
-                            className="form-check-input"
-                            type="checkbox"
-                            id="onlyShowAllPUs"
-                            name="onlyShowAllPUs"
-                            checked={this.state.onlyShowAllPUs}
-                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
-                            style={{marginTop:'2px'}}
-                          />
-                          <Label
-                            className="form-check-label"
-                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                            {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
-                          </Label>
-                        </div>
-                      </FormGroup>
+                          <div className={this.state.yaxisEquUnit != 1 ? "col-md-9" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="onlyShowAllPUs"
+                              name="onlyShowAllPUs"
+                              checked={this.state.onlyShowAllPUs}
+                              onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                              style={{ marginTop: '2px' }}
+                            />
+                            <Label
+                              className="form-check-label"
+                              check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                              {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
+                            </Label>
+                          </div>
+                        </FormGroup>
                       </FormGroup>
                       {/* <FormGroup style={{ "marginTop": "-10px" }}>
                         <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
@@ -2866,18 +2990,18 @@ class StockStatus extends Component {
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span align="center" className='text-blackD'><b>{entityname1}</b></span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="programIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.programId.filter(c => [...new Set(this.state.ppuList).map(ele => ele.programId)].includes(c.value)).map(ele => ele.label).join(", ")) : ""}</span>}<br />
                           {(this.state.yaxisEquUnit != -1 || this.state.programId.length > 1) && <span id="planningUnitIdsLabels" align="center" className='text-blackD'>{this.state.programId != undefined && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId) != undefined && this.state.programId.length > 0 && (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).length > 0 ? (this.state.yaxisEquUnit != -1 ? ("EU: " + document.getElementById("yaxisEquUnit").selectedOptions[0].text) : (this.state.viewById == 1 ? this.state.planningUnitId : this.state.realmCountryPlanningUnitId).map(ele => ele.label).join(", ")) : ""}</span>}
-                          <div className="chart-wrapper chart-graph-report">
+                          <div className={this.state.graphAggregatedBy != 3 ? "chart-wrapper chart-graph-report" : "chart-wrapper"} style={this.state.graphAggregatedBy == 3 ? { "height": height + "px" } : {}}>
                             {this.state.stockStatusList[0].planBasedOn == 1 && <Bar id="cool-canvas" data={bar} options={options} />}
                             {this.state.stockStatusList[0].planBasedOn == 2 && <Bar id="cool-canvas" data={bar} options={options1} />}
                           </div>
                           <div id="bars_div" style={{ display: "none" }}>
                             {this.state.isAggregate.toString() == "true" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.data[0].planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.data[0].planBasedOn == 2 && <div className="chart-wrapper chart-graph-report" ><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.data[0].planBasedOn == 1 && <div className={this.state.graphAggregatedBy != 3 ? "chart-wrapper chart-graph-report" : "chart-wrapper"} style={this.state.graphAggregatedBy == 3 ? { "height": height + "px" } : {}}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.data[0].planBasedOn == 2 && <div className={this.state.graphAggregatedBy != 3 ? "chart-wrapper chart-graph-report" : "chart-wrapper"} style={this.state.graphAggregatedBy == 3 ? { "height": height + "px" } : {}} ><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                             {this.state.isAggregate.toString() == "false" && this.state.PlanningUnitDataForExport.map((ele, index) => {
-                              return (<>{ele.planBasedOn == 1 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
-                                {ele.planBasedOn == 2 && <div className="chart-wrapper chart-graph-report"><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
+                              return (<>{ele.planBasedOn == 1 && <div className={this.state.graphAggregatedBy != 3 ? "chart-wrapper chart-graph-report" : "chart-wrapper"} style={this.state.graphAggregatedBy == 3 ? { "height": height + "px" } : {}}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}
+                                {ele.planBasedOn == 2 && <div className={this.state.graphAggregatedBy != 3 ? "chart-wrapper chart-graph-report" : "chart-wrapper"} style={this.state.graphAggregatedBy == 3 ? { "height": height + "px" } : {}}><Bar id={"cool-canvas" + index} data={ele.bar} options={ele.chartOptions} /></div>}</>)
                             })}
                           </div>
                         </div>
