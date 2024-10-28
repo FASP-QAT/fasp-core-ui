@@ -2762,13 +2762,16 @@ export default class BuildTree extends Component {
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
-            copyModalParentLevelList = [];
-            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
-                copyModalParentLevelList.push({
-                    label: { label_en: "Level " + i },
-                    levelNo: i
-                })
+            for (var i = 0; i < (tempCopyModalParentLevelList.length-copyModalParentLevelList.length); i++) {
+                copyModalParentLevelList.pop()
             }
+            // copyModalParentLevelList = [];
+            // for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+            //     copyModalParentLevelList.push({
+            //         label: { label_en: "Level " + i },
+            //         levelNo: i
+            //     })
+            // }
         } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
@@ -11338,7 +11341,7 @@ export default class BuildTree extends Component {
                                                                         name="sharePlanningUnit"
                                                                         value={true}
                                                                         checked={this.state.currentScenario.puNode.sharePlanningUnit == "" || this.state.currentScenario.puNode.sharePlanningUnit == true || this.state.currentScenario.puNode.sharePlanningUnit == "true"}
-                                                                        onChange={(e) => {
+                                                                        onClick={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
                                                                     />
@@ -11356,7 +11359,7 @@ export default class BuildTree extends Component {
                                                                         name="sharePlanningUnit"
                                                                         value={false}
                                                                         checked={this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.currentScenario.puNode.sharePlanningUnit == "false"}
-                                                                        onChange={(e) => {
+                                                                        onClick={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
                                                                     />

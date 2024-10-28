@@ -4400,7 +4400,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <FormGroup className="col-md-3">
                                             <div className="d-flex align-items-center">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
+                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') && localStorage.getItem("sessionType") === "Online" &&
                                                     <div className="d-flex align-items-center ml-3 col-md-12">
                                                         <Input
                                                             className="form-check-input MarginTopCheck"
@@ -4449,17 +4449,17 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-6 pl-lg-3 pt-lg-4">
-                                            {this.state.forecastProgramId && this.state.versionId &&
+                                            {this.state.forecastProgramId && this.state.versionId && this.state.versionId.toString().includes('Local') && 
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
                                                 </a>
                                             }
-                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' &&
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.versionId.toString().includes('Local') && 
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
                                                 </a>
                                             }
-                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA && this.state.versionId.toString().includes('Local') && 
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
                                                 </a>

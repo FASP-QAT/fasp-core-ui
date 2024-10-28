@@ -684,6 +684,7 @@ export default class TreeTable extends Component {
                 programData: ''
             },
             loading: false,
+            treeTableLoading: false,
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             lastRowDeleted: false,
@@ -1557,6 +1558,7 @@ export default class TreeTable extends Component {
                             this.setState({
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
+                                treeTableLoading: false,
                                 color: "green",
                                 isChanged: false,
                                 isTreeDataChanged: false,
@@ -1584,6 +1586,7 @@ export default class TreeTable extends Component {
                                 loading: false,
                                 message: 'Error occured.',
                                 color: "red",
+                                treeTableLoading: false,
                             });
                         }.bind(this)
                     }.bind(this);
@@ -1592,6 +1595,7 @@ export default class TreeTable extends Component {
                             loading: false,
                             message: 'Error occured.',
                             color: "red",
+                            treeTableLoading: false,
                         }, () => {
                             this.hideSecondComponent();
                         });
@@ -1602,6 +1606,7 @@ export default class TreeTable extends Component {
                         loading: false,
                         message: 'Error occured.',
                         color: "red",
+                        treeTableLoading: false,
                     }, () => {
                         this.hideSecondComponent();
                     });
@@ -2793,6 +2798,7 @@ export default class TreeTable extends Component {
     updateTab1Data() {
         this.setState({
             // momJexcelLoader: true
+            treeTableLoading: true
         }, () => {
             setTimeout(() => {
                 if (this.checkValidationTab1()) {
@@ -2889,6 +2895,7 @@ export default class TreeTable extends Component {
     }.bind(this)
     updateTab2Data() {
         this.setState({
+            treeTableLoading: true
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
@@ -3971,6 +3978,7 @@ export default class TreeTable extends Component {
     }
     updateTab3Data() {
         this.setState({
+            treeTableLoading: true
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
@@ -6031,7 +6039,7 @@ export default class TreeTable extends Component {
             <>
                 <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
                     <div className="TreeTable">
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
@@ -6043,7 +6051,7 @@ export default class TreeTable extends Component {
                 </TabPane>
                 <TabPane tabId="2" style={{ paddingBottom: "50px" }}>
                     <div className="TreeTable">
-                        <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv2" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
@@ -6055,7 +6063,7 @@ export default class TreeTable extends Component {
                 </TabPane>
                 <TabPane tabId="3" style={{ paddingBottom: "50px" }}>
                     <div className="TreeTable">
-                        <div id="tableDiv3" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv3" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
@@ -6691,7 +6699,7 @@ export default class TreeTable extends Component {
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0">
+                    <Card className="mb-lg-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
                         <div className="Card-header-reporticon pb-2">
                             {this.state.selectedScenario != "" && this.state.treeId != "" && this.state.programId != "" &&
                                 <div className="card-header-actions">
@@ -6740,7 +6748,7 @@ export default class TreeTable extends Component {
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
                                     <Form>
-                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
                                             <div className="col-md-12 pl-lg-0">
                                                 <Row>
                                                     <FormGroup className="col-md-3 pl-lg-0">
@@ -6815,7 +6823,7 @@ export default class TreeTable extends Component {
                                                 </Row>
                                             </div>
                                         </CardBody>
-                                        <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
+                                        <div style={{ display: !this.state.loading || !this.state.treeTableLoading? "block" : "none" }} class="sample">
                                             <i className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
                                             <i className='text-blackD'>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
@@ -6857,7 +6865,7 @@ export default class TreeTable extends Component {
                                                 </div>
                                             </Provider> */}
                                         </div>
-                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
                                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                 <div class="align-items-center">
                                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
@@ -6870,7 +6878,18 @@ export default class TreeTable extends Component {
                                 </>
                             </div>
                         </CardBody>
-                    </Card></Col></Row>
+                    </Card>
+                    <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                <div class="spinner-border blue ml-4" role="status">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Col>
+            </Row>
             <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">

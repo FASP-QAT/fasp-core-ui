@@ -1597,12 +1597,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     let currDate = Date.now();
     let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
-    let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.datasetId.toString()], "ROLE_FORECAST_VIEWER");
-    // AuthenticationService.getLoggedInUserRole().map(c => {
-    //   if (c.roleId == 'ROLE_FORECAST_VIEWER') {
-    //     hasRole = true;
-    //   }
-    // });
+    // let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([this.state.datasetId.toString()], "ROLE_FORECAST_VIEWER");
+    let hasRole = false;
+    AuthenticationService.getLoggedInUserRole().map(c => {
+      if (c.roleId == 'ROLE_FORECAST_VIEWER') {
+        hasRole = true;
+      }
+    });
     this.setState({
       onlyDownloadedProgram: !hasRole,
       maxDate: maxDateTmp
@@ -1624,115 +1625,162 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     });
     hideSecondComponent();
     if (localStorage.getItem('sessionType') === 'Online') {
-      ForecastingUnitService.getForecastingUnitListAll().then(response => {
-        if (response.status == 200) {
-          this.setState({
-            fuResult: response.data,
-            loading: false
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 409:
-                this.setState({
-                  message: i18n.t('static.common.accessDenied'),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
+      // ForecastingUnitService.getForecastingUnitListAll().then(response => {
+      //   if (response.status == 200) {
+      //     this.setState({
+      //       fuResult: response.data,
+      //       loading: false
+      //     })
+      //   }
+      // }).catch(
+      //   error => {
+      //     if (error.message === "Network Error") {
+      //       this.setState({
+      //         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+      //         loading: false
+      //       });
+      //     } else {
+      //       switch (error.response ? error.response.status : "") {
+      //         case 401:
+      //           this.props.history.push(`/login/static.message.sessionExpired`)
+      //           break;
+      //         case 409:
+      //           this.setState({
+      //             message: i18n.t('static.common.accessDenied'),
+      //             loading: false,
+      //             color: "#BA0C2F",
+      //           });
+      //           break;
+      //         case 403:
+      //           this.props.history.push(`/accessDenied`)
+      //           break;
+      //         case 500:
+      //         case 404:
+      //         case 406:
+      //           this.setState({
+      //             message: error.response.data.messageCode,
+      //             loading: false
+      //           });
+      //           break;
+      //         case 412:
+      //           this.setState({
+      //             message: error.response.data.messageCode,
+      //             loading: false
+      //           });
+      //           break;
+      //         default:
+      //           this.setState({
+      //             message: 'static.unkownError',
+      //             loading: false
+      //           });
+      //           break;
+      //       }
+      //     }
+      //   }
+      // );
     }
-    if (localStorage.getItem('sessionType') === 'Online') {
-      PlanningUnitService.getAllPlanningUnitList().then(response => {
-        if (response.status == 200) {
-          this.setState({
-            puResult: response.data,
-            loading: false
-          })
-        }
-      }).catch(
-        error => {
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 409:
-                this.setState({
-                  message: i18n.t('static.common.accessDenied'),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: error.response.data.messageCode,
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
-          }
-        }
-      );
-    }
+    // if (localStorage.getItem('sessionType') === 'Online') {
+    //   PlanningUnitService.getAllPlanningUnitList().then(response => {
+    //     if (response.status == 200) {
+    //       this.setState({
+    //         puResult: response.data,
+    //         loading: false
+    //       })
+    //     }
+    //   }).catch(
+    //     error => {
+    //       if (error.message === "Network Error") {
+    //         this.setState({
+    //           message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+    //           loading: false
+    //         });
+    //       } else {
+    //         switch (error.response ? error.response.status : "") {
+    //           case 401:
+    //             this.props.history.push(`/login/static.message.sessionExpired`)
+    //             break;
+    //           case 409:
+    //             this.setState({
+    //               message: i18n.t('static.common.accessDenied'),
+    //               loading: false,
+    //               color: "#BA0C2F",
+    //             });
+    //             break;
+    //           case 403:
+    //             this.props.history.push(`/accessDenied`)
+    //             break;
+    //           case 500:
+    //           case 404:
+    //           case 406:
+    //             this.setState({
+    //               message: error.response.data.messageCode,
+    //               loading: false
+    //             });
+    //             break;
+    //           case 412:
+    //             this.setState({
+    //               message: error.response.data.messageCode,
+    //               loading: false
+    //             });
+    //             break;
+    //           default:
+    //             this.setState({
+    //               message: 'static.unkownError',
+    //               loading: false
+    //             });
+    //             break;
+    //         }
+    //       }
+    //     }
+    //   );
+    //   TracerCategoryService.getTracerCategoryListAll()
+    //   .then(response => {
+    //     if (response.status == 200) {
+    //       this.setState({
+    //         tcResult: response.data,
+    //         loading: false
+    //       })
+    //     }
+    // }).catch(
+    //   error => {
+    //       if (error.message === "Network Error") {
+    //           this.setState({
+    //               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+    //               loading: false
+    //           });
+    //       } else {
+    //           switch (error.response ? error.response.status : "") {
+    //               case 401:
+    //                   this.props.history.push(`/login/static.message.sessionExpired`)
+    //                   break;
+    //               case 403:
+    //                   this.props.history.push(`/accessDenied`)
+    //                   break;
+    //               case 500:
+    //               case 404:
+    //               case 406:
+    //                   this.setState({
+    //                       message: error.response.data.messageCode,
+    //                       loading: false
+    //                   });
+    //                   break;
+    //               case 412:
+    //                   this.setState({
+    //                       message: error.response.data.messageCode,
+    //                       loading: false
+    //                   });
+    //                   break;
+    //               default:
+    //                   this.setState({
+    //                       message: 'static.unkownError',
+    //                       loading: false
+    //                   });
+    //                   break;
+    //           }
+    //       }
+    //   }
+    // );
+    // }
     // this.getDatasetList();
     this.getPrograms()
   }
@@ -2807,12 +2855,18 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 totalPlanningUnitPU += totalQtyPU;
               }
             }
-            var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
-            var tracerCategoryListFilter = this.state.tcResult.filter(c => healthAreaList.includes(c.healthArea.id));
-            var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
-            var forecastingUnitList = this.state.fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
-            var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
-            var allPlanningUnitList = this.state.puResult.filter(c => forecastingUnitIds.includes(c.forecastingUnit.forecastingUnitId));
+            // var healthAreaList = [...new Set(datasetJson.healthAreaList.map(ele => (ele.id)))];
+            // var tracerCategoryListFilter = this.state.tcResult.filter(c => healthAreaList.includes(c.healthArea.id));
+            // var tracerCategoryIds = [...new Set(tracerCategoryListFilter.map(ele => (ele.tracerCategoryId)))];
+            // var forecastingUnitList = this.state.fuResult.filter(c => tracerCategoryIds.includes(c.tracerCategory.id));
+            // var forecastingUnitIds = [...new Set(forecastingUnitList.map(ele => (ele.forecastingUnitId)))];
+            var puList=[]
+            var allPlanningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast.toString()=="true").map(c=>{
+              puList.push({
+                "planningUnitId":c.planningUnit.id,
+                "label":c.planningUnit.label
+              })
+            });
             this.setState({
               consumptionList: consumptionList,
               tempConsumptionList: consumptionList,
@@ -2822,12 +2876,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               monthArray: monthArray,
               datasetJson: datasetJson,
               planningUnitList: planningUnitList,
-              forecastingUnitList: forecastingUnitList,
+              forecastingUnitList: [],
               showSmallTable: true,
               loading: false,
               planningUnitTotalList: planningUnitTotalList,
               planningUnitTotalListRegion: planningUnitTotalListRegion,
-              allPlanningUnitList: allPlanningUnitList
+              allPlanningUnitList: puList
             }, () => {
               this.setState({
                 isTableLoaded: this.getTableDiv()
@@ -3425,7 +3479,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            {AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
                               <FormGroup className="col-md-3 ">
                                 <div className="tab-ml-1 ml-lg-3">
                                   <Input
