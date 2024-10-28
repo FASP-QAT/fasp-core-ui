@@ -6699,31 +6699,31 @@ export default class TreeTable extends Component {
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0">
+                    <Card className="mb-lg-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
                         <div className="Card-header-reporticon pb-2">
                             {this.state.selectedScenario != "" && this.state.treeId != "" && this.state.programId != "" &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                            var curTheme = localStorage.getItem("theme");
+                                            if(curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if(curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        />
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
@@ -6878,8 +6878,19 @@ export default class TreeTable extends Component {
                                 </>
                             </div>
                         </CardBody>
-                    </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidanceTreeTable}
+                    </Card>
+                    <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                <div class="spinner-border blue ml-4" role="status">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Col>
+            </Row>
+            <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>

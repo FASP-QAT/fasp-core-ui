@@ -11323,7 +11323,7 @@ export default class BuildTree extends Component {
                                                                         name="sharePlanningUnit"
                                                                         value={true}
                                                                         checked={this.state.currentScenario.puNode.sharePlanningUnit == "" || this.state.currentScenario.puNode.sharePlanningUnit == true || this.state.currentScenario.puNode.sharePlanningUnit == "true"}
-                                                                        onChange={(e) => {
+                                                                        onClick={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
                                                                     />
@@ -11341,7 +11341,7 @@ export default class BuildTree extends Component {
                                                                         name="sharePlanningUnit"
                                                                         value={false}
                                                                         checked={this.state.currentScenario.puNode.sharePlanningUnit == false || this.state.currentScenario.puNode.sharePlanningUnit == "false"}
-                                                                        onChange={(e) => {
+                                                                        onClick={(e) => {
                                                                             this.dataChange(e)
                                                                         }}
                                                                     />
