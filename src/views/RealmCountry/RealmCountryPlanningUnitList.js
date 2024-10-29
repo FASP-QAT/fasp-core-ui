@@ -261,7 +261,7 @@ export default class RealmCountryPlanningUnitList extends Component {
               this.filterData();
               this.setState(
                 {
-                  message: i18n.t(response.data.messageCode, { entityname }),
+                  message: i18n.t('static.message.addUpdateSuccess', { entityname }),
                   color: "green",
                   loading: false,
                 },

@@ -1410,6 +1410,8 @@ class AddprogramPlanningUnit extends Component {
                                         message: i18n.t('static.common.accessDenied'),
                                         loading: false,
                                         color: "#BA0C2F",
+                                    },()=>{
+                                        hideSecondComponent();
                                     });
                                     break;
                                 case 403:

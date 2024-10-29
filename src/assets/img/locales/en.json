@@ -3433,5 +3433,6 @@
   "static.realm.noOfMonthsInPastForBottomDashboard":"No of months in part for bottom dashboard",
   "static.validated.restrictionNoOfMonthsInFutureForTopDashboard":"Please enter No of months in future for top dashboard",
   "static.validated.restrictionNoOfMonthsInPastForBottomDashboard":"Please enter No of months in past for bottom dashboard",
-  "static.common.accessDenied":"You do not access to view this resource"
+  "static.common.accessDenied":"You do not access to view or edit this resource",
+  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully"
 }
