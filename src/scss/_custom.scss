@@ -16921,7 +16921,7 @@ label.arrow_label:before {
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid #ddd;
-  background-color: #f5f5f5;
+  background-color: #fff;
   // height: 100%;
 }
 
@@ -16987,19 +16987,20 @@ label.arrow_label:before {
   opacity: .7;
 }
 
-.card.custom-card .card-header:first-child {
-  border-radius: .625rem .625rem 0 0;
-}
+// .card.custom-card .card-header:first-child {
+//   border-radius: .625rem .625rem 0 0;
+// }
 
 .card.custom-card .card-header {
   padding: 3px 10px !important;
-  background-color: transparent !important;
+  background-color: #a7c6ed !important;
   border-block-end: 1px solid #f3f3f3;
   display: flex;
   align-items: center;
   position: relative;
   flex-wrap: wrap;
   gap: .25rem;
+  border-radius: .5rem .5rem 0px 0px!important;
 }
 
 .card.custom-card .card-header .card-title {
@@ -17069,8 +17070,12 @@ label.arrow_label:before {
   // max-height: 100% !important;
   // min-height: 310px;
   // max-height: 310px;
-  min-height: 55vh !important;
-  max-height: 55vh;
+  // min-height: 20vh !important;
+  // max-height: 20vh;
+  height: 300px; /* Set the desired fixed height */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Prevent content from overflowing outside the card */
 }
 
 @media screen and (min-width: 1920px) {
@@ -17079,8 +17084,12 @@ label.arrow_label:before {
     // max-height: calc(100vh - 0px) !important;
     // height: auto;
     // max-height: 100% !important;
-    min-height: 46vh !important;
-    max-height: 46vh;
+    // min-height: 46vh !important;
+    // max-height: 46vh;
+    height: 300px; /* Set the desired fixed height */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevent content from overflowing outside the card */
   }
 }
 
@@ -17258,15 +17267,16 @@ label.arrow_label:before {
 }
 
 .StockplanningBoxD {
-  max-height: 16vh;
-  min-height: 16vh;
-  // overflow-y: scroll;
+  max-height: 12vh;
+  min-height: 12vh;
+  overflow-y: scroll;
 }
 
 .PieShipment {
-  height: 300px !important;
-  width: 300px !important;
+  // height: 300px !important;
+  // width: 300px !important;
   margin: 0 auto;
+  padding-left: 20px;
 }
 
 .CursorDrag .jss>thead>tr>td:nth-child(2) {
@@ -17306,6 +17316,9 @@ label.arrow_label:before {
   .MarginLeftGobtn {
     margin-left: -94px;
   }
+  .boxHeightBottom{
+    height: 230px!important;
+  }
 }
 
 .MarginTopfieldsupply {
@@ -17338,6 +17351,9 @@ label.arrow_label:before {
     overflow-y: unset;
     height: 600px;
   }
+  .boxHeightBottom{
+    height: 230px!important;
+  }
 }
 
 .CustomHeight,
@@ -17349,12 +17365,23 @@ label.arrow_label:before {
 }
 
 .DashboardBg {
-  background: #fff;
-  border-radius: 0.25rem;
+  background: #f5f5f9;
+  border-radius: .5rem;
 }
 .pie-wrapper canvas{
   margin-bottom: 8px;
 }
 .gaugeHeader{
   height: 40px;
+}
+// .h-100{
+//   height: 100%!important;
+// }
+.scrollable-content {
+  flex: 1; /* Fills the remaining space in the card */
+  overflow-y: auto; /* Adds vertical scroll when content overflows */
+  padding: 10px; /* Add padding if needed */
+}
+.boxHeightBottom{
+  height: 230px!important;
 }

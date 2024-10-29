@@ -2514,13 +2514,13 @@ class ApplicationDashboard extends Component {
           }
         </Row>
         {activeTab1 == 2 && <>
-          <div className='row px-2'>
+          <div className='row px-1'>
             {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
               <div>
                 <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
               </div>
             </div> */}
-            <div className='col-md-12'>
+            <div className='col-md-12 pl-lg-4 pr-lg-4'>
               {/* <div className='row'>
                 <FormGroup className='col-md-3 pl-lg-1 FormGroupD'>
                   <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
@@ -2554,7 +2554,7 @@ class ApplicationDashboard extends Component {
 
               </div> */}
 
-              <div class="col-xl-12 pl-lg-2 pr-lg-2">
+              {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
                 <div class="card custom-card">
                   <div class="card-body px-2 py-2">
                     {/* <div className='row'> */}
@@ -2698,7 +2698,7 @@ class ApplicationDashboard extends Component {
                     </Modal>
                   </div>
                 </div>
-              </div>
+              {/* </div> */}
             </div>
           </div>
           {/* <div className='row'>
@@ -2762,8 +2762,9 @@ class ApplicationDashboard extends Component {
               <div className='row pt-lg-2'>
                 <div className='col-md-12'>
                   <div className='row'>
+                  <div class="col-3">
                     {/* <div className='col-md-4 pl-lg-0'> */}
-                    <FormGroup className='col-md-4 FormGroupD'>
+                    <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
                       <Input
                         type="select"
@@ -2778,8 +2779,10 @@ class ApplicationDashboard extends Component {
                         {bottomProgramList}
                       </Input>
                     </FormGroup>
-                    <FormGroup className='col-md-4' style={{ marginTop: '27px' }}>
-                      <div className="tab-ml-1 ml-lg-4">
+                    </div>
+                    <div style={{ gap: '20px', display: 'flex' }}>
+                        <FormGroup style={{ marginTop: '29px' }}>
+                          <div className="pl-lg-4">
                         <Input
                           className="form-check-input"
                           type="checkbox"
@@ -2796,8 +2799,10 @@ class ApplicationDashboard extends Component {
                         </Label>
                       </div>
                     </FormGroup>
+                    </div>
                     {/* </div> */}
-                    <FormGroup className='col-md-4 pl-lg-0 FormGroupD'>
+                    <div class='col-3'>
+                    <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
@@ -2812,18 +2817,20 @@ class ApplicationDashboard extends Component {
                         </Picker>
                       </div>
                     </FormGroup>
+                    </div>
+                   
                   </div>
                 </div>
               </div>
               {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row pl-lg-1 pr-lg-1'>
                 <div className='col-md-12'>
-                  <div className='row'>
+                  <div className='row pb-lg-0'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight">
-                        <div class="card-header  justify-content-between">
+                        <div class="card-header justify-content-between">
                           <div class="card-title"> Stock Status </div>
                         </div>
-                        <div class="card-body pt-lg-1">
+                        <div class="card-body pt-lg-1 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
                         </div>
                         <div class="card-header  justify-content-between">
@@ -2845,27 +2852,27 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
                       {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card CustomHeight pb-lg-2">
+                      <div className="card custom-card pb-lg-2 CustomHeight">
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
-                        <div class="card-body px-1 py-2" style={{ overflow: 'hidden' }}>
+                        <div class="card-body px-1 py-2 scrollable-content">
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className='col-md-6'>
-                      <div className="card custom-card CustomHeight pb-lg-2">
-                        <div class="card-header  justify-content-between">
+                      <div className="card custom-card pb-lg-2 CustomHeight">
+                        <div class="card-header justify-content-between">
                           <div class="card-title">Shipments </div>
                           <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the shipment <b>{shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
-                        <div class="card-body pt-lg-1">
+                        <div class="card-body pt-lg-1 scrollable-content">
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='col-md-11 pl-lg-2 FormGroupD'>
+                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD'>
                                   <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
                                   <Input
                                     type="select"
@@ -2909,13 +2916,13 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div> */}
                   </div>
-                  <div className='row'>
+                  <div className='row pb-lg-0'>
                     <div className='col-md-6'>
-                      <div class="card custom-card CustomHeight">
-                        <div class="card-header  justify-content-between">
+                      <div class="card custom-card CustomHeight boxHeightBottom">
+                        <div class="card-header justify-content-between">
                           <div class="card-title"> Data Quality (doesn't use date selector) </div>
                         </div>
-                        <div class="card-body py-2">
+                        <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
                               <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
@@ -2959,12 +2966,12 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className='row'>
                         <div class="col-md-12">
-                          <div class="card custom-card CustomHeight pb-lg-2">
+                          <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
                               <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
-                            <div class="card-body px-1 py-2" style={{ overflow: 'hidden' }}>
+                            <div class="card-body px-1 py-2 scrollable-content">
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
                               </div>
                             </div>
