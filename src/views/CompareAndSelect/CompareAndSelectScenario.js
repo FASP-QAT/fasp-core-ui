@@ -742,7 +742,7 @@ class CompareAndSelectScenario extends Component {
                                 totalArray[tsList] < lowerThenConsumptionThreshold ?
                                     (((Number(lowerThenConsumptionThreshold) - Number(totalArray[tsList])) / Number(lowerThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.belowLowestConsumption') :
                                     totalArray[tsList] > higherThenConsumptionThreshold ? (((Number(totalArray[tsList]) - Number(higherThenConsumptionThreshold)) / Number(higherThenConsumptionThreshold)) * 100).toFixed(2) + i18n.t('static.compareAndSelect.aboveHighestConsumption') :
-                                        i18n.t('static.supplyPlanFormula.na') :
+                                        i18n.t('static.forecast.compareAndSelectRangeInfo') :
                                 i18n.t('static.supplyPlanFormula.na') :
                             i18n.t('static.supplyPlanFormula.na'),
                     // actualTotalYear: actualTotalYear
@@ -1608,6 +1608,10 @@ class CompareAndSelectScenario extends Component {
         var json = elInstance.getJson(null, false);
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         for (var j = 0; j < json.length; j++) {
+            //to wrap text of column "Compare to Consumption forecast"
+            var c = elInstance.getCell(('H').concat(parseInt(j) + 1))
+            c.classList.add('cmpAndSelectTbl');
+
             var rowData = elInstance.getRowData(j);
             if (this.state.treeScenarioList[j].readonly) {
                 for (var c = 0; c < colArr.length; c++) {

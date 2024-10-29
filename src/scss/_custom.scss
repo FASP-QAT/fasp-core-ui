@@ -17337,10 +17337,9 @@ label.arrow_label:before {
   .ScrollLogin {
     overflow-y: unset;
     height: 600px;
-  }
-}
-
-.CustomHeight,
+   }
+ }
+ .CustomHeight,
 .dashboardTable2 {
   flex: 1;
   min-height: 0;
@@ -17357,4 +17356,8 @@ label.arrow_label:before {
 }
 .gaugeHeader{
   height: 40px;
+}
+
+.jss>tbody>tr>td.cmpAndSelectTbl {
+  white-space: normal !important;
 }
