@@ -17356,7 +17356,7 @@ label.arrow_label:before {
   }
 }
 
-.CustomHeight,
+ .CustomHeight,
 .dashboardTable2 {
   flex: 1;
   min-height: 0;
@@ -17384,4 +17384,9 @@ label.arrow_label:before {
 }
 .boxHeightBottom{
   height: 230px!important;
+}
+
+.jss>tbody>tr>td.cmpAndSelectTbl {
+  white-space: normal !important;
+
 }
