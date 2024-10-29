@@ -588,7 +588,7 @@ export default class CreateTreeTemplate extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             momListPerParent: [],
-            scalingMonth: new Date(),
+            scalingMonth: -1,
             orgCurrentItemConfig: {},
             tempItems: [],
             preItem: [],
@@ -2597,7 +2597,7 @@ export default class CreateTreeTemplate extends Component {
     copyMoveChange(event) {
         let val;
         let copyModalTree = this.state.treeTemplateId == "" ? -1 : this.state.treeTemplateId;
-        if(copyModalTree == -1) {
+        if (copyModalTree == -1) {
             document.getElementById("treeDropdown").value = -1;
         }
         let copyModalParentLevel;
@@ -2605,27 +2605,27 @@ export default class CreateTreeTemplate extends Component {
         let copyModalTreeList = [];
         let copyModalParentLevelList = [];
         let copyModalParentNodeList = [];
-        let allowedNodeTypeList = []; 
+        let allowedNodeTypeList = [];
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(this.state.copyModalNode.payload.nodeType.id)).map(x => x.id);
         if (event.target.name === "copyMove") {
             val = event.target.id === "copyMoveTrue" ? 1 : 2;
         }
         copyModalTreeList = this.state.treeTemplateList;
         copyModalParentLevelList = this.state.treeTemplate.levelList;
-        if(this.state.copyModalNode.payload.nodeType.id == 5) {
+        if (this.state.copyModalNode.payload.nodeType.id == 5) {
             let allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
             let invalidLevel = [];
-            for(let i = 0; i < copyModalParentLevelList.length; i++) {
+            for (let i = 0; i < copyModalParentLevelList.length; i++) {
                 let tempCopyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevelList[i].levelNo).filter(x => allowedNodeTypeList.includes(parseInt(x.payload.nodeType.id)));
-                if(tempCopyModalParentNodeList.length == 0) {
+                if (tempCopyModalParentNodeList.length == 0) {
                     invalidLevel.push(copyModalParentLevelList[i])
                 }
             }
             copyModalParentLevelList = copyModalParentLevelList.filter(x => !invalidLevel.includes(x))
         }
-        if(val == 1) {
-            if(this.state.copyModalNode.level != 0){
-                copyModalParentLevel = this.state.copyModalNode.level-1;
+        if (val == 1) {
+            if (this.state.copyModalNode.level != 0) {
+                copyModalParentLevel = this.state.copyModalNode.level - 1;
                 copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
                 copyModalParentNode = this.state.copyModalNode.parent;
             } else {
@@ -2633,11 +2633,11 @@ export default class CreateTreeTemplate extends Component {
                 copyModalParentNodeList = [];
                 copyModalParentNode = "";
             }
-        } else if(val == 2) {
-            if(copyModalParentLevelList.length == 1) {
+        } else if (val == 2) {
+            if (copyModalParentLevelList.length == 1) {
                 copyModalParentLevel = copyModalParentLevelList[0].levelNo;
                 copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == copyModalParentLevel);
-                if(copyModalParentNodeList.length == 1) {
+                if (copyModalParentNodeList.length == 1) {
                     copyModalParentNode = copyModalParentNodeList[0].id;
                 } else {
                     copyModalParentNode = "";
@@ -2672,15 +2672,15 @@ export default class CreateTreeTemplate extends Component {
         } else {
             copyModalParentNodeList = this.state.treeTemplate.flatList.filter(m => m.level == e.target.value);
         }
-        if(this.state.copyModalData == 2){
+        if (this.state.copyModalData == 2) {
             copyModalParentNodeList = copyModalParentNodeList.filter(x => x.id != this.state.copyModalNode.parent)
             copyModalParentNodeList = copyModalParentNodeList.filter(x => !x.sortOrder.startsWith(this.state.copyModalNode.sortOrder))
         }
-        if(copyModalParentNodeList.length == 1) {
+        if (copyModalParentNodeList.length == 1) {
             let allowedNodeTypeList = [];
             allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
             let tempParentNode = copyModalParentNodeList.filter(x => x.id == copyModalParentNodeList[0].id)[0].payload.nodeType.id;
-            if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+            if (allowedNodeTypeList.includes(parseInt(tempParentNode))) {
                 invalidNodeError = false;
             } else {
                 invalidNodeError = true;
@@ -2704,7 +2704,7 @@ export default class CreateTreeTemplate extends Component {
         let invalidParentNodeType = "";
         allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(this.state.copyModalNode.payload.nodeType.id))).map(x => parseInt(x.id));
         let tempParentNode = this.state.copyModalParentNodeList.filter(x => x.id == e.target.value)[0].payload.nodeType.id;
-        if(allowedNodeTypeList.includes(parseInt(tempParentNode))) {
+        if (allowedNodeTypeList.includes(parseInt(tempParentNode))) {
             invalidNodeError = false;
         } else {
             invalidNodeError = true;
@@ -2867,7 +2867,7 @@ export default class CreateTreeTemplate extends Component {
      * 
      */
     calculateParentValueFromMOM(month, increaseScalingMonth) {
-        console.log("inside ===> 1")
+        console.log("inside ===>", month, "====", increaseScalingMonth, "===", (month == -1 ? parseInt(month) + 2 : parseInt(month) + 1))
         var parentValue = 0;
         var currentItemConfig = this.state.currentItemConfig;
         if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
@@ -2889,7 +2889,7 @@ export default class CreateTreeTemplate extends Component {
             var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[0][0].dataValue;
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
         }
-        this.setState({ parentValue, currentItemConfig, scalingMonth: increaseScalingMonth ? parseInt(month) + 1 : this.state.scalingMonth }, () => {
+        this.setState({ parentValue, currentItemConfig, scalingMonth: increaseScalingMonth ? (month == -1 ? parseInt(month) + 2 : parseInt(month) + 1) : this.state.scalingMonth }, () => {
         });
     }
     /**
@@ -3078,8 +3078,8 @@ export default class CreateTreeTemplate extends Component {
             newItems.push(e)
         }
         for (var i = 0; i < newItems.length; i++) {
-            if(newItems[i].payload.downwardAggregationList || newItems[i].payload.nodeType.id == 6) {
-                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
+            if (newItems[i].payload.downwardAggregationList || newItems[i].payload.nodeType.id == 6) {
+                if (!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
                     treeLevelItems.push({
                         annotationType: AnnotationType.HighlightPath,
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
@@ -3089,8 +3089,8 @@ export default class CreateTreeTemplate extends Component {
                         showArrows: false
                     })
                 }
-                for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if(this.state.showConnections){
+                for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                    if (this.state.showConnections) {
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
                             fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -3114,7 +3114,7 @@ export default class CreateTreeTemplate extends Component {
                         showArrows: false
                     })
                     var tempValidLines = newItems.filter(x => x.payload.nodeType.id != 6).filter(x => x.id != parseInt(newItems[i].id));
-                    for(var k = 0; k < tempValidLines.length; k++) {
+                    for (var k = 0; k < tempValidLines.length; k++) {
                         treeLevelItems.push({
                             annotationType: AnnotationType.HighlightPath,
                             items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
@@ -3291,7 +3291,7 @@ export default class CreateTreeTemplate extends Component {
         }
     }
     downwardAggregationListChange(daList) {
-        console.log("Test@@@ daList",daList)
+        console.log("Test@@@ daList", daList)
         this.setState({
             isChanged: true
         })
@@ -3302,12 +3302,12 @@ export default class CreateTreeTemplate extends Component {
             scenarioId: x.value.split("~")[1],
             nodeId: x.value.split("~")[2]
         }))
-        console.log("Test@@@ tempList",tempList)
+        console.log("Test@@@ tempList", tempList)
         currentItemConfig.context.payload.downwardAggregationList = tempList;
         this.setState({
             currentItemConfig: currentItemConfig,
         })
-        if(tempList.length == 0) {
+        if (tempList.length == 0) {
             this.setState({
                 multiselectError: true
             })
@@ -4881,20 +4881,20 @@ export default class CreateTreeTemplate extends Component {
             var tempCalculatedValue = momListParentForMonth.length > 0 ? momListParentForMonth[0].calculatedValue : 0;
             var tempRepeatCountConvertToMonth = tempFuNode && tempFuNode.repeatUsagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatUsagePeriod.usagePeriodId))[0].convertToMonth : 1;
             var tempNConvertToMonth = tempFuNode && tempFuNode.usagePeriod ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod.usagePeriodId))[0].convertToMonth : 1;
-            if(this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false") {
+            if (this.state.currentItemConfig.context.payload.nodeType.id == 4 && tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false") {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
-                var tempNoOfMonths=Number(tempMonth)-Math.floor(Number(tempMonth));
+                var tempNoOfMonths = Number(tempMonth) - Math.floor(Number(tempMonth));
                 tempCalculatedValue = 0;
                 var f = momListParent.filter(c => c.month > (c.month <= 0 ? momList[j].month - tempMonth - 1 : momList[j].month - tempMonth) && c.month <= momList[j].month);
-                f.map((item,index) => {
-                    if(f.length>1 && (index!=f.length-1)){
+                f.map((item, index) => {
+                    if (f.length > 1 && (index != f.length - 1)) {
                         tempCalculatedValue += item.calculatedValue;
-                    }else if(f.length==1 || tempNoOfMonths==0){
+                    } else if (f.length == 1 || tempNoOfMonths == 0) {
                         tempCalculatedValue += item.calculatedValue;
                     }
                 })
-                if(f.length>=2){
-                    tempCalculatedValue += tempNoOfMonths*f[f.length-1].calculatedValue;
+                if (f.length >= 2) {
+                    tempCalculatedValue += tempNoOfMonths * f[f.length - 1].calculatedValue;
                 }
             }
             data[7] = momListParentForMonth.length > 0 ? parseFloat(momListParentForMonth[0].calculatedValue).toFixed(2) : 0;
@@ -4903,7 +4903,7 @@ export default class CreateTreeTemplate extends Component {
             data[10] = this.state.currentItemConfig.context.payload.nodeType.id == 4 || (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) ? j >= lagInMonths ? `=IF(R${parseInt(j) + 1 - lagInMonths}<0,0,R${parseInt(j) + 1 - lagInMonths})` : 0 : `=IF(R${parseInt(j) + 1}<0,0,R${parseInt(j) + 1})`;
             data[11] = `=ROUND(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,B${parseInt(j) + 1}+C${parseInt(j) + 1}),2)`
             data[12] = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].manualChangesEffectFuture;
-            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing!=undefined && tempFuNode.oneTimeDispensing!=null && tempFuNode.oneTimeDispensing.toString()!="" && tempFuNode.oneTimeDispensing.toString()=="false" ? tempNConvertToMonth * tempFuNode.usageFrequency * tempFuNode.noOfForecastingUnitsPerPerson: this.state.noFURequired)) : 1;
+            data[13] = this.state.currentItemConfig.context.payload.nodeType.id == 4 ? ((this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (tempFuNode.oneTimeUsage.toString() == "false" && tempFuNode.oneTimeDispensing != undefined && tempFuNode.oneTimeDispensing != null && tempFuNode.oneTimeDispensing.toString() != "" && tempFuNode.oneTimeDispensing.toString() == "false" ? tempNConvertToMonth * tempFuNode.usageFrequency * tempFuNode.noOfForecastingUnitsPerPerson : this.state.noFURequired)) : 1;
             data[14] = `=FLOOR.MATH(${j}/${monthsPerVisit},1)`;
             if (this.state.currentItemConfig.context.payload.nodeType.id == 5 && parentNodeNodeData.fuNode.usageType.id == 2) {
                 var dataValue = 0;
@@ -5327,9 +5327,6 @@ export default class CreateTreeTemplate extends Component {
      * Builds Jexcel table for modeling data
      */
     buildModelingJexcel() {
-        console.log("inside ===> 2")
-
-        console.log("====>", this.state.scalingMonth)
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
         var dataArray = [];
@@ -5481,7 +5478,7 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth,
+                    title: i18n.t('static.tree.calculatedChangeForMonth') + " " + (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo == -1 ? parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 2 : parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1),
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -6155,7 +6152,7 @@ export default class CreateTreeTemplate extends Component {
         var nodeType;
         var nodeTypeList = [];
         var downwardAggregationList = [];
-        this.state.treeTemplate.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => downwardAggregationList.push({label: t.payload.label.label_en, value: this.state.treeTemplate.treeTemplateId+"~"+"0"+"~"+t.payload.nodeId}));
+        this.state.treeTemplate.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => downwardAggregationList.push({ label: t.payload.label.label_en, value: this.state.treeTemplate.treeTemplateId + "~" + "0" + "~" + t.payload.nodeId }));
         // for(var i = 0; i < this.state.treeTemplate.length; i++) {
         //     for(var j = 0; j < this.state.treeTemplate[i].scenarioList.length; j++) {
         //         if(this.state.treeTemplate[i].scenarioList[j].active) {
@@ -6166,7 +6163,7 @@ export default class CreateTreeTemplate extends Component {
         //         }
         //     }
         // }
-        var funnelChildNodes = this.state.treeTemplate.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x =>x.id.toString())
+        var funnelChildNodes = this.state.treeTemplate.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x => x.id.toString())
         downwardAggregationList = downwardAggregationList.filter(x => !funnelChildNodes.includes(x.value.split("~")[2]))
         if (nodeTypeId != 0) {
             nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
@@ -6177,7 +6174,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             nodeTypeList = this.state.nodeTypeList.filter(c => c.id != 5);
         }
-        console.log("Test@@@ downwardAggregationList",downwardAggregationList)
+        console.log("Test@@@ downwardAggregationList", downwardAggregationList)
         this.setState({
             nodeTypeFollowUpList: nodeTypeList,
             downwardAggregationList: downwardAggregationList
@@ -6327,11 +6324,11 @@ export default class CreateTreeTemplate extends Component {
                 child.parent = this.state.copyModalParentNode;
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
-                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
+                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
                 // if(child.payload.nodeType.id == 6 ){
                 //     child.payload.downwardAggregationList = [];
                 // }
-                if(child.payload.downwardAggregationAllowed) {
+                if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
@@ -6353,11 +6350,11 @@ export default class CreateTreeTemplate extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
-                child.level = child.parent.level+1;
-                if(child.payload.nodeType.id == 6 ){
+                child.level = child.parent.level + 1;
+                if (child.payload.nodeType.id == 6) {
                     child.payload.downwardAggregationList = [];
                 }
-                if(child.payload.downwardAggregationAllowed) {
+                if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
                 var parentSortOrder = parentNode.newSortOrder;
@@ -6385,13 +6382,13 @@ export default class CreateTreeTemplate extends Component {
             if (indexItems != -1) {
                 let invalidTransfer = [];
                 var nodeDataModelingList = (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList;
-                if(!this.state.copyModeling) {
+                if (!this.state.copyModeling) {
                     nodeDataModelingList = nodeDataModelingList.filter(x => (x.transferNodeDataId != "" && x.transferNodeDataId != null && x.transferNodeDataId != "null"));
                 }
                 if (nodeDataModelingList.length > 0) {
                     nodeDataModelingList.map((item1, c) => {
                         var newTransferId = childListBasedOnScenarion.filter(c => c.oldId == item1.transferNodeDataId);
-                        if(newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
+                        if (newTransferId.length == 0 && item1.transferNodeDataId != null && item1.transferNodeDataId != "null" && item1.transferNodeDataId != "") {
                             invalidTransfer.push(item1.nodeDataModelingId);
                         }
                         try {
@@ -6401,7 +6398,7 @@ export default class CreateTreeTemplate extends Component {
                         }
                     })
                 }
-                (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId)); 
+                (items[indexItems].payload.nodeDataMap[0])[0].nodeDataModelingList = nodeDataModelingList.filter(x => !invalidTransfer.includes(x.nodeDataModelingId));
             }
         })
         this.setState({
@@ -6410,7 +6407,7 @@ export default class CreateTreeTemplate extends Component {
             isTemplateChanged: true,
         }, () => {
             this.calculateMOMData(itemConfig.parent, 2).then(() => {
-                if(this.state.copyModalData == 2) {
+                if (this.state.copyModalData == 2) {
                     this.onRemoveButtonClick(itemConfig);
                 }
                 this.setState({
@@ -7438,21 +7435,21 @@ export default class CreateTreeTemplate extends Component {
      * Reterives node type, usage template, procurement agent, forecast method, unit, usage period, usage type, tracer category, modeling type and tree template list on component mount
      */
     componentDidMount() {
-         // Detect initial theme
+        // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
-    
+
         // Listening for theme changes
         const observer = new MutationObserver(() => {
             const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
             this.setState({ isDarkMode: updatedDarkMode });
         });
-    
+
         observer.observe(document.documentElement, {
             attributes: true,
             attributeFilter: ['data-theme'],
         });
-    
+
         this.getNodeTyeList();
         this.getUsageTemplateList(0);
         this.procurementAgentList();
@@ -8331,7 +8328,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             if (tab == 2) {
-                this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
+                // this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
@@ -8372,9 +8369,9 @@ export default class CreateTreeTemplate extends Component {
      */
     resetTree() {
         this.setState({
-            isChanged:false,
-            isTemplateChanged:false
-        },()=>{
+            isChanged: false,
+            isTemplateChanged: false
+        }, () => {
             this.componentDidMount();
         })
     }
@@ -8718,7 +8715,7 @@ export default class CreateTreeTemplate extends Component {
                 (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.noOfPersons = 1;
             }
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usageType.id = event.target.value;
-            let usagePeriodJson = {usagePeriodId: 1 };//to fix error at the time of edit template
+            let usagePeriodJson = { usagePeriodId: 1 };//to fix error at the time of edit template
             (currentItemConfig.context.payload.nodeDataMap[0])[0].fuNode.usagePeriod = usagePeriodJson;
             this.getUsageText();
         }
@@ -9143,7 +9140,7 @@ export default class CreateTreeTemplate extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == data.context.payload.nodeId) ? sourceNodeUsageList.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == data.context.payload.nodeId) ? sourceNodeUsageList.push({ treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -9247,7 +9244,7 @@ export default class CreateTreeTemplate extends Component {
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
     updateNodeInfoInJson(currentItemConfig) {
-        console.log("Test@@@ currentItemConfig",currentItemConfig)
+        console.log("Test@@@ currentItemConfig", currentItemConfig)
         let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
@@ -9428,7 +9425,7 @@ export default class CreateTreeTemplate extends Component {
             },
             onpaste: function (instance, data) {
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].x == 1){
+                    if (data[i].x == 1) {
                         (instance).setValueFromCoords(1, data[i].y, Math.round(data[i].value), true);
                     }
                 }
@@ -9629,12 +9626,12 @@ export default class CreateTreeTemplate extends Component {
      */
     tabPane1() {
         const darkModeColors = [
-            '#d4bbff',   
+            '#d4bbff',
         ];
-        
+
         const lightModeColors = [
             '#002F6C',  // Color 1    
-        ]; 
+        ];
         const { isDarkMode } = this.state;
         const colors = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -9769,7 +9766,7 @@ export default class CreateTreeTemplate extends Component {
                                         : this.state.currentItemConfig.context.payload.nodeUnit.id != "" ? getLabelText(this.state.nodeUnitList.filter(c => c.unitId == this.state.currentItemConfig.context.payload.nodeUnit.id)[0].label, this.state.lang)
                                             : ""
                                 : "",
-                                fontColor: fontColor
+                            fontColor: fontColor
                         },
                         stacked: false,
                         ticks: {
@@ -10135,7 +10132,7 @@ export default class CreateTreeTemplate extends Component {
                                                     </Popover>
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==3?i18n.t('static.tree.percentageNodeValue'):i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                    <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 3 ? i18n.t('static.tree.percentageNodeValue') : i18n.t('static.tree.percentageOfParent'))}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                     <InputGroup>
                                                         <Input type="number"
                                                             id="percentageOfParent"
@@ -10177,7 +10174,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
-                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id==2?i18n.t('static.tree.numberNodeValue'):i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
+                                                        <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? i18n.t('static.tree.numberNodeValue') : i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id >= 4) &&
                                                         <Label htmlFor="currencyId"> {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].dataValue} % of {i18n.t('static.tree.parentValue')} {i18n.t('static.common.for')} {i18n.t("static.ManageTree.Month")} {this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo} {this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
                                                     <Input type="text"
@@ -10214,7 +10211,7 @@ export default class CreateTreeTemplate extends Component {
                                                         name="downwardAggregationList"
                                                         id="downwardAggregationList"
                                                         options={this.state.downwardAggregationList.length > 0 ? this.state.downwardAggregationList : []}
-                                                        value={this.state.currentItemConfig.context.payload.downwardAggregationList ? this.state.currentItemConfig.context.payload.downwardAggregationList.map(x => ({value: x.treeId + "~" + x.scenarioId + "~" + x.nodeId, label: this.state.downwardAggregationList.filter(t => t.value == (x.treeId + "~" + x.scenarioId + "~" + x.nodeId))[0].label})) : []}
+                                                        value={this.state.currentItemConfig.context.payload.downwardAggregationList ? this.state.currentItemConfig.context.payload.downwardAggregationList.map(x => ({ value: x.treeId + "~" + x.scenarioId + "~" + x.nodeId, label: this.state.downwardAggregationList.filter(t => t.value == (x.treeId + "~" + x.scenarioId + "~" + x.nodeId))[0].label })) : []}
                                                         onChange={(e) => { this.downwardAggregationListChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
@@ -10234,7 +10231,7 @@ export default class CreateTreeTemplate extends Component {
                                                     {this.state.sourceNodeUsageList.length == 0 && <b className='red'>{i18n.t('static.tree.notUsed')}</b>}<br></br>
                                                     {this.state.sourceNodeUsageList.map(sn => (<>
                                                         {sn.nodeName}
-                                                    <br></br></>))}
+                                                        <br></br></>))}
                                                 </div>}
                                             </div>
                                         </>
@@ -10950,7 +10947,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="oneTimeDispensingTrue"
                                                         name="oneTimeDispensing"
                                                         value={"true"}
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString()!=""?this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString():"true") : "") == "true" ? true : false}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString() != "" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? true : false}
                                                         onChange={(e) => {
                                                             this.dataChange(e)
                                                         }}
@@ -10968,7 +10965,7 @@ export default class CreateTreeTemplate extends Component {
                                                         id="oneTimeDispensingFalse"
                                                         name="oneTimeDispensing"
                                                         value={"false"}
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing!=null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString()!=""?this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString():"true") : "") == "true" ? false : true}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing != undefined && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing != null && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString() != "" ? this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? false : true}
                                                         onChange={(e) => {
                                                             this.dataChange(e)
                                                         }}
@@ -11188,7 +11185,7 @@ export default class CreateTreeTemplate extends Component {
                                                         </Input>
                                                         <FormFeedback className="red">{errors.repeatUsagePeriodId}</FormFeedback>
                                                     </FormGroup>
-                                                    </>
+                                                </>
                                             </>
                                             <>
                                                 <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? 'block' : 'none' }}>
@@ -11793,86 +11790,7 @@ export default class CreateTreeTemplate extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox4 = (e) => {
-        this.pickAMonth4.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange4 = (year, month) => {
-        this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis4 = (value) => {
-    }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox5 = (e) => {
-        this.pickAMonth5.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange5 = (year, month) => {
-        this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis5 = (value) => {
-    }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox1 = (e) => {
-        this.pickAMonth1.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange1 = (year, month) => {
-        var month = parseInt(month) < 10 ? "0" + month : month
-        var date = year + "-" + month + "-" + "01"
-        let { currentItemConfig } = this.state;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
-        this.setState({ currentItemConfig }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis1 = (value) => {
-        let month = value.year + '-' + value.month + '-01';
-        this.setState({ singleValue2: value, }, () => {
-            this.calculateParentValueFromMOM(month, false);
-        })
-    }
+
     /**
      * Export tree in word file
      */
@@ -11946,7 +11864,7 @@ export default class CreateTreeTemplate extends Component {
             if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 row = row.concat(addCommas(this.getPayloadData(items[i], 1)))
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
-            } else if(items[i].payload.nodeType.id == 6) {
+            } else if (items[i].payload.nodeType.id == 6) {
                 row = row.concat(this.getPayloadData(items[i], 2).split(" ")[1])
                 row1 = row1.concat(" ").concat(items[i].payload.label.label_en)
             } else {
@@ -11978,7 +11896,7 @@ export default class CreateTreeTemplate extends Component {
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         row = row.concat("NA ")
                         row1 = row1.concat(" Subtotal")
-                    } else if(items[i].payload.nodeType.id != 6) {
+                    } else if (items[i].payload.nodeType.id != 6) {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
@@ -12052,10 +11970,10 @@ export default class CreateTreeTemplate extends Component {
             var illegalNode = false;
             var outerLink = false;
             var itemConfigParent = this.state.treeTemplate.flatList.filter(x => x.id == itemConfig.parent);
-            var allowedNodeTypeList = []; 
-            if(itemConfigParent.length > 0) {
+            var allowedNodeTypeList = [];
+            if (itemConfigParent.length > 0) {
                 allowedNodeTypeList = this.state.nodeTypeList.filter(x => x.allowedChildList.includes(parseInt(itemConfig.payload.nodeType.id))).map(x => x.id);
-                if(allowedNodeTypeList.includes(parseInt(itemConfigParent[0].payload.nodeType.id))){
+                if (allowedNodeTypeList.includes(parseInt(itemConfigParent[0].payload.nodeType.id))) {
                     illegalNode = false;
                 } else {
                     illegalNode = true;
@@ -12071,7 +11989,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             var sourceNodeUsageListCount = [];
-            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
@@ -12088,7 +12006,7 @@ export default class CreateTreeTemplate extends Component {
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 4) == true && <i class="fa fa-long-arrow-up" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 6) == true && <i class="fa fa-long-arrow-down" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
                                     {itemConfig.payload.nodeType.id != 1 && this.getPayloadData(itemConfig, 5) == true && <i class="fa fa-link" style={{ fontSize: '11px', color: (itemConfig.payload.nodeType.id == 4 || itemConfig.payload.nodeType.id == 5 ? '#fff' : '#002f6c') }}></i>}
-                                    <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : (itemConfig.payload.nodeType.id == 6 ? <><span style={{color: '#002f6c'}} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                    <b style={{ color: '#212721', float: 'right' }}>{itemConfig.payload.nodeType.id == 4 ? itemConfig.payload.nodeDataMap[0][0].fuNode.usageType.id == 2 ? <b style={{ fontSize: '14px', color: '#fff' }}>c </b> : <b style={{ fontSize: '14px', color: '#fff' }}>d </b> : ""}{itemConfig.payload.nodeType.id == 2 ? <i class="fa fa-hashtag" style={{ fontSize: '11px', color: '#002f6c' }}></i> : (itemConfig.payload.nodeType.id == 3 ? <i class="fa fa-percent " style={{ fontSize: '11px', color: '#002f6c' }} ></i> : (itemConfig.payload.nodeType.id == 4 ? <i class="fa fa-cube" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 5 ? <i class="fa fa-cubes" style={{ fontSize: '11px', color: '#fff' }} ></i> : (itemConfig.payload.nodeType.id == 1 ? <i><img src={AggregationNode} className="AggregationNodeSize" /></i> : (itemConfig.payload.nodeType.id == 6 ? <><span style={{ color: '#002f6c' }} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
                                     {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
                                     {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 </div>
@@ -12106,7 +12024,7 @@ export default class CreateTreeTemplate extends Component {
             let itemTitleColor = Colors.RoyalBlue;
             var sourceNodeUsageListCount = [];
             var outerLink = false;
-            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
+            this.state.treeTemplate.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: this.state.treeTemplate.treeTemplateId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: "", scenarioName: "", nodeName: f.payload.label.label_en, }) : "")) : "");
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[0][0].notes} style={{ height: "88px", width: "200px", zIndex: "1" }}>
                     <div className={outerLink ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : itemConfig.payload.nodeType.id == 5
@@ -12225,10 +12143,10 @@ export default class CreateTreeTemplate extends Component {
                 }));
             }
         }
-        var newItems = this.state.items;       
+        var newItems = this.state.items;
         for (var i = 0; i < newItems.length; i++) {
-            if(newItems[i].payload.nodeType.id == 6) {
-                if(!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
+            if (newItems[i].payload.nodeType.id == 6) {
+                if (!newItems[i].payload.downwardAggregationList || newItems[i].payload.downwardAggregationList.length == 0) {
                     treeLevelItems.push({
                         annotationType: AnnotationType.HighlightPath,
                         items: [parseInt(newItems[i].id), parseInt(newItems[i].parent)],
@@ -12238,8 +12156,8 @@ export default class CreateTreeTemplate extends Component {
                         showArrows: false
                     })
                 } else {
-                    for(var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                        if(true) {
+                    for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
+                        if (true) {
                             treeLevelItems.push(new ConnectorAnnotationConfig({
                                 annotationType: AnnotationType.Connector,
                                 fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -12263,7 +12181,7 @@ export default class CreateTreeTemplate extends Component {
                             showArrows: false
                         })
                         var tempValidLines = newItems.filter(x => x.parent == newItems[i].parent).filter(x => x.id != parseInt(newItems[i].id));
-                        for(var k = 0; k < tempValidLines.length; k++) {
+                        for (var k = 0; k < tempValidLines.length; k++) {
                             treeLevelItems.push({
                                 annotationType: AnnotationType.HighlightPath,
                                 items: [parseInt(tempValidLines[k].id), parseInt(newItems[i].parent)],
@@ -12289,12 +12207,14 @@ export default class CreateTreeTemplate extends Component {
             linesColor: Colors.Black,
             annotations: treeLevelItems,
             onLevelBackgroundRender: ((data) => {
-                var {context, width, height } = data;
+                var { context, width, height } = data;
                 var { title, fillColor, opacity } = context;
                 return !opacity ? <div style={{
-                    background: "#212631"}}>
+                    background: "#212631"
+                }}>
                 </div> : <div style={{
-                  background: "#212631"}}>
+                    background: "#212631"
+                }}>
                 </div>
             }),
             onLevelTitleRender: ((data) => {
@@ -12362,24 +12282,24 @@ export default class CreateTreeTemplate extends Component {
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
                         {this.state.editable &&
-                                    <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
-                                        onClick={(event) => {
-                                            event.stopPropagation();
-                                            this.setState({
-                                                copyModal: true,
-                                                copyModalData: "",
-                                                copyModalTree: "",
-                                                copyModalParentLevel: "",
-                                                copyModalParentNode: "",
-                                                copyModalTreeList: [],
-                                                copyModalParentLevelList: [],
-                                                copyModalParentNodeList: [],
-                                                copyModalNode: JSON.parse(JSON.stringify(itemConfig))
-                                            })
-                                            // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
-                                        }}>
-                                        <i class="fa fa-paste" aria-hidden="true"></i>
-                                    </button>
+                            <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
+                                onClick={(event) => {
+                                    event.stopPropagation();
+                                    this.setState({
+                                        copyModal: true,
+                                        copyModalData: "",
+                                        copyModalTree: "",
+                                        copyModalParentLevel: "",
+                                        copyModalParentNode: "",
+                                        copyModalTreeList: [],
+                                        copyModalParentLevelList: [],
+                                        copyModalParentNodeList: [],
+                                        copyModalNode: JSON.parse(JSON.stringify(itemConfig))
+                                    })
+                                    // this.duplicateNode(JSON.parse(JSON.stringify(itemConfig)));
+                                }}>
+                                <i class="fa fa-paste" aria-hidden="true"></i>
+                            </button>
                         }
                         {itemConfig.parent != null &&
                             <>
@@ -12538,8 +12458,12 @@ export default class CreateTreeTemplate extends Component {
                                         this.setState({
                                             orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
                                         }, () => {
-                                            this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
-                                            this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, false);
+                                            setTimeout(() => {
+                                                this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
+                                                this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, true);
+                                                console.log("inside ===>scalingmonth", this.state.scalingMonth)
+
+                                            }, 0);
                                         });
                                         if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
                                             this.getUsageTemplateList(0);
@@ -12652,13 +12576,13 @@ export default class CreateTreeTemplate extends Component {
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')}
                                         onClick={() => {
                                             var curTheme = localStorage.getItem("theme");
-                                            if(curTheme == "dark") {
+                                            if (curTheme == "dark") {
                                                 this.setState({
                                                     isDarkMode: false
                                                 }, () => {
                                                     setTimeout(() => {
                                                         this.exportPDF();
-                                                        if(curTheme == "dark") {
+                                                        if (curTheme == "dark") {
                                                             this.setState({
                                                                 isDarkMode: true
                                                             })
@@ -12669,7 +12593,7 @@ export default class CreateTreeTemplate extends Component {
                                                 this.exportPDF();
                                             }
                                         }}
-                                        
+
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={docicon} title={i18n.t('static.report.exportWordDoc')} onClick={() => this.exportDoc()} />
                                     {this.state.treeTemplate.treeTemplateId > 0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && (this.state.treeTemplate.flatList[0].payload.nodeType.id == 1 || this.state.treeTemplate.flatList[0].payload.nodeType.id == 2) ? <span style={{ cursor: 'pointer' }} onClick={this.createTree}> <small className="supplyplanformulas">{i18n.t('static.treeTemplate.createTreeFromTemplate')}</small><i className="cui-arrow-right icons" style={{ color: '#002F6C', fontSize: '13px' }}></i></span> : <span className='WhiteText'><i>{"Create a tree first, then add this template to a node."}</i></span>}
@@ -13787,7 +13711,7 @@ export default class CreateTreeTemplate extends Component {
                             setFieldTouched
                         }) => (
                             <Form onSubmit={handleSubmit} onReset={handleReset} noValidate name='copyModalForm' autocomplete="off">
-                                <ModalHeader toggle={() => this.setState({copyModal: false})} className="modalHeader">
+                                <ModalHeader toggle={() => this.setState({ copyModal: false })} className="modalHeader">
                                     <strong>{i18n.t('static.tree.moveCopy')}</strong>
                                 </ModalHeader>
                                 <ModalBody>
@@ -13833,7 +13757,7 @@ export default class CreateTreeTemplate extends Component {
                                         </FormGroup>
                                         <FormGroup>
                                             <Label className="form-check-label">
-                                                Node name: {this.state.copyModalNode.payload.label.label_en} 
+                                                Node name: {this.state.copyModalNode.payload.label.label_en}
                                             </Label>
                                         </FormGroup>
                                         <div style={{ display: (this.state.copyModalData == 1 || this.state.copyModalData == 2) ? "block" : "none" }}>
@@ -13930,7 +13854,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
-                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>",this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "PU" : "FU").replace("<parentNodeType>",this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "PU" : "FU")}</p>
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>", this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "PU" : "FU").replace("<parentNodeType>", this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "PU" : "FU")}</p>
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>
@@ -13949,7 +13873,7 @@ export default class CreateTreeTemplate extends Component {
                                         <Button type="submit" size="md" color="success" className="submitBtn float-right" > <i className="fa fa-check"></i> {i18n.t('static.common.submit')}</Button>
                                     </div>
                                     <Button size="md" color="warning" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.resetCopyMoveModal()}> <i className="fa fa-times"></i> {i18n.t('static.common.reset')}</Button>
-                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.setState({copyModal: false})}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.state.copyLoader ? {} : this.setState({ copyModal: false })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </ModalFooter>
                             </Form>
                         )} />

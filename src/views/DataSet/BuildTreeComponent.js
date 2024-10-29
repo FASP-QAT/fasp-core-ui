@@ -5298,7 +5298,7 @@ export default class BuildTree extends Component {
             }
             document.getElementById("nodeValue").value = map1.get("9");
             this.handleAMonthDissmis1(json)
-            this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"))
+            this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"), 1)
         }
         );
     }
@@ -5658,7 +5658,9 @@ export default class BuildTree extends Component {
         }
         this.setState({ scalingTotal }, () => {
         });
-        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        if (this.state.modelingEl != "") {
+            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        }
         var data = dataArray;
         var options = {
             data: data,
@@ -11929,7 +11931,7 @@ export default class BuildTree extends Component {
                                 <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
                                     <Picker
                                         ref={this.pickAMonth2}
-                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                        years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                         value={this.state.scalingMonth}
                                         key={JSON.stringify(this.state.scalingMonth)}
                                         lang={pickerLang.months}
@@ -12415,7 +12417,7 @@ export default class BuildTree extends Component {
      * Updates the component state with the new range value and triggers a data fetch.
      * @param {object} value - The new range value selected by the user.
      */
-    handleAMonthChange1 = (year, month) => {
+    handleAMonthChange1 = (year, month, flag) => {
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
@@ -12424,7 +12426,9 @@ export default class BuildTree extends Component {
         nodeDataMap.month = updatedMonth;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] = nodeDataMap;
         this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
-            this.buildModelingJexcel();
+            if (flag == 0) {
+                this.buildModelingJexcel();
+            }
         });
     }
     /**
