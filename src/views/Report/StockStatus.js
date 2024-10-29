@@ -464,7 +464,6 @@ class StockStatus extends Component {
     var count = 0;
     list.map(
       (item, itemCount) => {
-        console.log("Item Test@123", item);
         if (itemCount != 0) {
           doc.addPage()
         }
@@ -1046,7 +1045,6 @@ class StockStatus extends Component {
         var tempOutputProgramId = tempOutputIndex.map(a => a.split("~")[0]);
         var tempOutputPlanningUnitId = tempOutputIndex.map(a => a.split("~")[1]);
         tempOutput = Object.values(tempOutput);
-        console.log("tempOutput Test@123", tempOutput)
         // var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
         //   a = a.label.toLowerCase();
         //   b = b.label.toLowerCase();
@@ -1271,7 +1269,7 @@ class StockStatus extends Component {
               var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
               const combinedDataset = newDatasetArray.reduce((acc, item) => {
                 const existingItem = acc.find((entry) => entry.programId === item.programId);
-    
+
                 if (existingItem) {
                   // Sum the data arrays if the programId already exists
                   existingItem.data = existingItem.data.map((value, index) =>
@@ -1292,11 +1290,10 @@ class StockStatus extends Component {
                   acc.push({ ...item });
                   count += 1;
                 }
-    
+
                 return acc;
               }, []);
               datasets = datasets.concat(combinedDataset);
-              console.log("Combined dataset Test@123", combinedDataset);
             } else {
               var count = 0;
               var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
@@ -1312,7 +1309,7 @@ class StockStatus extends Component {
                 item.pointHoverBorderColor = colourArray[count];
                 count += 1;
               })
-    
+
               const mediaQuery = window.matchMedia('(min-width: 1920px)')
               if (newDatasetArray.length > 10) {
                 if (mediaQuery.matches) {
@@ -1505,18 +1502,22 @@ class StockStatus extends Component {
               custom: CustomTooltips,
               callbacks: {
                 label: function (tooltipItem, data) {
-                  let label = data.labels[tooltipItem.index];
-                  let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                  var cell1 = value
-                  cell1 += '';
-                  var x = cell1.split('.');
-                  var x1 = x[0];
-                  var x2 = x.length > 1 ? '.' + x[1] : '';
-                  var rgx = /(\d+)(\d{3})/;
-                  while (rgx.test(x1)) {
-                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                  if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] != 0) {
+                    let label = data.labels[tooltipItem.index];
+                    let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                      x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                  } else {
+                    return false
                   }
-                  return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
                 }
               }
             },
@@ -2229,23 +2230,32 @@ class StockStatus extends Component {
         mode: 'nearest',
         callbacks: {
           label: function (tooltipItem, data) {
-            if (tooltipItem.datasetIndex == 2) {
-              return "";
-            } else {
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] != 0) {
+              if (tooltipItem.datasetIndex == 2) {
+                return "";
+              } else {
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
               }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+            } else {
+              return false
             }
           }
+        },
+        // Disable tooltips if the value is 0
+        filter: function (tooltipItem) {
+          const value = tooltipItem.value;
+          return value != 0; // Only show tooltips for non-zero values
         }
         , intersect: false
       },
@@ -2326,23 +2336,32 @@ class StockStatus extends Component {
         // custom: CustomTooltips,
         callbacks: {
           label: function (tooltipItem, data) {
-            if (tooltipItem.datasetIndex == 2) {
-              return "";
-            } else {
-              let label = data.labels[tooltipItem.index];
-              let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-              var cell1 = value
-              cell1 += '';
-              var x = cell1.split('.');
-              var x1 = x[0];
-              var x2 = x.length > 1 ? '.' + x[1] : '';
-              var rgx = /(\d+)(\d{3})/;
-              while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] != 0) {
+              if (tooltipItem.datasetIndex == 2) {
+                return "";
+              } else {
+                let label = data.labels[tooltipItem.index];
+                let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                var cell1 = value
+                cell1 += '';
+                var x = cell1.split('.');
+                var x1 = x[0];
+                var x2 = x.length > 1 ? '.' + x[1] : '';
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) {
+                  x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                }
+                return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
               }
-              return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+            } else {
+              return false
             }
           }
+        },
+        // Disable tooltips if the value is 0
+        filter: function (tooltipItem) {
+          const value = tooltipItem.value;
+          return value != 0; // Only show tooltips for non-zero values
         }
       },
       maintainAspectRatio: false,
@@ -2632,7 +2651,6 @@ class StockStatus extends Component {
             return acc;
           }, []);
           datasets = datasets.concat(combinedDataset);
-          console.log("Combined dataset Test@123", combinedDataset);
         } else {
           var count = 0;
           var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
@@ -2692,7 +2710,6 @@ class StockStatus extends Component {
         data: this.state.stockStatusList.map((item, index) => (item.mos != null ? roundN(item.mos) : item.mos))
       })
     }
-    console.log("datasets Test@123", datasets);
     const bar = {
       labels: this.state.stockStatusList.map((item, index) => (dateFormatter(item.dt))),
       datasets: datasets,
@@ -2726,44 +2743,44 @@ class StockStatus extends Component {
                   <div className=" pl-0">
                     <div className="row">
                       <FormGroup className="col-md-3">
-                      <div className="row">
-                      <FormGroup className="col-md-12">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
-                        <div className="controls  edit">
-                          <Picker
-                            ref="pickRange"
-                            years={{ min: this.state.minDate, max: this.state.maxDate }}
-                            value={rangeValue}
-                            lang={pickerLang}
-                            key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
-                            onDismiss={this.handleRangeDissmis}
-                          >
-                            <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
-                          </Picker>
-                        </div>
-                      </FormGroup>
-                      {this.state.yaxisEquUnit != -1 &&
+                        <div className="row">
                           <FormGroup className="col-md-12">
-                            <Label htmlFor="appendedInputButton">Graph Aggregated By</Label>
-                            <div className="controls ">
-                              <InputGroup>
-                                <Input
-                                  type="select"
-                                  name="graphAggregatedBy"
-                                  id="graphAggregatedBy"
-                                  value={this.state.graphAggregatedBy}
-                                  onChange={(e) => this.setGraphAggregatedBy(e)}
-                                  bsSize="sm"
-                                >
-                                  <option value="1">{i18n.t('static.program.programMaster')}</option>
-                                  <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
-                                  <option value="3">{i18n.t('static.supplyPlan.none')}</option>
-                                </Input>
-
-                              </InputGroup>
+                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}</Label>
+                            <div className="controls  edit">
+                              <Picker
+                                ref="pickRange"
+                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                value={rangeValue}
+                                lang={pickerLang}
+                                key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
+                                onDismiss={this.handleRangeDissmis}
+                              >
+                                <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
+                              </Picker>
                             </div>
                           </FormGroup>
-                        }
+                          {this.state.yaxisEquUnit != -1 &&
+                            <FormGroup className="col-md-12">
+                              <Label htmlFor="appendedInputButton">Graph Aggregated By</Label>
+                              <div className="controls ">
+                                <InputGroup>
+                                  <Input
+                                    type="select"
+                                    name="graphAggregatedBy"
+                                    id="graphAggregatedBy"
+                                    value={this.state.graphAggregatedBy}
+                                    onChange={(e) => this.setGraphAggregatedBy(e)}
+                                    bsSize="sm"
+                                  >
+                                    <option value="1">{i18n.t('static.program.programMaster')}</option>
+                                    <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
+                                    <option value="3">Program-PU/ARU.</option>
+                                  </Input>
+
+                                </InputGroup>
+                              </div>
+                            </FormGroup>
+                          }
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
