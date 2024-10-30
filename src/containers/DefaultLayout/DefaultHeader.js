@@ -98,6 +98,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
+          {this.props.changeIcon && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.programModifiedCount}</span>}
           {checkOnline === 'Online' && this.props.activeModule == 1 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
             <NavItem className="">

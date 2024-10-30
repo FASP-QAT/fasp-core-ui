@@ -1188,7 +1188,7 @@ class ApplicationDashboard extends Component {
                                 ctx.strokeStyle = dataset.backgroundColor[index];
                                 ctx.stroke();
                                 ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                ctx.font = 'bold 12px Arial';
+                                ctx.font = 'bold 10px Arial';
                                 // ctx.textBaseline = 'middle';
                                 ctx.fillStyle = dataset.backgroundColor[index];
                                 ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
@@ -2903,7 +2903,7 @@ class ApplicationDashboard extends Component {
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD'>
+                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD' style={{zIndex:"1"}}>
                                   <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
                                   <Input
                                     type="select"
