@@ -3810,7 +3810,7 @@ export default class syncPage extends Component {
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-4">
                                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.checkUserACL([this.state.programId.toString().split("_")[0]],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                                   &nbsp;
                                 </FormGroup>
                               </div>
@@ -3992,7 +3992,7 @@ export default class syncPage extends Component {
       problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.checkUserACL([this.state.programId.toString().split("_")[0]],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
