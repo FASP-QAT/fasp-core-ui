@@ -2654,7 +2654,7 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
 
-                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHead tableFixHeadDash">
+                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}

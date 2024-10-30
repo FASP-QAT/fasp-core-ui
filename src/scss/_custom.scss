@@ -17565,3 +17565,8 @@ label.arrow_label:before {
 .DashboardBg1{
   background:#f5f5f9!important;
 }
+.fixTableHeadTopDashboard {
+  max-height: calc(100vh - 680px) !important;
+  overflow: scroll;
+  border-top: 1px solid #2a303d;
+}
