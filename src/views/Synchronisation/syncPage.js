@@ -3989,7 +3989,7 @@ export default class syncPage extends Component {
       problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.checkUserACL([this.state.programId.toString().split("_")[0]],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
