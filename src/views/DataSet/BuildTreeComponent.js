@@ -2754,7 +2754,7 @@ export default class BuildTree extends Component {
         }
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
-        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level != "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             for (var i = 0; i < (tempCopyModalParentLevelList.length-copyModalParentLevelList.length); i++) {
                 copyModalParentLevelList.pop()
@@ -3136,6 +3136,7 @@ export default class BuildTree extends Component {
                     });
                 }
             } else {
+                this.saveTreeData(false, false);
                 this.setState({
                     loading: false,
                     modelingJexcelLoader: false,
@@ -8689,6 +8690,7 @@ export default class BuildTree extends Component {
      * Calls multiple function on component mount
      */
     componentDidMount() {
+        console.log("Test@123 inside componentDidMount")
         // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
