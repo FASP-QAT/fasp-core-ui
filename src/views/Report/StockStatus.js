@@ -179,6 +179,16 @@ class StockStatus extends Component {
         planningUnitId: [],
         realmCountryPlanningUnitId: [],
         stockStatusList: []
+      }, () => {
+        if (this.state.yaxisEquUnit != -1) {
+          var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+          var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+          var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+          this.setState({
+            planningUnitList: planningUnitList,
+            realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+          })
+        }
       })
     }).catch(
       error => {
@@ -1313,7 +1323,7 @@ class StockStatus extends Component {
               const mediaQuery = window.matchMedia('(min-width: 1920px)')
               if (newDatasetArray.length > 10) {
                 if (mediaQuery.matches) {
-                  height = 400 + (10 * newDatasetArray.length);
+                  height = 400 + (8 * newDatasetArray.length);
                 } else {
                   height = 400 + (21 * newDatasetArray.length);
                 }
@@ -1753,7 +1763,7 @@ class StockStatus extends Component {
     if (planningUnitId != "") {
       var planningUnitLabel = document.getElementById("planningUnitId").selectedOptions[0].text.toString()
       var planningUnit = [{
-        value: planningUnitId,
+        value: Number(planningUnitId),
         label: planningUnitLabel
       }]
       this.setState({
@@ -1783,7 +1793,7 @@ class StockStatus extends Component {
     if (realmCountryPlanningUnitId != "") {
       var realmCountryPlanningUnitLabel = document.getElementById("realmCountryPlanningUnitId").selectedOptions[0].text.toString()
       var realmCountryPlanningUnit = [{
-        value: realmCountryPlanningUnitId,
+        value: Number(realmCountryPlanningUnitId),
         label: realmCountryPlanningUnitLabel
       }]
       this.setState({
@@ -1859,8 +1869,18 @@ class StockStatus extends Component {
     var yaxisEquUnit = e.target.value;
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
-      loading: false
+      loading: false,
+      viewById:yaxisEquUnit!=-1?this.state.viewById:1
     }, () => {
+      if (this.state.viewById == 2) {
+        document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
+        document.getElementById("planningUnitDiv").style.display = "none";
+        // this.fetchData();
+      } else {
+        document.getElementById("planningUnitDiv").style.display = "block";
+        document.getElementById("realmCountryPlanningUnitDiv").style.display = "none";
+        // this.fetchData();
+      }
       // this.fetchData();
     })
   }
@@ -1879,7 +1899,9 @@ class StockStatus extends Component {
       show: false,
       loading: false,
       stockStatusList: [],
-      yaxisEquUnit: -1
+      yaxisEquUnit: -1,
+      realmCountryPlanningUnitId:[],
+      planningUnitId:[]
     }, () => {
       if (viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
@@ -1938,7 +1960,7 @@ class StockStatus extends Component {
     var checked = e.target.checked;
     this.setState({
       onlyShowAllPUs: checked,
-      yaxisEquUnit: -1
+      // yaxisEquUnit: -1
     }, () => {
       this.getDropdownLists();
     })
@@ -2670,7 +2692,7 @@ class StockStatus extends Component {
           const mediaQuery = window.matchMedia('(min-width: 1920px)')
           if (newDatasetArray.length > 10) {
             if (mediaQuery.matches) {
-              height = 400 + (10 * newDatasetArray.length);
+              height = 400 + (8 * newDatasetArray.length);
             } else {
               height = 400 + (21 * newDatasetArray.length);
             }
@@ -2761,7 +2783,7 @@ class StockStatus extends Component {
                           </FormGroup>
                           {this.state.yaxisEquUnit != -1 &&
                             <FormGroup className="col-md-12">
-                              <Label htmlFor="appendedInputButton">Graph Aggregated By</Label>
+                              <Label htmlFor="appendedInputButton">View Graph Disaggregated By</Label>
                               <div className="controls ">
                                 <InputGroup>
                                   <Input
@@ -2774,7 +2796,7 @@ class StockStatus extends Component {
                                   >
                                     <option value="1">{i18n.t('static.program.programMaster')}</option>
                                     <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
-                                    <option value="3">Program-PU/ARU.</option>
+                                    <option value="3">Program-PU/ARU</option>
                                   </Input>
 
                                 </InputGroup>
@@ -2840,7 +2862,7 @@ class StockStatus extends Component {
                               {i18n.t('static.report.planningUnit')}
                             </Label>
                           </FormGroup>
-                          <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
+                          {this.state.yaxisEquUnit==-1 && <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
                             <Input
                               type="radio"
                               id="viewById"
@@ -2857,7 +2879,7 @@ class StockStatus extends Component {
                               title={i18n.t('static.planningunit.countrysku')}>
                               {i18n.t('static.planningunit.countrysku')}
                             </Label>
-                          </FormGroup>
+                          </FormGroup>}
                         </div>
                         <FormGroup id="realmCountryPlanningUnitDiv" style={{ display: "none", "marginTop": "8px" }}>
                           <div className="controls">
@@ -2928,8 +2950,8 @@ class StockStatus extends Component {
                             </InputGroup>}
                           </div>
                         </FormGroup>
-                        <FormGroup style={{ "marginTop": "-10px" }}>
-                          <div className={this.state.yaxisEquUnit != 1 ? "col-md-9" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
+                        {this.state.programId.length > 1 && <FormGroup style={{ "marginTop": "-10px" }}>
+                          <div className={this.state.yaxisEquUnit != 1 ? "col-md-12" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
                             <Input
                               className="form-check-input"
                               type="checkbox"
@@ -2945,7 +2967,7 @@ class StockStatus extends Component {
                               {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
                             </Label>
                           </div>
-                        </FormGroup>
+                        </FormGroup>}
                       </FormGroup>
                       {/* <FormGroup style={{ "marginTop": "-10px" }}>
                         <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
@@ -3236,6 +3258,7 @@ class StockStatus extends Component {
                       /> */}
                     </div>
                   </FormGroup>
+                  {((this.state.yaxisEquUnit == -1 && this.state.isAggregate.toString() == "true" && (this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport).length > 1)) && <h5 className="red">This report does not allow aggregation of multiple programs and planning units(PU)/alternate reporting units (ARU), unless utilizing an equivalency unit (EU). Please only choose one PU/ARU for multi-select programs, or choose an EU, and then export.</h5>}
                 </>
               </ModalBody>
               <ModalFooter>
