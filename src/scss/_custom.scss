@@ -16921,7 +16921,7 @@ label.arrow_label:before {
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid #ddd;
-  background-color: #fff;
+  background-color: #f5f5f9;
   // height: 100%;
 }
 
@@ -17354,6 +17354,27 @@ label.arrow_label:before {
   .boxHeightBottom{
     height: 230px!important;
   }
+  .pxD-2{
+    padding-left:0.5rem !important;
+    padding-right:0.5rem !important;
+  }
+  .pxD-3{
+    padding-left:1rem !important;
+    padding-right:1rem !important;
+  }
+  .containerBox {
+    min-width: 940px!important;
+    margin: auto;
+    padding: 4px;
+    background-color: #ffffff;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-top: 16px;
+    border: 2px solid #002F6C;
+  }
+  
 }
 
  .CustomHeight,
@@ -17380,7 +17401,8 @@ label.arrow_label:before {
 .scrollable-content {
   flex: 1; /* Fills the remaining space in the card */
   overflow-y: auto; /* Adds vertical scroll when content overflows */
-  padding: 10px; /* Add padding if needed */
+  padding: 5px; /* Add padding if needed */
+  overflow-x:hidden;
 }
 .boxHeightBottom{
   height: 230px!important;
@@ -17389,4 +17411,102 @@ label.arrow_label:before {
 .jss>tbody>tr>td.cmpAndSelectTbl {
   white-space: normal !important;
 
+}
+#legend-container ul{
+  margin:revert!important;
+  padding:revert!important;
+}
+
+.containerBox {
+  min-width: 495px;
+  margin: auto;
+  padding: 4px;
+  background-color: #ffffff;
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  border-radius: 4px;
+  margin-top: 16px;
+  border: 2px solid #002F6C;
+}
+
+.containerBox::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: linear-gradient(
+    to right,
+    #fff,
+    rgba(255, 255, 255, 0) 80px,
+    rgba(255, 255, 255, 0) calc(100% - 80px),
+    #fff
+  );
+}
+
+.orb {
+  width: 100%;
+    height: 30px;
+    line-height: 20px;
+    font-size: 18px;
+    padding: 5px;
+    font-weight: normal;
+    text-align: center;
+    background: #a7c6ed;
+    display: inline-block;
+    margin: 0 30px;
+    border-radius:3px;
+}
+
+.orb:hover {
+  transform: scale(1.2);
+  cursor: pointer;
+}
+
+.red1 {
+  background: #a7c6ed;
+}
+.dark1 {
+  background: #a7c6ed;
+}
+.blue1 {
+  background: #a7c6ed;
+}
+.orange1 {
+  background: orange;
+}
+.purple {
+  background: purple;
+}
+.green1 {
+  background: green;
+}
+
+/* Animation Class */
+.scroll-wrapper {
+  display: flex;
+  -webkit-animation: marquee 20s linear infinite;
+  animation: marquee 20s linear infinite;
+}
+
+@-webkit-keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+.DashboardBg1{
+  background:#f5f5f9!important;
 }

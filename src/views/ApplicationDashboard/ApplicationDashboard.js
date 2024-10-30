@@ -1889,6 +1889,12 @@ class ApplicationDashboard extends Component {
       legend: {
         display: false
       },
+      layout: {
+        padding: {
+          top: 20, // Add extra top padding to avoid label overlap
+          bottom: 20,
+        },
+      },
     }
 
     function getOrCreateLegendList(chart, containerId) {
@@ -2521,7 +2527,7 @@ class ApplicationDashboard extends Component {
           }
         </Row>
         {activeTab1 == 2 && <>
-          <div className='row px-1'>
+          <div className='row px-1 pxD-2'>
             {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
               <div>
                 <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
@@ -2562,7 +2568,7 @@ class ApplicationDashboard extends Component {
               </div> */}
 
               {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
-                <div class="card custom-card">
+                <div class="card custom-card DashboardBg1">
                   <div class="card-body px-2 py-2">
                     {/* <div className='row'> */}
                     {/* <FormGroup className='col-md-3 FormGroupD'>
@@ -2628,6 +2634,24 @@ class ApplicationDashboard extends Component {
                           <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
 
+                      </div>
+
+                      <div className="col-5">
+
+                      <div class="containerBox">
+  <div class="scroll-wrapper">
+    <div class="orb">Header1</div>
+    <div class="orb red1">Header2</div>
+    <div class="orb dark1">Header3</div>
+    <div class="orb blue1">Header4</div>
+  </div>
+  <div class="scroll-wrapper">
+  <div class="orb">Header1</div>
+    <div class="orb red1">Header2</div>
+    <div class="orb dark1">Header3</div>
+    <div class="orb blue1">Header4</div>
+  </div>
+  </div>
                       </div>
                     </div>
 
@@ -2764,7 +2788,7 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div> */}
-          <div className='row pl-lg-2 pr-lg-2'>
+          <div className='row px-2 pxD-3'>
             <div class="col-xl-12 mb-lg-3 DashboardBg">
               <div className='row pt-lg-2'>
                 <div className='col-md-12'>
