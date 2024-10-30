@@ -1321,9 +1321,12 @@ class StockStatus extends Component {
               })
 
               const mediaQuery = window.matchMedia('(min-width: 1920px)')
+              const mediaQuery1 = window.matchMedia('(min-width: 1280px)')
               if (newDatasetArray.length > 10) {
                 if (mediaQuery.matches) {
-                  height = 400 + (8 * newDatasetArray.length);
+                  height = 400 + (10 * newDatasetArray.length);
+                }else if(mediaQuery1.matches){
+                  height = 400 + (15 * newDatasetArray.length);
                 } else {
                   height = 400 + (21 * newDatasetArray.length);
                 }
@@ -2694,15 +2697,16 @@ class StockStatus extends Component {
           })
 
           const mediaQuery = window.matchMedia('(min-width: 1920px)')
-          console.log("New Dataset Array Test@123 ",newDatasetArray.length);
-          if (newDatasetArray.length > 10) {
-            console.log("In new Dataset Array Test@123",mediaQuery.matches);
-            if (mediaQuery.matches) {
-              height = 400 + (8 * newDatasetArray.length);
-            } else {
-              height = 400 + (21 * newDatasetArray.length);
-            }
-          }
+              const mediaQuery1 = window.matchMedia('(min-width: 1280px)')
+              if (newDatasetArray.length > 10) {
+                if (mediaQuery.matches) {
+                  height = 400 + (10 * newDatasetArray.length);
+                }else if(mediaQuery1.matches){
+                  height = 400 + (15 * newDatasetArray.length);
+                } else {
+                  height = 400 + (21 * newDatasetArray.length);
+                }
+              }
 
           datasets = datasets.concat(newDatasetArray);
         }
