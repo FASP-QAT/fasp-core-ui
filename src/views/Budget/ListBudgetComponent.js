@@ -15,6 +15,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { message } from 'antd';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.budget');
 /**
@@ -355,6 +356,10 @@ class ListBudgetComponent extends Component {
             this.props.history.push({
               pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
             });
+          }else{
+            this.setState({
+              message:i18n.t('static.common.accessDenied')
+            })
           }
         }
       }
