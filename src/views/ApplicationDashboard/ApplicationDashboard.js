@@ -2796,7 +2796,7 @@ class ApplicationDashboard extends Component {
                   <div class="col-3">
                     {/* <div className='col-md-4 pl-lg-0'> */}
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
+                      <Label htmlFor="organisationTypeId">Program</Label>
                       <Input
                         type="select"
                         name="bottomProgramId"
@@ -2834,7 +2834,7 @@ class ApplicationDashboard extends Component {
                     {/* </div> */}
                     <div class='col-3'>
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
+                      <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="reportPeriod"
@@ -2904,7 +2904,7 @@ class ApplicationDashboard extends Component {
                             <div className='col-6'>
                               <div className='row'>
                                 <FormGroup className='col-md-11 pl-lg-3 FormGroupD' style={{zIndex:"1"}}>
-                                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                                  <Label htmlFor="displayBy">Display By</Label>
                                   <Input
                                     type="select"
                                     name="displayBy"
