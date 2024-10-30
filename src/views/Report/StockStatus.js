@@ -2060,6 +2060,10 @@ class StockStatus extends Component {
    * Calls the get programs function on page load
    */
   componentDidMount() {
+    console.log("Screen Test@123 width:", window.screen.width);
+    console.log("Screen Test@123 height:", window.screen.height);
+    console.log("Viewport Test@123 width:", window.innerWidth);
+    console.log("Viewport Test@123 height:", window.innerHeight);
     // Detect initial theme
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     this.setState({ isDarkMode });
