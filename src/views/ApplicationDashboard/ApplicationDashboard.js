@@ -2636,7 +2636,7 @@ class ApplicationDashboard extends Component {
 
                       </div>
 
-                      <div className="col-3">
+                      <div className="col-5" style={{marginLeft:'auto'}}>
                         <div class="containerBox">
                           <div class="scroll-wrapper">
                             <div class="orb"><Col>Countries</Col><Col>5</Col></div>

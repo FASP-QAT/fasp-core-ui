@@ -17393,7 +17393,7 @@ label.arrow_label:before {
     padding-right:1rem !important;
   }
   .containerBox {
-    min-width: 600px!important;
+    min-width: 388px!important;
     margin: auto;
     padding: 4px;
     background-color: #ffffff;
@@ -17401,8 +17401,9 @@ label.arrow_label:before {
     display: flex;
     overflow: hidden;
     border-radius: 4px;
-    margin-top: 16px;
-    border: 2px solid #002F6C;
+    margin-top: 4px;
+    border: 2px solid #a7c6ed;
+    // margin-left: auto;
   }
   
 }
@@ -17448,7 +17449,7 @@ label.arrow_label:before {
 }
 
 .containerBox {
-  min-width: 495px;
+  min-width: 419px;
   margin: auto;
   padding: 4px;
   background-color: #ffffff;
@@ -17456,8 +17457,9 @@ label.arrow_label:before {
   display: flex;
   overflow: hidden;
   border-radius: 4px;
-  margin-top: 16px;
-  border: 2px solid #002F6C;
+  margin-top: 4px;
+  border: 2px solid #a7c6ed;
+  // margin-left: auto;
 }
 
 .containerBox::after {
@@ -17477,10 +17479,10 @@ label.arrow_label:before {
 }
 
 .orb {
-  width: 150px;
+  width: 168px;
   height: 50px;
   line-height: 20px;
-  font-size: 12px;
+  font-size: 15px;
   padding: 5px;
   font-weight: normal;
   text-align: center;
