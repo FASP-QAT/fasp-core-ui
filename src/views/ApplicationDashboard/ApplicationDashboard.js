@@ -2887,8 +2887,8 @@ class ApplicationDashboard extends Component {
                         <div class="card-header  justify-content-between">
                           <div class="card-title"> Forecast Error </div>
                         </div>
-                        <div class="card-body px-1 py-2 scrollable-content">
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2'>
+                        <div class="card-body px-1 py-2 scrollable-content" style={{overflowY:'hidden'}}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
                           </div>
                         </div>
                       </div>
@@ -2899,7 +2899,7 @@ class ApplicationDashboard extends Component {
                           <div class="card-title">Shipments </div>
                           <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the shipment <b>{shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
-                        <div class="card-body pt-lg-1 scrollable-content">
+                        <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden'}}>
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
@@ -3005,7 +3005,7 @@ class ApplicationDashboard extends Component {
                               <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2 scrollable-content">
-                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}>
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '0px 8px' }}>
                               </div>
                             </div>
                           </div>

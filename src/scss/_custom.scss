@@ -17089,10 +17089,18 @@ label.arrow_label:before {
   // max-height: calc(100vh - 393px) !important;
   // height: 375px;
   max-height: calc(100vh - 52vh) !important;
-  ;
   overflow: auto;
 }
-
+.dashboardTable2E .jss_content {
+  // max-height: calc(100vh - 393px) !important;
+  // height: 375px;
+  max-height: calc(100vh - 73vh) !important;
+  overflow: auto;
+}
+.dashboardTable3 .jss_content{
+    max-height: calc(100vh - 46vh) !important;
+    overflow: auto;
+}
 .CustomHeight {
   // height: 375px;
   // max-height: calc(100vh - 0px) !important;
@@ -17102,7 +17110,7 @@ label.arrow_label:before {
   // max-height: 310px;
   // min-height: 20vh !important;
   // max-height: 20vh;
-  height: 300px; /* Set the desired fixed height */
+  height: 400px; /* Set the desired fixed height */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17116,11 +17124,20 @@ label.arrow_label:before {
     // max-height: 100% !important;
     // min-height: 46vh !important;
     // max-height: 46vh;
-    height: 300px; /* Set the desired fixed height */
+    height: 369px; /* Set the desired fixed height */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Prevent content from overflowing outside the card */
   }
+  .dashboardTable3 .jss_content{
+      max-height: calc(100vh - 70vh) !important;
+      overflow: auto;
+  }
+  .dashboardTable2E .jss_content {
+    max-height: calc(100vh - 83vh) !important;
+    overflow: auto;
+}
+  
 }
 
 .CustomHeight1 {
@@ -17405,6 +17422,12 @@ label.arrow_label:before {
     border: 2px solid #a7c6ed;
     // margin-left: auto;
   }
+  .dashboardTable2 .jss_content {
+    // max-height: calc(100vh - 393px) !important;
+    // height: 375px;
+    max-height: calc(100vh - 74vh) !important;
+    overflow:auto;
+  }
   
 }
 
@@ -17431,7 +17454,7 @@ label.arrow_label:before {
 // }
 .scrollable-content {
   flex: 1; /* Fills the remaining space in the card */
-  overflow-y: auto; /* Adds vertical scroll when content overflows */
+  overflow-y: hidden; /* Adds vertical scroll when content overflows */
   padding: 5px; /* Add padding if needed */
   overflow-x:hidden;
 }
