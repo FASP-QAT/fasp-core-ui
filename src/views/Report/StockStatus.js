@@ -2690,7 +2690,9 @@ class StockStatus extends Component {
           })
 
           const mediaQuery = window.matchMedia('(min-width: 1920px)')
+          console.log("New Dataset Array Test@123 ",newDatasetArray.length);
           if (newDatasetArray.length > 10) {
+            console.log("In new Dataset Array Test@123",mediaQuery.matches);
             if (mediaQuery.matches) {
               height = 400 + (8 * newDatasetArray.length);
             } else {
@@ -2796,7 +2798,7 @@ class StockStatus extends Component {
                                   >
                                     <option value="1">{i18n.t('static.program.programMaster')}</option>
                                     <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
-                                    <option value="3">Program-PU/ARU</option>
+                                    <option value="3">Program-PU</option>
                                   </Input>
 
                                 </InputGroup>
@@ -3258,7 +3260,7 @@ class StockStatus extends Component {
                       /> */}
                     </div>
                   </FormGroup>
-                  {((this.state.yaxisEquUnit == -1 && this.state.isAggregate.toString() == "true" && (this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport).length > 1)) && <h5 className="red">This report does not allow aggregation of multiple programs and planning units(PU)/alternate reporting units (ARU), unless utilizing an equivalency unit (EU). Please only choose one PU/ARU for multi-select programs, or choose an EU, and then export.</h5>}
+                  {((this.state.yaxisEquUnit == -1 && this.state.isAggregate.toString() == "true" && (this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport).length > 1)) && <span className="red">When selecting multiple programs, please only choose one product (PU or ARU). Alternatively, choose an EU to allow aggregation across products.</span>}
                 </>
               </ModalBody>
               <ModalFooter>
