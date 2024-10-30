@@ -1188,7 +1188,7 @@ class ApplicationDashboard extends Component {
                                 ctx.strokeStyle = dataset.backgroundColor[index];
                                 ctx.stroke();
                                 ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                ctx.font = 'bold 12px Arial';
+                                ctx.font = 'bold 10px Arial';
                                 // ctx.textBaseline = 'middle';
                                 ctx.fillStyle = dataset.backgroundColor[index];
                                 ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
@@ -2796,7 +2796,7 @@ class ApplicationDashboard extends Component {
                   <div class="col-3">
                     {/* <div className='col-md-4 pl-lg-0'> */}
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Program<span class="red Reqasterisk">*</span></Label>
+                      <Label htmlFor="organisationTypeId">Program</Label>
                       <Input
                         type="select"
                         name="bottomProgramId"
@@ -2834,7 +2834,7 @@ class ApplicationDashboard extends Component {
                     {/* </div> */}
                     <div class='col-3'>
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Report Period<span class="red Reqasterisk">*</span><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
+                      <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="reportPeriod"
@@ -2903,8 +2903,8 @@ class ApplicationDashboard extends Component {
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD'>
-                                  <Label htmlFor="displayBy">Display By<span class="red Reqasterisk">*</span></Label>
+                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD' style={{zIndex:"1"}}>
+                                  <Label htmlFor="displayBy">Display By</Label>
                                   <Input
                                     type="select"
                                     name="displayBy"
