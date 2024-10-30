@@ -3142,6 +3142,7 @@ export default class BuildTree extends Component {
                     });
                 }
             } else {
+                this.saveTreeData(false, false);
                 this.setState({
                     loading: false,
                     modelingJexcelLoader: false,
