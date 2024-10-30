@@ -588,7 +588,7 @@ export default class CreateTreeTemplate extends Component {
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             momListPerParent: [],
-            scalingMonth: new Date(),
+            scalingMonth: -1,
             orgCurrentItemConfig: {},
             tempItems: [],
             preItem: [],
@@ -2875,7 +2875,7 @@ export default class CreateTreeTemplate extends Component {
      * 
      */
     calculateParentValueFromMOM(month, increaseScalingMonth) {
-        console.log("inside ===> 1")
+        console.log("inside ===>", month, "====", increaseScalingMonth, "===", (month == -1 ? parseInt(month) + 2 : parseInt(month) + 1))
         var parentValue = 0;
         var currentItemConfig = this.state.currentItemConfig;
         if (currentItemConfig.context.payload.nodeType.id != 1 && currentItemConfig.context.payload.nodeType.id != 2) {
@@ -2897,7 +2897,7 @@ export default class CreateTreeTemplate extends Component {
             var percentageOfParent = currentItemConfig.context.payload.nodeDataMap[0][0].dataValue;
             currentItemConfig.context.payload.nodeDataMap[0][0].calculatedDataValue = ((percentageOfParent * parentValue) / 100).toString();
         }
-        this.setState({ parentValue, currentItemConfig, scalingMonth: increaseScalingMonth ? parseInt(month) + 1 : this.state.scalingMonth }, () => {
+        this.setState({ parentValue, currentItemConfig, scalingMonth: increaseScalingMonth ? (month == -1 ? parseInt(month) + 2 : parseInt(month) + 1) : this.state.scalingMonth }, () => {
         });
     }
     /**
@@ -3299,7 +3299,7 @@ export default class CreateTreeTemplate extends Component {
         }
     }
     downwardAggregationListChange(daList) {
-        console.log("Test@@@ daList",daList)
+        console.log("Test@@@ daList", daList)
         this.setState({
             isChanged: true
         })
@@ -3310,12 +3310,12 @@ export default class CreateTreeTemplate extends Component {
             scenarioId: x.value.split("~")[1],
             nodeId: x.value.split("~")[2]
         }))
-        console.log("Test@@@ tempList",tempList)
+        console.log("Test@@@ tempList", tempList)
         currentItemConfig.context.payload.downwardAggregationList = tempList;
         this.setState({
             currentItemConfig: currentItemConfig,
         })
-        if(tempList.length == 0) {
+        if (tempList.length == 0) {
             this.setState({
                 multiselectError: true
             })
@@ -5342,9 +5342,6 @@ export default class CreateTreeTemplate extends Component {
      * Builds Jexcel table for modeling data
      */
     buildModelingJexcel() {
-        console.log("inside ===> 2")
-
-        console.log("====>", this.state.scalingMonth)
         var scalingList = this.state.scalingList;
         var nodeTransferDataList = this.state.nodeTransferDataList;
         var dataArray = [];
@@ -5496,7 +5493,7 @@ export default class CreateTreeTemplate extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonth') + " " + this.state.scalingMonth,
+                    title: i18n.t('static.tree.calculatedChangeForMonth') + " " + (this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo == -1 ? parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 2 : parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1),
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -6181,7 +6178,7 @@ export default class CreateTreeTemplate extends Component {
         //         }
         //     }
         // }
-        var funnelChildNodes = this.state.treeTemplate.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x =>x.id.toString())
+        var funnelChildNodes = this.state.treeTemplate.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x => x.id.toString())
         downwardAggregationList = downwardAggregationList.filter(x => !funnelChildNodes.includes(x.value.split("~")[2]))
         if (nodeTypeId != 0) {
             nodeType = this.state.nodeTypeList.filter(c => c.id == nodeTypeId)[0];
@@ -6192,7 +6189,7 @@ export default class CreateTreeTemplate extends Component {
         } else {
             nodeTypeList = this.state.nodeTypeList.filter(c => c.id != 5);
         }
-        console.log("Test@@@ downwardAggregationList",downwardAggregationList)
+        console.log("Test@@@ downwardAggregationList", downwardAggregationList)
         this.setState({
             nodeTypeFollowUpList: nodeTypeList,
             downwardAggregationList: downwardAggregationList
@@ -6342,11 +6339,11 @@ export default class CreateTreeTemplate extends Component {
                 child.parent = this.state.copyModalParentNode;
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
-                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level+1;
+                child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
                 // if(child.payload.nodeType.id == 6 ){
                 //     child.payload.downwardAggregationList = [];
                 // }
-                if(child.payload.downwardAggregationAllowed) {
+                if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
@@ -8432,7 +8429,7 @@ export default class CreateTreeTemplate extends Component {
                 }
             }
             if (tab == 2) {
-                this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
+                // this.setState({ scalingMonth: parseInt(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo) + 1 });
                 if (this.state.currentItemConfig.context.payload.nodeType.id != 1) {
                     var curDate = (moment(Date.now()).utcOffset('-0500').format('YYYY-MM-DD'));
                     var month = (this.state.currentItemConfig.context.payload.nodeDataMap[0])[0].monthNo;
@@ -9348,7 +9345,7 @@ export default class CreateTreeTemplate extends Component {
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
     updateNodeInfoInJson(currentItemConfig) {
-        console.log("Test@@@ currentItemConfig",currentItemConfig)
+        console.log("Test@@@ currentItemConfig", currentItemConfig)
         let isNodeChanged = currentItemConfig.context.newTemplateFlag;
         var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
         var nodes = this.state.items;
@@ -11894,86 +11891,7 @@ export default class CreateTreeTemplate extends Component {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
     }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox4 = (e) => {
-        this.pickAMonth4.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange4 = (year, month) => {
-        this.setState({ currentCalculatorStartDate: year + "-" + month + "-01" }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis4 = (value) => {
-    }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox5 = (e) => {
-        this.pickAMonth5.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange5 = (year, month) => {
-        this.setState({ currentCalculatorStopDate: year + "-" + month + "-01" }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis5 = (value) => {
-    }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    handleClickMonthBox1 = (e) => {
-        this.pickAMonth1.current.show()
-    }
-    /**
-     * Handles the change of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthChange1 = (year, month) => {
-        var month = parseInt(month) < 10 ? "0" + month : month
-        var date = year + "-" + month + "-" + "01"
-        let { currentItemConfig } = this.state;
-        (currentItemConfig.context.payload.nodeDataMap[0])[0].month = date;
-        this.setState({ currentItemConfig }, () => {
-        });
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleAMonthDissmis1 = (value) => {
-        let month = value.year + '-' + value.month + '-01';
-        this.setState({ singleValue2: value, }, () => {
-            this.calculateParentValueFromMOM(month, false);
-        })
-    }
+
     /**
      * Export tree in word file
      */
@@ -12079,7 +11997,7 @@ export default class CreateTreeTemplate extends Component {
                     if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                         row = row.concat("NA ")
                         row1 = row1.concat(" Subtotal")
-                    } else if(items[i].payload.nodeType.id != 6) {
+                    } else if (items[i].payload.nodeType.id != 6) {
                         row = row.concat(total).concat("% ")
                         row1 = row1.concat(" Subtotal")
                     }
@@ -12641,8 +12559,12 @@ export default class CreateTreeTemplate extends Component {
                                         this.setState({
                                             orgCurrentItemConfig: JSON.parse(JSON.stringify(this.state.currentItemConfig.context)),
                                         }, () => {
-                                            this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
-                                            this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, false);
+                                            setTimeout(() => {
+                                                this.getNodeTypeFollowUpList(itemConfig.payload.nodeType.id);
+                                                this.calculateParentValueFromMOM(this.state.currentItemConfig.context.payload.nodeDataMap[0][0].monthNo, true);
+                                                console.log("inside ===>scalingmonth", this.state.scalingMonth)
+
+                                            }, 0);
                                         });
                                         if (itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) {
                                             this.getUsageTemplateList(0);
