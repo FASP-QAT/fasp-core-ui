@@ -1863,7 +1863,7 @@ class ApplicationDashboard extends Component {
       title: {
         display: true,
         text: "",
-        padding: 10
+        padding: 30,
       },
       tooltips: {
         callbacks: {
@@ -1891,8 +1891,8 @@ class ApplicationDashboard extends Component {
       },
       layout: {
         padding: {
-          top: 20, // Add extra top padding to avoid label overlap
-          bottom: 20,
+          top: 10, // Add extra top padding to avoid label overlap
+          bottom: 10,
         },
       },
     }
@@ -2636,22 +2636,21 @@ class ApplicationDashboard extends Component {
 
                       </div>
 
-                      <div className="col-5">
-
-                      <div class="containerBox">
-  <div class="scroll-wrapper">
-    <div class="orb">Header1</div>
-    <div class="orb red1">Header2</div>
-    <div class="orb dark1">Header3</div>
-    <div class="orb blue1">Header4</div>
-  </div>
-  <div class="scroll-wrapper">
-  <div class="orb">Header1</div>
-    <div class="orb red1">Header2</div>
-    <div class="orb dark1">Header3</div>
-    <div class="orb blue1">Header4</div>
-  </div>
-  </div>
+                      <div className="col-3">
+                        <div class="containerBox">
+                          <div class="scroll-wrapper">
+                            <div class="orb"><Col>Countries</Col><Col>5</Col></div>
+                            <div class="orb red1"><Col>User</Col><Col>5</Col></div>
+                            <div class="orb dark1"><Col>Program</Col><Col>5</Col></div>
+                            <div class="orb blue1"><Col>Pending Approval</Col><Col>5</Col></div>
+                          </div>
+                          <div class="scroll-wrapper">
+                            <div class="orb"><Col>Countries</Col><Col>5</Col></div>
+                            <div class="orb red1"><Col>User</Col><Col>5</Col></div>
+                            <div class="orb dark1"><Col>Program</Col><Col>5</Col></div>
+                            <div class="orb blue1"><Col>Pending Approval</Col><Col>5</Col></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -2675,7 +2674,7 @@ class ApplicationDashboard extends Component {
                                   <i class="fa fa-trash" style={{ color: "danger" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
-                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" title="QAT Problem List" style={{ color: "blue" }} onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")}><u>{d.program.code + " ~v" + d.program.version}​</u></td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version}​</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
@@ -2694,7 +2693,8 @@ class ApplicationDashboard extends Component {
                                 </td>
                                 <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfStockOutPU}</td>
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>
+                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
+                                {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
                                 <td>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}
                                   {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
@@ -2922,11 +2922,11 @@ class ApplicationDashboard extends Component {
                               </div>
                               <div className='row'>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} width={300} plugins={[htmlLegendPlugin]} />
-                                    <div id="legend-container" style={{marginTop:"20px"}}></div>
+                                  <Col style={{marginTop:"-70px"}}>
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={260} width={260} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
+                                <div id="legend-container" style={{marginTop:"20px"}}></div>
                               </div>
                             </div>
                             <div className='col-6'>
@@ -2958,7 +2958,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
@@ -2974,7 +2974,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />

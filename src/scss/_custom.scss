@@ -17363,7 +17363,7 @@ label.arrow_label:before {
     padding-right:1rem !important;
   }
   .containerBox {
-    min-width: 940px!important;
+    min-width: 600px!important;
     margin: auto;
     padding: 4px;
     background-color: #ffffff;
@@ -17447,17 +17447,17 @@ label.arrow_label:before {
 }
 
 .orb {
-  width: 100%;
-    height: 30px;
-    line-height: 20px;
-    font-size: 18px;
-    padding: 5px;
-    font-weight: normal;
-    text-align: center;
-    background: #a7c6ed;
-    display: inline-block;
-    margin: 0 30px;
-    border-radius:3px;
+  width: 150px;
+  height: 50px;
+  line-height: 20px;
+  font-size: 12px;
+  padding: 5px;
+  font-weight: normal;
+  text-align: center;
+  background: #a7c6ed;
+  display: inline-block;
+  margin: 0 30px;
+  border-radius:3px;
 }
 
 .orb:hover {
