@@ -1326,7 +1326,7 @@ class StockStatus extends Component {
                 if (mediaQuery.matches) {
                   height = 400 + (10 * newDatasetArray.length);
                 }else if(mediaQuery1.matches){
-                  height = 400 + (15 * newDatasetArray.length);
+                  height = 400 + (10 * newDatasetArray.length);
                 } else {
                   height = 400 + (21 * newDatasetArray.length);
                 }
@@ -2702,7 +2702,7 @@ class StockStatus extends Component {
                 if (mediaQuery.matches) {
                   height = 400 + (10 * newDatasetArray.length);
                 }else if(mediaQuery1.matches){
-                  height = 400 + (15 * newDatasetArray.length);
+                  height = 400 + (10 * newDatasetArray.length);
                 } else {
                   height = 400 + (21 * newDatasetArray.length);
                 }
