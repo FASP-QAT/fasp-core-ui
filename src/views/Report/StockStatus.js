@@ -2816,7 +2816,7 @@ class StockStatus extends Component {
                                   >
                                     <option value="1">{i18n.t('static.program.programMaster')}</option>
                                     <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
-                                    <option value="3">{i81n.t("static.stockStatus.programPlanningUnit")}</option>
+                                    <option value="3">{i18n.t("static.stockStatus.programPlanningUnit")}</option>
                                   </Input>
 
                                 </InputGroup>
