@@ -2711,7 +2711,7 @@ class StockStatus extends Component {
               height = 400 + (12 * newDatasetArray.length);
             } else if (mediumScreen.matches) {
               console.log("In if medium screen Test@123")
-              height = 400 + (14 * newDatasetArray.length);
+              height = 400 + (16 * newDatasetArray.length);
             } else if (smallScreen.matches) {
               console.log("In if small screen Test@123")
               height = 400 + (21 * newDatasetArray.length);
