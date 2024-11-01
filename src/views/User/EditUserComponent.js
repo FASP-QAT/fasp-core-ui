@@ -114,7 +114,7 @@ class EditUserComponent extends Component {
       loading1: true,
       programListForFilter: [],
       addUserEL: "",
-      aclMessage:""
+      aclMessage: ""
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -307,6 +307,14 @@ class EditUserComponent extends Component {
       .then((response) => {
         if (response.status == 200) {
           var listArray = response.data;
+          this.state.user.userAclList.map(item => {
+            if (listArray.findIndex(c => c.id == item.realmCountryId) == -1 && item.realmCountryId!=-1) {
+              listArray.push({
+                id: item.realmCountryId,
+                label: item.countryName,
+              })
+            }
+          });
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
@@ -326,6 +334,14 @@ class EditUserComponent extends Component {
             .then((response) => {
               if (response.status == "200") {
                 var listArray = response.data;
+                this.state.user.userAclList.map(item => {
+                  if (listArray.findIndex(c => c.id == item.organisationId) == -1 && item.organisationId!=-1) {
+                    listArray.push({
+                      id: item.organisationId,
+                      label: item.organisationName,
+                    })
+                  }
+                });
                 listArray.sort((a, b) => {
                   var itemLabelA = getLabelText(
                     a.label,
@@ -345,6 +361,14 @@ class EditUserComponent extends Component {
                   .then((response) => {
                     if (response.status == "200") {
                       var listArray = response.data;
+                      this.state.user.userAclList.map(item => {
+                        if (listArray.findIndex(c => c.id == item.healthAreaId) == -1 && item.healthAreaId!=-1) {
+                          listArray.push({
+                            id: item.healthAreaId,
+                            label: item.healthAreaName,
+                          })
+                        }
+                      });
                       listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(
                           a.label,
@@ -364,6 +388,19 @@ class EditUserComponent extends Component {
                         .then((response1) => {
                           if (response1.status == "200") {
                             var listArray = response1.data;
+                            this.state.user.userAclList.map(item => {
+                              if (listArray.findIndex(c => c.id == item.programId) == -1 && item.programId!=-1) {
+                                listArray.push({
+                                  id: item.programId,
+                                  label: item.programName,
+                                  code:item.programCode,
+                                  realmCountry:{
+                                    id:this.state.user.realm.realmId,
+                                  },
+                                  programTypeId:item.programTypeId
+                                })
+                              }
+                            });
                             listArray.sort((a, b) => {
                               var itemLabelA = a.code.toUpperCase();
                               var itemLabelB = b.code.toUpperCase();
@@ -884,34 +921,39 @@ class EditUserComponent extends Component {
           title: i18n.t("static.role.role"),
           type: "dropdown",
           source: roleList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.program.realmcountry"),
           type: "autocomplete",
           source: countryList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.dashboard.healthareaheader"),
           type: "autocomplete",
           source: healthAreaList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.organisation.organisation"),
           type: "autocomplete",
           source: organisationList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.dashboard.programheader"),
           type: "autocomplete",
           source: programList,
           filter: this.filterProgramByCountryId,
+          readOnly: !this.state.user.editable
         },
       ],
       pagination: localStorage.getItem("sesRecordCount"),
       filters: true,
       search: true,
       columnSorting: true,
-      editable: true,
+      editable: this.state.user.editable,
       wordWrap: true,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
@@ -1188,6 +1230,7 @@ class EditUserComponent extends Component {
     // document.getElementById("roleValid").value = false;
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
+        console.log("Respons.data Test@123", response.data)
         if (response.status == 200) {
           this.setState(
             {
@@ -1421,6 +1464,14 @@ class EditUserComponent extends Component {
               label: getLabelText(response.data[i].label, this.state.lang),
             };
           }
+          this.state.user.userAclList.map(item => {
+            if (roleList.findIndex(c => c.value == item.roleId) == -1) {
+              roleList.push({
+                value: item.roleId,
+                label: getLabelText(item.roleDesc, this.state.lang),
+              })
+            }
+          });
           this.setState({
             selRoleList: roleList,
             loading: false,
@@ -1730,6 +1781,7 @@ class EditUserComponent extends Component {
                           id="username"
                           bsSize="sm"
                           valid={!errors.username}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.username && !!errors.username) ||
                             !!errors.username
@@ -1758,6 +1810,7 @@ class EditUserComponent extends Component {
                           id="emailId"
                           bsSize="sm"
                           valid={!errors.emailId}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.emailId && !!errors.emailId) ||
                             !!errors.emailId
@@ -1786,6 +1839,7 @@ class EditUserComponent extends Component {
                           id="orgAndCountry"
                           bsSize="sm"
                           valid={!errors.orgAndCountry}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.orgAndCountry && !!errors.orgAndCountry) ||
                             !!errors.orgAndCountry
@@ -1813,6 +1867,7 @@ class EditUserComponent extends Component {
                           name="languageId"
                           id="languageId"
                           bsSize="sm"
+                          disabled={!this.state.user.editable}
                           valid={!errors.languageId}
                           invalid={
                             (touched.languageId && !!errors.languageId) ||
@@ -1844,6 +1899,7 @@ class EditUserComponent extends Component {
                             className="form-check-input"
                             type="radio"
                             id="active1"
+                            disabled={!this.state.user.editable}
                             name="active"
                             value={true}
                             checked={this.state.user.active === true}
@@ -1866,6 +1922,7 @@ class EditUserComponent extends Component {
                             type="radio"
                             id="active2"
                             name="active"
+                            disabled={!this.state.user.editable}
                             value={false}
                             checked={this.state.user.active === false}
                             onChange={(e) => {
@@ -1927,7 +1984,7 @@ class EditUserComponent extends Component {
                         </div>
                       </div>
                     </CardBody>
-                    <CardFooter
+                    {this.state.user.editable && <CardFooter
                       style={{ display: this.state.loading ? "none" : "block" }}
                     >
                       <FormGroup>
@@ -1944,7 +2001,7 @@ class EditUserComponent extends Component {
                         </Button>
                         &nbsp;
                       </FormGroup>
-                    </CardFooter>
+                    </CardFooter>}
                     <CardFooter
                       style={{ display: this.state.loading ? "none" : "block" }}
                     >
@@ -1959,7 +2016,7 @@ class EditUserComponent extends Component {
                           <i className="fa fa-times"></i>{" "}
                           {i18n.t("static.common.cancel")}
                         </Button>
-                        <Button
+                        {this.state.user.editable && <Button
                           type="button"
                           size="md"
                           color="warning"
@@ -1968,8 +2025,8 @@ class EditUserComponent extends Component {
                         >
                           <i className="fa fa-refresh"></i>{" "}
                           {i18n.t("static.common.reset")}
-                        </Button>
-                        <Button
+                        </Button>}
+                        {this.state.user.editable && <Button
                           type="submit"
                           size="md"
                           color="success"
@@ -1977,7 +2034,7 @@ class EditUserComponent extends Component {
                         >
                           <i className="fa fa-check"></i>
                           {i18n.t("static.common.update")}
-                        </Button>
+                        </Button>}
                         &nbsp;
                       </FormGroup>
                     </CardFooter>
