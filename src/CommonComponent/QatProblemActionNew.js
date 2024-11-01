@@ -23,6 +23,7 @@ import {
 import i18n from '../i18n';
 import AuthenticationService from '../views/Common/AuthenticationService';
 import createMinMaxProblems from "./createMinMaxProblems";
+import { roundAMC } from './JavascriptCommonFunctions.js';
 /**
  * This component is used to build the problem list based on the data
  */
@@ -845,7 +846,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 var maxForMonths = "";
                                                                                 var minForMonths = "";
                                                                                 if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
-                                                                                    mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                                    mos = Number(supplyPlanJson[0].mos);
                                                                                     maxForMonths = maxStockMoSQty;
                                                                                     minForMonths = minStockMoSQty;
                                                                                     if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
@@ -871,7 +872,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 var maxForMonths7to18 = "";
                                                                                 var minForMonths7to18 = "";
                                                                                 if (supplyPlanJson7to18.length > 0 && supplyPlanJson7to18[0].mos != null) {
-                                                                                    mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                                    mos7to18 = Number(supplyPlanJson7to18[0].mos);
                                                                                     maxForMonths7to18 = maxStockMoSQty;
                                                                                     minForMonths7to18 = minStockMoSQty;
                                                                                     if (minForMonths7to18 <= parseInt(toleranceCutoffMinMoS)) {
@@ -946,7 +947,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
                                                                             var mos = "";
                                                                             if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
-                                                                                mos = parseFloat(supplyPlanJson[0].mos).toFixed(1);
+                                                                                mos = Number(supplyPlanJson[0].mos);
                                                                                 if (mos == 0) {
                                                                                     stockoutsWithing6months.push(moment(m).format('MMM-YY'));
                                                                                 }
@@ -959,7 +960,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 && moment(c.transDate).format("YYYY-MM") == moment(m7to18).format("YYYY-MM"));
                                                                             var mos7to18 = "";
                                                                             if (supplyPlanJson7to18.length > 0 && supplyPlanJson7to18[0].mos != null) {
-                                                                                mos7to18 = parseFloat(supplyPlanJson7to18[0].mos).toFixed(1);
+                                                                                mos7to18 = Number(supplyPlanJson7to18[0].mos);
                                                                                 if (mos7to18 == 0) {
                                                                                     stockoutsWithing7to18months.push(moment(m7to18).format('MMM-YY'));
                                                                                 }
