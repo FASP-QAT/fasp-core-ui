@@ -3490,5 +3490,9 @@
   "static.dashboard.reviewStatusTooltip":"Status and date are based on the latest final version uploaded to the server",
   "static.forecast.compareAndSelectRangeInfo":"Between the highest and lowest consumption forecast",
   "static.common.accessDenied":"You do not have access to view or edit this data or setting.",
-  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully"
+  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
+  "static.stockStatus.graphAggregatedBy":"View Graph Disaggregated By",
+  "static.stockStatus.programPlanningUnit":"Program-Planning Unit",
+  "static.stockStatus.consensus":"Consensus",
+  "static.stockStatus.consensusConsumption":"Consensus Consumption"
 }

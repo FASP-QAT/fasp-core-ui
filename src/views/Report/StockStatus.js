@@ -350,7 +350,7 @@ class StockStatus extends Component {
           i18n.t('static.supplyPlan.openingBalance').replaceAll(' ', '%20'),
           i18n.t('static.report.forecasted').replaceAll(' ', '%20'),
           i18n.t('static.report.actual').replaceAll(' ', '%20'),
-          ("Consensus").replaceAll(' ', '%20'),
+          i18n.t('static.stockStatus.consensus').replaceAll(' ', '%20'),
           i18n.t('static.shipment.qty').replaceAll(' ', '%20'),
           (i18n.t('static.program.programMaster') + " | " + i18n.t('static.shipment.qty') + " | " + i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus').replaceAll(' ', '%20') + " | " + i18n.t('static.report.procurementAgentName') + " | " + i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')),
           i18n.t('static.report.adjustmentQty').replaceAll(' ', '%20'),
@@ -681,7 +681,7 @@ class StockStatus extends Component {
             i18n.t('static.supplyPlan.openingBalance'),
             i18n.t('static.report.forecasted'),
             i18n.t('static.report.actual'),
-            "Consensus",
+            i18n.t('static.stockStatus.consensus'),
             i18n.t('static.supplyPlan.qty'),
             i18n.t('static.program.programMaster') + " | " + (i18n.t('static.supplyPlan.qty') + " | " + i18n.t('static.supplyPlan.funding') + " | " + i18n.t('static.shipmentDataEntry.shipmentStatus') + " | " + (i18n.t('static.supplyPlan.procAgent')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo'))),
             i18n.t('static.supplyPlan.adj'),
@@ -1020,7 +1020,7 @@ class StockStatus extends Component {
     this.setState({
       exportModal: false
     })
-    let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
+    let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
     report == 1 ? document.getElementById("bars_div").style.display = 'block' : document.getElementById("bars_div").style.display = 'none';
     var PlanningUnitDataForExport = [];
     var PlanningUnitIdForExport;
@@ -1088,7 +1088,7 @@ class StockStatus extends Component {
         const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[index]);
         sortedTempOutput.map((plannningUnitItem, outputIndex) => {
           var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
-          let startDateForFilter = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
+          let startDateForFilter = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
           var filteredPlanningUnitData = this.state.isAggregate.toString() == "true" ? plannningUnitItem : plannningUnitItem.stockStatusVertical; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
           var datasets = [
             {
@@ -1126,7 +1126,7 @@ class StockStatus extends Component {
               data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
             },
             {
-              label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) ? "Consensus Consumption" : i18n.t('static.report.actualConsumption'),
+              label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) ? i18n.t('static.stockStatus.consensusConsumption') : i18n.t('static.report.actualConsumption'),
               yAxisID: 'A',
               type: 'line',
               stack: 7,
@@ -1550,7 +1550,7 @@ class StockStatus extends Component {
             }
           }
           var data = this.state.isAggregate.toString() == "true" ? planningUnitItemFilter : planningUnitItemFilter.stockStatusVertical;
-          let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
+          let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
           var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
           var planningUnit = this.state.planningUnitListAll.filter(e => e.id == sortedPlanningUnitList[outputIndex])[0];
           var conList = [];
@@ -1977,7 +1977,7 @@ class StockStatus extends Component {
     this.setState({
       loading: true
     })
-    let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
+    let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
     let inputjson = {
       "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
       "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
@@ -1994,7 +1994,7 @@ class StockStatus extends Component {
       var consumptionList = [];
       var shipmentList = [];
       var responseData = response.data.stockStatusVerticalAggregateList;
-      let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month)  + '-01');
+      let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
       var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
       filteredResponseData.map(c => {
         c.inventoryInfo.map(i => inventoryList.push(i))
@@ -2447,7 +2447,7 @@ class StockStatus extends Component {
         data: this.state.stockStatusList.map((item, index) => (item.finalConsumptionQty))
       },
       {
-        label: (this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) ? "Consensus Consumption" : i18n.t('static.report.actualConsumption'),
+        label: (this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) ? i18n.t('static.stockStatus.consensusConsumption') : i18n.t('static.report.actualConsumption'),
         yAxisID: 'A',
         type: 'line',
         stack: 7,
@@ -2803,7 +2803,7 @@ class StockStatus extends Component {
                           </FormGroup>
                           {this.state.yaxisEquUnit != -1 &&
                             <FormGroup className="col-md-12">
-                              <Label htmlFor="appendedInputButton">View Graph Disaggregated By</Label>
+                              <Label htmlFor="appendedInputButton">{i18n.t("static.stockStatus.graphAggregatedBy")}</Label>
                               <div className="controls ">
                                 <InputGroup>
                                   <Input
@@ -2816,7 +2816,7 @@ class StockStatus extends Component {
                                   >
                                     <option value="1">{i18n.t('static.program.programMaster')}</option>
                                     <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
-                                    <option value="3">Program-Planning Unit</option>
+                                    <option value="3">{i81n.t("static.stockStatus.programPlanningUnit")}</option>
                                   </Input>
 
                                 </InputGroup>
@@ -2841,7 +2841,7 @@ class StockStatus extends Component {
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-2" id="equivelencyUnitDiv">
-                        <Label htmlFor="appendedInputButton">Y-axis in equivalency unit</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t("static.forecastReport.yAxisInEquivalencyUnit")}</Label>
                         <div className="controls ">
                           <InputGroup>
                             <Input
@@ -3101,7 +3101,7 @@ class StockStatus extends Component {
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.openingBalanceTooltipSingleProgram') : i18n.t('static.stockStatus.openingBalanceTooltipMultiProgram')) : i18n.t('static.stockStatus.openingBalanceTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.supplyPlan.openingBalance')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.forecastedTooltipSingleProgram') : i18n.t('static.stockStatus.forecastedTooltipMultiProgram')) : i18n.t('static.stockStatus.forecastedTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.forecasted')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.actualTooltipSingleProgram') : i18n.t('static.stockStatus.actualTooltipMultiProgram')) : i18n.t('static.stockStatus.actualTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.report.actual')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i> </th>
-                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.consensusTooltipSingleProgram') : i18n.t('static.stockStatus.consensusTooltipMultiProgram')) : i18n.t('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> Consensus<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i> </th>}
+                        {(this.state.programId.length > 1 || this.state.planningUnitId.length > 1 || this.state.realmCountryPlanningUnitId.length > 1) && <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.consensusTooltipSingleProgram') : i18n.t('static.stockStatus.consensusTooltipMultiProgram')) : i18n.t('static.stockStatus.consensusTooltipEU')} className="text-center" style={{ width: "200px" }}> {i18n.t('static.stockStatus.consensus')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i> </th>}
                         <th className="text-center" title={this.state.yaxisEquUnit != -1 ? i18n.t('static.stockStatus.shipmentQtyTooltipEU') : ''} style={{ width: "200px" }}>{i18n.t('static.report.qty')}{this.state.yaxisEquUnit != -1 && <i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>}</th>
                         <th className="text-center" title={i18n.t('static.stockStatus.shipmemtTooltip')} style={{ width: "600px" }}>{i18n.t('static.report.qty') + " | " + (i18n.t('static.budget.fundingsource') + " | " + i18n.t('static.supplyPlan.shipmentStatus') + " | " + (i18n.t('static.report.procurementAgentName')) + " | " + (i18n.t('static.mt.roNoAndPrimeLineNo')) + " | " + (i18n.t('static.mt.orderNoAndPrimeLineNo')))}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
                         <th title={this.state.yaxisEquUnit == -1 ? (this.state.programId.length == 1 ? i18n.t('static.stockStatus.adjustmentQtyTooltipSingleProgram') : i18n.t('static.stockStatus.adjustmentQtyTooltipMultiProgram')) : i18n.t('static.stockStatus.adjustmentQtyTooltipEU')} className="text-center" style={{ width: "200px" }}>{i18n.t('static.report.adjustmentQty')}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i></th>
