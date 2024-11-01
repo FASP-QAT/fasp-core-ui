@@ -1320,14 +1320,19 @@ class StockStatus extends Component {
                 count += 1;
               })
 
-              const mediaQuery = window.matchMedia('(min-width: 1920px)')
-              const mediaQuery1 = window.matchMedia('(min-width: 1280px)')
+              const smallScreen = window.matchMedia('(max-width: 768px)');
+              const mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1366px)');
+              const largeScreen = window.matchMedia('(min-width: 1367px) and (max-width: 1919px)');
+              const extraLargeScreen = window.matchMedia('(min-width: 1920px)');
+
               if (newDatasetArray.length > 10) {
-                if (mediaQuery.matches) {
+                if (extraLargeScreen.matches) {
                   height = 400 + (10 * newDatasetArray.length);
-                }else if(mediaQuery1.matches){
-                  height = 400 + (10 * newDatasetArray.length);
-                } else {
+                } else if (largeScreen.matches) {
+                  height = 400 + (15 * newDatasetArray.length);
+                } else if (mediumScreen.matches) {
+                  height = 400 + (18 * newDatasetArray.length);
+                } else if (smallScreen.matches) {
                   height = 400 + (21 * newDatasetArray.length);
                 }
               }
@@ -1873,7 +1878,7 @@ class StockStatus extends Component {
     this.setState({
       yaxisEquUnit: yaxisEquUnit,
       loading: false,
-      viewById:yaxisEquUnit!=-1?this.state.viewById:1
+      viewById: yaxisEquUnit != -1 ? this.state.viewById : 1
     }, () => {
       if (this.state.viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
@@ -1903,8 +1908,8 @@ class StockStatus extends Component {
       loading: false,
       stockStatusList: [],
       yaxisEquUnit: -1,
-      realmCountryPlanningUnitId:[],
-      planningUnitId:[]
+      realmCountryPlanningUnitId: [],
+      planningUnitId: []
     }, () => {
       if (viewById == 2) {
         document.getElementById("realmCountryPlanningUnitDiv").style.display = "block";
@@ -2696,17 +2701,22 @@ class StockStatus extends Component {
             count += 1;
           })
 
-          const mediaQuery = window.matchMedia('(min-width: 1920px)')
-              const mediaQuery1 = window.matchMedia('(min-width: 1280px)')
-              if (newDatasetArray.length > 10) {
-                if (mediaQuery.matches) {
-                  height = 400 + (10 * newDatasetArray.length);
-                }else if(mediaQuery1.matches){
-                  height = 400 + (10 * newDatasetArray.length);
-                } else {
-                  height = 400 + (21 * newDatasetArray.length);
-                }
-              }
+          const smallScreen = window.matchMedia('(max-width: 768px)');
+          const mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1366px)');
+          const largeScreen = window.matchMedia('(min-width: 1367px) and (max-width: 1919px)');
+          const extraLargeScreen = window.matchMedia('(min-width: 1920px)');
+
+          if (newDatasetArray.length > 10) {
+            if (extraLargeScreen.matches) {
+              height = 400 + (10 * newDatasetArray.length);
+            } else if (largeScreen.matches) {
+              height = 400 + (15 * newDatasetArray.length);
+            } else if (mediumScreen.matches) {
+              height = 400 + (18 * newDatasetArray.length);
+            } else if (smallScreen.matches) {
+              height = 400 + (21 * newDatasetArray.length);
+            }
+          }
 
           datasets = datasets.concat(newDatasetArray);
         }
@@ -2872,7 +2882,7 @@ class StockStatus extends Component {
                               {i18n.t('static.report.planningUnit')}
                             </Label>
                           </FormGroup>
-                          {this.state.yaxisEquUnit==-1 && <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
+                          {this.state.yaxisEquUnit == -1 && <FormGroup check inline className='PaddingLeftSupplyReport' style={{ marginTop: '-4px' }}>
                             <Input
                               type="radio"
                               id="viewById"
