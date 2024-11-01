@@ -3456,5 +3456,9 @@
     "static.stockStatus.amcTooltipEU":"Sum of the individually calculated AMC values for selected programs & planning units each month after converting to EU",
     "static.stockStatus.onlyShowPUsThatArePartOfAllPrograms":"Only show PUs/ARUs that are available in ALL selected programs",
     "static.stockStatus.doYouWantToAggregate":"Do you want to aggregate selected programs",
-    "static.stockStatus.shipmemtTooltip":"Hover over each shipment box to see its assigned PU"
+    "static.stockStatus.shipmemtTooltip":"Hover over each shipment box to see its assigned PU",
+    "static.stockStatus.graphAggregatedBy":"View Graph Disaggregated By",
+    "static.stockStatus.programPlanningUnit":"Program-Planning Unit",
+    "static.stockStatus.consensus":"Consensus",
+    "static.stockStatus.consensusConsumption":"Consensus Consumption"
 }
