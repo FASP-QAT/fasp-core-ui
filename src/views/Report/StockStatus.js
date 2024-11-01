@@ -2068,10 +2068,6 @@ class StockStatus extends Component {
    * Calls the get programs function on page load
    */
   componentDidMount() {
-    console.log("Screen Test@123 width:", window.screen.width);
-    console.log("Screen Test@123 height:", window.screen.height);
-    console.log("Viewport Test@123 width:", window.innerWidth);
-    console.log("Viewport Test@123 height:", window.innerHeight);
     // Detect initial theme
     const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
     this.setState({ isDarkMode });
@@ -2710,9 +2706,9 @@ class StockStatus extends Component {
             if (extraLargeScreen.matches) {
               height = 400 + (10 * newDatasetArray.length);
             } else if (largeScreen.matches) {
-              height = 400 + (15 * newDatasetArray.length);
+              height = 400 + (12 * newDatasetArray.length);
             } else if (mediumScreen.matches) {
-              height = 400 + (18 * newDatasetArray.length);
+              height = 400 + (16 * newDatasetArray.length);
             } else if (smallScreen.matches) {
               height = 400 + (21 * newDatasetArray.length);
             }
