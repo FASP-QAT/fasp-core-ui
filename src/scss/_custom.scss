@@ -17273,6 +17273,10 @@ label.arrow_label:before {
   background-color: transparent !important;
 }
 
+.MarginTopCheck {
+  margin-top: -6px !important;
+}
+
 @media only screen and (min-width: 1474px) {
   .paddinCheckbox {
     padding-left: 45px;
@@ -17433,7 +17437,6 @@ label.arrow_label:before {
 
  .CustomHeight,
 .dashboardTable2 {
-  flex: 1;
   min-height: 0;
   /* Allow the item to shrink if necessary */
   overflow: auto;
