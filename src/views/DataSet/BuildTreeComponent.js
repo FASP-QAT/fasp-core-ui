@@ -5302,7 +5302,7 @@ export default class BuildTree extends Component {
             }
             document.getElementById("nodeValue").value = map1.get("9");
             this.handleAMonthDissmis1(json)
-            this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"))
+            this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"), 1)
         }
         );
     }
@@ -5662,7 +5662,9 @@ export default class BuildTree extends Component {
         }
         this.setState({ scalingTotal }, () => {
         });
-        jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        if (this.state.modelingEl != "") {
+            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+        }
         var data = dataArray;
         var options = {
             data: data,
@@ -5722,7 +5724,7 @@ export default class BuildTree extends Component {
                     readOnly: true
                 },
                 {
-                    title: i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(this.state.currentScenario.month.replace(/-/g, '\/')).format('MMM. YYYY'),
+                    title: i18n.t('static.tree.calculatedChangeForMonthTree') + " " + moment(this.state.currentScenario.month.replace(/-/g, '\/')).add(1, 'months').format('MMM. YYYY'),
                     type: 'numeric',
                     mask: '#,##0.0000',
                     decimal: '.',
@@ -5905,8 +5907,7 @@ export default class BuildTree extends Component {
         this.setState({
             modelingEl: modelingEl
         }, () => {
-            var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
-            this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
         }
         );
     }
@@ -8964,7 +8965,7 @@ export default class BuildTree extends Component {
                         showModelingJexcelNumber: true,
                         minMonth, maxMonth, filteredModelingType: modelingTypeListNew,
                         scalingMonth: {
-                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
+                            year: Number(moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY")), month: Number(moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("MM"))
                         },
                     }, () => {
                         if (!this.state.modelingTabChanged)
@@ -8975,7 +8976,7 @@ export default class BuildTree extends Component {
                     this.setState({
                         showModelingJexcelNumber: true,
                         scalingMonth: {
-                            year: Number(new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear()), month: Number(("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2))
+                            year: Number(moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY")), month: Number(moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("MM"))
                         },
                     }, () => {
                         if (!this.state.modelingTabChanged)
@@ -10094,8 +10095,7 @@ export default class BuildTree extends Component {
         this.setState({
             modelingCalculatorEl: modelingCalculatorEl,
         }, () => {
-            var scalingMonth = { year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) };
-            this.filterScalingDataByMonth(scalingMonth.year + "-" + scalingMonth.month + "-01");
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
             if (this.state.actualOrTargetValueList.length > 0) {
                 this.changed3(this.state.isCalculateClicked);
             }
@@ -11936,7 +11936,7 @@ export default class BuildTree extends Component {
                                 <FormGroup className="col-md-8 pl-lg-0 ModTransferMonthPickerWidth">
                                     <Picker
                                         ref={this.pickAMonth2}
-                                        years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                        years={{ min: this.state.minDateValue, max: this.state.maxDate }}
                                         value={this.state.scalingMonth}
                                         key={JSON.stringify(this.state.scalingMonth)}
                                         lang={pickerLang.months}
@@ -12422,7 +12422,7 @@ export default class BuildTree extends Component {
      * Updates the component state with the new range value and triggers a data fetch.
      * @param {object} value - The new range value selected by the user.
      */
-    handleAMonthChange1 = (year, month) => {
+    handleAMonthChange1 = (year, month, flag) => {
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
         let { currentItemConfig } = this.state;
@@ -12431,6 +12431,9 @@ export default class BuildTree extends Component {
         nodeDataMap.month = updatedMonth;
         (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] = nodeDataMap;
         this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
+            if (flag == 0) {
+                this.buildModelingJexcel();
+            }
         });
     }
     /**
