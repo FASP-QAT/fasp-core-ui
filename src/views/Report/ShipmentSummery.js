@@ -59,7 +59,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, formatter, makeText, roundARU } from "../../CommonComponent/JavascriptCommonFunctions";
 import FundingSourceService from "../../api/FundingSourceService.js";
 const ref = React.createRef();
 // const options = {
@@ -408,8 +408,8 @@ class ShipmentSummery extends Component {
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
           viewById == 1
-            ? re[item].shipmentQty
-            : (Number(re[item].shipmentQty) * re[item].multiplier).toFixed(2),
+            ? Number(re[item].shipmentQty).toFixed(3)
+            : (Number(Number(re[item].shipmentQty) * re[item].multiplier)).toFixed(3),
           moment(re[item].expectedDeliveryDate)
             .format(DATE_FORMAT_CAP_FOUR_DIGITS)
             .replaceAll(",", " ")
@@ -661,8 +661,8 @@ class ShipmentSummery extends Component {
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
       this.state.viewById == 1
-        ? formatter(ele.shipmentQty, 0)
-        : formatter(Number(ele.shipmentQty) * ele.multiplier, 0),
+        ? formatter(Number(ele.shipmentQty).toFixed(3), 0)
+        : formatter(Number(Number(ele.shipmentQty) * ele.multiplier).toFixed(3), 0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
@@ -1296,8 +1296,8 @@ class ShipmentSummery extends Component {
       data[10] =
         this.state.viewById == 1
           ? shipmentDetailsList[j].shipmentQty
-          : Number(shipmentDetailsList[j].shipmentQty) *
-          shipmentDetailsList[j].multiplier;
+          : (Number(shipmentDetailsList[j].shipmentQty) *
+          shipmentDetailsList[j].multiplier);
       data[11] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
         "YYYY-MM-DD"
       );
@@ -1369,7 +1369,7 @@ class ShipmentSummery extends Component {
         {
           title: i18n.t("static.report.qty"),
           type: "numeric",
-          mask: "#,##.00",
+          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
           decimal: ".",
         },
         {
