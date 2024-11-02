@@ -743,12 +743,12 @@ export default class ManualTagging extends Component {
                     this.el.setComments(col, "");
                     var json = this.el.getJson(null, false);
                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(8, y))[0];
-                    this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
+                    this.el.setValueFromCoords(11, y, (this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
                     this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                     this.el.setValueFromCoords(35, y, rcpu.multiplier, true);
                     for (var j = 0; j < json.length; j++) {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                            this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
+                            this.el.setValueFromCoords(11, j, (this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
                             this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                             this.el.setValueFromCoords(35, j, rcpu.multiplier, true);
                             this.el.setValueFromCoords(8, j, rcpu.id, true);
@@ -851,7 +851,7 @@ export default class ManualTagging extends Component {
                         this.state.instance.setComments(col, "");
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
                         if (rowData[0].toString() == "true") {
-                            this.state.instance.setValueFromCoords(12, y, Math.round(this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
+                            this.state.instance.setValueFromCoords(12, y, (this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                             this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(19, y, Math.round(this.state.instance.getValueFromCoords(10, y)), true);
@@ -859,7 +859,7 @@ export default class ManualTagging extends Component {
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
-                                        this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
+                                        this.state.instance.setValueFromCoords(12, j, (this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                                         this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
@@ -1422,7 +1422,7 @@ export default class ManualTagging extends Component {
                     tableJson.filter(c => c[16].roNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roNo && c[16].roPrimeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].roPrimeLineNo && c[16].knShipmentNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].knShipmentNo && c[16].orderNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].orderNo && c[16].primeLineNo == getUniqueOrderNoAndPrimeLineNoList[uq][16].primeLineNo).map(item => {
                         qty1 += Number(item[10]) * Number(this.state.instance.getValue(`V${parseInt(i) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.instance.getValue(`S${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
                     })
-                    qty += Math.round(qty1);
+                    qty += (qty1);
                 }
             }
         }
@@ -1619,7 +1619,7 @@ export default class ManualTagging extends Component {
                                 var shipmentIndex = shipmentList.findIndex(c => modifiedDataFilter[mdf][17].shipmentId > 0 ? c.shipmentId == modifiedDataFilter[mdf][17].shipmentId : c.tempShipmentId == modifiedDataFilter[mdf][17].tempShipmentId);
                                 var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.languageEl.getValueFromCoords(8, mdf))[0];
                                 shipmentList[shipmentIndex].notes = this.state.languageEl.getValue(`N${parseInt(mdf) + 1}`, true);
-                                shipmentList[shipmentIndex].shipmentQty = Math.round(Number(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AJ${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))));
+                                shipmentList[shipmentIndex].shipmentQty = (Number(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")) * Number(this.state.languageEl.getValue(`AJ${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", ""))));
                                 shipmentList[shipmentIndex].shipmentRcpuQty = Math.round(Number(this.state.languageEl.getValue(`AG${parseInt(mdf) + 1}`, true).toString().replaceAll("\,", "")));
                                 shipmentList[shipmentIndex].realmCountryPlanningUnit = {
                                     id: rcpu.id,
@@ -1861,7 +1861,7 @@ export default class ManualTagging extends Component {
                                                                 code: paRequest.result.filter(c => c.procurementAgentId == PSM_PROCUREMENT_AGENT_ID)[0].procurementAgentCode
                                                             },
                                                             productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty),
-                                                            shipmentQty: Math.round(shipmentQty),
+                                                            shipmentQty: (shipmentQty),
                                                             shipmentRcpuQty: Math.round(shipmentARUQty),
                                                             realmCountryPlanningUnit: {
                                                                 id: rcpu.id,
@@ -1960,7 +1960,7 @@ export default class ManualTagging extends Component {
                                                         planningUnit: shipmentList[shipmentIndex].planningUnit,
                                                         procurementAgent: shipmentList[shipmentIndex].procurementAgent,
                                                         productCost: Number(Number(getUniqueOrderNoAndPrimeLineNoList[uq][16].price / rcpu.multiplier).toFixed(6)) * Number(shipmentQty),
-                                                        shipmentQty: Math.round(shipmentQty),
+                                                        shipmentQty: (shipmentQty),
                                                         shipmentRcpuQty: Math.round(shipmentARUQty),
                                                         realmCountryPlanningUnit: {
                                                             id: rcpu.id,
@@ -2944,7 +2944,7 @@ export default class ManualTagging extends Component {
                         data1[8] = getLabelText(list[i].shipmentStatus.label, this.state.lang)
                         data1[9] = list[i].shipmentQty
                         data1[10] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data1[11] = Math.round(Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
+                        data1[11] = (Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
                         data1[12] = list[i].notes
                         data1[13] = i;
                         data1[14] = list[i].tempShipmentId;
@@ -3027,7 +3027,8 @@ export default class ManualTagging extends Component {
                             {
                                 title: i18n.t('static.manualTagging.qtyPU'),
                                 type: 'numeric',
-                                mask: '#,##',
+                                mask: '#,##.00',
+                                decimal:'.',
                                 readOnly: true,
                                 width: 80
                             },
@@ -3108,7 +3109,7 @@ export default class ManualTagging extends Component {
                         count++;
                     }
                     this.setState({
-                        totalQuantity: this.addCommas(Math.round(qty)),
+                        totalQuantity: this.addCommas((qty)),
                         displayTotalQty: (qty > 0 ? true : false)
                     });
                     if (document.getElementById("tableDiv1") != null) {
@@ -3194,7 +3195,7 @@ export default class ManualTagging extends Component {
                             {
                                 title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                                 type: 'numeric',
-                                mask: '#,##',
+                                mask: '#,##.00',
                                 decimal: '.',
                                 readOnly: true,
                                 width: 80
@@ -3363,7 +3364,7 @@ export default class ManualTagging extends Component {
                     data[8] = !this.state.versionId.toString().includes("Local") ? getLabelText(manualTaggingList[j].qatRealmCountryPlanningUnit.label, this.state.lang).toString().trim() : getLabelText(manualTaggingList[j].realmCountryPlanningUnit.label, this.state.lang).toString().trim()
                     data[9] = !this.state.versionId.toString().includes("Local") ? Math.round((shipmentQty)) : Math.round((shipmentQty) / (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1) / (!this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.multiplier : manualTaggingList[j].realmCountryPlanningUnit.multiplier))
                     data[31] = linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].conversionFactor : 1
-                    data[11] = `=ROUND(AG${parseInt(j) + 1}*AJ${parseInt(j) + 1}*AF${parseInt(j) + 1},0)`;
+                    data[11] = `=ROUND(AG${parseInt(j) + 1}*AJ${parseInt(j) + 1}*AF${parseInt(j) + 1},8)`;
                     data[13] = manualTaggingList[j].notes
                     data[14] = manualTaggingList[j].orderNo
                     data[15] = manualTaggingList[j].primeLineNo
@@ -3560,7 +3561,7 @@ export default class ManualTagging extends Component {
                         {
                             title: i18n.t('static.manualTagging.convertedQATShipmentQty'),
                             type: 'numeric',
-                            mask: '#,##', decimal: '.',
+                            mask: '#,##.00', decimal: '.',
                             readOnly: true,
                             width: 60,
                         },
