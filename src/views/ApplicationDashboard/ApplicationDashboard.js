@@ -6,7 +6,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
-import 'chart.piecelabel.js';
+// import 'chart.piecelabel.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';

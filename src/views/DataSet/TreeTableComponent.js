@@ -2815,7 +2815,9 @@ export default class TreeTable extends Component {
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
                             let tempMonth = new Date(json[i][5]);
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
+                            if(curItem.context.payload.nodeType.id != 1 && curItem.context.payload.nodeType.id != 6){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
+                            }
                             if (json[i][11] == 3) {
                                 var value = json[i][6].toString().replaceAll(",", "").replaceAll("%", "");
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
