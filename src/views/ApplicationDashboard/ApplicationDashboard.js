@@ -1219,15 +1219,15 @@ class ApplicationDashboard extends Component {
                           const labelX = model.x + x * (model.outerRadius + 10);
                           const labelY = model.y + y * (model.outerRadius + 10);
 
-                          const value = dataset.data[index];
-                          if (((value / total) * 100).toFixed(2) > 2) {
+                          const value = index == 1 ? dataset.data[0] == 0 ? 0 : dataset.data[index] : dataset.data[index];
+                          if (((value / total) * 100).toFixed(2) > 0 || (dataset.data[0] == 0 && index == 1)) {
                               ctx.beginPath();
                               ctx.moveTo(model.x, model.y);
                               ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
                               ctx.stroke();
                               ctx.textAlign = x >= 0 ? 'left' : 'right';
                               ctx.font = 'bold 14px Arial';
-                              ctx.fillStyle =  "#000000" //dataset.backgroundColor[index];
+                              ctx.fillStyle =  (dataset.data[0] == 0 && index == 1) ? "red" : "#000000" //dataset.backgroundColor[index];
                               ctx.fillText(`${value}`, labelX - 4, labelY + 2);
                               ctx.restore();
                           }
@@ -1431,7 +1431,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en
-        data[1] = forecastErrorList[j].errorPerc
+        data[1] = forecastErrorList[j].errorPerc.toFixed(2)
         dataArray[count] = data;
         count++;
       }
@@ -1887,7 +1887,14 @@ class ApplicationDashboard extends Component {
         containerID: 'legend-container',
       },
       legend: {
-        display: false
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            fontColor:fontColor,
+            fontSize: 0.01,
+            padding: 20
+        }
       },
       layout: {
         padding: {
@@ -2658,12 +2665,12 @@ class ApplicationDashboard extends Component {
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
-                          <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col"># of Active Planning Units <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.activePUTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Program <i class="fa fa-info-circle icons" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col"># of Active Planning Units <i class="fa fa-info-circle icons" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col"># of Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col">Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'># of Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'>Last Updated Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.lastUpdatedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.lastUpdatedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
                         <tbody>
@@ -2696,8 +2703,8 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}
-                                  {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                                <td><a href="/#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                    {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
                           })}
@@ -2826,7 +2833,7 @@ class ApplicationDashboard extends Component {
                         <Label
                           className="form-check-label"
                           check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                          Show only downloaded programs
+                          Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                         </Label>
                       </div>
                     </FormGroup>
@@ -2923,15 +2930,19 @@ class ApplicationDashboard extends Component {
                               <div className='row'>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-70px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={260} width={260} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
-                                <div id="legend-container" style={{marginTop:"20px"}}></div>
+                                <div id="legend-container" style={{marginTop:"5px"}}></div>
                               </div>
                             </div>
                             <div className='col-6'>
-                              <div class="card-title text-blackD"># of Shipments with funding TBD </div>
-                              <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
+                              <div className='row'>
+                                <Label htmlFor="displayBy"># of Shipments with funding TBD</Label>
+                              </div>
+                              <div className='row'>
+                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -2962,7 +2973,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
-                                <center><span className='text-blackD'>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
+                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -2970,7 +2981,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
-                                <center><span className='text-blackD'>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -2978,7 +2989,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
-                                <center><span className='text-blackD'>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -2986,7 +2997,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD'>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
