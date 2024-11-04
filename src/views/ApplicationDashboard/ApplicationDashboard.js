@@ -1635,7 +1635,7 @@ class ApplicationDashboard extends Component {
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
-      defaultModuleId = sessionStorage.getItem("defaultModuleId");;
+      defaultModuleId = sessionStorage.getItem('defaultModuleId');
     }
     if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
       defaultModuleId = defaultModuleId != undefined ? defaultModuleId : 1;
