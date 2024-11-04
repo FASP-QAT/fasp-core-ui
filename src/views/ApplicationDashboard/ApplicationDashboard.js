@@ -369,7 +369,7 @@ class ApplicationDashboard extends Component {
                 ],
                 editable: false,
                 onload: function (instance, cell) {
-                    jExcelLoadedFunction(instance, 1);
+                    jExcelLoadedFunction(instance, 4);
                 }.bind(this),
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
@@ -1424,7 +1424,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en
-        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!=undefined?roundARU(Number(forecastErrorList[j].errorPerc) * 100):"";
+        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?roundARU(Number(forecastErrorList[j].errorPerc) * 100, 1):"";
         dataArray[count] = data;
         count++;
       }
@@ -1446,9 +1446,11 @@ class ApplicationDashboard extends Component {
         },
         {
           title: "Average %",
-          type: 'text',
+          type: 'number',
           editable: false,
-          readOnly: true
+          readOnly: true,
+          mask: "#,##.00%",
+          decimal: "."
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1506,9 +1508,10 @@ class ApplicationDashboard extends Component {
         },
         {
           title: "# of Shipments",
-          type: 'text',
+          type: 'number',
           editable: false,
-          readOnly: true
+          readOnly: true,
+          mask: "#,##"
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
@@ -1546,8 +1549,8 @@ class ApplicationDashboard extends Component {
         data = [];
         data[0] = expiriesList[j].planningUnit.label.label_en
         data[1] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
-        data[2] = addCommas(roundARU(expiriesList[j].expiringQty, 1))
-        data[3] = addCommas(roundARU(expiriesList[j].expiryAmt, 1))
+        data[2] = roundARU(expiriesList[j].expiringQty, 1)
+        data[3] = roundARU(expiriesList[j].expiryAmt, 1)
         dataArray[count] = data;
         count++;
       }
@@ -1575,15 +1578,17 @@ class ApplicationDashboard extends Component {
         },
         {
           title: "Expired/Expiring Quantity",
-          type: 'text',
+          type: 'number',
           editable: false,
-          readOnly: true
+          readOnly: true,
+          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
         },
         {
           title: "Total Cost",
-          type: 'text',
+          type: 'number',
           editable: false,
-          readOnly: true
+          readOnly: true,
+          mask: '$#,##',
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
@@ -2696,7 +2701,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}
+                                <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
@@ -3006,7 +3011,7 @@ class ApplicationDashboard extends Component {
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
-                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b>{expiryTotal ? "$" : ""} {addCommas(roundARU(expiryTotal, 1))}</b></i></div>
+                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2 scrollable-content">
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '0px 8px' }}>
