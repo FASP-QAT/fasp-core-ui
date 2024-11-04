@@ -1713,12 +1713,12 @@ class ApplicationDashboard extends Component {
           backgroundColor: '#EDB944', // Yellow
         },
         {
-          label: 'Adequate',
+          label: 'Stocked to Plan',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
           backgroundColor: '#118B70', // Green
         },
         {
-          label: 'Overstock',
+          label: 'Above Max',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
           backgroundColor: '#49A4A1', // Dark Blue
         },
