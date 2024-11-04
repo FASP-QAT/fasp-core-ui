@@ -60,7 +60,8 @@ class Login extends Component {
       updatedSyncDate: '',
       lang: localStorage.getItem('lastLoggedInUsersLanguage'),
       loginOnline: true,
-      popupShown: 0
+      popupShown: 0,
+      disableLoginButton: false
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -339,6 +340,7 @@ class Login extends Component {
                             var lastLoggedInUsersLanguageChanged = localStorage.getItem('lastLoggedInUsersLanguageChanged');
                             LoginService.authenticate(emailId, password, languageCode, lastLoggedInUsersLanguageChanged)
                               .then(response => {
+                                document.getElementById("loginBtn").disabled = true;
                                 var decoded = jwt_decode(response.data.token);
                                 let keysToRemove = ["token-" + decoded.userId, "user-" + decoded.userId, "curUser", "lang", "typeOfSession", "i18nextLng", "lastActionTaken", "lastLoggedInUsersLanguage", "sessionType"];
                                 keysToRemove.forEach(k => localStorage.removeItem(k))
@@ -352,6 +354,7 @@ class Login extends Component {
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
                                 document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
                                 localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
+                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString()=="true"?false:true);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -367,6 +370,7 @@ class Login extends Component {
                               })
                               .catch(
                                 error => {
+                                  document.getElementById("loginBtn").disabled = false;
                                   if (error.message === "Network Error") {
                                     this.setState({
                                       message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -396,10 +400,12 @@ class Login extends Component {
                               );
                           }
                           else {
+                            document.getElementById("loginBtn").disabled = true;
                             var decryptedPassword = AuthenticationService.isUserLoggedIn(emailId);
                             if (decryptedPassword != "") {
                               bcrypt.compare(password, decryptedPassword, function (err, res) {
                                 if (err) {
+                                  document.getElementById("loginBtn").disabled = false;
                                   this.setState({ message: 'static.label.labelFail' });
                                 }
                                 if (res) {
@@ -413,23 +419,27 @@ class Login extends Component {
                                   localStorage.setItem('lang', user.language.languageCode);
                                   localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
                                   document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
+                                  localStorage.setItem('showDecimals', user.showDecimals.toString()=="true"?false:true);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());
                                   i18n.changeLanguage(user.language.languageCode);
                                   localStorage.removeItem("tempUser");
                                   if (AuthenticationService.syncExpiresOn() == true) {
+                                    document.getElementById("loginBtn").disabled = false;
                                     this.props.history.push(`/logout/static.message.syncExpiresOn`)
                                   } else {
                                     localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                     this.props.history.push(`/ApplicationDashboard`)
                                   }
                                 } else {
+                                  document.getElementById("loginBtn").disabled = false;
                                   this.setState({ message: 'static.message.login.invalidCredentials' });
                                 }
                               }.bind(this));
                             }
                             else {
+                              document.getElementById("loginBtn").disabled = false;
                               this.setState({ message: 'static.message.login.invalidCredentials' });
                             }
                           }
@@ -511,7 +521,7 @@ class Login extends Component {
                               </Row>}
                               <Row>
                                 <Col xs="6" className='DarkMode'>
-                                  <Button type="submit" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                  <Button type="submit" id="loginBtn" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
                                 <Col xs="6" className="text-right DarkMode">
                                   <Button type="button" color="link" className="px-0 btn-link" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>

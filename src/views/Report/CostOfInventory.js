@@ -25,7 +25,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, formatter, makeText, roundARU, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const { ExportCSVButton } = CSVExport;
 const ref = React.createRef();
 const pickerLang = {
@@ -313,7 +313,7 @@ export default class CostOfInventory extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -372,7 +372,7 @@ export default class CostOfInventory extends Component {
         const headers = [];
         columns.map((item, idx) => { headers[idx] = (item.text).replaceAll(' ', '%20') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.stock, (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
+        this.state.costOfInventory.map(ele => A.push(addDoubleQuoteToRowContent([ele.planningUnit.id, (getLabelText(ele.planningUnit.label).replaceAll(',', ' ')).replaceAll(' ', '%20'), (ele.stock!="" && ele.stock!=null?Number(ele.stock).toFixed(3):""), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), ele.catalogPrice, ele.cost])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -440,7 +440,7 @@ export default class CostOfInventory extends Component {
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         const headers = columns.map((item, idx) => (item.text));
-        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), formatter(ele.stock,0), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')),formatter(ele.catalogPrice,0), formatter(ele.cost,0)]);
+        const data = this.state.costOfInventory.map(ele => [ele.planningUnit.id, getLabelText(ele.planningUnit.label), (ele.stock!="" && ele.stock!=null?formatter(Number(ele.stock).toFixed(3), 0):""), (ele.calculated ? i18n.t('static.program.no') : i18n.t('static.program.yes')), formatter(ele.catalogPrice, 0), formatter(ele.cost, 0)]);
         let content = {
             margin: { top: 80, bottom: 50 },
             startY: 170,
@@ -561,7 +561,7 @@ export default class CostOfInventory extends Component {
                 },
                 {
                     title: i18n.t('static.report.stock'),
-                    type: 'numeric', mask: '#,##.00', decimal: '.',
+                    type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
                 },
                 {
                     title: i18n.t('static.report.actualInv'),
@@ -611,17 +611,17 @@ export default class CostOfInventory extends Component {
         var versionId = this.state.CostOfInventoryInput.versionId
         if (programId != 0 && versionId != 0 && versionId != "") {
             localStorage.setItem("sesVersionIdReport", versionId);
-            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+            var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
             var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
             var singleValue2 = this.state.singleValue2;
             if (moment(this.state.singleValue2.year + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                singleValue2= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                singleValue2 = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                 // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
             }
             this.setState({
-              minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-              singleValue2: singleValue2
+                minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                singleValue2: singleValue2
             })
             if (versionId.toString().includes('Local')) {
                 this.setState({ loading: true })
@@ -814,7 +814,7 @@ export default class CostOfInventory extends Component {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);

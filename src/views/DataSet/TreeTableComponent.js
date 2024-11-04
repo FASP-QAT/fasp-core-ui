@@ -42,6 +42,8 @@ import showguidanceTreeTableFr from '../../../src/ShowGuidanceFiles/TreeTableFr.
 import showguidanceTreeTablePr from '../../../src/ShowGuidanceFiles/TreeTablePr.html'
 import showguidanceTreeTableSp from '../../../src/ShowGuidanceFiles/TreeTableSp.html'
 import { LOGO } from '../../CommonComponent/Logo';
+import AggregationDown from '../../assets/img/funnel.png';
+import AggregationAllowed from '../../assets/img/aggregateAllowed.png';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import { addDoubleQuoteToRowContent, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
@@ -682,6 +684,7 @@ export default class TreeTable extends Component {
                 programData: ''
             },
             loading: false,
+            treeTableLoading: false,
             modelingJexcelLoader: false,
             momJexcelLoader: false,
             lastRowDeleted: false,
@@ -720,7 +723,9 @@ export default class TreeTable extends Component {
             calculateAllScenario: false,
             treeTabl1El: '',
             treeTabl2El: '',
-            isTabDataChanged: false
+            treeTabl3El: '',
+            isTabDataChanged: false,
+            downwardAggregationList: []
         }
         this.dataChange = this.dataChange.bind(this);
         this.scenarioChange = this.scenarioChange.bind(this);
@@ -766,19 +771,25 @@ export default class TreeTable extends Component {
         this.getUsageTemplateList = this.getUsageTemplateList.bind(this);
         this.buildTab1Jexcel = this.buildTab1Jexcel.bind(this);
         this.buildTab2Jexcel = this.buildTab2Jexcel.bind(this);
+        this.buildTab3Jexcel = this.buildTab3Jexcel.bind(this);
         this.updateTab1Data = this.updateTab1Data.bind(this);
         this.updateTab2Data = this.updateTab2Data.bind(this);
+        this.updateTab3Data = this.updateTab3Data.bind(this);
         this.updateNodeInfoInJson = this.updateNodeInfoInJson.bind(this);
         this.updateState = this.updateState.bind(this);
         this.saveTreeData = this.saveTreeData.bind(this);
         this.onChangeTab1Data = this.onChangeTab1Data.bind(this);
         this.onChangeTab2Data = this.onChangeTab2Data.bind(this);
+        this.onChangeTab3Data = this.onChangeTab3Data.bind(this);
         this.resetTab1Data = this.resetTab1Data.bind(this);
         this.resetTab2Data = this.resetTab2Data.bind(this);
+        this.resetTab3Data = this.resetTab3Data.bind(this);
         this.onChangePageTab1 = this.onChangePageTab1.bind(this);
         this.onChangePageTab2 = this.onChangePageTab2.bind(this);
+        this.onChangePageTab3 = this.onChangePageTab3.bind(this);
         this.checkValidationTab1 = this.checkValidationTab1.bind(this);
         this.checkValidationTab2 = this.checkValidationTab2.bind(this);
+        this.checkValidationTab3 = this.checkValidationTab3.bind(this);
         this.setProgramId = this.setProgramId.bind(this);
     }
     /**
@@ -1038,38 +1049,42 @@ export default class TreeTable extends Component {
      * @param {*} type Type of the node
      */
     calculateMOMData(nodeId, type, currentItemConfig) {
-        let { curTreeObj } = this.state;
-        let { treeData } = this.state;
-        let { dataSetObj } = this.state;
-        var items = this.state.items;
-        var programData = dataSetObj.programData;
-        programData.treeList = treeData;
-        if (this.state.selectedScenario !== "") {
-            curTreeObj.tree.flatList = items;
-        }
-        curTreeObj.scenarioList = this.state.scenarioList;
-        var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
-        treeData[findTreeIndex] = curTreeObj;
-        programData.treeList = treeData;
-        dataSetObj.programData = programData;
-        if (this.state.autoCalculate) {
-            var scenarioId = this.state.selectedScenario;
-            if (this.state.calculateAllScenario) {
-                scenarioId = -1;
+        return new Promise((resolve, reject) => {
+            let { curTreeObj } = this.state;
+            let { treeData } = this.state;
+            let { dataSetObj } = this.state;
+            var items = this.state.items;
+            var programData = dataSetObj.programData;
+            programData.treeList = treeData;
+            if (this.state.selectedScenario !== "") {
+                curTreeObj.tree.flatList = items;
             }
-            this.setState({
-                calculateAllScenario: false
-            })
-            calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, true);
-        } else {
-            this.setState({
-                loading: false,
-                modelingJexcelLoader: false,
-                momJexcelLoader: false,
-                message1: "Data updated successfully"
-            }, () => {
-            })
-        }
+            curTreeObj.scenarioList = this.state.scenarioList;
+            var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
+            treeData[findTreeIndex] = curTreeObj;
+            programData.treeList = treeData;
+            dataSetObj.programData = programData;
+            if (this.state.autoCalculate) {
+                var scenarioId = this.state.selectedScenario;
+                if (this.state.calculateAllScenario) {
+                    scenarioId = -1;
+                }
+                this.setState({
+                    calculateAllScenario: false
+                })
+                calculateModelingData(dataSetObj, this, '', (nodeId != 0 ? nodeId : currentItemConfig.context.id), scenarioId, type, this.state.treeId, false, false, true).then(() => {
+                    resolve();
+                });
+            } else {
+                this.setState({
+                    loading: false,
+                    modelingJexcelLoader: false,
+                    momJexcelLoader: false,
+                    message1: "Data updated successfully"
+                }, () => {
+                })
+            }      
+        })
     }
     /**
      * Fetches tracer category list from program data and updates state accordingly.
@@ -1157,7 +1172,7 @@ export default class TreeTable extends Component {
         var items = curTreeObj.tree.flatList;
         var scenarioId = scenarioId;
         for (let i = 0; i < items.length; i++) {
-            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2 || items[i].payload.nodeType.id == 6) {
                 (items[i].payload.nodeDataMap[scenarioId])[0].calculatedDataValue = (items[i].payload.nodeDataMap[scenarioId])[0].dataValue;
             } else {
                 var findNodeIndex = items.findIndex(n => n.id == items[i].parent);
@@ -1396,7 +1411,7 @@ export default class TreeTable extends Component {
      * Function to update the node info in json
      * @param {*} currentItemConfig The item configuration object that needs to be updated
      */
-    updateNodeInfoInJson(currentItemConfig) {
+    updateNodeInfoInJson(currentItemConfig, isTab3) {
         return new Promise((resolve, reject) => {
             var nodes = this.state.items;
             let { noFURequired, noOfMonthsInUsagePeriod } = this.getNoFURequiredForJexcel(currentItemConfig);
@@ -1465,8 +1480,13 @@ export default class TreeTable extends Component {
                 curTreeObj,
                 isTabDataChanged: false
             }, () => {
-                this.calculateMOMData(currentItemConfig.context.id, 0, currentItemConfig);
-                resolve();
+                this.calculateMOMData(currentItemConfig.context.id, 0, currentItemConfig).then(() => {
+                    if(isTab3) {
+                        setTimeout(() => {
+                            this.toggleModal(0, '3');
+                        }, 2000)
+                    }
+                })
             });
         });
     }
@@ -1538,6 +1558,7 @@ export default class TreeTable extends Component {
                             this.setState({
                                 loading: false,
                                 message: i18n.t("static.mt.dataUpdateSuccess"),
+                                treeTableLoading: false,
                                 color: "green",
                                 isChanged: false,
                                 isTreeDataChanged: false,
@@ -1565,6 +1586,7 @@ export default class TreeTable extends Component {
                                 loading: false,
                                 message: 'Error occured.',
                                 color: "red",
+                                treeTableLoading: false,
                             });
                         }.bind(this)
                     }.bind(this);
@@ -1573,6 +1595,7 @@ export default class TreeTable extends Component {
                             loading: false,
                             message: 'Error occured.',
                             color: "red",
+                            treeTableLoading: false,
                         }, () => {
                             this.hideSecondComponent();
                         });
@@ -1583,6 +1606,7 @@ export default class TreeTable extends Component {
                         loading: false,
                         message: 'Error occured.',
                         color: "red",
+                        treeTableLoading: false,
                     }, () => {
                         this.hideSecondComponent();
                     });
@@ -1822,6 +1846,8 @@ export default class TreeTable extends Component {
         tr.children[8].title = i18n.t('static.treeTable.parentValueTooltip');
         tr.children[9].classList.add('InfoTr');
         tr.children[9].title = i18n.t('static.treeTable.nodeValueTooltip');
+        tr.children[10].classList.add('InfoTr');
+        tr.children[10].title = i18n.t('static.tree.availableToBeAggregated');
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson(null, false);
         var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1834,7 +1860,7 @@ export default class TreeTable extends Component {
         var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
         for (var j = 0; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
-            if (rowData[10] == 1) {
+            if (rowData[11] == 1) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1849,7 +1875,7 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-            } else if (rowData[10] == 2 || rowData[10] == 3) {
+            } else if (rowData[11] == 2 || rowData[11] == 3) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1874,7 +1900,7 @@ export default class TreeTable extends Component {
         var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
         for (var j = start; j < jsonLength; j++) {
             var rowData = elInstance.getRowData(j);
-            if (rowData[10] == 1) {
+            if (rowData[11] == 1) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -1889,7 +1915,7 @@ export default class TreeTable extends Component {
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
-            } else if (rowData[10] == 2 || rowData[10] == 3) {
+            } else if (rowData[11] == 2 || rowData[11] == 3) {
                 var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                 cell.classList.add('readonly');
                 var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2193,10 +2219,74 @@ export default class TreeTable extends Component {
             }
         }
     }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loadedTab3 = function (instance, cell, x, y, value) {
+        jExcelLoadedFunction(instance);
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        tr.children[2].classList.add('InfoTr');
+        tr.children[2].title = i18n.t('static.tooltip.Parent');
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.NodeType');
+        tr.children[4].classList.add('InfoTr');
+        tr.children[4].title = i18n.t('static.tooltip.NodeTitle');
+        tr.children[6].classList.add('InfoTr');
+        tr.children[6].title = i18n.t('static.tree.availableToBeAggregated');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.treeTable.nodeValueTooltip');
+        var elInstance = instance.worksheets[0];
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O']
+        for (var j = 0; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if (rowData[7] == 6) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
+    onChangePageTab3(el, pageNo, oldPageNo) {
+        var elInstance = el;
+        var json = elInstance.getJson(null, false);
+        var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        if (jsonLength == undefined) {
+            jsonLength = 15
+        }
+        if (json.length < jsonLength) {
+            jsonLength = json.length;
+        }
+        var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+        for (var j = start; j < jsonLength; j++) {
+            var rowData = elInstance.getRowData(j);
+            if (rowData[7] == 6) {
+                var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+                var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                cell.classList.add('readonly');
+            }
+        }
+    }
     onChangeTab1Data = function (instance, cell, x, y, value) {
         this.checkValidationTab1();
         this.el = this.state.treeTabl1El;
-        this.el.setValueFromCoords(12, y, 1, true);
+        this.el.setValueFromCoords(13, y, 1, true);
         this.setState({
             isTabDataChanged: true
         })
@@ -2314,6 +2404,14 @@ export default class TreeTable extends Component {
             }
         }
     }
+    onChangeTab3Data = function (instance, cell, x, y, value) {
+        this.checkValidationTab3();
+        this.el = this.state.treeTabl3El;
+        this.el.setValueFromCoords(10, y, 1, true);
+        this.setState({
+            isTabDataChanged: true
+        })
+    }
     /**
      * Function to check validation of the jexcel table before performing updation.
      * @returns {boolean} - True if validation passes, false otherwise.
@@ -2323,7 +2421,7 @@ export default class TreeTable extends Component {
         var elInstance = this.state.treeTabl1El;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var nodeType = this.el.getValueFromCoords(10, y);
+            var nodeType = this.el.getValueFromCoords(11, y);
             if (this.el.getValueFromCoords(3, y) == "") {
                 var col = ('D').concat(parseInt(y) + 1);
                 elInstance.setStyle(col, "background-color", "transparent");
@@ -2445,19 +2543,24 @@ export default class TreeTable extends Component {
                     aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
                 }
             }
+            var sourceNodeUsageListCount = [];
+            if(this.state.dataSetObj.programData.treeList)
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == items[i].payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i style='color:#002f6c' class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i style='color:#002f6c' class='fa fa-link'></i>" : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
-                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px">Σ</div>' : ""}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
+                            ${items[i].payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? '<img height="18px" src="/aggregateAllowed.png" />' : ""}
+                            ${items[i].payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? '<img height="18px" src="/aggregateAllowedRed.png" />' : ""}
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
@@ -2466,10 +2569,11 @@ export default class TreeTable extends Component {
             data[6] = (items[i].payload.nodeType.id == 1) ? "" : currentScenario.dataValue == "" ? 0 : (items[i].payload.nodeType.id == 2 ? addCommasNodeValue(currentScenario.dataValue) : (addCommasNodeValue(currentScenario.dataValue) + "%"));
             data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : this.calculateParentValueFromMOMForJexcel(displayDate, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(displayDate, items[i]);
             data[8] = (items[i].payload.nodeType.id == 2 || items[i].payload.nodeType.id == 1) ? addCommasNodeValue(aggregationNodeValue) : addCommasNodeValue(Number(data[6].toString().replaceAll(",", "").replaceAll("%", "")) * Number(data[7]));
-            data[9] = currentScenario.notes;
-            data[10] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
-            data[11] = items[i].id;
-            data[12] = "";
+            data[9] = items[i].payload.downwardAggregationAllowed;
+            data[10] = currentScenario.notes;
+            data[11] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
+            data[12] = items[i].id;
+            data[13] = "";
             var nodeType = "";
             if (items[i].payload.nodeType.id == 2) {
                 nodeType = i18n.t("static.modelingValidation.number")
@@ -2523,7 +2627,7 @@ export default class TreeTable extends Component {
             {
                 title: i18n.t('static.ManageTree.NodeType'),
                 type: 'html',
-                width: '100'
+                width: '70'
             },
             {
                 title: i18n.t('static.tree.nodeTitle'),
@@ -2532,12 +2636,14 @@ export default class TreeTable extends Component {
             },
             {
                 title: i18n.t('static.tree.nodeUnit'),
+                width: '80',
                 source: this.state.nodeUnitListForDropdown,
                 type: 'dropdown',
             },
             {
                 title: i18n.t('static.supplyPlan.startMonth'),
                 options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' },
+                width: '80',
                 type: 'calendar'
             },
             {
@@ -2553,6 +2659,11 @@ export default class TreeTable extends Component {
                 title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
                 mask: '#,##0.0000', decimal: '.',
                 type: 'numeric',
+            },
+            {
+                title: i18n.t('static.tree.sourceNode'),
+                type: 'checkbox',
+                width: 80
             },
             {
                 title: i18n.t('static.common.notes'),
@@ -2633,7 +2744,7 @@ export default class TreeTable extends Component {
             updateTable: function (el, cell, x, j, source, value, id) {
                 var elInstance = el;
                 var rowData = elInstance.getRowData(j);
-                if (rowData[10] == 1) {
+                if (rowData[11] == 1) {
                     var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2648,7 +2759,7 @@ export default class TreeTable extends Component {
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
-                } else if (rowData[10] == 2 || rowData[10] == 3) {
+                } else if (rowData[11] == 2 || rowData[11] == 3) {
                     var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
                     cell.classList.add('readonly');
                     var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
@@ -2667,7 +2778,7 @@ export default class TreeTable extends Component {
                         items.push({
                             title: "Open this node for editing",
                             onclick: function () {
-                                localStorage.setItem("openNodeId", rowData[11]);
+                                localStorage.setItem("openNodeId", rowData[12]);
                                 window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
                             }.bind(this)
                         });
@@ -2687,34 +2798,38 @@ export default class TreeTable extends Component {
     updateTab1Data() {
         this.setState({
             // momJexcelLoader: true
+            treeTableLoading: true
         }, () => {
             setTimeout(() => {
                 if (this.checkValidationTab1()) {
                     var json = this.state.treeTabl1El.getJson(null, false);
                     var items = this.state.items;
                     for (var i = 0; i < json.length; i++) {
-                        if (json[i][12] == 1) {
+                        if (json[i][13] == 1) {
                             let curItem = {
                                 context: ''
                             };
-                            curItem.context = items.filter(c => c.id == json[i][11])[0];
+                            curItem.context = items.filter(c => c.id == json[i][12])[0];
                             curItem.context.payload.label.label_en = json[i][3];
                             curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
                             let tempMonth = new Date(json[i][5]);
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
-                            if (json[i][10] == 3) {
+                            if(curItem.context.payload.nodeType.id != 1 && curItem.context.payload.nodeType.id != 6){
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
+                            }
+                            if (json[i][11] == 3) {
                                 var value = json[i][6].toString().replaceAll(",", "").replaceAll("%", "");
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = value;
                                 this.state.currentScenario.dataValue = value;
                                 this.calculateParentValueFromMOM((curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month);
                             }
-                            if (json[i][10] == 2) {
+                            if (json[i][11] == 2) {
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][6].toString().replaceAll(",", "").replaceAll("%", "");
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][6].toString().replaceAll(",", "").replaceAll("%", "");
                             }
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][9];
+                            curItem.context.payload.downwardAggregationAllowed = json[i][9];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][10];
                             this.getNotes();
                             this.setState({
                                 currentItemConfig: curItem
@@ -2782,6 +2897,7 @@ export default class TreeTable extends Component {
     }.bind(this)
     updateTab2Data() {
         this.setState({
+            treeTableLoading: true
             // momJexcelLoader: true
         }, () => {
             setTimeout(() => {
@@ -3128,17 +3244,17 @@ export default class TreeTable extends Component {
             data[0] = items[i].id;
             data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
             data[2] = `<div>
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i class='fa fa-line-chart'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i class='fa fa-long-arrow-up'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i class='fa fa-long-arrow-down'></i>" : ""}
-                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i class='fa fa-link'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i style='color:#002f6c' class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i style='color:#002f6c' class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i style='color:#002f6c' class='fa fa-link'></i>" : ""}
                         <b>
                             ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
-                            ${items[i].payload.nodeType.id == 2 ? '<i class="fa fa-hashtag"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 3 ? '<i class="fa fa-percent"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 4 ? '<i class="fa fa-cube"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 5 ? '<i class="fa fa-cubes"></i>' : ""}
-                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px">Σ</div>' : ""}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
                         </b>
                     </div>`;
             data[3] = items[i].payload.label.label_en;
@@ -3239,6 +3355,10 @@ export default class TreeTable extends Component {
         try {
             this.el = jexcel(document.getElementById("tableDiv2"), '');
             jexcel.destroy(document.getElementById("tableDiv2"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv3"), '');
+            jexcel.destroy(document.getElementById("tableDiv3"), true);
         } catch (err) { }
         var data = treeArray;
         var columns = [
@@ -3603,6 +3723,341 @@ export default class TreeTable extends Component {
             loading: false,
             columns: columns
         })
+    }
+    /**
+     * Function to check validation of the jexcel table before performing updation.
+     * @returns {boolean} - True if validation passes, false otherwise.
+     */
+    checkValidationTab3() {
+        var valid = true;
+        var elInstance = this.state.treeTabl3El;
+        var json = this.el.getJson(null, false);
+        for (var y = 0; y < json.length; y++) {
+            var nodeType = this.el.getValueFromCoords(7, y);
+            if (this.el.getValueFromCoords(3, y) == "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+            if (this.el.getValueFromCoords(4, y) == "") {
+                var col = ('E').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setStyle(col, "background-color", "yellow");
+                elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
+                valid = false;
+            } else {
+                var col = ('E').concat(parseInt(y) + 1);
+                elInstance.setStyle(col, "background-color", "transparent");
+                elInstance.setComments(col, "");
+            }
+        }
+        return valid;
+    }
+    buildTab3Jexcel() {
+        var treeArray = [];
+        var count = 0;
+        var item1 = this.state.items;
+        var sortOrderArray = [...new Set(item1.map(ele => (ele.sortOrder)))];
+        var sortedArray = sortOrderArray.sort();
+        var items = [];
+        for (var i = 0; i < sortedArray.length; i++) {
+            items.push(item1.filter(c => c.sortOrder == sortedArray[i])[0]);
+        }
+        items = items.filter(c => c.payload.nodeType.id == 6)
+        var displayDate = (this.state.singleValue2.year) + "-" + (this.state.singleValue2.month <= 9 ? "0" + this.state.singleValue2.month : this.state.singleValue2.month) + "-01";
+        for (var i = 0; i < items.length; i++) {
+            data = [];
+            var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
+            var aggregationNodeValue = "0";
+            if (items[i].payload.nodeType.id == 6) {
+                var aggregationNodeValueFilter = currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(displayDate).format("YYYY-MM"));
+                if (aggregationNodeValueFilter.length > 0) {
+                    aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
+                }
+            }
+            data[1] = this.state.items.filter(c => c.id == items[i].parent).length > 0 ? this.state.items.filter(c => c.id == items[i].parent)[0].payload.label.label_en : "";
+            data[2] = `<div>
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true) ? "<i color:#002f6c class='fa fa-line-chart'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true ? "<i color:#002f6c class='fa fa-long-arrow-up'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true ? "<i color:#002f6c class='fa fa-long-arrow-down'></i>" : ""}
+                        ${(items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true ? "<i color:#002f6c class='fa fa-link'></i>" : ""}
+                        ${items[i].payload.nodeType.id == 6 ? '<b style="color:#002f6c" class="'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length == 0 ? "red" : "" : "red") +'" style="font-size:16px">'+(items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.length : 0)+'</b>' : ""}
+                        <b>
+                            ${(items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 4) ? items[i].payload.nodeDataMap[this.state.selectedScenario][0].fuNode.usageType.id == 2 ? '<b>c </b>' : '<b>d </b>' : ''}
+                            ${items[i].payload.nodeType.id == 2 ? '<i style="color:#002f6c" class="fa fa-hashtag"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 3 ? '<i style="color:#002f6c" class="fa fa-percent"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 4 ? '<i style="color:#002f6c" class="fa fa-cube"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 5 ? '<i style="color:#002f6c" class="fa fa-cubes"></i>' : ""}
+                            ${items[i].payload.nodeType.id == 1 ? '<div style="font-size:16px;color:#002f6c">Σ</div>' : ""}
+                            ${items[i].payload.nodeType.id == 6 ? '<img height="18px" src="/funnel.png" />' : ""}
+                        </b>
+                    </div>`;
+            data[3] = items[i].payload.label.label_en;
+            data[4] = this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId).length > 0 ? this.state.nodeUnitList.filter(c => c.id == items[i].payload.nodeUnit.unitId)[0].unitId : items[i].payload.nodeUnit.unitId;
+            data[5] = items[i].payload.downwardAggregationList ? items[i].payload.downwardAggregationList.map(x => (x.treeId + "~" + x.scenarioId + "~" + x.nodeId)).join(';') : []
+            data[6] = items[i].payload.nodeType.id == 6 ? addCommasNodeValue(aggregationNodeValue) : addCommasNodeValue(Number(data[6].toString().replaceAll(",", "").replaceAll("%", "")) * Number(data[7]));
+            data[7] = currentScenario.notes;
+            data[8] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
+            data[9] = items[i].id;
+            data[10] = "";
+            var nodeType = "";
+            if (items[i].payload.nodeType.id == 2) {
+                nodeType = i18n.t("static.modelingValidation.number")
+            } else if (items[i].payload.nodeType.id == 3) {
+                nodeType = i18n.t("static.ManageTree.Percentage")
+            } else if (items[i].payload.nodeType.id == 1) {
+                nodeType = i18n.t("static.ManageTree.Aggregation")
+            }else if (items[i].payload.nodeType.id == 6) {
+                nodeType = i18n.t('static.tree.funnelNode')
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
+                if (nodeType != "") {
+                    nodeType += ", ";
+                }
+                nodeType += i18n.t('static.ManageTree.Extrapolation')
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 4) == true) {
+                if (nodeType != "") {
+                    nodeType += ", ";
+                }
+                nodeType += "Increase"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 6) == true) {
+                if (nodeType != "") {
+                    nodeType += ", ";
+                }
+                nodeType += "Decrease"
+            }
+            if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation != true) && this.getPayloadData(items[i], 5) == true) {
+                if (nodeType != "") {
+                    nodeType += ", ";
+                }
+                nodeType += i18n.t('static.ManageTree.Transfer')
+            }
+            data[11] = nodeType;
+            treeArray[count] = data;
+            count++;
+        }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv3"), '');
+            jexcel.destroy(document.getElementById("tableDiv3"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv"), '');
+            jexcel.destroy(document.getElementById("tableDiv"), true);
+        } catch (err) { }
+        try {
+            this.el = jexcel(document.getElementById("tableDiv2"), '');
+            jexcel.destroy(document.getElementById("tableDiv2"), true);
+        } catch (err) { }
+        var data = treeArray;
+        var columns = [
+            {
+                title: 'Node Id',
+                type: 'hidden'
+            },
+            {
+                title: i18n.t('static.tree.parent'),
+                type: 'text',
+                width: '120'
+            },
+            {
+                title: i18n.t('static.ManageTree.NodeType'),
+                type: 'html',
+                width: '100'
+            },
+            {
+                title: i18n.t('static.tree.nodeTitle'),
+                type: 'text',
+                width: '120'
+            },
+            {
+                title: i18n.t('static.tree.nodeUnit'),
+                source: this.state.nodeUnitListForDropdown,
+                type: 'dropdown',
+            },
+            {
+                title: i18n.t('static.tree.sourceNode'),
+                source: this.state.downwardAggregationList,
+                type: 'dropdown',
+                multiple: true,
+                width: 200
+            },
+            {
+                title: i18n.t('static.tree.nodeValue') + " " + i18n.t('static.common.in') + " " + moment(displayDate).format("MMM YYYY"),
+                mask: '#,##0.0000', decimal: '.',
+                type: 'numeric',
+            },
+            {
+                title: i18n.t('static.common.notes'),
+                type: 'text',
+                width: 200
+            },
+            {
+                title: 'Node Type',
+                type: 'hidden',
+            },
+            {
+                title: 'Node Id',
+                type: 'hidden',
+            },
+            {
+                title: 'Is Changed',
+                type: 'hidden',
+            },
+            {
+                title: 'Node Type',
+                type: 'hidden',
+            }
+        ];
+        var options = {
+            data: data,
+            columnDrag: false,
+            colHeaderClasses: ["Reqasterisk"],
+            columns: columns,
+            editable: true,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            columnDrag: false,
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            onload: this.loadedTab3,
+            onchange: this.onChangeTab3Data,
+            onchangepage: this.onChangePageTab3,
+            updateTable: function (el, cell, x, j, source, value, id) {
+                var elInstance = el;
+                var rowData = elInstance.getRowData(j);
+                if (rowData[8] == 6) {
+                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                    cell.classList.add('readonly');
+                }
+            },
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                var rowData = obj.getRowData(y)
+                if (y != null) {
+                    if (1 == 1) {
+                        items.push({
+                            title: "Open this node for editing",
+                            onclick: function () {
+                                localStorage.setItem("openNodeId", rowData[12]);
+                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                            }.bind(this)
+                        });
+                    }
+                }
+                return items;
+            }.bind(this),
+        };
+        var treeTabl3El = jexcel(document.getElementById("tableDiv3"), options);
+        this.el = treeTabl3El;
+        this.setState({
+            treeTabl3El: treeTabl3El,
+            loading: false,
+            columns: columns
+        })
+    }
+    updateTab3Data() {
+        this.setState({
+            treeTableLoading: true
+            // momJexcelLoader: true
+        }, () => {
+            setTimeout(() => {
+                if (this.checkValidationTab3()) {
+                    var json = this.state.treeTabl3El.getJson(null, false);
+                    var items = this.state.items;
+                    for (var i = 0; i < json.length; i++) {
+                        if (json[i][10] == 1) {
+                            let curItem = {
+                                context: ''
+                            };
+                            curItem.context = items.filter(c => c.id == json[i][9])[0];
+                            curItem.context.payload.label.label_en = json[i][3];
+                            let tempList = [];
+                            if(json[i][5] != ""){
+                                json[i][5].split(";").map(x => tempList.push({
+                                    treeId: x.split("~")[0],
+                                    scenarioId: x.split("~")[1],
+                                    nodeId: x.split("~")[2]
+                                }));
+                            }   
+                            curItem.context.payload.downwardAggregationList = tempList;
+                            curItem.context.payload.nodeUnit.unitId = json[i][4];
+                            curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].notes = json[i][7];
+                            this.getNotes();
+                            this.setState({
+                                currentItemConfig: curItem
+                            }, () => {
+                                this.updateNodeInfoInJson(curItem, true);
+                            })
+                        }
+                    }
+                }
+            }, 0)
+        })
+    }
+    resetTab3Data() {
+        if (this.state.isTabDataChanged == true) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                this.setState({
+                    isTabDataChanged: false
+                }, () => {
+                    if (this.state.treeTabl3El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv3'), true);
+                        if (this.state.treeTabl3El != "") {
+                            if (document.getElementById('tableDiv3') != null) {
+                                jexcel.destroy(document.getElementById('tableDiv3'), true);
+                            }
+                        }
+                        else if (this.state.treeTabl3El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv3'), true);
+                        }
+                    }
+                    this.buildTab3Jexcel();
+                })
+            } else {
+            }
+        } else {
+            this.setState({
+                isTabDataChanged: false
+            }, () => {
+                if (this.state.treeTabl3El != "") {
+                    jexcel.destroy(document.getElementById('tableDiv3'), true);
+                    if (this.state.treeTabl3El != "") {
+                        if (document.getElementById('tableDiv3') != null) {
+                            jexcel.destroy(document.getElementById('tableDiv3'), true);
+                        }
+                    }
+                    else if (this.state.treeTabl3El != "") {
+                        jexcel.destroy(document.getElementById('tableDiv3'), true);
+                    }
+                }
+                this.buildTab3Jexcel();
+            })
+        }
     }
     /**
      * Calculates the parent value from the Month-on-Month (MOM) data for the given month.
@@ -4071,6 +4526,25 @@ export default class TreeTable extends Component {
                     toggleArray: tempToggleList,
                     programDataListForPuCheck: programDataListForPuCheck
                 }, () => {
+                    var tempDownwardAggregationList = [];
+                    var downwardAggregationList = [];
+                    this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.id}))))
+                    for(var i = 0; i < this.state.treeData.length; i++) {
+                        for(var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
+                            if(this.state.treeData[i].scenarioList[j].active) {
+                                tempDownwardAggregationList.filter(x => x.value.split("~")[0] == this.state.treeData[i].treeId).map(x => downwardAggregationList.push({
+                                    name: x.label.split("~")[0]+(this.state.treeData[i].scenarioList.filter(s => s.active).length > 1 ? (" > "+this.state.treeData[i].scenarioList[j].label.label_en) : "")+" > ... "+(this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent).length > 0 ? this.state.treeData[i].tree.flatList.filter(f2 => f2.id == this.state.treeData[i].tree.flatList.filter(x1 => x1.id == x.value.split("~")[1])[0].parent)[0].payload.label.label_en : "")+" > "+x.label.split("~")[1],
+                                    id: x.value.split("~")[0]+"~"+this.state.treeData[i].scenarioList[j].id+"~"+x.value.split("~")[1]
+                                }))
+                            }
+                        }
+                    }
+                    downwardAggregationList = downwardAggregationList.sort(function (a, b) {
+                        a = a.name.toLowerCase();
+                        b = b.name.toLowerCase();
+                        return a < b ? -1 : a > b ? 1 : 0;
+                    }.bind(this))
+                    this.setState({ downwardAggregationList });
                     if (this.state.treeId != "" && this.state.treeId != 0) {
                         this.getTreeByTreeId(this.state.treeId);
                     }
@@ -4937,6 +5411,19 @@ export default class TreeTable extends Component {
                                 }
                             }
                             this.buildTab2Jexcel();
+                        } else if (tab == 3) {
+                            if (this.state.treeTabl3El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv3'), true);
+                                if (this.state.treeTabl3El != "") {
+                                    if (document.getElementById('tableDiv3') != null) {
+                                        jexcel.destroy(document.getElementById('tableDiv3'), true);
+                                    }
+                                }
+                                else if (this.state.treeTabl1El != "") {
+                                    jexcel.destroy(document.getElementById('tableDiv1'), true);
+                                }
+                            }
+                            this.buildTab3Jexcel();
                         }
                     });
                 })
@@ -4978,6 +5465,19 @@ export default class TreeTable extends Component {
                             }
                         }
                         this.buildTab2Jexcel();
+                    } else if (tab == 3) {
+                        if (this.state.treeTabl3El != "") {
+                            jexcel.destroy(document.getElementById('tableDiv3'), true);
+                            if (this.state.treeTabl3El != "") {
+                                if (document.getElementById('tableDiv3') != null) {
+                                    jexcel.destroy(document.getElementById('tableDiv3'), true);
+                                }
+                            }
+                            else if (this.state.treeTabl1El != "") {
+                                jexcel.destroy(document.getElementById('tableDiv1'), true);
+                            }
+                        }
+                        this.buildTab3Jexcel();
                     }
                 });
             })
@@ -5092,7 +5592,7 @@ export default class TreeTable extends Component {
                     scenarioList: []
                 }, () => {
                     this.handleAMonthDissmis3(this.state.singleValue2, 0);
-                    this.toggleModal(0, this.state.activeTab1[0]);
+                    // this.toggleModal(0, this.state.activeTab1[0]);
                 });
             } else {
                 this.setState({
@@ -5115,6 +5615,14 @@ export default class TreeTable extends Component {
                     if (this.state.treeTabl2El != "") {
                         if (document.getElementById('tableDiv2') != null) {
                             jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        }
+                    }
+                }
+                if (this.state.treeTabl3El != "") {
+                    jexcel.destroy(document.getElementById('tableDiv3'), true);
+                    if (this.state.treeTabl3El != "") {
+                        if (document.getElementById('tableDiv3') != null) {
+                            jexcel.destroy(document.getElementById('tableDiv3'), true);
                         }
                     }
                 }
@@ -5154,6 +5662,14 @@ export default class TreeTable extends Component {
                     if (this.state.treeTabl2El != "") {
                         if (document.getElementById('tableDiv2') != null) {
                             jexcel.destroy(document.getElementById('tableDiv2'), true);
+                        }
+                    }
+                }
+                if (this.state.treeTabl3El != "") {
+                    jexcel.destroy(document.getElementById('tableDiv3'), true);
+                    if (this.state.treeTabl3El != "") {
+                        if (document.getElementById('tableDiv3') != null) {
+                            jexcel.destroy(document.getElementById('tableDiv3'), true);
                         }
                     }
                 }
@@ -5525,7 +6041,7 @@ export default class TreeTable extends Component {
             <>
                 <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
                     <div className="TreeTable">
-                        <div id="tableDiv" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
@@ -5537,7 +6053,7 @@ export default class TreeTable extends Component {
                 </TabPane>
                 <TabPane tabId="2" style={{ paddingBottom: "50px" }}>
                     <div className="TreeTable">
-                        <div id="tableDiv2" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div id="tableDiv2" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
                     {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
@@ -5545,6 +6061,18 @@ export default class TreeTable extends Component {
                             <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                         {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
                             <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                    </div>}
+                </TabPane>
+                <TabPane tabId="3" style={{ paddingBottom: "50px" }}>
+                    <div className="TreeTable">
+                        <div id="tableDiv3" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
+                        </div>
+                    </div>
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab3Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
+                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab3Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                     </div>}
                 </TabPane>
             </>
@@ -5836,8 +6364,10 @@ export default class TreeTable extends Component {
         }, () => {
             if (this.state.activeTab1[0] === '1') {
                 this.buildTab1Jexcel();
-            } else {
+            } else if(this.state.activeTab1[0] === '2') {
                 this.buildTab2Jexcel();
+            } else {
+                this.buildTab3Jexcel();
             }
         })
     }
@@ -5888,8 +6418,12 @@ export default class TreeTable extends Component {
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab1'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
-                }else{
+                } else if (this.state.activeTab1[0] === '2'){
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab2'), doc.internal.pageSize.width / 2, 50, {
+                        align: 'center'
+                    })
+                } else {
+                    doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.tree.funnelNode'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
                 }
@@ -5942,8 +6476,10 @@ export default class TreeTable extends Component {
         var json = "";
         if (this.state.activeTab1[0] === '1') {
             json = this.state.treeTabl1El.getJson(null, true);
-        } else {
+        } else if (this.state.activeTab1[0] === '2') {
             json = this.state.treeTabl2El.getJson(null, true);
+        } else {
+            json = this.state.treeTabl3El.getJson(null, true);
         }
         json.map(ele => {
             dataArr = [];
@@ -5964,11 +6500,13 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             dataArr.push(ele[13]);
-                        } else {
+                        } else if (this.state.activeTab1[0] === '2') {
                             dataArr.push(ele[39]);
+                        }else if (this.state.activeTab1[0] === '3') {
+                            dataArr.push(ele[11]);
                         }
                     } else {
-                        dataArr.push(ele[idx].toString().replaceAll(/&amp;/g, '&'));
+                        dataArr.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(/&gt;/g, '>'));
                     }
                 }
             })
@@ -6027,11 +6565,13 @@ export default class TreeTable extends Component {
                     } else if (item.type == 'html') {
                         if (this.state.activeTab1[0] === '1') {
                             B.push(ele[13].toString().replaceAll(',', '').replaceAll(' ', '%20'));
-                        } else {
+                        } else if(this.state.activeTab1[0] === '2'){
                             B.push(ele[39].toString().replaceAll(',', '').replaceAll(' ', '%20'));
+                        }else{
+                            B.push(ele[11].toString().replaceAll(',', '').replaceAll(' ', '%20'));
                         }
                     } else {
-                        B.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(',', '').replaceAll(' ', '%20'));
+                        B.push(ele[idx].toString().replaceAll(/&amp;/g, '&').replaceAll(/&gt;/g, '>').replaceAll(',', '').replaceAll(' ', '%20'));
                     }
                 }
             })
@@ -6161,31 +6701,31 @@ export default class TreeTable extends Component {
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0">
+                    <Card className="mb-lg-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
                         <div className="Card-header-reporticon pb-2">
                             {this.state.selectedScenario != "" && this.state.treeId != "" && this.state.programId != "" &&
                                 <div className="card-header-actions">
                                     <a className="card-header-action">
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                            var curTheme = localStorage.getItem("theme");
+                                            if(curTheme == "dark") {
+                                                this.setState({
+                                                    isDarkMode: false
+                                                }, () => {
+                                                    setTimeout(() => {
+                                                        this.exportPDF();
+                                                        if(curTheme == "dark") {
+                                                            this.setState({
+                                                                isDarkMode: true
+                                                            })
+                                                        }
+                                                    }, 0)
+                                                })
+                                            } else {
+                                                this.exportPDF();
+                                            }
+                                        }}
+                                        />
                                     </a>
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </div>
@@ -6210,7 +6750,7 @@ export default class TreeTable extends Component {
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
                                     <Form>
-                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading ? "none" : "block" }}>
+                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
                                             <div className="col-md-12 pl-lg-0">
                                                 <Row>
                                                     <FormGroup className="col-md-3 pl-lg-0">
@@ -6285,7 +6825,7 @@ export default class TreeTable extends Component {
                                                 </Row>
                                             </div>
                                         </CardBody>
-                                        <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
+                                        <div style={{ display: !this.state.loading || !this.state.treeTableLoading? "block" : "none" }} class="sample">
                                             <i className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
                                             <i className='text-blackD'>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
@@ -6297,6 +6837,14 @@ export default class TreeTable extends Component {
                                                                 onClick={() => { this.toggleModal(0, '1'); }}
                                                             >
                                                                 {i18n.t('static.treeTable.tab1')}
+                                                            </NavLink>
+                                                        </NavItem>
+                                                        <NavItem>
+                                                            <NavLink
+                                                                active={this.state.activeTab1[0] === '3'}
+                                                                onClick={() => { this.toggleModal(0, '3'); }}
+                                                            >
+                                                                {i18n.t('static.tree.funnelNode')}
                                                             </NavLink>
                                                         </NavItem>
                                                         <NavItem>
@@ -6319,7 +6867,7 @@ export default class TreeTable extends Component {
                                                 </div>
                                             </Provider> */}
                                         </div>
-                                        <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                        <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
                                             <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
                                                 <div class="align-items-center">
                                                     <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
@@ -6332,8 +6880,19 @@ export default class TreeTable extends Component {
                                 </>
                             </div>
                         </CardBody>
-                    </Card></Col></Row>
-                    <Modal isOpen={this.state.showGuidanceTreeTable}
+                    </Card>
+                    <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
+                        <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                            <div class="align-items-center">
+                                <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                <div class="spinner-border blue ml-4" role="status">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Col>
+            </Row>
+            <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>

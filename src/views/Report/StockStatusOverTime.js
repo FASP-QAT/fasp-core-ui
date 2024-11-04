@@ -28,7 +28,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundARU, roundN, roundNMOS } from '../../CommonComponent/JavascriptCommonFunctions';
 
 // const darkModeColors = [
 //     '#d4bbff', // Color 1 
@@ -1022,7 +1022,7 @@ observer.observe(document.documentElement, {
         csvRow.push('')
         var re;
         var A = [addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), (i18n.t('static.report.mospast')).replaceAll(' ', '%20'), (i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), i18n.t('static.report.mos')])]
-        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : roundARU(elt.stock,1), elt.consumptionQty == null ? '' : roundARU(elt.consumptionQty,1), elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1113,7 +1113,7 @@ observer.observe(document.documentElement, {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.mospast'), i18n.t('static.report.mosfuture'), i18n.t('static.report.amc'), i18n.t('static.report.mos')]];
         const data = [];
         // this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
-        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(roundARU(elt.stock,1),0), formatter(roundARU(elt.consumptionQty,1),0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1283,7 +1283,7 @@ const options = {
         //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         // ]
         const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundNMOS(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (dateFormatterLanguage(ele.dt)))))
         const bar = {
             labels: dts,
@@ -1513,10 +1513,10 @@ const options = {
                                                                 {getLabelText(item.planningUnit.label, this.state.lang)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.stock,0)}
+                                                                {formatter(roundARU(item.stock,1),0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.consumptionQty,0)}
+                                                                {formatter(roundARU(item.consumptionQty,1),0)}
                                                             </td>
                                                             <td>
                                                                 {formatter(item.mosPast,0)}
@@ -1531,7 +1531,7 @@ const options = {
                                                                 {formatter(item.amcMonthCount,0)}
                                                             </td> */}
                                                             <td>
-                                                                {item.mos != null ? roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
+                                                                {item.mos != null ? roundAMC(item.mos) : i18n.t("static.supplyPlanFormula.na")}
                                                             </td>
                                                         </tr>)}
                                             </tbody>

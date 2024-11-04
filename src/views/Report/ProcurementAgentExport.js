@@ -46,7 +46,7 @@ import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, filterOptions, makeText } from "../../CommonComponent/JavascriptCommonFunctions";
+import { addDoubleQuoteToRowContent, filterOptions, makeText, roundARU } from "../../CommonComponent/JavascriptCommonFunctions";
 const pickerLang = {
   months: [
     i18n.t("static.month.jan"),
@@ -1027,7 +1027,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            ele.qty,
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1047,7 +1047,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            ele.qty,
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1063,7 +1063,7 @@ class ProcurementAgentExport extends Component {
             getLabelText(ele.planningUnit.label, this.state.lang)
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            ele.qty,
+            Number(ele.qty).toFixed(3),
             Number(ele.productCost).toFixed(2),
             ele.freightPerc,
             ele.freightCost,
@@ -1253,7 +1253,7 @@ class ProcurementAgentExport extends Component {
         ele.procurementAgent.code,
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        ele.qty.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()
@@ -1279,7 +1279,7 @@ class ProcurementAgentExport extends Component {
         getLabelText(ele.fundingSourceType.label, this.state.lang),
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        ele.qty.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()
@@ -1304,7 +1304,7 @@ class ProcurementAgentExport extends Component {
       data = this.state.data.map((ele) => [
         ele.planningUnit.id,
         getLabelText(ele.planningUnit.label, this.state.lang),
-        ele.qty.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+        (Number(ele.qty).toFixed(3)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
         Number(ele.productCost)
           .toFixed(2)
           .toString()
@@ -1445,8 +1445,8 @@ class ProcurementAgentExport extends Component {
         },
         {
           title: i18n.t("static.report.qty"),
-          type: "numeric",
-          mask: "#,##",
+          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
+          decimal: ".",
         },
         {
           title: i18n.t("static.report.productCost"),
