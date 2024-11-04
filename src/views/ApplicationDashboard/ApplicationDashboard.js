@@ -1424,7 +1424,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en
-        data[1] = roundARU(Number(forecastErrorList[j].errorPerc) * 100);
+        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!=undefined?roundARU(Number(forecastErrorList[j].errorPerc) * 100):"";
         dataArray[count] = data;
         count++;
       }

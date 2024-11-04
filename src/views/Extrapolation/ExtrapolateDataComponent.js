@@ -327,7 +327,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             estimatedTime: 0,
             syncedExtrapolationsPercentage: 0,
             startBulkExtrapolation: false,
-            showMissingTESANDARIMA: false
+            showMissingTESANDARIMA: false,
+            type:0,
         }
         this.toggleConfidenceLevel = this.toggleConfidenceLevel.bind(this);
         this.toggleConfidenceLevel1 = this.toggleConfidenceLevel1.bind(this);
@@ -3180,7 +3181,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
                             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
-                            localStorage.setItem("message", i18n.t('static.extrapolation.bulkExtrapolationSuccess'));
+                            console.log("this.state.bulkExtrapolation Test@123",this.state.bulkExtrapolation);
+                            console.log("this.state.optimizeTESAndARIMA Test@123",this.state.optimizeTESAndARIMA);
+                            localStorage.setItem("message", (this.state.type==1?(i18n.t('static.extrapolation.bulkExtrapolationSuccess')):(this.state.type==2?i18n.t('static.extrapolation.optimiseTESAndARIMASuccess'):i18n.t('static.extrapolation.missingTESAndARIMASuccess'))));
                             localStorage.setItem("isExtrapolation", true);
                             window.location.reload();
                         }.bind(this);
@@ -3678,14 +3681,17 @@ export default class ExtrapolateDataComponent extends React.Component {
         if (modalView == 1) {
             this.setState({
                 bulkExtrapolation: !this.state.bulkExtrapolation,
+                type:modalView
             })
         } else if (modalView == 2) {
             this.setState({
                 optimizeTESAndARIMA: !this.state.optimizeTESAndARIMA,
+                type:modalView
             })
         } else if (modalView == 3) {
             this.setState({
-                missingTESAndARIMA: !this.state.missingTESAndARIMA
+                missingTESAndARIMA: !this.state.missingTESAndARIMA,
+                type:modalView
             })
         }
         if (flag) {
