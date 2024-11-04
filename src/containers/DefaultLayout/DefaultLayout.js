@@ -610,11 +610,18 @@ class DefaultLayout extends Component {
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
       var defaultModuleId = 1;
       if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
+        if(sessionStorage.getItem('defaultModuleId')=='' || sessionStorage.getItem('defaultModuleId')==undefined){
         defaultModuleId = decryptedUser.defaultModuleId;
+        sessionStorage.setItem('defaultModuleId',defaultModuleId);
+        }else{
+          defaultModuleId = sessionStorage.getItem('defaultModuleId');
+        }
       } else if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) {
         defaultModuleId = 2;
+        sessionStorage.setItem('defaultModuleId',2);
       } else {
         defaultModuleId = 1;
+        sessionStorage.setItem('defaultModuleId',1);
       }
       this.setState({
         activeTab: defaultModuleId,
@@ -926,9 +933,10 @@ class DefaultLayout extends Component {
     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
     decryptedUser.defaultModuleId = tab;
     localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
-    let decryptedUser1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    // let decryptedUser1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    sessionStorage.setItem("defaultModuleId",tab);
     this.setState({
-      activeTab: decryptedUser1.defaultModuleId,
+      activeTab: tab,
     });
   }
   /**
