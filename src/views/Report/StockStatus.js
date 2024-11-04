@@ -1329,9 +1329,9 @@ class StockStatus extends Component {
                 if (extraLargeScreen.matches) {
                   height = 400 + (10 * newDatasetArray.length);
                 } else if (largeScreen.matches) {
-                  height = 400 + (15 * newDatasetArray.length);
+                  height = 400 + (12 * newDatasetArray.length);
                 } else if (mediumScreen.matches) {
-                  height = 400 + (18 * newDatasetArray.length);
+                  height = 400 + (16 * newDatasetArray.length);
                 } else if (smallScreen.matches) {
                   height = 400 + (21 * newDatasetArray.length);
                 }
@@ -1653,7 +1653,7 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {
@@ -2704,16 +2704,12 @@ class StockStatus extends Component {
 
           if (newDatasetArray.length > 10) {
             if (extraLargeScreen.matches) {
-              console.log("In if extra large screen Test@123")
               height = 400 + (10 * newDatasetArray.length);
             } else if (largeScreen.matches) {
-              console.log("In if large screen Test@123")
               height = 400 + (12 * newDatasetArray.length);
             } else if (mediumScreen.matches) {
-              console.log("In if medium screen Test@123")
               height = 400 + (16 * newDatasetArray.length);
             } else if (smallScreen.matches) {
-              console.log("In if small screen Test@123")
               height = 400 + (21 * newDatasetArray.length);
             }
           }
