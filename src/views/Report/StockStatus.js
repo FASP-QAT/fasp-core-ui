@@ -1653,7 +1653,7 @@ class StockStatus extends Component {
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getSPProgramBasedOnRealmId(realmId)
+      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
         .then(response => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {
