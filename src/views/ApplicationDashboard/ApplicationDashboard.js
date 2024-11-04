@@ -971,21 +971,13 @@ class ApplicationDashboard extends Component {
       displayBy
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.split("_").length == 1) {
-        var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
-        var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
-        localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
         var inputJson = {
           programId: this.state.bottomProgramId,
-          startDate: dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-01",
-          stopDate: dt1.getFullYear() + "-" + (dt1.getMonth() + 1) + "-01",
+          startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
+          stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
           displayShipmentsBy: this.state.displayBy
         }
         this.getOnlineDashboardBottom(inputJson);
-        this.setState({
-          rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
-        })
       } else {
         Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
       }
@@ -1125,11 +1117,12 @@ class ApplicationDashboard extends Component {
           dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
           var dt1 = new Date();
           dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
-          localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
+          if(!localStorage.getItem("bottomReportPeriod"))
+            localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
           var inputJson = {
             programId: this.state.bottomProgramId,
-            startDate: dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-01",
-            stopDate: dt1.getFullYear() + "-" + (dt1.getMonth() + 1) + "-01",
+            startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
+            stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
             displayShipmentsBy: this.state.displayBy
           }
           this.getOnlineDashboardBottom(inputJson);
@@ -1893,13 +1886,13 @@ class ApplicationDashboard extends Component {
             usePointStyle: true,
             fontColor:fontColor,
             fontSize: 0.01,
-            padding: 20
+            padding: 10
         }
       },
       layout: {
         padding: {
           top: 10, // Add extra top padding to avoid label overlap
-          bottom: 10,
+          // bottom: 10,
         },
       },
     }
