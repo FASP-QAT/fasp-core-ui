@@ -578,7 +578,22 @@ export default class ExtrapolateDataComponent extends React.Component {
                     })
                 } else if (localStorage.getItem("sesDatasetId") != "" && proList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                     event.target.value = localStorage.getItem("sesDatasetId");
-                    this.setForecastProgramId(event);
+                    this.setState({
+                        forecastProgramList: proList.sort(function (a, b) {
+                            a = (a.name).toLowerCase();
+                            b = (b.name).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        downloadedProgramData: downloadedProgramData,
+                        downloadedProgramList: downloadedProgramData.sort(function (a, b) {
+                            a = (a.name).toLowerCase();
+                            b = (b.name).toLowerCase();
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }),
+                        loading: false
+                    },()=>{
+                        this.setForecastProgramId(event);
+                    })
                 } else {
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {

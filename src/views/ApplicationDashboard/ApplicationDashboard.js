@@ -6,7 +6,7 @@ import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
-import 'chart.piecelabel.js';
+// import 'chart.piecelabel.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
@@ -2702,9 +2702,9 @@ class ApplicationDashboard extends Component {
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
-                                <td>{moment(d.lastModifiedDate).format('DD-MMMM-YY')}</td>
-                                <td><a href="/#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
-                                    {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                                <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
+                                <td>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}
+                                  {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
                           })}
