@@ -2645,28 +2645,28 @@ class ApplicationDashboard extends Component {
 
                         <FormGroup>
                         <div class="myMarquee">
-  <div class="scroller">
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-    
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-  </div>
-</div>
+                          <div class="scroller">
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                            
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                          </div>
+                        </div>
                         </FormGroup>
 
                       </div>
@@ -2694,8 +2694,8 @@ class ApplicationDashboard extends Component {
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
-                          <th scope="col">Program <i class="fa fa-info-circle icons" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col"># of Active Planning Units <i class="fa fa-info-circle icons" aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Program</th>
+                          <th scope="col"># of Active Planning Units</th>
                           <th scope="col"># of Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'># of Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -2728,12 +2728,12 @@ class ApplicationDashboard extends Component {
 
                                 </td>
                                 <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfStockOutPU}</td>
-                                <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"} {addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                                <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
                                 <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
-                                  {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                                  {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
                           })}
