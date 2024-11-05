@@ -2645,28 +2645,28 @@ class ApplicationDashboard extends Component {
 
                         <FormGroup>
                         <div class="myMarquee">
-  <div class="scroller">
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-    
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-    <div class="scroller-content">
-      <div><a href="#">Countries</a><p>5</p></div>
-      <div><a href="#">Users</a><p>5</p></div>
-      <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-      <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-    </div>
-  </div>
-</div>
+                          <div class="scroller">
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                            
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                            <div class="scroller-content">
+                              <div><a href="#">Countries</a><p>5</p></div>
+                              <div><a href="#">Users</a><p>5</p></div>
+                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                            </div>
+                          </div>
+                        </div>
                         </FormGroup>
 
                       </div>
