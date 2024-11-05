@@ -17543,57 +17543,6 @@ label.arrow_label:before {
 }
 
 
-// .myMarquee {
-//   width: 484px;
-//   height: 53px;
-//   margin-left: 21px;
-//   margin-top: 9px;
-//   overflow: hidden;
-//   position: relative;
-//   border: 1px solid #aaa;
-//   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-//   border-radius: 8px;
-//   background: #4ad;
-//   background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
-// }
-
-// .scroller {
-//  display: flex;
-//   width: calc(100% * 2); /* Enough width to hold duplicated content */
-//   animation: scroll 10s linear infinite;
-// }
-
-// .scroller div {
-//   font-size: 16px;
-//   line-height: 23px;
-//   width: auto; /* Adjusted width */
-//   color: #000;
-//   font-weight: bold;
-//   padding: 5px 25px; /* Adjusted padding */
-//   text-align: center;
-//   // overflow: hidden; /* Ensure no overflow */
-//   white-space: nowrap; /* Prevent text wrapping */
-// }
-
-// .scroller div a {
-//   color: #c00;
-// }
-
-// @keyframes scroll {
-//   0% {
-//     left: 0;
-//   }
-//   100% {
-//     left: -2000px; /* Adjust based on total width of scroller */
-//   }
-// }
-
-// .scroller:hover {
-//   animation-play-state: paused;
-// }
-
-
-
 .myMarquee {
   width: 484px;
   height: 53px;
@@ -17671,4 +17620,7 @@ label.arrow_label:before {
   width: auto;
   white-space: nowrap; /* Prevent text wrapping */
 }
+}
+.selectBlack{
+  color: #000000 !important;
 }

@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import Picker from 'react-month-picker';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
+import Select from 'react-select';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 // import 'chart.piecelabel.js';
 import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
@@ -369,7 +370,7 @@ class ApplicationDashboard extends Component {
                 ],
                 editable: false,
                 onload: function (instance, cell) {
-                    jExcelLoadedFunction(instance, 4);
+                    jExcelLoadedFunction(instance);
                 }.bind(this),
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,
@@ -1625,7 +1626,10 @@ class ApplicationDashboard extends Component {
    * @returns {JSX.Element} - Application Dashboard.
    */
   render() {
-
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
     const { isDarkMode } = this.state;
     // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -1708,22 +1712,22 @@ class ApplicationDashboard extends Component {
         {
           label: 'Below Min',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#EDB944', // Yellow
+          backgroundColor: '#f48521', // Yellow
         },
         {
           label: 'Stocked to Plan',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
-          backgroundColor: '#118B70', // Green
+          backgroundColor: '#118b70', // Green
         },
         {
           label: 'Above Max',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#49A4A1', // Dark Blue
+          backgroundColor: '#edb944', // Dark Blue
         },
         {
           label: 'NA',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
-          backgroundColor: '#F48521', // Red
+          backgroundColor: '#cfcdc9', // Red
         }
       ]
     };
@@ -1831,19 +1835,19 @@ class ApplicationDashboard extends Component {
     }
 
     const darkModeColors = [
-      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
-      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
-      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
-      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521',
-      '#A7C6ED', '#118b70', '#BA0C2F', '#EDB944', '#49A4A1', '#F48521'
+      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
     ];
 
     const lightModeColors = [
-      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
-      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
-      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
-      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C',
-      '#49A4A1', '#118b70', '#BA0C2F', '#F48521', '#6C6463', '#002F6C'
+      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
     ];
 
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
@@ -2707,7 +2711,7 @@ class ApplicationDashboard extends Component {
                                   <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version}​</td>}
-                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId}​</td>}
+                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
@@ -2728,7 +2732,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : d.latestFinalVersionStatus ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem("topLocalProgram") != "true" && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
@@ -2833,6 +2837,7 @@ class ApplicationDashboard extends Component {
                         type="select"
                         name="bottomProgramId"
                         id="bottomProgramId"
+                        className="selectBlack"
                         value={this.state.bottomProgramId}
                         onChange={(e) => { this.dataChange(e) }}
                         bsSize="sm"
