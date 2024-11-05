@@ -2641,19 +2641,19 @@ class ApplicationDashboard extends Component {
 
                       </div>
 
-                      <div className="col-5" style={{marginLeft:'auto'}}>
+                      <div className="col-6" style={{marginLeft:'auto'}}>
                         <div class="containerBox">
                           <div class="scroll-wrapper">
                             <div class="orb"><Col>Countries</Col><Col>5</Col></div>
-                            <div class="orb red1"><Col>User</Col><Col>5</Col></div>
-                            <div class="orb dark1"><Col>Program</Col><Col>5</Col></div>
-                            <div class="orb blue1"><Col>Pending Approval</Col><Col>5</Col></div>
+                            <div class="orb red1"><Col>Users</Col><Col>5</Col></div>
+                            <div class="orb dark1"><Col>Supply Plan Programs</Col><Col>5</Col></div>
+                            <div class="orb blue1"><Col>Programs Pending Supply Plan Approval</Col><Col>5</Col></div>
                           </div>
                           <div class="scroll-wrapper">
                             <div class="orb"><Col>Countries</Col><Col>5</Col></div>
-                            <div class="orb red1"><Col>User</Col><Col>5</Col></div>
-                            <div class="orb dark1"><Col>Program</Col><Col>5</Col></div>
-                            <div class="orb blue1"><Col>Pending Approval</Col><Col>5</Col></div>
+                            <div class="orb red1"><Col>Users</Col><Col>5</Col></div>
+                            <div class="orb dark1"><Col>Supply Plan Programs</Col><Col>5</Col></div>
+                            <div class="orb blue1"><Col>Programs Pending Supply Plan Approval</Col><Col>5</Col></div>
                           </div>
                         </div>
                       </div>
