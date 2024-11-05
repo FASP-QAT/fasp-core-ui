@@ -187,7 +187,7 @@ export default class SyncMasterData extends Component {
             var lastSyncDate = date;
             lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss")
             var lastSyncDateForShipments = date;
-            if(this.props.location.state.programIds.includes(programList[pl].programId)){
+            if(this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(programList[pl].programId)){
                 lastSyncDateForShipments=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss");
             }
             jsonForNewShipmentSync.push({
