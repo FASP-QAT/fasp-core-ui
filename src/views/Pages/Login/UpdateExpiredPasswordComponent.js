@@ -110,6 +110,7 @@ class UpdateExpiredPasswordComponent extends Component {
                                                         document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
                                                         localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
                                                         localStorage.setItem('showDecimals', decoded.user.showDecimals.toString()=="true"?false:true);
+                                                        sessionStorage.setItem('defaultModuleId', decoded.user.defaultModuleId.toString()=="1"?1:2);
                                                         localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                                         localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                                         i18n.changeLanguage(decoded.user.language.languageCode);
