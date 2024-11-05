@@ -188,7 +188,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       if (puQty < 1) {
         puQty = Number(puQty).toFixed(4);
       } else {
-        puQty = Math.round(puQty);
+        // puQty = Math.round(puQty);
+        puQty = Number(puQty).toFixed(4);
       }
     }
     return puQty;
@@ -1795,7 +1796,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.user.user') + ' : ' + AuthenticationService.getLoggedInUsername()).replaceAll(' ', '%20') + '"')
     csvRow.push('')
-    csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " " + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1])).replaceAll(' ', '%20') + '"')
+    csvRow.push('"' + (document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + " v" + (document.getElementById("versionId").selectedOptions[0].text.toString())).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     csvRow.push('"' + (getLabelText(this.state.datasetJson.label, this.state.lang)).replaceAll(' ', '%20') + '"')
     csvRow.push('')
@@ -1831,6 +1832,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         totalPU += Number(data[0].qtyInPU);
         datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
       })
+
       datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(totalPU) : this.roundingForPuQty(total));
       datacsv.push("100 %");
       A.push(addDoubleQuoteToRowContent(datacsv))
@@ -1936,6 +1938,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     var planningUnitList = this.state.planningUnitList.filter(c => c.planningUnit.id != this.state.selectedConsumptionUnitId);
     for (var pul = 0; pul < planningUnitList.length; pul++) {
+      
       var consumptionList = this.state.consumptionList.filter(c => c.planningUnit.id == planningUnitList[pul].planningUnit.id);
       csvRow.push('')
       csvRow.push('')
@@ -2021,7 +2024,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
     a.download = i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
-    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-" + document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[1] + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
+    a.download = document.getElementById("datasetId").selectedOptions[0].text.toString().split("~")[0] + "-v" + document.getElementById("versionId").selectedOptions[0].text.toString() + "-" + i18n.t('static.dashboard.dataEntryAndAdjustment') + ".csv"
     document.body.appendChild(a)
     a.click()
   }

@@ -493,18 +493,18 @@ class CompareAndSelectScenario extends Component {
             calendarTableCol.push({ title: this.state.xAxisDisplayBy == 1 ? i18n.t('static.inventoryDate.inventoryReport') : this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : i18n.t('static.modelingValidation.fiscalYear'), type: 'text' });
             calendarTableCol.push({ title: "", type: 'hidden' });
             columns1.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
-            columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
+            columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.0000',decimal: '.'});
             var treeScenarioList = this.state.treeScenarioList;
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
-                    columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
                     if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
                     }
                 } else {
-                    columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                    columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
                     if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
                     }
                 }
             }
@@ -616,18 +616,18 @@ class CompareAndSelectScenario extends Component {
 
                 data[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) : "";
                 var total = 0;
                 var count = 0;
                 if (actualFilter.length > 0) {
-                    actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) });
+                    actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) });
                 }
                 for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                     if (treeScenarioList[tsl].type == "T") {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4) : "";
                         if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0)
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4)) : Number(0)
                             if (scenarioFilter.length > 0) {
                                 count += 1;
                             }
@@ -636,9 +636,9 @@ class CompareAndSelectScenario extends Component {
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null })
                     } else {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4) : "";
                         if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2)) : Number(0);
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4)) : Number(0);
                             if (scenarioFilter.length > 0) {
                                 count += 1;
                             }
@@ -647,9 +647,9 @@ class CompareAndSelectScenario extends Component {
                         collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
                     }
                 }
-                data[tsl + 2] = count > 0 ? Number(total).toFixed(2) : "";
+                data[tsl + 2] = count > 0 ? Number(total).toFixed(4) : "";
                 consumptionDataForTree.push({ id: "-1", value: count > 0 ? Number(total).toFixed(2) : "", month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") })
-                collapsedExpandArr.push({ id: "-1", year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: count > 0 ? Number(total).toFixed(2) : "" })
+                collapsedExpandArr.push({ id: "-1", year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: count > 0 ? Number(total).toFixed(4) : "" })
                 dataArr.push(data)
             }
             var monthArrayListWithoutFormat = this.state.calendarMonthList;
@@ -664,10 +664,10 @@ class CompareAndSelectScenario extends Component {
                         if (treeScenarioList[tsl].checked) {
                             if (treeScenarioList[tsl].type == "T") {
                                 var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4) : "";
                             } else {
                                 var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4) : "";
                             }
                         }
                     }
@@ -1117,12 +1117,12 @@ class CompareAndSelectScenario extends Component {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
                             B.push((ele[idx] + " %").toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                         } else {
-                            B.push(ele[idx] != "" ? "" + Number(ele[idx]).toFixed(2).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
+                            B.push(ele[idx] != "" ? "" + Number(ele[idx]).toFixed(4).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
                         }
                     } else if (item.type == 'calendar') {
                         B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     } else {
-                        B.push(ele[idx] != "" ? Number(ele[idx]).toFixed(2).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
+                        B.push(ele[idx] != "" ? Number(ele[idx]).toFixed(4).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
                     }
                 }
             })
