@@ -12442,6 +12442,9 @@ export default class BuildTree extends Component {
      * @param {object} value - The new range value selected by the user.
      */
     handleAMonthDissmis1 = (value) => {
+        this.setState({
+            isChanged: true
+        })
         let month = value.year + '-' + value.month + '-01';
         this.calculateParentValueFromMOM(month);
     }
