@@ -10771,7 +10771,7 @@ export default class BuildTree extends Component {
                                                                 year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                             }}
                                                             lang={pickerLang.months}
-                                                            onChange={this.handleAMonthChange1}
+                                                            onChange={this.handleAMonthChange}
                                                             onDismiss={this.handleAMonthDissmis1}
                                                         >
                                                             <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
@@ -12416,6 +12416,22 @@ export default class BuildTree extends Component {
     makeText = m => {
         if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
         return '?'
+    }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
+    handleAMonthChange = (year, month, flag) => {
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        var updatedMonth = date;
+        var nodeDataMap = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0];
+        nodeDataMap.month = updatedMonth;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] = nodeDataMap;
+        this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
+        });
     }
     /**
      * Handles the change of the range picker component.
