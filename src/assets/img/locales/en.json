@@ -3496,5 +3496,6 @@
   "static.common.accessDenied":"You do not have access to view or edit this data or setting.",
   "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
   "static.extrapolation.optimiseTESAndARIMASuccess": "Optimize TES & ARIMA done successfully",
-  "static.extrapolation.missingTESAndARIMASuccess": "Missing Extrapolation for TES & ARIMA done successfully"
+  "static.extrapolation.missingTESAndARIMASuccess": "Missing Extrapolation for TES & ARIMA done successfully",
+  "static.tooltip.aruProgram":"To edit, you must have editable access to all selected programs. If you lack editable access to any selected program, the screen will be view-only"
 }
