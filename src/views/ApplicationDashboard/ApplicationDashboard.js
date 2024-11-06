@@ -3022,7 +3022,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
+                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplCorrectCount != 0 ? ("/"+forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3030,7 +3030,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplCorrectCount != 0 ? ("/"+inventoryQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3038,7 +3038,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplCorrectCount != 0 ? ("/"+actualConsumptionQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3046,7 +3046,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplCorrectCount != 0 ? ("/"+shipmentQplPuCount) : ""} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
