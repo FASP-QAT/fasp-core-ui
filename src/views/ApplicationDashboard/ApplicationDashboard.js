@@ -108,10 +108,10 @@ class ApplicationDashboard extends Component {
       supplyPlanReviewCount: '',
       roleArray: [],
       dashboardTopList: [],
-      topProgramId: localStorage.getItem('topProgramId') ? JSON.parse(localStorage.getItem('topProgramId')) : [],
+      topProgramId: localStorage.getItem('topProgramId') ? localStorage.getItem('sessionType') === 'Online' ? JSON.parse(localStorage.getItem('topProgramId')) : localStorage.getItem("topLocalProgram") == "false" ? [] : JSON.parse(localStorage.getItem('topProgramId')) : [],
       topCountryId: [],
       topTechnicalAreaId: [],
-      bottomProgramId: localStorage.getItem('bottomProgramId'),
+      bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? JSON.parse(localStorage.getItem('bottomProgramId')) : localStorage.getItem("bottomLocalProgram") == "false" ? "" : JSON.parse(localStorage.getItem('bottomProgramId')) : "",
       displayBy: 1,
       onlyDownloadedTopProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true,
       onlyDownloadedBottomProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true,
@@ -2651,7 +2651,7 @@ class ApplicationDashboard extends Component {
                             name="topProgramId"
                             id="topProgramId"
                             bsSize="sm"
-                            value={this.state.topProgramId}
+                            value={this.state.topProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.topProgramId : localStorage.getItem("topLocalProgram") == "false" ? [] : this.state.topProgramId : []}
                             onChange={(e) => { this.handleTopProgramIdChange(e) }}
                             options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
                             labelledBy={i18n.t('static.common.regiontext')}
@@ -2660,89 +2660,45 @@ class ApplicationDashboard extends Component {
                         <FormGroup className='col-1' style={{ marginTop: '24px' }}>
                           <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
-
                       </div>
                       <div className='col-6 tickerbox'>
-                      {/* <div style={{ gap: '20px', display: 'flex' }}> */}
-                        {/* <FormGroup style={{ marginTop: '29px' }}>
-                          <div className="pl-lg-4">
-                            <Input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="onlyDownloadedTopProgram"
-                              name="onlyDownloadedTopProgram"
-                              disabled={!(localStorage.getItem('sessionType') === 'Online')}
-                              checked={this.state.onlyDownloadedTopProgram}
-                              onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
-                            />
-                            <Label
-                              className="form-check-label"
-                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                            </Label>
-                          </div>
-                        </FormGroup> */}
-
-                        {/* <FormGroup className='' style={{ marginTop: '24px' }}>
-                          <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
-                        </FormGroup> */}
-
                         <FormGroup>
-                        <div class="myMarquee">
-                          <div class="scroller">
-                            <div class="scroller-content">
-                              <div><a href="#">Countries</a><p>5</p></div>
-                              <div><a href="#">Users</a><p>5</p></div>
-                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-                            </div>
-                            
-                            <div class="scroller-content">
-                              <div><a href="#">Countries</a><p>5</p></div>
-                              <div><a href="#">Users</a><p>5</p></div>
-                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
-                            </div>
-                            <div class="scroller-content">
-                              <div><a href="#">Countries</a><p>5</p></div>
-                              <div><a href="#">Users</a><p>5</p></div>
-                              <div><a href="#">Supply Plan Programs</a><p>5</p></div>
-                              <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                          <div class="myMarquee">
+                            <div class="scroller">
+                              <div class="scroller-content">
+                                <div><a href="#">Countries</a><p>5</p></div>
+                                <div><a href="#">Users</a><p>5</p></div>
+                                <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                                <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                              </div>
+                              
+                              <div class="scroller-content">
+                                <div><a href="#">Countries</a><p>5</p></div>
+                                <div><a href="#">Users</a><p>5</p></div>
+                                <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                                <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                              </div>
+                              <div class="scroller-content">
+                                <div><a href="#">Countries</a><p>5</p></div>
+                                <div><a href="#">Users</a><p>5</p></div>
+                                <div><a href="#">Supply Plan Programs</a><p>5</p></div>
+                                <div><a href="#">Programs Pending Supply Plan Approval</a><p>5</p></div>
+                              </div>
                             </div>
                           </div>
-                        </div>
                         </FormGroup>
-
                       </div>
-                      {/* <div style={{ display: 'flex', gap: '20px', margin: '0px 11px', paddingLeft: '8px' }}>
-  <div className="containerBox">
-    <div className="scroll-wrapper">
-      <div className="orb"><Col><a href="#">Countries</a></Col><Col>5</Col></div>
-      <div className="orb red1"><Col><a href="#">Users</a></Col><Col>5</Col></div>
-      <div className="orb dark1"><Col><a href="#">Supply Plan Programs</a></Col><Col>5</Col></div>
-      <div className="orb blue1"><Col><a href="#">Programs Pending Supply Plan Approval</a></Col><Col>5</Col></div>
-    </div>
-    <div className="scroll-wrapper">
-      <div className="orb"><Col><a href="#">Countries</a></Col><Col>5</Col></div>
-      <div className="orb red1"><Col><a href="#">Users</a></Col><Col>5</Col></div>
-      <div className="orb dark1"><Col><a href="#">Supply Plan Programs</a></Col><Col>5</Col></div>
-      <div className="orb blue1"><Col><a href="#">Programs Pending Supply Plan Approval</a></Col><Col>5</Col></div>
-    </div>
-  </div>
-</div> */}
-
-
-   </div>                 
+                    </div>                 
 
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash" style={{borderTop:'0px solid #2a303d'}}>
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                           <th scope="col">Program</th>
-                          <th scope="col">Active Planning Units</th>
+                          <th scope="col" width="125px">Active Planning Units</th>
                           <th scope="col">Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'>Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
@@ -2751,29 +2707,30 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash" style={{ color: "danger" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
+                                  <i class="fa fa-trash" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 <td>
+                                  {d.activePlanningUnits}
+                                </td>
+                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
                                       <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.disabledPlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
-                                          {d.disabledPlanningUnits}
+                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.countOfStockOutPU / d.activePlanningUnits) * 100 + '%' }}>
+                                          {d.countOfStockOutPU}
                                         </div>
-                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#0067B9", width: (d.activePlanningUnits / (d.activePlanningUnits + d.disabledPlanningUnits)) * 100 + '%' }}>
-                                          {d.activePlanningUnits}
+                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#0067B9", width: ((d.activePlanningUnits-d.countOfStockOutPU) / d.activePlanningUnits) * 100 + '%' }}>
+                                          {d.activePlanningUnits-d.countOfStockOutPU}
                                         </div>
                                       </div>
                                     </div>
                                   </div>
-
                                 </td>
-                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>{d.countOfStockOutPU}</td>
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}><u>{d.countOfOpenProblem}</u></td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
                                 <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
@@ -2907,38 +2864,14 @@ class ApplicationDashboard extends Component {
                         name="bottomProgramId"
                         id="bottomProgramId"
                         className="selectBlack MarginBtmformgroup"
-                        value={this.state.bottomProgramId}
+                        value={this.state.bottomProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.bottomProgramId : localStorage.getItem("bottomLocalProgram") == "false" ? "" : this.state.bottomProgramId : ""}
                         options={bottomProgramList}
                         onChange={(e) => { this.handleBottomProgramIdChange(e) }}
                         bsSize="sm"
                         required
                       />
-                        {/* <option value="" selected>Open this select menu</option> */}
-                        {/* {bottomProgramList} */}
-                      {/* </Input> */}
                     </FormGroup>
                     </div>
-                    {/* <div style={{ gap: '20px', display: 'flex' }}>
-                        <FormGroup style={{ marginTop: '29px' }}>
-                          <div className="pl-lg-4">
-                        <Input
-                          className="form-check-input"
-                          type="checkbox"
-                          id="onlyDownloadedBottomProgram"
-                          name="onlyDownloadedBottomProgram"
-                          checked={this.state.onlyDownloadedBottomProgram}
-                          disabled={!(localStorage.getItem('sessionType') === 'Online')}
-                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
-                        />
-                        <Label
-                          className="form-check-label"
-                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                          Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                        </Label>
-                      </div>
-                    </FormGroup>
-                    </div> */}
-                    {/* </div> */}
                     <div class='col-4'>
                     <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
