@@ -304,6 +304,17 @@ class ApplicationDashboard extends Component {
     }
     this.props.history.push(url);
   }
+   /**
+   * Redirects the user to a specified URL.
+   * @param {string} url - The URL to redirect to.
+   */
+   redirectToCrudWindow = (url, programId) => {
+    if(programId) {
+      localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
+    }
+    const win = window.open(url, "_blank");
+        win.focus();
+  }
   /**
    * Clears the timeout when the component is unmounted.
    */
@@ -1431,6 +1442,7 @@ class ApplicationDashboard extends Component {
     } else {
       this.updateState(id, false);
     }
+    this.onTopSubmit();
   }
   /**
    * Toggles info for confidence level
@@ -2623,7 +2635,7 @@ class ApplicationDashboard extends Component {
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
                       </FormGroup> */}
-                    <div class="row">
+                    <div class="row pt-lg-2">
                       <div class="col-5" style={{display:'flex',gap:'40px'}}>
                         <FormGroup className='FormGroupD'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
@@ -2704,6 +2716,7 @@ class ApplicationDashboard extends Component {
                         </thead>
                         <tbody>
                           {this.state.dashboardTopList.map(d => {
+                            console.log("Hello",d)
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
@@ -2715,7 +2728,7 @@ class ApplicationDashboard extends Component {
                                 <td>
                                   {d.activePlanningUnits}
                                 </td>
-                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>
+                                <td align="center" style={{ verticalAlign:"middle", color: d.countOfStockOutPU > 0 ? "red" : "" }}>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
                                       <div class="progress">
@@ -2730,10 +2743,10 @@ class ApplicationDashboard extends Component {
                                   </div>
                                 </td>
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`#/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("#/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
