@@ -589,15 +589,15 @@ class CompareAndSelectScenario extends Component {
                 data = [];
                 data[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) : "";
                 for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                     if (treeScenarioList[tsl].type == "T") {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(4) * multiplier : "";
                         totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier) : 0);
                     } else {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) : "";
                         totalArray[tsl] = Number(totalArray[tsl] != undefined ? totalArray[tsl] : 0) + Number(scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * Number(multiplier)) : 0);
                     }
                 }
@@ -618,40 +618,40 @@ class CompareAndSelectScenario extends Component {
 
                 data[0] = monthArrayListWithoutFormat[m];
                 var actualFilter = consumptionData.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) : "";
+                data[1] = actualFilter.length > 0 ? (Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) : "";
                 var total = 0;
                 var count = 0;
                 if (actualFilter.length > 0) {
-                    actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(2) });
+                    actualConsumptionListForMonth.push({ year: moment(actualFilter[0].month).format("YYYY"), value: Number(Number(actualFilter[0].puAmount) * Number(actualMultiplier) * Number(multiplier)).toFixed(4) });
                 }
                 for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                     if (treeScenarioList[tsl].type == "T") {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4) : "";
                         if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2)) : Number(0)
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4)) : Number(0)
                             if (scenarioFilter.length > 0) {
                                 count += 1;
                             }
                         }
-                        consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
-                        collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(2) * multiplier : null })
+                        consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(4) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
+                        collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].calculatedMmdValue).toFixed(4) * multiplier : null })
                     } else {
                         var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                        data[tsl + 2] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4) : "";
                         if (this.state.selectedTreeScenarioId.includes(treeScenarioList[tsl].id.toString())) {
-                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2)) : Number(0);
+                            total += scenarioFilter.length > 0 ? Number((Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4)) : Number(0);
                             if (scenarioFilter.length > 0) {
                                 count += 1;
                             }
                         }
-                        consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
-                        collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(2) * Number(actualMultiplier) * multiplier : null })
+                        consumptionDataForTree.push({ id: treeScenarioList[tsl].id, value: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(4) * Number(actualMultiplier) * multiplier : null, month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") });
+                        collapsedExpandArr.push({ id: treeScenarioList[tsl].id, year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: scenarioFilter.length > 0 ? Number(scenarioFilter[0].amount).toFixed(4) * Number(actualMultiplier) * multiplier : null })
                     }
                 }
-                data[tsl + 2] = count > 0 ? Number(total).toFixed(2) : "";
-                consumptionDataForTree.push({ id: "-1", value: count > 0 ? Number(total).toFixed(2) : "", month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") })
-                collapsedExpandArr.push({ id: "-1", year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: count > 0 ? Number(total).toFixed(2) : "" })
+                data[tsl + 2] = count > 0 ? Number(total).toFixed(4) : "";
+                consumptionDataForTree.push({ id: "-1", value: count > 0 ? Number(total).toFixed(4) : "", month: moment(monthArrayListWithoutFormat[m]).format("YYYY-MM-DD") })
+                collapsedExpandArr.push({ id: "-1", year: moment(monthArrayListWithoutFormat[m]).format("YYYY"), actual: count > 0 ? Number(total).toFixed(4) : "" })
                 dataArr.push(data)
             }
             var monthArrayListWithoutFormat = this.state.calendarMonthList;
@@ -666,10 +666,10 @@ class CompareAndSelectScenario extends Component {
                         if (treeScenarioList[tsl].checked) {
                             if (treeScenarioList[tsl].type == "T") {
                                 var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(2) : "";
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].calculatedMmdValue) * multiplier).toFixed(4) : "";
                             } else {
                                 var scenarioFilter = treeScenarioList[tsl].data.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArrayListWithoutFormat[m]).format("YYYY-MM"));
-                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(2) : "";
+                                data1[tsl + 1] = scenarioFilter.length > 0 ? (Number(scenarioFilter[0].amount) * Number(actualMultiplier) * multiplier).toFixed(4) : "";
                             }
                         }
                     }
@@ -720,7 +720,7 @@ class CompareAndSelectScenario extends Component {
                     color: treeScenarioList[tsList].color,
                     tree: treeScenarioList[tsList].tree,
                     scenario: treeScenarioList[tsList].scenario,
-                    totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(2),
+                    totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(4),
                     isLowest: min == actualDiff[tsList] && useForLowestError[tsList] ? 1 : 0,
                     forecastError: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[tsList] > 0 && actualDiff.length > 0 && actualDiff[tsList] > 0 && totalActual > 0 && useForLowestError[tsList] ? (((actualDiff[tsList]) / totalActual)).toFixed(4) : "",
                     noOfMonths: treeScenarioList[tsList].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[tsList] != undefined && useForLowestError[tsList] ? countArray[tsList] + 1 : "",
@@ -793,13 +793,13 @@ class CompareAndSelectScenario extends Component {
                     data = [];
                     if (this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString())) {
                         count1 += 1;
-                        total += Number(Number(totalArray[j]).toFixed(2))
+                        total += Number(Number(totalArray[j]).toFixed(4))
                     }
                     data[0] = this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString()) ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
                     data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
-                    data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(2)}`
+                    data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(4)}`
                     data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
                     data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
                     data[7] = finalData[j].compareToConsumptionForecast
@@ -1119,12 +1119,12 @@ class CompareAndSelectScenario extends Component {
                         if (item.mask != undefined && item.mask.toString().includes("%")) {
                             B.push((ele[idx] + " %").toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                         } else {
-                            B.push(ele[idx] != "" ? "" + Number(ele[idx]).toFixed(2).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
+                            B.push(ele[idx] != "" ? "" + Number(ele[idx]).toFixed(4).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
                         }
                     } else if (item.type == 'calendar') {
                         B.push(moment(ele[idx]).format(DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS).toString().replaceAll(',', ' ').replaceAll(' ', '%20'));
                     } else {
-                        B.push(ele[idx] != "" ? Number(ele[idx]).toFixed(2).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
+                        B.push(ele[idx] != "" ? Number(ele[idx]).toFixed(4).toString().replaceAll(',', ' ').replaceAll(' ', '%20') : "");
                     }
                 }
             })
@@ -1705,7 +1705,7 @@ class CompareAndSelectScenario extends Component {
                             '',
                             '',
                             i18n.t("static.compareAndSelect.totalAggregated"),
-                            count > 0 ? formatter(Number(total).toFixed(2)) : "",
+                            count > 0 ? formatter(Number(total).toFixed(4)) : "",
                             '',
                             '',
                             '',
@@ -2578,7 +2578,7 @@ class CompareAndSelectScenario extends Component {
                         showInLegend: true,
                         data: this.state.xAxisDisplayBy == 1 ?
                             this.state.consumptionDataForTree.filter(c => c.id == item.id).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))) :
-                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
+                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(4) : null))
                     }
                 )
             })
@@ -2616,7 +2616,7 @@ class CompareAndSelectScenario extends Component {
                         showInLegend: true,
                         data: this.state.xAxisDisplayBy == 1 ?
                             this.state.consumptionDataForTree.filter(c => c.id == -1).map((ele, index) => (this.state.showFits ? ele.value : (moment(ele.month).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") ? ele.value : null))) :
-                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(2) : null))
+                            collapsedExpandArray.map((ele, index) => (moment(ele.year).format("YYYY") >= moment(this.state.forecastStartDate).format("YYYY") ? Number(ele.totalActual).toFixed(4) : null))
                     }
                 )
             }

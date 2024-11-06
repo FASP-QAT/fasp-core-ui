@@ -172,6 +172,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.formulaChanged = this.formulaChanged.bind(this);
     this.pickAMonth2 = React.createRef();
     this.roundingForPuQty = this.roundingForPuQty.bind(this);
+    this.roundingForPuQtyForCsv = this.roundingForPuQtyForCsv.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
@@ -190,6 +191,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       } else {
         puQty = Math.round(puQty);
       }
+    }
+    return puQty;
+  }
+  roundingForPuQtyForCsv(puQty) {
+    if (puQty !== "") {
+        puQty = Number(puQty).toFixed(4);
     }
     return puQty;
   }
@@ -1767,9 +1774,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
         total += Number(data[0].qty);
         totalPU += Number(data[0].qtyInPU);
-        datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
+        datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(data[0].qtyInPU) : this.roundingForPuQtyForCsv(data[0].qty))
       })
-      datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(totalPU) : this.roundingForPuQty(total));
+      datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(totalPU) : this.roundingForPuQtyForCsv(total));
       datacsv.push("100 %");
       A.push(addDoubleQuoteToRowContent(datacsv))
       this.state.regionList.map(r => {
@@ -1782,7 +1789,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
             totalRegion += Number(data[0].qty);
             totalRegionPU += Number(data[0].qtyInPU);
-            datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
+            datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(data[0].qtyInPU) : this.roundingForPuQtyForCsv(data[0].qty))
           })
         }
         A.push(addDoubleQuoteToRowContent(datacsv))
