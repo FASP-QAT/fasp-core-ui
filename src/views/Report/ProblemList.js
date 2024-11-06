@@ -1436,6 +1436,8 @@ export default class ProblemList extends React.Component {
                                             options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             labelledBy={i18n.t('static.common.select')}
                                             filterOptions={filterOptions}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>

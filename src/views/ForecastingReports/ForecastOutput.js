@@ -2594,6 +2594,9 @@ class ForecastOutput extends Component {
                                                         onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                         disabled={this.state.loading}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                
                                                     />
                                                 </div>
                                             </FormGroup>

@@ -1258,6 +1258,8 @@ class SupplierLeadTimes extends Component {
                                             onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                             options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>
@@ -1273,6 +1275,8 @@ class SupplierLeadTimes extends Component {
                                             onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                             options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>}
