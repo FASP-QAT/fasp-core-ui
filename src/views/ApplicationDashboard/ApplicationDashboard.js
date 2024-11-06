@@ -2560,13 +2560,8 @@ class ApplicationDashboard extends Component {
           }
         </Row>
         {activeTab1 == 2 && <>
-          <div className='row px-1 pxD-2'>
-            {/* <div class="d-md-flex d-block align-items-center justify-content-between my-4 page-header-breadcrumb">
-              <div>
-                <p class="fw-semibold fs-18 mb-0 titleColorModule1">Overview</p>
-              </div>
-            </div> */}
-            <div className='col-md-12 pl-lg-4 pr-lg-4'>
+          <div className='row pb-lg-2'>
+            {/* <div className='col-md-12 pl-lg-4 pr-lg-4'> */}
               {/* <div className='row'>
                 <FormGroup className='col-md-3 pl-lg-1 FormGroupD'>
                   <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
@@ -2601,8 +2596,8 @@ class ApplicationDashboard extends Component {
               </div> */}
 
               {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
-                <div class="card custom-card DashboardBg1">
-                  <div class="card-body px-2 py-2">
+                <div class="card custom-card DashboardBg1 pb-lg-2">
+                  <div class="card-body py-1">
                     {/* <div className='row'> */}
                     {/* <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Country<span class="red Reqasterisk">*</span></Label>
@@ -2629,22 +2624,10 @@ class ApplicationDashboard extends Component {
                         />
                       </FormGroup> */}
                     <div class="row">
-                      <div class="col-3">
+                      <div class="col-5" style={{display:'flex',gap:'40px'}}>
                         <FormGroup className='FormGroupD'>
-                          <Label htmlFor="topProgramId">Program</Label>
-                          <MultiSelect
-                            name="topProgramId"
-                            id="topProgramId"
-                            bsSize="sm"
-                            value={this.state.topProgramId}
-                            onChange={(e) => { this.handleTopProgramIdChange(e) }}
-                            options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
-                            labelledBy={i18n.t('static.common.regiontext')}
-                          />
-                        </FormGroup>
-                      </div>
-                      <div style={{ gap: '20px', display: 'flex' }}>
-                        <FormGroup style={{ marginTop: '29px' }}>
+                          <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
+                          <FormGroup style={{ marginTop: '-3px'}}>
                           <div className="pl-lg-4">
                             <Input
                               className="form-check-input"
@@ -2662,10 +2645,47 @@ class ApplicationDashboard extends Component {
                             </Label>
                           </div>
                         </FormGroup>
-
-                        <FormGroup className='' style={{ marginTop: '24px' }}>
+                          </Label>
+                          <MultiSelect
+                          className="MarginBtmformgroup MarginBtmformgroupsmall"
+                            name="topProgramId"
+                            id="topProgramId"
+                            bsSize="sm"
+                            value={this.state.topProgramId}
+                            onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                            options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                            labelledBy={i18n.t('static.common.regiontext')}
+                          />
+                        </FormGroup>
+                        <FormGroup className='col-1' style={{ marginTop: '24px' }}>
                           <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
+
+                      </div>
+                      <div className='col-6 tickerbox'>
+                      {/* <div style={{ gap: '20px', display: 'flex' }}> */}
+                        {/* <FormGroup style={{ marginTop: '29px' }}>
+                          <div className="pl-lg-4">
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="onlyDownloadedTopProgram"
+                              name="onlyDownloadedTopProgram"
+                              disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                              checked={this.state.onlyDownloadedTopProgram}
+                              onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
+                            />
+                            <Label
+                              className="form-check-label"
+                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                            </Label>
+                          </div>
+                        </FormGroup> */}
+
+                        {/* <FormGroup className='' style={{ marginTop: '24px' }}>
+                          <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
+                        </FormGroup> */}
 
                         <FormGroup>
                         <div class="myMarquee">
@@ -2712,9 +2732,9 @@ class ApplicationDashboard extends Component {
 </div> */}
 
 
-                    </div>
+   </div>                 
 
-                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
+                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash" style={{borderTop:'0px solid #2a303d'}}>
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
@@ -2764,6 +2784,7 @@ class ApplicationDashboard extends Component {
                         </tbody>
                       </Table>
                     </div>}
+                   
                     <Modal isOpen={this.state.notesPopup}
                       className={'modal-lg modalWidth ' + this.props.className}>
                       <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
@@ -2790,7 +2811,7 @@ class ApplicationDashboard extends Component {
                   </div>
                 </div>
               {/* </div> */}
-            </div>
+            {/* </div> */}
           </div>
           {/* <div className='row'>
             <div className='col-md-6'>
@@ -2848,33 +2869,20 @@ class ApplicationDashboard extends Component {
               </div>
             </div>
           </div> */}
-          <div className='row px-2 pxD-3'>
-            <div class="col-xl-12 mb-lg-3 DashboardBg">
+          <div className='row pb-lg-2'>
+            {/* <div class="col-xl-12 mb-lg-3 DashboardBg"> */}
+            <div class="card custom-card DashboardBg1">
+                  <div class="card-body py-1">
               <div className='row pt-lg-2'>
-                <div className='col-md-12'>
-                  <div className='row'>
-                  <div class="col-3">
+                {/* <div className='col-md-12'> */}
+                  {/* <div className='row'> */}
+                  <div class="col-4">
                     {/* <div className='col-md-4 pl-lg-0'> */}
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Program</Label>
-                      <Select
-                        type="select"
-                        name="bottomProgramId"
-                        id="bottomProgramId"
-                        className="selectBlack"
-                        value={this.state.bottomProgramId}
-                        options={bottomProgramList}
-                        onChange={(e) => { this.handleBottomProgramIdChange(e) }}
-                        bsSize="sm"
-                        required
-                      />
-                        {/* <option value="" selected>Open this select menu</option> */}
-                        {/* {bottomProgramList} */}
-                      {/* </Input> */}
-                    </FormGroup>
-                    </div>
-                    <div style={{ gap: '20px', display: 'flex' }}>
-                        <FormGroup style={{ marginTop: '29px' }}>
+                      <Label htmlFor="organisationTypeId" style={{display:'flex',gap:'10px'}}>Program
+
+                      <div style={{ gap: '20px', display: 'flex' }}>
+                        <FormGroup style={{ marginTop: '-3px' }}>
                           <div className="pl-lg-4">
                         <Input
                           className="form-check-input"
@@ -2893,8 +2901,45 @@ class ApplicationDashboard extends Component {
                       </div>
                     </FormGroup>
                     </div>
+                      </Label>
+                      <Select
+                        type="select"
+                        name="bottomProgramId"
+                        id="bottomProgramId"
+                        className="selectBlack MarginBtmformgroup"
+                        value={this.state.bottomProgramId}
+                        options={bottomProgramList}
+                        onChange={(e) => { this.handleBottomProgramIdChange(e) }}
+                        bsSize="sm"
+                        required
+                      />
+                        {/* <option value="" selected>Open this select menu</option> */}
+                        {/* {bottomProgramList} */}
+                      {/* </Input> */}
+                    </FormGroup>
+                    </div>
+                    {/* <div style={{ gap: '20px', display: 'flex' }}>
+                        <FormGroup style={{ marginTop: '29px' }}>
+                          <div className="pl-lg-4">
+                        <Input
+                          className="form-check-input"
+                          type="checkbox"
+                          id="onlyDownloadedBottomProgram"
+                          name="onlyDownloadedBottomProgram"
+                          checked={this.state.onlyDownloadedBottomProgram}
+                          disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                        />
+                        <Label
+                          className="form-check-label"
+                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                          Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                        </Label>
+                      </div>
+                    </FormGroup>
+                    </div> */}
                     {/* </div> */}
-                    <div class='col-3'>
+                    <div class='col-4'>
                     <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
@@ -2912,12 +2957,13 @@ class ApplicationDashboard extends Component {
                     </FormGroup>
                     </div>
                    
-                  </div>
-                </div>
+                  {/* </div> */}
+                {/* </div> */}
               </div>
-              {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row pl-lg-1 pr-lg-1'>
-                <div className='col-md-12'>
-                  <div className='row pb-lg-0'>
+              
+              {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
+                {/* <div className='col-md-12'> */}
+                  <div className='row px-3'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header justify-content-between">
@@ -2982,7 +3028,7 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row'>
+                              <div className='row' style={{height:'240px',overflowY:'scroll'}}>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-70px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
@@ -3015,7 +3061,7 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div> */}
                   </div>
-                  <div className='row pb-lg-0'>
+                  <div className='row px-3 pt-lg-2'>
                     <div className='col-md-6'>
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
@@ -3079,9 +3125,11 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
                   </div>
-                </div>
+                {/* </div> */}
               </div>}
-            </div>
+              </div>
+              </div>
+            {/* </div> */}
           </div>
         </>}
       </div >
