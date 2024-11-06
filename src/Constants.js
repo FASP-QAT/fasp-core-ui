@@ -2,12 +2,13 @@
 // export const API_URL='https://api-mod2.altius.cc'
 // export const API_URL = 'https://uatqatapi.altius.cc'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
-export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'http://localhost:8084'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 // export const API_URL='http://192.168.43.70:8080/FASP'
+export const API_URL = 'https://https://uatqatapi.altius.cc'
 
 export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
 export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
@@ -65,7 +66,7 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
-export const APP_VERSION_REACT = "[13066]"
+export const APP_VERSION_REACT = "[13116]"
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
 export const JEXCEL_PAGINATION_OPTION = [15, 25, 50, 5000000]
