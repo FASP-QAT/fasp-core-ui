@@ -510,10 +510,10 @@ class ForecastSummary extends Component {
                     let regionList = summeryData[j].regionListForSinglePlanningUnit;
                     for (var k = 0; k < regionList.length; k++) {
                         tempData.push(regionList[k].selectedForecast == null ? '' : regionList[k].selectedForecast);
-                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? '' : (regionList[k].forecastQuantity.toFixed(4)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
+                        tempData.push((regionList[k].forecastQuantity == null || regionList[k].forecastQuantity == '' ? '' : (Number(regionList[k].forecastQuantity).toFixed(4)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")));
                         tempData.push(regionList[k].notes == null ? '' : regionList[k].notes);
                     }
-                    tempData.push(summeryData[j].totalForecastQuantity != null && summeryData[j].totalForecastQuantity != '' ?  Number(summeryData[j].totalForecastQuantity).toFixed(4).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : '');
+                    tempData.push((Number(summeryData[j].totalForecastQuantity).toFixed(4)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","));
 
                     A.push(this.addDoubleQuoteToRowContent([((summeryData[j].planningUnit).replaceAll(',', ' ')).replaceAll(' ', '%20')].concat(tempData)));
 
