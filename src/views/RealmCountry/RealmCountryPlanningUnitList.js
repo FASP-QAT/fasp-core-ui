@@ -9,7 +9,7 @@ import {
   CardFooter,
   Form,
   FormGroup,
-  Label
+  Label, PopoverBody, Popover
 } from "reactstrap";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -95,6 +95,7 @@ export default class RealmCountryPlanningUnitList extends Component {
       offlinePrograms: [],
       programValues: [],
       programLabels: [],
+      popoverTooltip:false
     };
     this.filterData = this.filterData.bind(this);
     this.buildJexcel = this.buildJexcel.bind(this);
@@ -106,7 +107,16 @@ export default class RealmCountryPlanningUnitList extends Component {
     this.onPaste = this.onPaste.bind(this);
     this.handleChangeProgram = this.handleChangeProgram.bind(this);
     this.oneditionend = this.oneditionend.bind(this);
+    this.toggleTooltip = this.toggleTooltip.bind(this);
   }
+  /**
+     * Toggle info popup
+     */
+  toggleTooltip() {
+    this.setState({
+        popoverTooltip: !this.state.popoverTooltip,
+    });
+}
   /**
    * Redirects to the application dashboard screen when cancel button is clicked.
    */
@@ -546,20 +556,20 @@ export default class RealmCountryPlanningUnitList extends Component {
           title: i18n.t("static.planningunit.countrysku"),
           type: "text",
           required: true,
-          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
+          readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT'),
         },
         {
           title: i18n.t("static.procurementAgentProcurementUnit.skuCode"),
           type: "text",
           required: true,
-          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
+          readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT'),
         },
         {
           title: i18n.t("static.unit.unit"),
           type: "autocomplete",
           source: unitArr,
           required: true,
-          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
+          readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT'),
         },
         {
           title: i18n.t("static.unit.conversionMethod"),
@@ -583,7 +593,7 @@ export default class RealmCountryPlanningUnitList extends Component {
         {
           title: i18n.t("static.checkbox.active"),
           type: "checkbox",
-          readonly: !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
+          readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT'),
         },
         {
           title: "realmCountryId",
@@ -634,7 +644,7 @@ export default class RealmCountryPlanningUnitList extends Component {
       filters: true,
       search: true,
       columnSorting: true,
-      editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT"),
+      editable: AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT'),
       wordWrap: true,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
@@ -1230,9 +1240,14 @@ export default class RealmCountryPlanningUnitList extends Component {
             <Form>
               <div className="pl-0">
                 <div className="row">
+                  <div>
+                    <Popover placement="top" isOpen={this.state.popoverTooltip} target="pop" trigger="hover" toggle={this.toggleTooltip}>
+                      <PopoverBody>{i18n.t('static.tooltip.aruProgram')}</PopoverBody>
+                    </Popover>
+                  </div>
                   <FormGroup className="col-md-3 pt-2">
                     <Label htmlFor="programIds">
-                      {i18n.t("static.program.program")}
+                      {i18n.t("static.program.program")}<i class="fa fa-info-circle icons pl-lg-2" id="pop" onClick={this.toggleTooltip} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                     </Label>
                     <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                     <MultiSelect
@@ -1284,7 +1299,7 @@ export default class RealmCountryPlanningUnitList extends Component {
           </CardBody>
           {this.state.allowAdd && (
             <CardFooter>
-              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT") && (
+              {AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MANAGE_REALM_COUNTRY_PLANNING_UNIT') && (
                   <FormGroup>
                     <Button
                       type="button"

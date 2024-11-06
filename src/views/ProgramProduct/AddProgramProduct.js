@@ -338,7 +338,8 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: productCategoryListNew,
                                                         width: 150,
-                                                        required: true
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.dashboard.product'),
@@ -366,7 +367,8 @@ class AddprogramPlanningUnit extends Component {
                                                         },
                                                         filter: this.dropdownFilter,
                                                         width: 150,
-                                                        required: true
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.conversion.ConversionFactorFUPU'),
@@ -380,7 +382,8 @@ class AddprogramPlanningUnit extends Component {
                                                         source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
                                                         tooltip: i18n.t("static.programPU.planByTooltip"),
                                                         width: 120,
-                                                        required: true
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.reorderFrequency'),
@@ -394,7 +397,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.minMonthOfStock'),
@@ -402,7 +406,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
+                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.minQuantity'),
@@ -410,7 +415,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.minQtyTooltip")
+                                                        tooltip: i18n.t("static.programPU.minQtyTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.monthfutureamc'),
@@ -424,7 +430,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.monthpastamc'),
@@ -438,7 +445,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -453,7 +461,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_DECIMAL_LEAD_TIME,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.distributionLeadTime'),
@@ -461,7 +470,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
+                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.report.shelfLife'),
@@ -476,7 +486,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.pu.forecastErrorThresholdPercentage'),
@@ -491,7 +502,8 @@ class AddprogramPlanningUnit extends Component {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
                                                         },
-                                                        tooltip: i18n.t("static.programPlanningUnit.forecastErrorTooltip")
+                                                        tooltip: i18n.t("static.programPlanningUnit.forecastErrorTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -505,13 +517,15 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_DECIMAL_CATELOG_PRICE,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.notes'),
                                                         type: 'text',
                                                         width: 200,
-                                                        tooltip: i18n.t("static.pu.puNotesTooltip")
+                                                        tooltip: i18n.t("static.pu.puNotesTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: 'Id',
@@ -520,7 +534,8 @@ class AddprogramPlanningUnit extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.common.active'),
-                                                        type: 'checkbox'
+                                                        type: 'checkbox',
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: 'Changed Flag',
@@ -550,6 +565,7 @@ class AddprogramPlanningUnit extends Component {
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
+                                                    if(AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')){
                                                     var programPlanningUnitId = rowData[15];
                                                     if (programPlanningUnitId == 0) {
                                                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
@@ -577,6 +593,7 @@ class AddprogramPlanningUnit extends Component {
                                                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                                                         cell1.classList.add('readonly');
                                                     }
+                                                }
                                                     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
                                                     if (rowData[16].toString() == "true") {
                                                         for (var c = 0; c < colArr.length; c++) {
@@ -593,8 +610,9 @@ class AddprogramPlanningUnit extends Component {
                                                             } catch (err) { }
                                                         }
                                                     }
-
-                                                },
+                                                
+                                                }.bind(this),
+                                                editable: AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT'),
                                                 onsearch: function (el) {
                                                 },
                                                 onfilter: function (el) {
@@ -1650,7 +1668,7 @@ class AddprogramPlanningUnit extends Component {
                             &nbsp;
                             {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
-                            {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
+                            {this.state.isValidData && this.state.programId != 0 && AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

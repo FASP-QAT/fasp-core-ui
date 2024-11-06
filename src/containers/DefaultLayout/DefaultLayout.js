@@ -1674,7 +1674,7 @@ class DefaultLayout extends Component {
                               url: '/programProduct/addProgramProduct',
                               icon: 'fa fa-cubes',
                               attributes: {
-                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') && this.state.activeTab == 2) ? false : true),
+                                hidden: (((this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT') || this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT')) && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }
