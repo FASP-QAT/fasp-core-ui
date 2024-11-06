@@ -3434,5 +3434,6 @@
   "static.validated.restrictionNoOfMonthsInFutureForTopDashboard":"Please enter No of months in future for top dashboard",
   "static.validated.restrictionNoOfMonthsInPastForBottomDashboard":"Please enter No of months in past for bottom dashboard",
   "static.common.accessDenied":"You do not have access to view or edit this data or setting.",
-  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully"
+  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
+  "static.tooltip.aruProgram":"To edit, you must have editable access to all selected programs. If you lack editable access to any selected program, the screen will be view-only"
 }
