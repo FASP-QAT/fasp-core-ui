@@ -1887,13 +1887,14 @@ class ApplicationDashboard extends Component {
     ];
 
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-
+    // const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     const shipmentsPieData = {
       labels: shipmentDetailsList.map(x => x.code),
       datasets: [{
         label: 'My First Dataset',
         data: shipmentDetailsList.map(x => x.cost.toFixed(2)),
         backgroundColor: backgroundColor,
+        fontColor: fontColor,
         hoverOffset: 4
       }]
     };
@@ -1927,6 +1928,7 @@ class ApplicationDashboard extends Component {
       legend: {
         display: true,
         position: 'bottom',
+        fontColor: fontColor,
         labels: {
             usePointStyle: true,
             fontColor:fontColor,
@@ -2747,7 +2749,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
                                 <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("#/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
-                                  {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                                  {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
                           })}
@@ -2985,7 +2987,7 @@ class ApplicationDashboard extends Component {
                             </div>
                             <div className='col-6'>
                               <div className='row'>
-                                <Label htmlFor="displayBy"># of Shipments with funding TBD</Label>
+                                <Label htmlFor="displayBy" className='pl-lg-2'># of Shipments with funding TBD</Label>
                               </div>
                               <div className='row'>
                                 <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
