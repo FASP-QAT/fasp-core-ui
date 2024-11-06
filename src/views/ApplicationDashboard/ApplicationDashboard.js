@@ -111,7 +111,7 @@ class ApplicationDashboard extends Component {
       topProgramId: localStorage.getItem('topProgramId') ? localStorage.getItem('sessionType') === 'Online' ? JSON.parse(localStorage.getItem('topProgramId')) : localStorage.getItem("topLocalProgram") == "false" ? [] : JSON.parse(localStorage.getItem('topProgramId')) : [],
       topCountryId: [],
       topTechnicalAreaId: [],
-      bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? JSON.parse(localStorage.getItem('bottomProgramId')) : localStorage.getItem("bottomLocalProgram") == "false" ? "" : JSON.parse(localStorage.getItem('bottomProgramId')) : "",
+      bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('bottomProgramId') : localStorage.getItem("bottomLocalProgram") == "false" ? "" : localStorage.getItem('bottomProgramId') : "",
       displayBy: 1,
       onlyDownloadedTopProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true,
       onlyDownloadedBottomProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true,
