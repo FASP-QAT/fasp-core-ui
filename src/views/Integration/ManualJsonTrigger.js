@@ -174,7 +174,7 @@ export default class ConsumptionDetails extends Component {
       columns: [
         {
           title: i18n.t("static.budget.program"),
-          type: "dropdown",
+          type: "autocomplete",
           source: this.state.programList,
         },
         {
