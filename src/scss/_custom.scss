@@ -3375,6 +3375,7 @@ body {
     justify-content: space-between;
     border: 1px solid #ddd;
     background-color: transparent !important;
+    margin: 0px;
     // height: 100%;
   }
 
@@ -16952,6 +16953,7 @@ label.arrow_label:before {
   justify-content: space-between;
   border: 1px solid #ddd;
   background-color: #f5f5f9;
+  margin: 0px;
   // height: 100%;
 }
 
@@ -17541,30 +17543,34 @@ label.arrow_label:before {
   overflow: scroll;
   border-top: 1px solid #2a303d;
 }
+// .sidebar-minimized .sidebar .myMarquee{
 
-
+// }
 .myMarquee {
-  width: 484px;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Aligns content to the right */
+  width: 100%; /* Full width of container */
+  max-width: 900px; /* Adjust as needed */
   height: 53px;
-  margin-left: auto;
-  margin-top: 9px;
-  margin-right: 21px;
+  padding: 0 10px; /* Optional padding */
   overflow: hidden;
-  position: relative;
   border: 1px solid #aaa;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
   border-radius: 8px;
   background: #FFFFFF;
-  // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
 }
+
 .scroller {
   display: flex;
-  width: calc(100% * 4); /* Enough width to hold duplicated content */
+  flex-wrap: nowrap;
+  min-width: 100%;
   animation: scroll 30s linear infinite;
 }
 
 .scroller-content {
   display: flex;
+  padding-top: 17px;
 }
 
 .scroller-content div {
@@ -17574,8 +17580,7 @@ label.arrow_label:before {
   font-weight: 700;
   padding: 0 20px;
   text-align: center;
-  width: auto;
-  white-space: nowrap; /* Prevent text wrapping */
+  white-space: nowrap; /* Prevents text wrapping */
 }
 
 .scroller-content div a {
@@ -17594,33 +17599,106 @@ label.arrow_label:before {
 .scroller:hover {
   animation-play-state: paused;
 }
-@media only screen and (min-width: 1920px) {
 
-.myMarquee {
-  width: 916px;
-  height: 53px;
-  margin-left: auto;
-  margin-top: 9px;
-  margin-right: 21px;
-  overflow: hidden;
-  position: relative;
-  border: 1px solid #aaa;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-  border-radius: 8px;
-  background: #FFFFFF;
-  // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
-}
-.scroller-content div {
-  font-size: 16px;
-  line-height: 23px;
-  color: #000;
-  font-weight: 700;
-  padding: 0 20px;
-  text-align: center;
-  width: auto;
-  white-space: nowrap; /* Prevent text wrapping */
+@media only screen and (min-width: 1920px) {
+  .myMarquee {
+    max-width: 100%; /* Allow full width on larger screens */
+  }
+  .scroller-content div {
+    font-size: 16px;
+  }
+  .MarginBtmformgroupsmall {
+    width: 375px !important;
 }
 }
+
+// .myMarquee {
+//   width: 484px;
+//   height: 53px;
+//   margin-left: auto;
+//   margin-top: 9px;
+//   margin-right: 21px;
+//   overflow: hidden;
+//   position: relative;
+//   border: 1px solid #aaa;
+//   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+//   border-radius: 8px;
+//   background: #FFFFFF;
+//   // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+// }
+// .scroller {
+//   display: flex;
+//   width: calc(100% * 4); /* Enough width to hold duplicated content */
+//   animation: scroll 30s linear infinite;
+// }
+
+// .scroller-content {
+//   display: flex;
+// }
+
+// .scroller-content div {
+//   font-size: 14px;
+//   line-height: 23px;
+//   color: #000;
+//   font-weight: 700;
+//   padding: 0 20px;
+//   text-align: center;
+//   width: auto;
+//   white-space: nowrap; /* Prevent text wrapping */
+// }
+
+// .scroller-content div a {
+//   color: #002F6C;
+// }
+
+// @keyframes scroll {
+//   0% {
+//     transform: translateX(0);
+//   }
+//   100% {
+//     transform: translateX(-50%);
+//   }
+// }
+
+// .scroller:hover {
+//   animation-play-state: paused;
+// }
+// @media only screen and (min-width: 1920px) {
+
+// .myMarquee {
+//   width: 916px;
+//   height: 53px;
+//   margin-left: auto;
+//   margin-top: 9px;
+//   margin-right: 21px;
+//   overflow: hidden;
+//   position: relative;
+//   border: 1px solid #aaa;
+//   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
+//   border-radius: 8px;
+//   background: #FFFFFF;
+//   // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
+// }
+// .scroller-content div {
+//   font-size: 16px;
+//   line-height: 23px;
+//   color: #000;
+//   font-weight: 700;
+//   padding: 0 20px;
+//   text-align: center;
+//   width: auto;
+//   white-space: nowrap; /* Prevent text wrapping */
+// }
+// }
 .selectBlack{
   color: #000000 !important;
+}
+.MarginBtmformgroup{
+  margin-top: -15px!important;
+}
+.MarginBtmformgroupsmall{
+  width: 297px!important;
+}
+.tickerbox{
+  margin-top: 10px;
 }
