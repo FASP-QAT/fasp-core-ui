@@ -2761,6 +2761,8 @@ export default class SupplyPlanComponent extends React.Component {
                                                             value={this.state.planningUnitIdsPlan}
                                                             onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}
                                                             labelledBy={i18n.t('static.common.select')}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -5063,6 +5065,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                             options={this.state.planningUnitList}
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.updateFieldData(e); this.formSubmit(e, this.state.monthCount) }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                         {/* </div> */}
                                                     </FormGroup>

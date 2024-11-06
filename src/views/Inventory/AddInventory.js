@@ -846,6 +846,7 @@ export default class AddInventory extends Component {
                                                             options={this.state.programList}
                                                             value={this.state.programSelect}
                                                             onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -861,6 +862,8 @@ export default class AddInventory extends Component {
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
                                                             filterOptions={filterOptions}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                     </div>
                                                 </FormGroup>

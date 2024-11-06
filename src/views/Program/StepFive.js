@@ -157,6 +157,7 @@ export default class StepFive extends Component {
                                         multi
                                         options={this.state.regionList}
                                         value={this.props.items.program.regionArray}
+                                        placeholder={i18n.t('static.common.select')}
                                     />
                                     <FormFeedback className="red">{errors.regionId}</FormFeedback>
                                 </FormGroup>

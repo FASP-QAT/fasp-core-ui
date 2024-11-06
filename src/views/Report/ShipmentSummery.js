@@ -3196,6 +3196,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                 : []
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -3264,6 +3266,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                 : []
                             }
                             disabled={this.state.loading}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
                           />
                         </div>
                       </FormGroup>
@@ -3292,6 +3296,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                   };
                                 }, this)
                               }
+                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')}}
                             />
                           </div>
                         </FormGroup>

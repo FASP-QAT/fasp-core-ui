@@ -1276,7 +1276,10 @@ class StockStatusAcrossPlanningUnits extends Component {
                                                         {tracerCategories.length > 0 ?
                                                             tracerCategories.map((item, i) => {
                                                                 return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
-                                                            }, this) : []} />
+                                                            }, this) : []} 
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                            selectSomeItems: i18n.t('static.common.select')}}
+                                                            />
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-3">

@@ -1003,6 +1003,8 @@ class GlobalConsumption extends Component {
                           options={countryList && countryList.length > 0 ? countryList : []}
                           filterOptions={filterOptions}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1022,6 +1024,8 @@ class GlobalConsumption extends Component {
                         options={programList && programList.length > 0 ? programList : []}
                         filterOptions={filterOptions}
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1041,6 +1045,8 @@ class GlobalConsumption extends Component {
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           filterOptions={filterOptions}
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                       </div>
                     </FormGroup>

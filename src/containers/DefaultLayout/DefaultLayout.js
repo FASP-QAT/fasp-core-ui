@@ -214,7 +214,7 @@ const routes = [
   { path: '/dataentry/consumptionDataEntryAndAdjustment', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:color/:message', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
   { path: '/dataentry/consumptionDataEntryAndAdjustment/:planningUnitId', exact: true, name: 'static.dashboard.dataEntryAndAdjustments', component: ConsumptionDataEntryAndAdjustment },
-  { path: '/dataset/createTreeTemplate/:templateId', name: 'Create Tree Template', component: CreateTreeTemplate },
+  { path: '/dataset/createTreeTemplate/:templateId', name: 'static.common.createTreeTemplate', component: CreateTreeTemplate },
   { path: '/dataSet/buildTree/', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
   { path: '/dataSet/buildTree/tree/:treeId/:programId', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
   { path: '/dataSet/buildTree/treeServer/:treeId/:programId/:isLocal', exact: true, name: 'static.ManageTree.BuildTree', component: BuildTree },
@@ -266,10 +266,10 @@ const routes = [
   { path: '/healthArea/listHealthArea/:color/:message', name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: HealthAreaList },
   { path: '/healthArea/listHealthArea', exact: true, name: 'static.breadcrum.list', entityname: 'static.healtharea.healtharea', component: HealthAreaList },
   { path: '/healthArea/editHealthArea/:healthAreaId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.healthareaheader', component: EditHealthArea },
-  { path: '/organisation/addOrganisation', name: 'static.breadcrum.add', entityname: 'static.organisationHead.organisation', component: AddOrganisation },
-  { path: '/organisation/listOrganisation/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationHead.organisation', component: OrganisationList },
-  { path: '/organisation/listOrganisation', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationHead.organisation', component: OrganisationList },
-  { path: '/organisation/editOrganisation/:organisationId', name: 'static.breadcrum.edit', entityname: 'static.organisationHead.organisation', component: EditOrganisation },
+  { path: '/organisation/addOrganisation', name: 'static.breadcrum.add', entityname: i18n.t('static.organisationHead.organisation'), component: AddOrganisation },
+  { path: '/organisation/listOrganisation/:color/:message', name: 'static.breadcrum.list', entityname: i18n.t('static.organisationHead.organisation'), component: OrganisationList },
+  { path: '/organisation/listOrganisation', exact: true, name: 'static.breadcrum.list', entityname: i18n.t('static.organisationHead.organisation'), component: OrganisationList },
+  { path: '/organisation/editOrganisation/:organisationId', name: 'static.breadcrum.edit', entityname: i18n.t('static.organisationHead.organisation'), component: EditOrganisation },
   { path: '/organisationType/addOrganisationType', name: 'static.breadcrum.add', entityname: 'static.organisationType.organisationType', component: AddOrganisationType },
   { path: '/organisationType/listOrganisationType/:color/:message', name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
   { path: '/organisationType/listOrganisationType', exact: true, name: 'static.breadcrum.list', entityname: 'static.organisationType.organisationType', component: OrganisationTypeList },
@@ -441,8 +441,8 @@ const routes = [
   { path: '/dataset/editDataSet/:dataSetId', name: i18n.t('static.dataset.manageProgramInfo'), component: EditDataSet },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message', name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
   { path: '/importFromQATSupplyPlan/listImportFromQATSupplyPlan', exact: true, name: i18n.t('static.importFromQATSupplyPlan.importFromQATSupplyPlan'), component: ImportFromQATSupplyPlan },
-  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
-  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: 'Import Into Supply Plan', component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message', name: i18n.t('static.supplyPlan.importIntoSP'), component: ImportIntoQATSupplyPlan },
+  { path: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan', exact: true, name: i18n.t('static.supplyPlan.importIntoSP'), component: ImportIntoQATSupplyPlan },
   { path: '/planningUnitSetting/listPlanningUnitSetting/:color/:message', name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
   { path: '/planningUnitSetting/listPlanningUnitSetting', exact: true, name: 'static.updatePlanningUnit.updatePlanningUnit', component: PlanningUnitSetting },
   { path: '/forecastReport/forecastOutput', exact: true, name: 'static.MonthlyForecast.MonthlyForecast', component: ForecastOutput },
@@ -610,11 +610,18 @@ class DefaultLayout extends Component {
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
       var defaultModuleId = 1;
       if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE') && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_FORECASTING_MODULE')) {
+        if(sessionStorage.getItem('defaultModuleId')=='' || sessionStorage.getItem('defaultModuleId')==undefined){
         defaultModuleId = decryptedUser.defaultModuleId;
+        sessionStorage.setItem('defaultModuleId',defaultModuleId);
+        }else{
+          defaultModuleId = sessionStorage.getItem('defaultModuleId');
+        }
       } else if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SUPPLY_PLANNING_MODULE')) {
         defaultModuleId = 2;
+        sessionStorage.setItem('defaultModuleId',2);
       } else {
         defaultModuleId = 1;
+        sessionStorage.setItem('defaultModuleId',1);
       }
       this.setState({
         activeTab: defaultModuleId,
@@ -926,9 +933,10 @@ class DefaultLayout extends Component {
     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
     decryptedUser.defaultModuleId = tab;
     localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
-    let decryptedUser1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    // let decryptedUser1 = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+    sessionStorage.setItem("defaultModuleId",tab);
     this.setState({
-      activeTab: decryptedUser1.defaultModuleId,
+      activeTab: tab,
     });
   }
   /**
@@ -1998,7 +2006,7 @@ class DefaultLayout extends Component {
                               //   }
                               // },
                               {
-                                name: 'Forecast Error (Monthly)',
+                                name: i18n.t('static.report.forecasterrorovertime'),
                                 url: '/report/consumptionForecastErrorSupplyPlan',
                                 icon: 'fa fa-line-chart',
                                 attributes: {
