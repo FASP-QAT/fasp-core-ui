@@ -902,6 +902,29 @@ class ApplicationDashboard extends Component {
     * This function updates the state with the selected region values and generates a list of regions.
     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
     */
+  handleBottomProgramIdChange = (programId) => {
+    localStorage.setItem("bottomProgramId", programId.value);
+    this.setState({
+      bottomProgramId: programId.value
+    }, () => {
+      if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
+        var inputJson = {
+          programId: this.state.bottomProgramId,
+          startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
+          stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
+          displayShipmentsBy: this.state.displayBy
+        }
+        this.getOnlineDashboardBottom(inputJson);
+      } else {
+        Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+      }
+    });
+  }
+  /**
+    * Handle region change function.
+    * This function updates the state with the selected region values and generates a list of regions.
+    * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
+    */
   handleTopCountryIdChange = (countryIds) => {
     // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
@@ -930,7 +953,8 @@ class ApplicationDashboard extends Component {
     localStorage.setItem("topProgramId", JSON.stringify(this.state.topProgramId))
     if (this.state.topProgramId.length == 0) {
       this.setState({
-        dashboardTopList: []
+        dashboardTopList: [],
+        topSubmitLoader: false
       })
     } else if (this.state.onlyDownloadedTopProgram) {
       Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
@@ -960,10 +984,6 @@ class ApplicationDashboard extends Component {
   dataChange(event) {
     let bottomProgramId = this.state.bottomProgramId;
     let displayBy = this.state.displayBy;
-    if (event.target.name === "bottomProgramId") {
-      bottomProgramId = event.target.value;
-      localStorage.setItem("bottomProgramId", bottomProgramId);
-    }
     if (event.target.name === "displayBy") {
       displayBy = event.target.value;
     }
@@ -1393,6 +1413,10 @@ class ApplicationDashboard extends Component {
         }, () => {
           localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
         })
+      } else if(key == "dashboardTopList") {
+        this.setState({
+          dashboardTopList: value.filter(p => this.state.topProgramId.map(m => m.value.toString()).includes(p.program.id))
+        })
       }
     })
   }
@@ -1549,8 +1573,8 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < expiriesList.length; j++) {
         data = [];
         data[0] = expiriesList[j].planningUnit.label.label_en
-        data[1] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
-        data[2] = roundARU(expiriesList[j].expiringQty, 1)
+        data[1] = roundARU(expiriesList[j].expiringQty, 1)
+        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
         data[3] = roundARU(expiriesList[j].expiryAmt, 1)
         dataArray[count] = data;
         count++;
@@ -1572,17 +1596,17 @@ class ApplicationDashboard extends Component {
           readOnly: true
         },
         {
-          title: "Expiry Date",
-          type: 'text',
-          editable: false,
-          readOnly: true
-        },
-        {
           title: "Expired/Expiring Quantity",
           type: 'number',
           editable: false,
           readOnly: true,
           mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
+        },
+        {
+          title: "Expiry Date",
+          type: 'text',
+          editable: false,
+          readOnly: true
         },
         {
           title: "Total Cost",
@@ -2165,13 +2189,13 @@ class ApplicationDashboard extends Component {
       this.state.programList.filter(c => this.state.onlyDownloadedTopProgram ? c.local : !c.local).map(c => {
         topProgramList.push({ label: c.programCode, value: c.id })
       })
-    let bottomProgramList = this.state.programList.length > 0
+    let bottomProgramList = [];
+    this.state.programList.length > 0
       && this.state.programList.filter(c => this.state.onlyDownloadedBottomProgram ? c.local : !c.local).map((item, i) => {
-        return (
-          <option key={i} value={item.id}>
-            {item.programCode}
-          </option>
-        )
+        bottomProgramList.push({
+          value: item.id,
+          label: item.programCode
+        })
       }, this);
     const pickerLang = {
       months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -2715,11 +2739,11 @@ class ApplicationDashboard extends Component {
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                           <th scope="col">Program</th>
-                          <th scope="col"># of Active Planning Units</th>
-                          <th scope="col"># of Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Active Planning Units</th>
+                          <th scope="col">Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'># of Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.lastUpdatedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
                         <tbody>
@@ -2730,7 +2754,7 @@ class ApplicationDashboard extends Component {
                                   <i class="fa fa-trash" style={{ color: "danger" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   <i class="fa fa-refresh" style={{ color: "info" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
-                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version}​</td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 <td>
                                   <div id="example-1" class="examples">
@@ -2878,19 +2902,20 @@ class ApplicationDashboard extends Component {
                     </FormGroup>
                     </div>
                       </Label>
-                      <Input
+                      <Select
                         type="select"
                         name="bottomProgramId"
                         id="bottomProgramId"
                         className="selectBlack MarginBtmformgroup"
                         value={this.state.bottomProgramId}
-                        onChange={(e) => { this.dataChange(e) }}
+                        options={bottomProgramList}
+                        onChange={(e) => { this.handleBottomProgramIdChange(e) }}
                         bsSize="sm"
                         required
-                      >
-                        <option value="" selected>Open this select menu</option>
-                        {bottomProgramList}
-                      </Input>
+                      />
+                        {/* <option value="" selected>Open this select menu</option> */}
+                        {/* {bottomProgramList} */}
+                      {/* </Input> */}
                     </FormGroup>
                     </div>
                     {/* <div style={{ gap: '20px', display: 'flex' }}>
@@ -2926,7 +2951,7 @@ class ApplicationDashboard extends Component {
                           key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                          <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1 ? "" : this._handleClickRangeBox} />
                         </Picker>
                       </div>
                     </FormGroup>

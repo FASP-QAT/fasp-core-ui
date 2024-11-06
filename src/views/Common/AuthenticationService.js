@@ -927,7 +927,7 @@ class AuthenticationService {
                         break;
                     case "/programProduct/addProgramProduct":
                     case "/programProduct/addProgramProduct/:programId/:color/:message":
-                        if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT")) {
+                        if (bfunction.includes("ROLE_BF_ADD_PROGRAM_PRODUCT") || bfunction.includes("ROLE_BF_LIST_PROGRAM_PRODUCT")) {
                             return true;
                         }
                         break;

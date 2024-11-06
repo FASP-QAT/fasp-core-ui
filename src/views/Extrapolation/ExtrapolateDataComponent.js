@@ -294,6 +294,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             dataChanged: false,
+            methodChanged:false,
             notesChanged: false,
             noDataMessage: "",
             noDataMessage1: "",
@@ -1795,7 +1796,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         })
                         putRequest.onerror = function (event) {
                         }.bind(this);
@@ -1814,6 +1816,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             this.setState({
                                 loading: false,
                                 dataChanged: false,
+                                methodChanged: false,
                                 message: i18n.t('static.compareAndSelect.dataSaved'),
                                 extrapolateClicked: false,
                                 notesChanged: false
@@ -2024,7 +2027,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         })
                         putRequest.onerror = function (event) {
                         }.bind(this);
@@ -2043,6 +2047,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             this.setState({
                                 loading: false,
                                 dataChanged: false,
+                                methodChanged: false,
                                 message: i18n.t('static.compareAndSelect.dataSaved'),
                                 extrapolateClicked: false,
                                 notesChanged: false
@@ -2082,7 +2087,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 planningUnitId: planningUnitId,
                 showData: false,
                 dataEl: "",
-                dataChanged: false
+                dataChanged: false,
+                methodChanged:false,
             }, () => {
                 this.showDataOnPlanningAndRegionChange();
             })
@@ -2113,7 +2119,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 regionId: regionId,
                 showData: false,
                 dataEl: "",
-                dataChanged: false
+                dataChanged: false,
+                methodChanged:false
             }, () => {
                 this.showDataOnPlanningAndRegionChange();
             })
@@ -2746,7 +2753,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         }, () => {
                             localStorage.setItem("isExtrapolation", true);
                             localStorage.setItem("messageColor", "red");
@@ -2926,6 +2934,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             startBulkExtrapolation: false,
             dataChanged: false,
+            methodChanged: false,
             loading: true
         }, () => {
             var db1;
@@ -3197,7 +3206,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         event.stopPropagation();
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false
+            dataChanged: false,
+            methodChanged:false
         }, () => {
             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
@@ -3585,7 +3595,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             movingAvgId: movingAvgId,
             show: false,
-            dataChanged: true
+            dataChanged: true,
+            methodChanged:!movingAvgId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3598,7 +3609,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            dataChanged: true
+            dataChanged: true,
+            methodChanged:!semiAvgId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3611,7 +3623,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            dataChanged: true
+            dataChanged: true,
+            methodChanged:!linearRegressionId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3625,7 +3638,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             smoothingId: smoothingId,
             dataChanged: true,
-            offlineTES: false
+            offlineTES: false,
+            methodChanged:!smoothingId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3639,7 +3653,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             arimaId: arimaId,
             dataChanged: true,
-            offlineArima: false
+            offlineArima: false,
+            methodChanged:!arimaId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -5055,7 +5070,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                         (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                         (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                             (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
-                                                                                (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
+                                                                                ((this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) || (this.state.methodChanged)) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
                                                                     }
                                                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                                                 </FormGroup>
