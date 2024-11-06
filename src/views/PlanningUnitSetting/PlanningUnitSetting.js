@@ -225,6 +225,10 @@ export default class PlanningUnitSetting extends Component {
                     (instance).setValueFromCoords(17, data[i].y, true, true);
                     z = data[i].y;
                 }
+                if (index === "" || index == null || index == undefined) {
+                    (instance).setValueFromCoords(3, data[i].y, true, true);
+                    (instance).setValueFromCoords(4, data[i].y, true, true);
+                }
             }
             if (data[i].x == 0) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
