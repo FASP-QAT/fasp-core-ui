@@ -2537,12 +2537,12 @@ export default class TreeTable extends Component {
             data = [];
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             var aggregationNodeValue = "0";
-            if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
+            // if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
                 var aggregationNodeValueFilter = currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(displayDate).format("YYYY-MM"));
                 if (aggregationNodeValueFilter.length > 0) {
                     aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
                 }
-            }
+            // }
             var sourceNodeUsageListCount = [];
             if(this.state.dataSetObj.programData.treeList)
                 this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == items[i].payload.nodeId) ? sourceNodeUsageListCount.push({treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
@@ -2568,7 +2568,7 @@ export default class TreeTable extends Component {
             data[5] = items[i].payload.nodeType.id == 1 ? "" : moment(currentScenario.month).format("YYYY-MM-DD");
             data[6] = (items[i].payload.nodeType.id == 1) ? "" : currentScenario.dataValue == "" ? 0 : (items[i].payload.nodeType.id == 2 ? addCommasNodeValue(currentScenario.dataValue) : (addCommasNodeValue(currentScenario.dataValue) + "%"));
             data[7] = (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) ? "" : this.calculateParentValueFromMOMForJexcel(displayDate, items[i]) == "" ? 0 : this.calculateParentValueFromMOMForJexcel(displayDate, items[i]);
-            data[8] = (items[i].payload.nodeType.id == 2 || items[i].payload.nodeType.id == 1) ? addCommasNodeValue(aggregationNodeValue) : addCommasNodeValue(Number(data[6].toString().replaceAll(",", "").replaceAll("%", "")) * Number(data[7]));
+            data[8] = addCommasNodeValue(aggregationNodeValue);
             data[9] = items[i].payload.downwardAggregationAllowed;
             data[10] = currentScenario.notes;
             data[11] = this.state.nodeTypeList.filter(c => c.id == items[i].payload.nodeType.id)[0].id;
