@@ -7691,7 +7691,7 @@ export default class WhatIfReportComponent extends React.Component {
                 shipmentList = [];
             }
             // var roleList = AuthenticationService.getLoggedInUserRole();
-            if (AuthenticationService.checkUserACLBasedOnRoleId((document.getElementById("programId").value).toString().split("_")[0].map(c=>c.toString()), 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 if (document.getElementById("addRowId") != null) {
                     document.getElementById("addRowId").style.display = "none"
                 }
