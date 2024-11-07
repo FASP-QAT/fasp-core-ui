@@ -16713,7 +16713,7 @@ label.arrow_label:before {
 -------------------------------------------------------- */
 .cssProgress {
   width: 100%;
-  margin-bottom: 20px;
+  // margin-bottom: 20px;
 }
 
 .cssProgress .progress1,
@@ -17755,4 +17755,23 @@ label.arrow_label:before {
 }
 .IconColorD{
   color: #002F6C;
+}
+@media screen and (min-width: 1920px) {
+  .CustomHeight{
+    height: 412px;
+  }
+}
+.FreezePlaningUnitColumn1 .jss>tbody>tr:nth-child(odd)>td:nth-child(2).readonly {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: #cfcdc9 !important;
+}
+.FreezePlaningUnitColumn1 .jss>tbody>tr:nth-child(even)>td:nth-child(2).readonly {
+  width: 200px !important;
+  left: 0 !important;
+  z-index: 2 !important;
+  position: sticky !important;
+  background: #cfcdc9 !important;
 }

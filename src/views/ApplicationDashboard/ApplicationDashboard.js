@@ -52,7 +52,7 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
 /**
  * Formats a numerical value by adding commas as thousand separators.
@@ -194,6 +194,7 @@ class ApplicationDashboard extends Component {
                         color: 'green'
                       }, () => {
                         hideSecondComponent()
+                        this.onTopSubmit();
                       })
                       this.getPrograms();
                     }.bind(this)
@@ -303,6 +304,17 @@ class ApplicationDashboard extends Component {
       localStorage.setItem("sesDatasetId", this.state.datasetList.filter(c => c.programId == programId && c.versionId == versionId)[0].id);
     }
     this.props.history.push(url);
+  }
+   /**
+   * Redirects the user to a specified URL.
+   * @param {string} url - The URL to redirect to.
+   */
+   redirectToCrudWindow = (url, programId) => {
+    if(programId) {
+      localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
+    }
+    const win = window.open(window.location.origin + url, "_blank");
+    win.focus();
   }
   /**
    * Clears the timeout when the component is unmounted.
@@ -1431,6 +1443,7 @@ class ApplicationDashboard extends Component {
     } else {
       this.updateState(id, false);
     }
+    this.onTopSubmit();
   }
   /**
    * Toggles info for confidence level
@@ -2625,7 +2638,7 @@ class ApplicationDashboard extends Component {
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
                       </FormGroup> */}
-                    <div class="row">
+                    <div class="row pt-lg-2">
                       <div class="col-5" style={{display:'flex',gap:'40px'}}>
                         <FormGroup className='FormGroupD'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
@@ -2649,7 +2662,7 @@ class ApplicationDashboard extends Component {
                         </FormGroup>
                           </Label>
                           <MultiSelect
-                          className="MarginBtmformgroup MarginBtmformgroupsmall"
+                            className="MarginBtmformgroup MarginBtmformgroupsmall"
                             name="topProgramId"
                             id="topProgramId"
                             bsSize="sm"
@@ -2657,6 +2670,7 @@ class ApplicationDashboard extends Component {
                             onChange={(e) => { this.handleTopProgramIdChange(e) }}
                             options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
                             labelledBy={i18n.t('static.common.regiontext')}
+                            filterOptions={filterOptions}
                           />
                         </FormGroup>
                         <FormGroup className='col-1' style={{ marginTop: '24px' }}>
@@ -2696,7 +2710,7 @@ class ApplicationDashboard extends Component {
                       <Table className="table-striped table-bordered text-center">
                         <thead>
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
-                          <th scope="col">Program</th>
+                          <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Active Planning Units</th>
                           <th scope="col">Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -2717,7 +2731,7 @@ class ApplicationDashboard extends Component {
                                 <td>
                                   {d.activePlanningUnits}
                                 </td>
-                                <td style={{ color: d.countOfStockOutPU > 0 ? "red" : "" }}>
+                                <td align="center" style={{ verticalAlign:"middle", color: d.countOfStockOutPU > 0 ? "red" : "" }}>
                                   <div id="example-1" class="examples">
                                     <div class="cssProgress">
                                       <div class="progress">
@@ -2732,10 +2746,10 @@ class ApplicationDashboard extends Component {
                                   </div>
                                 </td>
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrud(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/#/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a href="#/report/supplyPlanVersionAndReview/1" target="_blank">{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/#/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
@@ -2940,7 +2954,7 @@ class ApplicationDashboard extends Component {
                       <div className="card custom-card pb-lg-2 CustomHeight">
                         <div class="card-header justify-content-between">
                           <div class="card-title">Shipments </div>
-                          <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Shipment: <b className='red h3 DarkFontbold'>{shipmentTotal ? "$" : ""} {addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Shipments: <b className='red h3 DarkFontbold'>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden'}}>
                           <div className='row'>
@@ -3009,7 +3023,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount} missing forecasts</span></center>
+                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplCorrectCount != 0 ? ("/"+forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3017,7 +3031,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplCorrectCount != 0 ? ("/"+inventoryQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3025,7 +3039,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplCorrectCount != 0 ? ("/"+actualConsumptionQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3033,7 +3047,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplCorrectCount != 0 ? ("/"+shipmentQplPuCount) : ""} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
@@ -3049,7 +3063,7 @@ class ApplicationDashboard extends Component {
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title">Expiries</div>
-                              <div className='col-md-7 pl-lg-0 pt-lg-1' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of all the Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
+                              <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2 scrollable-content">
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '0px 8px' }}>

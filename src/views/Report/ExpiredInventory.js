@@ -970,7 +970,7 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     title: i18n.t('static.shipment.totalCost'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', mask: '$#,##',
                 }
             ],
             editable: false,

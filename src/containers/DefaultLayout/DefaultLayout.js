@@ -1632,7 +1632,7 @@ class DefaultLayout extends Component {
                           icon: 'fa fa-list',
                           attributes: {
                             hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_ALTERNATE_REPORTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_SET_UP_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_EDIT_PROGRAM'))
-                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM'))
+                              || (this.state.businessFunctions.includes('ROLE_BF_LIST_BUDGET')) || (this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT'))|| (this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT')) || (this.state.businessFunctions.includes('ROLE_BF_IMPORT_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_EXPORT_PROGARM'))
                               || (this.state.businessFunctions.includes('ROLE_BF_DOWNLOAD_PROGARM')) || (this.state.businessFunctions.includes('ROLE_BF_DELETE_LOCAL_PROGRAM')) || (this.state.businessFunctions.includes('ROLE_BF_PIPELINE_PROGRAM_IMPORT')) || (this.state.businessFunctions.includes('ROLE_BF_COMMIT_VERSION')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_VERSION_AND_REVIEW'))) && this.state.activeTab == 2) ? false : true)
                           },
                           children: [
@@ -1674,7 +1674,7 @@ class DefaultLayout extends Component {
                               url: '/programProduct/addProgramProduct',
                               icon: 'fa fa-cubes',
                               attributes: {
-                                hidden: (((this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT') || this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT')) && this.state.activeTab == 2) ? false : true),
+                                hidden: (((this.state.businessFunctions.includes('ROLE_BF_ADD_PROGRAM_PRODUCT') || this.state.businessFunctions.includes('ROLE_BF_LIST_PROGRAM_PRODUCT')) && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }

@@ -70,6 +70,11 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     dashboradTopList.push(dashboradTop);
                                 }
                             })
+                            dashboradTopList.sort((a, b) => {
+                                var itemLabelA = a.program.code.toUpperCase();
+                                var itemLabelB = b.program.code.toUpperCase();
+                                return itemLabelA > itemLabelB ? 1 : -1;
+                            });
                             console.log("dashboradTopList Test@123", dashboradTopList)
                             props.updateStateDashboard("dashboardTopList", dashboradTopList);
                         } catch (err) {
