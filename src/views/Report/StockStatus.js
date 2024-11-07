@@ -384,7 +384,7 @@ class StockStatus extends Component {
                   ? ""
                   : "-" + item1.primeLineNo))
             )
-          }).join(' \n')).replaceAll(' ', '%20')
+          }).join(' \n')).replaceAll(' ', '%20').replaceAll("#", "%23")
             , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(ele.adjustment != null ? roundARU(ele.adjustment, 1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment, 1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock, 1) : '', roundARU(ele.closingBalance, 1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand, 1) : ''])));
         } else {
           item.data.map(ele => A.push(addDoubleQuoteToRowContent([dateFormatterCSV(ele.dt).replaceAll(' ', '%20'), roundARU(ele.openingBalance, 1), ele.forecastedConsumptionQty == null ? '' : roundARU(ele.forecastedConsumptionQty, 1), ele.actualConsumptionQty == null ? '' : roundARU(ele.actualConsumptionQty, 1), ele.shipmentQty == null ? '' : (ele.shipmentInfo.length > 0 ? roundARU(ele.shipmentQty, 1) : ""),
@@ -408,7 +408,7 @@ class StockStatus extends Component {
                   ? ""
                   : "-" + item1.primeLineNo))
             )
-          }).join(' \n')).replaceAll(' ', '%20')
+          }).join(' \n')).replaceAll(' ', '%20').replaceAll("#", "%23")
             , (ele.adjustment == 0 ? ele.regionCountForStock > 0 ? roundARU(ele.nationalAdjustment, 1) : "" : ele.regionCountForStock > 0 ? Number(roundARU(ele.nationalAdjustment, 1)) + Number(ele.adjustment != null ? roundARU(ele.adjustment, 1) : 0) : ele.adjustment != null ? roundARU(ele.adjustment, 1) : ""), ele.expiredStock != 0 ? roundARU(ele.expiredStock, 1) : '', roundARU(ele.closingBalance, 1), ele.amc != null ? roundAMC(ele.amc) : "", (this.state.isAggregate.toString() == "false" ? item.planBasedOn : ele.planBasedOn) == 1 ? roundAMC(ele.mos) : roundAMC((this.state.isAggregate.toString() == "false" ? ele.maxStock : ele.maxStockQty)), ele.unmetDemand != 0 ? roundARU(ele.unmetDemand, 1) : ''])));
         }
         for (var i = 0; i < A.length; i++) {

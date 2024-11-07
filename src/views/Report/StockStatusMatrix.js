@@ -2542,6 +2542,8 @@ export default class StockStatusMatrix extends React.Component {
                           }, this)
                           : []
                       }
+                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                      selectSomeItems: i18n.t('static.common.select')}}
                     />
                   </div>
                 </FormGroup>
@@ -2566,6 +2568,8 @@ export default class StockStatusMatrix extends React.Component {
                           : []
                       }
                       disabled={this.state.loading}
+                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                      selectSomeItems: i18n.t('static.common.select')}}
                     />{" "}
                   </div>
                 </FormGroup>

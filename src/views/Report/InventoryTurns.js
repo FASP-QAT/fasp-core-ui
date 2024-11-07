@@ -1310,6 +1310,7 @@ export default class InventoryTurns extends Component {
                                                         multi
                                                         options={this.state.countryList}
                                                         value={this.state.CostOfInventoryInput.country}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -1327,6 +1328,7 @@ export default class InventoryTurns extends Component {
                                                         multi
                                                         options={this.state.programList}
                                                         value={this.state.CostOfInventoryInput.programIds}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                 </div>
                                             </FormGroup>

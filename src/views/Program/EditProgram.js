@@ -118,7 +118,7 @@ const validationSchema = function (values) {
                     } else {
                         return true;
                     }
-                }),
+                })
     })
 }
 /**
@@ -303,6 +303,13 @@ export default class EditProgram extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -363,6 +370,13 @@ export default class EditProgram extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -419,6 +433,13 @@ export default class EditProgram extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -450,7 +471,7 @@ export default class EditProgram extends Component {
                 .then(response => {
                     if (response.status == 200) {
                         var haList = [];
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_SP")) {
+                        if (AuthenticationService.checkUserACL([this.props.match.params.programId.toString()], "ROLE_BF_UPDATE_TA_FOR_SP")) {
                             var json = response.data;
                             for (var i = 0; i < json.length; i++) {
                                 haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
@@ -487,6 +508,13 @@ export default class EditProgram extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -545,7 +573,7 @@ export default class EditProgram extends Component {
                         var json = response.data;
                         var fsList = [{ value: "-1", label: i18n.t("static.common.all") }];
                         for (var i = 0; i < json.length; i++) {
-                            fsList[i+1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                            fsList[i + 1] = { value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
                         }
                         var listArray = fsList;
                         listArray.sort((a, b) => {
@@ -573,6 +601,13 @@ export default class EditProgram extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -674,7 +709,7 @@ export default class EditProgram extends Component {
         } else {
             program.procurementAgents = selectedArray;
             this.setState({ program: program });
-        }        
+        }
     }
     /**
      * Handles the change event for funding sources.
@@ -841,6 +876,13 @@ export default class EditProgram extends Component {
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                         break;
+                                                    case 409:
+                                                        this.setState({
+                                                            message: i18n.t('static.common.accessDenied'),
+                                                            loading: false,
+                                                            color: "#BA0C2F",
+                                                        });
+                                                        break;
                                                     case 403:
                                                         this.props.history.push(`/accessDenied`)
                                                         break;
@@ -914,7 +956,7 @@ export default class EditProgram extends Component {
                                                                     type="text"
                                                                     maxLength={6}
                                                                     value={this.state.uniqueCode}
-                                                                    disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_PC_FOR_SP") ? true : false}
+                                                                    disabled={!AuthenticationService.checkUserACL([this.props.match.params.programId.toString()], "ROLE_BF_UPDATE_PC_FOR_SP") ? true : false}
                                                                     name="programCode1" id="programCode1" />
                                                             </FormGroup>
                                                         </Col>
@@ -970,7 +1012,7 @@ export default class EditProgram extends Component {
                                                             type="select"
                                                             name="organisationId"
                                                             id="organisationId"
-                                                            disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_ORG_FOR_SP") ? true : false}
+                                                            disabled={!AuthenticationService.checkUserACL([this.props.match.params.programId.toString()], "ROLE_BF_UPDATE_ORG_FOR_SP") ? true : false}
                                                             value={this.state.program.organisation.id}
                                                             onChange={(e) => { handleChange(e); this.dataChange(e); this.generateOrganisationCode(e) }}
                                                         >
@@ -996,6 +1038,7 @@ export default class EditProgram extends Component {
                                                             multi
                                                             options={this.state.regionList}
                                                             value={this.state.program.regionArray}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                         <FormFeedback>{errors.regionId}</FormFeedback>
                                                     </FormGroup>
@@ -1017,9 +1060,10 @@ export default class EditProgram extends Component {
                                                             multi
                                                             options={this.state.healthAreaList}
                                                             value={this.state.program.healthAreaArray}
-                                                            disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_UPDATE_TA_FOR_SP") ? true : false}
+                                                            disabled={!AuthenticationService.checkUserACL([this.props.match.params.programId.toString()], "ROLE_BF_UPDATE_TA_FOR_SP") ? true : false}
                                                             name="healthAreaId"
                                                             id="healthAreaId"
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                         <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                                     </FormGroup>
@@ -1355,6 +1399,13 @@ export default class EditProgram extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1410,6 +1461,13 @@ export default class EditProgram extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1448,6 +1506,13 @@ export default class EditProgram extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)

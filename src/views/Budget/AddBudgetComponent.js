@@ -578,6 +578,7 @@ class AddBudgetComponent extends Component {
                                                         required
                                                         options={this.state.programs}
                                                         value={this.state.programId}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.programId}</FormFeedback>
                                                 </FormGroup>
