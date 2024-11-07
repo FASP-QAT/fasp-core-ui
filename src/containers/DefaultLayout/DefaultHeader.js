@@ -1,4 +1,4 @@
-import { AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
+import { AppNavbarBrand, AppSidebarToggler, CFormSwitch } from '@coreui/react';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -155,7 +155,7 @@ class DefaultHeader extends Component {
               </span>
             </NavLink>
           </NavItem>
-          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} shipmentLinkingAlerts={this.props.shipmentLinkingAlerts} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} goOffline={this.props.goOffline} goOnline={this.props.goOnline} logout={this.props.logout} />
+          <DefaultHeaderDropdown onLogout={this.props.onLogout} accnt onChangePassword={this.props.onChangePassword} onChangeDashboard={this.props.onChangeDashboard} shipmentLinkingAlerts={this.props.shipmentLinkingAlerts} latestProgram={this.props.latestProgram} commitProgram={this.props.commitProgram} goOffline={this.props.goOffline} goOnline={this.props.goOnline} logout={this.props.logout} item={this.props.activeModule}/>
           <NavItem className="">
             <NavLink to="#" className="nav-link">
               <span className="icon-wrapper icon-wrapper-alt rounded-circle ">

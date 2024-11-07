@@ -20,7 +20,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 export default class SyncProgram extends Component {
     constructor(props) {
         super(props);
-        var pIds = this.props.location.state != undefined ? this.props.location.state.programIds : [];
+        var pIds = this.props.location.state != undefined && this.props.location.state.programIds != undefined ? this.props.location.state.programIds : [];
         this.state = {
             totalMasters: 0,
             syncedMasters: 0,
@@ -800,7 +800,7 @@ export default class SyncProgram extends Component {
                                 <strong>{i18n.t('static.program.programSync')}</strong>
                             </CardHeader>
                             <CardBody>
-                                <div className="text-center">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
+                                <div className="text-center DarkThColr">{this.state.syncedPercentage}% ({i18next.t('static.masterDataSync.synced')} {this.state.syncedMasters} {i18next.t('static.masterDataSync.of')} {this.state.totalMasters} {i18next.t('static.masterDataSync.masters')})</div>
                                 <Progress value={this.state.syncedMasters} max={this.state.totalMasters} />
                             </CardBody>
                         </Card>

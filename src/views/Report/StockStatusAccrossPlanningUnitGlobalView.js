@@ -37,7 +37,7 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, round, roundN } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, round, roundAMC } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const ref = React.createRef();
 const pickerLang = {
   months: [
@@ -245,7 +245,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           round(p.amc),
           round(p.finalClosingBalance),
           p.mos != null
-            ? roundN(p.mos)
+            ? roundAMC(p.mos)
             : i18n.t("static.supplyPlanFormula.na"),
           p.minMos,
           p.maxMos,
@@ -271,20 +271,20 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
    * @returns {Object} - An object representing the cell's background color based on the MOS thresholds.
    */
   cellstyleWithData = (item) => {
-    if (item.mos != null && roundN(item.mos) == 0) {
+    if (item.mos != null && (item.mos) == 0) {
       return { backgroundColor: legendcolor[0].color };
     } else if (
-      roundN(item.mos) != 0 &&
-      roundN(item.mos) != null &&
-      roundN(item.mos) < item.minMos
+      (item.mos) != 0 &&
+      (item.mos) != null &&
+      (item.mos) < item.minMos
     ) {
       return { backgroundColor: legendcolor[1].color };
     } else if (
-      roundN(item.mos) >= item.minMos &&
-      roundN(item.mos) <= item.maxMos
+      (item.mos) >= item.minMos &&
+      (item.mos) <= item.maxMos
     ) {
       return { backgroundColor: legendcolor[2].color };
-    } else if (roundN(item.mos) > item.maxMos) {
+    } else if ((item.mos) > item.maxMos) {
       return { backgroundColor: legendcolor[3].color };
     } else if (item.mos == null) {
       return { backgroundColor: legendcolor[4].color };
@@ -561,7 +561,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
         formatter(round(p.amc), 0),
         formatter(round(p.finalClosingBalance), 0),
         p.mos != null
-          ? formatter(roundN(p.mos), 0)
+          ? formatter(roundAMC(p.mos), 0)
           : i18n.t("static.supplyPlanFormula.na"),
         p.minMos,
         p.maxMos,
@@ -569,20 +569,20 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     );
 
     const cellstyleWithData = (item) => {
-      if (item.mos != null && roundN(item.mos) == 0) {
+      if (item.mos != null && (item.mos) == 0) {
         return legendcolor[0].color;
       } else if (
-        roundN(item.mos) != 0 &&
-        roundN(item.mos) != null &&
-        roundN(item.mos) < item.minMos
+        (item.mos) != 0 &&
+        (item.mos) != null &&
+        (item.mos) < item.minMos
       ) {
         return legendcolor[1].color;
       } else if (
-        roundN(item.mos) >= item.minMos &&
-        roundN(item.mos) <= item.maxMos
+        (item.mos) >= item.minMos &&
+        (item.mos) <= item.maxMos
       ) {
         return legendcolor[2].color;
-      } else if (roundN(item.mos) > item.maxMos) {
+      } else if ((item.mos) > item.maxMos) {
         return legendcolor[3].color;
       } else if (item.mos == null) {
         return legendcolor[4].color;
@@ -1059,23 +1059,23 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           var min = ele.minMos;
           var max = ele.maxMos;
           if (stockStatusId == 0) {
-            if (ele.mos != null && roundN(ele.mos) == 0) {
+            if (ele.mos != null && roundAMC(ele.mos) == 0) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 1) {
             if (
               ele.mos != null &&
-              roundN(ele.mos) != 0 &&
-              roundN(ele.mos) < min
+              roundAMC(ele.mos) != 0 &&
+              roundAMC(ele.mos) < min
             ) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 3) {
-            if (roundN(ele.mos) > max) {
+            if (roundAMC(ele.mos) > max) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 2) {
-            if (roundN(ele.mos) < max && roundN(ele.mos) > min) {
+            if (roundAMC(ele.mos) < max && roundAMC(ele.mos) > min) {
               filterProgramData.push(ele);
             }
           } else if (stockStatusId == 4) {
@@ -1508,8 +1508,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               <thead>
                                 <tr>
                                   <th
-                                    className="text-center Firstcolum1"
-                                    style={{ width: "27%" }}
+                                    className="text-center Firstcolum1SSAPUGV" 
                                   >
                                     {i18n.t("static.planningunit.planningunit")}
                                   </th>
@@ -1552,7 +1551,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                               <td></td>
                                             ) : (
                                               <td
-                                                className="text-center"
+                                                className="text-center darkModeclrblack"
                                                 style={this.cellstyleWithData(
                                                   item.programData.filter(
                                                     (c) =>
@@ -1563,12 +1562,12 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                                                 {item.programData.filter(
                                                   (c) => c.program.code == ele1
                                                 )[0].mos != null
-                                                  ? roundN(
+                                                  ? formatter(roundAMC(
                                                     item.programData.filter(
                                                       (c) =>
                                                         c.program.code == ele1
                                                     )[0].mos
-                                                  )
+                                                  ),0)
                                                   : i18n.t(
                                                     "static.supplyPlanFormula.na"
                                                   )}

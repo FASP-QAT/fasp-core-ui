@@ -682,12 +682,12 @@ class EquivalancyUnit extends Component {
                     type: 'numeric',
                     textEditor: true,
                     decimal: '.',
-                    mask: '#,##.00',
+                    mask: '#,##.00000000',
                     disabledMaskOnEdition: true,
                     required: true,
                     number: true,
                     regex: {
-                        ex: /^\d{1,14}(\.\d{1,4})?$/,
+                        ex: /^\d{1,14}(\.\d{1,8})?$/,
                         text: i18n.t("static.usagePeriod.conversionTOFUTest")
                     }
                 },

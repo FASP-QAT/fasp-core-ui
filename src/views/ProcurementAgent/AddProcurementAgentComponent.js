@@ -35,13 +35,9 @@ const validationSchema = function (values) {
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
         ,
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -52,8 +48,15 @@ class AddProcurementAgentComponent extends Component {
         super(props);
         this.state = {
             displayColorPicker: false,
+            displayColorPickerDarkMode: false,
             background: '#000000',
             color: {
+                r: '241',
+                g: '112',
+                b: '19',
+                a: '1',
+            },
+            colorDarkMode: {
                 r: '241',
                 g: '112',
                 b: '19',
@@ -75,6 +78,7 @@ class AddProcurementAgentComponent extends Component {
                 approvedToShippedLeadTime: '',
                 localProcurementAgent: false,
                 colorHtmlCode: '#F17013',
+                colorHtmlDarkCode: '#F17013',
                 procurementAgentType: {
                     id: ''
                 },
@@ -100,10 +104,22 @@ class AddProcurementAgentComponent extends Component {
         this.setState({ displayColorPicker: !this.state.displayColorPicker })
     };
     /**
+     * Handles click event on color code picker for dark mode. Toggle color picker according to displayColorPickerDarkMode value. 
+     */
+    handleClickDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: !this.state.displayColorPickerDarkMode })
+    };
+    /**
      * Close color picker.
      */
     handleClose = () => {
         this.setState({ displayColorPicker: false })
+    };
+    /**
+     * Close color picker for dark mode.
+     */
+    handleCloseDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: false })
     };
     /**
      * Handles color change in color picker.
@@ -116,6 +132,22 @@ class AddProcurementAgentComponent extends Component {
         this.setState({
             color: color.rgb,
             rgba,
+            procurementAgent
+        },
+            () => {
+            });
+    };
+    /**
+     * Handles color change in color picker for dark mode.
+     * @param {*} colorDarkMode - selected color for dark mode.
+     */
+    handleChangeColorDarkMode = (colorDarkMode) => {
+        let { procurementAgent } = this.state;
+        procurementAgent.colorHtmlDarkCode = colorDarkMode.hex.toUpperCase();
+        let rgbaDarkMode = 'rgba(' + colorDarkMode.rgb.r + "," + colorDarkMode.rgb.g + "," + colorDarkMode.rgb.b + "," + colorDarkMode.rgb.a + ')';
+        this.setState({
+            colorDarkMode: colorDarkMode.rgb,
+            rgbaDarkMode,
             procurementAgent
         },
             () => {
@@ -549,6 +581,12 @@ class AddProcurementAgentComponent extends Component {
                     borderRadius: '2px',
                     background: `rgba(${this.state.color.r}, ${this.state.color.g}, ${this.state.color.b}, ${this.state.color.a})`,
                 },
+                colorDarkMode: {
+                    width: '100px',
+                    height: '17px',
+                    borderRadius: '2px',
+                    background: `rgba(${this.state.colorDarkMode.r}, ${this.state.colorDarkMode.g}, ${this.state.colorDarkMode.b}, ${this.state.colorDarkMode.a})`,
+                },
                 swatch: {
                     padding: '5px',
                     background: '#fff',
@@ -605,6 +643,7 @@ class AddProcurementAgentComponent extends Component {
                                         submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
                                         approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                        colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
                                         programId: this.state.procurementAgent.programList.id
                                     }}
@@ -794,34 +833,42 @@ class AddProcurementAgentComponent extends Component {
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCodeDarkMode')}</Label>
+                                                    <div bsSize="sm">
+                                                        <div style={styles.swatch} onClick={this.handleClickDarkMode}>
+                                                            <div style={styles.colorDarkMode} />
+                                                        </div>
+                                                    </div>
+                                                    {this.state.displayColorPickerDarkMode ? <div style={styles.popover}>
+                                                        <div style={styles.cover} onClick={this.handleCloseDarkMode} />
+                                                        <SketchPicker color={this.state.colorDarkMode} onChange={this.handleChangeColorDarkMode} />
+                                                    </div> : null}
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
                                                         id="submittedToApprovedLeadTime"
-                                                        valid={!errors.submittedToApprovedLeadTime && this.state.procurementAgent.submittedToApprovedLeadTime != ''}
+                                                        valid={!errors.submittedToApprovedLeadTime}
                                                         invalid={touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
-                                                        min="0"
                                                     />
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
                                                         id="approvedToShippedLeadTime"
-                                                        valid={!errors.approvedToShippedLeadTime && this.state.procurementAgent.approvedToShippedLeadTime != ''}
+                                                        valid={!errors.approvedToShippedLeadTime}
                                                         invalid={touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                        min="1"
                                                     />
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
@@ -870,6 +917,7 @@ class AddProcurementAgentComponent extends Component {
         procurementAgent.submittedToApprovedLeadTime = ''
         procurementAgent.approvedToShippedLeadTime = ''
         procurementAgent.colorHtmlCode = ''
+        procurementAgent.colorHtmlDarkCode = ''
         this.setState({
             procurementAgent
         },

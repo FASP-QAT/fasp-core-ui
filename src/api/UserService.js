@@ -66,5 +66,13 @@ class UserService {
         return axios.post(`${API_URL}/api/user/module/${json}`, {}
         );
     }
+    updateUserTheme(json){
+        return axios.post(`${API_URL}/api/user/theme/${json}`, {}
+        );
+    }
+    updateUserDecimalPreference(json){
+        return axios.post(`${API_URL}/api/user/decimalPreference/${json}`, {}
+        );
+    }
 }
 export default new UserService()

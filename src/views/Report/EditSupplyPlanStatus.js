@@ -14,7 +14,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
-import { contrast, filterOptions, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { contrast, filterOptions, hideSecondComponent, roundAMC, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 import { checkValidation, changed, jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { JEXCEL_PAGINATION_OPTION, SECRET_KEY, APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, JEXCEL_PRO_KEY, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DATE_FORMAT_SM, API_URL } from '../../Constants.js';
 import i18n from '../../i18n';
@@ -97,6 +97,7 @@ class EditSupplyPlanStatus extends Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
+            isDarkMode:false,
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
@@ -127,6 +128,8 @@ class EditSupplyPlanStatus extends Component {
             consumptionTotalMonthWise: [],
             consumptionChangedFlag: 0,
             inventoryTotalData: [],
+            adjustmentTotalData: [],
+            nationalAdjustmentTotalData: [],
             expectedBalTotalData: [],
             suggestedShipmentsTotalData: [],
             inventoryFilteredArray: [],
@@ -153,6 +156,7 @@ class EditSupplyPlanStatus extends Component {
             jsonArrForGraph: [],
             display: 'none',
             lang: localStorage.getItem('lang'),
+            theme:localStorage.getItem('theme'),
             unmetDemand: [],
             expiredStock: [],
             versionId: "",
@@ -175,6 +179,7 @@ class EditSupplyPlanStatus extends Component {
             inventoryStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             shipmentStartDateClicked: moment(Date.now()).startOf('month').format("YYYY-MM-DD"),
             batchInfoInInventoryPopUp: [],
+            showBatchTable: 0,
             problemCategoryList: [],
             ledgerForBatch: [],
             showBatchSaveButton: false,
@@ -257,30 +262,9 @@ class EditSupplyPlanStatus extends Component {
         this.handleProblemReviewedChange = this.handleProblemReviewedChange.bind(this);
         this.buildProblemTransJexcel = this.buildProblemTransJexcel.bind(this);
         this.loaded1 = this.loaded1.bind(this);
-        this.roundAMC = this.roundAMC.bind(this);
         this.checkValidation = this.checkValidation.bind(this);
         this.toggleLargeNotes = this.toggleLargeNotes.bind(this);
         this.actionCanceledNotes = this.actionCanceledNotes.bind(this);
-    }
-    /**
-     * This is function is used to round the AMC value
-     * @param {*} amc The value of the AMC
-     * @returns This function returns the rounded AMC
-     */
-    roundAMC(amc) {
-        if (amc != null) {
-            if (Number(amc).toFixed(0) >= 100) {
-                return Number(amc).toFixed(0);
-            } else if (Number(amc).toFixed(1) >= 10) {
-                return Number(amc).toFixed(1);
-            } else if (Number(amc).toFixed(2) >= 1) {
-                return Number(amc).toFixed(2);
-            } else {
-                return Number(amc).toFixed(3);
-            }
-        } else {
-            return null;
-        }
     }
     /**
      * This method is used to add commas to the number
@@ -693,6 +677,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
+            showBatchTable:0
         })
         if (supplyPlanType == 'Consumption') {
             var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -976,8 +961,10 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
+                        console.log("Error 1 Test@123",error)
                     });
                 }).catch(error => {
+                    console.log("Error 2 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1100,8 +1087,10 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
+                        console.log("Error 3 Test@123",error)
                     });
                 }).catch(error => {
+                    console.log("Error 4 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1249,6 +1238,7 @@ class EditSupplyPlanStatus extends Component {
                                             this.setState({
                                                 currencyList: cList
                                             })
+                                            var programPlanningUnit = ((this.state.planningUnits).filter(p => p.planningUnit.id == document.getElementById("planningUnitId").value))[0];
                                             if (supplyPlanType == 'deliveredShipments') {
                                                 shipmentList = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate >= startDate && c.receivedDate <= endDate : c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate) && c.erpFlag == false && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.planningUnit.id == document.getElementById("planningUnitId").value && (c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS));
                                             } else if (supplyPlanType == 'shippedShipments') {
@@ -1285,6 +1275,7 @@ class EditSupplyPlanStatus extends Component {
                                                 programJson: programJson,
                                                 generalProgramJson: programJson,
                                                 shipmentStartDateClicked: startDate,
+                                                programPlanningUnitForPrice: programPlanningUnit,
                                                 loading: true
                                             }, () => {
                                                 if (this.refs.shipmentChild != undefined) {
@@ -1295,13 +1286,27 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             })
-                                        }).catch(error => { });
-                                    }).catch(error => { });
-                                }).catch(error => { });
-                            }).catch(error => { });
-                        }).catch(error => { });
-                    }).catch(error => { });
-                }).catch(error => { });
+                                        }).catch(error => {
+                                            console.log("Error 5 Test@123",error)
+                                         });
+                                    }).catch(error => {
+                                        console.log("Error 6 Test@123",error)
+                                     });
+                                }).catch(error => { 
+                                    console.log("Error 7 Test@123",error)
+                                });
+                            }).catch(error => {
+                                console.log("Error 8 Test@123",error)
+                             });
+                        }).catch(error => {
+                            console.log("Error 9 Test@123",error)
+                         });
+                    }).catch(error => { 
+                        console.log("Error 10 Test@123",error)
+                    });
+                }).catch(error => { 
+                    console.log("Error 11 Test@123",error)
+                });
             }.bind(this)
         }.bind(this)
     }
@@ -1331,6 +1336,22 @@ class EditSupplyPlanStatus extends Component {
         fields = document.getElementsByClassName("erpShipments");
         for (var i = 0; i < fields.length; i++) {
             if (!this.state.showTotalShipment == true && this.state.showErpShipment == true) {
+                fields[i].style.display = "";
+            } else {
+                fields[i].style.display = "none";
+            }
+        }
+    }
+    /**
+     * This function is used to toggle the accordian for the total adjustments
+     */
+    toggleAccordionTotalAdjustments() {
+        this.setState({
+            showTotalAdjustment: !this.state.showTotalAdjustment
+        })
+        var fields = document.getElementsByClassName("totalAdjustments");
+        for (var i = 0; i < fields.length; i++) {
+            if (!this.state.showTotalAdjustment == true) {
                 fields[i].style.display = "";
             } else {
                 fields[i].style.display = "none";
@@ -1403,8 +1424,13 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
+            showBatchTable:0
         },
             () => {
+                var inputs = document.getElementsByClassName("submitBtn");
+                for (var i = 0; i < inputs.length; i++) {
+                    inputs[i].disabled = false;
+                }
                 this.hideFirstComponent();
             })
         this.toggleLarge(supplyPlanType);
@@ -1514,6 +1540,8 @@ class EditSupplyPlanStatus extends Component {
         var minStockMoS = [];
         var maxStockMoS = [];
         var inventoryTotalData = [];
+        var adjustmentTotalData = [];
+        var nationalAdjustmentTotalData = [];
         var suggestedShipmentsTotalData = [];
         var openingBalanceArray = [];
         var closingBalanceArray = [];
@@ -1582,7 +1610,7 @@ class EditSupplyPlanStatus extends Component {
                     minStockMoSQty: minStockMoSQty,
                     maxStockMoSQty: maxStockMoSQty,
                     planBasedOn: programPlanningUnit.planBasedOn,
-                    minQtyPpu: programPlanningUnit.minQty,
+                    minQtyPpu: roundARU(programPlanningUnit.minQty, 1),
                     distributionLeadTime: programPlanningUnit.distributionLeadTime,
                     planningUnitNotes: programPlanningUnit.notes
                 })
@@ -1627,11 +1655,11 @@ class EditSupplyPlanStatus extends Component {
                             var jsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).format("YYYY-MM-DD"));
                             var prevMonthJsonList = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(m[n].startDate).subtract(1, 'months').format("YYYY-MM-DD"));
                             if (jsonList.length > 0) {
-                                openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: jsonList[0].openingBalance });
-                                consumptionTotalData.push({ consumptionQty: jsonList[0].consumptionQty, consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
+                                openingBalanceArray.push({ isActual: prevMonthJsonList.length > 0 && prevMonthJsonList[0].regionCountForStock == prevMonthJsonList[0].regionCount ? 1 : 0, balance: roundARU(jsonList[0].openingBalance, 1) });
+                                consumptionTotalData.push({ consumptionQty: roundARU(jsonList[0].consumptionQty, 1), consumptionType: jsonList[0].actualFlag, textColor: jsonList[0].actualFlag == 1 ? "#000000" : "rgb(170, 85, 161)" });
                                 var shipmentDetails = programJson.shipmentList.filter(c => c.active == true && c.planningUnit.id == planningUnitId && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag == true && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? (c.receivedDate >= m[n].startDate && c.receivedDate <= m[n].endDate) : (c.expectedDeliveryDate >= m[n].startDate && c.expectedDeliveryDate <= m[n].endDate))
                                 );
-                                shipmentsTotalData.push(shipmentDetails.length > 0 ? jsonList[0].shipmentTotalQty : "");
+                                shipmentsTotalData.push(shipmentDetails.length > 0 ? roundARU(jsonList[0].shipmentTotalQty, 1) : "");
                                 var sd1 = [];
                                 var sd2 = [];
                                 var sd3 = [];
@@ -1669,7 +1697,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = procurementAgent.colorHtmlCode;
+                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -1704,7 +1732,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = procurementAgent.colorHtmlCode;
+                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -1739,7 +1767,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = procurementAgent.colorHtmlCode;
+                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -1774,7 +1802,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = procurementAgent.colorHtmlCode;
+                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -1809,7 +1837,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor5 = procurementAgent.colorHtmlCode;
+                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -1847,7 +1875,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor1Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    deliveredShipmentsTotalData.push({ qty: Number(jsonList[0].receivedShipmentsTotalData) + Number(jsonList[0].receivedErpShipmentsTotalData), month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1, isErp: isErp1 });
+                                    deliveredShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].receivedShipmentsTotalData) + Number(jsonList[0].receivedErpShipmentsTotalData), 1), month: m[n], shipmentDetail: sd1, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder1, isLocalProcurementAgent: isLocalProcurementAgent1, isErp: isErp1 });
                                 } else {
                                     deliveredShipmentsTotalData.push("")
                                 }
@@ -1856,7 +1884,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor2Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    shippedShipmentsTotalData.push({ qty: Number(jsonList[0].shippedShipmentsTotalData) + Number(jsonList[0].shippedErpShipmentsTotalData), month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2, isErp: isErp2 });
+                                    shippedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].shippedShipmentsTotalData) + Number(jsonList[0].shippedErpShipmentsTotalData), 1), month: m[n], shipmentDetail: sd2, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder2, isLocalProcurementAgent: isLocalProcurementAgent2, isErp: isErp2 });
                                 } else {
                                     shippedShipmentsTotalData.push("")
                                 }
@@ -1865,7 +1893,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
+                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData),1), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -1874,7 +1902,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor4Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    plannedShipmentsTotalData.push({ qty: Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
+                                    plannedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].plannedShipmentsTotalData) + Number(jsonList[0].plannedErpShipmentsTotalData), 1), month: m[n], shipmentDetail: sd4, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder4, isLocalProcurementAgent: isLocalProcurementAgent4, isErp: isErp4 });
                                 } else {
                                     plannedShipmentsTotalData.push("")
                                 }
@@ -1883,19 +1911,18 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor5Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    onholdShipmentsTotalData.push({ qty: Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData), month: m[n], shipmentDetail: sd5, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder5, isLocalProcurementAgent: isLocalProcurementAgent5, isErp: isErp5 });
+                                    onholdShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].onholdErpShipmentsTotalData), 1), month: m[n], shipmentDetail: sd5, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder5, isLocalProcurementAgent: isLocalProcurementAgent5, isErp: isErp5 });
                                 } else {
                                     onholdShipmentsTotalData.push("")
                                 }
-                                inventoryTotalData.push(jsonList[0].adjustmentQty == 0 ? jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : "" : jsonList[0].regionCountForStock > 0 ? jsonList[0].nationalAdjustment : jsonList[0].adjustmentQty);
-                                totalExpiredStockArr.push({ qty: jsonList[0].expiredStock, details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
-                                monthsOfStockArray.push(jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(1) : jsonList[0].mos);
-                                maxQtyArray.push(this.roundAMC(jsonList[0].maxStock))
-                                amcTotalData.push(jsonList[0].amc != null ? this.roundAMC(Number(jsonList[0].amc)) : "");
+                                totalExpiredStockArr.push({ qty: roundARU(jsonList[0].expiredStock, 1), details: jsonList[0].batchDetails.filter(c => moment(c.expiryDate).format("YYYY-MM-DD") >= m[n].startDate && moment(c.expiryDate).format("YYYY-MM-DD") <= m[n].endDate), month: m[n] });
+                                monthsOfStockArray.push(jsonList[0].mos != null ? jsonList[0].mos : jsonList[0].mos);
+                                maxQtyArray.push(roundAMC(jsonList[0].maxStock))
+                                amcTotalData.push(jsonList[0].amc != null ? roundAMC(Number(jsonList[0].amc)) : "");
                                 minStockMoS.push(jsonList[0].minStockMoS)
                                 maxStockMoS.push(jsonList[0].maxStockMoS)
-                                unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : jsonList[0].unmetDemand);
-                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: jsonList[0].closingBalance, batchInfoList: jsonList[0].batchDetails })
+                                unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : roundARU(jsonList[0].unmetDemand, 1));
+                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: roundARU(jsonList[0].closingBalance, 1), batchInfoList: jsonList[0].batchDetails })
                                 lastClosingBalance = jsonList[0].closingBalance;
                                 lastBatchDetails = jsonList[0].batchDetails;
                                 lastIsActualClosingBalance = jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0;
@@ -1951,7 +1978,7 @@ class EditSupplyPlanStatus extends Component {
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -2014,7 +2041,7 @@ class EditSupplyPlanStatus extends Component {
                                         if (suggestedOrd <= 0) {
                                             sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": suggestedOrd, "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
                                         sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
@@ -2023,6 +2050,17 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
+                                var adjustmentCount=0;
+                                var adjustmentTotal=0;
+                                inventoryListForRegion.map(item=>{
+                                    if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
+                                        adjustmentCount+=1;
+                                        adjustmentTotal+=Number((Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
+                                    }
+                                })
+                                adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
+                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2037,20 +2075,20 @@ class EditSupplyPlanStatus extends Component {
                                     for (var cr = 0; cr < consumptionListForRegionalDetails.length; cr++) {
                                         if (noOfActualEntries > 0) {
                                             if (consumptionListForRegionalDetails[cr].actualFlag.toString() == "true") {
-                                                consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                                consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionQtyForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                                consumptionTotalForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             }
                                             actualFlagForRegion = true;
                                         } else {
-                                            consumptionQtyForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
-                                            consumptionTotalForRegion += Math.round(Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionQtyForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
+                                            consumptionTotalForRegion += (Math.round(consumptionListForRegionalDetails[cr].consumptionRcpuQty) * parseFloat(consumptionListForRegionalDetails[cr].multiplier));
                                             actualFlagForRegion = false;
                                         }
                                     }
                                     if (consumptionListForRegionalDetails.length == 0) {
                                         consumptionQtyForRegion = "";
                                     }
-                                    consumptionArrayForRegion.push({ "regionId": regionListFiltered[r].id, "qty": consumptionQtyForRegion, "actualFlag": actualFlagForRegion, "month": m[n] })
+                                    consumptionArrayForRegion.push({ "regionId": regionListFiltered[r].id, "qty": roundARU(consumptionQtyForRegion, 1), "actualFlag": actualFlagForRegion, "month": m[n] })
                                     var adjustmentsQtyForRegion = 0;
                                     var actualQtyForRegion = 0;
                                     var inventoryListForRegionalDetails = inventoryListForRegion.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionListFiltered[r].id);
@@ -2059,8 +2097,8 @@ class EditSupplyPlanStatus extends Component {
                                     for (var cr = 0; cr < inventoryListForRegionalDetails.length; cr++) {
                                         if (inventoryListForRegionalDetails[cr].actualQty != undefined && inventoryListForRegionalDetails[cr].actualQty != null && inventoryListForRegionalDetails[cr].actualQty !== "") {
                                             actualCount += 1;
-                                            actualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
-                                            totalActualQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                            actualQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                            totalActualQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].actualQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                             var index = regionsReportingActualInventory.findIndex(c => c == regionListFiltered[r].id);
                                             if (index == -1) {
                                                 regionsReportingActualInventory.push(regionListFiltered[r].id)
@@ -2068,8 +2106,8 @@ class EditSupplyPlanStatus extends Component {
                                         }
                                         if (inventoryListForRegionalDetails[cr].adjustmentQty != undefined && inventoryListForRegionalDetails[cr].adjustmentQty != null && inventoryListForRegionalDetails[cr].adjustmentQty !== "") {
                                             adjustmentsCount += 1;
-                                            adjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
-                                            totalAdjustmentsQtyForRegion += Math.round(Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                            adjustmentsQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
+                                            totalAdjustmentsQtyForRegion += (Math.round(inventoryListForRegionalDetails[cr].adjustmentQty) * parseFloat(inventoryListForRegionalDetails[cr].multiplier));
                                         }
                                     }
                                     if (actualCount == 0) {
@@ -2080,8 +2118,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                 }
-                                consumptionArrayForRegion.push({ "regionId": -1, "qty": consumptionTotalForRegion, "actualFlag": true, "month": m[n] })
-                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0);
+                                consumptionArrayForRegion.push({ "regionId": -1, "qty": roundARU(consumptionTotalForRegion, 1), "actualFlag": true, "month": m[n] })
+                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0)-(jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand!=null ? jsonList[0].unmetDemand : 0);
                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                 }
@@ -2093,8 +2131,8 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 var json = {
                                     month: m[n].monthName.concat(" ").concat(m[n].monthYear),
-                                    consumption: jsonList[0].consumptionQty,
-                                    stock: jsonList[0].closingBalance,
+                                    consumption: roundARU(jsonList[0].consumptionQty, 1),
+                                    stock: roundARU(jsonList[0].closingBalance, 1),
                                     planned: Number(plannedShipmentsTotalData[n] != "" ? plannedShipmentsTotalData[n].qty : 0)
                                     ,
                                     onhold: Number(onholdShipmentsTotalData[n] != "" ? onholdShipmentsTotalData[n].qty : 0)
@@ -2108,13 +2146,13 @@ class EditSupplyPlanStatus extends Component {
                                     mos: jsonList[0].mos != null ? parseFloat(jsonList[0].mos).toFixed(2) : jsonList[0].mos,
                                     minMos: minStockMoSQty,
                                     maxMos: maxStockMoSQty,
-                                    minQty: this.roundAMC(jsonList[0].minStock),
-                                    maxQty: this.roundAMC(jsonList[0].maxStock),
+                                    minQty: roundAMC(jsonList[0].minStock),
+                                    maxQty: roundAMC(jsonList[0].maxStock),
                                     planBasedOn: programPlanningUnit.planBasedOn
                                 }
                                 jsonArrForGraph.push(json);
                             } else {
-                                openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: lastClosingBalance });
+                                openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: roundARU(lastClosingBalance, 1) });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                 shipmentsTotalData.push("");
                                 suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
@@ -2124,6 +2162,8 @@ class EditSupplyPlanStatus extends Component {
                                 plannedShipmentsTotalData.push("");
                                 onholdShipmentsTotalData.push("");
                                 inventoryTotalData.push("");
+                                adjustmentTotalData.push("");
+                                nationalAdjustmentTotalData.push("");
                                 totalExpiredStockArr.push({ qty: 0, details: [], month: m[n] });
                                 monthsOfStockArray.push(null)
                                 maxQtyArray.push(null)
@@ -2131,7 +2171,7 @@ class EditSupplyPlanStatus extends Component {
                                 minStockMoS.push(minStockMoSQty);
                                 maxStockMoS.push(maxStockMoSQty)
                                 unmetDemand.push("");
-                                closingBalanceArray.push({ isActual: 0, balance: lastClosingBalance, batchInfoList: lastBatchDetails });
+                                closingBalanceArray.push({ isActual: 0, balance: roundARU(lastClosingBalance, 1), batchInfoList: lastBatchDetails });
                                 for (var i = 0; i < this.state.regionListFiltered.length; i++) {
                                     consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
@@ -2142,7 +2182,7 @@ class EditSupplyPlanStatus extends Component {
                                 var json = {
                                     month: m[n].monthName.concat(" ").concat(m[n].monthYear),
                                     consumption: null,
-                                    stock: lastClosingBalance,
+                                    stock: roundARU(lastClosingBalance, 1),
                                     planned: 0,
                                     onhold: 0,
                                     delivered: 0,
@@ -2170,6 +2210,8 @@ class EditSupplyPlanStatus extends Component {
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
                             onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
+                            adjustmentTotalData:adjustmentTotalData,
+                            nationalAdjustmentTotalData:nationalAdjustmentTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
                             amcTotalData: amcTotalData,
@@ -2227,12 +2269,14 @@ class EditSupplyPlanStatus extends Component {
                     b = getLabelText(b.planningUnit.label, this.state.lang).toLowerCase();
                     return a < b ? -1 : a > b ? 1 : 0;
                 }.bind(this)),
+                planningUnitListAll: (response.data),
                 planningUnitDropdownList: response.data.map((item, i) => ({ id: item.planningUnit.id, name: getLabelText(item.planningUnit.label, this.state.lang) })),
                 message: ''
             })
         })
             .catch(
                 error => {
+                    console.log("Error 12 Test@123",error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2320,6 +2364,21 @@ class EditSupplyPlanStatus extends Component {
      * This function is used to get planning unit, program data, problem criticaliy list
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
         this.setState({
             loading: true
         })
@@ -2377,6 +2436,10 @@ class EditSupplyPlanStatus extends Component {
                     for (var i = 0; i < fields.length; i++) {
                         fields[i].style.display = "none";
                     }
+                    var fields = document.getElementsByClassName("totalAdjustments");
+                    for (var i = 0; i < fields.length; i++) {
+                        fields[i].style.display = "none";
+                    }
                     fields = document.getElementsByClassName("manualShipments");
                     for (var i = 0; i < fields.length; i++) {
                         fields[i].style.display = "none";
@@ -2389,6 +2452,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 13 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -2433,6 +2497,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
+                    console.log("Error 14 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -2490,6 +2555,7 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
+                    console.log("Error 15 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -2661,11 +2727,24 @@ class EditSupplyPlanStatus extends Component {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
         }
-
+        const darkModeColors = [
+            '#d4bbff', 
+            '#757575' ,   
+        ];
+        
+        const lightModeColors = [
+            '#002F6C',  // Color 1 
+            '#cfcdc9',   
+        ];
+        const { isDarkMode } = this.state;
+    const colors = isDarkMode ? darkModeColors : lightModeColors;
+    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -2673,18 +2752,20 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 },
@@ -2693,25 +2774,29 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'right',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2744,14 +2829,15 @@ class EditSupplyPlanStatus extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
         var chartOptions1 = {
             title: {
                 display: true,
-                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname
+                text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
+                fontColor:fontColor
             },
             scales: {
                 yAxes: [{
@@ -2759,28 +2845,32 @@ class EditSupplyPlanStatus extends Component {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor: 'black',
+                        fontColor:fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     },
                     position: 'left',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor: 'black'
+                        fontColor:fontColor
                     },
                     gridLines: {
-                        drawBorder: true, lineWidth: 0
+                        drawBorder: true, lineWidth: 0,
+                        color: gridLineColor,
+                        zeroLineColor: gridLineColor 
                     }
                 }]
             },
@@ -2813,7 +2903,7 @@ class EditSupplyPlanStatus extends Component {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor: 'black'
+                    fontColor:fontColor
                 }
             }
         }
@@ -2893,12 +2983,12 @@ class EditSupplyPlanStatus extends Component {
                     label: i18n.t('static.supplyPlan.delivered'),
                     stack: 1,
                     yAxisID: 'A',
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
+                    backgroundColor: colors[0],
+                    borderColor: colors[0],
+                    pointBackgroundColor: colors[0],
+                    pointBorderColor: colors[0],
+                    pointHoverBackgroundColor: colors[0],
+                    pointHoverBorderColor: colors[0],
                     data: this.state.jsonArrForGraph.map((item, index) => (item.delivered)),
                 },
                 {
@@ -2954,7 +3044,8 @@ class EditSupplyPlanStatus extends Component {
                     stack: 2,
                     type: 'line',
                     yAxisID: 'A',
-                    borderColor: '#cfcdc9',
+                    backgroundColor: colors[1],
+                    borderColor: colors[1],
                     borderStyle: 'dotted',
                     ticks: {
                         fontSize: 2,
@@ -3171,7 +3262,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.openingBalance')}</b></td>
                                                             {
                                                                 this.state.openingBalanceArray.map(item1 => (
-                                                                    <td align="right">{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
+                                                                    <td align="right" className='darkModeclrblack'>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>
                                                                 ))
                                                             }
                                                         </tr>
@@ -3182,15 +3273,15 @@ class EditSupplyPlanStatus extends Component {
                                                                 this.state.consumptionTotalData.map((item1, count) => {
                                                                     if (item1.consumptionType == 1) {
                                                                         if (item1.consumptionQty != null) {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
+                                                                            return (<td align="right" className="hoverTd lightModeclrblack" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
+                                                                            return (<td align="right" className="hoverTd  textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}>{""}</td>)
                                                                         }
                                                                     } else {
                                                                         if (item1.consumptionQty != null) {
                                                                             return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.consumptionQty} /></i></td>)
                                                                         } else {
-                                                                            return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
+                                                                            return (<td align="right" className="hoverTd textclrshipeditstatus" onClick={() => this.toggleLarge('Consumption', '', '', '', '', '', '', count)} style={{ color: item1.textColor }}><i>{""}</i></td>)
                                                                         }
                                                                     }
                                                                 })
@@ -3409,18 +3500,46 @@ class EditSupplyPlanStatus extends Component {
                                                             }
                                                         </tr>
                                                         <tr>
-                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.adjustments')}</b></td>
-                                                            {
-                                                                this.state.inventoryTotalData.map((item1, count) => {
-                                                                    if (item1 != null) {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                                    } else {
-                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                                    }
-                                                                })
-                                                            }
-                                                        </tr>
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
+                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                            </td>
+                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
+                                            {
+                                                this.state.inventoryTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
+                                            {
+                                                this.state.adjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
+                                        <tr className="totalAdjustments">
+                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
+                                            {
+                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
+                                                    if (item1 != null) {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                    } else {
+                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                    }
+                                                })
+                                            }
+                                        </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
@@ -3443,7 +3562,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.endingBalance')}</b></td>
                                                             {
                                                                 this.state.closingBalanceArray.map((item1, count) => {
-                                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
+                                                                    return (<td align="right" bgcolor={this.state.planBasedOn == 1 ? (item1.balance == 0 ? '#BA0C2F' : '') : (item1.balance == null ? "#cfcdc9" : item1.balance == 0 ? "#BA0C2F" : item1.balance < this.state.minQtyPpu ? "#f48521" : item1.balance > this.state.maxQtyArray[count] ? "#edb944" : "#118b70")} className="hoverTd darkModeclrblack" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{item1.isActual == 1 ? <b><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} /></b> : <NumberFormat displayType={'text'} thousandSeparator={true} value={item1.balance} />}</td>)
                                                                 })
                                                             }
                                                         </tr>
@@ -3452,7 +3571,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>}
@@ -3502,7 +3621,7 @@ class EditSupplyPlanStatus extends Component {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className="offset-4 col-md-8"> <span>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
+                                                    <div className="offset-4 col-md-8"> <span className='text-blackD'>{i18n.t('static.supplyPlan.noteBelowGraph')}</span></div>
                                                 </div>}
                                         </div>
                                     </div>
@@ -3802,6 +3921,7 @@ class EditSupplyPlanStatus extends Component {
             filters: true,
             parseFormulas: true,
             license: JEXCEL_PRO_KEY,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -4232,6 +4352,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 16 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4335,6 +4456,7 @@ class EditSupplyPlanStatus extends Component {
             })
             .catch(
                 error => {
+                    console.log("Error 17 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4388,86 +4510,86 @@ class EditSupplyPlanStatus extends Component {
             loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-            .then(response => {
-                var data = response.data;
-                const listArray = [];
-                const grouped = data.reduce((acc, item) => {
-                    acc[item.versionId] = acc[item.versionId] || [];
-                    acc[item.versionId].push(item);
-                    return acc;
-                }, {});
-
-                Object.values(grouped).forEach(entries => {
-                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                    if (pendingEntries.length) {
-                        listArray.push(pendingEntries[0]);
-                        if (pendingEntries.length > 1) {
-                            listArray.push(pendingEntries[pendingEntries.length - 1]);
-                        }
+        .then(response => {
+            var data = response.data;
+            const listArray = [];
+            const grouped = data.reduce((acc, item) => {
+                acc[item.versionId] = acc[item.versionId] || [];
+                acc[item.versionId].push(item);
+                return acc;
+            }, {});
+        
+            Object.values(grouped).forEach(entries => {
+                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                if (pendingEntries.length) {
+                    listArray.push(pendingEntries[0]);
+                    if (pendingEntries.length > 1) {
+                        listArray.push(pendingEntries[pendingEntries.length - 1]);
                     }
-                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
-                });
-                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                    jexcel.destroy(document.getElementById("notesTransTable"), true);
                 }
-                var json = [];
-                for (var sb = listArray.length - 1; sb >= 0; sb--) {
-                    var data = [];
-                    data[0] = listArray[sb].versionId;
-                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                    data[3] = listArray[sb].notes;
-                    data[4] = listArray[sb].lastModifiedBy.username;
-                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                    json.push(data);
-                }
-                var options = {
-                    data: json,
-                    columnDrag: false,
-                    columns: [
-                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                        {
-                            title: i18n.t("static.common.lastModifiedBy"),
-                            type: "text",
-                        },
-                        {
-                            title: i18n.t("static.common.lastModifiedDate"),
-                            type: "calendar",
-                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                        },
-                    ],
-                    editable: false,
-                    onload: function (instance, cell) {
-                        jExcelLoadedFunction(instance, 1);
-                    }.bind(this),
-                    pagination: localStorage.getItem("sesRecordCount"),
-                    search: true,
-                    columnSorting: true,
-                    wordWrap: true,
-                    allowInsertColumn: false,
-                    allowManualInsertColumn: false,
-                    allowDeleteRow: false,
-                    // onselection: this.selected,
-                    oneditionend: this.onedit,
-                    copyCompatibility: true,
-                    allowExport: false,
-                    paginationOptions: JEXCEL_PAGINATION_OPTION,
-                    position: "top",
-                    filters: true,
-                    license: JEXCEL_PRO_KEY,
-                    contextMenu: function (obj, x, y, e) {
-                        return false;
-                    }.bind(this),
-                };
-                var elVar = jexcel(document.getElementById("notesTransTable"), options);
-                this.el = elVar;
-                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
-
-            }).catch(
-                error => {
+                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+            });
+            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                jexcel.destroy(document.getElementById("notesTransTable"), true);
+            }
+            var json=[];
+            for (var sb = listArray.length-1; sb >= 0; sb--) {
+                var data = [];
+                data[0] = listArray[sb].versionId; 
+                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                data[3] = listArray[sb].notes;
+                data[4] = listArray[sb].lastModifiedBy.username;
+                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");                
+                json.push(data);
+            }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                {
+                    title: i18n.t("static.common.lastModifiedBy"),
+                    type: "text",
+                  },
+                  {
+                    title: i18n.t("static.common.lastModifiedDate"),
+                    type: "calendar",
+                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                  },
+            ],
+            editable: false,
+            onload: function (instance, cell) {
+                jExcelLoadedFunction(instance,1);
+            }.bind(this),
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: false,
+            // onselection: this.selected,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: "top",
+            filters: true,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
+            
+        }).catch(
+            error => {
                     this.setState({
                         loadingForNotes: false
                     })
@@ -4653,7 +4775,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         name="programId"
                                                                         id="programId"
                                                                         bsSize="sm"
-                                                                        value={this.state.program.label.label_en}
+                                                                        value={this.state.program.label.label_en +'~v'+ this.state.program.currentVersion.versionId}
                                                                         disabled />
                                                                 </InputGroup>
                                                             </div>
@@ -4853,14 +4975,14 @@ class EditSupplyPlanStatus extends Component {
                                                                     if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                         return (
                                                                             <>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty,1)} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty,1)} /></td>
                                                                             </>
                                                                         )
                                                                     } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
                                                                         return (
                                                                             <>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.adjustmentsQty} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty,1)} /></td>
                                                                                 <td align="center"></td>
                                                                             </>
                                                                         )
@@ -4868,7 +4990,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         return (
                                                                             <>
                                                                                 <td align="center"></td>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.actualQty} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty,1)} /></td>
                                                                             </>
                                                                         )
                                                                     } else {
@@ -4881,16 +5003,16 @@ class EditSupplyPlanStatus extends Component {
                                                 )
                                                 )
                                             }
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td style={{ textAlign: 'left' }}>{i18n.t('static.supplyPlan.total')}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
                                                         if (count < 7) {
                                                             return (
                                                                 <>
-                                                                    <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentsQty} />
+                                                                    <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentsQty,1)} />
                                                                     </td>
-                                                                    {(item.actualQty) > 0 ? <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.actualQty} /></td> : <td style={{ textAlign: 'left' }}>{item.actualQty}</td>}
+                                                                    {(item.actualQty) > 0 ? <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.actualQty,1)} /></td> : <td style={{ textAlign: 'left' }}>{roundARU(item.actualQty,1)}</td>}
                                                                 </>
                                                             )
                                                         }
@@ -4900,25 +5022,25 @@ class EditSupplyPlanStatus extends Component {
                                             <tr>
                                                 <td className="BorderNoneSupplyPlan" colSpan="15"></td>
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td align="left">{i18n.t("static.supplyPlan.projectedInventory")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={item.projectedInventory} /></td>
+                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.projectedInventory,1)} /></td>
                                                             )
                                                         }
                                                     })
                                                 }
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
-                                                <td align="left">{i18n.t("static.supplyPlan.autoAdjustment")}</td>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
+                                                <td align="left">{i18n.t("static.supplyPlan.nationalAdjustment")}</td>
                                                 {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                         if (count < 7) {
                                                             if (item1.autoAdjustments.toString() != '') {
-                                                                return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={item1.autoAdjustments} /></td>)
+                                                                return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.autoAdjustments,1)} /></td>)
                                                             } else {
                                                                 return (<td colSpan="2"></td>)
                                                             }
@@ -4926,13 +5048,13 @@ class EditSupplyPlanStatus extends Component {
                                                     })
                                                 }
                                             </tr>
-                                            <tr bgcolor='#d9d9d9'>
+                                            <tr bgcolor='#d9d9d9' className='text-blackDModal'>
                                                 <td align="left">{i18n.t("static.supplyPlan.finalInventory")}</td>
                                                 {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={item.balance != 0 ? "hoverTd" : ""} onClick={() => item.balance != 0 ? this.setState({ batchInfoInInventoryPopUp: item.batchInfoList }) : ""}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable:1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -4940,7 +5062,7 @@ class EditSupplyPlanStatus extends Component {
                                             </tr>
                                         </tbody>
                                     </Table>
-                                    {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).length > 0 &&
+                                    {this.state.showBatchTable == 1 &&
                                         <>
                                             <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                                 <thead>
@@ -4955,16 +5077,16 @@ class EditSupplyPlanStatus extends Component {
                                                 <tbody>
                                                     {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
                                                         <tr>
-                                                            <td>{item.batchNo}</td>
+                                                            <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                            <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                            <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                             <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </Table><br />
-                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [] })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable:0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
                                         </>
                                     }
                                     {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
@@ -5125,9 +5247,9 @@ class EditSupplyPlanStatus extends Component {
                                                     <tr>
                                                         <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{moment(item.expiryDate).format(DATE_FORMAT_CAP)}</td>
+                                                        <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.expiredQty} /></td>
+                                                        <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.expiredQty,1)} /></td>
                                                     </tr>
                                                 )
                                                 )
@@ -5166,12 +5288,12 @@ class EditSupplyPlanStatus extends Component {
                                                         ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance} /></td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty} /></td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty} /></td>
-                                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={item.shipmentQty} />}</td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={0 - Number(item.unallocatedQty)} /></td>
-                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.qty} /></td>}
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.openingBalance,1)} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.consumptionQty,1)} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentQty,1)} /></td>
+                                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.shipmentQty,1)} />}</td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(0 - Number(item.unallocatedQty),1)} /></td>
+                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></td>}
                                                             </tr>
                                                         ))
                                                     }
@@ -5179,7 +5301,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <tfoot>
                                                     <tr>
                                                         <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty} /></b></td>
+                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty,1)} /></b></td>
                                                     </tr>
                                                 </tfoot>
                                             </Table>
@@ -5240,9 +5362,10 @@ class EditSupplyPlanStatus extends Component {
                                                     var json = elInstance.getJson();
                                                     var reviewedProblemList = [];
                                                     var isAllCheckForReviewed = true;
+                                                    var j=0;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
-                                                        if (map.get("23") == 1 && (this.state.problemList[i].problemStatus.id != map.get("11") || this.state.problemList[i].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != "")) {
+                                                        if ((map.get("0") != "" && map.get("0") != 0) && (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
                                                             reviewedProblemList.push({
                                                                 problemReportId: map.get("0"),
                                                                 problemStatus: {
@@ -5252,6 +5375,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 reviewedNotes: map.get("22"),
                                                                 notes: map.get("22")
                                                             });
+                                                        }
+                                                        if((map.get("0") != "" && map.get("0") != 0)){
+                                                            j+=1;
                                                         }
                                                         if (map.get("21") == false && map.get("13") != 4) {
                                                             isAllCheckForReviewed = false
@@ -5295,7 +5421,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 } else {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
-                                                                    } catch (err) { }
+                                                                    } catch (err) { 
+                                                                        console.log("Error 19 Test@123",err)
+                                                                    }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",
                                                                         submitColor: "green",
@@ -5314,6 +5442,7 @@ class EditSupplyPlanStatus extends Component {
                                                             })
                                                             .catch(
                                                                 error => {
+                                                                    console.log("Error 20 Test@123",error)
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
                                                                             // message: 'static.unkownError',
@@ -5366,6 +5495,9 @@ class EditSupplyPlanStatus extends Component {
                                                                 }
                                                             );
                                                     } else {
+                                                        this.setState({
+                                                            loading:false
+                                                        })
                                                         document.getElementById("submitButton").disabled = false;
                                                         alert("To approve a supply plan – Reviewed must all be checked.");
                                                     }
@@ -5397,6 +5529,7 @@ class EditSupplyPlanStatus extends Component {
                                         })
                                         .catch(
                                             error => {
+                                                console.log("Error 21 Test@123",error)
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',
@@ -5464,7 +5597,7 @@ class EditSupplyPlanStatus extends Component {
                                                 <Col md="12 pl-0">
                                                     <div className="row">
                                                         <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
                                                             <Input
                                                                 type="textarea"
                                                                 maxLength={65535}
@@ -5566,8 +5699,32 @@ class EditSupplyPlanStatus extends Component {
                 allBatchLedger.push(batchInfo);
             }));
         var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+        let finalLedger = [];
+        let start = moment(createdDate).format("YYYY-MM");
+        let end = moment(expiryDate).format("YYYY-MM");
+        let months = new Set(ledgerForBatch.map(e => e.transDate));
+        var batchInventortList=this.state.generalProgramJson.batchInventoryList;
+        if(batchInventortList==undefined){
+            batchInventortList=[]
+        }
+        while (moment(start).format("YYYY-MM") <= moment(end).format("YYYY-MM")) {
+            let month = moment(start).startOf('month').format("YYYY-MM-DD");
+            var ledgerData;
+            if (months.has(month)) {
+                var ledgerData=ledgerForBatch.find(e => e.transDate === month);
+                ledgerData.actualInventoryBatch=batchInventortList.filter(c=>moment(c.inventoryDate).format("YYYY-MM")==moment(month).format("YYYY-MM")).flatMap(c=>c.batchList).length>0?true:false;
+                var projectedBalance=Number(ledgerData.openingBalance)-Number(ledgerData.consumptionQty)+Number(ledgerData.adjustmentQty)+Number(ledgerData.shipmentQty)-Number(ledgerData.unallocatedQty);
+                if(projectedBalance!=Number(ledgerData.qty)){
+                    ledgerData.unallocatedQty=Number(ledgerData.unallocatedQty)-Number((Number(ledgerData.qty)-Number(projectedBalance)))
+                }
+            } else {
+                ledgerData = { transDate: month, openingBalance: 0, consumptionQty: null, adjustmentQty: null, shipmentQty: null, unallocatedQty: null, qty: 0, stockQty: 0, actualInventoryBatch: false, expiryDate:expiryDate, expiredQty:0 }
+            }
+            finalLedger.push(ledgerData);
+            start = moment(start).add(1, 'month').format('YYYY-MM')
+        }
         this.setState({
-            ledgerForBatch: ledgerForBatch,
+            ledgerForBatch: finalLedger,
             loading: false
         })
     }

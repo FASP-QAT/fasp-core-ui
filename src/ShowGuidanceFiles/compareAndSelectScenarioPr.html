@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,70 +8,217 @@
 	<title>Show Guidance</title>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 	<style>
-		table, td, div, h1, p {font-family: Arial, sans-serif;line-height: 20px;}
-		body{padding: 0;margin: 0;color: #272127;}
-	
-/* .table1 td, th {
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		/* .table1 td, th {
   border: 1px solid #c8ced3;
   text-align: left;
   padding: 8px;
   border-collapse: collapse!important;
   width: 100%;
 }*/
-.table1 td {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 th {
-  border: 1px solid #c8ced3!important;
-  padding: 6px;
-  font-size: 13px;
-}
-.table1 {
-  /* width: 100%; */
-  border-collapse: collapse;
-}
-a {
-    color: #205493;
-    /* text-decoration: none; */
-    background-color: transparent;
-}
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 {
+			/* width: 100%; */
+			border-collapse: collapse;
+		}
+
+		a {
+			color: #205493;
+			/* text-decoration: none; */
+			background-color: transparent;
+		}
 	</style>
 </head>
+
 <body style="margin:0;padding:0;background:#e4e5e6;">
 	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 		<tr>
 			<td align="center" style="padding:0;">
-				<table role="presentation" style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border:1px solid #fff;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
 					<tr>
 						<td style="padding:10px 30px 20px 30px;">
-							<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
 								<tr>
-									
+
 									<td style="padding:0 0 10px 0;color:#153643;">
-										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Comparar e selecionar</h3>
-										<p><p style="font-size: 13px;"><span><u style="font-weight:bold ;">Objetivo :</u></span> Permita que os usuários comparem todas as previsões disponíveis (de árvore e métodos de consumo) e selecionem sua previsão final. Nesta tela, os usuários selecionam suas previsões uma unidade de planejamento e região por vez. Para selecionar previsões em várias unidades de planejamento e regiões, use o <a href="/#/forecastReport/forecastSummary" target="_blank" style="text-decoration: underline;"> Resumo da previsão</a> screen.</p></p>
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Comparar e
+											selecionar</h3>
 										<p>
-											<p style="font-size: 13px;"><p style="font-size: 13px;"><span style="font-weight:bold ;"><u>Usando esta tela :</u></span></p><ol type="1" style="font-size: 13px;"><li>Verifique se todas as previsões esperadas aparecem na tabela Comparar e selecionar. Para adicionar previsões, navegue até o <a href="/#/dataset/listTree" target="_blank" style="text-decoration: underline;">Gerenciar árvore</a> tela para construir uma previsão de árvore ou o <a href="/#/Extrapolation/extrapolateData" target="_blank" style="text-decoration: underline;">Extrapolação</a> tela para construir uma previsão baseada no consumo. o <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>  símbolo indica que não há quantidade prevista disponível; a linha inteira ficará cinza e não editável, pois não há nada para exibir ou selecionar.</li><li>Revise as previsões disponíveis usando as seguintes informações na tela:<ul type="a"><li> <b>Erro de previsão (%):</b> esse erro é calculado usando o cálculo do Erro de Porcentagem Absoluta Ponderada (WAPE). Se o erro de previsão estiver destacado em <span style="color: rgb(17, 139, 112);">texto verde</span>, esta previsão tem o menor erro de previsão entre as previsões disponíveis. Exemplo de cálculo WAPE usando a janela de tempo padrão de 6 meses:<img class="img-fluid" src="/ForecastError-Formula.png"><br>Se 6 meses de dados não estiverem disponíveis, o QAT utilizará quantos meses estiverem disponíveis e os indicará nesta coluna.</li><li> <b>Comparar com a previsão de consumo:</b> QAT compara Previsões de Consumo e Previsões de Árvore disponíveis. Para qualquer Previsão de Árvore, o QAT sinalizará a porcentagem acima da Previsão de Consumo mais alta ou abaixo da Previsão de Consumo mais baixa. A comparação será destacada em <span style="color: rgb(186, 12, 47);">texto vermelho</span> se estiver fora das porcentagens de limite definidas pelo usuário no <br>  <a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Configuración de versión</a> Assumindo dados confiáveis de consumo real, esta comparação ajuda os usuários a determinar se suas Previsões de Árvore são realistas. </li><li> <b>Gráfico:</b> Compare visualmente as diferentes previsões. A previsão selecionada aparecerá <b>negrito.</b></li><li> <b>Tabela de dados tabulares:</b> Compare os dados entre as previsões lado a lado clicando no botão Mostrar dados abaixo do gráfico. Algum <b>negrito/<span style="color: rgb(128, 0, 128); font-style: italic;">roxo em itálico em negrito</span></b> os dados estão dentro do período de previsão. </li></ul></li><li>Selecione a previsão final na tabela Comparar e Selecionar. Repita as etapas 1 a 3 para cada unidade de planejamento e região. Uma vez concluído, continue em frente para o <a href="/#/forecastReport/forecastOutput" target="_blank" style="text-decoration: underline;">Previsão Mensal</a> para verificar todas as unidades de planejamento juntas.</li></ol>
+										<p style="font-size: 13px;"><span><u style="font-weight:bold ;">Objetivo
+													:</u></span> Permitir que os usuários comparem todas as previsões
+											disponíveis (da árvore e
+											métodos de consumo) e selecione sua previsão final. Nesta tela, os usuários
+											selecione suas previsões, uma unidade de planejamento e região de cada vez.
+											Para selecionar
+											previsões em diversas unidades de planejamento e regiões, use o<a
+												href="/#/forecastReport/forecastSummary" target="_blank"
+												style="text-decoration: underline;"> Resumo da previsão</a>.</p>
+										</p>
+										<p>
+										<p style="font-size: 13px;">
+										<p style="font-size: 13px;"><span style="font-weight:bold ;"><u>Usando esta tela
+													:</u></span></p>
+										<ol type="1" style="font-size: 13px;">
+											<li>Verifique se todas as previsões esperadas aparecem na caixa Comparar e Selecionar
+												mesa. Para adicionar previsões, navegue até <a href="/#/dataset/listTree"
+													target="_blank" style="text-decoration: underline;">Gerenciar árvore</a>
+												tela para construir um
+												previsão de árvore ou <a href="/#/Extrapolation/extrapolateData"
+													alvo="_em branco"
+													style="text-decoration: underline;">Extrapolação</a> da tela para
+												construir uma base de consumo
+												previsão. Quaisquer linhas que aparecem em cinza e não editáveis ​​indicam que há
+												não há quantidade prevista disponível, pois não há dados para isso
+												previsão específica.</li>
+											<li>Revise as previsões disponíveis usando as seguintes informações na tela:
+												<ul type="a">
+													<li><b>Erro de previsão (%):</b> este erro é calculado usando o
+														Cálculo do erro percentual absoluto ponderado (WAPE). Se o
+														erro de previsão é destacado em <span
+															style="color: #86cd99;">texto verde</span>, este
+														previsão tem o menor erro de previsão dentre os disponíveis
+														previsões. Exemplo de cálculo WAPE usando o padrão de 6 meses
+														janela de tempo: <img class="img-fluid"
+															src="/ForecastError-Formula.png"><br>Se 6 meses de dados
+														forem
+														não estiver disponível, o QAT utilizará quantos meses estiverem
+														disponíveis e
+														indique-o nesta coluna.
+													</li>
+													<li> <b>Comparar com a previsão de consumo:</b> comparações QAT
+														disponíveis
+														Previsões de consumo e previsões de árvores. Para qualquer
+														árvore
+														Previsões, o QAT sinalizará a porcentagem acima do valor mais
+														alto ou
+														abaixo da menor Previsão de Consumo. A comparação será
+														destacado em <span style="color: rgb(186, 12, 47);">vermelho
+															texto</span> se estiver fora das porcentagens limite
+														definido pelo usuário em <br> <a
+															href="/#/dataset/versionSettings" target="_blank"
+															style="text-decoration: underline;">Versão
+															Tela de configurações</a>. Assumindo um consumo real
+														confiável
+														dados, esta comparação ajuda os usuários a determinar se sua
+														árvore
+														As previsões são realistas.
+													</li>
+													<li> <b>Gráfico:</b> Compare visualmente as diferentes previsões. A
+														previsão selecionada aparecerá <b>negrito.</b></li>
+													<li> <b>Tabela de dados tabulares:</b> compare os dados entre as
+														previsões
+														lado a lado clicando no botão “Mostrar dados” abaixo do gráfico.
+														Qualquer <b>negrito/<span
+																style="color: rgb(128, 0, 128);font-style: italic; ">negrito
+																os dados roxos em itálico</span></b> se enquadram no
+														período de previsão.
+													</li>
+												</ul>
+											</li>
+											<li>
+												Selecione a previsão final na tabela Comparar e Selecionar. Se houver um
+
+												<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> símbolo
+												ao lado da Unidade de Planejamento, há
+												nenhuma previsão selecionada.
+												Se houver um <i class="fa fa-check-square" aria-hidden="true" style="color: #86cd99;"></i>
+												símbolo ao lado
+												a Unidade de Planejamento,
+												há uma previsão selecionada. Repita as etapas 1 a 3 para cada unidade de planejamento
+												e
+												Região até não mais<i class="fa fa-exclamation-triangle"
+													aria-hidden="true"></i> símbolos
+												permanecer. Depois de concluído,
+												continue em frente para <a href="/#/forecastReport/forecastOutput"
+													target="_blank" style="text-decoration: underline;">Mensalmente
+													Previsão</a> para verificar todas as unidades de planejamento juntas.
+											</li>
+										</ol>
+										<p style="font-style: italic;">Nota: Os usuários podem selecionar várias previsões de árvores como previsão final, o que
+											agregará as quantidades previstas mensalmente; no entanto, os usuários não podem selecionar
+											múltiplas previsões de consumo ou uma combinação de consumo e árvore
+											previsões.
+										</p>
 										</p>
 
-                                        <p style="font-size: 13px;"><span style="font-weight:bold;"><u>Tips on Using the Graph &amp; Tabular Data:</u></span><ul style="font-size: 13px;"><li>Por padrão, o QAT exibirá todas as previsões disponíveis por Unidade de Planejamento e quaisquer dados reais inseridos ou importados do módulo QAT Supply Planning; no entanto, um usuário pode desmarcar a opção Exibir? caixa de seleção para quaisquer previsões na tabela superior se eles não desejarem visualizá-las no gráfico.  </li><li>Um usuário pode visualizar o gráfico em Unidade de Previsão, Unidade de Equivalência e por um período de tempo específico. Se um usuário escolher Mostrar apenas o período de previsão, o gráfico exibirá apenas o período de tempo que o usuário escolheu como período de previsão no <a href="/#/dataset/versionSettings" target="_blank" style="text-decoration: underline;">Configuração das versões</a> screen. </li></ul></p>
+										<p style="font-size: 13px;"><span style="font-weight:bold;"><u>Tips on Using the
+													Graph &amp; Tabular Data:</u></span>
+										<ul style="font-size: 13px;">
+											<li>Por padrão, o QAT exibirá todas as previsões disponíveis por unidade de
+												planejamento
+												e quaisquer valores reais inseridos ou importados do módulo QAT Supply
+												Planning;
+												no entanto, um usuário pode desmarcar a opção “Exibir?” caixa de seleção
+												para qualquer previsão
+												na tabela superior se não desejarem visualizá-lo no gráfico.</li>
+											</li>
+											<li>Um usuário pode visualizar o gráfico em Unidade de Planejamento, Unidade
+												de Previsão,
+												Unidade de Equivalência, e por um período de tempo determinado. Se um
+												usuário optar por
+												“Mostrar apenas período de previsão”, o gráfico exibirá apenas o período
+												de
+												horário que o usuário escolheu como período de previsão no <a
+													href="/#/dataset/versionSettings" target="_blank"
+													style="text-decoration: underline;">Versão
+													Tela de configurações</a>.</li>
+											<li>Se a opção “Exibir previsões em meses com consumo real” estiver marcada,
+												o gráfico calculará retroativamente as previsões de consumo para
+												comparação com os reais.
+											</li>
+											<li>Os usuários também podem optar por exibir o gráfico e a tabela de dados
+												por Calendário
+												Ano ou Ano Fiscal alternando o menu suspenso “Exibir por”. QAT irá
+												preencher uma tabela de resumo do ano civil/ano fiscal abaixo do gráfico
+												com
+												quantidades agregadas anuais.
+											</li>
+											</li>
+										</ul>
+										</p>
 
-									</li>
-								</ol>
-							</p>
-				</td>
-				</tr>
-				
-		
+										</li>
+										</ol>
+										</p>
+									</td>
+								</tr>
+
+
 							</table>
 						</td>
 					</tr>
-					
+
 				</table>
 			</td>
 		</tr>
 	</table>
 </body>
+
 </html>

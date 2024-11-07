@@ -39,13 +39,9 @@ const validationSchema = function (values) {
             .matches(/^\S+(?: \S+)*$/, i18n.t('static.validSpace.string'))
             .required(i18n.t('static.procurementAgent.procurementagentnametext')),
         submittedToApprovedLeadTime: Yup.string()
-            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.submitToApproveLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext')),
+            .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal')),
         approvedToShippedLeadTime: Yup.string()
             .matches(/^\d{0,2}(\.\d{1,2})?$/, i18n.t('static.message.2digitDecimal'))
-            .required(i18n.t('static.procurementagent.approvedToShippedLeadTime'))
-            .min(0, i18n.t('static.program.validvaluetext'))
     })
 }
 /**
@@ -56,8 +52,16 @@ class EditProcurementAgentComponent extends Component {
         super(props);
         this.state = {
             displayColorPicker: false,
+            displayColorPickerDarkMode: false,
             rgba: '',
+            rgbaDarkMode: '',
             color: {
+                r: '241',
+                g: '112',
+                b: '19',
+                a: '1',
+            },
+            colorDarkMode: {
                 r: '241',
                 g: '112',
                 b: '19',
@@ -86,6 +90,7 @@ class EditProcurementAgentComponent extends Component {
                 },
                 procurementAgentCode: '',
                 colorHtmlCode: '',
+                colorHtmlDarkCode: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
                 procurementAgentType: {
@@ -128,6 +133,35 @@ class EditProcurementAgentComponent extends Component {
         this.setState({
             color: color.rgb,
             rgba,
+            procurementAgent
+        },
+            () => {
+            });
+    };
+
+    /**
+     * Handles click event on color code picker. Toggle color picker according to displayColorPicker value for dark mode
+     */
+    handleClickDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: !this.state.displayColorPickerDarkMode })
+    };
+    /**
+     * Close color picker dark mode.
+     */
+    handleCloseDarkMode = () => {
+        this.setState({ displayColorPickerDarkMode: false })
+    };
+    /**
+     * Handles color change in color picker for dark mode.
+     * @param {*} colorDarkMode - selected color.
+     */
+    handleChangeColorDarkMode = (colorDarkMode) => {
+        let { procurementAgent } = this.state;
+        procurementAgent.colorHtmlDarkCode = colorDarkMode.hex.toUpperCase();
+        let rgbaDarkMode = 'rgba(' + colorDarkMode.rgb.r + "," + colorDarkMode.rgb.g + "," + colorDarkMode.rgb.b + "," + colorDarkMode.rgb.a + ')';
+        this.setState({
+            colorDarkMode: colorDarkMode.rgb,
+            rgbaDarkMode,
             procurementAgent
         },
             () => {
@@ -311,7 +345,8 @@ class EditProcurementAgentComponent extends Component {
                     procurementAgent: response.data, loading: false
                 });
                 let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-                this.setState({ rgba: color })
+                let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
+                this.setState({ rgba: color, rgbaDarkMode:colorDark })
                 var proramListArray = [];
                 let { procurementAgent } = this.state;
                 for (var i = 0; i < this.state.procurementAgent.programList.length; i++) {
@@ -446,6 +481,12 @@ class EditProcurementAgentComponent extends Component {
                     borderRadius: '2px',
                     background: `${this.state.rgba}`,
                 },
+                colorDarkMode: {
+                    width: '100px',
+                    height: '17px',
+                    borderRadius: '2px',
+                    background: `${this.state.rgbaDarkMode}`,
+                },
                 swatch: {
                     padding: '5px',
                     background: '#fff',
@@ -489,9 +530,10 @@ class EditProcurementAgentComponent extends Component {
                                     {
                                         procurementAgentCode: this.state.procurementAgent.procurementAgentCode,
                                         procurementAgentName: this.state.procurementAgent.label.label_en,
-                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime,
-                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime,
+                                        submittedToApprovedLeadTime: this.state.procurementAgent.submittedToApprovedLeadTime!=null?this.state.procurementAgent.submittedToApprovedLeadTime:'',
+                                        approvedToShippedLeadTime: this.state.procurementAgent.approvedToShippedLeadTime!=null?this.state.procurementAgent.approvedToShippedLeadTime:'',
                                         colorHtmlCode: this.state.procurementAgent.colorHtmlCode,
+                                        colorHtmlDarkCode: this.state.procurementAgent.colorHtmlDarkCode,
                                         procurementAgentTypeId: this.state.procurementAgent.procurementAgentType.id,
                                         programId: this.state.procurementAgent.programList
                                     }}
@@ -672,7 +714,19 @@ class EditProcurementAgentComponent extends Component {
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="colorHtmlCode">{i18n.t('static.procurementagent.procurementAgentColorCodeDarkMode')}</Label>
+                                                    <div bsSize="sm">
+                                                        <div style={styles.swatch} onClick={this.handleClickDarkMode}>
+                                                            <div style={styles.colorDarkMode} />
+                                                        </div>
+                                                    </div>
+                                                    {this.state.displayColorPickerDarkMode ? <div style={styles.popover}>
+                                                        <div style={styles.cover} onClick={this.handleCloseDarkMode} />
+                                                        <SketchPicker color={this.state.colorDarkMode} onChange={this.handleChangeColorDarkMode} />
+                                                    </div> : null}
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="submittedToApprovedLeadTime">{i18n.t('static.procurementagent.procurementagentsubmittoapprovetimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="submittedToApprovedLeadTime"
@@ -681,14 +735,12 @@ class EditProcurementAgentComponent extends Component {
                                                         invalid={(touched.submittedToApprovedLeadTime && !!errors.submittedToApprovedLeadTime) || !!errors.submittedToApprovedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
-                                                        min="0"
                                                         value={this.state.procurementAgent.submittedToApprovedLeadTime}
                                                     />
                                                     <FormFeedback className="red">{errors.submittedToApprovedLeadTime}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}<span className="red Reqasterisk">*</span></Label>
+                                                    <Label for="approvedToShippedLeadTime">{i18n.t('static.procurementagent.procurementagentapprovetoshippedtimeLabel')}</Label>
                                                     <Input type="number"
                                                         bsSize="sm"
                                                         name="approvedToShippedLeadTime"
@@ -697,9 +749,7 @@ class EditProcurementAgentComponent extends Component {
                                                         invalid={(touched.approvedToShippedLeadTime && !!errors.approvedToShippedLeadTime) || !!errors.approvedToShippedLeadTime}
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
-                                                        required
                                                         value={this.state.procurementAgent.approvedToShippedLeadTime}
-                                                        min="0"
                                                     />
                                                     <FormFeedback className="red">{errors.approvedToShippedLeadTime}</FormFeedback>
                                                 </FormGroup>
@@ -780,7 +830,8 @@ class EditProcurementAgentComponent extends Component {
                 procurementAgent: response.data, loading: false
             });
             let color = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlCode);
-            this.setState({ rgba: color })
+            let colorDark = AuthenticationService.hexToRgbA(this.state.procurementAgent.colorHtmlDarkCode!=""?this.state.procurementAgent.colorHtmlDarkCode:this.state.procurementAgent.colorHtmlCode);
+            this.setState({ rgba: color, rgbaDarkMode:colorDark })
         }).catch(
             error => {
                 if (error.message === "Network Error") {

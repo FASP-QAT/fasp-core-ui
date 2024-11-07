@@ -28,80 +28,98 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundN } from '../../CommonComponent/JavascriptCommonFunctions';
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.stockstatusovertime')
-    },
-    scales: {
-        yAxes: [
-            {
-                scaleLabel: {
-                    display: true,
-                    labelString: i18n.t('static.report.mos'),
-                    fontColor: 'black'
-                },
-                ticks: {
-                    beginAtZero: true,
-                    fontColor: 'black',
-                    callback: function (value) {
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return x1 + x2;
-                    }
-                }
-            }
-        ], xAxes: [{
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.common.month'),
-                fontColor: 'black',
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                fontColor: 'black'
-            }
-        }]
-    },
-    tooltips: {
-        mode: 'index',
-        enabled: false,
-        custom: CustomTooltips,
-        callback: function (value) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
-        }
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor: 'black',
-            fontSize: 12,
-            boxWidth: 9,
-            boxHeight: 2
-        }
-    }
-}
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterLanguage, filterOptions, formatter, makeText, roundAMC, roundARU, roundN, roundNMOS } from '../../CommonComponent/JavascriptCommonFunctions';
+
+// const darkModeColors = [
+//     '#d4bbff', // Color 1 
+//     '#ba4e00'    
+// ];
+
+// const lightModeColors = [
+//     '#002F6C',  // Color 1
+//     '#651D32'
+// ];
+
+
+// const { isDarkMode } = this.state;
+// const colors = isDarkMode ? darkModeColors : lightModeColors;
+// const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+
+
+// const options = {
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.stockstatusovertime'),
+//         fontColor:fontColor
+//     },
+//     scales: {
+//         yAxes: [
+//             {
+//                 scaleLabel: {
+//                     display: true,
+//                     labelString: i18n.t('static.report.mos'),
+//                     fontColor:fontColor
+//                 },
+//                 ticks: {
+//                     beginAtZero: true,
+//                     fontColor:fontColor,
+//                     callback: function (value) {
+//                         var cell1 = value
+//                         cell1 += '';
+//                         var x = cell1.split('.');
+//                         var x1 = x[0];
+//                         var x2 = x.length > 1 ? '.' + x[1] : '';
+//                         var rgx = /(\d+)(\d{3})/;
+//                         while (rgx.test(x1)) {
+//                             x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                         }
+//                         return x1 + x2;
+//                     }
+//                 }
+//             }
+//         ], xAxes: [{
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.common.month'),
+//                 fontColor:fontColor,
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 fontColor:fontColor
+//             }
+//         }]
+//     },
+//     tooltips: {
+//         mode: 'index',
+//         enabled: false,
+//         custom: CustomTooltips,
+//         callback: function (value) {
+//             var cell1 = value
+//             cell1 += '';
+//             var x = cell1.split('.');
+//             var x1 = x[0];
+//             var x2 = x.length > 1 ? '.' + x[1] : '';
+//             var rgx = /(\d+)(\d{3})/;
+//             while (rgx.test(x1)) {
+//                 x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//             }
+//             return x1 + x2;
+//         }
+//     },
+//     maintainAspectRatio: false,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor:fontColor,
+//             fontSize: 12,
+//             boxWidth: 9,
+//             boxHeight: 2
+//         }
+//     }
+// }
 /**
  * Component for Stock Status Overtime Report.
  */
@@ -113,6 +131,7 @@ class StockStatusOverTime extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
+            isDarkMode:false,
             matricsList: [],
             dropdownOpen: false,
             radioSelected: 2,
@@ -688,6 +707,23 @@ class StockStatusOverTime extends Component {
      * Calls the get programs function on page load
      */
     componentDidMount() {
+        // Detect initial theme
+const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+this.setState({ isDarkMode });
+
+// Listening for theme changes
+const observer = new MutationObserver(() => {
+    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+    this.setState({ isDarkMode: updatedDarkMode });
+});
+
+observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-theme'],
+});
+
+
+
         this.getPrograms();
     }
     /**
@@ -986,7 +1022,7 @@ class StockStatusOverTime extends Component {
         csvRow.push('')
         var re;
         var A = [addDoubleQuoteToRowContent([i18n.t('static.common.month'), ((i18n.t('static.report.qatPID')).replaceAll(',', '%20')).replaceAll(' ', '%20'), ((i18n.t('static.planningunit.planningunit')).replaceAll(',', '%20')).replaceAll(' ', '%20'), i18n.t('static.report.stock'), ((i18n.t('static.report.consupmtionqty')).replaceAll(',', '%20')).replaceAll(' ', '%20'), (i18n.t('static.report.mospast')).replaceAll(' ', '%20'), (i18n.t('static.report.mosfuture')).replaceAll(' ', '%20'), i18n.t('static.report.amc'), i18n.t('static.report.mos')])]
-        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : elt.stock, elt.consumptionQty == null ? '' : elt.consumptionQty, elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([moment(elt.dt).format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(' ', '%20'), elt.planningUnit.id, ((getLabelText(elt.planningUnit.label, this.state.lang)).replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.stock == null ? '' : roundARU(elt.stock,1), elt.consumptionQty == null ? '' : roundARU(elt.consumptionQty,1), elt.mosPast == null ? '' : elt.mosPast, elt.mosFuture == null ? '' : elt.mosFuture, elt.amc != null ? roundAMC(elt.amc) : "", elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
@@ -1077,7 +1113,7 @@ class StockStatusOverTime extends Component {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.mospast'), i18n.t('static.report.mosfuture'), i18n.t('static.report.amc'), i18n.t('static.report.mos')]];
         const data = [];
         // this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
-        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(roundARU(elt.stock,1),0), formatter(roundARU(elt.consumptionQty,1),0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1100,6 +1136,100 @@ class StockStatusOverTime extends Component {
      * @returns {JSX.Element} - Stock Status Overtime report table.
      */
     render() {
+
+
+
+const { isDarkMode } = this.state;
+const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+const gridLineColor = isDarkMode ? '#444' : '#fff';
+
+const options = {
+    title: {
+        display: true,
+        text: i18n.t('static.dashboard.stockstatusovertime'),
+        fontColor:fontColor
+    },
+    scales: {
+        yAxes: [
+            {
+                scaleLabel: {
+                    display: true,
+                    labelString: i18n.t('static.report.mos'),
+                    fontColor:fontColor
+                },
+                ticks: {
+                    beginAtZero: true,
+                    fontColor:fontColor,
+                    callback: function (value) {
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return x1 + x2;
+                    }
+                },
+                gridLines: {
+                    color: gridLineColor,
+                    drawBorder: true,
+                    lineWidth: 0,
+                    zeroLineColor: gridLineColor 
+                }
+            }
+        ], xAxes: [{
+            scaleLabel: {
+                display: true,
+                labelString: i18n.t('static.common.month'),
+                fontColor:fontColor,
+                fontStyle: "normal",
+                fontSize: "12"
+            },
+            ticks: {
+                fontColor:fontColor
+            },
+            gridLines: {
+                color: gridLineColor, 
+                drawBorder: true,
+                lineWidth: 0,
+                zeroLineColor: gridLineColor 
+            }
+        }]
+    },
+    tooltips: {
+        mode: 'index',
+        enabled: false,
+        custom: CustomTooltips,
+        callback: function (value) {
+            var cell1 = value
+            cell1 += '';
+            var x = cell1.split('.');
+            var x1 = x[0];
+            var x2 = x.length > 1 ? '.' + x[1] : '';
+            var rgx = /(\d+)(\d{3})/;
+            while (rgx.test(x1)) {
+                x1 = x1.replace(rgx, '$1' + ',' + '$2');
+            }
+            return x1 + x2;
+        }
+    },
+    maintainAspectRatio: false,
+    legend: {
+        display: true,
+        position: 'bottom',
+        labels: {
+            usePointStyle: true,
+            fontColor:fontColor,
+            fontSize: 12,
+            boxWidth: 9,
+            boxHeight: 2
+        }
+    }
+}
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -1123,20 +1253,41 @@ class StockStatusOverTime extends Component {
                     </option>
                 )
             }, this);
-        const backgroundColor = [
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-        ]
-        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundN(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
+            const darkModeColors = [
+                '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+                 '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                 '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+                 '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                 '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+             ];
+             
+             const lightModeColors = [
+                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                 '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+                 '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+             ];
+             
+        // const backgroundColor = [
+        //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+        //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+        //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+        //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+        //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        // ]
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
+        var v = this.state.planningUnitValues.map(pu => this.state.matricsList.filter(c => c.planningUnit.id == pu.value).map(ele => (roundN(ele.mos) > 48 ? 48 : ele.mos != null ? roundNMOS(ele.mos) : i18n.t("static.supplyPlanFormula.na"))))
         var dts = Array.from(new Set(this.state.matricsList.map(ele => (dateFormatterLanguage(ele.dt)))))
         const bar = {
             labels: dts,
-            datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor[index] }))
+            datasets: this.state.planningUnitValues.map((ele, index) => ({ type: "line", pointStyle: 'line', lineTension: 0, backgroundColor: 'transparent', label: ele.label, data: v[index], borderColor: backgroundColor1[index] }))
         }
         const pickerLang = {
             months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -1162,7 +1313,26 @@ class StockStatusOverTime extends Component {
                             {
                                 this.state.matricsList.length > 0 &&
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => this.exportPDF()} />
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
+    var curTheme = localStorage.getItem("theme");
+    if(curTheme == "dark") {
+        this.setState({
+            isDarkMode: false
+        }, () => {
+            setTimeout(() => {
+                this.exportPDF();
+                if(curTheme == "dark") {
+                    this.setState({
+                        isDarkMode: true
+                    })
+                }
+            }, 0)
+        })
+    } else {
+        this.exportPDF();
+    }
+}}
+ />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </a>
                             }
@@ -1237,6 +1407,8 @@ class StockStatusOverTime extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     labelledBy={i18n.t('static.common.select')}
                                                     disabled={this.state.loading}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1341,10 +1513,10 @@ class StockStatusOverTime extends Component {
                                                                 {getLabelText(item.planningUnit.label, this.state.lang)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.stock,0)}
+                                                                {formatter(roundARU(item.stock,1),0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.consumptionQty,0)}
+                                                                {formatter(roundARU(item.consumptionQty,1),0)}
                                                             </td>
                                                             <td>
                                                                 {formatter(item.mosPast,0)}
@@ -1359,7 +1531,7 @@ class StockStatusOverTime extends Component {
                                                                 {formatter(item.amcMonthCount,0)}
                                                             </td> */}
                                                             <td>
-                                                                {item.mos != null ? roundN(item.mos) : i18n.t("static.supplyPlanFormula.na")}
+                                                                {item.mos != null ? roundAMC(item.mos) : i18n.t("static.supplyPlanFormula.na")}
                                                             </td>
                                                         </tr>)}
                                             </tbody>

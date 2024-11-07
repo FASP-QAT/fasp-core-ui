@@ -73,19 +73,19 @@ a {
 														<tr>
 															<td style="background: #a7c6ed;color: #002f6c;"><b>Número #</b></td>
 															<td>Definido neste nó</td>
-															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
 														</tr>
 														<tr>
 															<td style="background: #a7c6ed;color: #002f6c;"><b>Percentagem %</b></td>
 															<td>Definido como uma porcentagem do pai</td>
-															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 														</tr>
 														<tr>
 															<td style="background:#002f6c;color: #fff;"><b>Unidade de previsão <i class="fa fa-cube" aria-hidden="true"></i></b></td>
 															<td>Definido como uma porcentagem dos parâmetros da unidade pai e de previsão</td>
-															<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td><b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 														</tr>
 														<tr>
@@ -163,6 +163,22 @@ a {
 													<ul style="font-size: 13px;">
 														<li><b> Tipo de nó de previsão :</b> Selecione discreto se este produto for usado por tempo limitado e contínuo se 
 															for usado indefinidamente.</li>
+															<li><b>Precisa calcular quantidades de uso discreto de produtos?
+															</b>
+															QAT tem a opção de calcular o uso discreto do produto em nós de unidades de previsão em 
+															duas maneiras: antecipando a quantidade discreta consumida por paciente no mês 1 
+															(escolha "Calcular Usando Dispensação Única" = "Sim") ou desagregando o 
+															quantidade discreta consumida por paciente por mês (escolha "Calcular usando distribuição única" = "Não"). 
+															Por padrão, o QAT assumirá o método de antecipação para calcular a unidade de previsão discreta 
+															quantidades; no entanto, os usuários têm a opção de escolher o método alternativo por meio de um rádio 
+															botão. Este cálculo discreto alternativo pode ser útil para Unidades de Planejamento (PUs) 
+															que apresentam padrões de baixo consumo durante um período de tempo. Por exemplo, se uma mulher grávida 
+															é obrigado a tomar um suplemento nutricional uma vez por mês durante a gravidez 
+															(nove meses), o QAT atualmente calcularia nove suplementos no mês 1 (fornecimento prévio). 
+															Sem o fornecimento prévio, o QAT calcularia um suplemento no mês 1, um suplemento no 
+															mês 2, um suplemento no mês 3 e assim por diante.
+
+															</li>
 														<li><b> Uso do produto atrasado ou faseado?</b> Às vezes, o consumo do produto é atrasado em relação aos demais 
 															níveis superiores da árvore. No relevante <b> Unidade de previsão </b>nó, use o <b>Atraso</b> campo para indicar este atraso.
 														<ul>
