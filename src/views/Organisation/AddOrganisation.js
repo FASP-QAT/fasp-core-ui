@@ -535,14 +535,7 @@ export default class AddOrganisationComponent extends Component {
             && realms.map((item, i) => {
                 return (
                     <option key={i} value={item.realmId}>
-                        {(() => {
-                            switch (this.state.languageId) {
-                                case 2: return (item.label.label_pr !== null && item.label.label_pr !== "" ? item.label.label_pr : item.label.label_en);
-                                case 3: return (item.label.label_fr !== null && item.label.label_fr !== "" ? item.label.label_fr : item.label.label_en);
-                                case 4: return (item.label.label_sp !== null && item.label.label_sp !== "" ? item.label.label_sp : item.label.label_en);
-                                default: return item.label.label_en;
-                            }
-                        })()}
+                        {getLabelText(item.label, this.state.lang)}
                     </option>
                 )
             }, this);
@@ -550,7 +543,7 @@ export default class AddOrganisationComponent extends Component {
         let organisationTypes = organisationTypeList.length > 0
             && organisationTypeList.map((item, i) => {
                 return (
-                    <option key={i} value={item.organisationTypeId}>{item.label.label_en}</option>
+                    <option key={i} value={item.organisationTypeId}>{getLabelText(item.label, this.state.lang)}</option>
                 )
             }, this);
         return (
@@ -676,6 +669,8 @@ export default class AddOrganisationComponent extends Component {
                                                         multi
                                                         options={this.state.realmCountryList}
                                                         value={this.state.realmCountryId}
+                                                        placeholder={i18n.t('static.common.select')}
+
                                                     />
                                                     <FormFeedback>{errors.realmCountryId}</FormFeedback>
                                                 </FormGroup>

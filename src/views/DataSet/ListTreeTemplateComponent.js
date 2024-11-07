@@ -1950,7 +1950,7 @@ export default class ListTreeTemplate extends Component {
                                 </FormGroup>
                             </div>
                         </div>
-                        <div className="col-md-10 pl-0 DarkThColr" style={{ marginTop: '58px' }}>{"Left click on any tree template to preview. Right click to create tree from template (only available for templates starting from aggregation or number nodes)."}</div>
+                        <div className="col-md-10 pl-0 DarkThColr" style={{ marginTop: '58px' }}>{i18n.t('static.treeTemplate.listTreeTemplateTooltip')}</div>
                         <div className="TreeTemplateTable consumptionDataEntryTable treeTemplateSearchMarginTop1">
                             <div id="tableDiv" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE_TEMPLATE') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>

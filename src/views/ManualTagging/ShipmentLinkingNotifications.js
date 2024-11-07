@@ -1342,6 +1342,8 @@ export default class ShipmentLinkingNotifications extends Component {
                                             onChange={(e) => { this.filterData(e) }}
                                             options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                             filterOptions={filterOptions}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>

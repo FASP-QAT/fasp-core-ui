@@ -174,7 +174,7 @@ export default class ConsumptionDetails extends Component {
       columns: [
         {
           title: i18n.t("static.budget.program"),
-          type: "dropdown",
+          type: "autocomplete",
           source: this.state.programList,
         },
         {
@@ -1295,6 +1295,8 @@ export default class ConsumptionDetails extends Component {
                         }
                         filterOptions={filterOptions}
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error && this.props.touched && (
                         <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1321,6 +1323,8 @@ export default class ConsumptionDetails extends Component {
                       }
                       filterOptions={filterOptions}
                       disabled={this.state.loading}
+                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                      selectSomeItems: i18n.t('static.common.select')}}
                     />
                     {!!this.props.error && this.props.touched && (
                       <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>

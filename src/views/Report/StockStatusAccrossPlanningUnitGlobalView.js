@@ -1350,6 +1350,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               : []
                           }
                           disabled={this.state.loading}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                         {!!this.props.error && this.props.touched && (
                           <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1378,6 +1380,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                             : []
                         }
                         disabled={this.state.loading}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error && this.props.touched && (
                         <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>
@@ -1414,6 +1418,8 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               }, this)
                               : []
                           }
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                       </div>
                     </FormGroup>

@@ -282,6 +282,7 @@ export default class AddDimensionComponent extends Component {
                                                         multi
                                                         options={this.state.procurementAgentList}
                                                         value={this.state.selectedProcurementAgentList}
+                                                        placeholder={i18n.t('static.common.select')}
                                                     />
                                                     <FormFeedback className="red">{errors.procurementAgentId}</FormFeedback>
                                                 </FormGroup>

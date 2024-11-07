@@ -699,6 +699,8 @@ class warehouseCapacity extends Component {
                                                             value={this.state.countryValues}
                                                             onChange={(e) => { this.handleChange(e) }}
                                                             options={countryList && countryList.length > 0 ? countryList : []}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                            selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                         {!!this.props.error &&
                                                             this.props.touched && (
@@ -720,6 +722,8 @@ class warehouseCapacity extends Component {
                                                         onChange={(e) => { this.handleChangeProgram(e) }}
                                                         options={programList && programList.length > 0 ? programList : []}
                                                         disabled={this.state.loading}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                     {!!this.props.error &&
                                                         this.props.touched && (

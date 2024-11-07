@@ -1067,6 +1067,8 @@ class ForecastMetrics extends Component {
                           options={countryList && countryList.length > 0 ? countryList : []}
                           disabled={this.state.loading}
                           filterOptions={filterOptions}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1086,6 +1088,8 @@ class ForecastMetrics extends Component {
                         options={programList && programList.length > 0 ? programList : []}
                         disabled={this.state.loading}
                         filterOptions={filterOptions}
+                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                        selectSomeItems: i18n.t('static.common.select')}}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1108,7 +1112,10 @@ class ForecastMetrics extends Component {
                           {tracerCategories.length > 0 ?
                             tracerCategories.map((item, i) => {
                               return ({ label: getLabelText(item.label, this.state.lang), value: item.tracerCategoryId })
-                            }, this) : []} />
+                            }, this) : []}
+                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')}}
+                             />
                       </div>
                     </FormGroup>
                     <FormGroup className="col-sm-3" id="hideDiv" style={{ zIndex: '1' }}>
@@ -1124,6 +1131,8 @@ class ForecastMetrics extends Component {
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           disabled={this.state.loading}
                           filterOptions={filterOptions}
+                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                          selectSomeItems: i18n.t('static.common.select')}}
                         />
                       </div>
                     </FormGroup>

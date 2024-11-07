@@ -198,14 +198,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 forecastingUnit: []
                             });
                             tempList.unshift({
-                                name: "No Forecast Selected",
+                                name: i18n.t('static.commitTree.noForecastSelected'),
                                 id: -2,
                                 multiplier: 1,
                                 active: true,
                                 forecastingUnit: []
                             });
                             tempList.unshift({
-                                name: "Forecast is blank",
+                                name: i18n.t('static.importIntoSP.forecastBlank'),
                                 id: -3,
                                 multiplier: 1,
                                 active: true,

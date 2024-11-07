@@ -5266,7 +5266,13 @@ export default class BuildTree extends Component {
             var data = []
             var stopDate = moment("01 " + map.get("8"), "DD MMM YYYY").format("YYYY-MM-DD");
             var data2 = (i == 0) ? moment(stopDate, "YYYY-MM-DD").subtract(6, "months").format("YYYY-MM-DD") : stopDate;
-            data[0] = "Monthly change for " + map.get("7") + " - " + moment(data2).format("MMM YYYY") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            // data[0] = "Monthly change for " + map.get("7") + " - " + moment(data2).format("MMM YYYY") + ";\nConsiders: " + map.get("0") + " Entered Target = " + addCommas(map.get("1")) + "\nCalculated Target = " + addCommas(map.get("4"));
+            var startDate = map.get("7");
+            var stopDate = moment(data2).format("MMM YYYY");
+            var dateRange = map.get("0");
+            var enteredTarget = addCommas(map.get("1"));
+            var calculatedTarget = addCommas(map.get("4"));
+            data[0] = i18n.t('static.tree.discription', { startDate, stopDate, dateRange, enteredTarget, calculatedTarget });
             data[1] = moment("01 " + map.get("7"), "DD MMM YYYY").format("YYYY-MM-DD");
             data[2] = data2;
             data[3] = '';
@@ -5703,8 +5709,8 @@ export default class BuildTree extends Component {
                     title: '+/-',
                     type: 'dropdown',
                     source: [
-                        { id: 1, name: "Increase" },
-                        { id: -1, name: "Decrease" }
+                        { id: 1, name: i18n.t('static.tree.increase') },
+                        { id: -1, name: i18n.t('static.tree.decrease') }
                     ]
                 },
                 {
@@ -10771,7 +10777,7 @@ export default class BuildTree extends Component {
                                                                 year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                             }}
                                                             lang={pickerLang.months}
-                                                            onChange={this.handleAMonthChange1}
+                                                            onChange={this.handleAMonthChange}
                                                             onDismiss={this.handleAMonthDissmis1}
                                                         >
                                                             <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
@@ -11239,7 +11245,7 @@ export default class BuildTree extends Component {
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-6">
-                                                                    <Label htmlFor="currencyId">Consumption Interval (Reference)<i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.consumptionInterval')}<i class="fa fa-info-circle icons pl-lg-2" id="Popover15" onClick={this.toggleQATEstimateForInterval} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
                                                                         id="interval"
                                                                         name="interval"
@@ -11999,15 +12005,15 @@ export default class BuildTree extends Component {
                                         <FormGroup className="col-md-6" >
                                             <div className="check inline  pl-lg-1 pt-lg-2">
                                                 {this.state.currentItemConfig.context.payload.nodeType.id == 2 && <div className="col-md-12 form-group">
-                                                    <Label htmlFor="select">Target</Label>
+                                                    <Label htmlFor="select">{i18n.t('static.tree.target')}</Label>
                                                     <Input
                                                         onChange={(e) => { this.dataChange(e); }}
                                                         bsSize="sm"
                                                         className="col-md-6"
                                                         disabled={(this.state.currentModelingType == 2 || this.state.currentModelingType == 3 || this.state.currentModelingType == 4) ? false : this.state.targetSelectDisable}
                                                         type="select" name="targetSelect" id="targetSelect">
-                                                        <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{'Annual Target'}</option>
-                                                        <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{'Ending Value Target / Change'}</option>
+                                                        <option value="target1" selected={this.state.targetSelect == 1 ? true : false}>{i18n.t('static.tree.annualTarget')}</option>
+                                                        <option value="target2" selected={this.state.targetSelect == 0 ? true : false}>{i18n.t('static.tree.endingValueTarget')}</option>
                                                     </Input>
                                                 </div>}
                                             </div>
@@ -12164,7 +12170,7 @@ export default class BuildTree extends Component {
                                             <input type="hidden" id="percentForOneMonth" name="percentForOneMonth" value={this.state.percentForOneMonth} />
                                             <FormGroup className="col-md-5">
                                                 <Label htmlFor="currencyId">
-                                                    {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? 'Change (% points)' : 'Target change (%)'}
+                                                    {this.state.currentItemConfig.context.payload.nodeType.id > 2 ? i18n.t('static.tree.changePerPoints') : i18n.t('static.tree.targetChangePer')}
                                                     <span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover26" onClick={this.toggleTargetChangePercent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <Input type="text"
                                                     id="currentTargetChangePercentage"
@@ -12422,6 +12428,22 @@ export default class BuildTree extends Component {
      * Updates the component state with the new range value and triggers a data fetch.
      * @param {object} value - The new range value selected by the user.
      */
+    handleAMonthChange = (year, month, flag) => {
+        var month = parseInt(month) < 10 ? "0" + month : month
+        var date = year + "-" + month + "-" + "01"
+        let { currentItemConfig } = this.state;
+        var updatedMonth = date;
+        var nodeDataMap = (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0];
+        nodeDataMap.month = updatedMonth;
+        (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0] = nodeDataMap;
+        this.setState({ currentItemConfig, currentScenario: nodeDataMap }, () => {
+        });
+    }
+    /**
+     * Handles the change of the range picker component.
+     * Updates the component state with the new range value and triggers a data fetch.
+     * @param {object} value - The new range value selected by the user.
+     */
     handleAMonthChange1 = (year, month, flag) => {
         var month = parseInt(month) < 10 ? "0" + month : month
         var date = year + "-" + month + "-" + "01"
@@ -12442,6 +12464,9 @@ export default class BuildTree extends Component {
      * @param {object} value - The new range value selected by the user.
      */
     handleAMonthDissmis1 = (value) => {
+        this.setState({
+            isChanged: true
+        })
         let month = value.year + '-' + value.month + '-01';
         this.calculateParentValueFromMOM(month);
     }

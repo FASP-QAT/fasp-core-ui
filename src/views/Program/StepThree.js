@@ -170,6 +170,7 @@ export default class StepThree extends Component {
                                         multi
                                         options={this.state.healthAreaList}
                                         value={this.props.items.program.healthAreaArray}
+                                        placeholder={i18n.t('static.common.select')}
                                     />
                                     <FormFeedback className="red">{errors.healthAreaId}</FormFeedback>
                                 </FormGroup>
