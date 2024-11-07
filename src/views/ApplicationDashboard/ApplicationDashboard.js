@@ -1214,7 +1214,7 @@ class ApplicationDashboard extends Component {
                                 ctx.strokeStyle = dataset.backgroundColor[index];
                                 ctx.stroke();
                                 ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                ctx.font = 'bold 10px Arial';
+                                ctx.font = '10px Arial';
                                 // ctx.textBaseline = 'middle';
                                 ctx.fillStyle = dataset.backgroundColor[index];
                                 ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
@@ -1246,13 +1246,13 @@ class ApplicationDashboard extends Component {
                           const labelY = model.y + y * (model.outerRadius + 10);
 
                           const value = index == 1 ? dataset.data[0] == 0 ? 0 : dataset.data[index] : dataset.data[index];
-                          if (((value / total) * 100).toFixed(2) > 0 || (dataset.data[0] == 0 && index == 1)) {
+                          if ((((value / total) * 100).toFixed(2) > 0 && index == 0) || (dataset.data[0] == 0 && index == 1)) {
                               ctx.beginPath();
                               ctx.moveTo(model.x, model.y);
                               ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
                               ctx.stroke();
                               ctx.textAlign = x >= 0 ? 'left' : 'right';
-                              ctx.font = 'bold 14px Arial';
+                              ctx.font = '14px Arial';
                               ctx.fillStyle =  (dataset.data[0] == 0 && index == 1) ? "red" : "#000000" //dataset.backgroundColor[index];
                               ctx.fillText(`${value}`, labelX - 4, labelY + 2);
                               ctx.restore();
@@ -3023,7 +3023,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplCorrectCount != 0 ? ("/"+forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
+                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount != 0 ? ("/"+forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3031,7 +3031,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplCorrectCount != 0 ? ("/"+inventoryQplPuCount) : ""} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplPuCount - inventoryQplCorrectCount != 0 ? ("/"+inventoryQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3039,7 +3039,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplCorrectCount != 0 ? ("/"+actualConsumptionQplPuCount) : ""} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount != 0 ? ("/"+actualConsumptionQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
@@ -3047,7 +3047,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplCorrectCount != 0 ? ("/"+shipmentQplPuCount) : ""} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplPuCount - shipmentQplCorrectCount != 0 ? ("/"+shipmentQplPuCount) : ""} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
