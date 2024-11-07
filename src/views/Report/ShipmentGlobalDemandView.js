@@ -2270,10 +2270,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2290,10 +2288,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2355,10 +2351,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2396,10 +2390,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2416,10 +2408,8 @@ class ShipmentGlobalDemandView extends Component {
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>

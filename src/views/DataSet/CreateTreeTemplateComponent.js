@@ -10174,7 +10174,7 @@ export default class CreateTreeTemplate extends Component {
                                                     <FormFeedback className="red">{errors.nodeTypeId}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 6 || (this.state.aggregationNode && this.state.currentItemConfig.context.payload.nodeType.id < 4) ? 'block' : 'none' }}>
-                                                    <Label htmlFor="currencyId">Node Unit<span class="red Reqasterisk">*</span></Label>
+                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.nodeUnit')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input
                                                         type="select"
                                                         id="nodeUnitId"

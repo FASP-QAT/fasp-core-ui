@@ -454,9 +454,9 @@ class RegionListComponent extends Component {
                                                         value={this.state.countryValues}
                                                         onChange={(e) => { this.handleChange(e) }}
                                                         options={countryList && countryList.length > 0 ? countryList : []}
+                                                        filterOptions={filterOptions}
                                                         overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
-                                                        filterOptions={filterOptions}
                                                     />
                                                 </div>
                                             </FormGroup>

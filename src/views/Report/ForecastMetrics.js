@@ -1104,9 +1104,9 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handleChange(e) }}
                           options={countryList && countryList.length > 0 ? countryList : []}
                           disabled={this.state.loading}
+                          filterOptions={filterOptions}
                           overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                           selectSomeItems: i18n.t('static.common.select')}}
-                          filterOptions={filterOptions}
                         />
                         {!!this.props.error &&
                           this.props.touched && (
@@ -1125,9 +1125,9 @@ class ForecastMetrics extends Component {
                         onChange={(e) => { this.handleChangeProgram(e) }}
                         options={programList && programList.length > 0 ? programList : []}
                         disabled={this.state.loading}
+                        filterOptions={filterOptions}
                         overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                         selectSomeItems: i18n.t('static.common.select')}}
-                        filterOptions={filterOptions}
                       />
                       {!!this.props.error &&
                         this.props.touched && (
@@ -1168,9 +1168,9 @@ class ForecastMetrics extends Component {
                           onChange={(e) => { this.handlePlanningUnitChange(e) }}
                           options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                           disabled={this.state.loading}
+                          filterOptions={filterOptions}
                           overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                           selectSomeItems: i18n.t('static.common.select')}}
-                          filterOptions={filterOptions}
                         />
                       </div>
                     </FormGroup>

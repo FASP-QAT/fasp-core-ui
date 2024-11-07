@@ -5068,11 +5068,9 @@ export default class ManualTagging extends Component {
                                                         value={this.state.productCategoryValues}
                                                         onChange={(e) => { this.handleProductCategoryChange(e) }}
                                                         options={productCategoryMultList && productCategoryMultList.length > 0 ? productCategoryMultList : []}
-                                                        overrideStrings={{
-                                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                            selectSomeItems: i18n.t('static.common.select')
-                                                        }}
                                                         filterOptions={filterOptions}
+                                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                     />
                                                 </div>
                                             </FormGroup>
@@ -5126,11 +5124,9 @@ export default class ManualTagging extends Component {
                                                     value={this.state.planningUnitValues}
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitMultiList1 && planningUnitMultiList1.length > 0 ? planningUnitMultiList1 : []}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>}
@@ -5146,11 +5142,9 @@ export default class ManualTagging extends Component {
                                                     onChange={(e) => { this.filterData(e) }}
                                                     options={planningUnitMultiList && planningUnitMultiList.length > 0 ? planningUnitMultiList : []}
                                                     labelledBy={i18n.t('static.common.select')}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>}

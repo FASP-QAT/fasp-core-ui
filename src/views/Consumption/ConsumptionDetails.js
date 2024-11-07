@@ -882,9 +882,9 @@ export default class ConsumptionDetails extends React.Component {
                                                             value={this.state.planningUnit}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
+                                                            filterOptions={filterOptions}
                                                             overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
                                                         selectSomeItems: i18n.t('static.common.select')}}
-                                                            filterOptions={filterOptions}
                                                         />
                                                     </div>
                                                 </FormGroup>

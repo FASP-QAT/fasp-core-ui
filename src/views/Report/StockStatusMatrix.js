@@ -677,7 +677,9 @@ export default class StockStatusMatrix extends React.Component {
             data1.sort((a, b) => {
               var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
               var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-              return itemLabelA > itemLabelB ? 1 : -1;
+              if (itemLabelA > itemLabelB) return 1;
+              if (itemLabelA < itemLabelB) return -1;
+              return a.year - b.year;
             });
             this.setState(
               {
@@ -708,7 +710,9 @@ export default class StockStatusMatrix extends React.Component {
             listArray.sort((a, b) => {
               var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
               var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-              return itemLabelA > itemLabelB ? 1 : -1;
+              if (itemLabelA > itemLabelB) return 1;
+              if (itemLabelA < itemLabelB) return -1;
+              return a.year - b.year;
             });
             this.setState(
               {
