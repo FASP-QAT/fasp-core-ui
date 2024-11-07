@@ -63,6 +63,239 @@ body {
     border-top: 1px solid #2a303d;
   }
 
+.btn-transparent {
+  color: #e4e5e6 !important;
+  background-color: transparent;
+}
+.dropdown-menu{
+  background-color: #212631;
+  border: 1px solid #2a303d;
+}
+.dropdown-item {
+  color: #e4e5e6;
+  font-size: 13px;
+  border-bottom: 1px solid #2a303d;
+}
+.dropdown-header {
+  padding: 8px 20px;
+  background: #212721;
+  border-bottom: 1px solid #2a303d;
+  color: #e4e5e6;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+  color: #e4e5e6;
+  text-decoration: none;
+  background-color: #212721;
+}
+.react-confirm-alert-body {
+  font-family: Arial, Helvetica, sans-serif;
+  width: 400px;
+  padding: 30px;
+  text-align: left;
+  background: #2a303d;
+  border-radius: 10px;
+  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+  color: #e4e5e6!important;
+}
+.TextTittle {
+  color: #e4e5e6 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.TextTittle {
+  color: #e4e5e6 !important;
+  font-size: 13px !important;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.TextCont p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e4e5e6;
+}
+.carousel-indicators li {
+  background-color: #e4e5e6 !important;
+}
+.text-count {
+  font-size: 16px;
+  font-weight: 500;
+  color: #e4e5e6;
+}
+.ProblemListTableBorder .jss > thead > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar th, .table-borderedproblemListDashboar td {
+  border-right: 1px solid #4d515a !important;
+  border-bottom: 1px solid #4d515a !important;
+}
+.ProblemListDashboardBorder .table-borderedproblemListDashboar {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a;
+  border-collapse: inherit !important;
+  text-indent: initial !important;
+  border-spacing: 0px !important;
+}
+.ProblemListTableBorder .jss > tbody > tr > td {
+  border-top: 1px solid #4d515a !important;
+  border-left: 1px solid #4d515a !important;
+  border-right: 1px solid transparent !important;
+  border-bottom: 1px solid #4d515a !important;
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  height: 23px;
+}
+.jss > thead > tr > td {
+  background-color: #212631 !important;
+  color: #e4e5e6 !important;
+  font-weight: bold;
+  font-style: normal !important;
+}
+.jss>thead>tr>td {
+  border-top: 1px solid #4d515a;
+  border-left: 1px solid #4d515a;
+  // border-right: 1px solid #4d515a;
+  // border-bottom: 1px solid transparent;
+  background-color: #f3f3f3;
+  padding: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  z-index: 1!important;
+  background-repeat: no-repeat;
+  background-position: center right 0;
+  line-height: 1em;
+  text-align: center;
+}
+.jss {
+  border-collapse: separate;
+  table-layout: fixed;
+  white-space: nowrap;
+  empty-cells: show;
+  border: 0;
+  background-color: transparent;
+  width: 0;
+  outline: 0;
+  border-top: 0;
+  border-left: 1px solid #4d515a;
+  border-right: 1px solid #4d515a;
+  border-bottom: 1px solid #4d515a;
+  margin-right: 2px;
+  margin-bottom: 2px;
+}
+.jss_search {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 1.5;
+  border-radius: 0.2rem;
+  width: 130px;
+  background-color: #212631;
+  background-clip: padding-box;
+  border: 1px solid #4d515a;
+  color: #e4e5e6;
+}
+.jss_pagination > div > div {
+  text-align: center;
+  width: 30px !important;
+  height: 22px !important;
+  line-height: 22px !important;
+  border: 1px solid #2a303d !important;
+  box-sizing: border-box !important;
+  margin-left: 0px !important;
+  cursor: pointer !important;
+}
+.jss_pagination>div{
+  color: #e4e5e6 !important;
+}
+.nav-tabs {
+  border-bottom: 1px solid #4d515a;
+}
+.tab-content {
+  margin-top: -1px;
+  background: #212631;
+  border: 1px solid #4d515a;
+  border-radius: 0 0 0.25rem 0.25rem;
+}
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  color: #e4e5e6;
+  background-color: #212631;
+  border-color: #4d515a #4d515a #4d515a;
+}
+.nav-tabs .nav-link {
+  color: #e4e5e6;
+  // background-color: #212631;
+  // border-color: #2a303d #2a303d #2a303d;
+}
+.jss_content .jss tbody tr:nth-of-type(odd) {
+  background-color: #212631!important;
+  // background-color: #373c46!important;
+  color: #e4e5e6;
+}
+.jss_content .jss tbody tr:nth-of-type(even) {
+  // background-color: #23282c;
+  background-color: #373c46;
+  color: #e4e5e6;
+}
+.jss>tbody>tr>td {
+  border-top: 1px solid #4d515a!important;
+  border-left: 1px solid #4d515a!important;
+  // border-right: 1px solid #4d515a!important;
+  // border-bottom: 1px solid transparent;
+  // border-bottom: 1px solid #4d515a!important;
+  box-sizing: border-box;
+  padding: 4px;
+  line-height: 1em;
+  min-height: 23px;
+  text-align: center;
+  white-space: pre;
+  color: #e5edf5;
+}
+.form-control:disabled, .form-control[readonly] {
+  // background-color: #212631;
+  // opacity: 1;
+  // background-color: #e5edf5;
+  //   opacity: 1;
+  //   color: #000!important;
+  background-color: #373c46;
+    opacity: 1;
+    color: #e5edf5 !important;
+}
+.titleColorModule2 {
+  color: #e4e5e6 !important;
+  text-align: justify;
+}
+.module2 {
+  background-color: #212631 !important;
+}
+.module1 {
+  background-color: #212631 !important;
+}
+.card-footer {
+  padding: 0.75rem 1.25rem;
+  background-color: #212631;
+  border-top: 1px solid #2a303d;
+}
+h5, .h5 {
+  font-size: 14px !important;
+  margin-top: 5px;
+  color: #e4e5e6;
+}
+label {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  color: #e4e5e6;
+}
+::placeholder {
+  color: #697069 !important;
+}
+
   .btn-transparent {
     color: #e4e5e6 !important;
     background-color: transparent;
@@ -185,7 +418,7 @@ body {
     text-overflow: ellipsis;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 1!important;
     background-repeat: no-repeat;
     background-position: center right 0;
     line-height: 1em;
@@ -585,7 +818,7 @@ body {
     text-overflow: ellipsis;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 1!important;
     background-repeat: no-repeat;
     background-position: center right 0;
     line-height: 1em;
