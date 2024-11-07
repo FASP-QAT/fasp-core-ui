@@ -3595,7 +3595,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             movingAvgId: movingAvgId,
             show: false,
-            dataChanged: true,
+            dataChanged: !movingAvgId?this.state.dataChanged:true,
             methodChanged:!movingAvgId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3609,7 +3609,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            dataChanged: true,
+            dataChanged: !semiAvgId?this.state.dataChanged:true,
             methodChanged:!semiAvgId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3623,7 +3623,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            dataChanged: true,
+            dataChanged: !linearRegressionId?this.state.dataChanged:true,
             methodChanged:!linearRegressionId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3637,7 +3637,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            dataChanged: true,
+            dataChanged: !smoothingId?this.state.dataChanged:true,
             offlineTES: false,
             methodChanged:!smoothingId?true:false
         }, () => {
@@ -3652,7 +3652,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            dataChanged: true,
+            dataChanged: !arimaId?this.state.dataChanged:true,
             offlineArima: false,
             methodChanged:!arimaId?true:false
         }, () => {
@@ -5072,7 +5072,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                                             (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                                 ((this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) || (this.state.methodChanged)) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
                                                                     }
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
+                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && ((this.state.dataChanged || this.state.notesChanged) && !this.state.extrapolateClicked) && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                                                 </FormGroup>
                                                             </div>
                                                         </div>
