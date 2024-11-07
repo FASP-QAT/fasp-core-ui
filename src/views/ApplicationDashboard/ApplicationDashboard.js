@@ -2642,7 +2642,7 @@ class ApplicationDashboard extends Component {
                       <div class="col-5" style={{display:'flex',gap:'40px'}}>
                         <FormGroup className='FormGroupD'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
-                          <FormGroup style={{ marginTop: '-3px'}}>
+                          <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
                             <Input
                               className="form-check-input"
@@ -2855,7 +2855,7 @@ class ApplicationDashboard extends Component {
                       <Label htmlFor="organisationTypeId" style={{display:'flex',gap:'10px'}}>Program
 
                       <div style={{ gap: '20px', display: 'flex' }}>
-                        <FormGroup style={{ marginTop: '-3px' }}>
+                        <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
                         <Input
                           className="form-check-input"
@@ -2961,7 +2961,7 @@ class ApplicationDashboard extends Component {
                             <div className='col-6'>
                               <div className='row'>
                                 <FormGroup className='col-md-11 pl-lg-3 FormGroupD' style={{zIndex:"1"}}>
-                                  <Label htmlFor="displayBy">Display By</Label>
+                                  <Label htmlFor="displayBy" className='pl-lg-1'>Display By</Label>
                                   <Input
                                     type="select"
                                     name="displayBy"
@@ -2977,7 +2977,7 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'240px',overflowY:'scroll'}}>
+                              <div className='row' style={{height:'209px',overflowY:'scroll'}}>
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-70px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
