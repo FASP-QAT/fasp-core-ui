@@ -3644,6 +3644,9 @@ observer.observe(document.documentElement, {
                                         onChange={(e) => { this.handleProblemStatusChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
+                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                        
                                     />
                                 </div>
                             </FormGroup>
@@ -3689,6 +3692,8 @@ observer.observe(document.documentElement, {
                                         onChange={(e) => { this.handleProblemReviewedChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
+                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                     />
                                 </div>
                             </FormGroup>

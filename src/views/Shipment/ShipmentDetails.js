@@ -1178,6 +1178,7 @@ export default class ShipmentDetails extends React.Component {
                                                             options={this.state.programList}
                                                             value={this.state.programSelect}
                                                             onChange={(e) => { this.getPlanningUnitList(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -1193,6 +1194,8 @@ export default class ShipmentDetails extends React.Component {
                                                             filterOptions={filterOptions}
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
+                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -1207,6 +1210,7 @@ export default class ShipmentDetails extends React.Component {
                                                             options={[{ value: 1, label: i18n.t('static.shipment.manualShipments') }, { value: 2, label: i18n.t('static.shipment.erpShipment') }]}
                                                             value={this.state.shipmentType}
                                                             onChange={(e) => { this.updateDataType(e); }}
+                                                            placeholder={i18n.t('static.common.select')}
                                                         />
                                                     </div>
                                                 </FormGroup>

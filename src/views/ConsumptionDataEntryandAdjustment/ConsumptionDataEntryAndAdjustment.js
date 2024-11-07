@@ -119,7 +119,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       dataEnteredInUnitList: [],
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       singleValue2: localStorage.getItem("sesDataentryStartDateRange") != "" ? JSON.parse(localStorage.getItem("sesDataentryStartDateRange")) : { year: Number(moment(startDate).startOf('month').format("YYYY")), month: Number(moment(startDate).startOf('month').format("M")) },
-      maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      // maxDate: { year: Number(moment(Date.now()).startOf('month').format("YYYY")), month: Number(moment(Date.now()).startOf('month').format("M")) },
+      maxDate: '',
       planningUnitTotalList: [],
       dataEnteredInTableExSpan: 0,
       confidenceLevelId: 0.85,
@@ -172,6 +173,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     this.formulaChanged = this.formulaChanged.bind(this);
     this.pickAMonth2 = React.createRef();
     this.roundingForPuQty = this.roundingForPuQty.bind(this);
+    this.roundingForPuQtyForCsv = this.roundingForPuQtyForCsv.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.changeOnlyDownloadedProgram = this.changeOnlyDownloadedProgram.bind(this);
@@ -190,6 +192,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       } else {
         puQty = Math.round(puQty);
       }
+    }
+    return puQty;
+  }
+  roundingForPuQtyForCsv(puQty) {
+    if (puQty !== "") {
+        puQty = Number(puQty).toFixed(4);
     }
     return puQty;
   }
@@ -1593,7 +1601,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   /**
    * Calls getDatasetList function on component mount
    */
-  componentDidMount() {//to restrict calender max date to current Date - 36 months
+  componentDidMount() {
+    //to restrict calender max date to current Date - 36 months
     let currDate = Date.now();
     let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
@@ -1767,9 +1776,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var data = this.state.planningUnitTotalList.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM"));
         total += Number(data[0].qty);
         totalPU += Number(data[0].qtyInPU);
-        datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
+        datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(data[0].qtyInPU) : this.roundingForPuQtyForCsv(data[0].qty))
       })
-      datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(totalPU) : this.roundingForPuQty(total));
+      datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(totalPU) : this.roundingForPuQtyForCsv(total));
       datacsv.push("100 %");
       A.push(addDoubleQuoteToRowContent(datacsv))
       this.state.regionList.map(r => {
@@ -1782,7 +1791,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var data = this.state.planningUnitTotalListRegion.filter(c => c.planningUnitId == item.planningUnit.id && moment(c.month).format("YYYY-MM") == moment(item1.date).format("YYYY-MM") && c.region.regionId == r.regionId)
             totalRegion += Number(data[0].qty);
             totalRegionPU += Number(data[0].qtyInPU);
-            datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQty(data[0].qtyInPU) : this.roundingForPuQty(data[0].qty))
+            datacsv.push(this.state.showInPlanningUnit ? this.roundingForPuQtyForCsv(data[0].qtyInPU) : this.roundingForPuQtyForCsv(data[0].qty))
           })
         }
         A.push(addDoubleQuoteToRowContent(datacsv))
@@ -3230,7 +3239,9 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     }
     let bar = {}
     var datasetListForGraph = [];
-    var colourArray = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    var lightModeColors = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    var darkModeColors = ["#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+    const colourArray = isDarkMode ? darkModeColors : lightModeColors;
     if (this.state.showDetailTable) {
       var elInstance = this.state.dataEl;
       if (elInstance != undefined) {
@@ -3386,7 +3397,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                   ref={this.pickAMonth2}
                                   years={{ min: this.state.minDate, max: this.state.maxDate }}
                                   value={this.state.singleValue2}
-                                  key={JSON.stringify(this.state.singleValue2)}
+                                  // key={JSON.stringify(this.state.singleValue2)}
+                                  key={JSON.stringify(this.state.maxDate) + "-" + JSON.stringify(this.state.singleValue2)}
                                   lang={pickerLang}
                                   onDismiss={this.handleAMonthDissmis2}
                                 >

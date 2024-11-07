@@ -16,6 +16,8 @@ export function jExcelLoadedFunction(instance, number) {
     elInstance.hideIndex(0);
     var pagignation = document.getElementsByClassName('jss_pagination')[number];
     pagignation.classList.add('row');
+    // console.log("pagignation", pagignation.firstChild.innerHTML)
+    // pagignation.firstChild.innerHTML = i18n.t('static.common.result', { from:1, size:20 });
     var searchContainer = document.getElementsByClassName('jss_search_container')[number];
     var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
     try {
@@ -581,7 +583,7 @@ export function checkValidation(worksheets) {
                     worksheets.setComments(col, "Not a number");
                     valid = false;
                     columnValid = false;
-                } 
+                }
             }
             if (columns[c].decimal === false && columnValid != false && value != "") {
                 if (!Number.isInteger(Number(value))) {
@@ -590,7 +592,7 @@ export function checkValidation(worksheets) {
                     worksheets.setComments(col, i18n.t('static.planningUnitSetting.decimalNotAllowed'));
                     valid = false;
                     columnValid = false;
-                } 
+                }
             }
             if (columns[c].maxValue && columnValid != false && value != "") {
                 if (parseInt(value) > columns[c].maxValue.value) {
@@ -599,7 +601,7 @@ export function checkValidation(worksheets) {
                     worksheets.setComments(col, columns[c].maxValue.text);
                     valid = false;
                     columnValid = false;
-                } 
+                }
             }
             if (columns[c].minValue && columnValid != false && value != "") {
                 if (parseInt(value) < columns[c].minValue.value) {
@@ -608,11 +610,11 @@ export function checkValidation(worksheets) {
                     worksheets.setComments(col, columns[c].minValue.text);
                     valid = false;
                     columnValid = false;
-                } 
+                }
             }
             if (columns[c].regex && columns[c].regex !== undefined && columnValid != false && value != "") {
                 var reg = columns[c].regex.ex;
-                if (value!=="" && value!==null && !reg.test(value)) {
+                if (value !== "" && value !== null && !reg.test(value)) {
                     worksheets.setStyle(col, "background-color", "transparent");
                     worksheets.setStyle(col, "background-color", "yellow");
                     worksheets.setComments(col, columns[c].regex.text);
@@ -620,7 +622,7 @@ export function checkValidation(worksheets) {
                     columnValid = false;
                 }
             }
-            if(columnValid == true){
+            if (columnValid == true) {
                 worksheets.setStyle(col, "background-color", "transparent");
                 worksheets.setComments(col, "");
             }
@@ -635,7 +637,7 @@ export function checkValidation(worksheets) {
  * @param {*} x This is the value of the column number that is being updated
  * @param {*} y This is the value of the row number that is being updated
  * @param {*} value This is the updated value
- */    
+ */
 export function changed(worksheets, cell, x, y, value) {
     var columns = worksheets.getConfig().columns
     var isChangedColumnIndex = columns.findIndex(c => c.isChangedFlag == true);
@@ -652,7 +654,7 @@ export function changed(worksheets, cell, x, y, value) {
             validFlag = false;
         }
     }
-    if (columnInfo.number === true && value!=="" && validFlag != false) {
+    if (columnInfo.number === true && value !== "" && validFlag != false) {
         if (isNaN(parseInt(value))) {
             worksheets.setStyle(col, "background-color", "transparent");
             worksheets.setStyle(col, "background-color", "yellow");
@@ -693,7 +695,7 @@ export function changed(worksheets, cell, x, y, value) {
             validFlag = false;
         }
     }
-    if(validFlag){
+    if (validFlag) {
         worksheets.setStyle(col, "background-color", "transparent");
         worksheets.setComments(col, "");
     }

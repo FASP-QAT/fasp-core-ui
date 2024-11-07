@@ -1874,6 +1874,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                 options={countryList && countryList.length > 0 ? countryList : []}
                                                 disabled={this.state.loading}
                                                 filterOptions={filterOptions}
+                                                overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')}}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1892,6 +1894,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                 options={programList && programList.length > 0 ? programList : []}
                                                 disabled={this.state.loading}
                                                 filterOptions={filterOptions}
+                                                overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')}}
                                             />
                                             {!!this.props.error &&
                                                 this.props.touched && (
@@ -1977,6 +1981,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleProcurementAgentChange(e) }}
                                                     options={procurementAgentList && procurementAgentList.length > 0 ? procurementAgentList : []}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1992,6 +1998,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleProcurementAgentTypeChange(e) }}
                                                     options={procurementAgentTypeList && procurementAgentTypeList.length > 0 ? procurementAgentTypeList : []}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2008,6 +2016,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -2024,6 +2034,8 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     options={fundingSourceTypeList && fundingSourceTypeList.length > 0 ? fundingSourceTypeList : []}
                                                     disabled={this.state.loading}
                                                     filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
                                                 />
                                             </div>
                                         </FormGroup>

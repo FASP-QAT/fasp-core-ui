@@ -896,6 +896,8 @@ class Budgets extends Component {
                                             onChange={(e) => { this.handleChangeProgram(e) }}
                                             options={programList && programList.length > 0 ? programList : []}
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>
@@ -937,6 +939,8 @@ class Budgets extends Component {
                                                     : []
                                             }
                                             disabled={this.state.loading}
+                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')}}
                                         />
                                     </div>
                                 </FormGroup>

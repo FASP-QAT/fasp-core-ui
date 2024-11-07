@@ -1207,6 +1207,8 @@ export default class RealmCountryPlanningUnitList extends Component {
                         programList && programList.length > 0 ? programList : []
                       }
                       filterOptions={filterOptions}
+                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                      selectSomeItems: i18n.t('static.common.select')}}
                     />
                     {!!this.props.error && this.props.touched && (
                       <div style={{ color: "#BA0C2F", marginTop: ".5rem" }}>

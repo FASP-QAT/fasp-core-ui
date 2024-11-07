@@ -84,6 +84,7 @@ export default class AddDataSource extends Component {
       programs: [],
       programId: "",
       loading: true,
+      lang: localStorage.getItem('lang')
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -199,16 +200,10 @@ export default class AddDataSource extends Component {
     if (this.state.realm.id != 0) {
       DataSourceTypeService.getDataSourceTypeByRealmId(this.state.realm.id)
         .then((response) => {
-          var listArray = response.data.filter(c=>c.active==true);
+          var listArray = response.data.filter(c => c.active == true);
           listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(
-              a.label,
-              this.state.lang
-            ).toUpperCase();
-            var itemLabelB = getLabelText(
-              b.label,
-              this.state.lang
-            ).toUpperCase();
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -367,7 +362,7 @@ export default class AddDataSource extends Component {
       realms.map((item, i) => {
         return (
           <option key={i} value={item.realmId}>
-            {item.label.label_en}
+            {getLabelText(item.label, this.state.lang)}
           </option>
         );
       }, this);
@@ -377,7 +372,7 @@ export default class AddDataSource extends Component {
       dataSourceTypeList.map((item, i) => {
         return (
           <option key={i} value={item.dataSourceTypeId}>
-            {item.label.label_en}
+            {getLabelText(item.label, this.state.lang)}
           </option>
         );
       }, this);
