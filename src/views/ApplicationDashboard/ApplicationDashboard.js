@@ -1480,7 +1480,7 @@ class ApplicationDashboard extends Component {
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'150px'
+          width:'100px'
         },
         {
           title: "Average %",
@@ -1489,7 +1489,7 @@ class ApplicationDashboard extends Component {
           readOnly: true,
           mask: "#,##.00%",
           decimal: ".",
-          width:'100px'
+          width:'80px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1544,7 +1544,7 @@ class ApplicationDashboard extends Component {
           type: 'text',
           editable: false,
           readOnly: true,
-           width:'150px'
+           width:'100px'
         },
         {
           title: "# of Shipments",
@@ -1552,7 +1552,7 @@ class ApplicationDashboard extends Component {
           editable: false,
           readOnly: true,
           mask: "#,##",
-           width:'100px'
+           width:'80px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
@@ -2984,7 +2984,7 @@ class ApplicationDashboard extends Component {
                               <div className='row'>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-85px"}}>
+                                  <Col style={{marginTop:"-73px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
