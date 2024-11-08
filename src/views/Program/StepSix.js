@@ -44,6 +44,7 @@ const initialValuesSix = {
     procurementAgents: [],
     fundingSources:[],
     noOfMonthsInPastForBottomDashboard: '',
+    noOfMonthsInFutureForBottomDashboard: '',
 }
 /**
  * Defines the validation schema for step six of program onboarding.
@@ -111,6 +112,10 @@ const validationSchemaSix = function (values) {
         fundingSources: Yup.string()
             .required(i18n.t('static.budget.fundingtext')),            
         noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow')),
+        noOfMonthsInFutureForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
@@ -311,6 +316,20 @@ export default class StepSix extends Component {
                                         value={this.props.items.program.noOfMonthsInPastForBottomDashboard}
                                     />
                                     <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
+                                </div>
+                                <div className="col-md-6">
+                                <Label htmlFor="select">{i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard')}</Label>
+                                    <Input type="number"
+                                        name="noOfMonthsInFutureForBottomDashboard"
+                                        id="noOfMonthsInFutureForBottomDashboard"
+                                        bsSize="sm"
+                                        valid={!errors.noOfMonthsInFutureForBottomDashboard}
+                                        invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
+                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                        onBlur={handleBlur}
+                                        value={this.props.items.program.noOfMonthsInFutureForBottomDashboard}
+                                    />
+                                    <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
                                 </div>
 
                                 <FormGroup className="Selectcontrol-bdrNone col-md-6 h-100">
