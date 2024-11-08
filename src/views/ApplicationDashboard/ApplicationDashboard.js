@@ -313,8 +313,7 @@ class ApplicationDashboard extends Component {
     if(programId) {
       localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
     }
-    const win = window.open(window.location.origin + url, "_blank");
-    win.focus();
+    this.props.history.push(url)
   }
   /**
    * Clears the timeout when the component is unmounted.
@@ -2712,7 +2711,7 @@ class ApplicationDashboard extends Component {
                           {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                           <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Active Planning Units</th>
-                          <th scope="col">Products With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope="col">Planning Units With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -2724,7 +2723,7 @@ class ApplicationDashboard extends Component {
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Calculate" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
+                                  <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
@@ -2746,10 +2745,10 @@ class ApplicationDashboard extends Component {
                                   </div>
                                 </td>
                                 <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/#/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
+                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/#/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
@@ -2916,7 +2915,7 @@ class ApplicationDashboard extends Component {
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight">
                         <div class="card-header justify-content-between">
-                          <div class="card-title"> Stock Status </div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> Stock Status </div>
                         </div>
                         <div class="card-body pt-lg-1 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
@@ -2942,7 +2941,7 @@ class ApplicationDashboard extends Component {
                       {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
                       <div className="card custom-card pb-lg-2 CustomHeight">
                         <div class="card-header  justify-content-between">
-                          <div class="card-title"> Forecast Error </div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> Forecast Error </div>
                         </div>
                         <div class="card-body px-1 py-2 scrollable-content" style={{overflowY:'hidden'}}>
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
@@ -2953,8 +2952,8 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className="card custom-card pb-lg-2 CustomHeight">
                         <div class="card-header justify-content-between">
-                          <div class="card-title">Shipments </div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Shipments: <b className='red h3 DarkFontbold'>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>Shipments </div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden'}}>
                           <div className='row'>
@@ -3062,7 +3061,7 @@ class ApplicationDashboard extends Component {
                         <div class="col-md-12">
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
-                              <div className="card-title">Expiries</div>
+                              <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>Expiries</div>
                               <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2 scrollable-content">
