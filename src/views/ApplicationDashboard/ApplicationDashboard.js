@@ -1002,7 +1002,7 @@ class ApplicationDashboard extends Component {
       bottomProgramId,
       displayBy
     }, () => {
-      if (this.state.bottomProgramId && this.state.bottomProgramId.split("_").length == 1) {
+      if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
           programId: this.state.bottomProgramId,
           startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
@@ -1480,7 +1480,7 @@ class ApplicationDashboard extends Component {
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'150px'
+          width:'100px'
         },
         {
           title: "Average %",
@@ -1489,7 +1489,7 @@ class ApplicationDashboard extends Component {
           readOnly: true,
           mask: "#,##.00%",
           decimal: ".",
-          width:'100px'
+          width:'80px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1544,7 +1544,7 @@ class ApplicationDashboard extends Component {
           type: 'text',
           editable: false,
           readOnly: true,
-           width:'150px'
+           width:'100px'
         },
         {
           title: "# of Shipments",
@@ -1552,7 +1552,7 @@ class ApplicationDashboard extends Component {
           editable: false,
           readOnly: true,
           mask: "#,##",
-           width:'100px'
+           width:'80px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
@@ -1765,7 +1765,7 @@ class ApplicationDashboard extends Component {
           backgroundColor: '#edb944', // Dark Blue
         },
         {
-          label: 'NA',
+          label: 'N/A',
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
           backgroundColor: '#cfcdc9', // Red
         }
@@ -2891,7 +2891,7 @@ class ApplicationDashboard extends Component {
                       />
                     </FormGroup>
                     </div>
-                    <div class='col-3'>
+                    <div class='col-2'>
                     <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
@@ -2984,11 +2984,11 @@ class ApplicationDashboard extends Component {
                               <div className='row'>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-85px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
+                                  <Col style={{marginTop:"-73px"}}>
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={265} width={265} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
-                                <div id="legend-container" style={{marginTop:"5px"}}></div>
+                                <div id="legend-container" style={{marginTop:"0px"}}></div>
                               </div>
                             </div>
                             <div className='col-6'>

@@ -3696,7 +3696,7 @@ label {
   text-align: center;
   white-space: nowrap;
 }
-.DashboardBg1.fixTableHeadTopDashboard{
+.DashboardBg1 .fixTableHeadTopDashboard{
   border-top: 1px solid #4d515a!important;
 }
 .IconColorD{
@@ -17373,7 +17373,7 @@ label.arrow_label:before {
   // max-height: calc(100vh - 393px) !important;
   // height: 375px;
   // max-height: calc(100vh - 73vh) !important;
-  max-height: calc(100vh - 468px) !important;
+  max-height: calc(100vh - 481px) !important;
   overflow: auto;
 }
 .dashboardTable3 .jss_content{
@@ -17970,7 +17970,7 @@ label.arrow_label:before {
 .MarginBtmformgroup .Select-control{
   background-color: #fff!important;
 }
-.DashboardBg1.fixTableHeadTopDashboard{
+.DashboardBg1 .fixTableHeadTopDashboard{
   border-top: 1px solid #c8ced3!important;
 }
 .IconColorD{
