@@ -44,6 +44,7 @@ let initialValues = {
     regionId: [],
     programCode1: '',
     noOfMonthsInPastForBottomDashboard: '',
+    noOfMonthsInFutureForBottomDashboard: '',
 }
 /**
  * Defines the validation schema for program details.
@@ -123,6 +124,10 @@ const validationSchema = function (values) {
         noOfMonthsInPastForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow')),
+        noOfMonthsInFutureForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
     })
 }
@@ -187,6 +192,7 @@ export default class EditProgram extends Component {
                 seaFreightPerc: '',
                 roadFreightPerc: '',
                 noOfMonthsInPastForBottomDashboard:'',
+                noOfMonthsInFutureForBottomDashboard:'',
                 plannedToSubmittedLeadTime: '',
                 submittedToApprovedLeadTime: '',
                 approvedToShippedLeadTime: '',
@@ -761,6 +767,9 @@ export default class EditProgram extends Component {
         if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
             program.noOfMonthsInPastForBottomDashboard = event.target.value
         }
+        if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
+            program.noOfMonthsInFutureForBottomDashboard = event.target.value
+        }
         if (event.target.name == 'plannedToSubmittedLeadTime') {
             program.plannedToSubmittedLeadTime = event.target.value;
         } if (event.target.name == 'submittedToApprovedLeadTime') {
@@ -853,7 +862,8 @@ export default class EditProgram extends Component {
                                     regionId: this.state.program.regionArray,
                                     programCode1: this.state.uniqueCode,
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
-                                    noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard
+                                    noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard,
+                                    noOfMonthsInFutureForBottomDashboard:this.state.program.noOfMonthsInFutureForBottomDashboard
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -1297,6 +1307,20 @@ export default class EditProgram extends Component {
                                                              />
                                                         <FormFeedback>{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
                                                     </FormGroup>
+                                                    <FormGroup className="col-md-4">
+                                                        <Label htmlFor="company">{i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard')}</Label>
+                                                        <Input
+                                                            value={this.state.program.noOfMonthsInFutureForBottomDashboard}
+                                                            bsSize="sm"
+                                                            valid={!errors.noOfMonthsInFutureForBottomDashboard}
+                                                            invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
+                                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                            onBlur={handleBlur}
+                                                            type="number"
+                                                            name="noOfMonthsInFutureForBottomDashboard" id="noOfMonthsInFutureForBottomDashboard"
+                                                             />
+                                                        <FormFeedback>{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
+                                                    </FormGroup>
                                                     <FormGroup>
                                                         <Label className="P-absltRadio">{i18n.t('static.common.status')}  </Label>
                                                         <FormGroup check inline>
@@ -1399,7 +1423,8 @@ export default class EditProgram extends Component {
                 regionArray: this.state.program.regionArray,
                 uniqueCode: this.state.uniqueCode,
                 healthAreaArray: this.state.program.healthAreaArray,
-                noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard
+                noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard,
+                noOfMonthsInFutureForBottomDashboard:this.state.program.noOfMonthsInFutureForBottomDashboard
             }
             ProgramService.getProgramManagerList(response.data.realmCountry.realm.realmId)
                 .then(response => {

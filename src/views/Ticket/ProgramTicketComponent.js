@@ -85,6 +85,10 @@ const validationSchema = function (values) {
         noOfMonthsInPastForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow')),
+        noOfMonthsInFutureForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
     })
 }
@@ -117,7 +121,8 @@ export default class ProgramTicketComponent extends Component {
                 arrivedToDeliveredLeadTime: '',
                 notes: "",
                 priority: 3,
-                noOfMonthsInPastForBottomDashboard:18
+                noOfMonthsInPastForBottomDashboard:'',
+                noOfMonthsInFutureForBottomDashboard:''
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -197,6 +202,9 @@ export default class ProgramTicketComponent extends Component {
         }
         if (event.target.name == "noOfMonthsInPastForBottomDashboard") {
             program.noOfMonthsInPastForBottomDashboard = event.target.value;
+        }
+        if (event.target.name == "noOfMonthsInFutureForBottomDashboard") {
+            program.noOfMonthsInFutureForBottomDashboard = event.target.value;
         }
         if (event.target.name == "plannedToSubmittedLeadTime") {
             program.plannedToSubmittedLeadTime = event.target.value;
@@ -730,7 +738,8 @@ export default class ProgramTicketComponent extends Component {
         program.airFreightPerc = '';
         program.seaFreightPerc = '';
         program.roadFreightPerc = '';
-        program.noOfMonthsInPastForBottomDashboard=18;
+        program.noOfMonthsInPastForBottomDashboard='';
+        program.noOfMonthsInFutureForBottomDashboard='';
         program.plannedToSubmittedLeadTime = '';
         program.submittedToApprovedLeadTime = '';
         program.approvedToShippedLeadTime = '';
@@ -834,7 +843,8 @@ export default class ProgramTicketComponent extends Component {
                             airFreightPerc: '',
                             seaFreightPerc: '',
                             roadFreightPerc: '',
-                            noOfMonthsInPastForBottomDashboard:18,
+                            noOfMonthsInPastForBottomDashboard:'',
+                            noOfMonthsInFutureForBottomDashboard:'',
                             plannedToSubmittedLeadTime: '',
                             submittedToApprovedLeadTime: '',
                             approvedToShippedLeadTime: '',
@@ -1224,6 +1234,20 @@ export default class ProgramTicketComponent extends Component {
                                             value={this.state.program.noOfMonthsInPastForBottomDashboard}
                                             required />
                                         <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInFutureForBottomDashboard"
+                                            id="noOfMonthsInFutureForBottomDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInFutureForBottomDashboard}
+                                            invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.program.noOfMonthsInFutureForBottomDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
