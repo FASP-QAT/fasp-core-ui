@@ -25,7 +25,9 @@ const initialValues = {
     inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
     minCountForMode: '',
     minPercForMode: '',
-    noOfMonthsInPastForBottomDashboard: 18,
+    noOfMonthsInPastForBottomDashboard: 6,
+    noOfMonthsInFutureForBottomDashboard: 18,
+    noOfMonthsInPastForTopDashboard: 0,
     noOfMonthsInFutureForTopDashboard: 18
 }
 /**
@@ -116,6 +118,18 @@ const validationSchema = function (values) {
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForBottomDashboard'))
             .min(0, i18n.t('static.program.validvaluetext')),
+        noOfMonthsInPastForTopDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForTopDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
+        noOfMonthsInFutureForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -146,8 +160,10 @@ export default class AddRealmComponent extends Component {
                 inventoryMonthsInPast: Number(INVENTORY_MONTHS_IN_PAST),
                 minCountForMode: '',
                 minPercForMode: '',
-                noOfMonthsInFutureForTopDashboard:18,
-                noOfMonthsInPastForBottomDashboard:18
+                noOfMonthsInPastForBottomDashboard: 6,
+                noOfMonthsInFutureForBottomDashboard: 18,
+                noOfMonthsInPastForTopDashboard: 0,
+                noOfMonthsInFutureForTopDashboard: 18
             },
             message: ''
         }
@@ -208,6 +224,12 @@ export default class AddRealmComponent extends Component {
         }
         if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
             realm.noOfMonthsInPastForBottomDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInPastForTopDashboard") {
+            realm.noOfMonthsInPastForTopDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
+            realm.noOfMonthsInFutureForBottomDashboard = event.target.value
         }
         this.setState(
             {
@@ -515,6 +537,20 @@ export default class AddRealmComponent extends Component {
                                                     <FormFeedback className="red">{errors.minPercForMode}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
+                                                    <Label>{i18n.t('static.realm.noOfMonthsInPastForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="noOfMonthsInPastForTopDashboard"
+                                                        id="noOfMonthsInPastForTopDashboard"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfMonthsInPastForTopDashboard && this.state.realm.noOfMonthsInPastForTopDashboard != ''}
+                                                        invalid={touched.noOfMonthsInPastForTopDashboard && !!errors.noOfMonthsInPastForTopDashboard}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfMonthsInPastForTopDashboard}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfMonthsInPastForTopDashboard}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
                                                     <Label>{i18n.t('static.realm.noOfMonthsInFutureForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
                                                         name="noOfMonthsInFutureForTopDashboard"
@@ -543,8 +579,22 @@ export default class AddRealmComponent extends Component {
                                                     <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
+                                                    <Label>{i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="noOfMonthsInFutureForBottomDashboard"
+                                                        id="noOfMonthsInFutureForBottomDashboard"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfMonthsInFutureForBottomDashboard && this.state.realm.noOfMonthsInFutureForBottomDashboard != ''}
+                                                        invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfMonthsInFutureForBottomDashboard}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
-                                                    <FormGroup className='form-check form-check-inline' style={{paddingLeft:'13%'}}>
+                                                    <FormGroup className='form-check form-check-inline' style={{ paddingLeft: '13%' }}>
                                                         <Input
                                                             className="form-check-input"
                                                             type="radio"

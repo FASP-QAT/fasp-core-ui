@@ -66,6 +66,7 @@ export default class ProgramOnboarding extends Component {
                 seaFreightPerc: '',
                 roadFreightPerc: '',
                 noOfMonthsInPastForBottomDashboard:'',
+                noOfMonthsInFutureForBottomDashboard:'',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
@@ -519,6 +520,9 @@ export default class ProgramOnboarding extends Component {
         }
         if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
             program.noOfMonthsInPastForBottomDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
+            program.noOfMonthsInFutureForBottomDashboard = event.target.value
         }
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;

@@ -68,11 +68,13 @@ export default class ReactListComponent extends Component {
                             data[11] = realmList[j].inventoryMonthsInPast;
                             data[12] = realmList[j].minCountForMode;
                             data[13] = realmList[j].minPercForMode;
-                            data[14] = realmList[j].noOfMonthsInFutureForTopDashboard;
-                            data[15] = realmList[j].noOfMonthsInPastForBottomDashboard;
-                            data[16] = realmList[j].lastModifiedBy.username;
-                            data[17] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[18] = realmList[j].active;
+                            data[14] = realmList[j].noOfMonthsInPastForTopDashboard;
+                            data[15] = realmList[j].noOfMonthsInFutureForTopDashboard;
+                            data[16] = realmList[j].noOfMonthsInPastForBottomDashboard;
+                            data[17] = realmList[j].noOfMonthsInFutureForBottomDashboard;
+                            data[18] = realmList[j].lastModifiedBy.username;
+                            data[19] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[20] = realmList[j].active;
                             realmArray[count] = data;
                             count++;
                         }
@@ -142,11 +144,19 @@ export default class ReactListComponent extends Component {
                                     type: 'numeric', mask: '#,##.00', decimal: '.'
                                 },
                                 {
+                                    title: i18n.t('static.realm.noOfMonthsInPastForTopDashboard'),
+                                    type: 'numeric', mask: '#,##'
+                                },
+                                {
                                     title: i18n.t('static.realm.noOfMonthsInFutureForTopDashboard'),
                                     type: 'numeric', mask: '#,##'
                                 },
                                 {
                                     title: i18n.t('static.realm.noOfMonthsInPastForBottomDashboard'),
+                                    type: 'numeric', mask: '#,##'
+                                },
+                                {
+                                    title: i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard'),
                                     type: 'numeric', mask: '#,##'
                                 },
                                 {

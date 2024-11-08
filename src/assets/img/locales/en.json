@@ -3509,5 +3509,9 @@
   "static.forecast.compareAndSelectRangeInfo":"Between the highest and lowest consumption forecast",
   "static.common.accessDenied":"You do not have access to view or edit this data or setting.",
   "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
-  "static.tooltip.aruProgram":"To edit, you must have editable access to all selected programs. If you lack editable access to any selected program, the screen will be view-only"
+  "static.tooltip.aruProgram":"To edit, you must have editable access to all selected programs. If you lack editable access to any selected program, the screen will be view-only",
+  "static.validated.restrictionNoOfMonthsInPastForTopDashboard":"Please enter No of months in past for top dashboard",
+  "static.validated.restrictionNoOfMonthsInFutureForBottomDashboard":"Please enter No of months in future for bottom dashboard",
+  "static.realm.noOfMonthsInPastForTopDashboard":"No of months in past for top dashboard",
+  "static.realm.noOfMonthsInFutureForBottomDashboard":"No of months in future for bottom dashboard"
 }

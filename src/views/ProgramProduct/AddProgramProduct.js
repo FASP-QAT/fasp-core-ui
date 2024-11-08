@@ -58,7 +58,8 @@ class AddprogramPlanningUnit extends Component {
             tempSortOrder: '',
             sortOrderLoading: true,
             dropdownList: [],
-            active: 1
+            active: 1,
+            hasAccess:false,
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -177,6 +178,7 @@ class AddprogramPlanningUnit extends Component {
         var programId = document.getElementById("programId").value;
         this.setState({
             programId: programId,
+            hasAccess:AuthenticationService.checkUserACL([programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
         },
             () => {
                 this.buildJexcel();
@@ -565,7 +567,7 @@ class AddprogramPlanningUnit extends Component {
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
-                                                    if(AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')){
+                                                    if(this.state.hasAccess){
                                                     var programPlanningUnitId = rowData[15];
                                                     if (programPlanningUnitId == 0) {
                                                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
