@@ -1472,14 +1472,15 @@ class ApplicationDashboard extends Component {
     var options = {
       data: data,
       columnDrag: false,
-      colWidths: [20, 80],
+      colWidths: [100, 20],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
           title: "PU",
           type: 'text',
           editable: false,
-          readOnly: true
+          readOnly: true,
+          width:'150px'
         },
         {
           title: "Average %",
@@ -1487,7 +1488,8 @@ class ApplicationDashboard extends Component {
           editable: false,
           readOnly: true,
           mask: "#,##.00%",
-          decimal: "."
+          decimal: ".",
+          width:'100px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1541,14 +1543,16 @@ class ApplicationDashboard extends Component {
           title: "PU",
           type: 'text',
           editable: false,
-          readOnly: true
+          readOnly: true,
+           width:'150px'
         },
         {
           title: "# of Shipments",
           type: 'number',
           editable: false,
           readOnly: true,
-          mask: "#,##"
+          mask: "#,##",
+           width:'100px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
@@ -2639,7 +2643,7 @@ class ApplicationDashboard extends Component {
                       </FormGroup> */}
                     <div class="row pt-lg-2">
                       <div class="col-5" style={{display:'flex',gap:'40px'}}>
-                        <FormGroup className='FormGroupD'>
+                        <FormGroup className='FormGroupD col-10 px-0'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
                           <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
@@ -2661,7 +2665,7 @@ class ApplicationDashboard extends Component {
                         </FormGroup>
                           </Label>
                           <MultiSelect
-                            className="MarginBtmformgroup MarginBtmformgroupsmall"
+                            className="MarginBtmformgroup"
                             name="topProgramId"
                             id="topProgramId"
                             bsSize="sm"
@@ -2887,7 +2891,7 @@ class ApplicationDashboard extends Component {
                       />
                     </FormGroup>
                     </div>
-                    <div class='col-4'>
+                    <div class='col-3'>
                     <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
@@ -2959,9 +2963,10 @@ class ApplicationDashboard extends Component {
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='col-md-11 pl-lg-3 FormGroupD' style={{zIndex:"1"}}>
-                                  <Label htmlFor="displayBy" className='pl-lg-1'>Display By</Label>
+                                <FormGroup className='FormGroupD pl-lg-3' style={{zIndex:"1",display:'flex',gap:'8px'}}>
+                                  <Label htmlFor="displayBy" style={{marginTop:'6px'}}>Display By</Label>
                                   <Input
+                                  style={{width:'155px'}}
                                     type="select"
                                     name="displayBy"
                                     id="displayBy"
@@ -2976,9 +2981,10 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'209px',overflowY:'scroll'}}>
+                              <div className='row'>
+                              {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-70px"}}>
+                                  <Col style={{marginTop:"-85px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={275} width={275} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>

@@ -3390,15 +3390,13 @@ label {
     max-height: calc(100vh - 391px) !important;
   }
 
-  .dashboardTable2 .jss_content {
-    // max-height: calc(100vh - 100%) !important;
-    // height: 375px;
-    // overflow: scroll;
-    max-height: calc(100vh - 150px);
-    /* Adjust to leave more space */
-    overflow: auto;
-    /* Consider 'auto' instead of 'scroll' */
-  }
+  // .dashboardTable2 .jss_content {
+  
+  //   max-height: calc(100vh - 150px);
+   
+  //   overflow: auto;
+    
+  // }
 
   .Iconclr {
     filter: brightness(15);
@@ -17368,17 +17366,19 @@ label.arrow_label:before {
 .dashboardTable2 .jss_content {
   // max-height: calc(100vh - 393px) !important;
   // height: 375px;
-  max-height: calc(100vh - 52vh) !important;
+  max-height: calc(100vh - 412px) !important;
   overflow: auto;
 }
 .dashboardTable2E .jss_content {
   // max-height: calc(100vh - 393px) !important;
   // height: 375px;
-  max-height: calc(100vh - 73vh) !important;
+  // max-height: calc(100vh - 73vh) !important;
+  max-height: calc(100vh - 468px) !important;
   overflow: auto;
 }
 .dashboardTable3 .jss_content{
-    max-height: calc(100vh - 46vh) !important;
+    // max-height: calc(100vh - 46vh) !important;
+    max-height: calc(100vh - 385px) !important;
     overflow: auto;
 }
 .CustomHeight {
@@ -17390,7 +17390,8 @@ label.arrow_label:before {
   // max-height: 310px;
   // min-height: 20vh !important;
   // max-height: 20vh;
-  height: 400px; /* Set the desired fixed height */
+  height: 313px;
+  // height: 400px; /* Set the desired fixed height */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17722,7 +17723,7 @@ label.arrow_label:before {
   overflow-x:hidden;
 }
 .boxHeightBottom{
-  height: 230px!important;
+  height: 220px!important;
 }
 
 .jss>tbody>tr>td.cmpAndSelectTbl {
