@@ -114,7 +114,12 @@ class EditUserComponent extends Component {
       loading1: true,
       programListForFilter: [],
       addUserEL: "",
-      aclMessage: ""
+      aclMessage: "",
+      selRoleList:[],
+      selProgram: [],
+    selRealmCountry:[],
+    selOrganisation:[],
+    selHealthArea:[]
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
