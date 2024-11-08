@@ -303,6 +303,7 @@ export default class StepSix extends Component {
                                     </Input>
                                     <FormFeedback className="red">{errors.userId}</FormFeedback>
                                 </FormGroup>
+                                <FormGroup className="col-md-6"></FormGroup>
                                 <div className="col-md-6">
                                 <Label htmlFor="select">{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}</Label>
                                     <Input type="number"
