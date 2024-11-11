@@ -46,7 +46,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             if (item.stockOut.toString() == "true") {
                                                 stockedOutCount += 1;
                                             }
-                                            valueOfExpiredPU += Number(item.valueOfExpiredStock)
+                                            valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
                                         })
                                     }
                                     var dashboradTop = {
