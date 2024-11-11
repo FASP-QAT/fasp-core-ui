@@ -17998,3 +17998,17 @@ label.arrow_label:before {
 .DashboardBg1 .tableFixHeadDash thead th {  
   top: -2px!important;  
 }
+.jss>thead>tr>td {
+  padding: 6px;
+  cursor: pointer;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  position: sticky;
+  top: 0;
+  z-index: 1!important;
+  background-repeat: no-repeat;
+  background-position: center right 0;
+  line-height: 1em;
+  text-align: center;
+}
