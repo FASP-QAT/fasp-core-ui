@@ -909,16 +909,18 @@ class DefaultLayout extends Component {
         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         var programDatasetChanged = 0;
+        var programDatasetModifiedCount = 0;
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
             if (myResult[i].changed == 1) {
               programDatasetChanged = 1;
-              break;
+              programDatasetModifiedCount++;
             }
           }
         }
         this.setState({
-          programDatasetChanged: programDatasetChanged
+          programDatasetChanged: programDatasetChanged,
+          programDatasetModifiedCount: programDatasetModifiedCount
         })
         if (programDatasetChanged == 1) {
           localStorage.setItem("sesLocalVersionChange", true);
@@ -975,7 +977,7 @@ class DefaultLayout extends Component {
           />
           <AppHeader fixed >
             <Suspense fallback={this.loading()}>
-              <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} programModifiedCount={this.state.programModifiedCount} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} openIssues={this.state.openIssues}/>
+              <DefaultHeader onLogout={e => this.signOut(e)} onChangePassword={e => this.changePassword(e)} onChangeDashboard={e => this.showDashboard(e)} shipmentLinkingAlerts={e => this.showShipmentLinkingAlerts(e)} latestProgram={e => this.goToLoadProgram(e)} latestProgramFC={e => this.goToLoadProgramFC(e)} title={this.state.name} notificationCount={this.state.notificationCount} changeIcon={this.state.changeIcon} programModifiedCount={this.state.programModifiedCount} programDatasetModifiedCount={this.state.programDatasetModifiedCount} fuChangeIcon={this.state.fuChangeIcon} commitProgram={e => this.goToCommitProgram(e)} commitProgramFC={e => this.goToCommitProgramFC(e)} goOffline={e => this.goOffline(e)} goOnline={e => this.goOnline(e)} logout={e => this.logout(e)} activeModule={this.state.activeTab == 1 ? 1 : 2} openIssues={this.state.openIssues}/>
             </Suspense>
           </AppHeader>
           <div className="app-body">
