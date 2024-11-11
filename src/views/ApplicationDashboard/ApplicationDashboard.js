@@ -1506,11 +1506,11 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "PU",
+          title: "Planning Unit",
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'100px'
+          width:'110px'
         },
         {
           title: "Average %",
@@ -1519,7 +1519,7 @@ class ApplicationDashboard extends Component {
           readOnly: true,
           mask: "#,##.00%",
           decimal: ".",
-          width:'80px'
+          width:'70px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1554,7 +1554,7 @@ class ApplicationDashboard extends Component {
     if (shipmentWithFundingSourceTbdList.length > 0) {
       for (var j = 0; j < shipmentWithFundingSourceTbdList.length; j++) {
         data = [];
-        data[0] = shipmentWithFundingSourceTbdList[j].planningUnit.label.label_en
+        data[0] = shipmentWithFundingSourceTbdList[j].planningUnit.label.label_en + " | " + shipmentWithFundingSourceTbdList[j].planningUnit.id
         data[1] = shipmentWithFundingSourceTbdList[j].count
         dataArray[count] = data;
         count++;
@@ -1570,11 +1570,11 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "PU",
+          title: "Planning Unit",
           type: 'text',
           editable: false,
           readOnly: true,
-           width:'100px'
+          width:'110px'
         },
         {
           title: "# of Shipments",
@@ -1582,7 +1582,7 @@ class ApplicationDashboard extends Component {
           editable: false,
           readOnly: true,
           mask: "#,##",
-           width:'80px'
+          width:'70px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
@@ -1618,7 +1618,7 @@ class ApplicationDashboard extends Component {
     if (expiriesList.length > 0) {
       for (var j = 0; j < expiriesList.length; j++) {
         data = [];
-        data[0] = expiriesList[j].planningUnit.label.label_en
+        data[0] = expiriesList[j].planningUnit.label.label_en + " | " + expiriesList[j].planningUnit.id
         data[1] = roundARU(expiriesList[j].expiringQty, 1)
         data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
         data[3] = roundARU(expiriesList[j].expiryAmt, 1)
@@ -2923,7 +2923,7 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div class='col-2'>
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId">Report Period<span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
+                      <Label htmlFor="organisationTypeId">Report Period <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reportPeriodTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="reportPeriod"
@@ -2932,6 +2932,7 @@ class ApplicationDashboard extends Component {
                           lang={pickerLang}
                           key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
+                          style={{backgroundColor:"#000 !important"}}
                         >
                           <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == "" ? "" : this._handleClickRangeBox} />
                         </Picker>
@@ -2962,7 +2963,7 @@ class ApplicationDashboard extends Component {
                             {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
                               return (<li class="success">
                                 <div class="d-flex align-items-center justify-content-between">
-                                  <div className='text-mutedDashboard'>{x.planningUnit.label.label_en} </div>
+                                  <div className='text-mutedDashboard'>{x.planningUnit.label.label_en} | {x.planningUnit.id} </div>
                                   <div class="fs-12 text-mutedDashboard">{x.count}​</div>
                                 </div>
                               </li>)
@@ -3049,7 +3050,7 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
-                          <div class="card-title"> Data Quality (doesn't use date selector) </div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/problemList/1/'+this.state.bottomProgramId+"/false")} style={{ cursor: 'pointer' }}> Data Quality (doesn't use date selector) </div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>

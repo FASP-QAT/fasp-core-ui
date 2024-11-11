@@ -3506,6 +3506,7 @@
   "static.dashboard.qatProblemTooltip": "Number of “open” problems in the QAT Problem List. For downloaded programs, click on the cell to be redirected to the QAT Problem List.",
   "static.dashboard.uploadedDateTooltip": "The date this version (draft or final) was uploaded to the server",
   "static.dashboard.reviewStatusTooltip": "Status and date are based on the latest final version uploaded to the server",
+  "static.dashboard.reportPeriodTooltip": "Default is 6 months in past, 18 months in future. Update in the Program Info screen",
   "static.forecast.compareAndSelectRangeInfo": "Between the highest and lowest consumption forecast",
   "static.common.accessDenied": "You do not have access to view or edit this data or setting.",
   "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
