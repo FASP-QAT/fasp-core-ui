@@ -10144,6 +10144,22 @@ export default class BuildTree extends Component {
      */
     changed3(isCalculateClicked) {
         var elInstance = this.state.modelingCalculatorEl;
+        var dataArr = elInstance.records;
+        var rowEndDate = moment(dataArr[dataArr.length - 1][8].v).format("YYYY-MM-DD");
+        var forecastStopDate = moment(this.state.forecastStopDate).format("YYYY-MM-DD");
+        var isAfter = moment(rowEndDate).isAfter(forecastStopDate);
+        if (isCalculateClicked == 2 && isAfter) {
+            var cf = window.confirm(i18n.t("static.modelingCalculator.targetBeyondForecast"));
+            if (cf == true) {
+                this.calculateChanged3(isCalculateClicked);
+            }
+        } else {
+            this.calculateChanged3(isCalculateClicked);
+        }
+    }
+
+    calculateChanged3(isCalculateClicked) {
+        var elInstance = this.state.modelingCalculatorEl;
         var validation = this.validFieldData();
         if (validation) {
             this.setState({ isCalculateClicked: isCalculateClicked })
