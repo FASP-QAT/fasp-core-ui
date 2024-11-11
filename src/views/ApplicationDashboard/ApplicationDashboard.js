@@ -916,7 +916,9 @@ class ApplicationDashboard extends Component {
   handleBottomProgramIdChange = (programId) => {
     localStorage.setItem("bottomProgramId", programId.value);
     this.setState({
-      bottomProgramId: programId.value
+      bottomProgramId: programId.value,
+      dashboardStartDateBottom: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month,
+      dashboardStopDateBottom: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month,
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
@@ -1052,20 +1054,30 @@ class ApplicationDashboard extends Component {
         this.getPrograms();
       })
     } else {
+      var dt = new Date();
+      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+      var dt1 = new Date();
+      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
       this.setState({
         onlyDownloadedBottomProgram: false,
-        bottomProgramId: ""
+        bottomProgramId: "",
+        rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
       }, () => {
         this.getPrograms();
       })
     }
   }
   getOnlineDashboardBottom(inputJson) {
+    var dt = new Date();
+    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    var dt1 = new Date();
+    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     if (localStorage.getItem('sessionType') === 'Online') {
       DashboardService.getDashboardBottom(inputJson)
         .then(response => {
           this.setState({
-            dashboardBottomData: response.data
+            dashboardBottomData: response.data,
+            rangeValue: this.state.rangeValue ? this.state.rangeValue : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
           }, () => {
             if (document.getElementById("shipmentsTBDJexcel")) {
               this.buildForecastErrorJexcel();
@@ -1420,7 +1432,7 @@ class ApplicationDashboard extends Component {
           this.buildExpiriesJexcel();
         }
         this.setState({
-          rangeValue: this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 && this.state.dashboardStartDateBottom ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+          rangeValue: (this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.split("_").length > 1 && this.state.dashboardStartDateBottom) || this.state.bottomProgramId == "" ? { from: { year: this.state.dashboardStartDateBottom.split("-")[0], month: this.state.dashboardStartDateBottom.split("-")[1] }, to: { year: this.state.dashboardStopDateBottom.split("-")[0], month: this.state.dashboardStopDateBottom.split("-")[1] } } : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
         }, () => {
           localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
         })
@@ -2921,7 +2933,7 @@ class ApplicationDashboard extends Component {
                           key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
                         >
-                          <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1 ? "" : this._handleClickRangeBox} />
+                          <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == "" ? "" : this._handleClickRangeBox} />
                         </Picker>
                       </div>
                     </FormGroup>
