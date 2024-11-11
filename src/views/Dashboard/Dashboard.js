@@ -140,7 +140,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var expiryList = value.expiriesList;
                                     expiryList.forEach(expiry => {
                                         expiry.planningUnit = item.planningUnit;
-                                        expiryTotal += Number(expiry.expiryAmt);
+                                        expiryTotal += Number(Math.round(expiry.expiryAmt));
                                     });
                                     expiriesList = expiriesList.concat(expiryList);
                                     if (reportBy == 1) {
