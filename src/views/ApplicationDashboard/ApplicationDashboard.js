@@ -1445,6 +1445,24 @@ class ApplicationDashboard extends Component {
     this.onTopSubmit();
   }
   /**
+   * Retrieves the problem list after calculation for a specific program ID.
+   * @param {number} id The ID of the program for which to retrieve the problem list. 
+   */
+  getProblemListAfterCalculationMultiple() {
+    let i = 0;
+    for(i = 0; i < this.state.topProgramId.length; i++){
+      this.updateState(this.state.topProgramId[i].value, true);
+      if (this.state.topProgramId[i].value != 0) {
+        this.refs.problemListChild.qatProblemActions(this.state.topProgramId[i].value, this.state.topProgramId[i].value, false);
+      } else {
+        this.updateState(this.state.topProgramId[i].value, false);
+      }
+    }
+    if(i == this.state.topProgramId.length){
+      this.onTopSubmit();
+    }
+  }
+  /**
    * Toggles info for confidence level
    */
   togglepopoverOpenMa() {
@@ -2712,12 +2730,12 @@ class ApplicationDashboard extends Component {
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash" style={{borderTop:'0px solid #2a303d'}}>
                       <Table className="table-striped table-bordered text-center">
                         <thead>
-                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
+                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Delete <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                           <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Active Planning Units</th>
                           <th scope="col">Planning Units With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                          <th scope='col' width="125px">Open QAT Problems​ {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
@@ -2727,7 +2745,7 @@ class ApplicationDashboard extends Component {
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i>
+                                  {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
