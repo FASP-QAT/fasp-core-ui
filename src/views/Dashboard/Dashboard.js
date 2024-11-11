@@ -46,7 +46,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             if (item.stockOut.toString() == "true") {
                                                 stockedOutCount += 1;
                                             }
-                                            valueOfExpiredPU += Number(item.valueOfExpiredStock)
+                                            valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
                                         })
                                     }
                                     var dashboradTop = {
@@ -145,7 +145,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var expiryList = value.expiriesList;
                                     expiryList.forEach(expiry => {
                                         expiry.planningUnit = item.planningUnit;
-                                        expiryTotal += Number(expiry.expiryAmt);
+                                        expiryTotal += Number(Math.round(expiry.expiryAmt));
                                     });
                                     expiriesList = expiriesList.concat(expiryList);
                                     if (reportBy == 1) {
