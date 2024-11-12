@@ -3503,9 +3503,9 @@
   "static.dashboard.activePUTooltip": "",
   "static.dashboard.stockoutTooltip": "Red value indicates planning units with at least one month of stockout in the next 18 months. Blue value indicates planning units with no stockouts in the next 18 months",
   "static.dashboard.expiryTooltip": "Total cost of projected expiries in the next 18 months",
-  "static.dashboard.qatProblemTooltip": "Number of “open” problems in the QAT Problem List. For downloaded programs, click on the cell to be redirected to the QAT Problem List.",
+  "static.dashboard.qatProblemTooltip": "Click on the refresh icon to re-calculate the QAT Problem List open problems for the selected program(s) below.",
   "static.dashboard.uploadedDateTooltip": "The date this version (draft or final) was uploaded to the server",
-  "static.dashboard.reviewStatusTooltip": "Status and date are based on the latest final version uploaded to the server",
+  "static.dashboard.reviewStatusTooltip": "Status and date are based on the latest final version uploaded to the server. Click on the status to be redirected to the Supply Plan Version and Review screen. Click on the note icon to view the Notes History.",
   "static.dashboard.reportPeriodTooltip": "Default is 6 months in past, 18 months in future. Update in the Program Info screen",
   "static.forecast.compareAndSelectRangeInfo": "Between the highest and lowest consumption forecast",
   "static.common.accessDenied": "You do not have access to view or edit this data or setting.",
@@ -3515,5 +3515,10 @@
   "static.validated.restrictionNoOfMonthsInFutureForBottomDashboard": "Please enter No of months in future for bottom dashboard",
   "static.realm.noOfMonthsInPastForTopDashboard": "No of months in past for top dashboard",
   "static.realm.noOfMonthsInFutureForBottomDashboard": "No of months in future for bottom dashboard",
-  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings."
+  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
+  "static.dashboard.stockStatusHeaderTooltip": "The Stock Status % is calculated based on the number of months available in the report period across all planning units. These months are used as the denominator when determining the percentage.",
+  "static.dashboard.forecastErrorHeaderTooltip": "",
+  "static.dashboard.dataQualityHeaderTooltip": "This data does not use the Report Period for calculation; instead it uses the problems flagged in the QAT Problem List for this selected program.",
+  "static.dashboard.shipmentsHeaderTooltip": "Based on chose report period for selected program",
+  "static.dashboard.expiriesHeaderTooltip": "Total Cost = expired quantity * planning unit cost"
 }
