@@ -914,9 +914,9 @@ class ApplicationDashboard extends Component {
     * @param {array} regionIds - An array containing the IDs and labels of the selected regions.
     */
   handleBottomProgramIdChange = (programId) => {
-    localStorage.setItem("bottomProgramId", programId.value);
+    localStorage.setItem("bottomProgramId", programId ? programId.value : "");
     this.setState({
-      bottomProgramId: programId.value,
+      bottomProgramId: programId ? programId.value : "",
       dashboardStartDateBottom: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month,
       dashboardStopDateBottom: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month,
     }, () => {
@@ -2924,23 +2924,23 @@ class ApplicationDashboard extends Component {
                       <div style={{ gap: '20px', display: 'flex' }}>
                         <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
-                        <Input
-                          className="form-check-input"
-                          type="checkbox"
-                          id="onlyDownloadedBottomProgram"
-                          name="onlyDownloadedBottomProgram"
-                          checked={this.state.onlyDownloadedBottomProgram}
-                          disabled={!(localStorage.getItem('sessionType') === 'Online')}
-                          onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
-                        />
-                        <Label
-                          className="form-check-label"
-                          check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
-                          Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                        </Label>
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="onlyDownloadedBottomProgram"
+                              name="onlyDownloadedBottomProgram"
+                              checked={this.state.onlyDownloadedBottomProgram}
+                              disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                              onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                            />
+                            <Label
+                              className="form-check-label"
+                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                            </Label>
+                          </div>
+                        </FormGroup>
                       </div>
-                    </FormGroup>
-                    </div>
                       </Label>
                       <Select
                         type="select"
@@ -2966,7 +2966,6 @@ class ApplicationDashboard extends Component {
                           lang={pickerLang}
                           key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
-                          style={{backgroundColor:"#000 !important"}}
                         >
                           <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == "" ? "" : this._handleClickRangeBox} />
                         </Picker>
