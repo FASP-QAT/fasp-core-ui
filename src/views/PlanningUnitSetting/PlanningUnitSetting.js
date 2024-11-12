@@ -940,7 +940,7 @@ export default class PlanningUnitSetting extends Component {
         let count = 0;
         let indexVar = 1;
         let dropdownList = this.state.dropdownList;
-        loop1: for (var j = 0; j < outPutList.length; j++) {
+        for (var j = 0; j < outPutList.length; j++) {
             data = [];
 
             let index = dropdownList.findIndex(c => c.id == outPutList[j].planningUnit.id);
@@ -951,8 +951,6 @@ export default class PlanningUnitSetting extends Component {
                     id: outPutList[j].planningUnit.id,
                     name: outPutList[j].planningUnit.label.label_en + " | " + outPutList[j].planningUnit.id
                 });
-            } else {
-                continue loop1;//this statement is used to fix ticket QAT-5195
             }
 
             // dropdownList[j] = {
