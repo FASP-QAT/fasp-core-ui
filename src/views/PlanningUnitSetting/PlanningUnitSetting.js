@@ -2231,7 +2231,7 @@ export default class PlanningUnitSetting extends Component {
                                 </i>
                             </p>
                         }
-                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn1" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <div className="UpdatePlanningSettingTable consumptionDataEntryTable FreezePlaningUnitColumn1 FreezePlaningUnitColumn1New" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv" className='TableWidth100'>
                             </div>
                         </div>
