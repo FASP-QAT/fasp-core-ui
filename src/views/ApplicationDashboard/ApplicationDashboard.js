@@ -52,7 +52,7 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
 /**
  * Formats a numerical value by adding commas as thousand separators.
@@ -1241,7 +1241,7 @@ class ApplicationDashboard extends Component {
                                 ctx.strokeStyle = dataset.backgroundColor[index];
                                 ctx.stroke();
                                 ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                ctx.font = '10px Arial';
+                                ctx.font = 'number 10px Arial';
                                 // ctx.textBaseline = 'middle';
                                 ctx.fillStyle = dataset.backgroundColor[index];
                                 ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
@@ -1507,7 +1507,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en + " | " + forecastErrorList[j].planningUnit.id
-        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2):"<i class='fa fa-exclamation-triangle' title='hello'></i>";
+        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?formatter(Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2))+"%":"<i class='fa fa-exclamation-triangle' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
         data[2] = forecastErrorList[j].aboveForecastThreshold
         dataArray[count] = data;
         count++;
@@ -1926,7 +1926,7 @@ class ApplicationDashboard extends Component {
         shipmentDetailsList = Object.values(
           this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
             if (!acc[curr.reportBy.code]) {
-              acc[curr.reportBy.code] = { code: curr.reportBy.code, cost: curr.cost };
+              acc[curr.reportBy.code] = { code: curr.reportBy.code, cost: curr.cost, colorHtmlCode: curr.colorHtmlCode, colorHtmlDarkCode: curr.colorHtmlDarkCode };
             } else {
               acc[curr.reportBy.code].cost += curr.cost;
             }
@@ -1937,7 +1937,7 @@ class ApplicationDashboard extends Component {
         shipmentDetailsList = Object.values(
           this.state.dashboardBottomData.shipmentDetailsList.reduce((acc, curr) => {
             if (!acc[getLabelText(curr.reportBy.label, this.state.lang)]) {
-              acc[getLabelText(curr.reportBy.label, this.state.lang)] = { code: getLabelText(curr.reportBy.label, this.state.lang), cost: curr.cost };
+              acc[getLabelText(curr.reportBy.label, this.state.lang)] = { code: getLabelText(curr.reportBy.label, this.state.lang), cost: curr.cost, colorHtmlCode: curr.colorHtmlCode, colorHtmlDarkCode: curr.colorHtmlDarkCode };
             } else {
               acc[getLabelText(curr.reportBy.label, this.state.lang)].cost += curr.cost;
             }
@@ -1947,21 +1947,93 @@ class ApplicationDashboard extends Component {
       }
     }
 
-    const darkModeColors = [
-      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
-    ];
+    let darkModeColors = [];
+    let lightModeColors = [];
 
-    const lightModeColors = [
-      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-      "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
-    ];
+    if(this.state.displayBy == 1) {
+      darkModeColors = [
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
+      ];
+  
+      lightModeColors = [
+        "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
+        "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
+      ];
+    } else if(this.state.displayBy == 2) {
+      darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
+      lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
+    } else if(this.state.displayBy == 3) {
+      let lightStatus = [
+        {
+          status: "Received",
+          color: "#002F6C"
+        },
+        {
+          status: "Approved", 
+          color: "#118b70"
+        },
+        {
+          status: "Planned",
+          color: "#A7C6ED"
+        },
+        {
+          status: "Submitted",
+          color: "#25A7FF"
+        },
+        {
+          status: "Arrived",
+          color: "#0067B9"
+        },
+        {
+          status: "Shipped",
+          color: "#49A4A1"
+        },
+        {
+          status: "On-hold",
+          color: "#6C6463"
+        }
+      ]
+      let darkStatus = [
+        {
+          status: "Received",
+          color:"#d4bbff"
+        },
+        {
+          status: "Approved",
+          color:"#118b70"
+        },
+        {
+          status: "Planned",
+          color:"#A7C6ED"
+        },
+        {
+          status: "Submitted",
+          color:"#25A7FF"
+        },
+        {
+          status: "Arrived",
+          color:"#0067B9"
+        },
+        {
+          status: "Shipped",
+          color:"#49A4A1"
+        },
+        {
+          status: "On-hold",
+          color:"#6C6463"
+        }
+      ]
+      shipmentDetailsList.map(x => darkModeColors.push(darkStatus.filter(l => l.status == x.code).length > 0 ? darkStatus.filter(l => l.status == x.code)[0].color : ""));
+      shipmentDetailsList.map(x => lightModeColors.push(lightStatus.filter(l => l.status == x.code).length > 0 ? lightStatus.filter(l => l.status == x.code)[0].color : ""));
+    }
+    
 
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     // const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -2010,7 +2082,7 @@ class ApplicationDashboard extends Component {
             usePointStyle: true,
             fontColor:fontColor,
             fontSize: 0.01,
-            padding: 10
+            padding: 12
         }
       },
       layout: {
