@@ -1590,7 +1590,7 @@ class AddprogramPlanningUnit extends Component {
                             <div>
                                 <h4 className="red">{this.props.message}</h4>
                                 <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
-                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1 CursorDrag" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1 CursorDrag FreezePlaningUnitColumn1New" style={{ display: this.state.loading ? "none" : "block" }}>
                                     <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                     </div>
                                 </div>
