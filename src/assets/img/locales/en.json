@@ -3520,5 +3520,9 @@
   "static.dashboard.forecastErrorHeaderTooltip": "",
   "static.dashboard.dataQualityHeaderTooltip": "This data does not use the Report Period for calculation; instead it uses the problems flagged in the QAT Problem List for this selected program.",
   "static.dashboard.shipmentsHeaderTooltip": "Based on chose report period for selected program",
-  "static.dashboard.expiriesHeaderTooltip": "Total Cost = expired quantity * planning unit cost"
+  "static.dashboard.expiriesHeaderTooltip": "Total Cost = expired quantity * planning unit cost",
+  "static.dashboard.forecastedConsumptionTooltip": "Counts the number of PUs that have at least one month of missing forecasted consumption data in the next 18 months",
+  "static.dashboard.actualInventoryTooltip": "Counts the number of PUs that have missing recent actual inventory data (within the last 3 months)",
+  "static.dashboard.actualConsumptionTooltip": "Counts the number of PUs that either have missing recent actual consumption data (within the last 3 months), or a gap in actual consumption data (within the last 6 months)",
+  "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times"
 }
