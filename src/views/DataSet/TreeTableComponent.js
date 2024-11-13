@@ -2284,15 +2284,115 @@ export default class TreeTable extends Component {
         }
     }
     onChangeTab1Data = function (instance, cell, x, y, value) {
-        this.checkValidationTab1();
         this.el = this.state.treeTabl1El;
         this.el.setValueFromCoords(13, y, 1, true);
+        var nodeType = this.el.getValueFromCoords(11, y);
+        if (x == 3) {
+            if (value == "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (nodeType == 2) {
+            if (x == 4) {
+                if (value === "") {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 5) {
+                if (value === "") {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 6) {
+                if (value.toString().replaceAll(",", "").replaceAll("%", "") === "") {
+                    var col = ('G').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if (isNaN(Number(value.toString().replaceAll(",", "").replaceAll("%", ""))) || !(DECIMAL_NO_REGEX_8_DECIMALS.test(this.el.getValueFromCoords(6, y).toString().replaceAll(",", "").replaceAll("%", "")))) {
+                        var col = ('G').concat(parseInt(y) + 1);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        var col = ('G').concat(parseInt(y) + 1);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+        } else if (nodeType == 3) {
+            if (x == 4) {
+                if (value === "") {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('E').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 5) {
+                if (value === "") {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('F').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 6) {
+                if (value.toString().replaceAll(",", "").replaceAll("%", "") === "") {
+                    var col = ('G').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    if (isNaN(Number(value.toString().replaceAll(",", "").replaceAll("%", ""))) || !(DECIMAL_NO_REGEX_8_DECIMALS.test(this.el.getValueFromCoords(6, y).toString().replaceAll(",", "").replaceAll("%", "")))) {
+                        var col = ('G').concat(parseInt(y) + 1);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        this.el.setComments(col, i18n.t('static.message.invalidnumber'));
+                    } else {
+                        var col = ('G').concat(parseInt(y) + 1);
+                        this.el.setStyle(col, "background-color", "transparent");
+                        this.el.setComments(col, "");
+                    }
+                }
+            }
+        }
         this.setState({
             isTabDataChanged: true
         })
     }
     onChangeTab2Data = function (instance, cell, x, y, value) {
-        this.checkValidationTab2();
         this.setState({
             isTabDataChanged: true
         })
@@ -2403,11 +2503,258 @@ export default class TreeTable extends Component {
                 }
             }
         }
+        var nodeType = this.el.getValueFromCoords(36, y);
+        if (x == 3) {
+            if (this.el.getValueFromCoords(3, y) === "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 4) {
+            if (this.el.getValueFromCoords(4, y) === "") {
+                var col = ('E').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('E').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 5) {
+            if (this.el.getValueFromCoords(5, y) === "") {
+                var col = ('F').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('F').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (nodeType == 4) {
+            if (x == 9) {
+                if (this.el.getValueFromCoords(9, y) === "") {
+                    var col = ('J').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('J').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 8) {
+                if (this.el.getValueFromCoords(8, y) === "") {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('I').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 14) {
+                if (this.el.getValueFromCoords(14, y) === "") {
+                    var col = ('O').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('O').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 17) {
+                if (this.el.getValueFromCoords(17, y) === "") {
+                    var col = ('R').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('R').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 19) {
+                if (this.el.getValueFromCoords(19, y) === "") {
+                    var col = ('T').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('T').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 21 || x == 14) {
+                if (this.el.getValueFromCoords(21, y) == 0 && this.el.getValueFromCoords(14, y) == 1) {
+                    if (x == 22) {
+                        if (this.el.getValueFromCoords(22, y) === "") {
+                            var col = ('W').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('W').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                    if (x == 23) {
+                        if (this.el.getValueFromCoords(23, y) === "") {
+                            var col = ('X').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('X').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                    if (x == 24) {
+                        if (this.el.getValueFromCoords(24, y) == "") {
+                            var col = ('Y').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('Y').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                    if (x == 25) {
+                        if (this.el.getValueFromCoords(25, y) === "") {
+                            var col = ('Z').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('Z').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                } else if (this.el.getValueFromCoords(14, y) == 2) {
+                    if (x == 22) {
+                        if (this.el.getValueFromCoords(22, y) == "") {
+                            var col = ('W').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('W').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                    if (x == 23) {
+                        if (this.el.getValueFromCoords(23, y) === "") {
+                            var col = ('X').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setStyle(col, "background-color", "yellow");
+                            this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                        } else {
+                            var col = ('X').concat(parseInt(y) + 1);
+                            this.el.setStyle(col, "background-color", "transparent");
+                            this.el.setComments(col, "");
+                        }
+                    }
+                    var col = ('Y').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                    var col = ('Z').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                } else {
+                    var col = ('W').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                    var col = ('X').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                    var col = ('Y').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+
+                    var col = ('Z').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        } else if (nodeType == 5) {
+            if (x == 10) {
+                if (this.el.getValueFromCoords(10, y) === "") {
+                    var col = ('K').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('K').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+            if (x == 13) {
+                if (this.el.getValueFromCoords(13, y) === "") {
+                    var col = ('N').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "yellow");
+                    this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+                } else {
+                    var col = ('N').concat(parseInt(y) + 1);
+                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setComments(col, "");
+                }
+            }
+        }
     }
     onChangeTab3Data = function (instance, cell, x, y, value) {
-        this.checkValidationTab3();
         this.el = this.state.treeTabl3El;
         this.el.setValueFromCoords(10, y, 1, true);
+        if (x == 3) {
+            if (this.el.getValueFromCoords(3, y) == "") {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('D').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
+        if (x == 4) {
+            if (this.el.getValueFromCoords(4, y) == "") {
+                var col = ('E').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setStyle(col, "background-color", "yellow");
+                this.el.setComments(col, i18n.t('static.label.fieldRequired'));
+            } else {
+                var col = ('E').concat(parseInt(y) + 1);
+                this.el.setStyle(col, "background-color", "transparent");
+                this.el.setComments(col, "");
+            }
+        }
         this.setState({
             isTabDataChanged: true
         })
@@ -2538,10 +2885,10 @@ export default class TreeTable extends Component {
             var currentScenario = items[i].payload.nodeDataMap[this.state.selectedScenario][0];
             var aggregationNodeValue = "0";
             // if (items[i].payload.nodeType.id == 1 || items[i].payload.nodeType.id == 2) {
-                var aggregationNodeValueFilter = currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(displayDate).format("YYYY-MM"));
-                if (aggregationNodeValueFilter.length > 0) {
-                    aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
-                }
+            var aggregationNodeValueFilter = currentScenario.nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(displayDate).format("YYYY-MM"));
+            if (aggregationNodeValueFilter.length > 0) {
+                aggregationNodeValue = aggregationNodeValueFilter[0].calculatedValue;
+            }
             // }
             var sourceNodeUsageListCount = [];
             if (this.state.dataSetObj.programData.treeList)
@@ -2741,35 +3088,113 @@ export default class TreeTable extends Component {
             onload: this.loadedTab1,
             onchange: this.onChangeTab1Data,
             onchangepage: this.onChangePageTab1,
-            updateTable: function (el, cell, x, j, source, value, id) {
+            onsearch: function (el, term, rowNumbers) {
                 var elInstance = el;
-                var rowData = elInstance.getRowData(j);
-                if (rowData[11] == 1) {
-                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                } else if (rowData[11] == 2 || rowData[11] == 3) {
-                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[11] == 1) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        } else if (rowData[11] == 2 || rowData[11] == 3) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
+                    }
                 }
             },
+            onfilter: function (el, term, rowNumbers) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[11] == 1) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        } else if (rowData[11] == 2 || rowData[11] == 3) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
+                    }
+                }
+            },
+            // updateTable: function (el, cell, x, j, source, value, id) {
+            //     var elInstance = el;
+            //     var rowData = elInstance.getRowData(j);
+            //     if (rowData[11] == 1) {
+            //         var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("E").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("F").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //     } else if (rowData[11] == 2 || rowData[11] == 3) {
+            //         var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //     }
+            // },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var rowData = obj.getRowData(y)
@@ -2815,7 +3240,7 @@ export default class TreeTable extends Component {
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
                             let tempMonth = new Date(json[i][5]);
-                            if(curItem.context.payload.nodeType.id != 1 && curItem.context.payload.nodeType.id != 6){
+                            if (curItem.context.payload.nodeType.id != 1 && curItem.context.payload.nodeType.id != 6) {
                                 (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
                             }
                             if (json[i][11] == 3) {
@@ -2838,6 +3263,10 @@ export default class TreeTable extends Component {
                             })
                         }
                     }
+                } else {
+                    this.setState({
+                        treeTableLoading: false
+                    })
                 }
             }, 0)
         })
@@ -3582,123 +4011,377 @@ export default class TreeTable extends Component {
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
             onchangepage: this.onChangePageTab2,
-            updateTable: function (el, cell, x, j, source, value, id) {
+            onsearch: function (el, term, rowNumbers) {
                 var elInstance = el;
-                var rowData = elInstance.getRowData(j);
-                if (rowData[36] == 4) {
-                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    if (rowData[14] == 2) {
-                        var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[36] == 4) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            if (rowData[14] == 2) {
+                                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                            }
+                            if (rowData[20] == 1) {
+                                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                            }
+                            var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        } else if (rowData[36] == 5) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
                     }
-                    if (rowData[20] == 1) {
-                        var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                        var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
-                        cell.classList.add('readonly');
-                    }
-                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                } else if (rowData[35] == 5) {
-                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
                 }
             },
+            onfilter: function (el, term, rowNumbers) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[36] == 4) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            if (rowData[14] == 2) {
+                                var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                            }
+                            if (rowData[20] == 1) {
+                                var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                                var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                                cell.classList.add('readonly');
+                            }
+                            var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        } else if (rowData[36] == 5) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
+                    }
+                }
+            },
+            // updateTable: function (el, cell, x, j, source, value, id) {
+            //     var elInstance = el;
+            //     var rowData = elInstance.getRowData(j);
+            //     if (rowData[36] == 4) {
+            //         var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("K").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("N").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         if (rowData[14] == 2) {
+            //             var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //         }
+            //         if (rowData[20] == 1) {
+            //             var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //             var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+            //             cell.classList.add('readonly');
+            //         }
+            //         var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //     } else if (rowData[35] == 5) {
+            //         var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("H").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("J").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("L").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("M").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("I").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("O").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("P").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("Q").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("R").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("S").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("T").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("W").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("V").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("X").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("Y").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("Z").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AA").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AB").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AC").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AD").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AE").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AF").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("AG").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //     }
+            // },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var rowData = obj.getRowData(y)
@@ -3813,7 +4496,7 @@ export default class TreeTable extends Component {
                 nodeType = i18n.t("static.ManageTree.Percentage")
             } else if (items[i].payload.nodeType.id == 1) {
                 nodeType = i18n.t("static.ManageTree.Aggregation")
-            }else if (items[i].payload.nodeType.id == 6) {
+            } else if (items[i].payload.nodeType.id == 6) {
                 nodeType = i18n.t('static.tree.funnelNode')
             }
             if ((items[i].payload.nodeType.id != 1 && items[i].payload.nodeDataMap[this.state.selectedScenario] != undefined && items[i].payload.nodeType.id == 2 && items[i].payload.nodeDataMap[this.state.selectedScenario][0].extrapolation == true)) {
@@ -3941,18 +4624,62 @@ export default class TreeTable extends Component {
             onload: this.loadedTab3,
             onchange: this.onChangeTab3Data,
             onchangepage: this.onChangePageTab3,
-            updateTable: function (el, cell, x, j, source, value, id) {
+            onsearch: function (el, term, rowNumbers) {
                 var elInstance = el;
-                var rowData = elInstance.getRowData(j);
-                if (rowData[8] == 6) {
-                    var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
-                    var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
-                    cell.classList.add('readonly');
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[8] == 6) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
+                    }
                 }
             },
+            onfilter: function (el, term, rowNumbers) {
+                var elInstance = el;
+                var json = elInstance.getJson();
+                var jsonLength;
+                jsonLength = json.length;
+                for (var i = 0; i < rowNumbers.length; i++) {
+                    try {
+                        var j = rowNumbers[i];
+                        var rowData = elInstance.getRowData(j);
+                        if (rowData[8] == 6) {
+                            var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                            var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+                            cell.classList.add('readonly');
+                        }
+                    } catch (error) {
+
+                    }
+                }
+            },
+            // updateTable: function (el, cell, x, j, source, value, id) {
+            //     var elInstance = el;
+            //     var rowData = elInstance.getRowData(j);
+            //     if (rowData[8] == 6) {
+            //         var cell = elInstance.getCell(("B").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("C").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //         var cell = elInstance.getCell(("G").concat(parseInt(j) + 1))
+            //         cell.classList.add('readonly');
+            //     }
+            // },
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 var rowData = obj.getRowData(y)
@@ -6701,7 +7428,7 @@ export default class TreeTable extends Component {
                 {i18n.t(this.state.message, { entityname })}</h5>
             <Row>
                 <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
-                    <Card className="mb-lg-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
+                    <Card className="mb-lg-0" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         <div className="Card-header-reporticon pb-2">
                             {this.state.selectedScenario != "" && this.state.treeId != "" && this.state.programId != "" &&
                                 <div className="card-header-actions">
@@ -6750,7 +7477,7 @@ export default class TreeTable extends Component {
                             <div className="container-fluid pl-lg-3 pr-lg-3">
                                 <>
                                     <Form>
-                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading || this.state.treeTableLoading? "none" : "block" }}>
+                                        <CardBody className="pt-0 pb-0" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                                             <div className="col-md-12 pl-lg-0">
                                                 <Row>
                                                     <FormGroup className="col-md-3 pl-lg-0">
@@ -6825,7 +7552,7 @@ export default class TreeTable extends Component {
                                                 </Row>
                                             </div>
                                         </CardBody>
-                                        <div style={{ display: !this.state.loading || !this.state.treeTableLoading? "block" : "none" }} class="sample">
+                                        <div style={{ display: !this.state.loading || !this.state.treeTableLoading ? "block" : "none" }} class="sample">
                                             <i className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;<a href={`/#/dataSet/buildTree/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.managetree')}</a>&nbsp;{i18n.t('static.tree.or')}&nbsp;{i18n.t('static.treeTable.rightClickNotes')}</i><br /><br />
                                             <i className='text-blackD'>{i18n.t('static.treeTable.updateNotes')}</i><br /><br />
                                             <Row>
