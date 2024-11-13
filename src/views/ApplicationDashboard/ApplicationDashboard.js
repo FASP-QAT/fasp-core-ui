@@ -309,9 +309,20 @@ class ApplicationDashboard extends Component {
    * Redirects the user to a specified URL.
    * @param {string} url - The URL to redirect to.
    */
-   redirectToCrudWindow = (url, programId) => {
-    if(programId) {
+   redirectToCrudWindow = (url, isMultiSelect, programId) => {
+    if(isMultiSelect) {
       localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
+    } else {
+      let pId, vId;
+      if(this.state.bottomProgramId.toString().split("_").length > 0){
+        pId = this.state.bottomProgramId.toString().split("_")[0];
+        vId = this.state.programList.filter(x => x.id == this.state.bottomProgramId)[0].versionId+" (Local)";
+      } else {
+        pId = this.state.bottomProgramId;
+        vId = this.state.programList.filter(x => x.programId == this.state.bottomProgramId)[0].versionId;
+      }
+      localStorage.setItem("sesProgramIdReport", pId)
+      localStorage.setItem("sesVersionIdReport", vId)
     }
     this.props.history.push(url)
   }
@@ -604,7 +615,8 @@ class ApplicationDashboard extends Component {
               id: response.data[i].id,
               programId: response.data[i].id,
               label: response.data[i].label,
-              programCode: response.data[i].code
+              programCode: response.data[i].code,
+              versionId: response.data[i].currentVersionId
             }
             proList[i] = programJson
           }
@@ -1495,7 +1507,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en + " | " + forecastErrorList[j].planningUnit.id
-        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2):""//<i class='fa fa-exclamation-triangle'></i>;
+        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2):"<i class='fa fa-exclamation-triangle' title='hello'></i>";
         data[2] = forecastErrorList[j].aboveForecastThreshold
         dataArray[count] = data;
         count++;
@@ -1519,7 +1531,7 @@ class ApplicationDashboard extends Component {
         },
         {
           title: "Average %",
-          type: 'number',
+          type: 'html',
           editable: false,
           readOnly: true,
           mask: "#,##.00%",
@@ -1533,11 +1545,15 @@ class ApplicationDashboard extends Component {
       ],
       onload: function(instance, cell, x, y, value) { 
         jExcelLoadedFunctionWithoutPagination(instance);
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild;
+        // tr.children[2].classList.add('InfoTr');
+        // tr.children[2].title = "Hello";
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
           var rowData = elInstance.getRowData(j);
-          if (rowData[2]) {
+          if (rowData[2] || rowData[1].includes("exclamation")) {
             var cell = elInstance.getCell('B'.concat(parseInt(j) + 1));
             cell.classList.add("shipmentEntryEmergency");
           }
@@ -2785,7 +2801,7 @@ class ApplicationDashboard extends Component {
                           <th scope="col" width="125px">Active Planning Units</th>
                           <th scope="col">Planning Units With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>{localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer", paddingLeft:'6px' }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
+                          <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
                           <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                         </thead>
@@ -2820,7 +2836,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
@@ -3061,10 +3077,10 @@ class ApplicationDashboard extends Component {
                             </div>
                             <div className='col-6 container1'>
                               <div class="label-text text-center text-mutedDashboard">
-                                <h7><b># of Shipments with funding TBD</b></h7>
+                                <h7><b># of Shipments with funding TBD: {this.state.dashboardBottomData.shipmentWithFundingSourceTbd.map(x => x.count).reduce((a,b) => a+b,0)}</b></h7>
                               </div>
                               <div className='row'>
-                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '0px 8px' }}></div>
+                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px' }}></div>
                               </div>
                             </div>
                           </div>
@@ -3092,7 +3108,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
@@ -3100,7 +3116,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
@@ -3108,7 +3124,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
@@ -3116,7 +3132,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments <i class="fa fa-info-circle icons" id="Popover1" onClick={() => this.toggle('popoverOpenMa', !this.state.popoverOpenMa)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
