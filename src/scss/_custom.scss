@@ -167,7 +167,7 @@ body {
   text-overflow: ellipsis;
   position: sticky;
   top: 0;
-  z-index: 1!important;
+  z-index: 1;
   background-repeat: no-repeat;
   background-position: center right 0;
   line-height: 1em;
@@ -523,7 +523,7 @@ label.arrow_label:before {
     text-overflow: ellipsis;
     position: sticky;
     top: 0;
-    z-index: 1!important;
+    z-index: 1;
     background-repeat: no-repeat;
     background-position: center right 0;
     line-height: 1em;
@@ -933,7 +933,7 @@ label.arrow_label:before {
     text-overflow: ellipsis;
     position: sticky;
     top: 0;
-    z-index: 1!important;
+    z-index: 1;
     background-repeat: no-repeat;
     background-position: center right 0;
     line-height: 1em;
@@ -16628,9 +16628,14 @@ label.arrow_label:before {
   text-overflow: ellipsis;
   position: sticky;
   top: 0;
-  z-index: 1!important;
+  z-index: 1;
   background-repeat: no-repeat;
   background-position: center right 0;
   line-height: 1em;
   text-align: center;
+}
+.jss>tbody>tr>td.readonly>input[type=checkbox], .jss>tbody>tr>td.readonly>input[type=radio] {
+  pointer-events: none;
+  opacity: 1.5!important;
+ 
 }
