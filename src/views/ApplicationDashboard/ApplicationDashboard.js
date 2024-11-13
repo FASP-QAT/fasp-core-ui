@@ -14,7 +14,7 @@ import { confirmAlert } from 'react-confirm-alert';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import {
   Button,
   ButtonGroup,
@@ -392,7 +392,11 @@ class ApplicationDashboard extends Component {
                 ],
                 editable: false,
                 onload: function (instance, cell) {
-                    jExcelLoadedFunction(instance);
+                  if(this.state.bottomProgramId==""){
+                    jExcelLoadedFunctionForNotes(instance,0);
+                  }else{
+                    jExcelLoadedFunctionForNotes(instance,3);
+                  }
                 }.bind(this),
                 pagination: localStorage.getItem("sesRecordCount"),
                 search: true,

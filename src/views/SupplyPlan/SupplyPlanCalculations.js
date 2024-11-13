@@ -57,6 +57,11 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     var programQPLDetailsJsonRequest = programQPLDetailsOs.get(programId);
                     programQPLDetailsJsonRequest.onsuccess = function (e) {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
+                        var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
+                    var paOs = paTransaction.objectStore('procurementAgent');
+                    var paRequest = paOs.getAll();
+                    paRequest.onsuccess = function (e) {
+                        var paJson = paRequest.result;
                         if (objectStoreName != "whatIfProgramData") {
                             if (page != "masterDataSync") {
                                 programQPLDetailsJson.programModified = 1;
@@ -1145,7 +1150,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 var shipmentListFiltered=shipmentList.filter(c => c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (moment(c.receivedDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.receivedDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")) : (moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")));
                                 var shipmentDetailsByFundingSource=Object.values(shipmentListFiltered.reduce((acc, { fundingSource, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
                                     const { id, label, code } = fundingSource; // Destructure id and label
-                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0 };
+                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
                                     acc[id].quantity += shipmentQty;
                                     acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
                                     acc[id].orderCount += 1;
@@ -1153,7 +1158,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }, {}));
                                 var shipmentDetailsByProcurementAgent=Object.values(shipmentListFiltered.reduce((acc, { procurementAgent, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
                                     const { id, label, code } = procurementAgent; // Destructure id and label
-                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0 };
+                                    var pa=paJson.filter(c=>c.procurementAgentId==id)[0];
+                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode:pa.colorHtmlCode, colorHtmlDarkCode:pa.colorHtmlDarkCode };
                                     acc[id].quantity += shipmentQty;
                                     acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
                                     acc[id].orderCount += 1;
@@ -1161,7 +1167,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 }, {}));
                                 var shipmentDetailsByShipmentStatus=Object.values(shipmentListFiltered.reduce((acc, { shipmentStatus, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
                                     const { id, label } = shipmentStatus; // Destructure id and label
-                                    acc[id] = acc[id] || { reportBy: { id, label, code:"" }, quantity: 0, cost: 0, orderCount: 0 };
+                                    acc[id] = acc[id] || { reportBy: { id, label, code:"" }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
                                     acc[id].quantity += shipmentQty;
                                     acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
                                     acc[id].orderCount += 1;
@@ -1453,4 +1459,5 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
             }
         }
     }
+}
 }
