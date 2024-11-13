@@ -3687,22 +3687,27 @@ label {
 }
 .scroller-content div a {
   color: #002F6C;
+  background: #a7c6ed;
+  padding: 2px 14px;
+  border-radius: 5px 5px 0px 0px;
 }
 .scroller-content div {
   font-size: 14px;
   line-height: 20px;
   color: #e4e5e6;
   font-weight: 700;
-  padding: 4px 17px;
-  margin: 0px 5px;
+  padding: 0px;
+  margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
-  background: #a7c6ed;
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 10px;
+  box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
 }
 .scroller-content div p {
   margin-bottom: 0rem!important;
-  color: #fff;
+  color: #002F6C;
 }
 .DashboardBg1 .fixTableHeadTopDashboard{
   border-top: 1px solid #4d515a!important;
@@ -17415,7 +17420,7 @@ label.arrow_label:before {
   // max-height: calc(100vh - 412px) !important;
   overflow: auto;
   max-height: 215px !important;
-  min-height: 238px !important;
+  // min-height: 238px !important;
 }
 .dashboardTable2E .jss_content {
   // max-height: calc(100vh - 393px) !important;
@@ -17887,21 +17892,26 @@ label.arrow_label:before {
   color: #000;
   font-weight: 700;
   // color: #e4e5e6;
-  padding: 4px 17px;
-  margin: 0px 5px;
+  padding: 0px;
+  margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
-  background: #a7c6ed;
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 10px;
+  box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
   
 }
 
 .scroller-content div a {
   color: #002F6C;
+  background: #a7c6ed;
+  padding: 2px 14px;
+  border-radius: 5px 5px 0px 0px;
 }
 .scroller-content div p {
   margin-bottom: 0rem!important;
-  color: #fff;
+  color: #002F6C;
 }
 @keyframes scroll {
   0% {
