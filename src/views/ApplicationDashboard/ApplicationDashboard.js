@@ -1279,7 +1279,7 @@ class ApplicationDashboard extends Component {
                               ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
                               ctx.stroke();
                               ctx.textAlign = x >= 0 ? 'left' : 'right';
-                              ctx.font = '14px Arial';
+                              ctx.font = 'number 14px Arial';
                               ctx.fillStyle =  (dataset.data[0] == 0) ? "red" : "#000000" //dataset.backgroundColor[index];
                               ctx.fillText(`${value}`, labelX - 4, labelY + 2);
                               ctx.restore();
@@ -2836,7 +2836,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                                 {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                                 <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ")" : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                                <td><a style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                                   {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                                 </td>
                               </tr>)
