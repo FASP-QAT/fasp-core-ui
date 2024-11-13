@@ -5668,7 +5668,7 @@ export default class BuildTree extends Component {
         }
         this.setState({ scalingTotal }, () => {
         });
-        if (this.state.modelingEl != "") {
+        if (this.state.modelingEl != "" && document.getElementById("modelingJexcel")!=null) {
             jexcel.destroy(document.getElementById("modelingJexcel"), true);
         }
         var data = dataArray;
