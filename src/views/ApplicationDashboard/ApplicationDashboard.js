@@ -3139,7 +3139,7 @@ class ApplicationDashboard extends Component {
               
               {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
                 {/* <div className='col-md-12'> */}
-                  <div className='row'>
+                  <div className='row px-3 pt-lg-2'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
                       <div className="card custom-card CustomHeight" style={{overflow:'hidden'}}>
                         <div class="card-header justify-content-between">
@@ -3172,7 +3172,7 @@ class ApplicationDashboard extends Component {
                       <div className="card custom-card pb-lg-2 CustomHeight">
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden'}}>
                           <div className='row'>
@@ -3199,7 +3199,7 @@ class ApplicationDashboard extends Component {
                               <div className='row'>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-73px"}}>
+                                  <Col style={{marginTop:"-77px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={265} width={265} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
@@ -3228,7 +3228,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
@@ -3236,7 +3236,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
@@ -3244,7 +3244,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
@@ -3252,7 +3252,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></b></h7></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
@@ -3265,14 +3265,14 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-6'>
                       <div className='row'>
-                        <div class="col-md-12 pr-lg-0">
+                        <div class="col-md-12">
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiriesHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                              <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10 text-mutedDashboard">Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
+                              <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
                             <div class="card-body px-1 py-2 scrollable-content">
-                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '0px 8px' }}>
+                              <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '3px 8px' }}>
                               </div>
                             </div>
                           </div>

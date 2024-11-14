@@ -3373,7 +3373,7 @@ label {
 
   .card.custom-card .card-header {
     padding: 3px 10px !important;
-    background-color: transparent !important;
+    background-color: #a7c6ed !important;
     border-block-end: 1px solid #4d515a;
     display: flex;
     align-items: center;
@@ -3567,13 +3567,13 @@ label {
   }
 
   .FormGroupD .box {
-    height: calc(1.5em + 0.5rem + 2px) !important;
+    height: 30px !important;
     padding: 0.25rem 0.5rem;
     font-size: 0.76562rem;
-    line-height: 1.5;
+    line-height: 20px;
     border: 1px solid #e4e7ea;
     border-radius: 0.2rem;
-    background-color: #212631;
+    background-color: #373c46;
   }
 
   .card.custom-card .card-header .card-title {
@@ -3582,9 +3582,11 @@ label {
     font-size: .9375rem;
     font-weight: 700;
     text-transform: capitalize;
-    color: #20a8d8;
+    color: #002f6c;
   }
-
+  .card.custom-card .card-header .card-title i.fa-info-circle:before{
+    color: #002f6c!important;
+  }
   .dashboardTable2 {
     flex: 1;
     min-height: 0;
@@ -3612,7 +3614,7 @@ label {
 
   .card.custom-card .card-header {
     padding: 1rem 1.25rem;
-    background-color: transparent !important;
+    background-color: #a7c6ed !important;
     border-block-end: 1px solid #f3f3f3;
     display: flex;
     align-items: center;
@@ -3756,6 +3758,9 @@ label {
   text-overflow: ellipsis;
   overflow-x: hidden;
   padding-right: 16px;
+}
+.card.custom-card .card-header .card-title .text-mutedDashboard{
+  color: #000!important;
 }
   // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
   //   content: "";
@@ -17419,17 +17424,17 @@ label.arrow_label:before {
 
 .dashboardTable2 .jss_content {
   // max-height: calc(100vh - 393px) !important;
-  // height: 225px;
+  height: 221px;
   // max-height: calc(100vh - 412px) !important;
   overflow: auto;
-  max-height: 215px !important;
+  // max-height: 215px !important;
   // min-height: 238px !important;
 }
 .dashboardTable2E .jss_content {
   // max-height: calc(100vh - 393px) !important;
-  // height: 375px;
+  height: 152px;
   // max-height: calc(100vh - 73vh) !important;
-  max-height: calc(100vh - 481px) !important;
+  // max-height: calc(100vh - 481px) !important;
   overflow: auto;
 }
 .dashboardTable3 .jss_content{
@@ -17626,13 +17631,14 @@ label.arrow_label:before {
 }
 
 .FormGroupD .box {
-  height: calc(1.5em + 0.5rem + 2px) !important;
+  // height: calc(1.5em + 0.5rem + 2px) !important;
+  height: 30px!important;
   padding: 0.25rem 0.5rem;
   font-size: 0.76562rem;
-  line-height: 1.5;
+  line-height: 20px;
   border: 1px solid #e4e7ea;
   border-radius: 0.2rem;
-  background-color: #fff;
+  background-color: #e5edf5;
 }
 
 .StockplanningBoxD {
@@ -18166,6 +18172,15 @@ label.arrow_label:before {
 // }
 @media (min-width: 1025px) and (max-width: 1280px){
   .dashboardTable2 .jss_content {
-    height: 250px;
+    height: 222px;
 }
 }
+
+@media only screen
+and (min-width: 1370px)
+and (max-width: 1605px)
+{ 
+  .dashboardTable2 .jss_content {
+    height: 222px;
+}
+ }
