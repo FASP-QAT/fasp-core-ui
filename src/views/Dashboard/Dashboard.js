@@ -28,11 +28,11 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                         var pqdObjectStore = pqdTransaction.objectStore('programQPLDetails');
                         var pqdRequest = pqdObjectStore.getAll();
                         pqdRequest.onsuccess = function (event) {
-                            var pqdList = pdRequest.result;
+                            var pqdList = pqdRequest.result;
                             var dashboradTopList = [];
                             try {
                                 pdList.map(item => {
-                                    var pqd=pqdList.filter(c=>c.id==item.id);
+                                    var pqd = pqdList.filter(c => c.id == item.id);
                                     var ppu = ppuList.filter(c => c.program.id == item.programId);
                                     var p = pList.filter(c => c.programId == item.programId);
                                     var programDataBytes = CryptoJS.AES.decrypt(item.programData.generalData, SECRET_KEY);
@@ -73,11 +73,16 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             "versionStatus": programJson.currentVersion.versionStatus,
                                             "latestFinalVersion": p[0].versionList.filter(c => c.versionType.id == FINAL_VERSION_TYPE).slice(-1)[0],
                                             "isLatest": p[0].currentVersion.versionId > item.version ? false : true,
-                                            "isChanged":pqd[0].programModified
+                                            "isChanged": pqd[0].programModified
                                         }
                                         dashboradTopList.push(dashboradTop);
                                     }
                                 })
+                                dashboradTopList.sort((a, b) => {
+                                    var itemLabelA = a.program.code.toUpperCase();
+                                    var itemLabelB = b.program.code.toUpperCase();
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
                                 console.log("dashboradTopList Test@123", dashboradTopList)
                                 props.updateStateDashboard("dashboardTopList", dashboradTopList);
                             } catch (err) {
