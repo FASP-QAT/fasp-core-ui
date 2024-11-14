@@ -123,11 +123,11 @@ const validationSchema = function (values) {
                 }),
         noOfMonthsInPastForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow')),
         noOfMonthsInFutureForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
     })
 }
