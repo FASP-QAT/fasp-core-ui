@@ -3680,16 +3680,16 @@ label {
   height: 58px;
   padding: 0 10px;
   overflow: hidden;
-  border: 1px solid #aaa;
+  border: 1px solid #4d515a;
   // box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
   border-radius: 8px;
   background: #373c46;
 }
 .scroller-content div a {
   color: #002F6C;
-  background: #a7c6ed;
+  // background: #a7c6ed;
   padding: 2px 14px;
-  border-radius: 5px 5px 0px 0px;
+  // border-radius: 5px 5px 0px 0px;
 }
 .scroller-content div {
   font-size: 14px;
@@ -3700,14 +3700,15 @@ label {
   margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #a7c6ed;
+  // border: 1px solid #ddd;
   border-radius: 10px;
   // box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
 }
 .scroller-content div p {
   margin-bottom: 0rem!important;
-  color: #002F6C;
+  color: #000;
+  font-weight: normal;
 }
 .DashboardBg1 .fixTableHeadTopDashboard{
   border-top: 1px solid #4d515a!important;
@@ -17868,7 +17869,7 @@ label.arrow_label:before {
   height: 58px;
   padding: 0 10px; /* Optional padding */
   overflow: hidden;
-  border: 1px solid #aaa;
+  border: 1px solid #ddd;
   // box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
   border-radius: 8px;
   background: #FFFFFF;
@@ -17896,8 +17897,8 @@ label.arrow_label:before {
   margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
-  background: #fff;
-  border: 1px solid #ddd;
+  background: #a7c6ed;
+  // border: 1px solid #ddd;
   border-radius: 10px;
   // box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
   
@@ -17905,13 +17906,15 @@ label.arrow_label:before {
 
 .scroller-content div a {
   color: #002F6C;
-  background: #a7c6ed;
+  // background: #a7c6ed;
   padding: 2px 14px;
-  border-radius: 5px 5px 0px 0px;
+  // border-radius: 5px 5px 0px 0px;
 }
 .scroller-content div p {
   margin-bottom: 0rem!important;
-  color: #002F6C;
+  color: #000;
+  font-weight: normal;
+
 }
 @keyframes scroll {
   0% {
