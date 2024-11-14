@@ -1282,7 +1282,7 @@ class ApplicationDashboard extends Component {
                               ctx.stroke();
                               ctx.textAlign = x >= 0 ? 'left' : 'right';
                               ctx.font = 'number 14px Arial';
-                              ctx.fillStyle =  (dataset.data[0] == 0) ? "red" : "#000000" //dataset.backgroundColor[index];
+                              ctx.fillStyle =  (dataset.data[0] == 0) ? "red" : localStorage.getItem("theme") == "dark" ? "#FFFFFF" : "#000000" //dataset.backgroundColor[index];
                               ctx.fillText(`${value}`, labelX - 4, labelY + 2);
                               ctx.restore();
                           }
@@ -2225,7 +2225,7 @@ class ApplicationDashboard extends Component {
     
           // Text for the label
           const textContainer = document.createElement('p');
-          textContainer.style.color = item.fontColor;
+          textContainer.style.color = localStorage.getItem("theme") == "dark" ? "#FFFFFF" : item.fontColor;
           textContainer.style.margin = 0;
           textContainer.style.padding = 5;
           textContainer.style.textDecoration = item.hidden ? 'line-through' : '';
@@ -3200,7 +3200,7 @@ class ApplicationDashboard extends Component {
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-73px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={265} width={265} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} width={300} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>
