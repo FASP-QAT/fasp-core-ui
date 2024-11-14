@@ -3196,7 +3196,7 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row'>
+                              <div className='row' style={{height:'200px',overflowY:'scroll',overflowX:'hidden'}}>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-77px"}}>
