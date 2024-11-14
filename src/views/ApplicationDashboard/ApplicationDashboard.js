@@ -3139,20 +3139,20 @@ class ApplicationDashboard extends Component {
               
               {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
                 {/* <div className='col-md-12'> */}
-                  <div className='row px-3'>
+                  <div className='row'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
-                      <div className="card custom-card CustomHeight">
+                      <div className="card custom-card CustomHeight" style={{overflow:'hidden'}}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> Stock Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
-                        <div class="card-body pt-lg-1 scrollable-content">
+                        <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
                         </div>
                         <div class="label-text text-center text-mutedDashboard">
                           <h7><b>Stocked out Planning Units: {this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}</b></h7>
                         </div>
-                        <div className='row'>
-                          <div id="stockedOutJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px' }}></div>
+                        <div className='row px-3'>
+                          <div id="stockedOutJexcel" className='DashboardreadonlyBg dashboardTable2E jtabs-animation jtabs jss_container' style={{ padding: '2px 8px' }}></div>
                         </div>
                       </div>
                     </div>
@@ -3265,7 +3265,7 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-6'>
                       <div className='row'>
-                        <div class="col-md-12">
+                        <div class="col-md-12 pr-lg-0">
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiriesHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
