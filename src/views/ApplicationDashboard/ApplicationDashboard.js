@@ -99,6 +99,7 @@ class ApplicationDashboard extends Component {
       datasetList: [],
       countryList: [],
       technicalAreaList: [],
+      shipmentStatusList: [],
       message: '',
       dashboard: '',
       users: [],
@@ -1134,6 +1135,7 @@ class ApplicationDashboard extends Component {
   componentDidMount() {
     var db1;
     let tempProgramList = [];
+    let shipmentStatusList = [];
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onerror = function (event) {
@@ -1203,6 +1205,27 @@ class ApplicationDashboard extends Component {
           b = b.programCode.toLowerCase();
           return a < b ? -1 : a > b ? 1 : 0;
         });
+        var shipmentStatusTransaction = db1.transaction(['shipmentStatus'], 'readwrite');
+        var shipmentStatusOs = shipmentStatusTransaction.objectStore('shipmentStatus');
+        var shipmentStatusRequest = shipmentStatusOs.getAll();
+        shipmentStatusRequest.onerror = function (event) {
+        }.bind(this);
+        shipmentStatusRequest.onsuccess = function (event) {
+        var shipmentStatusResult = [];
+        shipmentStatusResult = shipmentStatusRequest.result;
+        for (var k = 0; k < shipmentStatusResult.length; k++) {
+          if(shipmentStatusResult[k].active) {
+              var shipmentStatusJson = {
+                  id: shipmentStatusResult[k].shipmentStatusId,
+                  active: shipmentStatusResult[k].active,
+                  label: shipmentStatusResult[k].label
+              }
+              shipmentStatusList.push(shipmentStatusJson);
+            }
+          }
+          console.log("Hello",shipmentStatusList)
+          this.setState({ shipmentStatusList: shipmentStatusList})
+        }
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
@@ -2039,61 +2062,61 @@ class ApplicationDashboard extends Component {
     } else if(this.state.displayBy == 3) {
       let lightStatus = [
         {
-          status: "Received",
+          status: i18n.t("static.supplyPlan.delivered"),
           color: "#002F6C"
         },
         {
-          status: "Approved", 
+          status: i18n.t("static.supplyPlan.ordered"), 
           color: "#118b70"
         },
         {
-          status: "Planned",
+          status: i18n.t("static.report.planned"),
           color: "#A7C6ED"
         },
         {
-          status: "Submitted",
+          status: i18n.t("static.report.submitted"),
           color: "#25A7FF"
         },
         {
-          status: "Arrived",
+          status: i18n.t("static.report.arrived"),
           color: "#0067B9"
         },
         {
-          status: "Shipped",
+          status: i18n.t("static.report.shipped"),
           color: "#49A4A1"
         },
         {
-          status: "On-hold",
+          status: i18n.t("static.report.hold"),
           color: "#6C6463"
         }
       ]
       let darkStatus = [
         {
-          status: "Received",
+          status: i18n.t("static.supplyPlan.delivered"),
           color:"#d4bbff"
         },
         {
-          status: "Approved",
+          status: i18n.t("static.supplyPlan.ordered"),
           color:"#118b70"
         },
         {
-          status: "Planned",
+          status: i18n.t("static.report.planned"),
           color:"#A7C6ED"
         },
         {
-          status: "Submitted",
+          status: i18n.t("static.report.submitted"),
           color:"#25A7FF"
         },
         {
-          status: "Arrived",
+          status: i18n.t("static.report.arrived"),
           color:"#0067B9"
         },
         {
-          status: "Shipped",
+          status: i18n.t("static.report.shipped"),
           color:"#49A4A1"
         },
         {
-          status: "On-hold",
+          status: i18n.t("static.report.hold"),
           color:"#6C6463"
         }
       ]
@@ -2876,7 +2899,7 @@ class ApplicationDashboard extends Component {
                             />
                             <Label
                               className="form-check-label"
-                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
                               Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
@@ -2903,29 +2926,29 @@ class ApplicationDashboard extends Component {
                           <div class="myMarquee">
                             <div class="scroller">
                               <div class="scroller-content">
-                                <div><a href="#">Accessible Programs</a><p>{this.state.programList.length}</p></div>
-                                <div><a href="#">Downloaded Programs</a><p>{this.state.programList.filter(c => c.local).length}</p></div>
-                                <div><a href="#">Countries</a><p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
-                                <div><a href="#">Users</a><p>{this.state.dashboard.USER_COUNT}</p></div>
-                                <div><a href="#">Programs</a><p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
-                                <div><a href="#">Linked ERP Shipments</a><p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Accessible Programs<p>{this.state.programList.length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Downloaded Programs<p>{this.state.programList.filter(c => c.local).length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/realmCountry/listRealmCountry`)}>Countries<p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/user/listUser`)}>Users<p>{this.state.dashboard.USER_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Programs<p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/shipment/manualTagging`)}>Linked ERP Shipments<p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
                               </div>
                               
                               <div class="scroller-content">
-                                <div><a href="#">Accessible Programs</a><p>{this.state.programList.length}</p></div>
-                                <div><a href="#">Downloaded Programs</a><p>{this.state.programList.filter(c => c.local).length}</p></div>
-                                <div><a href="#">Countries</a><p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
-                                <div><a href="#">Users</a><p>{this.state.dashboard.USER_COUNT}</p></div>
-                                <div><a href="#">Programs</a><p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
-                                <div><a href="#">Linked ERP Shipments</a><p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Accessible Programs<p>{this.state.programList.length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Downloaded Programs<p>{this.state.programList.filter(c => c.local).length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/realmCountry/listRealmCountry`)}>Countries<p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/user/listUser`)}>Users<p>{this.state.dashboard.USER_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Programs<p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/shipment/manualTagging`)}>Linked ERP Shipments<p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
                               </div>
                               <div class="scroller-content">
-                                <div><a href="#">Accessible Programs</a><p>{this.state.programList.length}</p></div>
-                                <div><a href="#">Downloaded Programs</a><p>{this.state.programList.filter(c => c.local).length}</p></div>
-                                <div><a href="#">Countries</a><p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
-                                <div><a href="#">Users</a><p>{this.state.dashboard.USER_COUNT}</p></div>
-                                <div><a href="#">Programs</a><p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
-                                <div><a href="#">Linked ERP Shipments</a><p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Accessible Programs<p>{this.state.programList.length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Downloaded Programs<p>{this.state.programList.filter(c => c.local).length}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/realmCountry/listRealmCountry`)}>Countries<p>{this.state.dashboard.REALM_COUNTRY_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/user/listUser`)}>Users<p>{this.state.dashboard.USER_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/program/downloadProgram/`)}>Programs<p>{this.state.dashboard.FULL_PROGRAM_COUNT}</p></div>
+                                <div onClick={() => this.redirectToCrudWindow(`/shipment/manualTagging`)}>Linked ERP Shipments<p>{this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT}</p></div>
                               </div>
                             </div>
                           </div>
@@ -3095,7 +3118,7 @@ class ApplicationDashboard extends Component {
                             />
                             <Label
                               className="form-check-label"
-                              check htmlFor="inline-radio2" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
                               Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
@@ -3200,7 +3223,7 @@ class ApplicationDashboard extends Component {
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-73px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} width={300} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={350} width={350} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>
