@@ -1223,7 +1223,6 @@ class ApplicationDashboard extends Component {
               shipmentStatusList.push(shipmentStatusJson);
             }
           }
-          console.log("Hello",shipmentStatusList)
           this.setState({ shipmentStatusList: shipmentStatusList})
         }
       }.bind(this);
@@ -2465,6 +2464,14 @@ class ApplicationDashboard extends Component {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
       return '?'
     }
+    const mediaQuery = window.matchMedia('(min-width: 1920px)')
+    let shipmentsPieHeight;
+    if (mediaQuery.matches) {
+      shipmentsPieHeight = 265;
+    } else {
+      shipmentsPieHeight = 240;
+    }
+
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -3223,7 +3230,7 @@ class ApplicationDashboard extends Component {
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-73px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={265} width={265} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>
