@@ -485,7 +485,7 @@
   "static.extrapolation.UseFilters": "Use the filters at the top of this screen to select the planning unit and region to extrapolate.",
   "static.ManageTree.BuildTree": "Manage Tree - Build Trees",
   "static.login.loginOnline": "Online",
-  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will need to update one node per every scenario for every tree for tree forecasts to properly extend.",
+  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will be redirected for tree forecast calculations.",
   "static.dataentry.conversionFactorTooltip": "User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor",
   "static.report.problemTransDetails": "Problem Transaction Details",
   "static.supplyPlan.addNewInventory": "Add New Inventory Count",
@@ -3490,5 +3490,6 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.program.treeSync": "Program sync"
 }
