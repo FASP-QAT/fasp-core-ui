@@ -3703,12 +3703,14 @@ label {
   background: #a7c6ed;
   // border: 1px solid #ddd;
   border-radius: 5px;
+  min-width: 170px;
   // box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
 }
 .scroller-content div p {
   margin-bottom: 0rem!important;
   color: #000;
   font-weight: normal;
+  font-size: 12px;
 }
 .DashboardBg1 .fixTableHeadTopDashboard{
   border-top: 1px solid #4d515a!important;
@@ -17900,6 +17902,7 @@ label.arrow_label:before {
   background: #a7c6ed;
   // border: 1px solid #ddd;
   border-radius: 5px;
+  min-width: 170px;
   // box-shadow: 0px 1px 2px 0px rgba(15, 22, 36, 0.06), 0px 1px 3px 0px rgba(15, 22, 36, 0.1) !important;
   
 }
@@ -17914,6 +17917,7 @@ label.arrow_label:before {
   margin-bottom: 0rem!important;
   color: #000;
   font-weight: normal;
+  font-size: 12px;
 
 }
 @keyframes scroll {
@@ -18148,15 +18152,20 @@ label.arrow_label:before {
   opacity: 1.5!important;
  
 }
-@media (max-width: 768px) {
-  .dashboardTable2 .jss_content {
-      height: 238px;
-  }
-}
+// @media (max-width: 768px) {
+//   .dashboardTable2 .jss_content {
+//       height: 238px;
+//   }
+// }
 
-@media (min-width: 769px) {
+// @media (min-width: 769px) {
+//   .dashboardTable2 .jss_content {
+//       // max-height: calc(100vh - 412px); /* Full height for larger screens */
+//       height: 250px;
+//   }
+// }
+@media (min-width: 1025px) and (max-width: 1280px){
   .dashboardTable2 .jss_content {
-      // max-height: calc(100vh - 412px); /* Full height for larger screens */
-      height: 250px;
-  }
+    height: 250px;
+}
 }
