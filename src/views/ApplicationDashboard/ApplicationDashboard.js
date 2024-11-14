@@ -137,6 +137,7 @@ class ApplicationDashboard extends Component {
     this.buildForecastErrorJexcel = this.buildForecastErrorJexcel.bind(this);
     this.buildShipmentsTBDJexcel = this.buildShipmentsTBDJexcel.bind(this);
     this.buildExpiriesJexcel = this.buildExpiriesJexcel.bind(this);
+    this.buildStockedOutJexcel = this.buildStockedOutJexcel.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.getOnlineDashboardBottom = this.getOnlineDashboardBottom.bind(this);
@@ -395,7 +396,7 @@ class ApplicationDashboard extends Component {
                   if(this.state.bottomProgramId==""){
                     jExcelLoadedFunctionForNotes(instance,0);
                   }else{
-                    jExcelLoadedFunctionForNotes(instance,3);
+                    jExcelLoadedFunctionForNotes(instance,4);
                   }
                 }.bind(this),
                 pagination: localStorage.getItem("sesRecordCount"),
@@ -1096,6 +1097,7 @@ class ApplicationDashboard extends Component {
             rangeValue: this.state.rangeValue ? this.state.rangeValue : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
           }, () => {
             if (document.getElementById("shipmentsTBDJexcel")) {
+              this.buildStockedOutJexcel();
               this.buildForecastErrorJexcel();
               this.buildShipmentsTBDJexcel();
               this.buildExpiriesJexcel();
@@ -1443,6 +1445,7 @@ class ApplicationDashboard extends Component {
     }, () => {
       if (key == "dashboardBottomData") {
         if (document.getElementById("shipmentsTBDJexcel")) {
+          this.buildStockedOutJexcel();
           this.buildForecastErrorJexcel();
           this.buildShipmentsTBDJexcel();
           this.buildExpiriesJexcel();
@@ -1544,7 +1547,7 @@ class ApplicationDashboard extends Component {
         }
       ],
       onload: function(instance, cell, x, y, value) { 
-        jExcelLoadedFunctionWithoutPagination(instance);
+        jExcelLoadedFunctionWithoutPagination(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         // tr.children[2].classList.add('InfoTr');
@@ -1621,7 +1624,7 @@ class ApplicationDashboard extends Component {
           width:'70px'
         }
       ],
-      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
       pagination: false,
       search: false,
       columnSorting: true,
@@ -1643,6 +1646,70 @@ class ApplicationDashboard extends Component {
     this.el = shipmentsTBDJexcel;
     this.setState({
       shipmentsTBDJexcel
+    }
+    );
+  }
+
+  buildStockedOutJexcel() {
+    var stockedOutList = this.state.dashboardBottomData.stockStatus.puStockOutList;
+    var dataArray = [];
+    let count = 0;
+    if (stockedOutList.length > 0) {
+      for (var j = 0; j < stockedOutList.length; j++) {
+        data = [];
+        data[0] = stockedOutList[j].planningUnit.label.label_en + " | " + stockedOutList[j].planningUnit.id
+        data[1] = stockedOutList[j].count
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("stockedOutJexcel"), '');
+    jexcel.destroy(document.getElementById("stockedOutJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: "Planning Unit",
+          type: 'text',
+          editable: false,
+          readOnly: true,
+          width:'110px'
+        },
+        {
+          title: "# of Months",
+          type: 'number',
+          editable: false,
+          readOnly: true,
+          mask: "#,##",
+          width:'70px'
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
+      pagination: false,
+      search: false,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var stockedOutJexcel = jexcel(document.getElementById("stockedOutJexcel"), options);
+    this.el = stockedOutJexcel;
+    this.setState({
+      stockedOutJexcel
     }
     );
   }
@@ -1698,7 +1765,7 @@ class ApplicationDashboard extends Component {
           mask: '$#,##',
         }
       ],
-      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 3) },
       pagination: false,
       search: false,
       columnSorting: true,
@@ -2136,8 +2203,8 @@ class ApplicationDashboard extends Component {
           li.style.cursor = 'pointer';
           li.style.display = 'flex';
           li.style.flexDirection = 'row';
-          li.style.marginLeft = '10px';
-          li.style.marginRight = '10px';
+          li.style.marginLeft = '5px';
+          li.style.marginRight = '5px';
           li.style.marginBottom = '5px';
     
           li.onclick = () => {
@@ -2152,8 +2219,9 @@ class ApplicationDashboard extends Component {
           boxSpan.style.display = 'inline-block';
           boxSpan.style.flexShrink = 0;
           boxSpan.style.height = '10px';
-          boxSpan.style.marginRight = '10px';
+          boxSpan.style.marginRight = '5px';
           boxSpan.style.width = '10px';
+          boxSpan.style.borderRadius = '50%';
     
           // Text for the label
           const textContainer = document.createElement('p');
@@ -3080,20 +3148,11 @@ class ApplicationDashboard extends Component {
                         <div class="card-body pt-lg-1 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
                         </div>
-                        <div class="card-header  justify-content-between">
-                          <div class="card-title"> Stocked out Planning Units ({this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}) </div>
+                        <div class="label-text text-center text-mutedDashboard">
+                          <h7><b>Stocked out Planning Units: {this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}</b></h7>
                         </div>
-                        <div class="card-body pt-1 pb-0 StockplanningBoxD">
-                          <ul class="list-unstyled mb-0 pt-0 crm-deals-status">
-                            {this.state.dashboardBottomData && this.state.dashboardBottomData.stockStatus.puStockOutList.map(x => {
-                              return (<li class="success">
-                                <div class="d-flex align-items-center justify-content-between">
-                                  <div className='text-mutedDashboard'>{x.planningUnit.label.label_en} | {x.planningUnit.id} </div>
-                                  <div class="fs-12 text-mutedDashboard">{x.count}​</div>
-                                </div>
-                              </li>)
-                            })}
-                          </ul>
+                        <div className='row'>
+                          <div id="stockedOutJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px' }}></div>
                         </div>
                       </div>
                     </div>
@@ -3159,17 +3218,6 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    {/* <div className="col-md-3">
-                      <div className="card custom-card CustomHeight">
-                        <div class="card-header  justify-content-between">
-                          <div class="card-title"># of Shipments with funding TBD </div>
-                        </div>
-                        <div class="card-body px-0 py-0" style={{ overflow: 'hidden' }}>
-                          <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2'>
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
                   </div>
                   <div className='row px-3 pt-lg-2'>
                     <div className='col-md-6'>
@@ -3212,9 +3260,6 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                           </div>
-                          {/* <div className='row pt-lg-2'>
-                            
-                          </div> */}
                         </div>
                       </div>
                     </div>
