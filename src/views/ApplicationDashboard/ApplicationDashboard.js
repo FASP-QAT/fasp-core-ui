@@ -1133,6 +1133,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
+    console.log("Test@123 resolution width: ",window.innerWidth," height:",window.innerHeight)
     var db1;
     let tempProgramList = [];
     let shipmentStatusList = [];
