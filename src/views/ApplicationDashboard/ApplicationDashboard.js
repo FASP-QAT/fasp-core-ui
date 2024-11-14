@@ -3223,7 +3223,7 @@ class ApplicationDashboard extends Component {
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-73px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={350} width={350} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={300} width={300} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>
