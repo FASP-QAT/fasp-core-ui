@@ -3687,18 +3687,14 @@ label {
   border-radius: 8px;
   background: #373c46;
 }
-.scroller-content div a {
-  color: #002F6C;
-  // background: #a7c6ed;
-  padding: 2px 14px;
-  // border-radius: 5px 5px 0px 0px;
-}
 .scroller-content div {
   font-size: 14px;
   line-height: 20px;
   color: #e4e5e6;
   font-weight: 700;
-  padding: 0px;
+  color: #002F6C;
+  cursor: pointer;
+  padding: 2px 14px;
   margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
@@ -17898,11 +17894,10 @@ label.arrow_label:before {
 .scroller-content div {
   font-size: 14px;
   line-height: 20px;
-  color: #000;
   font-weight: 700;
-  // color: #e4e5e6;
-  padding: 0px;
-  margin: 0px 9px;
+  color: #002F6C;
+  cursor: pointer;
+  padding: 2px 14px;  margin: 0px 9px;
   text-align: center;
   white-space: nowrap;
   background: #a7c6ed;
@@ -17913,12 +17908,6 @@ label.arrow_label:before {
   
 }
 
-.scroller-content div a {
-  color: #002F6C;
-  // background: #a7c6ed;
-  padding: 2px 14px;
-  // border-radius: 5px 5px 0px 0px;
-}
 .scroller-content div p {
   margin-bottom: 0rem!important;
   color: #000;
