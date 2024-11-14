@@ -3525,5 +3525,5 @@
   "static.dashboard.actualInventoryTooltip": "Counts the number of PUs that have missing recent actual inventory data (within the last 3 months)",
   "static.dashboard.actualConsumptionTooltip": "Counts the number of PUs that either have missing recent actual consumption data (within the last 3 months), or a gap in actual consumption data (within the last 6 months)",
   "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times",
-  "static.program.treeSync": "Program sync"
+  "static.program.treeSync": "Tree sync"
 }
