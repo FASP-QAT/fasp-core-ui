@@ -65,7 +65,8 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                         "commitDate": programJson.currentVersion.createdDate,
                                         "versionType": programJson.currentVersion.versionType,
                                         "versionStatus": programJson.currentVersion.versionStatus,
-                                        "latestFinalVersion":p[0].versionList.filter(c=>c.versionType.id==FINAL_VERSION_TYPE).slice(-1)[0]
+                                        "latestFinalVersion":p[0].versionList.filter(c=>c.versionType.id==FINAL_VERSION_TYPE).slice(-1)[0],
+                                        isLatest:p[0].currentVersion.versionId>item.version?false:true
                                     }
                                     dashboradTopList.push(dashboradTop);
                                 }
