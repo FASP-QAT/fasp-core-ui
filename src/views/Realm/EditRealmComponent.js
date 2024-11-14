@@ -91,22 +91,22 @@ const validationSchema = function (values) {
             .min(0, i18n.t('static.program.validvaluetext')),
         noOfMonthsInFutureForTopDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForTopDashboard')),
         noOfMonthsInPastForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForBottomDashboard')),
         noOfMonthsInPastForTopDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForTopDashboard')),
         noOfMonthsInFutureForBottomDashboard: Yup.number()
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
-            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
             .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard'))
     })
