@@ -11042,7 +11042,7 @@ export default class BuildTree extends Component {
                                                                         year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                                     }}
                                                                     lang={pickerLang.months}
-                                                                    onChange={this.handleAMonthChange1}
+                                                                    onChange={this.handleAMonthChange}
                                                                     onDismiss={this.handleAMonthDissmis1}
                                                                 >
                                                                     <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}
