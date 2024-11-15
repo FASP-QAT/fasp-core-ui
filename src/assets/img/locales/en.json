@@ -3517,7 +3517,7 @@
   "static.realm.noOfMonthsInFutureForBottomDashboard": "No of months in future for bottom dashboard",
   "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
   "static.dashboard.stockStatusHeaderTooltip": "The Stock Status % is calculated based on the number of months available in the report period across all planning units. These months are used as the denominator when determining the percentage.",
-  "static.dashboard.forecastErrorHeaderTooltip": "",
+  "static.dashboard.forecastErrorHeaderTooltip": "The forecast error is calculated as the average percentage error over the selected report period. If the percentage is displayed in red, it indicates that the calculated forecast error is above the forecast error threshold (user entered in Update Planning Units screen).",
   "static.dashboard.dataQualityHeaderTooltip": "This data does not use the Report Period for calculation; instead it uses the problems flagged in the QAT Problem List for this selected program.",
   "static.dashboard.shipmentsHeaderTooltip": "Based on chose report period for selected program",
   "static.dashboard.expiriesHeaderTooltip": "Total Cost = expired quantity * planning unit cost",

@@ -1689,7 +1689,7 @@ class ApplicationDashboard extends Component {
             cell.classList.add("shipmentEntryEmergency");
             if(rowData[2]) {
               var divInsideCell = cell.querySelector("div");
-              divInsideCell.title = "Above threshold";
+              divInsideCell.title = "Calculated Forecast Error is above the Forecast Error Threshold";
             }
           }
         }
