@@ -4277,7 +4277,6 @@ export default class syncPage extends Component {
           delete generalData.supplyPlan;
           delete generalData.planningUnitList;
           generalData.actionList = [];
-          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var planningUnitDataList = [];
           for (var pu = 0; pu < planningUnitList.length; pu++) {
             var planningUnitDataJson = {
@@ -4287,9 +4286,13 @@ export default class syncPage extends Component {
               batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
               supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
             }
+            if(generalData.dashboardData.topPuData[planningUnitList[pu].id]!=undefined){
+              generalData.dashboardData.topPuData[planningUnitList[pu].id].linkedShipmentsCount=planningUnitDataJson.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length;
+            }
             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
           }
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var programDataJson = {
             generalData: generalEncryptedData,
             planningUnitDataList: planningUnitDataList
