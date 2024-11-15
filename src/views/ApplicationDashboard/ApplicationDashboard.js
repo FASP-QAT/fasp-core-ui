@@ -2021,7 +2021,7 @@ class ApplicationDashboard extends Component {
       actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
       shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
       shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
-      expiryTotal = this.state.dashboardBottomData.expiryTotal;
+      expiryTotal = Math.ceil(this.state.dashboardBottomData.expiryTotal);
       shipmentTotal = this.state.dashboardBottomData.shipmentTotal;
       if (this.state.displayBy == 1 || this.state.displayBy == 2) {
         shipmentDetailsList = Object.values(
