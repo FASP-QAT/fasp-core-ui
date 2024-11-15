@@ -2908,7 +2908,7 @@ class ApplicationDashboard extends Component {
                             />
                             <Label
                               className="form-check-label"
-                              check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
                               Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
@@ -2930,8 +2930,55 @@ class ApplicationDashboard extends Component {
                           <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
                       </div>
-                      <div className='col-6 tickerbox'>
-                        <FormGroup>
+                      <div className='col-7 tickerbox'>
+                        <div className='row'>
+                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                <Card className="CardHeight">
+                  <CardBody className="p-0">
+                    <div class="h1 text-muted text-left mb-0 m-3">
+                    <h5 class="card-title IconColorD">Realm</h5>
+                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
+                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                        {slides}
+                      </Carousel>
+                      <div className="chart-wrapper " >
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+              <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                <Card className=" CardHeight">
+                  <CardBody className="p-0">
+                    <div class="h1 text-muted text-left mb-0 m-3">
+                    <h5 class="card-title IconColorD">User</h5>
+                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
+                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                        {slides}
+                      </Carousel>
+                      <div className="chart-wrapper " >
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+              <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                <Card className=" CardHeight">
+                  <CardBody className="p-0">
+                    <div class="h1 text-muted text-left mb-0 m-3">
+                    <h5 class="card-title IconColorD">ERP Linking</h5>
+                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
+                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
+                        {slides}
+                      </Carousel>
+                      <div className="chart-wrapper " >
+                      </div>
+                    </div>
+                  </CardBody>
+                </Card>
+              </Col>
+                        </div>
+                        {/* <FormGroup>
                           <div class="myMarquee">
                             <div class="scroller">
                               <div class="scroller-content">
@@ -2961,7 +3008,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                           </div>
-                        </FormGroup>
+                        </FormGroup> */}
                       </div>
                     </div>                 
 
@@ -2982,9 +3029,9 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer" }} title="Download" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: "danger", cursor: "pointer" }} title="Upload" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: "danger", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
@@ -3149,7 +3196,7 @@ class ApplicationDashboard extends Component {
                       />
                     </FormGroup>
                     </div>
-                    <div class='col-2'>
+                    <div class='col-3'>
                     <FormGroup className='FormGroupD'>
                       <Label htmlFor="organisationTypeId">Report Period <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reportPeriodTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">

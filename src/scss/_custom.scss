@@ -17449,12 +17449,6 @@ label.arrow_label:before {
 
 @media screen and (min-width: 1920px) {
   .CustomHeight {
-    // height: 412px;
-    // max-height: calc(100vh - 0px) !important;
-    // height: auto;
-    // max-height: 100% !important;
-    // min-height: 46vh !important;
-    // max-height: 46vh;
     height: 327px; /* Set the desired fixed height */
     display: flex;
     flex-direction: column;
@@ -17919,7 +17913,7 @@ label.arrow_label:before {
 }
 
 .MarginTopCheckBox{
-  margin-top: -3px;
+  margin-top: -1px;
 }
 .selectBlack{
   color: #000000 !important;
@@ -17931,7 +17925,7 @@ label.arrow_label:before {
   width: 297px!important;
 }
 .tickerbox{
-  margin-top: 10px;
+  margin-top: 4px;
 }
 .MarginBtmformgroup .Select-control{
   background-color: #fff!important;
@@ -18042,4 +18036,29 @@ label.arrow_label:before {
 }
 .DashboardreadonlyBg .jss>thead>tr>td{
   top:-2px!important;
+}
+.Dashboardticker .CardHeight{
+  height: 110px;
+}
+.Dashboardticker .CardHeight .card-body .card-title{
+margin-top: -8px!important;
+margin-bottom: 3px!important;
+font-weight: bold;
+}
+.Dashboardticker .carousel-caption {
+  position: absolute;
+  right: 0% !important;
+  bottom: 16px;
+  left: 0% !important;
+  z-index: 0 !important;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+  text-align: left;
+}
+.Dashboardticker .carousel-indicators {
+  position: absolute;
+  right: 0;
+  bottom: 15px !important;
+  z-index: 1 !important;
 }
