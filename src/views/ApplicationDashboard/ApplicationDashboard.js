@@ -2011,17 +2011,17 @@ class ApplicationDashboard extends Component {
 
     var slidesRealmContent = [{
       "name": "Countries",
-      "count": this.state.dashboard.REALM_COUNTRY_COUNT,
+      "count": formatter(this.state.dashboard.REALM_COUNTRY_COUNT),
       "url": "/realmCountry/listRealmCountry",
     },
     {
       "name": "Users",
-      "count": this.state.dashboard.USER_COUNT,
+      "count": formatter(this.state.dashboard.USER_COUNT),
       "url": "/user/listUser",
     },
     {
       "name":"Programs",
-      "count": this.state.dashboard.FULL_PROGRAM_COUNT,
+      "count": formatter(this.state.dashboard.FULL_PROGRAM_COUNT),
       "url":"/program/downloadProgram/",
     }]
     const slidesRealm = slidesRealmContent.map((item) => {
@@ -2045,12 +2045,12 @@ class ApplicationDashboard extends Component {
 
     var slidesUserContent = [{
       "name": "Accessible Programs",
-      "count": this.state.programList.length,
+      "count": formatter(this.state.programList.length),
       "url": "/program/downloadProgram/",
     },
     {
       "name": "Downloaded Programs",
-      "count": this.state.programList.filter(c => c.local).length,
+      "count": formatter(this.state.programList.filter(c => c.local).length),
       "url": "/program/downloadProgram/",
     }]
     const slidesUser = slidesUserContent.map((item) => {
@@ -2074,12 +2074,12 @@ class ApplicationDashboard extends Component {
 
     var slidesErpContent = [{
       "name": "Linked ERP Shipments",
-      "count": this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT,
+      "count": formatter(this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT),
       "url": "/shipment/manualTagging",
     },
     {
       "name": "Linked ERP Shipments for Downloaded Programs",
-      "count": this.state.dashboardTopList.linkedShipmentsCount,
+      "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a,b) => a+b,0)),
       "url": "/shipment/manualTagging",
     }]
     const slidesErp = slidesErpContent.map((item) => {
@@ -3236,7 +3236,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
