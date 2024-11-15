@@ -55,7 +55,7 @@ class LoadDeleteDataSet extends Component {
             programList: []
         };
         this.getPrograms = this.getPrograms.bind(this);
-        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        // this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
         this.programCheckboxChecked = this.programCheckboxChecked.bind(this);
@@ -164,20 +164,20 @@ class LoadDeleteDataSet extends Component {
                 }
             );
     }
-    /**
-     * Checks for newer versions of programs.
-     * @param {Array} programs - An array of programs to check for newer versions.
-     */
-    checkNewerVersions(programs) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-            AuthenticationService.setupAxiosInterceptors()
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestDataset");
-                    localStorage.setItem("sesLatestDataset", response.data);
-                })
-        }
-    }
+    // /**
+    //  * Checks for newer versions of programs.
+    //  * @param {Array} programs - An array of programs to check for newer versions.
+    //  */
+    // checkNewerVersions(programs) {
+    //     if (localStorage.getItem("sessionType") === 'Online') {
+    //         AuthenticationService.setupAxiosInterceptors()
+    //         ProgramService.checkNewerVersions(programs)
+    //             .then(response => {
+    //                 localStorage.removeItem("sesLatestDataset");
+    //                 localStorage.setItem("sesLatestDataset", response.data);
+    //             })
+    //     }
+    // }
     /**
      * Calls getLocalPrograms and getPrograms function and load the realm list on component mount
      */
@@ -481,7 +481,7 @@ class LoadDeleteDataSet extends Component {
                         proList.push(programJson)
                     }
                 }
-                this.checkNewerVersions(proList);
+                // this.checkNewerVersions(proList);
             }.bind(this);
         }.bind(this)
     }

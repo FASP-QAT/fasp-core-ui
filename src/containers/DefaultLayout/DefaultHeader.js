@@ -105,14 +105,14 @@ class DefaultHeader extends Component {
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {localStorage.getItem("sesLatestDataset") == "true" &&
+              {localStorage.getItem("sesLatestDataset") && localStorage.getItem("sesLatestDataset") > 0 &&
                   <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
-                {localStorage.getItem("sesLatestDataset") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
+                {localStorage.getItem("sesLatestDataset") && localStorage.getItem("sesLatestDataset") == 0 && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgramFC} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }
-          {checkOnline === 'Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{0}</span>}
+          {checkOnline === 'Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestDataset") ? localStorage.getItem("sesLatestDataset") : 0}</span>}
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
