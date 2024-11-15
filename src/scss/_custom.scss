@@ -17411,12 +17411,12 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  height: 214px;
+  height: 244px;
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
 }
 .dashboardTable2E .jss_content {
-  height: 153px;
+  height: 133px;
   max-height: calc(100vh - 100%) !important;
     overflow: auto;
 }
@@ -17432,16 +17432,8 @@ label.arrow_label:before {
     overflow: auto;
 }
 .CustomHeight {
-  // height: 375px;
-  // max-height: calc(100vh - 0px) !important;
-  // height: auto;
-  // max-height: 100% !important;
-  // min-height: 310px;
-  // max-height: 310px;
-  // min-height: 20vh !important;
-  // max-height: 20vh;
-  height: 313px;
-  // height: 400px; /* Set the desired fixed height */
+  height: 282px;
+  // height: 313px;
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17461,7 +17453,7 @@ label.arrow_label:before {
   }
   .dashboardTable2E .jss_content {
     max-height: calc(100vh - 100%) !important;
-    height:168px;
+    height:132px;
     overflow: auto;
 }
 .dashboardTable2Ss .jss_content {
@@ -17751,7 +17743,7 @@ label.arrow_label:before {
   overflow-x:hidden;
 }
 .boxHeightBottom{
-  height: 220px!important;
+  height: 184px!important;
 }
 
 .jss>tbody>tr>td.cmpAndSelectTbl {
@@ -17910,6 +17902,26 @@ label.arrow_label:before {
 .MarginTopCheckBox{
   margin-top:-1px!important;
 }
+.Dashboardticker .CardHeight {
+  height: 97px!important;
+}
+.Dashboardticker .carousel-caption {
+  position: absolute;
+  right: 0% !important;
+  bottom: 29px!important;
+  left: 0% !important;
+  z-index: 0 !important;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+  text-align: left;
+}
+.Dashboardticker .carousel-indicators {
+  position: absolute;
+  right: 0;
+  bottom: 29px!important;
+  z-index: 1 !important;
+}
 }
 
 .MarginTopCheckBox{
@@ -18059,6 +18071,25 @@ font-weight: bold;
 .Dashboardticker .carousel-indicators {
   position: absolute;
   right: 0;
-  bottom: 15px !important;
+  bottom: 15px;
   z-index: 1 !important;
+}
+.pie-wrapper{
+  margin-top: -17px;
+}
+@media screen 
+  and (min-device-width: 1200px) 
+  and (max-device-width: 1600px) 
+  and (-webkit-min-device-pixel-ratio: 1) { 
+    .Dashboardticker .carousel-caption {
+      position: absolute;
+      right: 0% !important;
+      bottom: 32px;
+      left: 0% !important;
+      z-index: 0 !important;
+      padding-top: 20px;
+      padding-bottom: 20px;
+      color: #fff;
+      text-align: left;
+  }
 }

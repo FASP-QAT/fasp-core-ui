@@ -2902,7 +2902,7 @@ class ApplicationDashboard extends Component {
                         />
                       </FormGroup> */}
                     <div class="row pt-lg-2">
-                      <div class="col-5" style={{display:'flex',gap:'40px'}}>
+                      <div class="col-5 pt-lg-3" style={{display:'flex',gap:'40px'}}>
                         <FormGroup className='FormGroupD col-10 px-0'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
                           <FormGroup className='MarginTopCheckBox'>
@@ -3186,7 +3186,7 @@ class ApplicationDashboard extends Component {
                             />
                             <Label
                               className="form-check-label"
-                              check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
+                              check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
                               Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
@@ -3287,10 +3287,10 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'200px',overflowY:'scroll',overflowX:'hidden'}}>
+                              <div className='row' style={{height:'219px',overflowY:'scroll',overflowX:'scroll'}}>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-73px"}}>
+                                  <Col style={{marginTop:"-59px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
