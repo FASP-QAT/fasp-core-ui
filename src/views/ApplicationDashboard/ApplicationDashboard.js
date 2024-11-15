@@ -2079,7 +2079,7 @@ class ApplicationDashboard extends Component {
     },
     {
       "name": "Linked ERP Shipments for Downloaded Programs",
-      "count": this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT,
+      "count": this.state.dashboardTopList.linkedShipmentsCount,
       "url": "/shipment/manualTagging",
     }]
     const slidesErp = slidesErpContent.map((item) => {
