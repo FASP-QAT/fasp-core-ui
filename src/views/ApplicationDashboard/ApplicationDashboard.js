@@ -1023,7 +1023,11 @@ class ApplicationDashboard extends Component {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
           localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
           this.setState({
-            dashboardTopList: response.data,
+            dashboardTopList: (response.data).sort((a, b) => {
+              var itemLabelA = a.program.code.toUpperCase();
+              var itemLabelB = b.program.code.toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+          }),
             topSubmitLoader: false
           })
         }).catch(e => {
