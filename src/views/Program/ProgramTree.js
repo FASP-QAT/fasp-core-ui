@@ -20,7 +20,7 @@ import {
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { decompressJson, hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
+import { API_URL, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
 import RealmCountryService from "../../api/RealmCountryService";
 import RealmService from '../../api/RealmService';
