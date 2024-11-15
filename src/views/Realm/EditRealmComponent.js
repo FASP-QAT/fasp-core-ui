@@ -145,7 +145,11 @@ export default class UpdateDataSourceComponent extends Component {
                 noOfMonthsInFutureForBottomDashboard: '',
             },
             lang: localStorage.getItem('lang'),
-            message: ''
+            message: '',
+            originalNoOfMonthsInFutureForTopDashboard: '',
+            originalNoOfMonthsInPastForBottomDashboard: '',
+            originalNoOfMonthsInPastForTopDashboard: '',
+            originalNoOfMonthsInFutureForBottomDashboard: '',
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -227,7 +231,11 @@ export default class UpdateDataSourceComponent extends Component {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
                 this.setState({
-                    realm: response.data, loading: false
+                    realm: response.data, loading: false,
+                    originalNoOfMonthsInFutureForTopDashboard: response.data.noOfMonthsInFutureForTopDashboard,
+                    originalNoOfMonthsInPastForBottomDashboard: response.data.noOfMonthsInPastForBottomDashboard,
+                    originalNoOfMonthsInPastForTopDashboard: response.data.noOfMonthsInPastForTopDashboard,
+                    originalNoOfMonthsInFutureForBottomDashboard: response.data.noOfMonthsInFutureForBottomDashboard
                 });
             }
             else {
@@ -328,6 +336,9 @@ export default class UpdateDataSourceComponent extends Component {
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
+                                    if(this.state.originalNoOfMonthsInFutureForBottomDashboard!=this.state.realm.noOfMonthsInFutureForBottomDashboard || this.state.originalNoOfMonthsInPastForBottomDashboard!=this.state.realm.noOfMonthsInPastForBottomDashboard || this.state.originalNoOfMonthsInFutureForTopDashboard!=this.state.realm.noOfMonthsInFutureForTopDashboard || this.state.originalNoOfMonthsInPastForTopDashboard!=this.state.realm.noOfMonthsInPastForTopDashboard){
+                                        alert(i18n.t('static.realm.settingChangeWarning'));
+                                    }
                                     this.setState({
                                         loading: true
                                     })

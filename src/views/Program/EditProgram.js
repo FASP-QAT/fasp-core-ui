@@ -230,7 +230,9 @@ export default class EditProgram extends Component {
             loading: true,
             healthAreaCode: '',
             organisationCode: '',
-            realmCountryCode: ''
+            realmCountryCode: '',
+            originalNoOfMonthsInPastForBottomDashboard:'',
+            originalNoOfMonthsInFutureForBottomDashboard:'',
         }
         this.dataChange = this.dataChange.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -281,7 +283,9 @@ export default class EditProgram extends Component {
                 uniqueCode: uniqueCode,
                 healthAreaCode: healthAreaCode,
                 organisationCode: organisationCode,
-                realmCountryCode: realmCountryCode
+                realmCountryCode: realmCountryCode,
+                originalNoOfMonthsInPastForBottomDashboard:proObj.noOfMonthsInPastForBottomDashboard,
+                originalNoOfMonthsInFutureForBottomDashboard:proObj.noOfMonthsInFutureForBottomDashboard
             })
             ProgramService.getProgramManagerListByProgramId(this.props.match.params.programId)
                 .then(response => {
@@ -871,6 +875,9 @@ export default class EditProgram extends Component {
                                         loading: true
                                     })
                                     let pro = this.state.program;
+                                    if(this.state.originalNoOfMonthsInFutureForBottomDashboard!=pro.noOfMonthsInFutureForBottomDashboard || this.state.originalNoOfMonthsInPastForBottomDashboard!=pro.noOfMonthsInPastForBottomDashboard){
+                                        alert(i18n.t('static.realm.settingChangeWarning'));
+                                    }
                                     pro.programCode = this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "");
                                     ProgramService.editProgram(pro).then(response => {
                                         if (response.status == 200) {
