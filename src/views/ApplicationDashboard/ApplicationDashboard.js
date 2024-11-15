@@ -324,7 +324,10 @@ class ApplicationDashboard extends Component {
    * @param {string} url - The URL to redirect to.
    */
    redirectToCrudWindow = (url, isMultiSelect, programId) => {
-    if(isMultiSelect) {
+    if(isMultiSelect == 2) {
+      localStorage.setItem("sesProgramId", programId)
+    }
+    else if(isMultiSelect) {
       localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
     } else {
       let pId, vId;
@@ -3233,7 +3236,7 @@ class ApplicationDashboard extends Component {
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/")}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
