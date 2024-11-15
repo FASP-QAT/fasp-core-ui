@@ -1677,8 +1677,6 @@ class ApplicationDashboard extends Component {
         jExcelLoadedFunctionWithoutPagination(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
-        // tr.children[2].classList.add('InfoTr');
-        // tr.children[2].title = "Hello";
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
         for (var j = 0; j < json.length; j++) {
@@ -1686,6 +1684,10 @@ class ApplicationDashboard extends Component {
           if (rowData[2] || rowData[1].includes("exclamation")) {
             var cell = elInstance.getCell('B'.concat(parseInt(j) + 1));
             cell.classList.add("shipmentEntryEmergency");
+            if(rowData[2]) {
+              var divInsideCell = cell.querySelector("div");
+              divInsideCell.title = "Above threshold";
+            }
           }
         }
       },
@@ -3480,7 +3482,7 @@ class ApplicationDashboard extends Component {
                               <div className='row' style={{height:'200px',overflowY:'scroll',overflowX:'hidden'}}>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-73px"}}>
+                                  <Col style={{marginTop:"-60px"}}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
@@ -3504,7 +3506,7 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/problemList/1/'+this.state.bottomProgramId+"/false")} style={{ cursor: 'pointer' }}> Data Quality <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/'+this.state.bottomProgramId+"/false")}> Data Quality </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
