@@ -24,63 +24,71 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                     var pdRequest = pdObjectStore.getAll();
                     pdRequest.onsuccess = function (event) {
                         var pdList = pdRequest.result;
-                        var dashboradTopList = [];
-                        try {
-                            pdList.map(item => {
-                                var ppu = ppuList.filter(c => c.program.id == item.programId);
-                                var p=pList.filter(c=>c.programId==item.programId);
-                                var programDataBytes = CryptoJS.AES.decrypt(item.programData.generalData, SECRET_KEY);
-                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                var programJson = JSON.parse(programData);
-                                var generalProgramJson = programJson;
-                                var dashboardData = generalProgramJson.dashboardData;
-                                console.log("dashboardData Test@123",dashboardData)
-                                if (dashboardData != undefined) {
-                                    var topPuData = dashboardData.topPuData;
-                                    var stockedOutCount = 0;
-                                    var valueOfExpiredPU = 0;
-                                    if (topPuData != "" && topPuData != undefined) {
-                                        var puIds = ppu.filter(c => c.active.toString() == "true")
-                                        puIds.map(pu => {
-                                            var item = topPuData[pu.planningUnit.id];
-                                            if (item.stockOut.toString() == "true") {
-                                                stockedOutCount += 1;
-                                            }
-                                            valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
-                                        })
+                        var pqdTransaction = db1.transaction(['programQPLDetails'], 'readwrite');
+                        var pqdObjectStore = pqdTransaction.objectStore('programQPLDetails');
+                        var pqdRequest = pqdObjectStore.getAll();
+                        pqdRequest.onsuccess = function (event) {
+                            var pqdList = pqdRequest.result;
+                            var dashboradTopList = [];
+                            try {
+                                pdList.map(item => {
+                                    var pqd = pqdList.filter(c => c.id == item.id);
+                                    var ppu = ppuList.filter(c => c.program.id == item.programId);
+                                    var p = pList.filter(c => c.programId == item.programId);
+                                    var programDataBytes = CryptoJS.AES.decrypt(item.programData.generalData, SECRET_KEY);
+                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                    var programJson = JSON.parse(programData);
+                                    var generalProgramJson = programJson;
+                                    var dashboardData = generalProgramJson.dashboardData;
+                                    console.log("dashboardData Test@123", dashboardData)
+                                    if (dashboardData != undefined) {
+                                        var topPuData = dashboardData.topPuData;
+                                        var stockedOutCount = 0;
+                                        var valueOfExpiredPU = 0;
+                                        if (topPuData != "" && topPuData != undefined) {
+                                            var puIds = ppu.filter(c => c.active.toString() == "true")
+                                            puIds.map(pu => {
+                                                var item = topPuData[pu.planningUnit.id];
+                                                if (item.stockOut.toString() == "true") {
+                                                    stockedOutCount += 1;
+                                                }
+                                                valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
+                                            })
+                                        }
+                                        var dashboradTop = {
+                                            "program": {
+                                                "id": item.id,
+                                                "label": programJson.label,
+                                                "code": programJson.programCode,
+                                                "version": item.version
+                                            },
+                                            "activePlanningUnits": ppu.filter(c => c.active).length,
+                                            "disabledPlanningUnits": ppu.filter(c => c.active == false).length,
+                                            "countOfStockOutPU": stockedOutCount,
+                                            "valueOfExpiredPU": valueOfExpiredPU,
+                                            "countOfOpenProblem": programJson.problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length,
+                                            "lastModifiedDate": moment(programJson.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss"),
+                                            "commitDate": programJson.currentVersion.createdDate,
+                                            "versionType": programJson.currentVersion.versionType,
+                                            "versionStatus": programJson.currentVersion.versionStatus,
+                                            "latestFinalVersion": p[0].versionList.filter(c => c.versionType.id == FINAL_VERSION_TYPE).slice(-1)[0],
+                                            "isLatest": p[0].currentVersion.versionId > item.version ? false : true,
+                                            "isChanged": pqd[0].programModified
+                                        }
+                                        dashboradTopList.push(dashboradTop);
                                     }
-                                    var dashboradTop = {
-                                        "program": {
-                                            "id": item.id,
-                                            "label": programJson.label,
-                                            "code": programJson.programCode,
-                                            "version": item.version
-                                        },
-                                        "activePlanningUnits": ppu.filter(c => c.active).length,
-                                        "disabledPlanningUnits": ppu.filter(c => c.active == false).length,
-                                        "countOfStockOutPU": stockedOutCount,
-                                        "valueOfExpiredPU": valueOfExpiredPU,
-                                        "countOfOpenProblem": programJson.problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length,
-                                        "lastModifiedDate": moment(programJson.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss"),
-                                        "commitDate": programJson.currentVersion.createdDate,
-                                        "versionType": programJson.currentVersion.versionType,
-                                        "versionStatus": programJson.currentVersion.versionStatus,
-                                        "latestFinalVersion":p[0].versionList.filter(c=>c.versionType.id==FINAL_VERSION_TYPE).slice(-1)[0]
-                                    }
-                                    dashboradTopList.push(dashboradTop);
-                                }
-                            })
-                            dashboradTopList.sort((a, b) => {
-                                var itemLabelA = a.program.code.toUpperCase();
-                                var itemLabelB = b.program.code.toUpperCase();
-                                return itemLabelA > itemLabelB ? 1 : -1;
-                            });
-                            console.log("dashboradTopList Test@123", dashboradTopList)
-                            props.updateStateDashboard("dashboardTopList", dashboradTopList);
-                        } catch (err) {
-                            console.log("Error Test@123", err)
-                        }
-
+                                })
+                                dashboradTopList.sort((a, b) => {
+                                    var itemLabelA = a.program.code.toUpperCase();
+                                    var itemLabelB = b.program.code.toUpperCase();
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                });
+                                console.log("dashboradTopList Test@123", dashboradTopList)
+                                props.updateStateDashboard("dashboardTopList", dashboradTopList);
+                            } catch (err) {
+                                console.log("Error Test@123", err)
+                            }
+                        }.bind(this)
                     }.bind(this)
                 }.bind(this)
             }.bind(this)

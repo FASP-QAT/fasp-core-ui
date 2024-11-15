@@ -485,7 +485,7 @@
   "static.extrapolation.UseFilters": "Use the filters at the top of this screen to select the planning unit and region to extrapolate.",
   "static.ManageTree.BuildTree": "Manage Tree - Build Trees",
   "static.login.loginOnline": "Online",
-  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will need to update one node per every scenario for every tree for tree forecasts to properly extend.",
+  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will be redirected for tree forecast calculations.",
   "static.dataentry.conversionFactorTooltip": "User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor",
   "static.report.problemTransDetails": "Problem Transaction Details",
   "static.supplyPlan.addNewInventory": "Add New Inventory Count",
@@ -3524,5 +3524,6 @@
   "static.dashboard.forecastedConsumptionTooltip": "Counts the number of PUs that have at least one month of missing forecasted consumption data in the next 18 months",
   "static.dashboard.actualInventoryTooltip": "Counts the number of PUs that have missing recent actual inventory data (within the last 3 months)",
   "static.dashboard.actualConsumptionTooltip": "Counts the number of PUs that either have missing recent actual consumption data (within the last 3 months), or a gap in actual consumption data (within the last 6 months)",
-  "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times"
+  "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times",
+  "static.program.treeSync": "Tree sync"
 }

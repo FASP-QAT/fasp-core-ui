@@ -534,11 +534,12 @@ class ApplicationDashboard extends Component {
    */
   checkNewerVersions(programs) {
     if (localStorage.getItem('sessionType') === 'Online') {
-      ProgramService.checkNewerVersions(programs)
-        .then(response => {
-          localStorage.removeItem("sesLatestProgram");
-          localStorage.setItem("sesLatestProgram", response.data);
-        })
+      localStorage.setItem("sesLatestProgram", this.state.dashboardTopList.filter(x => !x.isLatest).length);
+      // ProgramService.checkNewerVersions(programs)
+      //   .then(response => {
+      //     localStorage.removeItem("sesLatestProgram");
+      //     localStorage.setItem("sesLatestProgram", response.data);
+      //   })
     }
   }
   /**
@@ -1133,6 +1134,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
+    console.log("Test@123 resolution width: ",window.innerWidth," height:",window.innerHeight)
     var db1;
     let tempProgramList = [];
     let shipmentStatusList = [];
@@ -1223,7 +1225,6 @@ class ApplicationDashboard extends Component {
               shipmentStatusList.push(shipmentStatusJson);
             }
           }
-          console.log("Hello",shipmentStatusList)
           this.setState({ shipmentStatusList: shipmentStatusList})
         }
       }.bind(this);
@@ -2465,6 +2466,14 @@ class ApplicationDashboard extends Component {
       if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
       return '?'
     }
+    const mediaQuery = window.matchMedia('(min-width: 1920px)')
+    let shipmentsPieHeight;
+    if (mediaQuery.matches) {
+      shipmentsPieHeight = 265;
+    } else {
+      shipmentsPieHeight = 240;
+    }
+
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -2959,7 +2968,7 @@ class ApplicationDashboard extends Component {
                     {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
                       <Table className="table-striped table-bordered text-center">
                         <thead>
-                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Delete <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
+                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                           <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                           <th scope="col" width="125px">Active Planning Units</th>
                           <th scope="col">Planning Units With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -2973,7 +2982,9 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer" }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer" }} title="Download" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: "danger", cursor: "pointer" }} title="Upload" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
@@ -3223,7 +3234,7 @@ class ApplicationDashboard extends Component {
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-73px"}}>
-                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={265} width={265} plugins={[htmlLegendPlugin]} />
+                                    <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>

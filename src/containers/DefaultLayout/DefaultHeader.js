@@ -79,13 +79,14 @@ class DefaultHeader extends Component {
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
-                {localStorage.getItem("sesLatestProgram") == "true" &&
+                {localStorage.getItem("sesLatestProgram") && localStorage.getItem("sesLatestProgram") > 0 &&
                   <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#BA0C2F', lineHeight: '57px' }} ></i>
                 }
-                {localStorage.getItem("sesLatestProgram") == "false" && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
+                {localStorage.getItem("sesLatestProgram") && localStorage.getItem("sesLatestProgram") == 0 && <i class="nav-icon cui-cloud-download icons" onClick={this.props.latestProgram} title={i18n.t('static.header.notLatestVersion')} style={{ fontSize: '25px', paddingTop: '5px', color: '#a7c6ed', lineHeight: '57px' }} ></i>}
               </NavLink>
             </NavItem>
           }
+          {checkOnline === 'Online' && this.props.activeModule == 2 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestProgram") ? localStorage.getItem("sesLatestProgram") : 0}</span>}
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -111,6 +112,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
+          {checkOnline === 'Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{0}</span>}
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
