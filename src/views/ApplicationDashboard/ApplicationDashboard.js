@@ -94,6 +94,9 @@ class ApplicationDashboard extends Component {
       radioSelected: 2,
       activeIndex: 0,
       activeIndexProgram: 0,
+      activeIndexRealm: 0,
+      activeIndexUser: 0,
+      activeIndexErp: 0,
       problemActionList: [],
       programList: [],
       datasetList: [],
@@ -124,6 +127,15 @@ class ApplicationDashboard extends Component {
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
+    this.nextRealm = this.nextRealm.bind(this);
+    this.previousRealm = this.previousRealm.bind(this);
+    this.goToIndexRealm = this.goToIndexRealm.bind(this);
+    this.nextUser = this.nextUser.bind(this);
+    this.previousUser = this.previousUser.bind(this);
+    this.goToIndexUser = this.goToIndexUser.bind(this);
+    this.nextErp = this.nextErp.bind(this);
+    this.previousErp = this.previousErp.bind(this);
+    this.goToIndexErp = this.goToIndexErp.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
@@ -1452,6 +1464,87 @@ class ApplicationDashboard extends Component {
     this.setState({ activeIndex: newIndex });
   }
   /**
+   * Move to the next item in the carousel.
+   */
+  nextRealm() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexRealm === 2 ? 0 :
+      this.state.activeIndexRealm + 1;
+    this.setState({ activeIndexRealm: nextIndex });
+  }
+  /**
+   * Move to the previous item in the carousel.
+   */
+  previousRealm() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexRealm === 0 ? 2 :
+      this.state.activeIndexRealm - 1;
+    this.setState({ activeIndexRealm: nextIndex });
+  }
+  /**
+   * Navigate to a specific index in the carousel.
+   * @param {number} newIndex The index of the item to navigate to.
+   * @returns 
+   */
+  goToIndexRealm(newIndex) {
+    if (this.animating) return;
+    this.setState({ activeIndexRealm: newIndex });
+  }
+  /**
+   * Move to the next item in the carousel.
+   */
+  nextUser() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexUser === 1 ? 0 :
+      this.state.activeIndexUser + 1;
+    this.setState({ activeIndexUser: nextIndex });
+  }
+  /**
+   * Move to the previous item in the carousel.
+   */
+  previousUser() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexUser === 0 ? 1 :
+      this.state.activeIndexUser - 1;
+    this.setState({ activeIndexUser: nextIndex });
+  }
+  /**
+   * Navigate to a specific index in the carousel.
+   * @param {number} newIndex The index of the item to navigate to.
+   * @returns 
+   */
+  goToIndexUser(newIndex) {
+    if (this.animating) return;
+    this.setState({ activeIndexUser: newIndex });
+  }
+  /**
+   * Move to the next item in the carousel.
+   */
+  nextErp() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexErp === 1 ? 0 :
+      this.state.activeIndexErp + 1;
+    this.setState({ activeIndexErp: nextIndex });
+  }
+  /**
+   * Move to the previous item in the carousel.
+   */
+  previousErp() {
+    if (this.animating) return;
+    const nextIndex = this.state.activeIndexErp === 0 ? 1 :
+      this.state.activeIndexErp - 1;
+    this.setState({ activeIndexErp: nextIndex });
+  }
+  /**
+   * Navigate to a specific index in the carousel.
+   * @param {number} newIndex The index of the item to navigate to.
+   * @returns 
+   */
+  goToIndexErp(newIndex) {
+    if (this.animating) return;
+    this.setState({ activeIndexErp: newIndex });
+  }
+  /**
    * Update a specific key-value pair in the state's programList array.
    * @param {string} key The key of the item in the programList array to update.
    * @param {any} value The new value to set for the specified key.
@@ -1857,6 +1950,9 @@ class ApplicationDashboard extends Component {
     }
     const activeTab1 = defaultModuleId;
     const { activeIndex } = this.state;
+    const { activeIndexRealm } = this.state;
+    const { activeIndexUser } = this.state;
+    const { activeIndexErp } = this.state;
     const { SearchBar, ClearSearchButton } = Search;
     const customTotal = (from, to, size) => (
       <span className="react-bootstrap-table-pagination-total">
@@ -1902,6 +1998,98 @@ class ApplicationDashboard extends Component {
             </div>
             <div className='TextCont'>
               <CarouselCaption captionHeader={getLabelText(item.label, this.state.lang)} captionText={item.count} />
+            </div>
+          </div>
+        </CarouselItem>
+      );
+    });
+
+    var slidesRealmContent = [{
+      "name": "Countries",
+      "count": this.state.dashboard.REALM_COUNTRY_COUNT,
+      "url": "/realmCountry/listRealmCountry",
+    },
+    {
+      "name": "Users",
+      "count": this.state.dashboard.USER_COUNT,
+      "url": "/user/listUser",
+    },
+    {
+      "name":"Programs",
+      "count": this.state.dashboard.FULL_PROGRAM_COUNT,
+      "url":"/program/downloadProgram/",
+    }]
+    const slidesRealm = slidesRealmContent.map((item) => {
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
+        >
+          <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
+            <div className='ImgCont'>
+              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
+            </div>
+            <div className='TextCont'>
+              <CarouselCaption captionHeader={item.name} captionText={item.count} />
+            </div>
+          </div>
+        </CarouselItem>
+      );
+    });
+
+    var slidesUserContent = [{
+      "name": "Accessible Programs",
+      "count": this.state.programList.length,
+      "url": "/program/downloadProgram/",
+    },
+    {
+      "name": "Downloaded Programs",
+      "count": this.state.programList.filter(c => c.local).length,
+      "url": "/program/downloadProgram/",
+    }]
+    const slidesUser = slidesUserContent.map((item) => {
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
+        >
+          <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
+            <div className='ImgCont'>
+              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
+            </div>
+            <div className='TextCont'>
+              <CarouselCaption captionHeader={item.name} captionText={item.count} />
+            </div>
+          </div>
+        </CarouselItem>
+      );
+    });
+
+    var slidesErpContent = [{
+      "name": "Linked ERP Shipments",
+      "count": this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT,
+      "url": "/shipment/manualTagging",
+    },
+    {
+      "name": "Linked ERP Shipments for Downloaded Programs",
+      "count": this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT,
+      "url": "/shipment/manualTagging",
+    }]
+    const slidesErp = slidesErpContent.map((item) => {
+      return (
+        <CarouselItem
+          onExiting={this.onExiting}
+          onExited={this.onExited}
+          key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
+        >
+          <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
+            <div className='ImgCont'>
+              <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
+            </div>
+            <div className='TextCont'>
+              <CarouselCaption captionHeader={item.name} captionText={item.count} />
             </div>
           </div>
         </CarouselItem>
@@ -2021,7 +2209,7 @@ class ApplicationDashboard extends Component {
       actualConsumptionQplPuCount = this.state.dashboardBottomData.actualConsumptionQpl.puCount;
       shipmentQplCorrectCount = this.state.dashboardBottomData.shipmentQpl.correctCount;
       shipmentQplPuCount = this.state.dashboardBottomData.shipmentQpl.puCount;
-      expiryTotal = this.state.dashboardBottomData.expiryTotal;
+      expiryTotal = Math.ceil(this.state.dashboardBottomData.expiryTotal);
       shipmentTotal = this.state.dashboardBottomData.shipmentTotal;
       if (this.state.displayBy == 1 || this.state.displayBy == 2) {
         shipmentDetailsList = Object.values(
@@ -2051,7 +2239,7 @@ class ApplicationDashboard extends Component {
     let darkModeColors = [];
     let lightModeColors = [];
 
-    if(this.state.displayBy == 1) {
+    if(this.state.displayBy == 1 || this.state.displayBy == 2) {
       darkModeColors = [
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
@@ -2067,10 +2255,12 @@ class ApplicationDashboard extends Component {
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
       ];
-    } else if(this.state.displayBy == 2) {
-      darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
-      lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
-    } else if(this.state.displayBy == 3) {
+    } 
+    // else if(this.state.displayBy == 2) {
+    //   darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
+    //   lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
+    // } 
+    else if(this.state.displayBy == 3) {
       let lightStatus = [
         {
           status: i18n.t("static.supplyPlan.delivered"),
@@ -2943,50 +3133,50 @@ class ApplicationDashboard extends Component {
                       <div className='col-7 tickerbox'>
                         <div className='row'>
                         <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                <Card className="CardHeight">
-                  <CardBody className="p-0">
-                    <div class="h1 text-muted text-left mb-0 m-3">
-                    <h5 class="card-title IconColorD">Realm</h5>
-                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
-                        {slides}
-                      </Carousel>
-                      <div className="chart-wrapper " >
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
-              <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                <Card className=" CardHeight">
-                  <CardBody className="p-0">
-                    <div class="h1 text-muted text-left mb-0 m-3">
-                    <h5 class="card-title IconColorD">User</h5>
-                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
-                        {slides}
-                      </Carousel>
-                      <div className="chart-wrapper " >
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
-              <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                <Card className=" CardHeight">
-                  <CardBody className="p-0">
-                    <div class="h1 text-muted text-left mb-0 m-3">
-                    <h5 class="card-title IconColorD">ERP Linking</h5>
-                      <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndex} next={this.next} previous={this.previous} ride="carousel">
-                        <CarouselIndicators items={this.state.users} activeIndex={activeIndex} onClickHandler={this.goToIndex} />
-                        {slides}
-                      </Carousel>
-                      <div className="chart-wrapper " >
-                      </div>
-                    </div>
-                  </CardBody>
-                </Card>
-              </Col>
+                          <Card className="CardHeight">
+                            <CardBody className="p-0">
+                              <div class="h1 text-muted text-left mb-0 m-3">
+                              <h5 class="card-title IconColorD">Realm</h5>
+                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
+                                  <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
+                                  {slidesRealm}
+                                </Carousel>
+                                <div className="chart-wrapper " >
+                                </div>
+                              </div>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                          <Card className=" CardHeight">
+                            <CardBody className="p-0">
+                              <div class="h1 text-muted text-left mb-0 m-3">
+                              <h5 class="card-title IconColorD">User</h5>
+                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
+                                  <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
+                                  {slidesUser}
+                                </Carousel>
+                                <div className="chart-wrapper " >
+                                </div>
+                              </div>
+                            </CardBody>
+                          </Card>
+                        </Col>
+                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                          <Card className=" CardHeight">
+                            <CardBody className="p-0">
+                              <div class="h1 text-muted text-left mb-0 m-3">
+                              <h5 class="card-title IconColorD">ERP Linking</h5>
+                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
+                                  <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
+                                  {slidesErp}
+                                </Carousel>
+                                <div className="chart-wrapper " >
+                                </div>
+                              </div>
+                            </CardBody>
+                          </Card>
+                        </Col>
                         </div>
                         {/* <FormGroup>
                           <div class="myMarquee">
@@ -3040,8 +3230,8 @@ class ApplicationDashboard extends Component {
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: "danger", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/")}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
@@ -3056,7 +3246,7 @@ class ApplicationDashboard extends Component {
                                         <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.countOfStockOutPU / d.activePlanningUnits) * 100 + '%' }}>
                                           {d.countOfStockOutPU}
                                         </div>
-                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#0067B9", width: ((d.activePlanningUnits-d.countOfStockOutPU) / d.activePlanningUnits) * 100 + '%' }}>
+                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#002F6C", width: ((d.activePlanningUnits-d.countOfStockOutPU) / d.activePlanningUnits) * 100 + '%' }}>
                                           {d.activePlanningUnits-d.countOfStockOutPU}
                                         </div>
                                       </div>
