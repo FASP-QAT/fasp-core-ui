@@ -3390,14 +3390,6 @@ label {
     max-height: calc(100vh - 391px) !important;
   }
 
-  // .dashboardTable2 .jss_content {
-  
-  //   max-height: calc(100vh - 150px);
-   
-  //   overflow: auto;
-    
-  // }
-
   .Iconclr {
     filter: brightness(15);
   }
@@ -3714,7 +3706,7 @@ label {
   border-top: 1px solid #4d515a!important;
 }
 .IconColorD{
-  color:#20a8d8;
+  color:#20a8d8!important;
 }
 .FreezePlaningUnitColumn1New .jss > tbody > tr:nth-child(odd) > td:nth-child(2) {
   width: 200px !important;
@@ -17419,23 +17411,23 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  // max-height: calc(100vh - 393px) !important;
-  height: 221px;
-  // max-height: calc(100vh - 412px) !important;
+  height: 214px;
+  max-height: calc(100vh - 100%) !important;
   overflow: auto;
-  // max-height: 215px !important;
-  // min-height: 238px !important;
 }
 .dashboardTable2E .jss_content {
-  // max-height: calc(100vh - 393px) !important;
-  height: 152px;
-  // max-height: calc(100vh - 73vh) !important;
-  // max-height: calc(100vh - 481px) !important;
-  overflow: auto;
+  height: 153px;
+  max-height: calc(100vh - 100%) !important;
+    overflow: auto;
+}
+.dashboardTable2Ss .jss_content {
+  height: 101px;
+  max-height: calc(100vh - 100%) !important;
+    overflow: auto;
 }
 .dashboardTable3 .jss_content{
     // max-height: calc(100vh - 46vh) !important;
-    // max-height: calc(100vh - 385px) !important;
+    max-height: calc(100vh - 100%) !important;
     height: 265px;
     overflow: auto;
 }
@@ -17469,31 +17461,20 @@ label.arrow_label:before {
     overflow: hidden; /* Prevent content from overflowing outside the card */
   }
   .dashboardTable3 .jss_content{
-      max-height: calc(100vh - 74vh) !important;
+      max-height: calc(100vh - 100%) !important;
       overflow: auto;
+      height: 272px;
   }
   .dashboardTable2E .jss_content {
-    max-height: calc(100vh - 83vh) !important;
+    max-height: calc(100vh - 100%) !important;
+    height:168px;
     overflow: auto;
 }
-  
+.dashboardTable2Ss .jss_content {
+  max-height: calc(100vh - 100%) !important;
+  overflow: auto;
 }
-
-// .MuiSwitch-colorPrimary.Mui-checked {
-//     color: #23a8d8!important;
-// }
-// .MuiSwitch-colorPrimary.Mui-checked + .MuiSwitch-track {
-//   background-color: #23a8d8!important;
-// }
-// .MuiSwitch-track {
-//   width: 100%;
-//   height: 100%;
-//   opacity: 0.38;
-//   z-index: -1;
-//   transition: opacity 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-//   border-radius: 7px;
-//   background-color: #23a8d8!important;
-// }
+}
 .MuiSwitch-switchBase {
   top: 0;
   left: 0;
@@ -17644,10 +17625,7 @@ label.arrow_label:before {
 }
 
 .PieShipment {
-  // height: 300px !important;
-  // width: 300px !important;
   margin: 0 auto;
-  // padding-left: 20px;
 }
 
 .CursorDrag .jss>thead>tr>td:nth-child(2) {
@@ -17747,9 +17725,8 @@ label.arrow_label:before {
     // margin-left: auto;
   }
   .dashboardTable2 .jss_content {
-    // max-height: calc(100vh - 393px) !important;
-    // height: 375px;
-    max-height: calc(100vh - 74vh) !important;
+    max-height: calc(100vh - 100%) !important;
+    height:252px;
     overflow:auto;
   }
   
@@ -17772,9 +17749,7 @@ label.arrow_label:before {
 .gaugeHeader{
   height: 40px;
 }
-// .h-100{
-//   height: 100%!important;
-// }
+
 .scrollable-content {
   flex: 1; /* Fills the remaining space in the card */
   overflow-y: hidden; /* Adds vertical scroll when content overflows */
@@ -17943,84 +17918,6 @@ label.arrow_label:before {
 }
 }
 
-// .myMarquee {
-//   width: 484px;
-//   height: 53px;
-//   margin-left: auto;
-//   margin-top: 9px;
-//   margin-right: 21px;
-//   overflow: hidden;
-//   position: relative;
-//   border: 1px solid #aaa;
-//   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-//   border-radius: 8px;
-//   background: #FFFFFF;
-//   // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
-// }
-// .scroller {
-//   display: flex;
-//   width: calc(100% * 4); /* Enough width to hold duplicated content */
-//   animation: scroll 30s linear infinite;
-// }
-
-// .scroller-content {
-//   display: flex;
-// }
-
-// .scroller-content div {
-//   font-size: 14px;
-//   line-height: 23px;
-//   color: #000;
-//   font-weight: 700;
-//   padding: 0 20px;
-//   text-align: center;
-//   width: auto;
-//   white-space: nowrap; /* Prevent text wrapping */
-// }
-
-// .scroller-content div a {
-//   color: #002F6C;
-// }
-
-// @keyframes scroll {
-//   0% {
-//     transform: translateX(0);
-//   }
-//   100% {
-//     transform: translateX(-50%);
-//   }
-// }
-
-// .scroller:hover {
-//   animation-play-state: paused;
-// }
-// @media only screen and (min-width: 1920px) {
-
-// .myMarquee {
-//   width: 916px;
-//   height: 53px;
-//   margin-left: auto;
-//   margin-top: 9px;
-//   margin-right: 21px;
-//   overflow: hidden;
-//   position: relative;
-//   border: 1px solid #aaa;
-//   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.7);
-//   border-radius: 8px;
-//   background: #FFFFFF;
-//   // background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0));
-// }
-// .scroller-content div {
-//   font-size: 16px;
-//   line-height: 23px;
-//   color: #000;
-//   font-weight: 700;
-//   padding: 0 20px;
-//   text-align: center;
-//   width: auto;
-//   white-space: nowrap; /* Prevent text wrapping */
-// }
-// }
 .MarginTopCheckBox{
   margin-top: -3px;
 }
@@ -18045,11 +17942,7 @@ label.arrow_label:before {
 .IconColorD{
   color: #002F6C;
 }
-// @media screen and (min-width: 1920px) {
-//   .CustomHeight{
-//     height: 412px;
-//   }
-// }
+
 .FreezePlaningUnitColumn1 .jss>tbody>tr:nth-child(odd)>td:nth-child(2).readonly {
   width: 200px !important;
   left: 0 !important;
@@ -18147,34 +18040,6 @@ label.arrow_label:before {
   opacity: 1.5!important;
  
 }
-// @media (max-width: 768px) {
-//   .dashboardTable2 .jss_content {
-//       height: 238px;
-//   }
-// }
-
-// @media (min-width: 769px) {
-//   .dashboardTable2 .jss_content {
-//       // max-height: calc(100vh - 412px); /* Full height for larger screens */
-//       height: 250px;
-//   }
-// }
-@media (min-width: 1025px) and (max-width: 1280px){
-  .dashboardTable2 .jss_content {
-    height: 222px;
+.DashboardreadonlyBg .jss>thead>tr>td{
+  top:-2px!important;
 }
-}
-
-// @media only screen
-// and (min-width: 1370px)
-// and (max-width: 1605px)
-// { 
-//   .dashboardTable2 .jss_content {
-//     height: 222px;
-// }
-//  }
-//  @media  screen and ((min-width: 992px)) {
-//   .dashboardTable2 .jss_content {
-//     height: 235px;
-// }
-// }
