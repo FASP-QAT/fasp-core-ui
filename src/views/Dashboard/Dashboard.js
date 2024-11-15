@@ -45,6 +45,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                         var topPuData = dashboardData.topPuData;
                                         var stockedOutCount = 0;
                                         var valueOfExpiredPU = 0;
+                                        var linkedShipmentsCount=0;
                                         if (topPuData != "" && topPuData != undefined) {
                                             var puIds = ppu.filter(c => c.active.toString() == "true")
                                             puIds.map(pu => {
@@ -53,6 +54,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                                     stockedOutCount += 1;
                                                 }
                                                 valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
+                                                linkedShipmentsCount+=Number(item.linkedShipmentsCount);
                                             })
                                         }
                                         var dashboradTop = {
@@ -66,6 +68,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             "disabledPlanningUnits": ppu.filter(c => c.active == false).length,
                                             "countOfStockOutPU": stockedOutCount,
                                             "valueOfExpiredPU": valueOfExpiredPU,
+                                            "linkedShipmentsCount": linkedShipmentsCount,
                                             "countOfOpenProblem": programJson.problemReportList.filter(c => c.problemStatus.id == OPEN_PROBLEM_STATUS_ID).length,
                                             "lastModifiedDate": moment(programJson.lastModifiedDate).format("YYYY-MM-DD HH:mm:ss"),
                                             "commitDate": programJson.currentVersion.createdDate,

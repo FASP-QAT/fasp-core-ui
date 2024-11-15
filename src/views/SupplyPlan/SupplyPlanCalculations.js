@@ -1217,10 +1217,12 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                 if(generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=undefined && generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=""){
                                     generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut=stockOutFlag;
                                     generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock=valueOfExpiredStock;
+                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].linkedShipmentsCount=programJsonForStoringTheResult.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length
                                 }else{
                                     generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]={
                                         "stockOut":stockOutFlag,
-                                        "valueOfExpiredStock":valueOfExpiredStock
+                                        "valueOfExpiredStock":valueOfExpiredStock,
+                                        "linkedShipmentsCount":programJsonForStoringTheResult.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length
                                     }
                                 }
                             }
