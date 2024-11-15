@@ -1494,7 +1494,7 @@ class AuthenticationService {
         localStorage.setItem('sesPlanningUnitId', "");
         localStorage.setItem('sesPlanningUnitIdMulti', "");
         localStorage.setItem("sesLatestProgram", 0);
-        localStorage.setItem("sesLatestDataset", false);
+        localStorage.setItem("sesLatestDataset", 0);
         localStorage.setItem('sesReportRangeSPVR', JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }))
         localStorage.setItem("sesCountryIdSPVR", -1);
         localStorage.setItem("sesProgramIdSPVR", -1);

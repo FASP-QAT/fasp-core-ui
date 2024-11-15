@@ -533,27 +533,28 @@ class ApplicationDashboard extends Component {
    * @param {Array} programs - List of programs to check for newer versions.
    */
   checkNewerVersions(programs) {
-    if (localStorage.getItem('sessionType') === 'Online') {
+    // if (localStorage.getItem('sessionType') === 'Online') {
       localStorage.setItem("sesLatestProgram", this.state.dashboardTopList.filter(x => !x.isLatest).length);
       // ProgramService.checkNewerVersions(programs)
       //   .then(response => {
       //     localStorage.removeItem("sesLatestProgram");
       //     localStorage.setItem("sesLatestProgram", response.data);
       //   })
-    }
+    // }
   }
   /**
    * Checks for newer versions of datasets and updates local storage with the latest dataset information.
    * @param {Array} datasets - List of datasets to check for newer versions.
    */
   checkNewerVersionsDataset(programs) {
-    if (localStorage.getItem('sessionType') === 'Online') {
-      ProgramService.checkNewerVersions(programs)
-        .then(response => {
-          localStorage.removeItem("sesLatestDataset");
-          localStorage.setItem("sesLatestDataset", response.data);
-        })
-    }
+    localStorage.setItem("sesLatestDataset", programs.filter(x => !x.isLatest).length);
+    // if (localStorage.getItem('sessionType') === 'Online') {
+    //   ProgramService.checkNewerVersions(programs)
+    //     .then(response => {
+    //       localStorage.removeItem("sesLatestDataset");
+    //       localStorage.setItem("sesLatestDataset", response.data);
+    //     })
+    // }
   }
   /**
     * Retrieves the list of Realm Country.
@@ -751,30 +752,39 @@ class ApplicationDashboard extends Component {
       getRequest.onsuccess = function (event) {
         var myResult = [];
         myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
-        for (var i = 0; i < filteredGetRequestList.length; i++) {
-          var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
-          var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-          var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
-          var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-          var programJson1 = JSON.parse(programData);
-          datasetList.push({
-            programCode: filteredGetRequestList[i].programCode,
-            programVersion: filteredGetRequestList[i].version,
-            programId: filteredGetRequestList[i].programId,
-            versionId: filteredGetRequestList[i].version,
-            id: filteredGetRequestList[i].id,
-            loading: false,
-            forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
-            forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
-          });
-        }
-        this.setState({
-          datasetList: datasetList
-        })
-        this.checkNewerVersionsDataset(datasetList);
+        var pTransaction = db1.transaction(['program'], 'readwrite');
+        var p = pTransaction.objectStore('program');
+        var pRequest = p.getAll();
+        pRequest.onsuccess = function (event) {
+          var programList = [];
+          programList = pRequest.result;
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+          for (var i = 0; i < filteredGetRequestList.length; i++) {
+            var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
+            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+            var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
+            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            var programJson1 = JSON.parse(programData);
+            var pqd = programList.filter(c => c.programId == filteredGetRequestList[i].programId);
+            datasetList.push({
+              programCode: filteredGetRequestList[i].programCode,
+              programVersion: filteredGetRequestList[i].version,
+              programId: filteredGetRequestList[i].programId,
+              versionId: filteredGetRequestList[i].version,
+              id: filteredGetRequestList[i].id,
+              loading: false,
+              forecastStartDate: (programJson1.currentVersion.forecastStartDate ? moment(programJson1.currentVersion.forecastStartDate).format(`MMM-YYYY`) : ''),
+              forecastStopDate: (programJson1.currentVersion.forecastStopDate ? moment(programJson1.currentVersion.forecastStopDate).format(`MMM-YYYY`) : ''),
+              isLatest: pqd[0].currentVersion.versionId > filteredGetRequestList[i].version ? false : true,
+            });
+          }
+          this.setState({
+            datasetList: datasetList
+          })
+          this.checkNewerVersionsDataset(datasetList);
+        }.bind(this);
       }.bind(this);
     }.bind(this)
   }

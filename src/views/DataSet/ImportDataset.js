@@ -47,7 +47,7 @@ export default class ImportDataset extends Component {
         this.cancelClicked = this.cancelClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.getPrograms = this.getPrograms.bind(this);
-        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        // this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.finishedStepOne = this.finishedStepOne.bind(this);
         this.previousToStepOne = this.previousToStepOne.bind(this);
         this.removeMessageText = this.removeMessageText.bind(this);
@@ -140,23 +140,23 @@ export default class ImportDataset extends Component {
                         proList.push(programJson)
                     }
                 }
-                this.checkNewerVersions(proList);
+                // this.checkNewerVersions(proList);
             }.bind(this);
         }.bind(this)
     }
-    /**
-     * Checks for newer versions of programs.
-     * @param {Array} programs - An array of programs to check for newer versions.
-     */
-    checkNewerVersions(programs) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestDataset");
-                    localStorage.setItem("sesLatestDataset", response.data);
-                })
-        }
-    }
+    // /**
+    //  * Checks for newer versions of programs.
+    //  * @param {Array} programs - An array of programs to check for newer versions.
+    //  */
+    // checkNewerVersions(programs) {
+    //     if (localStorage.getItem("sessionType") === 'Online') {
+    //         ProgramService.checkNewerVersions(programs)
+    //             .then(response => {
+    //                 localStorage.removeItem("sesLatestDataset");
+    //                 localStorage.setItem("sesLatestDataset", response.data);
+    //             })
+    //     }
+    // }
     /**
      * Calls the get programs function on component mount
      */
