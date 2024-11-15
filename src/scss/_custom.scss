@@ -18039,11 +18039,12 @@ label.arrow_label:before {
 }
 .Dashboardticker .CardHeight{
   height: 110px;
+  background-color: #A7C6ED;
 }
 .Dashboardticker .CardHeight .card-body .card-title{
-margin-top: -8px!important;
-margin-bottom: 3px!important;
-font-weight: bold;
+  margin-top: -8px!important;
+  margin-bottom: 2px!important;
+  font-weight: bold;
 }
 .Dashboardticker .carousel-caption {
   position: absolute;
@@ -18051,7 +18052,7 @@ font-weight: bold;
   bottom: 16px;
   left: 0% !important;
   z-index: 0 !important;
-  padding-top: 20px;
+  padding-top: 0px;
   padding-bottom: 20px;
   color: #fff;
   text-align: left;
