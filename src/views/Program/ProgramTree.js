@@ -61,7 +61,7 @@ class Program extends Component {
         };
         this.pickRange = React.createRef();
         this.getPrograms = this.getPrograms.bind(this);
-        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        // this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
@@ -188,15 +188,15 @@ class Program extends Component {
      * Checks for newer versions of programs.
      * @param {Array} programs - An array of programs to check for newer versions.
      */
-    checkNewerVersions(programs) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestProgram");
-                    localStorage.setItem("sesLatestProgram", response.data);
-                })
-        }
-    }
+    // checkNewerVersions(programs) {
+    //     if (localStorage.getItem("sessionType") === 'Online') {
+    //         ProgramService.checkNewerVersions(programs)
+    //             .then(response => {
+    //                 localStorage.removeItem("sesLatestProgram");
+    //                 localStorage.setItem("sesLatestProgram", response.data);
+    //             })
+    //     }
+    // }
     /**
      * Calls getLocalPrograms and getPrograms function and load the realm list on component mount
      */
@@ -563,7 +563,7 @@ class Program extends Component {
                         proList.push(programJson)
                     }
                 }
-                this.checkNewerVersions(proList);
+                // this.checkNewerVersions(proList);
             }.bind(this);
         }.bind(this)
     }

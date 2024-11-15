@@ -2051,7 +2051,7 @@ class ApplicationDashboard extends Component {
     let darkModeColors = [];
     let lightModeColors = [];
 
-    if(this.state.displayBy == 1) {
+    if(this.state.displayBy == 1 || this.state.displayBy == 2) {
       darkModeColors = [
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
@@ -2067,10 +2067,12 @@ class ApplicationDashboard extends Component {
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
       ];
-    } else if(this.state.displayBy == 2) {
-      darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
-      lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
-    } else if(this.state.displayBy == 3) {
+    } 
+    // else if(this.state.displayBy == 2) {
+    //   darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
+    //   lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
+    // } 
+    else if(this.state.displayBy == 3) {
       let lightStatus = [
         {
           status: i18n.t("static.supplyPlan.delivered"),
@@ -3040,8 +3042,8 @@ class ApplicationDashboard extends Component {
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
                                   <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: "danger", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/")}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
