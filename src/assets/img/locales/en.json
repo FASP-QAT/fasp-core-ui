@@ -3498,7 +3498,7 @@
   "static.validated.restrictionNoOfMonthsInPastForBottomDashboard": "Please enter No of months in past for bottom dashboard",
   "static.ticket.manageTickets": "Manage my tickets",
   "static.dashboard.localTooltip": "If checked only downloaded versions will appear in the dropdown. If unchecked, only server versions (latest final or draft) will appear in the dropdown",
-  "static.dashboard.actionTooltip": "Click on trashcan icon to delete local program from QAT",
+  "static.dashboard.actionTooltip": "Click on trashcan icon to delete local program from QAT. Down cloud icon in red indicates there is a more updated version on the server. Up cloud icon in red indicates the downloaded program has unsaved changes to the server.",
   "static.dashboard.programTooltip": "Asterisk (*) indicates final and approved version",
   "static.dashboard.activePUTooltip": "",
   "static.dashboard.stockoutTooltip": "Red value indicates planning units with at least one month of stockout in the next 18 months. Blue value indicates planning units with no stockouts in the next 18 months",

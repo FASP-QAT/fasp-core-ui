@@ -122,7 +122,8 @@ class ApplicationDashboard extends Component {
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-      topSubmitLoader: false
+      topSubmitLoader: false,
+      fullDashbaordTopList:[]
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -549,7 +550,7 @@ class ApplicationDashboard extends Component {
    */
   checkNewerVersions(programs) {
     // if (localStorage.getItem('sessionType') === 'Online') {
-      localStorage.setItem("sesLatestProgram", this.state.dashboardTopList.filter(x => !x.isLatest).length);
+      localStorage.setItem("sesLatestProgram", this.state.fullDashbaordTopList.filter(x => !x.isLatest).length);
       // ProgramService.checkNewerVersions(programs)
       //   .then(response => {
       //     localStorage.removeItem("sesLatestProgram");
@@ -635,7 +636,9 @@ class ApplicationDashboard extends Component {
               programId: response.data[i].id,
               label: response.data[i].label,
               programCode: response.data[i].code,
-              versionId: response.data[i].currentVersionId
+              versionId: response.data[i].currentVersionId,
+              noOfMonthsInPastForBottomDashboard: response.data[i].noOfMonthsInPastForBottomDashboard,
+              noOfMonthsInFutureForBottomDashboard: response.data[i].noOfMonthsInFutureForBottomDashboard
             }
             proList[i] = programJson
           }
@@ -959,16 +962,27 @@ class ApplicationDashboard extends Component {
     */
   handleBottomProgramIdChange = (programId) => {
     localStorage.setItem("bottomProgramId", programId ? programId.value : "");
+    var program = this.state.programList.filter(c=>c.programId==programId.value);
+    var dashboardStartDateBottom,dashboardStopDateBottom;
+    if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
+      var startDate = moment(Date.now()).subtract(program[0].noOfMonthsInPastForBottomDashboard, 'months').startOf('month').format("YYYY-MM-DD");
+      var endDate = moment(Date.now()).add(program[0].noOfMonthsInFutureForBottomDashboard-1, 'months').startOf('month').format("YYYY-MM-DD")
+      dashboardStartDateBottom=moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM");
+      dashboardStopDateBottom=moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM");
+    }else{
+      dashboardStartDateBottom= this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month;
+      dashboardStopDateBottom= this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month;
+    }
     this.setState({
       bottomProgramId: programId ? programId.value : "",
-      dashboardStartDateBottom: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month,
-      dashboardStopDateBottom: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month,
+      dashboardStartDateBottom: dashboardStartDateBottom,
+      dashboardStopDateBottom: dashboardStopDateBottom,
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
           programId: this.state.bottomProgramId,
-          startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
-          stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
+          startDate: moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM") + "-01",
+          stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM")+ "-" + moment(endDate).endOf('month').format("DD"),
           displayShipmentsBy: this.state.displayBy
         }
         this.getOnlineDashboardBottom(inputJson);
@@ -1347,21 +1361,21 @@ class ApplicationDashboard extends Component {
       }
     });
     if (localStorage.getItem('sessionType') === 'Online') {
-      if (this.state.id == 1) {
-        DashboardService.applicationLevelDashboard()
-          .then(response => {
-            this.setState({
-              dashboard: response.data
-            })
-          })
-        DashboardService.applicationLevelDashboardUserList()
-          .then(response => {
-            this.setState({
-              users: response.data
-            })
-          })
-      }
-      if (this.state.id == 2) {
+      // if (this.state.id == 1) {
+      //   DashboardService.applicationLevelDashboard()
+      //     .then(response => {
+      //       this.setState({
+      //         dashboard: response.data
+      //       })
+      //     })
+      //   DashboardService.applicationLevelDashboardUserList()
+      //     .then(response => {
+      //       this.setState({
+      //         users: response.data
+      //       })
+      //     })
+      // }
+      // if (this.state.id == 2) {
         DashboardService.realmLevelDashboard(this.state.realmId)
           .then(response => {
             this.setState({
@@ -1374,7 +1388,7 @@ class ApplicationDashboard extends Component {
               users: response.data
             })
           })
-      }
+      // }
       let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
       var roleList = decryptedUser.roleList;
@@ -1591,7 +1605,10 @@ class ApplicationDashboard extends Component {
         })
       } else if(key == "dashboardTopList") {
         this.setState({
-          dashboardTopList: value.filter(p => this.state.topProgramId.map(m => m.value.toString()).includes(p.program.id))
+          dashboardTopList: value.filter(p => this.state.topProgramId.map(m => m.value.toString()).includes(p.program.id)),
+          fullDashbaordTopList: value
+        },()=>{
+          this.checkNewerVersions();
         })
       }
     })
@@ -2024,10 +2041,16 @@ class ApplicationDashboard extends Component {
       "url": "/user/listUser",
     },
     {
-      "name":"Programs",
+      "name":"Supply Planning Programs",
       "count": formatter(this.state.dashboard.FULL_PROGRAM_COUNT),
       "url":"/program/downloadProgram/",
-    }]
+    },
+    {
+      "name":"Forecasting Programs",
+      "count": formatter(this.state.dashboard.FULL_DATASET_COUNT),
+      "url":"/program/downloadProgram",
+    }
+  ]
     const slidesRealm = slidesRealmContent.map((item) => {
       return (
         <CarouselItem
@@ -2077,7 +2100,7 @@ class ApplicationDashboard extends Component {
     });
 
     var slidesErpContent = [{
-      "name": "Linked ERP Shipments",
+      "name": "Realm Linked ERP Shipments",
       "count": formatter(this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT),
       "url": "/shipment/manualTagging",
     },
