@@ -17261,6 +17261,9 @@ label.arrow_label:before {
 .FormGroupD .form-control-sm {
   height: calc(1.5em + 0.5rem + 2px) !important;
 }
+.FormGroupDServer .form-control-sm {
+  height: calc(1.5em + 0.5rem + 2px) !important;
+}
 
 .card.custom-card {
   border-radius: .5rem;
@@ -17610,6 +17613,17 @@ label.arrow_label:before {
   border: 1px solid #e4e7ea;
   border-radius: 0.2rem;
   background-color: #e5edf5;
+}
+
+.FormGroupDServer .box {
+  // height: calc(1.5em + 0.5rem + 2px) !important;
+  height: 30px!important;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 20px;
+  border: 1px solid #e4e7ea;
+  border-radius: 0.2rem;
+  background-color: #FFF;
 }
 
 .StockplanningBoxD {

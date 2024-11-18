@@ -3429,7 +3429,7 @@ class ApplicationDashboard extends Component {
                     </FormGroup>
                     </div>
                     <div class='col-3'>
-                    <FormGroup className='FormGroupD'>
+                    <FormGroup className={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == ""?'FormGroupD':'FormGroupDServer'}>
                       <Label htmlFor="organisationTypeId">Report Period <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reportPeriodTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
