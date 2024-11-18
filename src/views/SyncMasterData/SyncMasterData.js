@@ -527,11 +527,15 @@ export default class SyncMasterData extends Component {
                                                         linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                                         var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter1[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter1[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter1[0].tempParentShipmentId) && c.active == true);
                                                         var activateParentShipment = false;
-                                                        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+                                                        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0 && linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0) {
                                                             activateParentShipment = true;
                                                         }
                                                         var shipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsList[linkedShipmentsListIndex].childShipmentId > 0 ? c.shipmentId == linkedShipmentsList[linkedShipmentsListIndex].childShipmentId : c.tempShipmentId == linkedShipmentsList[linkedShipmentsListIndex].tempChildShipmentId);
+                                                        if(linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0){
                                                         shipmentDataList[shipmentIndex].active = false;
+                                                        }else{
+                                                            shipmentDataList[shipmentIndex].erpFlag = false;
+                                                        }
                                                         shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentDataList[shipmentIndex].shipmentId>0?(c.shipmentId!=shipmentDataList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentDataList[shipmentIndex].tempShipmentId)));
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
