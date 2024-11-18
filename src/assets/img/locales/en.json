@@ -485,7 +485,7 @@
   "static.extrapolation.UseFilters": "Use the filters at the top of this screen to select the planning unit and region to extrapolate.",
   "static.ManageTree.BuildTree": "Manage Tree - Build Trees",
   "static.login.loginOnline": "Online",
-  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will need to update one node per every scenario for every tree for tree forecasts to properly extend.",
+  "static.versionSettings.confirmUpdate": "Note: If you changed the forecast period, you will be redirected for tree forecast calculations.",
   "static.dataentry.conversionFactorTooltip": "User-created or auto-generated in the Alternate Reporting Unit screen. `*` will multiply and `/` will divide the Order Quantity (ARU) by the Conversion Factor",
   "static.report.problemTransDetails": "Problem Transaction Details",
   "static.supplyPlan.addNewInventory": "Add New Inventory Count",
@@ -3491,5 +3491,6 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings."
+  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
+  "static.program.treeSync": "Tree sync"
 }
