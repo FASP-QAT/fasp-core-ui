@@ -2064,10 +2064,10 @@ class ApplicationDashboard extends Component {
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
-            <div className='ImgCont'>
+            <div className='ImgContTicker'>
               <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
-            <div className='TextCont'>
+            <div className='TextContTicker'>
               <CarouselCaption captionHeader={item.name} captionText={item.count} />
             </div>
           </div>
@@ -2093,10 +2093,10 @@ class ApplicationDashboard extends Component {
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
-            <div className='ImgCont'>
+            <div className='ImgContTicker'>
               <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
-            <div className='TextCont'>
+            <div className='TextContTicker'>
               <CarouselCaption captionHeader={item.name} captionText={item.count} />
             </div>
           </div>
@@ -2105,12 +2105,12 @@ class ApplicationDashboard extends Component {
     });
 
     var slidesErpContent = [{
-      "name": "Realm Linked ERP Shipments",
+      "name": "Realm",
       "count": formatter(this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT),
       "url": "/shipment/manualTagging",
     },
     {
-      "name": "Linked ERP Shipments for Downloaded Programs",
+      "name": "Downloaded Programs",
       "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a,b) => a+b,0)),
       "url": "/shipment/manualTagging",
     }]
@@ -2122,10 +2122,10 @@ class ApplicationDashboard extends Component {
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
-            <div className='ImgCont'>
+            <div className='ImgContTicker'>
               <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
-            <div className='TextCont'>
+            <div className='TextContTicker'>
               <CarouselCaption captionHeader={item.name} captionText={item.count} />
             </div>
           </div>
@@ -2529,7 +2529,7 @@ class ApplicationDashboard extends Component {
       title: {
         display: true,
         text: "",
-        padding: 5
+        padding: 3
       },
       layout: {
         padding: {
@@ -2572,7 +2572,7 @@ class ApplicationDashboard extends Component {
       title: {
         display: true,
         text: "",
-        padding: 5
+        padding: 3
       },
       layout: {
         padding: {
@@ -2615,7 +2615,7 @@ class ApplicationDashboard extends Component {
       title: {
         display: true,
         text: "",
-        padding: 5
+        padding: 3
       },
       layout: {
         padding: {
@@ -2662,7 +2662,7 @@ class ApplicationDashboard extends Component {
       title: {
         display: true,
         text: "",
-        padding: 5
+        padding: 3
       },
       layout: {
         padding: {
@@ -3173,7 +3173,7 @@ class ApplicationDashboard extends Component {
                           <Card className="CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">Realm</h5>
+                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>Realm</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
                                   <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
                                   {slidesRealm}
@@ -3188,7 +3188,7 @@ class ApplicationDashboard extends Component {
                           <Card className=" CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">User</h5>
+                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>User</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
                                   <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
                                   {slidesUser}
@@ -3203,7 +3203,7 @@ class ApplicationDashboard extends Component {
                           <Card className=" CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">ERP Linking</h5>
+                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>ERP Linked Shipments</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
                                   <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
                                   {slidesErp}
@@ -3492,7 +3492,7 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
-                        <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden'}}>
+                        <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden', paddingBottom: 0}}>
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
@@ -3514,7 +3514,7 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'200px',overflowY:'scroll',overflowX:'hidden'}}>
+                              <div className='row' style={{height:'250px',overflowY:'scroll',overflowX:'hidden'}}>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-60px"}}>
@@ -3546,7 +3546,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted<br />Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
@@ -3554,7 +3554,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Inventory </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual<br />Inventory </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
@@ -3562,7 +3562,7 @@ class ApplicationDashboard extends Component {
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual<br />Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />

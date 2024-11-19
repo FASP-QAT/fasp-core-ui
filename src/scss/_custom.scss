@@ -7461,6 +7461,14 @@ h6 {
   // margin-top: -17%;
 }
 
+.ImgContTicker {
+  // float: left !important;
+  // width: 50%;
+  visibility: hidden;
+  height: 90px;
+  // margin-top: -17%;
+}
+
 .TextCont {
   margin-top: 1%;
 }
@@ -7719,6 +7727,13 @@ h6 {
 
 @media (min-width: 1920px) {
   .ImgCont {
+    // float: left !important;
+    width: 50%;
+    visibility: hidden;
+    // margin-top: -42px;
+  }
+
+  .ImgContTicker {
     // float: left !important;
     width: 50%;
     visibility: hidden;
@@ -17414,7 +17429,7 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  height: 214px;
+  height: 250px;
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
 }
@@ -17755,9 +17770,8 @@ label.arrow_label:before {
   margin-bottom: 8px;
 }
 .gaugeHeader{
-  height: 40px;
+  height: 25px;
 }
-
 .scrollable-content {
   flex: 1; /* Fills the remaining space in the card */
   overflow-y: hidden; /* Adds vertical scroll when content overflows */
@@ -17765,7 +17779,17 @@ label.arrow_label:before {
   overflow-x:hidden;
 }
 .boxHeightBottom{
-  height: 220px!important;
+  height: 190px!important;
+}
+@media (min-width: 1720px) {
+  .boxHeightBottom{
+    height: 200px!important;
+  }
+}
+@media (min-width: 1860px) {
+  .boxHeightBottom{
+    height: 220px!important;
+  }
 }
 
 .jss>tbody>tr>td.cmpAndSelectTbl {
@@ -18052,7 +18076,7 @@ label.arrow_label:before {
   top:-2px!important;
 }
 .Dashboardticker .CardHeight{
-  height: 110px;
+  height: 90px;
   background-color: #A7C6ED;
 }
 .Dashboardticker .CardHeight .card-body .card-title{
@@ -18076,4 +18100,17 @@ label.arrow_label:before {
   right: 0;
   bottom: 15px !important;
   z-index: 1 !important;
+}
+.TextContTicker {
+  margin-top: 1%;
+}
+.TextContTicker p {
+  font-size: 16px;
+  font-weight: 500;
+  color: #212721;
+}
+.TextContTicker h3 {
+  color: #000000 !important;
+  font-size: 12px !important;
+  margin-bottom: 1%;
 }
