@@ -645,6 +645,7 @@
   "static.shipmentStatus.shipmentStatusName": "Shipment status name",
   "static.dataentry.dataEnteredInTableEx": "e.g. If I enter 1,000 units, this will be converted into",
   "static.extrapolation.arimaLower": "Arima (Lower Confidence Bound)",
+  "static.program.treeSync": "Tree sync",
   "static.tree.hidePlanningUnit": "Hide Planning Unit",
   "static.stockStatus.consensusConsumption": "Consensus Consumption",
   "static.procurementAgentPlanningUnit.unitPerPalletEuro1": "Units per Pallet EURO 1",
@@ -3441,6 +3442,7 @@
   "static.organisationHead.organisation": "Organization",
   "static.dimension.dimension": "Dimension",
   "static.productCategory.success": "Planning Unit Category updated successfully",
+  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
   "static.QATForecastImport.OldestForecasted": "The oldest forecasted consumption you can import is 6 months before the current month.",
   "static.tree.decimalValidation10&2": "Please enter a valid number having max 3 digits before decimal and max 4 digits after decimal.",
   "static.supplyPlan.inventoryType": "Inventory Type",
@@ -3515,7 +3517,6 @@
   "static.validated.restrictionNoOfMonthsInFutureForBottomDashboard": "Please enter No of months in future for bottom dashboard",
   "static.realm.noOfMonthsInPastForTopDashboard": "No of months in past for top dashboard",
   "static.realm.noOfMonthsInFutureForBottomDashboard": "No of months in future for bottom dashboard",
-  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
   "static.dashboard.stockStatusHeaderTooltip": "The Stock Status % is calculated based on the number of months available in the report period across all planning units. These months are used as the denominator when determining the percentage.",
   "static.dashboard.forecastErrorHeaderTooltip": "The forecast error is calculated as the average percentage error over the selected report period. If the percentage is displayed in red, it indicates that the calculated forecast error is above the forecast error threshold (user entered in Update Planning Units screen).",
   "static.dashboard.dataQualityHeaderTooltip": "This data does not use the Report Period for calculation; instead it uses the problems flagged in the QAT Problem List for this selected program.",
@@ -3525,6 +3526,5 @@
   "static.dashboard.actualInventoryTooltip": "Counts the number of PUs that have missing recent actual inventory data (within the last 3 months)",
   "static.dashboard.actualConsumptionTooltip": "Counts the number of PUs that either have missing recent actual consumption data (within the last 3 months), or a gap in actual consumption data (within the last 6 months)",
   "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times",
-  "static.program.treeSync": "Tree sync",
   "static.realm.settingChangeWarning":"One of the dashboard settings has been updated. In order for this change to reflect, please re-download or upload the program."
 }
