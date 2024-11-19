@@ -5,7 +5,8 @@ import React, { Component } from "react";
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
 import { Prompt } from 'react-router';
-import { Button, Card, CardBody, CardFooter, Col, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalHeader, Table } from 'reactstrap';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalHeader, Progress, Table } from 'reactstrap';
+import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import showguidanceEn from '../../../src/ShowGuidanceFiles/UpdateVersionSettingsEn.html';
@@ -93,7 +94,8 @@ class VersionSettingsComponent extends Component {
             datasetPlanningUnitNotes: [],
             dataList: [],
             consumptionExtrapolationList: [],
-            consumptionExtrapolationNotes: ''
+            consumptionExtrapolationNotes: '',
+            syncPrograms : false
         }
         this.getOnLineDatasetsVersion = this.getOnLineDatasetsVersion.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -107,6 +109,87 @@ class VersionSettingsComponent extends Component {
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
         this.updateState = this.updateState.bind(this);
         this.onchangepage = this.onchangepage.bind(this)
+        this.calculateModeling=this.calculateModeling.bind(this);
+        this.saveTreeData=this.saveTreeData.bind(this);
+    }
+    /**
+     * Function for rebuilding tree
+     */
+    calculateModeling(){
+        var programList = this.state.programsForWhichDateIsChanged;
+        programList.forEach(program => {
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            hideFirstComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');            
+            var programRequest = programTransaction.get(program);
+            programRequest.onsuccess = function (e) {
+                var databytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
+                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                programRequest.result.programData=programData;
+                calculateModelingData(programRequest.result, this, '', 0, -1, 1, -1, false, false, true);
+            }.bind(this)
+        }.bind(this)
+    })
+    }
+    saveTreeData(datasetObj) {
+        var programData = (CryptoJS.AES.encrypt(JSON.stringify(datasetObj.programData), SECRET_KEY)).toString();
+        datasetObj.programData = programData;
+        var db1;
+        getDatabase();
+        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        openRequest.onerror = function (event) {
+            this.setState({
+                message: i18n.t('static.program.errortext'),
+                color: 'red'
+            })
+            this.hideSecondComponent()
+        }.bind(this);
+        openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['datasetData'], 'readwrite');
+            var programTransaction = transaction.objectStore('datasetData');
+            var programRequest = programTransaction.put(datasetObj);
+            transaction.oncomplete = function (event) {
+                var totalProgramCount=this.state.totalProgramCount;
+                var percentage=0;
+                var countR = this.state.syncedPrograms;
+                if (totalProgramCount > 0) {
+                    percentage = Math.floor(((countR + 1) / totalProgramCount) * 100);
+                } else {
+                    // Handle the case where totalExtrapolatedCount is 0
+                    percentage = 0; // or any fallback value you deem appropriate
+                }
+                this.setState({
+                    syncedPrograms: countR + 1,
+                    syncedProgramPercentage: percentage
+                }, () => {
+                    if(this.state.syncedPrograms==this.state.totalProgramCount){
+                        this.setState({
+                            message: i18n.t('static.mt.dataUpdateSuccess'),
+                            color: "green",
+                            isChanged: false,
+                            syncPrograms:false,
+                            totalProgramCount:0,
+                            syncedPrograms:0,
+                            syncedProgramPercentage:0
+                        },()=>{
+                            hideSecondComponent();
+                        });
+                    }
+                })
+            }.bind(this);
+        }.bind(this)
     }
     /**
      * Updates the state with the provided parameter name and value, then invokes the buildActualJxl method.
@@ -122,6 +205,9 @@ class VersionSettingsComponent extends Component {
             }
             if (parameterName == "treeScenarioListNotHaving100PerChild") {
                 buildJxl(this)
+            }
+            if(parameterName=="datasetObj"){
+                this.saveTreeData(value);
             }
         })
     }
@@ -477,12 +563,7 @@ class VersionSettingsComponent extends Component {
     formSubmit() {
         var validation = this.checkValidation();
         if (validation == true) {
-            var cont = false;
-            var cf = window.confirm(i18n.t("static.versionSettings.confirmUpdate"));
-            if (cf == true) {
-                cont = true;
-            } else {
-            }
+            var cont = true;
             if (cont) {
                 this.setState({
                     loading: true
@@ -490,6 +571,7 @@ class VersionSettingsComponent extends Component {
                 var tableJson = this.el.getJson(null, false);
                 var programs = [];
                 var count = 0;
+                var programsForWhichDateIsChanged=[];
                 for (var i = 0; i < tableJson.length; i++) {
                     var map1 = new Map(Object.entries(tableJson[i]));
                     if (parseInt(map1.get("12")) === 1) {
@@ -498,6 +580,9 @@ class VersionSettingsComponent extends Component {
                         var stopDate = map1.get("9");
                         var id = map1.get("11");
                         var noOfDaysInMonth = Number(map1.get("13"));
+                        if((moment(startDate).format("YYYY-MM")!=moment(map1.get("19")).format("YYYY-MM")) || (moment(stopDate).format("YYYY-MM") != moment(map1.get("20")).format("YYYY-MM"))){
+                            programsForWhichDateIsChanged.push(id);
+                        }
                         var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                         var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
@@ -552,7 +637,19 @@ class VersionSettingsComponent extends Component {
                                 color: "green",
                                 isChanged: false
                             }, () => {
-                                hideSecondComponent();
+                                if(programsForWhichDateIsChanged.length==0){
+                                    hideSecondComponent();
+                                }else{
+                                    this.setState({
+                                        syncPrograms:true,
+                                        programsForWhichDateIsChanged:programsForWhichDateIsChanged,
+                                        syncedProgramPercentage:0,
+                                        syncedPrograms:0,
+                                        totalProgramCount:programsForWhichDateIsChanged.length
+                                    },()=>{
+                                        this.calculateModeling()
+                                    })
+                                }
                             });
                         }.bind(this);
                         transaction.onerror = function (event) {
@@ -902,6 +999,8 @@ class VersionSettingsComponent extends Component {
                 data[16] = (pd.currentVersion.forecastThresholdLowPerc == null ? '' : pd.currentVersion.forecastThresholdLowPerc)
                 data[17] = 0;
                 data[18] = pd;
+                data[19] = pd.currentVersion.forecastStartDate;
+                data[20] = pd.currentVersion.forecastStopDate;
                 if (versionTypeId == "") {
                     versionSettingsArray[count] = data;
                     count++;
@@ -1020,6 +1119,14 @@ class VersionSettingsComponent extends Component {
                 },
                 {
                     title: 'datasetData',
+                    type: 'hidden',
+                },
+                {
+                    title: 'Forecast Start Date',
+                    type: 'hidden',
+                },
+                {
+                    title: 'Forecast Stop Date',
                     type: 'hidden',
                 },
             ],
@@ -1460,7 +1567,7 @@ class VersionSettingsComponent extends Component {
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
-                <Card>
+                <Card style={{ display: !this.state.syncPrograms ? "block" : "none" }}>
                     <div className="card-header-actions">
                         <div className="Card-header-reporticon">
                             {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>}
@@ -1527,6 +1634,7 @@ class VersionSettingsComponent extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        <br/><span>{i18n.t('static.versionSettings.confirmUpdate')}</span><br/>
                         <div className="VersionSettingMarginTop consumptionDataEntryTable">
                             <div id="tableDiv" className={"RemoveStriped"} style={{ display: this.state.loading ? "none" : "block" }}>
                             </div>
@@ -1689,6 +1797,21 @@ class VersionSettingsComponent extends Component {
                         </div>
                     </div>
                 </Modal >
+                <div style={{ display: this.state.syncPrograms ? "block" : "none" }}>
+                    <div className="col-md-12" style={{ display: this.state.loading ? "none" : "block" }}>
+                        <Col xs="12" sm="12">
+                            <Card>
+                                <CardHeader>
+                                    <strong>{i18n.t('static.program.treeSync')}</strong>
+                                </CardHeader>
+                                <CardBody>
+                                    <div className="text-center text-blackD">{this.state.syncedProgramPercentage}% ({this.state.syncedPrograms} {i18n.t('static.masterDataSync.of')} {this.state.totalProgramCount} {i18n.t('static.dashboard.program')})</div>
+                                    <Progress value={this.state.syncedPrograms} max={this.state.totalProgramCount} />
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </div>
+                </div>
             </div>
         )
     }

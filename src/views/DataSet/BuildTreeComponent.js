@@ -2756,7 +2756,7 @@ export default class BuildTree extends Component {
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level != "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
-            for (var i = 0; i < (tempCopyModalParentLevelList.length-copyModalParentLevelList.length); i++) {
+            for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
                 copyModalParentLevelList.pop()
             }
             // copyModalParentLevelList = [];
@@ -5668,7 +5668,7 @@ export default class BuildTree extends Component {
         }
         this.setState({ scalingTotal }, () => {
         });
-        if (this.state.modelingEl != "") {
+        if (this.state.modelingEl != "" && document.getElementById("modelingJexcel")!=null) {
             jexcel.destroy(document.getElementById("modelingJexcel"), true);
         }
         var data = dataArray;
@@ -10144,6 +10144,22 @@ export default class BuildTree extends Component {
      */
     changed3(isCalculateClicked) {
         var elInstance = this.state.modelingCalculatorEl;
+        var dataArr = elInstance.records;
+        var rowEndDate = moment(dataArr[dataArr.length - 1][8].v).format("YYYY-MM-DD");
+        var forecastStopDate = moment(this.state.forecastStopDate).format("YYYY-MM-DD");
+        var isAfter = moment(rowEndDate).isAfter(forecastStopDate);
+        if (isCalculateClicked == 2 && isAfter) {
+            var cf = window.confirm(i18n.t("static.modelingCalculator.targetBeyondForecast"));
+            if (cf == true) {
+                this.calculateChanged3(isCalculateClicked);
+            }
+        } else {
+            this.calculateChanged3(isCalculateClicked);
+        }
+    }
+
+    calculateChanged3(isCalculateClicked) {
+        var elInstance = this.state.modelingCalculatorEl;
         var validation = this.validFieldData();
         if (validation) {
             this.setState({ isCalculateClicked: isCalculateClicked })
@@ -10153,6 +10169,7 @@ export default class BuildTree extends Component {
             var calculatedTotal = 0;
             var calculatedTotal1 = 0;
             var dataArr = elInstance.records;
+            var startMonthYear = "";
             for (var j = 0; j < dataArr.length; j++) {
                 var monthlyChange = "";
                 var rowData = dataArr[j];
@@ -10174,6 +10191,9 @@ export default class BuildTree extends Component {
                     var calculatedTotal = parseFloat(rowData1[9].v);
                     var calculatedTotal1 = parseFloat(rowData1[9].v);
                     var arr = [];
+                    if (startMonthYear == "") {
+                        startMonthYear = moment(moment(rowData[0].v.split("-")[0], 'MMM YYYY')).format("MMM YYYY");
+                    }
                     while (start.isSameOrBefore(stop)) {
                         if (modelingType == "active1") {
                             calculatedTotal = parseFloat(calculatedTotal * (1 + monthlyChange / 100));
@@ -10184,10 +10204,8 @@ export default class BuildTree extends Component {
                             }
                         }
                         var programJson = {
-                            date: moment(start.format('MMM YYYY')).format("YYYY"),
+                            date: moment(start).format('MMM YYYY'),
                             calculatedTotal: modelingType == "active1" ? calculatedTotal : calculatedTotal1,
-                            startDate: moment(moment(rowData[0].v.split("-")[0], 'MMM YYYY')),
-                            stopDate: moment(moment(rowData[0].v.split("-")[1], 'MMM YYYY'))
                         }
                         arr.push(programJson)
                         dataArrayTotal.push(programJson);
@@ -10199,22 +10217,42 @@ export default class BuildTree extends Component {
                 dataArray[j] = rowData[1].v;
             }
             if (dataArrayTotal.length > 0) {
-                const arraySum = dataArrayTotal.map(c => c.date)
-                const arraySum1 = arraySum.filter((value, index, array) => array.indexOf(value) === index);
-                for (var i = 1; i <= arraySum1.length; i++) {
-                    var abc = Math.round(dataArrayTotal.filter(c => c.date == arraySum1[i]).map(c => Number(c.calculatedTotal))
-                        .reduce((accumulator, currentItem) => accumulator + currentItem, 0));
-                    elInstance.setValueFromCoords(4, i, abc, true);
-                    var value = elInstance.getValueFromCoords(1, i);
-                    elInstance.setValueFromCoords(5, i, abc != 0 ? (abc - value) : 0, true);
-                    elInstance.setValueFromCoords(6, i, abc != 0 ? (abc - value) / value * 100 : 0, true);
-                }
+                this.calculateRollingTotals(startMonthYear, dataArrayTotal);
                 this.setState({
                     actualOrTargetValueList: dataArray
                 });
             }
         }
     }
+
+    calculateRollingTotals(startDateStr, data) {
+        const startDate = moment(startDateStr, "MMM YYYY");
+        let result = [];
+        let index = 0;
+        var elInstance = this.state.modelingCalculatorEl;
+        while (index < this.state.yearsOfTarget) {
+            let endDate = startDate.clone().add(11, "months");
+            let total = 0;
+
+            data.forEach(entry => {
+                const entryDate = moment(entry.date, "MMM YYYY");
+                if (entryDate.isBetween(startDate, endDate, undefined, "[]")) {
+                    total += entry.calculatedTotal;
+                }
+            });
+
+            result.push(`${startDate.format("MMM YY")}-${endDate.format("MMM YY")}: ${total.toFixed(1)}`);
+            var abc = total.toFixed(1);
+            elInstance.setValueFromCoords(4, index + 1, abc, true);
+            var value = elInstance.getValueFromCoords(1, index + 1);
+            elInstance.setValueFromCoords(5, index + 1, abc != 0 ? (abc - value) : 0, true);
+            elInstance.setValueFromCoords(6, index + 1, abc != 0 ? (abc - value) / value * 100 : 0, true);
+
+            startDate.add(1, "years");
+            index++;
+        }
+    }
+
     /**
      * This function is used to format the table like add asterisk or info to the table headers
      * @param {*} instance This is the DOM Element where sheet is created
@@ -10228,7 +10266,7 @@ export default class BuildTree extends Component {
         elInstance.setValueFromCoords(4, 0, "", true)
         elInstance.setValueFromCoords(5, 0, "", true)
         elInstance.setValueFromCoords(6, 0, "", true)
-        elInstance.setValueFromCoords(7, 0, "", true)
+        // elInstance.setValueFromCoords(7, 0, "", true)
         var asterisk = document.getElementsByClassName("jss")[1].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         tr.children[3].title = i18n.t('static.tooltip.annualChangePer');
@@ -10990,7 +11028,7 @@ export default class BuildTree extends Component {
                                                                         year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2)
                                                                     }}
                                                                     lang={pickerLang.months}
-                                                                    onChange={this.handleAMonthChange1}
+                                                                    onChange={this.handleAMonthChange}
                                                                     onDismiss={this.handleAMonthDissmis1}
                                                                 >
                                                                     <MonthBox value={this.makeText({ year: new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getFullYear(), month: ("0" + (new Date(this.state.currentScenario.month.replace(/-/g, '\/')).getMonth() + 1)).slice(-2) })}

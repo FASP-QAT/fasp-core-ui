@@ -185,10 +185,9 @@ export default class SyncMasterData extends Component {
                 }
             }
             var lastSyncDate = date;
-            lastSyncDate = moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss")
-            var lastSyncDateForShipments = date;
+            lastSyncDate = moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss")
             if(this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(programList[pl].programId)){
-                lastSyncDateForShipments=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss");
+                lastSyncDate=moment(generalJson.currentVersion.createdDate).subtract(3,'years').format("YYYY-MM-DD HH:mm:ss")
             }
             jsonForNewShipmentSync.push({
                 roAndRoPrimeLineNoList: listOfRoNoAndRoPrimeLineNo,
@@ -528,11 +527,15 @@ export default class SyncMasterData extends Component {
                                                         linkedShipmentsList[linkedShipmentsListIndex].lastModifiedDate = curDate;
                                                         var checkIfThereIsOnlyOneChildShipmentOrNot = linkedShipmentsList.filter(c => (linkedShipmentsListFilter1[0].parentShipmentId > 0 ? c.parentShipmentId == linkedShipmentsListFilter1[0].parentShipmentId : c.tempParentShipmentId == linkedShipmentsListFilter1[0].tempParentShipmentId) && c.active == true);
                                                         var activateParentShipment = false;
-                                                        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0) {
+                                                        if (checkIfThereIsOnlyOneChildShipmentOrNot.length == 0 && linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0) {
                                                             activateParentShipment = true;
                                                         }
                                                         var shipmentIndex = shipmentDataList.findIndex(c => linkedShipmentsList[linkedShipmentsListIndex].childShipmentId > 0 ? c.shipmentId == linkedShipmentsList[linkedShipmentsListIndex].childShipmentId : c.tempShipmentId == linkedShipmentsList[linkedShipmentsListIndex].tempChildShipmentId);
+                                                        if(linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0){
                                                         shipmentDataList[shipmentIndex].active = false;
+                                                        }else{
+                                                            shipmentDataList[shipmentIndex].erpFlag = false;
+                                                        }
                                                         shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentDataList[shipmentIndex].shipmentId>0?(c.shipmentId!=shipmentDataList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentDataList[shipmentIndex].tempShipmentId)));
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
@@ -667,6 +670,10 @@ export default class SyncMasterData extends Component {
                                                             pricePerUnit = ppu[0].catalogPrice
                                                             lastModifiedDateForShipment=ppu[0].lastModifiedDate;
                                                         }
+                                                    }
+                                                    var lastSyncDateForShipments = date;
+                                                    if(this.props.location.state != undefined && this.props.location.state.programIds != undefined && this.props.location.state.programIds.includes(generalJson.programId)){
+                                                        lastSyncDateForShipments=moment(generalJson.currentVersion.createdDate).format("YYYY-MM-DD HH:mm:ss");
                                                     }
                                                     if(moment(lastModifiedDateForShipment).format("YYYY-MM-DD HH:mm:ss")>moment(lastSyncDateForShipments).format("YYYY-MM-DD HH:mm:ss")){
                                                     var shipmentIndex = shipmentDataList.findIndex(c => c.shipmentId > 0 ? c.shipmentId == getPlannedShipments[pss].shipmentId : c.tempShipmentId == getPlannedShipments[pss].tempShipmentId)

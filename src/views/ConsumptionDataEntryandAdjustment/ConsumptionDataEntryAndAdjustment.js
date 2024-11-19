@@ -1179,7 +1179,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       var rangeValue = this.state.singleValue2;
       var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
       var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
-      var fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
+      if(moment(stopDate).format("YYYY-MM")>=moment(Date.now()).format("YYYY-MM")){
+        stopDate=moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+      }
+      var fullConsumptionList=[];
+      if(moment(startDate).format("YYYY-MM")==moment(stopDate).format("YYYY-MM")){
+        fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") != moment(startDate).format("YYYY-MM"))));
+      }else{
+        fullConsumptionList = this.state.tempConsumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
+      }
       var elInstance = this.state.dataEl;
       for (var i = 0; i < monthArray.length; i++) {
         var columnData = elInstance.getColumnData([i + 1]);
@@ -1355,7 +1363,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           var rangeValue = this.state.singleValue2;
           var startDate = moment(rangeValue.year + '-' + rangeValue.month + '-01').format("YYYY-MM-DD");
           var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
-          var fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
+          if(moment(stopDate).format("YYYY-MM")>=moment(Date.now()).format("YYYY-MM")){
+            stopDate=moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+          }
+          var fullConsumptionList=[];
+          if(moment(startDate).format("YYYY-MM")==moment(stopDate).format("YYYY-MM")){
+            fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") != moment(startDate).format("YYYY-MM"))));            
+          }else{
+            fullConsumptionList = this.state.consumptionList.filter(c => (c.planningUnit.id != consumptionUnit.planningUnit.id) || (c.planningUnit.id == consumptionUnit.planningUnit.id && (moment(c.month).format("YYYY-MM") < moment(startDate).format("YYYY-MM") || moment(c.month).format("YYYY-MM") > moment(stopDate).format("YYYY-MM"))));
+          }
           var monthArray = this.state.monthArray;
           var regionList = this.state.regionList;
           for (var i = 0; i < monthArray.length; i++) {
@@ -1604,7 +1620,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   componentDidMount() {
     //to restrict calender max date to current Date - 36 months
     let currDate = Date.now();
-    let maxDateCalender = moment(currDate).startOf('month').add(-36, 'months').format("YYYY-MM-DD");
+    let maxDateCalender = moment(currDate).startOf('month').format("YYYY-MM-DD");
     let maxDateTmp = { year: Number(moment(maxDateCalender).startOf('month').format("YYYY")), month: Number(moment(maxDateCalender).startOf('month').format("M")) };
     let hasRole = false;
     AuthenticationService.getLoggedInUserRole().map(c => {
@@ -2604,12 +2620,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 var rangeValue = this.state.singleValue2;
                 var startDate = moment(rangeValue.year + '-' + (rangeValue.month <= 9 ? "0" + rangeValue.month : rangeValue.month) + '-01').format("YYYY-MM-DD");
                 var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+                if(moment(stopDate).format("YYYY-MM")>=moment(Date.now()).format("YYYY-MM")){
+                  stopDate=moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                }
                 var daysInMonth = datasetJson.currentVersion.daysInMonth;
                 var monthArray = [];
                 var curDate = startDate;
                 var planningUnitTotalList = [];
                 var planningUnitTotalListRegion = [];
-                for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+                for (var m = 0; (moment(startDate).format("YYYY-MM") == moment(stopDate).format("YYYY-MM")?(m<=0):(moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"))); m++) {
                   curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
                   var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
                   var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
@@ -2727,12 +2746,15 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             var rangeValue = this.state.singleValue2;
             var startDate = moment(rangeValue.year + '-' + (rangeValue.month <= 9 ? "0" + rangeValue.month : rangeValue.month) + '-01').format("YYYY-MM-DD");
             var stopDate = moment(startDate).add(35, 'months').format("YYYY-MM-DD");
+            if(moment(stopDate).format("YYYY-MM")>=moment(Date.now()).format("YYYY-MM")){
+              stopDate=moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+            }
             var daysInMonth = datasetJson.currentVersion.daysInMonth;
             var monthArray = [];
             var curDate = startDate;
             var planningUnitTotalList = [];
             var planningUnitTotalListRegion = [];
-            for (var m = 0; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); m++) {
+            for (var m = 0; (moment(startDate).format("YYYY-MM") == moment(stopDate).format("YYYY-MM")?(m<=0):(moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"))); m++) {
               curDate = moment(startDate).add(m, 'months').format("YYYY-MM-DD");
               var daysInCurrentDate = moment(curDate, "YYYY-MM").daysInMonth();
               var noOfDays = daysInMonth > 0 ? daysInMonth > daysInCurrentDate ? daysInCurrentDate : daysInMonth : daysInCurrentDate;
