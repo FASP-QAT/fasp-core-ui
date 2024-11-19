@@ -17429,7 +17429,7 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  height: 250px;
+  height: 255px;
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
 }
@@ -17446,7 +17446,7 @@ label.arrow_label:before {
 .dashboardTable3 .jss_content{
     // max-height: calc(100vh - 46vh) !important;
     max-height: calc(100vh - 100%) !important;
-    height: 265px;
+    height: 270px;
     overflow: auto;
 }
 .CustomHeight {
@@ -17458,7 +17458,7 @@ label.arrow_label:before {
   // max-height: 310px;
   // min-height: 20vh !important;
   // max-height: 20vh;
-  height: 313px;
+  height: 320px;
   // height: 400px; /* Set the desired fixed height */
   display: flex;
   flex-direction: column;
@@ -17467,7 +17467,7 @@ label.arrow_label:before {
 
 @media screen and (min-width: 1920px) {
   .CustomHeight {
-    height: 327px; /* Set the desired fixed height */
+    height: 335px; /* Set the desired fixed height */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17475,7 +17475,7 @@ label.arrow_label:before {
   .dashboardTable3 .jss_content{
       max-height: calc(100vh - 100%) !important;
       overflow: auto;
-      height: 272px;
+      height: 282px;
   }
   .dashboardTable2E .jss_content {
     max-height: calc(100vh - 100%) !important;
@@ -17749,7 +17749,7 @@ label.arrow_label:before {
   }
   .dashboardTable2 .jss_content {
     max-height: calc(100vh - 100%) !important;
-    height:252px;
+    height:262px;
     overflow:auto;
   }
   

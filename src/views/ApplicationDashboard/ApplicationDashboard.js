@@ -962,7 +962,7 @@ class ApplicationDashboard extends Component {
     */
   handleBottomProgramIdChange = (programId) => {
     localStorage.setItem("bottomProgramId", programId ? programId.value : "");
-    var program = this.state.programList.filter(c=>c.programId==programId.value);
+    var program = programId ? this.state.programList.filter(c=>c.programId==programId.value) : "";
     var dashboardStartDateBottom,dashboardStopDateBottom;
     if ((programId ? true : false) && (programId ? programId.value : "").toString().split("_").length == 1) {
       var startDate = moment(Date.now()).subtract(program[0].noOfMonthsInPastForBottomDashboard, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1629,7 +1629,7 @@ class ApplicationDashboard extends Component {
     } else {
       this.updateState(id, false);
     }
-    this.onTopSubmit();
+    Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
@@ -3459,7 +3459,7 @@ class ApplicationDashboard extends Component {
                 {/* <div className='col-md-12'> */}
                   <div className='row px-3 pt-lg-2'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
-                      <div className="card custom-card CustomHeight" style={{overflow:'hidden'}}>
+                      <div className="card custom-card CustomHeight" style={{overflow:'visible'}}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> Stock Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
@@ -3584,12 +3584,12 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className='row'>
                         <div class="col-md-12">
-                          <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom">
+                          <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{overflow:'visible'}}>
                             <div className="card-header d-flex justify-content-between align-items-center">
                               <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiriesHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                               <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
-                            <div class="card-body px-1 py-2 scrollable-content">
+                            <div class="card-body px-1 py-2 scrollable-content" style={{overflow:'visible'}}>
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '3px 8px' }}>
                               </div>
                             </div>
