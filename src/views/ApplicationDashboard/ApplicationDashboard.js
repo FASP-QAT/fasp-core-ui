@@ -964,11 +964,16 @@ class ApplicationDashboard extends Component {
     localStorage.setItem("bottomProgramId", programId ? programId.value : "");
     var program = this.state.programList.filter(c=>c.programId==programId.value);
     var dashboardStartDateBottom,dashboardStopDateBottom;
-    if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
+    if ((programId ? true : false) && (programId ? programId.value : "").toString().split("_").length == 1) {
       var startDate = moment(Date.now()).subtract(program[0].noOfMonthsInPastForBottomDashboard, 'months').startOf('month').format("YYYY-MM-DD");
       var endDate = moment(Date.now()).add(program[0].noOfMonthsInFutureForBottomDashboard-1, 'months').startOf('month').format("YYYY-MM-DD")
       dashboardStartDateBottom=moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM");
       dashboardStopDateBottom=moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM");
+      var rangeValue= { from: { year: dashboardStartDateBottom.split("-")[0], month: dashboardStartDateBottom.split("-")[1] }, to: { year: dashboardStopDateBottom.split("-")[0], month: dashboardStopDateBottom.split("-")[1] } };
+      localStorage.setItem("bottomReportPeriod", JSON.stringify(rangeValue))
+      this.setState({
+        rangeValue:rangeValue
+      })
     }else{
       dashboardStartDateBottom= this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month;
       dashboardStopDateBottom= this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month;
