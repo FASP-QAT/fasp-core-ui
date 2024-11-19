@@ -645,6 +645,7 @@
   "static.shipmentStatus.shipmentStatusName": "Shipment status name",
   "static.dataentry.dataEnteredInTableEx": "e.g. If I enter 1,000 units, this will be converted into",
   "static.extrapolation.arimaLower": "Arima (Lower Confidence Bound)",
+  "static.program.treeSync": "Tree sync",
   "static.tree.hidePlanningUnit": "Hide Planning Unit",
   "static.stockStatus.consensusConsumption": "Consensus Consumption",
   "static.procurementAgentPlanningUnit.unitPerPalletEuro1": "Units per Pallet EURO 1",
@@ -3441,6 +3442,7 @@
   "static.organisationHead.organisation": "Organization",
   "static.dimension.dimension": "Dimension",
   "static.productCategory.success": "Planning Unit Category updated successfully",
+  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
   "static.QATForecastImport.OldestForecasted": "The oldest forecasted consumption you can import is 6 months before the current month.",
   "static.tree.decimalValidation10&2": "Please enter a valid number having max 3 digits before decimal and max 4 digits after decimal.",
   "static.supplyPlan.inventoryType": "Inventory Type",
@@ -3490,7 +3492,5 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
-  "static.program.treeSync": "Tree sync"
+  "static.pipeline.pipelineConvertorLinux": "Linux."
 }
