@@ -1626,10 +1626,10 @@ class ApplicationDashboard extends Component {
     this.updateState(id, true);
     if (id != 0) {
       this.refs.problemListChild.qatProblemActions(id, id, false);
+      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
     } else {
       this.updateState(id, false);
     }
-    Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
@@ -3514,7 +3514,7 @@ class ApplicationDashboard extends Component {
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'250px',overflowY:'scroll',overflowX:'hidden'}}>
+                              <div className='row' style={{height:'250px',overflowY:'visible',overflowX:'hidden'}}>
                               {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
                                   <Col style={{marginTop:"-60px"}}>
@@ -3529,7 +3529,7 @@ class ApplicationDashboard extends Component {
                                 <h7><b># of Shipments with funding TBD: {this.state.dashboardBottomData.shipmentWithFundingSourceTbd.map(x => x.count).reduce((a,b) => a+b,0)}</b></h7>
                               </div>
                               <div className='row'>
-                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px' }}></div>
+                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 20px 2px 8px' }}></div>
                               </div>
                             </div>
                           </div>
