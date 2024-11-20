@@ -12321,7 +12321,7 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                 </div>
                                 {this.state.currentItemConfig.context.payload.nodeType.id == 6 && <div className="pt-lg-2 pl-lg-0"><i>
-                                    {i18n.t('static.tree.tableDisplays') + " " + i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a sum of <b>{this.state.currentItemConfig.context.payload.downwardAggregationList.length} nodes</b></i>
+                                    {i18n.t('static.tree.tableDisplays') + " " + i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a sum of <b>{this.state.currentItemConfig.context.payload.downwardAggregationList!=undefined?this.state.currentItemConfig.context.payload.downwardAggregationList.length:0} nodes</b></i>
                                 </div>}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcel" className="RowClickable consumptionDataEntryTable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
