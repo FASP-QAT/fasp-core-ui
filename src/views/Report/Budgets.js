@@ -946,6 +946,7 @@ class Budgets extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        {this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.selBudget.length==0 && <h5 className='red'>{i18n.t('static.budgetReport.noBudgetNote')}</h5>}
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <Col md="12 pl-0">
                                 <div className="row">
