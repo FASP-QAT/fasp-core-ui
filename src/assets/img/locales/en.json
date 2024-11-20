@@ -3526,5 +3526,6 @@
   "static.dashboard.actualInventoryTooltip": "Counts the number of PUs that have missing recent actual inventory data (within the last 3 months)",
   "static.dashboard.actualConsumptionTooltip": "Counts the number of PUs that either have missing recent actual consumption data (within the last 3 months), or a gap in actual consumption data (within the last 6 months)",
   "static.dashboard.shipmentsTooltip": "Counts the number of PUs that have shipments with receive dates in the past, or shipments that should have been “submitted” based on program lead times",
-  "static.realm.settingChangeWarning":"One of the dashboard settings has been updated. In order for this change to reflect, please re-download or upload the program."
+  "static.realm.settingChangeWarning":"One of the dashboard settings has been updated. In order for this change to reflect, please re-download or upload the program.",
+  "static.budgetReport.noBudgetNote":"No budgets found for select report period, program(s), and funding source(s). Note that if the start or end date of a budget falls outside of the selected report period, the budget will not be shown. Program Admins can add or edit a budget in Program Management > Budget."
 }
