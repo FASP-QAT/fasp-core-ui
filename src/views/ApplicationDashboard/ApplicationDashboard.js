@@ -139,6 +139,12 @@ class ApplicationDashboard extends Component {
     this.goToIndexErp = this.goToIndexErp.bind(this);
     this.onExiting = this.onExiting.bind(this);
     this.onExited = this.onExited.bind(this);
+    this.onExitingRealm = this.onExitingRealm.bind(this);
+    this.onExitedRealm = this.onExitedRealm.bind(this);
+    this.onExitingUser = this.onExitingUser.bind(this);
+    this.onExitedUser = this.onExitedUser.bind(this);
+    this.onExitingErp = this.onExitingErp.bind(this);
+    this.onExitedErp = this.onExitedErp.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.consolidatedProgramList = this.consolidatedProgramList.bind(this);
     this.checkNewerVersions = this.checkNewerVersions.bind(this);
@@ -1463,6 +1469,48 @@ class ApplicationDashboard extends Component {
     this.animating = false;
   }
   /**
+   * Callback function invoked when an animation is about to start exiting.
+   * Used in components that utilize animations or transitions to perform specific actions just before the exit animation begins.
+   */
+  onExitingRealm() {
+    this.animatingRealm = true;
+  }
+  /**
+   * Callback function invoked when an animation has completed exiting.
+   * Used in components that utilize animations or transitions to perform specific actions after the exit animation has finished.
+   */
+  onExitedRealm() {
+    this.animatingRealm = false;
+  }
+  /**
+   * Callback function invoked when an animation is about to start exiting.
+   * Used in components that utilize animations or transitions to perform specific actions just before the exit animation begins.
+   */
+  onExitingUser() {
+    this.animatingUser = true;
+  }
+  /**
+   * Callback function invoked when an animation has completed exiting.
+   * Used in components that utilize animations or transitions to perform specific actions after the exit animation has finished.
+   */
+  onExitedUser() {
+    this.animatingUser = false;
+  }
+  /**
+   * Callback function invoked when an animation is about to start exiting.
+   * Used in components that utilize animations or transitions to perform specific actions just before the exit animation begins.
+   */
+  onExitingErp() {
+    this.animatingErp = true;
+  }
+  /**
+   * Callback function invoked when an animation has completed exiting.
+   * Used in components that utilize animations or transitions to perform specific actions after the exit animation has finished.
+   */
+  onExitedErp() {
+    this.animatingErp = false;
+  }
+  /**
    * Move to the next item in the carousel.
    */
   next() {
@@ -2059,8 +2107,8 @@ class ApplicationDashboard extends Component {
     const slidesRealm = slidesRealmContent.map((item) => {
       return (
         <CarouselItem
-          onExiting={this.onExiting}
-          onExited={this.onExited}
+          onExiting={this.onExitingRealm}
+          onExited={this.onExitedRealm}
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
@@ -2088,8 +2136,8 @@ class ApplicationDashboard extends Component {
     const slidesUser = slidesUserContent.map((item) => {
       return (
         <CarouselItem
-          onExiting={this.onExiting}
-          onExited={this.onExited}
+          onExiting={this.onExitingUser}
+          onExited={this.onExitedUser}
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
@@ -2117,8 +2165,8 @@ class ApplicationDashboard extends Component {
     const slidesErp = slidesErpContent.map((item) => {
       return (
         <CarouselItem
-          onExiting={this.onExiting}
-          onExited={this.onExited}
+          onExiting={this.onExitingErp}
+          onExited={this.onExitedErp}
           key={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'}
         >
           <div className='carouselCont' onClick={() => this.redirectToCrudWindow(item.url)} style={{ cursor: 'pointer' }}>
@@ -2126,7 +2174,7 @@ class ApplicationDashboard extends Component {
               <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
             <div className='TextContTicker'>
-              <CarouselCaption captionHeader={item.name} captionText={item.count} />
+              <CarouselCaption captionHeader={item.name} captionText={isNaN(item.count) ? 0 : item.count} />
             </div>
           </div>
         </CarouselItem>
@@ -3129,7 +3177,7 @@ class ApplicationDashboard extends Component {
                         />
                       </FormGroup> */}
                     <div class="row pt-lg-2">
-                      <div class="col-5" style={{display:'flex',gap:'40px'}}>
+                      <div class="col-5" style={{display:'flex',gap:'40px', alignItems:"center"}}>
                         <FormGroup className='FormGroupD col-10 px-0'>
                           <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
                           <FormGroup className='MarginTopCheckBox'>
@@ -3174,7 +3222,7 @@ class ApplicationDashboard extends Component {
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
                               <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>Realm</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
+                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
                                   <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
                                   {slidesRealm}
                                 </Carousel>
@@ -3189,7 +3237,7 @@ class ApplicationDashboard extends Component {
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
                               <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>User</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
+                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
                                   <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
                                   {slidesUser}
                                 </Carousel>
@@ -3204,7 +3252,7 @@ class ApplicationDashboard extends Component {
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
                               <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>ERP Linked Shipments</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={1000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
+                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
                                   <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
                                   {slidesErp}
                                 </Carousel>
@@ -3266,9 +3314,9 @@ class ApplicationDashboard extends Component {
                             return (
                               <tr>
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"top",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer",verticalAlign:'top',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
+                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"middle",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'middle',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
+                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer",verticalAlign:'middle',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
                                   {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                                 </td>}
                                 {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
