@@ -7697,8 +7697,8 @@ h6 {
   flex: 0 1 auto;
   // width: 30px;
   // height: 3px;
-  margin-right: 3px;
-  margin-left: 3px;
+  margin-right: 6px;
+  margin-left: 6px;
   text-indent: 0 !important;
   cursor: pointer;
   background-color: #fff;
@@ -7707,8 +7707,8 @@ h6 {
   border-bottom: 10px solid transparent;
   opacity: .5;
   transition: opacity 0;
-  width: 8px !important;
-  height: 8px !important;
+  width: 10px !important;
+  height: 10px !important;
   border-radius: 50% !important;
 }
 
@@ -17797,7 +17797,7 @@ label.arrow_label:before {
 
 }
 #legend-container ul{
-  margin:revert!important;
+  margin:0px !important;
   padding:revert!important;
 }
 .containerBox {
