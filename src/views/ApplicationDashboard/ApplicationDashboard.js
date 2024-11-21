@@ -123,7 +123,8 @@ class ApplicationDashboard extends Component {
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       topSubmitLoader: false,
-      fullDashbaordTopList:[]
+      fullDashbaordTopList:[],
+      topProgramIdChange: false
     };
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
@@ -958,7 +959,8 @@ class ApplicationDashboard extends Component {
   handleTopProgramIdChange = (programIds) => {
     // localStorage.setItem("topProgramId", JSON.stringify(programIds))//programIds.map(x => x.value).toString())
     this.setState({
-      topProgramId: programIds //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+      topProgramId: programIds, //this.state.programList.filter(x => programIds.map(ids => ids.value).includes(x.id)),
+      topProgramIdChange: true
     });
   }
   /**
@@ -1029,7 +1031,8 @@ class ApplicationDashboard extends Component {
 
   onTopSubmit() {
     this.setState({
-      topSubmitLoader: true
+      topSubmitLoader: true,
+      topProgramIdChange: false
     })
     localStorage.setItem("topLocalProgram", this.state.onlyDownloadedTopProgram);
     localStorage.setItem("topProgramId", JSON.stringify(this.state.topProgramId))
@@ -1542,7 +1545,7 @@ class ApplicationDashboard extends Component {
    */
   nextRealm() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndexRealm === 2 ? 0 :
+    const nextIndex = this.state.activeIndexRealm === 3 ? 0 :
       this.state.activeIndexRealm + 1;
     this.setState({ activeIndexRealm: nextIndex });
   }
@@ -1551,7 +1554,7 @@ class ApplicationDashboard extends Component {
    */
   previousRealm() {
     if (this.animating) return;
-    const nextIndex = this.state.activeIndexRealm === 0 ? 2 :
+    const nextIndex = this.state.activeIndexRealm === 0 ? 3 :
       this.state.activeIndexRealm - 1;
     this.setState({ activeIndexRealm: nextIndex });
   }
@@ -2174,7 +2177,7 @@ class ApplicationDashboard extends Component {
               <img width='100%' src={'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22800%22%20height%3D%22400%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20400%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3Cstyle%20type%3D%22text%2Fcss%22%3E%23holder_1607923e7e2%20text%20%7B%20fill%3A%23555%3Bfont-weight%3Anormal%3Bfont-family%3AHelvetica%2C%20monospace%3Bfont-size%3A40pt%20%7D%20%3C%2Fstyle%3E%3C%2Fdefs%3E%3Cg%20id%3D%22holder_1607923e7e2%22%3E%3Crect%20width%3D%22800%22%20height%3D%22400%22%20fill%3D%22%23777%22%3E%3C%2Frect%3E%3Cg%3E%3Ctext%20x%3D%22285.9296875%22%20y%3D%22217.75625%22%3EFirst%20slide%3C%2Ftext%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E'} />
             </div>
             <div className='TextContTicker'>
-              <CarouselCaption captionHeader={item.name} captionText={isNaN(item.count) ? 0 : item.count} />
+              <CarouselCaption captionHeader={item.name} captionText={item.count == 'NaN' ? 0 : item.count} />
             </div>
           </div>
         </CarouselItem>
@@ -3211,7 +3214,7 @@ class ApplicationDashboard extends Component {
                             filterOptions={filterOptions}
                           />
                         </FormGroup>
-                        <FormGroup className='col-1' style={{ marginTop: '24px' }}>
+                        <FormGroup className='col-1' style={{ marginTop: '24px', display: this.state.topProgramIdChange ? "block" : "none" }}>
                           <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
                       </div>
@@ -3221,7 +3224,7 @@ class ApplicationDashboard extends Component {
                           <Card className="CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>Realm</h5>
+                              <h5 class="card-title IconColorD">Realm</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
                                   <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
                                   {slidesRealm}
@@ -3236,7 +3239,7 @@ class ApplicationDashboard extends Component {
                           <Card className=" CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>User</h5>
+                              <h5 class="card-title IconColorD">User</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
                                   <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
                                   {slidesUser}
@@ -3251,7 +3254,7 @@ class ApplicationDashboard extends Component {
                           <Card className=" CardHeight">
                             <CardBody className="p-0">
                               <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD" style={{fontWeight:"200"}}>ERP Linked Shipments</h5>
+                              <h5 class="card-title IconColorD">ERP Linked Shipments</h5>
                                 <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
                                   <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
                                   {slidesErp}
