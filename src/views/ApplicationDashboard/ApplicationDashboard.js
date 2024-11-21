@@ -167,6 +167,7 @@ class ApplicationDashboard extends Component {
     this.getHealthAreaListByRealmCountryIds = this.getHealthAreaListByRealmCountryIds.bind(this);
     this.toggleLarge=this.toggleLarge.bind(this);
     this.actionCanceled=this.actionCanceled.bind(this);
+    this.fetchData = this.fetchData.bind(this);
   }
   /**
    * Deletes a supply plan program.
@@ -970,7 +971,7 @@ class ApplicationDashboard extends Component {
     */
   handleBottomProgramIdChange = (programId) => {
     localStorage.setItem("bottomProgramId", programId ? programId.value : "");
-    var program = programId ? this.state.programList.filter(c=>c.programId==programId.value) : "";
+    var program = programId ? this.state.programList.filter(c=>c.id==programId.value) : "";
     var dashboardStartDateBottom,dashboardStopDateBottom;
     if ((programId ? true : false) && (programId ? programId.value : "").toString().split("_").length == 1) {
       var startDate = moment(Date.now()).subtract(program[0].noOfMonthsInPastForBottomDashboard, 'months').startOf('month').format("YYYY-MM-DD");
@@ -1669,6 +1670,9 @@ class ApplicationDashboard extends Component {
       }
     })
   }
+  fetchData() {
+    Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+  }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
    * @param {number} id The ID of the program for which to retrieve the problem list. 
@@ -1677,7 +1681,9 @@ class ApplicationDashboard extends Component {
     this.updateState(id, true);
     if (id != 0) {
       this.refs.problemListChild.qatProblemActions(id, id, false);
-      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+      setTimeout(() => {
+        Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+      }, 0)
     } else {
       this.updateState(id, false);
     }
@@ -2764,7 +2770,7 @@ class ApplicationDashboard extends Component {
 
     return (
       <div className="animated fadeIn">
-        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.getPrograms} objectStore="programData" page="dashboard"></QatProblemActionNew>
+        <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" page="dashboard"></QatProblemActionNew>
         <AuthenticationServiceComponent history={this.props.history} message={(message) => {
           this.setState({ message: message })
         }} />
@@ -3527,23 +3533,23 @@ class ApplicationDashboard extends Component {
                     </div>
                     <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
                       {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card pb-lg-2 CustomHeight">
+                      <div className="card custom-card pb-lg-2 CustomHeight" style={{overflow:'visible'}}>
                         <div class="card-header  justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> Forecast Error <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
-                        <div class="card-body px-1 py-2 scrollable-content" style={{overflowY:'hidden'}}>
+                        <div class="card-body px-1 py-2">
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
                           </div>
                         </div>
                       </div>
                     </div>
                     <div className='col-md-6'>
-                      <div className="card custom-card pb-lg-2 CustomHeight">
+                      <div className="card custom-card pb-lg-2 CustomHeight" style={{overflow:'visible'}}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
-                        <div class="card-body pt-lg-1 scrollable-content" style={{overflowY:'hidden', paddingBottom: 0}}>
+                        <div class="card-body pt-lg-1" style={{paddingBottom: 0}}>
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
@@ -3575,12 +3581,12 @@ class ApplicationDashboard extends Component {
                                 <div id="legend-container" style={{marginTop:"0px"}}></div>
                               </div>
                             </div>
-                            <div className='col-6 container1'>
+                            <div className='col-6 container1' style={{overflow:'visible'}}>
                               <div class="label-text text-center text-mutedDashboard">
                                 <h7><b># of Shipments with funding TBD: {this.state.dashboardBottomData.shipmentWithFundingSourceTbd.map(x => x.count).reduce((a,b) => a+b,0)}</b></h7>
                               </div>
                               <div className='row'>
-                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 20px 2px 8px' }}></div>
+                                <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px 2px 8px' }}></div>
                               </div>
                             </div>
                           </div>
