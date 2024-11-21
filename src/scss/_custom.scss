@@ -17481,11 +17481,11 @@ label.arrow_label:before {
     max-height: calc(100vh - 100%) !important;
     height:168px;
     overflow: auto;
-}
-.dashboardTable2Ss .jss_content {
-  max-height: calc(100vh - 100%) !important;
-  overflow: auto;
-}
+  }
+  .dashboardTable2Ss .jss_content {
+    max-height: calc(100vh - 100%) !important;
+    overflow: auto;
+  }
 }
 .MuiSwitch-switchBase {
   top: 0;
@@ -18119,8 +18119,8 @@ label.arrow_label:before {
   top: -150px !important;
 }
 .dashboardTable3>div .jss_filters {
-  top: -50px !important;
+  top: 0px !important;
 }
 .dashboardTable2>div .jss_filters {
-  top: -100px !important;
+  top: 0px !important;
 }
