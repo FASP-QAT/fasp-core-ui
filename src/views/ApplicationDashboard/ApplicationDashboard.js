@@ -123,7 +123,7 @@ class ApplicationDashboard extends Component {
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       topSubmitLoader: false,
-      fullDashbaordTopList:[],
+      fullDashbaordTopList: [],
       topProgramIdChange: false
     };
     this.next = this.next.bind(this);
@@ -165,8 +165,8 @@ class ApplicationDashboard extends Component {
     this.onTopSubmit = this.onTopSubmit.bind(this);
     this.getRealmCountryList = this.getRealmCountryList.bind(this);
     this.getHealthAreaListByRealmCountryIds = this.getHealthAreaListByRealmCountryIds.bind(this);
-    this.toggleLarge=this.toggleLarge.bind(this);
-    this.actionCanceled=this.actionCanceled.bind(this);
+    this.toggleLarge = this.toggleLarge.bind(this);
+    this.actionCanceled = this.actionCanceled.bind(this);
     this.fetchData = this.fetchData.bind(this);
   }
   /**
@@ -328,21 +328,21 @@ class ApplicationDashboard extends Component {
     }
     this.props.history.push(url);
   }
-   /**
-   * Redirects the user to a specified URL.
-   * @param {string} url - The URL to redirect to.
-   */
-   redirectToCrudWindow = (url, isMultiSelect, programId) => {
-    if(isMultiSelect == 2) {
+  /**
+  * Redirects the user to a specified URL.
+  * @param {string} url - The URL to redirect to.
+  */
+  redirectToCrudWindow = (url, isMultiSelect, programId) => {
+    if (isMultiSelect == 2) {
       localStorage.setItem("sesProgramId", programId)
     }
-    else if(isMultiSelect) {
+    else if (isMultiSelect) {
       localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
     } else {
       let pId, vId;
-      if(this.state.bottomProgramId.toString().split("_").length > 0){
+      if (this.state.bottomProgramId.toString().split("_").length > 0) {
         pId = this.state.bottomProgramId.toString().split("_")[0];
-        vId = this.state.programList.filter(x => x.id == this.state.bottomProgramId)[0].versionId+" (Local)";
+        vId = this.state.programList.filter(x => x.id == this.state.bottomProgramId)[0].versionId + " (Local)";
       } else {
         pId = this.state.bottomProgramId;
         vId = this.state.programList.filter(x => x.programId == this.state.bottomProgramId)[0].versionId;
@@ -361,148 +361,148 @@ class ApplicationDashboard extends Component {
   getNotes(programId) {
     this.toggleLarge();
     this.setState({
-        loadingForNotes: true
+      loadingForNotes: true
     })
     ProgramService.getNotesHistory(programId)
-        .then(response => {
-            var data = response.data;
-            const listArray = [];
-            const grouped = data.reduce((acc, item) => {
-                acc[item.versionId] = acc[item.versionId] || [];
-                acc[item.versionId].push(item);
-                return acc;
-            }, {});
+      .then(response => {
+        var data = response.data;
+        const listArray = [];
+        const grouped = data.reduce((acc, item) => {
+          acc[item.versionId] = acc[item.versionId] || [];
+          acc[item.versionId].push(item);
+          return acc;
+        }, {});
 
-            Object.values(grouped).forEach(entries => {
-                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                if (pendingEntries.length) {
-                    listArray.push(pendingEntries[0]);
-                    if (pendingEntries.length > 1) {
-                        listArray.push(pendingEntries[pendingEntries.length - 1]);
-                    }
-                }
-                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+        Object.values(grouped).forEach(entries => {
+          const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+          if (pendingEntries.length) {
+            listArray.push(pendingEntries[0]);
+            if (pendingEntries.length > 1) {
+              listArray.push(pendingEntries[pendingEntries.length - 1]);
+            }
+          }
+          listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+        });
+
+        if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+          jexcel.destroy(document.getElementById("notesTransTable"), true);
+        }
+        var json = [];
+        for (var sb = listArray.length - 1; sb >= 0; sb--) {
+          var data = [];
+          data[0] = listArray[sb].versionId;
+          data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+          data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+          data[3] = listArray[sb].notes;
+          data[4] = listArray[sb].lastModifiedBy.username;
+          data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+          json.push(data);
+        }
+        var options = {
+          data: json,
+          columnDrag: false,
+          columns: [
+            { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+            { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+            { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+            { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+            {
+              title: i18n.t("static.common.lastModifiedBy"),
+              type: "text",
+            },
+            {
+              title: i18n.t("static.common.lastModifiedDate"),
+              type: "calendar",
+              options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+            },
+          ],
+          editable: false,
+          onload: function (instance, cell) {
+            if (this.state.bottomProgramId == "") {
+              jExcelLoadedFunctionForNotes(instance, 0);
+            } else {
+              jExcelLoadedFunctionForNotes(instance, 4);
+            }
+          }.bind(this),
+          pagination: localStorage.getItem("sesRecordCount"),
+          search: true,
+          columnSorting: true,
+          wordWrap: true,
+          allowInsertColumn: false,
+          allowManualInsertColumn: false,
+          allowDeleteRow: false,
+          // onselection: this.selected,
+          oneditionend: this.onedit,
+          copyCompatibility: true,
+          allowExport: false,
+          paginationOptions: JEXCEL_PAGINATION_OPTION,
+          position: "top",
+          filters: true,
+          license: JEXCEL_PRO_KEY,
+          contextMenu: function (obj, x, y, e) {
+            return false;
+          }.bind(this),
+        };
+        var elVar = jexcel(document.getElementById("notesTransTable"), options);
+        this.el = elVar;
+        this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+      }).catch(
+        error => {
+          this.setState({
+            loadingForNotes: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
             });
-
-            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                jexcel.destroy(document.getElementById("notesTransTable"), true);
-            }
-            var json = [];
-            for (var sb = listArray.length - 1; sb >= 0; sb--) {
-                var data = [];
-                data[0] = listArray[sb].versionId;
-                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                data[3] = listArray[sb].notes;
-                data[4] = listArray[sb].lastModifiedBy.username;
-                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
-                json.push(data);
-            }
-            var options = {
-                data: json,
-                columnDrag: false,
-                columns: [
-                    { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                    { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                    { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                    { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                    {
-                        title: i18n.t("static.common.lastModifiedBy"),
-                        type: "text",
-                    },
-                    {
-                        title: i18n.t("static.common.lastModifiedDate"),
-                        type: "calendar",
-                        options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                    },
-                ],
-                editable: false,
-                onload: function (instance, cell) {
-                  if(this.state.bottomProgramId==""){
-                    jExcelLoadedFunctionForNotes(instance,0);
-                  }else{
-                    jExcelLoadedFunctionForNotes(instance,4);
-                  }
-                }.bind(this),
-                pagination: localStorage.getItem("sesRecordCount"),
-                search: true,
-                columnSorting: true,
-                wordWrap: true,
-                allowInsertColumn: false,
-                allowManualInsertColumn: false,
-                allowDeleteRow: false,
-                // onselection: this.selected,
-                oneditionend: this.onedit,
-                copyCompatibility: true,
-                allowExport: false,
-                paginationOptions: JEXCEL_PAGINATION_OPTION,
-                position: "top",
-                filters: true,
-                license: JEXCEL_PRO_KEY,
-                contextMenu: function (obj, x, y, e) {
-                    return false;
-                }.bind(this),
-            };
-            var elVar = jexcel(document.getElementById("notesTransTable"), options);
-            this.el = elVar;
-            this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
-
-        }).catch(
-            error => {
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
                 this.setState({
-                    loadingForNotes: false
-                })
-                if (error.message === "Network Error") {
-                    this.setState({
-                        message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                        loading: false
-                    });
-                } else {
-                    switch (error.response ? error.response.status : "") {
-                        case 401:
-                            this.props.history.push(`/login/static.message.sessionExpired`)
-                            break;
-                        case 409:
-                            this.setState({
-                                message: i18n.t('static.common.accessDenied'),
-                                loading: false,
-                                color: "#BA0C2F",
-                            });
-                            break;
-                        case 403:
-                            this.props.history.push(`/accessDenied`)
-                            break;
-                        case 500:
-                        case 404:
-                        case 406:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        case 412:
-                            this.setState({
-                                message: error.response.data.messageCode,
-                                loading: false
-                            });
-                            break;
-                        default:
-                            this.setState({
-                                message: 'static.unkownError',
-                                loading: false
-                            });
-                            break;
-                    }
-                }
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: error.response.data.messageCode,
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
             }
-        );
+          }
+        }
+      );
   }
   /**
      * This function is used to toggle the notes history model
      */
   toggleLarge() {
     this.setState({
-        notesPopup: !this.state.notesPopup,
+      notesPopup: !this.state.notesPopup,
     });
   }
   /**
@@ -510,11 +510,11 @@ class ApplicationDashboard extends Component {
      */
   actionCanceled() {
     this.setState({
-        message: i18n.t('static.actionCancelled'),
-        color: "#BA0C2F",
+      message: i18n.t('static.actionCancelled'),
+      color: "#BA0C2F",
     }, () => {
-        hideSecondComponent();
-        this.toggleLarge();
+      hideSecondComponent();
+      this.toggleLarge();
     })
   }
   /**
@@ -558,12 +558,12 @@ class ApplicationDashboard extends Component {
    */
   checkNewerVersions(programs) {
     // if (localStorage.getItem('sessionType') === 'Online') {
-      localStorage.setItem("sesLatestProgram", this.state.fullDashbaordTopList.filter(x => !x.isLatest).length);
-      // ProgramService.checkNewerVersions(programs)
-      //   .then(response => {
-      //     localStorage.removeItem("sesLatestProgram");
-      //     localStorage.setItem("sesLatestProgram", response.data);
-      //   })
+    localStorage.setItem("sesLatestProgram", this.state.fullDashbaordTopList.filter(x => !x.isLatest).length);
+    // ProgramService.checkNewerVersions(programs)
+    //   .then(response => {
+    //     localStorage.removeItem("sesLatestProgram");
+    //     localStorage.setItem("sesLatestProgram", response.data);
+    //   })
     // }
   }
   /**
@@ -971,21 +971,21 @@ class ApplicationDashboard extends Component {
     */
   handleBottomProgramIdChange = (programId) => {
     localStorage.setItem("bottomProgramId", programId ? programId.value : "");
-    var program = programId ? this.state.programList.filter(c=>c.id==programId.value) : "";
-    var dashboardStartDateBottom,dashboardStopDateBottom;
+    var program = programId ? this.state.programList.filter(c => c.id == programId.value) : "";
+    var dashboardStartDateBottom, dashboardStopDateBottom;
     if ((programId ? true : false) && (programId ? programId.value : "").toString().split("_").length == 1) {
       var startDate = moment(Date.now()).subtract(program[0].noOfMonthsInPastForBottomDashboard, 'months').startOf('month').format("YYYY-MM-DD");
-      var endDate = moment(Date.now()).add(program[0].noOfMonthsInFutureForBottomDashboard-1, 'months').startOf('month').format("YYYY-MM-DD")
-      dashboardStartDateBottom=moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM");
-      dashboardStopDateBottom=moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM");
-      var rangeValue= { from: { year: dashboardStartDateBottom.split("-")[0], month: dashboardStartDateBottom.split("-")[1] }, to: { year: dashboardStopDateBottom.split("-")[0], month: dashboardStopDateBottom.split("-")[1] } };
+      var endDate = moment(Date.now()).add(program[0].noOfMonthsInFutureForBottomDashboard - 1, 'months').startOf('month').format("YYYY-MM-DD")
+      dashboardStartDateBottom = moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM");
+      dashboardStopDateBottom = moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM");
+      var rangeValue = { from: { year: dashboardStartDateBottom.split("-")[0], month: dashboardStartDateBottom.split("-")[1] }, to: { year: dashboardStopDateBottom.split("-")[0], month: dashboardStopDateBottom.split("-")[1] } };
       localStorage.setItem("bottomReportPeriod", JSON.stringify(rangeValue))
       this.setState({
-        rangeValue:rangeValue
+        rangeValue: rangeValue
       })
-    }else{
-      dashboardStartDateBottom= this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month;
-      dashboardStopDateBottom= this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month;
+    } else {
+      dashboardStartDateBottom = this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month;
+      dashboardStopDateBottom = this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month;
     }
     this.setState({
       bottomProgramId: programId ? programId.value : "",
@@ -996,7 +996,7 @@ class ApplicationDashboard extends Component {
         var inputJson = {
           programId: this.state.bottomProgramId,
           startDate: moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM") + "-01",
-          stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM")+ "-" + moment(endDate).endOf('month').format("DD"),
+          stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM") + "-" + moment(endDate).endOf('month').format("DD"),
           displayShipmentsBy: this.state.displayBy
         }
         this.getOnlineDashboardBottom(inputJson);
@@ -1056,7 +1056,7 @@ class ApplicationDashboard extends Component {
               var itemLabelA = a.program.code.toUpperCase();
               var itemLabelB = b.program.code.toUpperCase();
               return itemLabelA > itemLabelB ? 1 : -1;
-          }),
+            }),
             topSubmitLoader: false
           })
         }).catch(e => {
@@ -1192,7 +1192,7 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    console.log("Test@123 resolution width: ",window.innerWidth," height:",window.innerHeight)
+    console.log("Test@123 resolution width: ", window.innerWidth, " height:", window.innerHeight)
     var db1;
     let tempProgramList = [];
     let shipmentStatusList = [];
@@ -1241,7 +1241,7 @@ class ApplicationDashboard extends Component {
           dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
           var dt1 = new Date();
           dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
-          if(!localStorage.getItem("bottomReportPeriod"))
+          if (!localStorage.getItem("bottomReportPeriod"))
             localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
           var inputJson = {
             programId: this.state.bottomProgramId,
@@ -1271,106 +1271,106 @@ class ApplicationDashboard extends Component {
         shipmentStatusRequest.onerror = function (event) {
         }.bind(this);
         shipmentStatusRequest.onsuccess = function (event) {
-        var shipmentStatusResult = [];
-        shipmentStatusResult = shipmentStatusRequest.result;
-        for (var k = 0; k < shipmentStatusResult.length; k++) {
-          if(shipmentStatusResult[k].active) {
+          var shipmentStatusResult = [];
+          shipmentStatusResult = shipmentStatusRequest.result;
+          for (var k = 0; k < shipmentStatusResult.length; k++) {
+            if (shipmentStatusResult[k].active) {
               var shipmentStatusJson = {
-                  id: shipmentStatusResult[k].shipmentStatusId,
-                  active: shipmentStatusResult[k].active,
-                  label: shipmentStatusResult[k].label
+                id: shipmentStatusResult[k].shipmentStatusId,
+                active: shipmentStatusResult[k].active,
+                label: shipmentStatusResult[k].label
               }
               shipmentStatusList.push(shipmentStatusJson);
             }
           }
-          this.setState({ shipmentStatusList: shipmentStatusList})
+          this.setState({ shipmentStatusList: shipmentStatusList })
         }
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
       afterDraw: function (chart) {
         if (chart.config.type === 'pie') {
-            const ctx = chart.chart.ctx;
-            const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
-            chart.data.datasets.forEach((dataset, datasetIndex) => {
-                const meta = chart.getDatasetMeta(datasetIndex);
-                if (!meta.hidden) {
-                    meta.data.forEach((element, index) => {
-                        if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
-                            // Draw the connecting lines
-                            ctx.save();
-                            const model = element._model;
-                            const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
-                            const startAngle = model.startAngle;
-                            const endAngle = model.endAngle;
-                            const midAngle = startAngle + (endAngle - startAngle) / 2;
+          const ctx = chart.chart.ctx;
+          const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
+          chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta.hidden) {
+              meta.data.forEach((element, index) => {
+                if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                  // Draw the connecting lines
+                  ctx.save();
+                  const model = element._model;
+                  const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
+                  const startAngle = model.startAngle;
+                  const endAngle = model.endAngle;
+                  const midAngle = startAngle + (endAngle - startAngle) / 2;
 
-                            const x = Math.cos(midAngle);
-                            const y = Math.sin(midAngle);
+                  const x = Math.cos(midAngle);
+                  const y = Math.sin(midAngle);
 
-                            // Calculate the end point for the line
-                            const lineX = model.x + x * model.outerRadius;
-                            const lineY = model.y + y * model.outerRadius;
-                            const labelX = model.x + x * (model.outerRadius + 10);
-                            const labelY = model.y + y * (model.outerRadius + 10);
+                  // Calculate the end point for the line
+                  const lineX = model.x + x * model.outerRadius;
+                  const lineY = model.y + y * model.outerRadius;
+                  const labelX = model.x + x * (model.outerRadius + 10);
+                  const labelY = model.y + y * (model.outerRadius + 10);
 
-                            const label = chart.data.labels[index];
-                            const value = dataset.data[index];
-                            const percentage = ((value / total) * 100).toFixed(2) + '%';
-                            if (((value / total) * 100).toFixed(2) > 2) {
-                                ctx.beginPath();
-                                ctx.moveTo(model.x, model.y);
-                                ctx.lineTo(lineX, lineY);
-                                ctx.lineTo(labelX, labelY);
-                                ctx.strokeStyle = dataset.backgroundColor[index];
-                                ctx.stroke();
-                                ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                ctx.font = 'number 10px Arial';
-                                // ctx.textBaseline = 'middle';
-                                ctx.fillStyle = dataset.backgroundColor[index];
-                                ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
-                                ctx.restore();
-                            }
-                        }
-                    });
+                  const label = chart.data.labels[index];
+                  const value = dataset.data[index];
+                  const percentage = ((value / total) * 100).toFixed(2) + '%';
+                  if (((value / total) * 100).toFixed(2) > 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(model.x, model.y);
+                    ctx.lineTo(lineX, lineY);
+                    ctx.lineTo(labelX, labelY);
+                    ctx.strokeStyle = dataset.backgroundColor[index];
+                    ctx.stroke();
+                    ctx.textAlign = x >= 0 ? 'left' : 'right';
+                    ctx.font = 'number 10px Arial';
+                    // ctx.textBaseline = 'middle';
+                    ctx.fillStyle = dataset.backgroundColor[index];
+                    ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
+                    ctx.restore();
+                  }
                 }
-            });
+              });
+            }
+          });
         } else if (chart.config.type === 'doughnut') {
           const ctx = chart.chart.ctx;
           const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
           chart.data.datasets.forEach((dataset, datasetIndex) => {
-              const meta = chart.getDatasetMeta(datasetIndex);
-              if (!meta.hidden) {
-                  meta.data.forEach((element, index) => {
-                      if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
-                          // Draw the connecting lines
-                          ctx.save();
-                          const model = element._model;
-                          const startAngle = model.startAngle;
-                          const endAngle = model.endAngle;
-                          const midAngle = startAngle + (endAngle - startAngle) / 2;
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta.hidden) {
+              meta.data.forEach((element, index) => {
+                if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
+                  // Draw the connecting lines
+                  ctx.save();
+                  const model = element._model;
+                  const startAngle = model.startAngle;
+                  const endAngle = model.endAngle;
+                  const midAngle = startAngle + (endAngle - startAngle) / 2;
 
-                          const x = Math.cos(endAngle);
-                          const y = Math.sin(endAngle);
+                  const x = Math.cos(endAngle);
+                  const y = Math.sin(endAngle);
 
-                          const labelX = model.x + x * (model.outerRadius + 10);
-                          const labelY = model.y + y * (model.outerRadius + 10);
+                  const labelX = model.x + x * (model.outerRadius + 10);
+                  const labelY = model.y + y * (model.outerRadius + 10);
 
-                          const value = dataset.data[index];
-                          if ((((value / total) * 100).toFixed(2) >= 0 && index == 0)) {
-                              ctx.beginPath();
-                              ctx.moveTo(model.x, model.y);
-                              ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
-                              ctx.stroke();
-                              ctx.textAlign = x >= 0 ? 'left' : 'right';
-                              ctx.font = 'number 14px Arial';
-                              ctx.fillStyle =  (dataset.data[0] == 0) ? "red" : localStorage.getItem("theme") == "dark" ? "#FFFFFF" : "#000000" //dataset.backgroundColor[index];
-                              ctx.fillText(`${value}`, labelX - 4, labelY + 2);
-                              ctx.restore();
-                          }
-                      }
-                  });
-              }
+                  const value = dataset.data[index];
+                  if ((((value / total) * 100).toFixed(2) >= 0 && index == 0)) {
+                    ctx.beginPath();
+                    ctx.moveTo(model.x, model.y);
+                    ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
+                    ctx.stroke();
+                    ctx.textAlign = x >= 0 ? 'left' : 'right';
+                    ctx.font = 'number 14px Arial';
+                    ctx.fillStyle = (dataset.data[0] == 0) ? "red" : localStorage.getItem("theme") == "dark" ? "#FFFFFF" : "#000000" //dataset.backgroundColor[index];
+                    ctx.fillText(`${value}`, labelX - 4, labelY + 2);
+                    ctx.restore();
+                  }
+                }
+              });
+            }
           });
         }
       }
@@ -1391,18 +1391,18 @@ class ApplicationDashboard extends Component {
       //     })
       // }
       // if (this.state.id == 2) {
-        DashboardService.realmLevelDashboard(this.state.realmId)
-          .then(response => {
-            this.setState({
-              dashboard: response.data
-            })
+      DashboardService.realmLevelDashboard(this.state.realmId)
+        .then(response => {
+          this.setState({
+            dashboard: response.data
           })
-        DashboardService.realmLevelDashboardUserList()
-          .then(response => {
-            this.setState({
-              users: response.data
-            })
+        })
+      DashboardService.realmLevelDashboardUserList()
+        .then(response => {
+          this.setState({
+            users: response.data
           })
+        })
       // }
       let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
       let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
@@ -1660,11 +1660,11 @@ class ApplicationDashboard extends Component {
         }, () => {
           localStorage.setItem("bottomReportPeriod", JSON.stringify(this.state.rangeValue))
         })
-      } else if(key == "dashboardTopList") {
+      } else if (key == "dashboardTopList") {
         this.setState({
           dashboardTopList: value.filter(p => this.state.topProgramId.map(m => m.value.toString()).includes(p.program.id)),
           fullDashbaordTopList: value
-        },()=>{
+        }, () => {
           this.checkNewerVersions();
         })
       }
@@ -1694,7 +1694,7 @@ class ApplicationDashboard extends Component {
    */
   getProblemListAfterCalculationMultiple() {
     let i = 0;
-    for(i = 0; i < this.state.topProgramId.length; i++){
+    for (i = 0; i < this.state.topProgramId.length; i++) {
       this.updateState(this.state.topProgramId[i].value, true);
       if (this.state.topProgramId[i].value != 0) {
         this.refs.problemListChild.qatProblemActions(this.state.topProgramId[i].value, this.state.topProgramId[i].value, false);
@@ -1702,7 +1702,7 @@ class ApplicationDashboard extends Component {
         this.updateState(this.state.topProgramId[i].value, false);
       }
     }
-    if(i == this.state.topProgramId.length){
+    if (i == this.state.topProgramId.length) {
       this.onTopSubmit();
     }
   }
@@ -1723,7 +1723,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en + " | " + forecastErrorList[j].planningUnit.id
-        data[1] = forecastErrorList[j].errorPerc!="" && forecastErrorList[j].errorPerc!=null && forecastErrorList[j].errorPerc!="null" && forecastErrorList[j].errorPerc!=undefined?formatter(Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2))+"%":"<i class='fa fa-exclamation-triangle' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+        data[1] = forecastErrorList[j].errorPerc != "" && forecastErrorList[j].errorPerc != null && forecastErrorList[j].errorPerc != "null" && forecastErrorList[j].errorPerc != undefined ? formatter(Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2)) + "%" : "<i class='fa fa-exclamation-triangle' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
         data[2] = forecastErrorList[j].aboveForecastThreshold
         dataArray[count] = data;
         count++;
@@ -1739,27 +1739,27 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "Planning Unit",
+          title: i18n.t("static.procurementUnit.planningUnit"),
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'110px'
+          width: '110px'
         },
         {
-          title: "Average %",
+          title: i18n.t("static.common.averagePer"),
           type: 'html',
           editable: false,
           readOnly: true,
           mask: "#,##.00%",
           decimal: ".",
-          width:'70px'
+          width: '70px'
         },
         {
           title: "Threshold",
           type: 'hidden'
         }
       ],
-      onload: function(instance, cell, x, y, value) { 
+      onload: function (instance, cell, x, y, value) {
         jExcelLoadedFunctionWithoutPagination(instance, 1);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
@@ -1770,9 +1770,9 @@ class ApplicationDashboard extends Component {
           if (rowData[2] || rowData[1].includes("exclamation")) {
             var cell = elInstance.getCell('B'.concat(parseInt(j) + 1));
             cell.classList.add("shipmentEntryEmergency");
-            if(rowData[2]) {
+            if (rowData[2]) {
               var divInsideCell = cell.querySelector("div");
-              divInsideCell.title = "Calculated Forecast Error is above the Forecast Error Threshold";
+              divInsideCell.title = i18n.t("static.dashboard.aboveThreshold");
             }
           }
         }
@@ -1824,19 +1824,19 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "Planning Unit",
+          title: i18n.t("static.procurementUnit.planningUnit"),
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'110px'
+          width: '110px'
         },
         {
-          title: "# of Shipments",
+          title: i18n.t("static.dashboard.noOfShipments"),
           type: 'number',
           editable: false,
           readOnly: true,
           mask: "#,##",
-          width:'70px'
+          width: '70px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
@@ -1888,19 +1888,19 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "Planning Unit",
+          title: i18n.t("static.procurementUnit.planningUnit"),
           type: 'text',
           editable: false,
           readOnly: true,
-          width:'110px'
+          width: '110px'
         },
         {
-          title: "# of Months",
+          title: i18n.t("static.dashboard.noOfMonths"),
           type: 'number',
           editable: false,
           readOnly: true,
           mask: "#,##",
-          width:'70px'
+          width: '70px'
         }
       ],
       onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
@@ -1954,26 +1954,26 @@ class ApplicationDashboard extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: "Planning Unit",
+          title: i18n.t("static.procurementUnit.planningUnit"),
           type: 'text',
           editable: false,
           readOnly: true
         },
         {
-          title: "Expired/Expiring Quantity",
+          title: i18n.t("static.report.expiredQty"),
           type: 'number',
           editable: false,
           readOnly: true,
           mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
         },
         {
-          title: "Expiry Date",
+          title: i18n.t("static.supplyPlan.expiryDate"),
           type: 'text',
           editable: false,
           readOnly: true
         },
         {
-          title: "Total Cost",
+          title: i18n.t("static.shipment.totalCost"),
           type: 'number',
           editable: false,
           readOnly: true,
@@ -2093,26 +2093,26 @@ class ApplicationDashboard extends Component {
     });
 
     var slidesRealmContent = [{
-      "name": "Countries",
+      "name": i18n.t("static.dashboard.countrylist"),
       "count": formatter(this.state.dashboard.REALM_COUNTRY_COUNT),
       "url": "/realmCountry/listRealmCountry",
     },
     {
-      "name": "Users",
+      "name": i18n.t("static.dashboard.user"),
       "count": formatter(this.state.dashboard.USER_COUNT),
       "url": "/user/listUser",
     },
     {
-      "name":"Supply Planning Programs",
+      "name": i18n.t("static.dashboard.supplyPlanPrograms"),
       "count": formatter(this.state.dashboard.FULL_PROGRAM_COUNT),
-      "url":"/program/downloadProgram/",
+      "url": "/program/downloadProgram/",
     },
     {
-      "name":"Forecasting Programs",
+      "name": i18n.t("static.dashboard.forecastingPrograms"),
       "count": formatter(this.state.dashboard.FULL_DATASET_COUNT),
-      "url":"/program/downloadProgram",
+      "url": "/program/downloadProgram",
     }
-  ]
+    ]
     const slidesRealm = slidesRealmContent.map((item) => {
       return (
         <CarouselItem
@@ -2133,12 +2133,12 @@ class ApplicationDashboard extends Component {
     });
 
     var slidesUserContent = [{
-      "name": "Accessible Programs",
+      "name": i18n.t("static.dashboard.accessSP"),
       "count": formatter(this.state.programList.length),
       "url": "/program/downloadProgram/",
     },
     {
-      "name": "Downloaded Programs",
+      "name": i18n.t("static.dashboard.downloadedSP"),
       "count": formatter(this.state.programList.filter(c => c.local).length),
       "url": "/program/downloadProgram/",
     }]
@@ -2162,13 +2162,13 @@ class ApplicationDashboard extends Component {
     });
 
     var slidesErpContent = [{
-      "name": "Realm",
+      "name": i18n.t("static.dashboard.erpLinkingRealm"),
       "count": formatter(this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT),
       "url": "/shipment/manualTagging",
     },
     {
-      "name": "Downloaded Programs",
-      "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a,b) => a+b,0)),
+      "name": i18n.t("static.dashboard.erpLinkingDownloaded"),
+      "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a, b) => a + b, 0)),
       "url": "/shipment/manualTagging",
     }]
     const slidesErp = slidesErpContent.map((item) => {
@@ -2194,27 +2194,27 @@ class ApplicationDashboard extends Component {
       labels: ['Current Stock Status'],
       datasets: [
         {
-          label: 'Stockout',
+          label: i18n.t("static.supplyPlan.stockOut"),
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.stockOutPerc * 100).toFixed(2)] : [],
           backgroundColor: '#BA0C2F', // Red
         },
         {
-          label: 'Below Min',
+          label: i18n.t("static.report.lowstock"),
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.underStockPerc * 100).toFixed(2)] : [],
           backgroundColor: '#f48521', // Yellow
         },
         {
-          label: 'Stocked to Plan',
+          label: i18n.t("static.report.okaystock"),
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.adequatePerc * 100).toFixed(2)] : [],
           backgroundColor: '#118b70', // Green
         },
         {
-          label: 'Above Max',
+          label: i18n.t("static.report.overstock"),
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.overStockPerc * 100).toFixed(2)] : [],
           backgroundColor: '#edb944', // Dark Blue
         },
         {
-          label: 'N/A',
+          label: i18n.t("static.supplyPlanFormula.na"),
           data: this.state.dashboardBottomData ? [(this.state.dashboardBottomData.stockStatus.naPerc * 100).toFixed(2)] : [],
           backgroundColor: '#cfcdc9', // Red
         }
@@ -2226,12 +2226,12 @@ class ApplicationDashboard extends Component {
       maintainAspectRatio: false,
       scales: {
         xAxes: [{
-          beginAtZero: true,  
+          beginAtZero: true,
           stacked: true,
           maxBarThickness: 100,
           ticks: {
             callback: (val) => {
-              return val+"%";
+              return val + "%";
             },
             beginAtZero: true,
             stepSize: 25,
@@ -2333,7 +2333,7 @@ class ApplicationDashboard extends Component {
     let darkModeColors = [];
     let lightModeColors = [];
 
-    if(this.state.displayBy == 1 || this.state.displayBy == 2) {
+    if (this.state.displayBy == 1 || this.state.displayBy == 2) {
       darkModeColors = [
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
@@ -2341,7 +2341,7 @@ class ApplicationDashboard extends Component {
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
       ];
-  
+
       lightModeColors = [
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
@@ -2349,19 +2349,19 @@ class ApplicationDashboard extends Component {
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
         "#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
       ];
-    } 
+    }
     // else if(this.state.displayBy == 2) {
     //   darkModeColors = shipmentDetailsList.map(x => x.colorHtmlDarkCode);
     //   lightModeColors = shipmentDetailsList.map(x => x.colorHtmlCode);
     // } 
-    else if(this.state.displayBy == 3) {
+    else if (this.state.displayBy == 3) {
       let lightStatus = [
         {
           status: i18n.t("static.supplyPlan.delivered"),
           color: "#002F6C"
         },
         {
-          status: i18n.t("static.supplyPlan.ordered"), 
+          status: i18n.t("static.supplyPlan.ordered"),
           color: "#118b70"
         },
         {
@@ -2388,44 +2388,44 @@ class ApplicationDashboard extends Component {
       let darkStatus = [
         {
           status: i18n.t("static.supplyPlan.delivered"),
-          color:"#d4bbff"
+          color: "#d4bbff"
         },
         {
           status: i18n.t("static.supplyPlan.ordered"),
-          color:"#118b70"
+          color: "#118b70"
         },
         {
           status: i18n.t("static.report.planned"),
-          color:"#A7C6ED"
+          color: "#A7C6ED"
         },
         {
           status: i18n.t("static.report.submitted"),
-          color:"#25A7FF"
+          color: "#25A7FF"
         },
         {
           status: i18n.t("static.report.arrived"),
-          color:"#0067B9"
+          color: "#0067B9"
         },
         {
           status: i18n.t("static.report.shipped"),
-          color:"#49A4A1"
+          color: "#49A4A1"
         },
         {
           status: i18n.t("static.report.hold"),
-          color:"#6C6463"
+          color: "#6C6463"
         }
       ]
       shipmentDetailsList.map(x => darkModeColors.push(darkStatus.filter(l => l.status == x.code).length > 0 ? darkStatus.filter(l => l.status == x.code)[0].color : ""));
       shipmentDetailsList.map(x => lightModeColors.push(lightStatus.filter(l => l.status == x.code).length > 0 ? lightStatus.filter(l => l.status == x.code)[0].color : ""));
     }
-    
+
 
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     // const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     const shipmentsPieData = {
       labels: shipmentDetailsList.map(x => x.code),
       datasets: [{
-        label: 'My First Dataset',
+        label: 'Shipments Pie Dataset',
         data: shipmentDetailsList.map(x => x.cost.toFixed(2)),
         backgroundColor: backgroundColor,
         fontColor: fontColor,
@@ -2464,10 +2464,10 @@ class ApplicationDashboard extends Component {
         position: 'bottom',
         fontColor: fontColor,
         labels: {
-            usePointStyle: true,
-            fontColor:fontColor,
-            fontSize: 0.01,
-            padding: 12
+          usePointStyle: true,
+          fontColor: fontColor,
+          fontSize: 0.01,
+          padding: 12
         }
       },
       layout: {
@@ -2486,7 +2486,7 @@ class ApplicationDashboard extends Component {
     function getOrCreateLegendList(chart, containerId) {
       const legendContainer = document.getElementById(containerId);
       let listContainer = legendContainer.querySelector('ul');
-    
+
       if (!listContainer) {
         listContainer = document.createElement('ul');
         listContainer.style.display = 'flex';
@@ -2496,7 +2496,7 @@ class ApplicationDashboard extends Component {
         listContainer.style.padding = 0;
         legendContainer.appendChild(listContainer);
       }
-    
+
       return listContainer;
     }
 
@@ -2506,14 +2506,14 @@ class ApplicationDashboard extends Component {
       segment.hidden = !segment.hidden;
       chart.update();
     };
-   
+
     const htmlLegendPlugin = {
       id: 'htmlLegend',
-      afterUpdate(chart, args, options) {    
+      afterUpdate(chart, args, options) {
         const ul = getOrCreateLegendList(chart, "legend-container");
         while (ul.firstChild) {
           ul.firstChild.remove();
-        }    
+        }
         const items = chart.config.options.legend.labels.generateLabels(chart);
         items.forEach((item) => {
           const li = document.createElement('li');
@@ -2524,11 +2524,11 @@ class ApplicationDashboard extends Component {
           li.style.marginLeft = '5px';
           li.style.marginRight = '5px';
           li.style.marginBottom = '5px';
-    
+
           li.onclick = () => {
             toggleDatasetVisibility(chart, item.index);
           };
-    
+
           // Color box
           const boxSpan = document.createElement('span');
           boxSpan.style.background = item.fillStyle;
@@ -2540,17 +2540,17 @@ class ApplicationDashboard extends Component {
           boxSpan.style.marginRight = '5px';
           boxSpan.style.width = '10px';
           boxSpan.style.borderRadius = '50%';
-    
+
           // Text for the label
           const textContainer = document.createElement('p');
           textContainer.style.color = localStorage.getItem("theme") == "dark" ? "#FFFFFF" : item.fontColor;
           textContainer.style.margin = 0;
           textContainer.style.padding = 5;
           textContainer.style.textDecoration = item.hidden ? 'line-through' : '';
-    
+
           const text = document.createTextNode(item.text);
           textContainer.appendChild(text);
-    
+
           li.appendChild(boxSpan);
           li.appendChild(textContainer);
           ul.appendChild(li);
@@ -2560,7 +2560,7 @@ class ApplicationDashboard extends Component {
 
     const forecastConsumptionData = {
       datasets: [{
-        label: 'My First Dataset',
+        label: 'Forecast Consumption Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
           (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= 1 ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
@@ -2603,7 +2603,7 @@ class ApplicationDashboard extends Component {
         'Yellow'
       ],
       datasets: [{
-        label: 'My First Dataset',
+        label: 'Actual Inventory Dataset',
         data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
           (inventoryQplCorrectCount / inventoryQplPuCount) >= 1 ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#f48521" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
@@ -2646,7 +2646,7 @@ class ApplicationDashboard extends Component {
         'Yellow'
       ],
       datasets: [{
-        label: 'My First Dataset',
+        label: 'Actual Consumption Dataset',
         data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
           (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= 1 ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
@@ -2689,7 +2689,7 @@ class ApplicationDashboard extends Component {
         'Yellow'
       ],
       datasets: [{
-        label: 'My First Dataset',
+        label: 'Shipments Dataset',
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
           (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#f48521" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
@@ -2763,7 +2763,7 @@ class ApplicationDashboard extends Component {
     const mediaQuery = window.matchMedia('(min-width: 1920px)')
     let shipmentsPieHeight;
     if (mediaQuery.matches) {
-      shipmentsPieHeight = 265;
+      shipmentsPieHeight = 320;
     } else {
       shipmentsPieHeight = 240;
     }
@@ -3124,7 +3124,7 @@ class ApplicationDashboard extends Component {
         {activeTab1 == 2 && <>
           <div className='row pb-lg-2'>
             {/* <div className='col-md-12 pl-lg-4 pr-lg-4'> */}
-              {/* <div className='row'>
+            {/* <div className='row'>
                 <FormGroup className='col-md-3 pl-lg-1 FormGroupD'>
                   <Label htmlFor="topProgramId">Program<span class="red Reqasterisk">*</span></Label>
                   <MultiSelect
@@ -3157,11 +3157,11 @@ class ApplicationDashboard extends Component {
 
               </div> */}
 
-              {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
-                <div class="card custom-card DashboardBg1 pb-lg-2">
-                  <div class="card-body py-1">
-                    {/* <div className='row'> */}
-                    {/* <FormGroup className='col-md-3 FormGroupD'>
+            {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
+            <div class="card custom-card DashboardBg1 pb-lg-2">
+              <div class="card-body py-1">
+                {/* <div className='row'> */}
+                {/* <FormGroup className='col-md-3 FormGroupD'>
                         <Label htmlFor="topProgramId">Country<span class="red Reqasterisk">*</span></Label>
                         <MultiSelect
                           name="topCountryId"
@@ -3185,11 +3185,12 @@ class ApplicationDashboard extends Component {
                           labelledBy={i18n.t('static.common.regiontext')}
                         />
                       </FormGroup> */}
-                    <div class="row pt-lg-2">
-                      <div class="col-5" style={{display:'flex',gap:'40px', alignItems:"center"}}>
-                        <FormGroup className='FormGroupD col-10 px-0'>
-                          <Label htmlFor="topProgramId" style={{display:'flex',gap:'10px'}}>Program
-                          <FormGroup className='MarginTopCheckBox'>
+                <div class="row pt-lg-2">
+                  <div class="col-5" style={{ display: 'flex', gap: '40px', alignItems: "center" }}>
+                    <FormGroup className='FormGroupD col-10 px-0'>
+                      <h4 style={{ fontWeight: 900 }}>{i18n.t("static.dashboard.overview")}</h4>
+                      <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.dashboard.programheader")}
+                        <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
                             <Input
                               className="form-check-input"
@@ -3203,76 +3204,76 @@ class ApplicationDashboard extends Component {
                             <Label
                               className="form-check-label"
                               check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
-                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                              {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                             </Label>
                           </div>
                         </FormGroup>
-                          </Label>
-                          <MultiSelect
-                            className="MarginBtmformgroup"
-                            name="topProgramId"
-                            id="topProgramId"
-                            bsSize="sm"
-                            value={this.state.topProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.topProgramId : localStorage.getItem("topLocalProgram") == "false" ? [] : this.state.topProgramId : []}
-                            onChange={(e) => { this.handleTopProgramIdChange(e) }}
-                            options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
-                            labelledBy={i18n.t('static.common.regiontext')}
-                            filterOptions={filterOptions}
-                          />
-                        </FormGroup>
-                        <FormGroup className='col-1' style={{ marginTop: '24px', display: this.state.topProgramIdChange ? "block" : "none" }}>
-                          <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
-                        </FormGroup>
-                      </div>
-                      <div className='col-7 tickerbox'>
-                        <div className='row'>
-                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                          <Card className="CardHeight">
-                            <CardBody className="p-0">
-                              <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">Realm</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
-                                  <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
-                                  {slidesRealm}
-                                </Carousel>
-                                <div className="chart-wrapper " >
-                                </div>
+                      </Label>
+                      <MultiSelect
+                        className="MarginBtmformgroup"
+                        name="topProgramId"
+                        id="topProgramId"
+                        bsSize="sm"
+                        value={this.state.topProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.topProgramId : localStorage.getItem("topLocalProgram") == "false" ? [] : this.state.topProgramId : []}
+                        onChange={(e) => { this.handleTopProgramIdChange(e) }}
+                        options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
+                        labelledBy={i18n.t('static.common.regiontext')}
+                        filterOptions={filterOptions}
+                      />
+                    </FormGroup>
+                    <FormGroup className='col-1' style={{ marginTop: '24px', display: this.state.topProgramIdChange ? "block" : "none" }}>
+                      <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
+                    </FormGroup>
+                  </div>
+                  <div className='col-7 tickerbox'>
+                    <div className='row'>
+                      <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                        <Card className="CardHeight">
+                          <CardBody className="p-0">
+                            <div class="h1 text-muted text-left mb-0 m-3">
+                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.product.realm")}</p>
+                              <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
+                                <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
+                                {slidesRealm}
+                              </Carousel>
+                              <div className="chart-wrapper " >
                               </div>
-                            </CardBody>
-                          </Card>
-                        </Col>
-                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                          <Card className=" CardHeight">
-                            <CardBody className="p-0">
-                              <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">User</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
-                                  <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
-                                  {slidesUser}
-                                </Carousel>
-                                <div className="chart-wrapper " >
-                                </div>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                      <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                        <Card className=" CardHeight">
+                          <CardBody className="p-0">
+                            <div class="h1 text-muted text-left mb-0 m-3">
+                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.myAccess")}</p>
+                              <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
+                                <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
+                                {slidesUser}
+                              </Carousel>
+                              <div className="chart-wrapper " >
                               </div>
-                            </CardBody>
-                          </Card>
-                        </Col>
-                        <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
-                          <Card className=" CardHeight">
-                            <CardBody className="p-0">
-                              <div class="h1 text-muted text-left mb-0 m-3">
-                              <h5 class="card-title IconColorD">ERP Linked Shipments</h5>
-                                <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
-                                  <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
-                                  {slidesErp}
-                                </Carousel>
-                                <div className="chart-wrapper " >
-                                </div>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                      <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                        <Card className=" CardHeight">
+                          <CardBody className="p-0">
+                            <div class="h1 text-muted text-left mb-0 m-3">
+                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.erpLinkedShipments")}</p>
+                              <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
+                                <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
+                                {slidesErp}
+                              </Carousel>
+                              <div className="chart-wrapper " >
                               </div>
-                            </CardBody>
-                          </Card>
-                        </Col>
-                        </div>
-                        {/* <FormGroup>
+                            </div>
+                          </CardBody>
+                        </Card>
+                      </Col>
+                    </div>
+                    {/* <FormGroup>
                           <div class="myMarquee">
                             <div class="scroller">
                               <div class="scroller-content">
@@ -3303,89 +3304,89 @@ class ApplicationDashboard extends Component {
                             </div>
                           </div>
                         </FormGroup> */}
-                      </div>
-                    </div>                 
-
-                    {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
-                      <Table className="table-striped table-bordered text-center">
-                        <thead>
-                          {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">Action <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
-                          <th scope="col">Program <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col" width="125px">Active Planning Units</th>
-                          <th scope="col">Planning Units With Stockouts <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope="col" width="125px">Total Cost of Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col' width="125px">Open QAT Problems​ <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
-                          <th scope='col'>Uploaded Date <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                          <th scope='col'>Review Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                        </thead>
-                        <tbody>
-                          {this.state.dashboardTopList.map(d => {
-                            return (
-                              <tr>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
-                                  <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer",verticalAlign:"middle",position:'relative',top:'-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
-                                  <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer",verticalAlign:'middle',fontWeight:'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
-                                  <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer",verticalAlign:'middle',fontWeight:'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
-                                  {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
-                                </td>}
-                                {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
-                                {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
-                                <td>
-                                  {d.activePlanningUnits}
-                                </td>
-                                <td align="center" style={{ verticalAlign:"middle", color: d.countOfStockOutPU > 0 ? "red" : "" }}>
-                                  <div id="example-1" class="examples">
-                                    <div class="cssProgress">
-                                      <div class="progress">
-                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.countOfStockOutPU / d.activePlanningUnits) * 100 + '%' }}>
-                                          {d.countOfStockOutPU}
-                                        </div>
-                                        <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#002F6C", width: ((d.activePlanningUnits-d.countOfStockOutPU) / d.activePlanningUnits) * 100 + '%' }}>
-                                          {d.activePlanningUnits-d.countOfStockOutPU}
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                                {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
-                                {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
-                                <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                                <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
-                                  {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={()=> this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
-                                </td>
-                              </tr>)
-                          })}
-                        </tbody>
-                      </Table>
-                    </div>}
-                   
-                    <Modal isOpen={this.state.notesPopup}
-                      className={'modal-lg modalWidth ' + this.props.className}>
-                      <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
-                          <strong>{i18n.t('static.problemContext.transDetails')}</strong>
-                      </ModalHeader>
-                      <ModalBody>
-                          <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
-                              <div id="notesTransTable" className="AddListbatchtrHeight"></div>
-                          </div>
-                          <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
-                              <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                  <div class="align-items-center">
-                                      <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                      <div class="spinner-border blue ml-4" role="status">
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                      </ModalBody>
-                      <ModalFooter>
-                          <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                      </ModalFooter>
-                    </Modal>
                   </div>
                 </div>
-              {/* </div> */}
+
+                {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
+                  <Table className="table-striped table-bordered text-center">
+                    <thead>
+                      {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">{i18n.t("static.common.action")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
+                      <th scope="col">{i18n.t("static.common.programAndProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">{i18n.t("static.dashboard.activePlanningUnits")}</th>
+                      <th scope="col">{i18n.t("static.dashboard.stockoutPUs")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">{i18n.t("static.dashboard.totalExpiriesCost")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope='col' width="125px">{i18n.t("static.dashboard.openQATProblems")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
+                      <th scope='col'>{i18n.t("static.dashboard.uploadedDate")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope='col'>{i18n.t("static.dashboard.reviewStatus")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                    </thead>
+                    <tbody>
+                      {this.state.dashboardTopList.map(d => {
+                        return (
+                          <tr>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
+                              <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer", verticalAlign: "middle", position: 'relative', top: '-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
+                              <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
+                              <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
+                              {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
+                            </td>}
+                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
+                            <td>
+                              {d.activePlanningUnits}
+                            </td>
+                            <td align="center" style={{ verticalAlign: "middle", color: d.countOfStockOutPU > 0 ? "red" : "" }}>
+                              <div id="example-1" class="examples">
+                                <div class="cssProgress">
+                                  <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#BA0C2F", width: (d.countOfStockOutPU / d.activePlanningUnits) * 100 + '%' }}>
+                                      {d.countOfStockOutPU}
+                                    </div>
+                                    <div class="progress-bar" role="progressbar" style={{ backgroundColor: "#002F6C", width: ((d.activePlanningUnits - d.countOfStockOutPU) / d.activePlanningUnits) * 100 + '%' }}>
+                                      {d.activePlanningUnits - d.countOfStockOutPU}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
+                            <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
+                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                              {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
+                            </td>
+                          </tr>)
+                      })}
+                    </tbody>
+                  </Table>
+                </div>}
+
+                <Modal isOpen={this.state.notesPopup}
+                  className={'modal-lg modalWidth ' + this.props.className}>
+                  <ModalHeader toggle={() => this.toggleLarge()} className="modalHeaderSupplyPlan">
+                    <strong>{i18n.t('static.problemContext.transDetails')}</strong>
+                  </ModalHeader>
+                  <ModalBody>
+                    <div className="" style={{ display: this.state.loadingForNotes ? "none" : "block" }}>
+                      <div id="notesTransTable" className="AddListbatchtrHeight"></div>
+                    </div>
+                    <div style={{ display: this.state.loadingForNotes ? "block" : "none" }}>
+                      <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                        <div class="align-items-center">
+                          <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                          <div class="spinner-border blue ml-4" role="status">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                  </ModalFooter>
+                </Modal>
+              </div>
+            </div>
+            {/* </div> */}
             {/* </div> */}
           </div>
           {/* <div className='row'>
@@ -3447,35 +3448,38 @@ class ApplicationDashboard extends Component {
           <div className='row pb-lg-2'>
             {/* <div class="col-xl-12 mb-lg-3 DashboardBg"> */}
             <div class="card custom-card DashboardBg1">
-                  <div class="card-body py-1">
-              <div className='row pt-lg-2'>
-                {/* <div className='col-md-12'> */}
+              <div class="card-body py-1">
+                <div class="row pt-lg-2">
+                  <h4 style={{ fontWeight: 900, padding: "0px 15px" }}>{i18n.t("static.dashboard.programSpotlight")}</h4>
+                </div>
+                <div className='row'>
+                  {/* <div className='col-md-12'> */}
                   {/* <div className='row'> */}
                   <div class="col-4">
                     {/* <div className='col-md-4 pl-lg-0'> */}
                     <FormGroup className='FormGroupD'>
-                      <Label htmlFor="organisationTypeId" style={{display:'flex',gap:'10px'}}>Program
+                      <Label htmlFor="organisationTypeId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.program.programMaster")}
 
-                      <div style={{ gap: '20px', display: 'flex' }}>
-                        <FormGroup className='MarginTopCheckBox'>
-                          <div className="pl-lg-4">
-                            <Input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="onlyDownloadedBottomProgram"
-                              name="onlyDownloadedBottomProgram"
-                              checked={this.state.onlyDownloadedBottomProgram}
-                              disabled={!(localStorage.getItem('sessionType') === 'Online')}
-                              onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
-                            />
-                            <Label
-                              className="form-check-label"
-                              check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
-                              Show only downloaded programs <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                            </Label>
-                          </div>
-                        </FormGroup>
-                      </div>
+                        <div style={{ gap: '20px', display: 'flex' }}>
+                          <FormGroup className='MarginTopCheckBox'>
+                            <div className="pl-lg-4">
+                              <Input
+                                className="form-check-input"
+                                type="checkbox"
+                                id="onlyDownloadedBottomProgram"
+                                name="onlyDownloadedBottomProgram"
+                                checked={this.state.onlyDownloadedBottomProgram}
+                                disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                                onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
+                              />
+                              <Label
+                                className="form-check-label"
+                                check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
+                                {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                              </Label>
+                            </div>
+                          </FormGroup>
+                        </div>
                       </Label>
                       <Select
                         type="select"
@@ -3489,10 +3493,10 @@ class ApplicationDashboard extends Component {
                         required
                       />
                     </FormGroup>
-                    </div>
-                    <div class='col-3'>
-                    <FormGroup className={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == ""?'FormGroupD':'FormGroupDServer'}>
-                      <Label htmlFor="organisationTypeId">Report Period <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reportPeriodTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
+                  </div>
+                  <div class='col-3'>
+                    <FormGroup className={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == "" ? 'FormGroupD' : 'FormGroupDServer'}>
+                      <Label htmlFor="organisationTypeId">{i18n.t("static.report.dateRange")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reportPeriodTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1" style={{ marginTop: '0px', zIndex: '1' }}></span></Label>
                       <div className="controls edit">
                         <Picker
                           ref="reportPeriod"
@@ -3506,36 +3510,36 @@ class ApplicationDashboard extends Component {
                         </Picker>
                       </div>
                     </FormGroup>
-                    </div>
-                   
+                  </div>
+
                   {/* </div> */}
-                {/* </div> */}
-              </div>
-              
-              {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
-                {/* <div className='col-md-12'> */}
+                  {/* </div> */}
+                </div>
+
+                {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
+                  {/* <div className='col-md-12'> */}
                   <div className='row px-3 pt-lg-2'>
                     <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
-                      <div className="card custom-card CustomHeight" style={{overflow:'visible'}}>
+                      <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> Stock Status <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
                         <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
                         </div>
                         <div class="label-text text-center text-mutedDashboard">
-                          <h7><b>Stocked out Planning Units: {this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}</b></h7>
+                          <h7><b>{i18n.t("static.dashboard.stockedoutPlanningUnits")}: {this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatus.puStockOutList.length : 0}</b></h7>
                         </div>
-                        <div className='row px-3' style={{height:'110px'}}>
+                        <div className='row px-3' style={{ height: '110px' }}>
                           <div id="stockedOutJexcel" className='DashboardreadonlyBg dashboardTable2Ss jtabs-animation jtabs jss_container' style={{ padding: '2px 8px' }}></div>
                         </div>
                       </div>
                     </div>
                     <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
                       {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card pb-lg-2 CustomHeight" style={{overflow:'visible'}}>
+                      <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header  justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> Forecast Error <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> {i18n.t("static.report.error")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
                         <div class="card-body px-1 py-2">
                           <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
@@ -3544,19 +3548,19 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
                     <div className='col-md-6'>
-                      <div className="card custom-card pb-lg-2 CustomHeight" style={{overflow:'visible'}}>
+                      <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>Shipments <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Shipments: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>{i18n.t("static.report.orders")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalShipments")}: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{shipmentTotal ? "$" : ""}{addCommas(roundARU(shipmentTotal, 1))}</b></i></div>
                         </div>
-                        <div class="card-body pt-lg-1" style={{paddingBottom: 0}}>
+                        <div class="card-body pt-lg-1" style={{ paddingBottom: 0 }}>
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='FormGroupD pl-lg-3' style={{zIndex:"1",display:'flex',gap:'8px'}}>
-                                  <Label htmlFor="displayBy" style={{marginTop:'6px'}}>Display By</Label>
+                                <FormGroup className='FormGroupD pl-lg-3' style={{ zIndex: "1", display: 'flex', gap: '8px' }}>
+                                  <Label htmlFor="displayBy" style={{ marginTop: '6px' }}>{i18n.t("static.modelingValidation.displayBy")}</Label>
                                   <Input
-                                  style={{width:'155px'}}
+                                    style={{ width: '155px' }}
                                     type="select"
                                     name="displayBy"
                                     id="displayBy"
@@ -3565,25 +3569,25 @@ class ApplicationDashboard extends Component {
                                     value={this.state.displayBy}
                                     required
                                   >
-                                    <option value="1">Funding Source</option>
-                                    <option value="2">Procurement Agent</option>
-                                    <option value="3">Status</option>
+                                    <option value="1">{i18n.t("static.fundingSourceHead.fundingSource")}</option>
+                                    <option value="2">{i18n.t("static.report.procurementAgentName")}</option>
+                                    <option value="3">{i18n.t("static.shipmentDataEntry.shipmentStatus")}</option>
                                   </Input>
                                 </FormGroup>
                               </div>
-                              <div className='row' style={{height:'250px',overflowY:'visible',overflowX:'hidden'}}>
-                              {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
+                              <div className='row' style={{ height: '250px', overflowY: 'visible', overflowX: 'hidden' }}>
+                                {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{marginTop:"-60px"}}>
+                                  <Col style={{ marginTop: "-60px" }}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
-                                <div id="legend-container" style={{marginTop:"0px"}}></div>
+                                <div id="legend-container" style={{ marginTop: "0px", width: "100%" }}></div>
                               </div>
                             </div>
-                            <div className='col-6 container1' style={{overflow:'visible'}}>
+                            <div className='col-6 container1' style={{ overflow: 'visible' }}>
                               <div class="label-text text-center text-mutedDashboard">
-                                <h7><b># of Shipments with funding TBD: {this.state.dashboardBottomData.shipmentWithFundingSourceTbd.map(x => x.count).reduce((a,b) => a+b,0)}</b></h7>
+                                <h7><b>{i18n.t("static.dashboard.shipmentsTBD")}: {this.state.dashboardBottomData.shipmentWithFundingSourceTbd.map(x => x.count).reduce((a, b) => a + b, 0)}</b></h7>
                               </div>
                               <div className='row'>
                                 <div id="shipmentsTBDJexcel" className='DashboardreadonlyBg dashboardTable2' style={{ padding: '2px 8px 2px 8px' }}></div>
@@ -3598,40 +3602,40 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
-                          <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/'+this.state.bottomProgramId+"/false")}> Data Quality </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
+                          <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Forecasted<br />Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>{i18n.t("static.report.forecasted")}<br />{i18n.t("static.supplyPlan.consumption")} </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastedConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer', verticalAlign: 'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={forecastConsumptionData} options={forecastConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:forecastConsumptionQplCorrectCount == 0 ? "red" : ""}}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount != 0 ? ("/"+forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
+                                <center><span className='text-blackD' style={{ color: forecastConsumptionQplCorrectCount == 0 ? "red" : "" }}>{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount}{forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount != 0 ? ("/" + forecastConsumptionQplPuCount) : ""} missing forecasts</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual<br />Inventory </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>{i18n.t("static.report.actual")}<br />{i18n.t("static.inventory.inventory")} </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualInventoryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer', verticalAlign: 'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualInventoryData} options={actualInventoryOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:inventoryQplCorrectCount == 0 ? "red" : ""}}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplPuCount - inventoryQplCorrectCount != 0 ? ("/"+inventoryQplPuCount) : ""} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{ color: inventoryQplCorrectCount == 0 ? "red" : "" }}>{inventoryQplPuCount - inventoryQplCorrectCount}{inventoryQplPuCount - inventoryQplCorrectCount != 0 ? ("/" + inventoryQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Actual<br />Consumption </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>{i18n.t("static.report.actual")}<br />{i18n.t("static.supplyPlan.consumption")} </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actualConsumptionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer', verticalAlign: 'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={actualConsumptionData} options={actualConsumptionOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:actualConsumptionQplCorrectCount == 0 ? "red" : ""}}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount != 0 ? ("/"+actualConsumptionQplPuCount) : ""} missing actuals</span></center>
+                                <center><span className='text-blackD' style={{ color: actualConsumptionQplCorrectCount == 0 ? "red" : "" }}>{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount}{actualConsumptionQplPuCount - actualConsumptionQplCorrectCount != 0 ? ("/" + actualConsumptionQplPuCount) : ""} missing actuals</span></center>
                               </div>
                             </div>
                             <div class="col-3 container1">
-                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>Shipments </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer',verticalAlign:'middle' }}></i></div>
+                              <div class="label-text text-center text-mutedDashboard gaugeHeader"><h7><b>{i18n.t("static.report.orders")} </b></h7> <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer', verticalAlign: 'middle' }}></i></div>
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD' style={{color:shipmentQplCorrectCount == 0 ? "red" : ""}}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplPuCount - shipmentQplCorrectCount != 0 ? ("/"+shipmentQplPuCount) : ""} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{ color: shipmentQplCorrectCount == 0 ? "red" : "" }}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplPuCount - shipmentQplCorrectCount != 0 ? ("/" + shipmentQplPuCount) : ""} flagged dates</span></center>
                               </div>
                             </div>
                           </div>
@@ -3641,12 +3645,12 @@ class ApplicationDashboard extends Component {
                     <div className='col-md-6'>
                       <div className='row'>
                         <div class="col-md-12">
-                          <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{overflow:'visible'}}>
+                          <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{ overflow: 'visible' }}>
                             <div className="card-header d-flex justify-content-between align-items-center">
-                              <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>Expiries <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiriesHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                              <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{color:'#000'}}>Total value of Expiries: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
+                              <div className="card-title" onClick={() => this.redirectToCrudWindow('/report/expiredInventory')} style={{ cursor: 'pointer' }}>{i18n.t("static.report.expiredInventory")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiriesHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                              <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalExpiries")}: <b className='red h3 DarkFontbold'>{expiryTotal ? "$" : ""}{addCommas(roundARU(expiryTotal, 1))}</b></i></div>
                             </div>
-                            <div class="card-body px-1 py-2 scrollable-content" style={{overflow:'visible'}}>
+                            <div class="card-body px-1 py-2 scrollable-content" style={{ overflow: 'visible' }}>
                               <div id="expiriesJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '3px 8px' }}>
                               </div>
                             </div>
@@ -3655,10 +3659,10 @@ class ApplicationDashboard extends Component {
                       </div>
                     </div>
                   </div>
-                {/* </div> */}
-              </div>}
+                  {/* </div> */}
+                </div>}
               </div>
-              </div>
+            </div>
             {/* </div> */}
           </div>
         </>}
