@@ -2134,7 +2134,7 @@ class ApplicationDashboard extends Component {
 
     var slidesUserContent = [{
       "name": i18n.t("static.dashboard.accessSP"),
-      "count": formatter(this.state.programList.length),
+      "count": formatter(this.state.programList.filter(c => !c.local).length),
       "url": "/program/downloadProgram/",
     },
     {
