@@ -787,6 +787,7 @@ class StockStatusAcrossPlanningUnits extends Component {
      * Callback function triggered when the Jexcel instance is loaded to format the table.
      */
     loaded = function (instance, cell, x, y, value) {
+        try{
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
@@ -828,6 +829,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 cell.classList.add('legendColor4');
             }
         }
+    }catch(err){}
     }
     /**
      * Filters data based on the selected stock status and updates the component state.
