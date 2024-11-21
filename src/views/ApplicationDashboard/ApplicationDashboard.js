@@ -2763,7 +2763,7 @@ class ApplicationDashboard extends Component {
     const mediaQuery = window.matchMedia('(min-width: 1920px)')
     let shipmentsPieHeight;
     if (mediaQuery.matches) {
-      shipmentsPieHeight = 320;
+      shipmentsPieHeight = 340;
     } else {
       shipmentsPieHeight = 240;
     }
@@ -3557,7 +3557,7 @@ class ApplicationDashboard extends Component {
                           <div className='row'>
                             <div className='col-6'>
                               <div className='row'>
-                                <FormGroup className='FormGroupD pl-lg-3' style={{ zIndex: "1", display: 'flex', gap: '8px' }}>
+                                <FormGroup className='FormGroupD pl-lg-3' style={{ zIndex: "1", display: 'flex', gap: '8px', marginBottom: "0px" }}>
                                   <Label htmlFor="displayBy" style={{ marginTop: '6px' }}>{i18n.t("static.modelingValidation.displayBy")}</Label>
                                   <Input
                                     style={{ width: '155px' }}
@@ -3578,7 +3578,7 @@ class ApplicationDashboard extends Component {
                               <div className='row' style={{ height: '250px', overflowY: 'visible', overflowX: 'hidden' }}>
                                 {/* <div className='row' style={{height:'209px',overflowY:'scroll'}}> */}
                                 <div className='d-flex align-items-center justify-content-center chart-wrapper PieShipment'>
-                                  <Col style={{ marginTop: "-60px" }}>
+                                  <Col style={{ marginTop: "-70px" }}>
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
