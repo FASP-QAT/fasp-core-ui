@@ -446,6 +446,7 @@ export default class ProblemList extends React.Component {
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
                             programQPLDetails.addressedCount = addressedCount;
+                            programQPLDetails.programModified = 1;
                             programObj.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
