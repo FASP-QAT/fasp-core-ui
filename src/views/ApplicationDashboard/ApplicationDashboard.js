@@ -1672,6 +1672,7 @@ class ApplicationDashboard extends Component {
   }
   fetchData() {
     Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+    this.onTopSubmit();
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
@@ -1701,9 +1702,6 @@ class ApplicationDashboard extends Component {
       } else {
         this.updateState(this.state.topProgramId[i].value, false);
       }
-    }
-    if (i == this.state.topProgramId.length) {
-      this.onTopSubmit();
     }
   }
   /**
@@ -3584,7 +3582,7 @@ class ApplicationDashboard extends Component {
                                     <Pie data={shipmentsPieData} options={shipmentsPieOptions} height={shipmentsPieHeight} width={shipmentsPieHeight} plugins={[htmlLegendPlugin]} />
                                   </Col>
                                 </div>
-                                <div id="legend-container" style={{ marginTop: "0px", width: "100%" }}></div>
+                                <div id="legend-container" style={{ marginTop: "0px", width: "100%", height: "2px",verticalAlign: 'bottom' }}></div>
                               </div>
                             </div>
                             <div className='col-6 container1' style={{ overflow: 'visible' }}>
