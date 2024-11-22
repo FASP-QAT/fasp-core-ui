@@ -3231,7 +3231,7 @@ class ApplicationDashboard extends Component {
                         <Card className="CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.product.realm")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px", color: "#002F6C" }}>{i18n.t("static.product.realm")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
                                 <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
                                 {slidesRealm}
@@ -3246,7 +3246,7 @@ class ApplicationDashboard extends Component {
                         <Card className=" CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.myAccess")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px", color: "#002F6C" }}>{i18n.t("static.dashboard.myAccess")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
                                 <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
                                 {slidesUser}
@@ -3257,11 +3257,11 @@ class ApplicationDashboard extends Component {
                           </CardBody>
                         </Card>
                       </Col>
-                      <Col xs="12" sm="6" lg="4" className='Dashboardticker'>
+                      <Col xs="12" sm="6" lg="4" className='Dashboardticker' style={{paddingRight: "0px"}}>
                         <Card className=" CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.erpLinkedShipments")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px", color: "#002F6C" }}>{i18n.t("static.dashboard.erpLinkedShipments")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
                                 <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
                                 {slidesErp}
