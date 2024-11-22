@@ -1215,10 +1215,10 @@ export default class QatProblemActionNew extends Component {
                                                         }
                                                         var paListForDashboard=problemActionList.filter(c => c.program.id == programList[pp].generalData.programId && c.planningUnit.id==planningUnitList[p].planningUnit.id && c.problemStatus.id!=4);
                                                         if(programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id]!=undefined){
-                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
-                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==23).length>0?false:true;
-                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
-                                                        programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4).length>0?false:true;
+                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
+                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25).length>0?false:true;
+                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
+                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4).length>0?false:true;
                                                         }
                                                     }
                                                     }
