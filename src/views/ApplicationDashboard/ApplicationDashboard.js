@@ -1723,7 +1723,7 @@ class ApplicationDashboard extends Component {
       for (var j = 0; j < forecastErrorList.length; j++) {
         data = [];
         data[0] = forecastErrorList[j].planningUnit.label.label_en + " | " + forecastErrorList[j].planningUnit.id
-        data[1] = forecastErrorList[j].errorPerc != "" && forecastErrorList[j].errorPerc != null && forecastErrorList[j].errorPerc != "null" && forecastErrorList[j].errorPerc != undefined ? formatter(Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2)) + "%" : "<i class='fa fa-exclamation-triangle' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+        data[1] = forecastErrorList[j].errorPerc != "" && forecastErrorList[j].errorPerc != null && forecastErrorList[j].errorPerc != "null" && forecastErrorList[j].errorPerc != undefined ? formatter(Number(Number(forecastErrorList[j].errorPerc) * 100).toFixed(2)) + "%" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
         data[2] = forecastErrorList[j].aboveForecastThreshold
         dataArray[count] = data;
         count++;
@@ -2237,6 +2237,7 @@ class ApplicationDashboard extends Component {
             stepSize: 25,
             max: 100,
             min: 0,
+            fontColor: fontColor,
             display: true
           },
           gridLines: {
@@ -2250,6 +2251,7 @@ class ApplicationDashboard extends Component {
           // beginAtZero: true,  
           stacked: true,
           maxBarThickness: 100,
+          fontColor: fontColor,
           ticks: {
             beginAtZero: true,
             display: false // Hide the Y-axis values
@@ -2335,11 +2337,11 @@ class ApplicationDashboard extends Component {
 
     if (this.state.displayBy == 1 || this.state.displayBy == 2) {
       darkModeColors = [
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9"
       ];
 
       lightModeColors = [
@@ -2378,7 +2380,7 @@ class ApplicationDashboard extends Component {
         },
         {
           status: i18n.t("static.report.shipped"),
-          color: "#49A4A1"
+          color: "#F48521"
         },
         {
           status: i18n.t("static.report.hold"),
@@ -2408,7 +2410,7 @@ class ApplicationDashboard extends Component {
         },
         {
           status: i18n.t("static.report.shipped"),
-          color: "#49A4A1"
+          color: "#F48521"
         },
         {
           status: i18n.t("static.report.hold"),
@@ -3186,7 +3188,7 @@ class ApplicationDashboard extends Component {
                         />
                       </FormGroup> */}
                 <div class="row pt-lg-2">
-                  <div class="col-5" style={{ display: 'flex', gap: '40px', alignItems: "center" }}>
+                  <div class="col-5 Topsectiondashboard">
                     <FormGroup className='FormGroupD col-10 px-0'>
                       <h4 style={{ fontWeight: 900 }}>{i18n.t("static.dashboard.overview")}</h4>
                       <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.dashboard.programheader")}
@@ -3221,7 +3223,7 @@ class ApplicationDashboard extends Component {
                         filterOptions={filterOptions}
                       />
                     </FormGroup>
-                    <FormGroup className='col-1' style={{ marginTop: '24px', display: this.state.topProgramIdChange ? "block" : "none" }}>
+                    <FormGroup className='col-1' style={{ marginTop: '58px', display: this.state.topProgramIdChange ? "block" : "none" }}>
                       <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                     </FormGroup>
                   </div>
@@ -3231,7 +3233,7 @@ class ApplicationDashboard extends Component {
                         <Card className="CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.product.realm")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.product.realm")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexRealm} next={this.nextRealm} previous={this.previousRealm} ride="carousel">
                                 <CarouselIndicators items={slidesRealmContent} activeIndex={activeIndexRealm} onClickHandler={this.goToIndexRealm} />
                                 {slidesRealm}
@@ -3246,7 +3248,7 @@ class ApplicationDashboard extends Component {
                         <Card className=" CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.myAccess")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.myAccess")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexUser} next={this.nextUser} previous={this.previousUser} ride="carousel">
                                 <CarouselIndicators items={slidesUserContent} activeIndex={activeIndexUser} onClickHandler={this.goToIndexUser} />
                                 {slidesUser}
@@ -3261,7 +3263,7 @@ class ApplicationDashboard extends Component {
                         <Card className=" CardHeight">
                           <CardBody className="p-0">
                             <div class="h1 text-muted text-left mb-0 m-3">
-                              <p class="card-title IconColorD" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.erpLinkedShipments")}</p>
+                              <p class="card-title IconColorDTile" style={{ fontSize: "15px" }}>{i18n.t("static.dashboard.erpLinkedShipments")}</p>
                               <Carousel className='trustedMechCarousel' defaultWait={3000} activeIndex={activeIndexErp} next={this.nextErp} previous={this.previousErp} ride="carousel">
                                 <CarouselIndicators items={slidesErpContent} activeIndex={activeIndexErp} onClickHandler={this.goToIndexErp} />
                                 {slidesErp}
@@ -3323,7 +3325,7 @@ class ApplicationDashboard extends Component {
                       {this.state.dashboardTopList.map(d => {
                         return (
                           <tr>
-                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">
+                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row" className='DashboardIcon'>
                               <i class="fa fa-trash icons" style={{ color: "danger", cursor: "pointer", verticalAlign: "middle", position: 'relative', top: '-1px' }} title="Delete" onClick={() => this.deleteSupplyPlanProgram(d.program.id.split("_")[0], d.program.id.split("_")[1].slice(1))}></i> &nbsp;
                               <i class="cui-cloud-download icons" style={{ color: d.isLatest ? "" : "#FF0000", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Download" onClick={() => this.redirectToCrudWindow("/program/downloadProgram/")}></i> &nbsp;
                               <i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;
@@ -3348,9 +3350,9 @@ class ApplicationDashboard extends Component {
                                 </div>
                               </div>
                             </td>
-                            <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                            {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
-                            {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
+                            <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" ,fontWeight:"bold" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer", fontWeight:"bold" }}>{d.countOfOpenProblem}</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" , fontWeight:"bold"}}>{d.countOfOpenProblem}</td>}
                             <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
                             <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                               {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}

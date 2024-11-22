@@ -115,7 +115,7 @@ body {
   color: #e4e5e6;
 }
 .carousel-indicators li {
-  background-color: #e4e5e6 !important;
+  background-color: #212631 !important;
 }
 .text-count {
   font-size: 16px;
@@ -358,7 +358,7 @@ label {
   }
 
   .carousel-indicators li {
-    background-color: #e4e5e6 !important;
+    background-color: #212631 !important;
   }
 
   .text-count {
@@ -758,7 +758,7 @@ label {
   }
 
   .carousel-indicators li {
-    background-color: #e4e5e6 !important;
+    background-color: #212631 !important;
   }
 
   .text-count {
@@ -1168,7 +1168,7 @@ label {
   }
 
   .carousel-indicators li {
-    background-color: #e4e5e6 !important;
+    background-color: #212631 !important;
   }
 
   .text-count {
@@ -3661,6 +3661,7 @@ label {
 }
 .tickerbox{
   margin-top: 10px;
+  margin-left: -21px;
 }
 .MarginBtmformgroup .Select-control{
   background-color: #212631!important;
@@ -3749,6 +3750,32 @@ label {
 }
 .card.custom-card .card-header .card-title .text-mutedDashboard{
   color: #000!important;
+}
+.IconColorDTile{
+  color: #002f6c;
+}
+.FormGroupDServer .box {
+  height: 30px !important;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 20px;
+  border: 1px solid #e4e7ea;
+  border-radius: 0.2rem;
+  background-color: #212631;
+}
+.Select-input > input {
+  padding: 8px 0 3px !important;
+  color: #e4e5e6 !important;
+}
+.DashboardIcon .fa-trash:before {
+  content: "\f1f8";
+  color: #a7c6ed !important;
+}
+.DashboardIcon .cui-cloud-upload .icons{
+  color: #a7c6ed !important;
+}
+.DashboardIcon .cui-cloud-download .icons{
+  color: #a7c6ed !important;
 }
   // .jss>thead>tr>td.InfoTrAsteriskTheadtrTdImageShipmentFreightCost::after {
   //   content: "";
@@ -17429,7 +17456,7 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  height: 255px;
+  height: 235px;
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
 }
@@ -17785,10 +17812,18 @@ label.arrow_label:before {
   .boxHeightBottom{
     height: 200px!important;
   }
+  .scrollable-content{
+    height: 200px;
+    overflow-y: scroll;
+  }
 }
 @media (min-width: 1860px) {
   .boxHeightBottom{
     height: 220px!important;
+  }
+  .scrollable-content{
+    height: 220px;
+    overflow-y: scroll;
   }
 }
 
@@ -17948,6 +17983,11 @@ label.arrow_label:before {
 .MarginTopCheckBox{
   margin-top:-1px!important;
 }
+.Topsectiondashboard{
+  display: flex;
+  gap:40px!important;
+  align-items:center;
+}
 }
 
 .MarginTopCheckBox{
@@ -17964,6 +18004,7 @@ label.arrow_label:before {
 }
 .tickerbox{
   margin-top: 4px;
+  margin-left: -21px;
 }
 .MarginBtmformgroup .Select-control{
   background-color: #fff!important;
@@ -18123,4 +18164,12 @@ label.arrow_label:before {
 }
 .dashboardTable2>div .jss_filters {
   top: 0px !important;
+}
+.Topsectiondashboard{
+  display: flex;
+  gap:40px;
+  align-items:center;
+}
+.Dashboardticker .card {
+  margin: 0px -9px !important;
 }
