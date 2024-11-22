@@ -32,7 +32,7 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED, NO_REVIEW_NEEDED_VERSION_STATUS } from '../../Constants.js';
+import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED, NO_REVIEW_NEEDED_VERSION_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -4315,7 +4315,6 @@ export default class syncPage extends Component {
           delete generalData.supplyPlan;
           delete generalData.planningUnitList;
           generalData.actionList = [];
-          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var planningUnitDataList = [];
           for (var pu = 0; pu < planningUnitList.length; pu++) {
             var planningUnitDataJson = {
@@ -4325,9 +4324,13 @@ export default class syncPage extends Component {
               batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
               supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
             }
+            if(generalData.dashboardData.topPuData[planningUnitList[pu].id]!=undefined){
+              generalData.dashboardData.topPuData[planningUnitList[pu].id].linkedShipmentsCount=planningUnitDataJson.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length;
+            }
             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
           }
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var programDataJson = {
             generalData: generalEncryptedData,
             planningUnitDataList: planningUnitDataList

@@ -7461,6 +7461,14 @@ h6 {
   // margin-top: -17%;
 }
 
+.ImgContTicker {
+  // float: left !important;
+  // width: 50%;
+  visibility: hidden;
+  height: 84px;
+  // margin-top: -17%;
+}
+
 .TextCont {
   margin-top: 1%;
 }
@@ -7689,8 +7697,8 @@ h6 {
   flex: 0 1 auto;
   // width: 30px;
   // height: 3px;
-  margin-right: 3px;
-  margin-left: 3px;
+  margin-right: 6px;
+  margin-left: 6px;
   text-indent: 0 !important;
   cursor: pointer;
   background-color: #fff;
@@ -7699,8 +7707,8 @@ h6 {
   border-bottom: 10px solid transparent;
   opacity: .5;
   transition: opacity 0;
-  width: 8px !important;
-  height: 8px !important;
+  width: 10px !important;
+  height: 10px !important;
   border-radius: 50% !important;
 }
 
@@ -7719,6 +7727,13 @@ h6 {
 
 @media (min-width: 1920px) {
   .ImgCont {
+    // float: left !important;
+    width: 50%;
+    visibility: hidden;
+    // margin-top: -42px;
+  }
+
+  .ImgContTicker {
     // float: left !important;
     width: 50%;
     visibility: hidden;
@@ -17261,6 +17276,9 @@ label.arrow_label:before {
 .FormGroupD .form-control-sm {
   height: calc(1.5em + 0.5rem + 2px) !important;
 }
+.FormGroupDServer .form-control-sm {
+  height: calc(1.5em + 0.5rem + 2px) !important;
+}
 
 .card.custom-card {
   border-radius: .5rem;
@@ -17411,12 +17429,12 @@ label.arrow_label:before {
 }
 
 .dashboardTable2 .jss_content {
-  height: 244px;
+  height: 255px;
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
 }
 .dashboardTable2E .jss_content {
-  height: 133px;
+  height: 145px;
   max-height: calc(100vh - 100%) !important;
     overflow: auto;
 }
@@ -17428,12 +17446,20 @@ label.arrow_label:before {
 .dashboardTable3 .jss_content{
     // max-height: calc(100vh - 46vh) !important;
     max-height: calc(100vh - 100%) !important;
-    height: 236px;
+    height: 270px;
     overflow: auto;
 }
 .CustomHeight {
-  height: 282px;
-  // height: 313px;
+  // height: 375px;
+  // max-height: calc(100vh - 0px) !important;
+  // height: auto;
+  // max-height: 100% !important;
+  // min-height: 310px;
+  // max-height: 310px;
+  // min-height: 20vh !important;
+  // max-height: 20vh;
+  height: 320px;
+  // height: 400px; /* Set the desired fixed height */
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17441,7 +17467,7 @@ label.arrow_label:before {
 
 @media screen and (min-width: 1920px) {
   .CustomHeight {
-    height: 327px; /* Set the desired fixed height */
+    height: 335px; /* Set the desired fixed height */
     display: flex;
     flex-direction: column;
     overflow: hidden; /* Prevent content from overflowing outside the card */
@@ -17449,20 +17475,17 @@ label.arrow_label:before {
   .dashboardTable3 .jss_content{
       max-height: calc(100vh - 100%) !important;
       overflow: auto;
-      height: 272px;
+      height: 282px;
   }
   .dashboardTable2E .jss_content {
     max-height: calc(100vh - 100%) !important;
-    height:132px;
+    height:168px;
     overflow: auto;
-}
-.dashboardTable2Ss .jss_content {
-  max-height: calc(100vh - 100%) !important;
-  overflow: auto;
-}
-.pie-wrapper {
-  margin-top: -47px;
-}
+  }
+  .dashboardTable2Ss .jss_content {
+    max-height: calc(100vh - 100%) !important;
+    overflow: auto;
+  }
 }
 .MuiSwitch-switchBase {
   top: 0;
@@ -17607,6 +17630,17 @@ label.arrow_label:before {
   background-color: #e5edf5;
 }
 
+.FormGroupDServer .box {
+  // height: calc(1.5em + 0.5rem + 2px) !important;
+  height: 30px!important;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.76562rem;
+  line-height: 20px;
+  border: 1px solid #e4e7ea;
+  border-radius: 0.2rem;
+  background-color: #FFF;
+}
+
 .StockplanningBoxD {
   max-height: 12vh;
   min-height: 12vh;
@@ -17715,7 +17749,7 @@ label.arrow_label:before {
   }
   .dashboardTable2 .jss_content {
     max-height: calc(100vh - 100%) !important;
-    height:252px;
+    height:262px;
     overflow:auto;
   }
   
@@ -17736,9 +17770,8 @@ label.arrow_label:before {
   margin-bottom: 8px;
 }
 .gaugeHeader{
-  height: 40px;
+  height: 25px;
 }
-
 .scrollable-content {
   flex: 1; /* Fills the remaining space in the card */
   overflow-y: hidden; /* Adds vertical scroll when content overflows */
@@ -17746,7 +17779,17 @@ label.arrow_label:before {
   overflow-x:hidden;
 }
 .boxHeightBottom{
-  height: 184px!important;
+  height: 190px!important;
+}
+@media (min-width: 1720px) {
+  .boxHeightBottom{
+    height: 200px!important;
+  }
+}
+@media (min-width: 1860px) {
+  .boxHeightBottom{
+    height: 220px!important;
+  }
 }
 
 .jss>tbody>tr>td.cmpAndSelectTbl {
@@ -17754,7 +17797,7 @@ label.arrow_label:before {
 
 }
 #legend-container ul{
-  margin:revert!important;
+  margin:0px !important;
   padding:revert!important;
 }
 .containerBox {
@@ -17905,26 +17948,6 @@ label.arrow_label:before {
 .MarginTopCheckBox{
   margin-top:-1px!important;
 }
-.Dashboardticker .CardHeight {
-  height: 97px!important;
-}
-.Dashboardticker .carousel-caption {
-  position: absolute;
-  right: 0% !important;
-  bottom: 29px!important;
-  left: 0% !important;
-  z-index: 0 !important;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  color: #fff;
-  text-align: left;
-}
-.Dashboardticker .carousel-indicators {
-  position: absolute;
-  right: 0;
-  bottom: 29px!important;
-  z-index: 1 !important;
-}
 }
 
 .MarginTopCheckBox{
@@ -18053,12 +18076,12 @@ label.arrow_label:before {
   top:-2px!important;
 }
 .Dashboardticker .CardHeight{
-  height: 103px;
+  height: 84px;
   background-color: #A7C6ED;
 }
 .Dashboardticker .CardHeight .card-body .card-title{
   margin-top: -8px!important;
-  margin-bottom: 2px!important;
+  margin-bottom: 6px!important;
   font-weight: bold;
 }
 .Dashboardticker .carousel-caption {
@@ -18075,39 +18098,29 @@ label.arrow_label:before {
 .Dashboardticker .carousel-indicators {
   position: absolute;
   right: 0;
-  bottom: 14px!important;
+  bottom: 15px !important;
   z-index: 1 !important;
 }
-.pie-wrapper{
-  margin-top: -17px;
+.TextContTicker {
+  margin-top: 1%;
 }
-@media screen 
-  and (min-device-width: 1200px) 
-  and (max-device-width: 1600px) 
-  and (-webkit-min-device-pixel-ratio: 1) { 
-    .Dashboardticker .carousel-caption {
-      position: absolute;
-      right: 0% !important;
-      bottom: 32px;
-      left: 0% !important;
-      z-index: 0 !important;
-      padding-top: 20px;
-      padding-bottom: 20px;
-      color: #fff;
-      text-align: left;
-      // display: flex;
-  }
+.TextContTicker p {
+  font-size: 14px;
+  font-weight: 500;
+  color: #212721;
 }
-// .Dashboardticker .TextCont h3 {
-//   color: #73818f !important;
-//   font-size: 12px !important;
-//   text-transform: uppercase;
-//   font-weight: 700;
-//   inline-size: 150px;
-// }
-// .Dashboardticker.TextCont p {
-//   font-size: 16px;
-//   font-weight: 500;
-//   color: #212721;
-//   text-align: right;
-// }
+.TextContTicker h3 {
+  color: #000000 !important;
+  font-size: 14px !important;
+  margin-bottom: 1%;
+  font-weight: 500;
+}
+.dashboardTable2E>div .jss_filters {
+  top: -150px !important;
+}
+.dashboardTable3>div .jss_filters {
+  top: 0px !important;
+}
+.dashboardTable2>div .jss_filters {
+  top: 0px !important;
+}

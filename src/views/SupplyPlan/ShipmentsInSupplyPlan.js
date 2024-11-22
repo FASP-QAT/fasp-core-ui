@@ -123,8 +123,8 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     var pricePerUnit = "";
                     var planningUnitId = rowData[3];
                     var procurementAgentPlanningUnit = this.state.procurementAgentPlanningUnitListAll.filter(c => c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
-                    var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
-                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
+                    var puData = this.props.items.programPlanningUnitForPrice;
+                    var programPriceList = puData.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.planningUnit.id == planningUnitId && c.active);
                     if (programPriceList.length > 0 && programPriceList[0].price !== null) {
                         pricePerUnit = Number(programPriceList[0].price);
                     } else {
@@ -2578,8 +2578,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var freightCost = 0;
                 var planningUnitId = rowData[3];
                 if (planningUnitId != "") {
-                    var puData = this.props.items.puData.filter(c => c.id == planningUnitId)[0];
-                    var programPriceList = puData.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
+                    var programPriceList = this.props.items.programPlanningUnitForPrice.programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == this.state.actualProgramId && c.procurementAgent.id == rowData[7] && c.active);
                     if (rowData[6] == 1) {
                         var seaFreightPercentage = this.props.items.generalProgramJson.seaFreightPerc;
                         if (programPriceList.length > 0) {

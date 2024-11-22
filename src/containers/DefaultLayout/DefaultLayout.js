@@ -953,6 +953,10 @@ class DefaultLayout extends Component {
     sessionStorage.setItem("defaultModuleId",tab);
     this.setState({
       activeTab: tab,
+    },()=>{
+      if(window.location.hash.toString().includes("ApplicationDashboard") && this.state.activeTab==2){
+        window.location.reload();
+      }
     });
   }
   /**
