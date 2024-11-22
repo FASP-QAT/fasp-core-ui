@@ -17428,7 +17428,7 @@ label.arrow_label:before {
 .dashboardTable3 .jss_content{
     // max-height: calc(100vh - 46vh) !important;
     max-height: calc(100vh - 100%) !important;
-    height: 265px;
+    height: 236px;
     overflow: auto;
 }
 .CustomHeight {
@@ -17459,6 +17459,9 @@ label.arrow_label:before {
 .dashboardTable2Ss .jss_content {
   max-height: calc(100vh - 100%) !important;
   overflow: auto;
+}
+.pie-wrapper {
+  margin-top: -47px;
 }
 }
 .MuiSwitch-switchBase {
@@ -18050,7 +18053,7 @@ label.arrow_label:before {
   top:-2px!important;
 }
 .Dashboardticker .CardHeight{
-  height: 110px;
+  height: 103px;
   background-color: #A7C6ED;
 }
 .Dashboardticker .CardHeight .card-body .card-title{
@@ -18072,7 +18075,7 @@ label.arrow_label:before {
 .Dashboardticker .carousel-indicators {
   position: absolute;
   right: 0;
-  bottom: 15px;
+  bottom: 14px!important;
   z-index: 1 !important;
 }
 .pie-wrapper{
@@ -18092,5 +18095,19 @@ label.arrow_label:before {
       padding-bottom: 20px;
       color: #fff;
       text-align: left;
+      // display: flex;
   }
 }
+// .Dashboardticker .TextCont h3 {
+//   color: #73818f !important;
+//   font-size: 12px !important;
+//   text-transform: uppercase;
+//   font-weight: 700;
+//   inline-size: 150px;
+// }
+// .Dashboardticker.TextCont p {
+//   font-size: 16px;
+//   font-weight: 500;
+//   color: #212721;
+//   text-align: right;
+// }
