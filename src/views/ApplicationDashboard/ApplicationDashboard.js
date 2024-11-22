@@ -2359,11 +2359,11 @@ class ApplicationDashboard extends Component {
 
     if (this.state.displayBy == 1 || this.state.displayBy == 2) {
       darkModeColors = [
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
-        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#f0bc52", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9"
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9",
+        "#d4bbff", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#6C6463", "#F48521", "#49A4A1", "#cfcdc9"
       ];
 
       lightModeColors = [
