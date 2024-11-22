@@ -234,11 +234,14 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                             props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
                             props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
+                            props.updateStateDashboard("bottomSubmitLoader", false);
                         } else {
                             props.updateStateDashboard("dashboardBottomData", "");
+                            props.updateStateDashboard("bottomSubmitLoader", false);
                         }
                     } else {
                         props.updateStateDashboard("dashboardBottomData", "");
+                        props.updateStateDashboard("bottomSubmitLoader", false);
                     }
                 }.bind(this)
             }.bind(this)

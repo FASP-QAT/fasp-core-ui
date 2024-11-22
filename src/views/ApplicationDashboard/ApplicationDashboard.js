@@ -14,6 +14,8 @@ import { confirmAlert } from 'react-confirm-alert';
 import jexcel from 'jspreadsheet';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import Skeleton from 'react-loading-skeleton'
+import '../../../node_modules/react-loading-skeleton/dist/skeleton.css'
 import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import {
   Button,
@@ -123,6 +125,7 @@ class ApplicationDashboard extends Component {
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       topSubmitLoader: false,
+      bottomSubmitLoader: false,
       fullDashbaordTopList: [],
       topProgramIdChange: false
     };
@@ -1001,6 +1004,9 @@ class ApplicationDashboard extends Component {
         }
         this.getOnlineDashboardBottom(inputJson);
       } else {
+        this.setState({
+          bottomSubmitLoader: true,
+        })
         Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
       }
     });
@@ -1090,6 +1096,9 @@ class ApplicationDashboard extends Component {
         }
         this.getOnlineDashboardBottom(inputJson);
       } else {
+        this.setState({
+          bottomSubmitLoader: true,
+        })
         Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
       }
     });
@@ -1145,6 +1154,9 @@ class ApplicationDashboard extends Component {
     }
   }
   getOnlineDashboardBottom(inputJson) {
+    this.setState({
+      bottomSubmitLoader: true,
+    })
     var dt = new Date();
     dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
     var dt1 = new Date();
@@ -1161,11 +1173,17 @@ class ApplicationDashboard extends Component {
               this.buildForecastErrorJexcel();
               this.buildShipmentsTBDJexcel();
               this.buildExpiriesJexcel();
+              this.setState({
+                bottomSubmitLoader: false,
+              })
             }
           })
         }
         ).catch(
           error => {
+            this.setState({
+              bottomSubmitLoader: true,
+            })
             if (error.message === "Network Error") {
               this.setState({
                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -1251,9 +1269,15 @@ class ApplicationDashboard extends Component {
           }
           this.getOnlineDashboardBottom(inputJson);
         } else if (tempProgramList.length > 0) {
+          this.setState({
+            bottomSubmitLoader: true,
+          })
           Dashboard(this, localStorage.getItem("bottomProgramId"), this.state.displayBy, false, true);
         }
         if (this.state.onlyDownloadedTopProgram) {
+          this.setState({
+            bottomSubmitLoader: true,
+          })
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
         } else if (localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
           this.setState({
@@ -3306,8 +3330,19 @@ class ApplicationDashboard extends Component {
                         </FormGroup> */}
                   </div>
                 </div>
-
-                {(this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
+                {this.state.topSubmitLoader && 
+                <div
+                  style={{
+                    margin: '1rem auto',
+                    padding: '1rem',
+                    backgroundColor: this.state.isDarkMode ? '#4d515a' : '#ededed',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                  }}
+                >
+                  <Skeleton count={5} baseColor="#dcdcdc" highlightColor="#ececec" />
+                </div>}
+                {!this.state.topSubmitLoader && (this.state.dashboardTopList.length > 0 || this.state.topProgramId.length > 0) && <div class="table-responsive fixTableHeadTopDashboard tableFixHeadDash">
                   <Table className="table-striped table-bordered text-center">
                     <thead>
                       {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">{i18n.t("static.common.action")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
@@ -3348,9 +3383,9 @@ class ApplicationDashboard extends Component {
                                 </div>
                               </div>
                             </td>
-                            <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" ,fontWeight:"bold" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
-                            {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer", fontWeight:"bold" }}>{d.countOfOpenProblem}</td>}
-                            {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" , fontWeight:"bold"}}>{d.countOfOpenProblem}</td>}
+                            <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                             <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
                             <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                               {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
