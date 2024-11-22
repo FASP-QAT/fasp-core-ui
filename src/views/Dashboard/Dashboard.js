@@ -88,6 +88,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 });
                                 console.log("dashboradTopList Test@123", dashboradTopList)
                                 props.updateStateDashboard("dashboardTopList", dashboradTopList);
+                                props.updateStateDashboard("topSubmitLoader", false);
                             } catch (err) {
                                 console.log("Error Test@123", err)
                             }
