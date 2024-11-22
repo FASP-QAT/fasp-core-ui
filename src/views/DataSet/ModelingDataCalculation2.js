@@ -110,9 +110,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     if (payload.nodeType.id != 1 && payload.nodeType.id != 6) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        if (scenarioId != -1 && treeList[tl].treeId == treeId) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
-                        }
+                        // if (scenarioId != -1 && treeList[tl].treeId == treeId) {
+                        //     scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                        // }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var nodeDataModelingListUnFiltered = (nodeDataMapForScenario.nodeDataModelingList);
@@ -173,9 +173,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     if (payload.nodeType.id != 1 && payload.nodeType.id != 6 && (payload.extrapolation == undefined || payload.extrapolation.toString() == "false")) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        if (scenarioId != -1 && treeList[tl].treeId == treeId) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
-                        }
+                        // if (scenarioId != -1 && treeList[tl].treeId == treeId) {
+                        //     scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                        // }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             if (nodeDataMapForScenario.extrapolation == undefined || nodeDataMapForScenario.extrapolation.toString() == "false") {
@@ -700,9 +700,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             if (payload.nodeType.id == 6) {
                                 var nodeDataMap = payload.nodeDataMap;
                                 var scenarioList = tree.scenarioList;
-                                if (scenarioId != -1 && treeList[tl].treeId == treeId) {
-                                    scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
-                                }
+                                // if (scenarioId != -1 && treeList[tl].treeId == treeId) {
+                                //     scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                                // }
                                 for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                                     var childNodeFlatList = [];
                                     var invalidChild = [];
@@ -789,7 +789,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             var treeIndex = dataset.programData.treeList.findIndex(t => t.treeId == treeList[tl].treeId);
                             dataset.programData.treeList[treeIndex] = treeList[tl];
                             datasetJson = dataset.programData;
-                            await calculateModelingData(dataset, props, page, aggregateDownwardNodeList[fl].id, -1, type, treeId != -1 ? treeList[tl].treeId : treeId, isTemplate, listPage, autoCalculate, true, allNodeDataList, (calculateAggregationDownward ? originalTreeId : treeId), count)
+                            await calculateModelingData(dataset, props, page, aggregateDownwardNodeList[fl].id, scenarioId, type, treeId != -1 ? treeList[tl].treeId : treeId, isTemplate, listPage, autoCalculate, true, allNodeDataList, (calculateAggregationDownward ? originalTreeId : treeId), count)
                         }
                     }
 
@@ -799,9 +799,9 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                     if (payload.nodeType.id == 1) {
                         var nodeDataMap = payload.nodeDataMap;
                         var scenarioList = tree.scenarioList;
-                        if (scenarioId != -1 && treeList[tl].treeId == treeId) {
-                            scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
-                        }
+                        // if (scenarioId != -1 && treeList[tl].treeId == treeId) {
+                        //     scenarioList = scenarioList.filter(c => c.id == scenarioId && c.active.toString() == "true");
+                        // }
                         for (var ndm = 0; ndm < scenarioList.length; ndm++) {
                             var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                             var childNodeFlatList = flatListUnsorted.filter(c => c.parent == aggregateNodeList[fl - 1].id && c.payload.nodeType.id != 6);

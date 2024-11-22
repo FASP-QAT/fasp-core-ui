@@ -8697,7 +8697,6 @@ export default class BuildTree extends Component {
      * Calls multiple function on component mount
      */
     componentDidMount() {
-        console.log("Test@123 inside componentDidMount")
         // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
