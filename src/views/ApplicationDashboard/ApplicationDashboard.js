@@ -981,7 +981,7 @@ class ApplicationDashboard extends Component {
       var endDate = moment(Date.now()).add(program[0].noOfMonthsInFutureForBottomDashboard - 1, 'months').startOf('month').format("YYYY-MM-DD")
       dashboardStartDateBottom = moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM");
       dashboardStopDateBottom = moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM");
-      var rangeValue = { from: { year: dashboardStartDateBottom.split("-")[0], month: dashboardStartDateBottom.split("-")[1] }, to: { year: dashboardStopDateBottom.split("-")[0], month: dashboardStopDateBottom.split("-")[1] } };
+      var rangeValue = { from: { year: Number(dashboardStartDateBottom.split("-")[0]), month: Number(dashboardStartDateBottom.split("-")[1]) }, to: { year: Number(dashboardStopDateBottom.split("-")[0]), month: Number(dashboardStopDateBottom.split("-")[1]) } };
       localStorage.setItem("bottomReportPeriod", JSON.stringify(rangeValue))
       this.setState({
         rangeValue: rangeValue
@@ -1050,9 +1050,6 @@ class ApplicationDashboard extends Component {
       })
     } else if (this.state.onlyDownloadedTopProgram) {
       Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-      this.setState({
-        topSubmitLoader: false
-      })
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
@@ -3538,7 +3535,8 @@ class ApplicationDashboard extends Component {
                           years={{ min: this.state.minDate, max: this.state.maxDate }}
                           value={rangeValue}
                           lang={pickerLang}
-                          key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
+                          key={JSON.stringify(rangeValue)}
+                          // key={JSON.stringify(this.state.minDate) + "-" + JSON.stringify(rangeValue)}
                           onDismiss={this.handleRangeDissmis}
                         >
                           <MonthBox value={makeText(rangeValue.from) + ' - ' + makeText(rangeValue.to)} onClick={(this.state.onlyDownloadedBottomProgram && this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length > 1) || this.state.bottomProgramId == "" ? "" : this._handleClickRangeBox} />
