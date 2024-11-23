@@ -3680,7 +3680,7 @@ export default class BuildTree extends Component {
                             var nodeId = nodeDataMomList[i].nodeId;
                             var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
                             var node = items.filter(n => n.id == nodeId)[0];
-                            (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                            (node.payload.nodeDataMap[nodeDataMomList[i].scenarioId])[0].nodeDataMomList = nodeDataMomListForNode;
                             var findNodeIndex = items.findIndex(n => n.id == nodeId);
                             items[findNodeIndex] = node;
                         } catch (e) {

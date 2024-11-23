@@ -667,7 +667,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                 allNodeDataList.push({
                                     treeId: treeList[tl].treeId,
                                     nodeId: flatList[fl].id,
-                                    nodeDataMomList: nodeDataList
+                                    nodeDataMomList: nodeDataList,
+                                    scenarioId:scenarioList[ndm].id
                                 })
                                 nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                                 nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
@@ -770,7 +771,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     allNodeDataList.push({
                                         treeId: treeList[tl].treeId,
                                         nodeId: aggregateDownwardNodeList[fl].id,
-                                        nodeDataMomList: nodeDataList
+                                        nodeDataMomList: nodeDataList,
+                                        scenarioId:scenarioList[ndm].id
                                     })
                                     nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                                     nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
@@ -856,7 +858,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                             allNodeDataList.push({
                                 treeId: treeList[tl].treeId,
                                 nodeId: aggregateNodeList[fl - 1].id,
-                                nodeDataMomList: nodeDataList
+                                nodeDataMomList: nodeDataList,
+                                scenarioId:scenarioList[ndm].id
                             })
                             nodeDataMapForScenario.nodeDataMomList = nodeDataList;
                             nodeDataMap[scenarioList[ndm].id] = [nodeDataMapForScenario];
