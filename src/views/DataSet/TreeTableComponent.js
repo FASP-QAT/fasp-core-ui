@@ -7145,11 +7145,7 @@ export default class TreeTable extends Component {
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab1'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
-<<<<<<< HEAD
                 } else if (this.state.activeTab1[0] === '2') {
-=======
-                } else {
->>>>>>> QAT-469
                     doc.text(i18n.t('static.common.treeTable') + " - " + i18n.t('static.treeTable.tab2'), doc.internal.pageSize.width / 2, 50, {
                         align: 'center'
                     })
@@ -7611,7 +7607,6 @@ export default class TreeTable extends Component {
                                 </>
                             </div>
                         </CardBody>
-<<<<<<< HEAD
                     </Card>
                     <div style={{ display: this.state.loading || this.state.treeTableLoading ? "block" : "none" }}>
                         <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
@@ -7624,9 +7619,6 @@ export default class TreeTable extends Component {
                     </div>
                 </Col>
             </Row>
-=======
-                    </Card></Col></Row>
->>>>>>> QAT-469
             <Modal isOpen={this.state.showGuidanceTreeTable}
                 className={'modal-lg ' + this.props.className} >
                 <ModalHeader toggle={() => this.toggleShowGuidanceTreeTable()} className="ModalHead modal-info-Headher">

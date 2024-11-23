@@ -757,23 +757,13 @@ export default class ManualTagging extends Component {
                     this.el.setComments(col, "");
                     var json = this.el.getJson(null, false);
                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.el.getValueFromCoords(8, y))[0];
-<<<<<<< HEAD
                     this.el.setValueFromCoords(11, y, (this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
-                    this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
-                    this.el.setValueFromCoords(35, y, rcpu.multiplier, true);
-                    for (var j = 0; j < json.length; j++) {
-                        if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                            this.el.setValueFromCoords(11, j, (this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
-                            this.el.setValueFromCoords(10, y, (rcpu.conversionMethod==1?"*":"/")+rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
-=======
-                    this.el.setValueFromCoords(11, y, Math.round(this.el.getValueFromCoords(32, y) * rcpu.multiplier), true);
                     this.el.setValueFromCoords(10, y, (rcpu.conversionMethod == 1 ? "*" : "/") + rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                     this.el.setValueFromCoords(35, y, rcpu.multiplier, true);
                     for (var j = 0; j < json.length; j++) {
                         if (j != y && json[j][22] == this.el.getValueFromCoords(22, y, true)) {
-                            this.el.setValueFromCoords(11, j, Math.round(this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
+                            this.el.setValueFromCoords(11, j, (this.el.getValueFromCoords(32, j) * rcpu.multiplier), true);
                             this.el.setValueFromCoords(10, y, (rcpu.conversionMethod == 1 ? "*" : "/") + rcpu.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
->>>>>>> QAT-469
                             this.el.setValueFromCoords(35, j, rcpu.multiplier, true);
                             this.el.setValueFromCoords(8, j, rcpu.id, true);
                         }
@@ -875,26 +865,16 @@ export default class ManualTagging extends Component {
                         this.state.instance.setComments(col, "");
                         var rcpuFilter = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
                         if (rowData[0].toString() == "true") {
-<<<<<<< HEAD
                             this.state.instance.setValueFromCoords(12, y, (this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
-                            this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
-=======
-                            this.state.instance.setValueFromCoords(12, y, Math.round(this.state.instance.getValueFromCoords(10, y) * rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod == 1 ? "*" : "/") + rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
->>>>>>> QAT-469
                             this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                             this.state.instance.setValueFromCoords(19, y, Math.round(this.state.instance.getValueFromCoords(10, y)), true);
                             for (var j = 0; j < json.length; j++) {
                                 if (json[j][17] == this.state.instance.getValueFromCoords(17, y, true)) {
                                     if (j != y) {
                                         this.state.instance.setValueFromCoords(9, j, rcpuFilter.id, true);
-<<<<<<< HEAD
                                         this.state.instance.setValueFromCoords(12, j, (this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
-                                        this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod==1?"*":"/")+rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
-=======
-                                        this.state.instance.setValueFromCoords(12, j, Math.round(this.state.instance.getValueFromCoords(10, j) * rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(11, y, (rcpuFilter.conversionMethod == 1 ? "*" : "/") + rcpuFilter.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
->>>>>>> QAT-469
                                         this.state.instance.setValueFromCoords(21, y, Number(rcpuFilter.multiplier), true);
                                         this.state.instance.setValueFromCoords(19, j, Math.round(this.state.instance.getValueFromCoords(10, j)), true);
                                     }
@@ -1581,14 +1561,10 @@ export default class ManualTagging extends Component {
                                 var shipmentIndex = shipmentList.findIndex(c => selectedShipment[ss][17].shipmentId > 0 ? c.shipmentId == selectedShipment[ss][17].shipmentId : c.tempShipmentId == selectedShipment[ss][17].tempShipmentId);
                                 if(linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0){
                                 shipmentList[shipmentIndex].active = false;
-<<<<<<< HEAD
                                 }else{
                                     shipmentList[shipmentIndex].erpFlag = false;
                                 }
                                 shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
-=======
-                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex].tempShipmentId))
->>>>>>> QAT-469
                                 shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
                                 shipmentList[shipmentIndex].lastModifiedBy.username = username;
                                 shipmentList[shipmentIndex].lastModifiedDate = curDate;
@@ -1853,7 +1829,6 @@ export default class ManualTagging extends Component {
                                                 var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
                                                 shipmentList[shipmentIndex1].erpFlag = true;
-<<<<<<< HEAD
                                                 if(notes!="" && shipmentList[shipmentIndex1].notes!=""){
                                                     notes+=" | "
                                                 }
@@ -1862,9 +1837,6 @@ export default class ManualTagging extends Component {
                                                 }
 
                                                 shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex1].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex1].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex1].tempShipmentId))
-=======
-                                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex1].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex1].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex1].tempShipmentId))
->>>>>>> QAT-469
                                                 shipmentList[shipmentIndex1].active = false;
                                                 shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
                                                 shipmentList[shipmentIndex1].tempParentLinkedShipmentId = this.state.finalShipmentId[0].tempShipmentId;
@@ -1917,7 +1889,6 @@ export default class ManualTagging extends Component {
                                                     if (this.state.active4 && uq == 0) {
                                                         var c = (cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0]);
                                                         var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-<<<<<<< HEAD
                                                         var tempShipmentId=ppuObject.planningUnit.id.toString().concat(shipmentList.length);
                                                         var tempNotes=notes;
                                                         if(tableJson[y][13]!=""){
@@ -1926,9 +1897,6 @@ export default class ManualTagging extends Component {
                                                             }
                                                             tempNotes+=tableJson[y][13]
                                                         }
-=======
-                                                        var tempShipmentId = ppuObject.planningUnit.id.toString().concat(shipmentList.length);
->>>>>>> QAT-469
                                                         shipmentList.push({
                                                             accountFlag: true,
                                                             active: false,
@@ -2034,7 +2002,6 @@ export default class ManualTagging extends Component {
                                                         lastModifiedDate: curDate,
                                                     })
                                                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-<<<<<<< HEAD
                                                     var tempShipmentId=shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
                                                     var tempNotes=notes;
                                                         if(getUniqueOrderNoAndPrimeLineNoList[uq][13]!=""){
@@ -2043,9 +2010,6 @@ export default class ManualTagging extends Component {
                                                             }
                                                             tempNotes+=getUniqueOrderNoAndPrimeLineNoList[uq][13]
                                                         }
-=======
-                                                    var tempShipmentId = shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
->>>>>>> QAT-469
                                                     shipmentList.push({
                                                         accountFlag: true,
                                                         active: true,
@@ -3097,13 +3061,8 @@ export default class ManualTagging extends Component {
                         data1[7] = list[i].receivedDate != "" && list[i].receivedDate != null && list[i].receivedDate != undefined && list[i].receivedDate != "Invalid date" ? list[i].receivedDate : list[i].expectedDeliveryDate;
                         data1[8] = getLabelText(list[i].shipmentStatus.label, this.state.lang)
                         data1[9] = list[i].shipmentQty
-<<<<<<< HEAD
-                        data1[10] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data1[11] = (Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
-=======
                         data1[10] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data1[11] = Math.round(Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
->>>>>>> QAT-469
+                        data1[11] = (Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
                         data1[12] = list[i].notes
                         data1[13] = i;
                         data1[14] = list[i].tempShipmentId;

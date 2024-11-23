@@ -293,7 +293,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center bg-height">
         {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
-        <div className="Login-component InnerBgImg" >
+        <div className="Login-component InnerBgImg ScrollLogin" >
           <Container className="container-login">
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
@@ -316,11 +316,68 @@ class Login extends Component {
                   </ButtonDropdown>
                 </div>
               </Col>
-              <Col md="12">
+              {/* <Col md="12">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+              </Col> */}
+              <Row className='pb-lg-5'>
+                <Col md="3">
+                <div className="upper-logo logo-MarginTop">
+                  <img src={image1} className="img-fluid " />
+                </div>
+                </Col>
+                <Col md="8" lg="7">
+  <div style={{ marginBottom: '25px', marginTop:'-25px',fontSize:'14px' }}>
+    {this.state.lang === 'en' ?
+      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
+      <h3 style={{ marginTop: 0, color: '#333' }}>New Enhanced Supply Planning Dashboard Released!</h3>
+      <p>
+        We’re excited to announce the release of our enhanced Supply Planning Dashboard. To view the updated data for downloaded programs, please re-download the program(s).
+      </p>
+      <p>
+        <strong>Note:</strong> This step is not necessary for server versions, as they will automatically display the latest data.
+      </p>
+      <p>Thank you for using our tool, and we hope you enjoy the improved features!</p>
+    </div>:
+      this.state.lang === 'sp' ?
+      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
+  <h3 style={{ marginTop: 0, color: '#333' }}>¡Nueva versión mejorada del Panel de Planificación de Suministros lanzada!</h3>
+  <p>
+    Estamos emocionados de anunciar el lanzamiento de nuestra versión mejorada del Panel de Planificación de Suministros. Para ver los datos actualizados de los programas descargados, por favor, vuelva a descargar el/los programa(s).
+  </p>
+  <p>
+    <strong>Nota:</strong> Este paso no es necesario para las versiones de servidor, ya que mostrarán automáticamente los datos más recientes.
+  </p>
+  <p>¡Gracias por usar nuestra herramienta y esperamos que disfrute las funciones mejoradas!</p>
+</div>:
+      this.state.lang === 'fr' ?
+      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
+  <h3 style={{ marginTop: 0, color: '#333' }}>Nouvelle version améliorée du tableau de bord de planification des approvisionnements publiée !</h3>
+  <p>
+    Nous sommes ravis d'annoncer le lancement de notre tableau de bord de planification des approvisionnements amélioré. Pour afficher les données mises à jour des programmes téléchargés, veuillez retélécharger le(s) programme(s).
+  </p>
+  <p>
+    <strong>Remarque :</strong> Cette étape n'est pas nécessaire pour les versions serveur, car elles afficheront automatiquement les données les plus récentes.
+  </p>
+  <p>Merci d'utiliser notre outil et nous espérons que vous apprécierez les fonctionnalités améliorées !</p>
+</div>
+ :
+ <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
+ <h3 style={{ marginTop: 0, color: '#333' }}>Nova versão aprimorada do Painel de Planejamento de Suprimentos lançada!</h3>
+ <p>
+   Estamos animados em anunciar o lançamento de nossa versão aprimorada do Painel de Planejamento de Suprimentos. Para visualizar os dados atualizados dos programas baixados, faça o download novamente do(s) programa(s).
+ </p>
+ <p>
+   <strong>Nota:</strong> Este passo não é necessário para versões de servidor, pois elas exibirão automaticamente os dados mais recentes.
+ </p>
+ <p>Obrigado por usar nossa ferramenta e esperamos que você aproveite os recursos aprimorados!</p>
+</div>
+
+    }
+  </div>
               </Col>
+              </Row>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <div className="p-4 Login-card card-marginTop" >

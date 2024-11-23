@@ -6339,15 +6339,12 @@ export default class CreateTreeTemplate extends Component {
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
                 child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
-<<<<<<< HEAD
                 // if(child.payload.nodeType.id == 6 ){
                 //     child.payload.downwardAggregationList = [];
                 // }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
-=======
->>>>>>> QAT-469
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = items.filter(c => c.parent == itemConfig.parent);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6356,7 +6353,8 @@ export default class CreateTreeTemplate extends Component {
                     oldId: itemConfig.id,
                     newId: nodeId,
                     oldSortOrder: itemConfig.sortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             } else {
@@ -6367,16 +6365,13 @@ export default class CreateTreeTemplate extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
-                child.level = child.parent.level + 1;
-<<<<<<< HEAD
+                child.level = parentNode.newLevel + 1;
                 if (child.payload.nodeType.id == 6) {
                     child.payload.downwardAggregationList = [];
                 }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
-=======
->>>>>>> QAT-469
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6385,7 +6380,8 @@ export default class CreateTreeTemplate extends Component {
                     oldId: oldId,
                     newId: nodeId,
                     oldSortOrder: oldSortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             }

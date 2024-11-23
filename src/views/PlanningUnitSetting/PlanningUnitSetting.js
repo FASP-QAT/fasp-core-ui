@@ -232,7 +232,6 @@ export default class PlanningUnitSetting extends Component {
             }
             if (data[i].x == 0) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-<<<<<<< HEAD
                 if(index==0){
                     // let pCatList = this.state.productCategoryListNew;
 
@@ -250,15 +249,10 @@ export default class PlanningUnitSetting extends Component {
                     // let index = pCatList.findIndex(c => c.name == cleanedText);
                     
                     (instance).setValueFromCoords(0, data[i].y, cleanedText, true);
-=======
-                if (index == 0) {
-                    (instance).setValueFromCoords(0, data[i].y, data[i].value, true);
->>>>>>> QAT-469
                 }
             }
             if (data[i].x == 1) {
                 var index = (instance).getValue(`O${parseInt(data[i].y) + 1}`, true);
-<<<<<<< HEAD
                 if(index==0){
 
                 //=====code to clear formatting in text=====
@@ -285,14 +279,14 @@ export default class PlanningUnitSetting extends Component {
                 let temp_list = this.state.dropdownList;
                 // temp_list[data[i].y] = temp_obj;
 
-                let index = temp_list.findIndex(c => c.id == temp_obj.id);
-                if(index == -1) {
-                    //if new planning unit push to list
-                    temp_list.push(temp_obj);
-                } 
-                // else {
-                //     continue loop1;
-                // }                
+                    let index = temp_list.findIndex(c => c.id == temp_obj.id);
+                    if (index == -1) {
+                        //if new planning unit push to list
+                        temp_list.push(temp_obj);
+                    }
+                    // else {
+                    //     continue loop1;
+                    // }                
 
                 this.setState(
                     {
@@ -302,23 +296,6 @@ export default class PlanningUnitSetting extends Component {
                         (instance).setValueFromCoords(1, data[i].y, cleanedText, true);
                     }
                 )
-=======
-                if (index == 0) {
-                    let temp = data[i].value.split(" | ");
-                    let temp_obj = {
-                        id: parseInt(temp[1]),
-                        name: data[i].value
-                    };
-                    let temp_list = this.state.dropdownList;
-                    temp_list[data[i].y] = temp_obj;
-                    this.setState(
-                        {
-                            dropdownList: temp_list
-                        }, () => {
-                            (instance).setValueFromCoords(1, data[i].y, data[i].value, true);
-                        }
-                    )
->>>>>>> QAT-469
                 }
             }
         }

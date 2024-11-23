@@ -74,13 +74,12 @@ class UserService {
         return axios.post(`${API_URL}/api/user/theme/${json}`, {}
         );
     }
-<<<<<<< HEAD
-    updateUserDecimalPreference(json){
+    updateUserDecimalPreference(json) {
         return axios.post(`${API_URL}/api/user/decimalPreference/${json}`, {}
-=======
+        );
+    }
     getAccessControls() {
         return axios.get(`${API_URL}/api/user/accessControls`, {}
->>>>>>> QAT-469
         );
     }
 }
