@@ -1280,7 +1280,6 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "A", y, rowData[0], elInstance);
             if (valid == true) {
                 if (value != -1) {
-                    console.log("Value Test@123", elInstance.getValue(`A${parseInt(y) + 1}`, false));
                     var expiryDate = this.props.items.puData.filter(c => c.id == rowDataConsumption[0])[0].batchInfoList.filter(c => (c.batchNo == (elInstance.getValue(`A${parseInt(y) + 1}`, false)).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((elInstance.getValue(`A${parseInt(y) + 1}`, false)).split("~")[1]).format("YYYY-MM")))[0].expiryDate;
                     elInstance.setValueFromCoords(1, y, moment(expiryDate).format("MMM-YY"), true);
                 } else {
