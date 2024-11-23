@@ -80,7 +80,8 @@ export default class syncPage extends Component {
       conflictsCountConsumption: 0,
       conflictsCountInventory: 0,
       conflictsCountShipment: 0,
-      conflictsCountQPL: 0
+      conflictsCountQPL: 0,
+      programModified:0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -1330,7 +1331,8 @@ export default class syncPage extends Component {
               label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
               version: myResult[i].version,
-              programId: myResult[i].programId
+              programId: myResult[i].programId,
+              programModified: myResult[i].programModified
             }
             proList.push(programJson)
           }
@@ -1461,6 +1463,10 @@ export default class syncPage extends Component {
     var programId = value != "" && value != undefined ? value.value : 0;
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+    var programModified=(this.state.programList).filter(c => c.value == programId)[0].programModified;
+    this.setState({
+      programModified:programModified
+    })
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
@@ -3416,9 +3422,9 @@ export default class syncPage extends Component {
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 2, true);
         }
-        this.setState({
-          isChanged: true
-        })
+        // this.setState({
+        //   isChanged: true
+        // })
       } else if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -3426,9 +3432,9 @@ export default class syncPage extends Component {
           elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 3, true);
         }
-        this.setState({
-          isChanged: true
-        })
+        // this.setState({
+        //   isChanged: true
+        // })
       } else if ((jsonData[c])[18] != "" && (jsonData[c])[17] != "" && (jsonData[c])[20] != 1) {
         var oldData = (jsonData[c])[17];
         var latestData = (jsonData[c])[18];
@@ -3437,9 +3443,9 @@ export default class syncPage extends Component {
           var col = ("K").concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
         } else {
-          this.setState({
-            isChanged: true
-          })
+          // this.setState({
+          //   isChanged: true
+          // })
           if ((jsonData[c])[19] != "" && oldData[10] == downloadedData[10]) {
             if (latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
               var col = ("K").concat(parseInt(c) + 1);
@@ -3779,7 +3785,7 @@ export default class syncPage extends Component {
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-4">
                                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  {(((this.state.isChanged.toString() == "true" || this.state.programModified==1) && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                                   &nbsp;
                                 </FormGroup>
                               </div>
