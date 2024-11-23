@@ -3668,7 +3668,7 @@ class ApplicationDashboard extends Component {
                               <div class="pie-wrapper">
                                 <div class="arc text-blackD" data-value="24"></div>
                                 <Doughnut data={shipmentsData} options={shipmentsOptions} height={180} />
-                                <center><span className='text-blackD' style={{ color: shipmentQplCorrectCount == 0 ? "red" : "" }}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplPuCount - shipmentQplCorrectCount != 0 ? ("/" + shipmentQplPuCount) : ""} flagged dates</span></center>
+                                <center><span className='text-blackD' style={{ color: shipmentQplCorrectCount == 0 ? "red" : "" }}>{shipmentQplPuCount - shipmentQplCorrectCount}{shipmentQplPuCount - shipmentQplCorrectCount != 0 ? ("/" + shipmentQplPuCount) : ""} with flagged dates</span></center>
                               </div>
                             </div>
                           </div>
