@@ -3491,5 +3491,9 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.program.treeSync": "Tree sync"
+  "static.program.treeSync": "Tree sync",
+  "static.versionSettings.updateForecastTree":"Updating Forecast Trees",
+  "static.versionSettings.noteInTreeSync":"We are automatically updating the forecast trees for your selected program and version based on the new forecast period. This may take a moment.",
+  "static.versionSettings.noteInTreeSyncPart2":"Once the process is complete, no further action is required. Please wait while the system updates the data.",
+  "static.versionSettings.noteInTreeSyncPart3":"Thank you for your patience!"
 }
