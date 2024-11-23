@@ -34,6 +34,7 @@ import UserService from "../../api/UserService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { hideFirstComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
 const initialValues = {
   username: "",
   realmId: [],
@@ -57,17 +58,17 @@ const validationSchema = function (values) {
     emailId: Yup.string()
       .email(i18n.t("static.user.invalidemail"))
       .required(i18n.t("static.user.validemail")),
-    roleId: Yup.string()
-      .test(
-        "roleValid",
-        i18n.t("static.common.roleinvalidtext"),
-        function (value) {
-          if (document.getElementById("roleValid").value == "false") {
-            return true;
-          }
-        }
-      )
-      .required(i18n.t("static.user.validrole")),
+    // roleId: Yup.string()
+    //   .test(
+    //     "roleValid",
+    //     i18n.t("static.common.roleinvalidtext"),
+    //     function (value) {
+    //       if (document.getElementById("roleValid").value == "false") {
+    //         return true;
+    //       }
+    //     }
+    //   )
+    //   .required(i18n.t("static.user.validrole")),
     orgAndCountry: Yup.string()
       .matches(
         SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE,
@@ -113,6 +114,7 @@ class EditUserComponent extends Component {
       loading1: true,
       programListForFilter: [],
       addUserEL: "",
+      aclMessage: ""
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -155,12 +157,12 @@ class EditUserComponent extends Component {
     if (event.target.name == "orgAndCountry") {
       user.orgAndCountry = event.target.value;
     }
-    if (event.target.name == "roleId") {
-      user.roles = Array.from(
-        event.target.selectedOptions,
-        (item) => item.value
-      );
-    }
+    // if (event.target.name == "roleId") {
+    //   user.roles = Array.from(
+    //     event.target.selectedOptions,
+    //     (item) => item.value
+    //   );
+    // }
     if (event.target.name == "realmId") {
       user.realm.realmId = event.target.value;
     }
@@ -174,7 +176,7 @@ class EditUserComponent extends Component {
       {
         user,
       },
-      () => {}
+      () => { }
     );
   }
   /**
@@ -231,7 +233,7 @@ class EditUserComponent extends Component {
         user,
         validateRealm: count > 0 ? true : false,
       },
-      () => {}
+      () => { }
     );
   }
   /**
@@ -305,15 +307,23 @@ class EditUserComponent extends Component {
       .then((response) => {
         if (response.status == 200) {
           var listArray = response.data;
+          this.state.user.userAclList.map(item => {
+            if (listArray.findIndex(c => c.id == item.realmCountryId) == -1 && item.realmCountryId!=-1) {
+              listArray.push({
+                id: item.realmCountryId,
+                label: item.countryName,
+              })
+            }
+          });
           listArray.sort((a, b) => {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -324,15 +334,23 @@ class EditUserComponent extends Component {
             .then((response) => {
               if (response.status == "200") {
                 var listArray = response.data;
+                this.state.user.userAclList.map(item => {
+                  if (listArray.findIndex(c => c.id == item.organisationId) == -1 && item.organisationId!=-1) {
+                    listArray.push({
+                      id: item.organisationId,
+                      label: item.organisationName,
+                    })
+                  }
+                });
                 listArray.sort((a, b) => {
                   var itemLabelA = getLabelText(
                     a.label,
                     this.state.lang
-                  ).toUpperCase(); 
+                  ).toUpperCase();
                   var itemLabelB = getLabelText(
                     b.label,
                     this.state.lang
-                  ).toUpperCase(); 
+                  ).toUpperCase();
                   return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
@@ -343,31 +361,49 @@ class EditUserComponent extends Component {
                   .then((response) => {
                     if (response.status == "200") {
                       var listArray = response.data;
+                      this.state.user.userAclList.map(item => {
+                        if (listArray.findIndex(c => c.id == item.healthAreaId) == -1 && item.healthAreaId!=-1) {
+                          listArray.push({
+                            id: item.healthAreaId,
+                            label: item.healthAreaName,
+                          })
+                        }
+                      });
                       listArray.sort((a, b) => {
                         var itemLabelA = getLabelText(
                           a.label,
                           this.state.lang
-                        ).toUpperCase(); 
+                        ).toUpperCase();
                         var itemLabelB = getLabelText(
                           b.label,
                           this.state.lang
-                        ).toUpperCase(); 
+                        ).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                       });
                       this.setState({
                         healthAreas: listArray,
                         selHealthArea: listArray,
                       });
-                      DropdownService.getProgramBasedOnRealmIdAndProgramTypeId(
-                        realmId,
-                        0
-                      )
+                      DropdownService.getAllProgramListByRealmId(realmId)
                         .then((response1) => {
                           if (response1.status == "200") {
                             var listArray = response1.data;
+                            this.state.user.userAclList.map(item => {
+                              if (listArray.findIndex(c => c.id == item.programId) == -1 && item.programId!=-1) {
+                                listArray.push({
+                                  id: item.programId,
+                                  label: item.programName,
+                                  code:item.programCode,
+                                  realmCountry:{
+                                    id:this.state.user.realm.realmId,
+                                  },
+                                  programTypeId:item.programTypeId
+                                })
+                              }
+                            });
                             listArray.sort((a, b) => {
-                              var itemLabelA = a.code.toUpperCase(); 
-                              var itemLabelB = b.code.toUpperCase(); 
+                              var itemLabelA = a.code.toUpperCase();
+                              var itemLabelB = b.code.toUpperCase();
                               return itemLabelA > itemLabelB ? 1 : -1;
                             });
                             this.setState(
@@ -391,22 +427,29 @@ class EditUserComponent extends Component {
                               message: API_URL.includes("uat")
                                 ? i18n.t("static.common.uatNetworkErrorMessage")
                                 : API_URL.includes("demo")
-                                ? i18n.t(
+                                  ? i18n.t(
                                     "static.common.demoNetworkErrorMessage"
                                   )
-                                : i18n.t(
+                                  : i18n.t(
                                     "static.common.prodNetworkErrorMessage"
                                   ),
                               loading: false,
                             });
                           } else {
                             switch (
-                              error.response ? error.response.status : ""
+                            error.response ? error.response.status : ""
                             ) {
                               case 401:
                                 this.props.history.push(
                                   `/login/static.message.sessionExpired`
                                 );
+                                break;
+                              case 409:
+                                this.setState({
+                                  message: i18n.t('static.common.accessDenied'),
+                                  loading: false,
+                                  color: "#BA0C2F",
+                                });
                                 break;
                               case 403:
                                 this.props.history.push(`/accessDenied`);
@@ -451,8 +494,8 @@ class EditUserComponent extends Component {
                         message: API_URL.includes("uat")
                           ? i18n.t("static.common.uatNetworkErrorMessage")
                           : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                            ? i18n.t("static.common.demoNetworkErrorMessage")
+                            : i18n.t("static.common.prodNetworkErrorMessage"),
                         loading: false,
                       });
                     } else {
@@ -461,6 +504,13 @@ class EditUserComponent extends Component {
                           this.props.history.push(
                             `/login/static.message.sessionExpired`
                           );
+                          break;
+                        case 409:
+                          this.setState({
+                            message: i18n.t('static.common.accessDenied'),
+                            loading: false,
+                            color: "#BA0C2F",
+                          });
                           break;
                         case 403:
                           this.props.history.push(`/accessDenied`);
@@ -500,8 +550,8 @@ class EditUserComponent extends Component {
                   message: API_URL.includes("uat")
                     ? i18n.t("static.common.uatNetworkErrorMessage")
                     : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                      ? i18n.t("static.common.demoNetworkErrorMessage")
+                      : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
                 });
               } else {
@@ -510,6 +560,13 @@ class EditUserComponent extends Component {
                     this.props.history.push(
                       `/login/static.message.sessionExpired`
                     );
+                    break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
                     break;
                   case 403:
                     this.props.history.push(`/accessDenied`);
@@ -554,14 +611,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -595,7 +659,7 @@ class EditUserComponent extends Component {
    */
   changed = function (instance, cell, x, y, value) {
     if (x == 1) {
-      this.el.setValueFromCoords(4, y, "", true);
+      this.el.setValueFromCoords(5, y, "", true);
       var col = "B".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -607,7 +671,7 @@ class EditUserComponent extends Component {
       }
     }
     if (x == 2) {
-      this.el.setValueFromCoords(4, y, "", true);
+      this.el.setValueFromCoords(5, y, "", true);
       var col = "C".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -619,6 +683,7 @@ class EditUserComponent extends Component {
       }
     }
     if (x == 3) {
+      this.el.setValueFromCoords(5, y, "", true);
       var col = "D".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -640,13 +705,24 @@ class EditUserComponent extends Component {
         this.el.setComments(col, "");
       }
     }
+    if (x == 5) {
+      var col = "F".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
   }.bind(this);
   /**
    * This function is used to filter the program list based on user's selected realm country, health area and organisation
    */
   filterProgramByCountryId = function (instance, cell, c, r, source) {
-    var value = this.state.addUserEL.getJson(null, false)[r][1];
-    var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][2];
+    var value = this.state.addUserEL.getJson(null, false)[r][2];
+    var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][3];
     var proList = [];
     var proListByCountryId = [];
     var proListByHealthAreaId = [];
@@ -687,9 +763,9 @@ class EditUserComponent extends Component {
     } else {
       proList = this.state.programListForFilter;
     }
-    var orgvalue = this.state.addUserEL.getJson(null, false)[r][3];
-    if(orgvalue!=-1){
-      proList=proList.filter(c=>c.id==-1 || c.organisation.id==orgvalue)
+    var orgvalue = this.state.addUserEL.getJson(null, false)[r][4];
+    if (orgvalue != -1) {
+      proList = proList.filter(c => c.id == -1 || c.organisation.id == orgvalue)
     }
     return proList;
   }.bind(this);
@@ -701,10 +777,13 @@ class EditUserComponent extends Component {
     const { selRealmCountry } = this.state;
     const { selOrganisation } = this.state;
     const { selHealthArea } = this.state;
+    const { selRoleList } = this.state;
     let programList = [];
     let countryList = [];
     let organisationList = [];
     let healthAreaList = [];
+    let roleList = [];
+
     var varEL = "";
     if (selProgram.length > 0) {
       for (var i = 0; i < selProgram.length; i++) {
@@ -714,15 +793,15 @@ class EditUserComponent extends Component {
           (selProgram[i].programTypeId == 1
             ? "SP"
             : selProgram[i].programTypeId == 2
-            ? "FC"
-            : "") +
+              ? "FC"
+              : "") +
           ")";
         var paJson = {
           name: name,
           id: parseInt(selProgram[i].id),
           realmCountryId: selProgram[i].realmCountry.id,
           healthAreaList: selProgram[i].healthAreaList,
-          organisation:selProgram[i].organisation
+          organisation: selProgram[i].organisation
         };
         programList[i] = paJson;
       }
@@ -781,6 +860,23 @@ class EditUserComponent extends Component {
       };
       healthAreaList.unshift(paJson);
     }
+    if (selRoleList.length > 0) {
+      for (var i = 0; i < selRoleList.length; i++) {
+        if (selRoleList[i] != undefined) {
+          var paJson = {
+            name: selRoleList[i].label,
+            id: selRoleList[i].value,
+          };
+          roleList[i] = paJson;
+        }
+      }
+      var paJson = {
+        name: "Select",
+        id: "",
+        active: true,
+      };
+      roleList.unshift(paJson);
+    }
     var papuList = this.state.rows;
     var data = [];
     var papuDataArr = [];
@@ -789,10 +885,11 @@ class EditUserComponent extends Component {
       for (var j = 0; j < papuList.length; j++) {
         data = [];
         data[0] = this.state.user.username;
-        data[1] = papuList[j].realmCountryId;
-        data[2] = papuList[j].healthAreaId;
-        data[3] = papuList[j].organisationId;
-        data[4] = papuList[j].programId;
+        data[1] = papuList[j].roleId;
+        data[2] = papuList[j].realmCountryId;
+        data[3] = papuList[j].healthAreaId;
+        data[4] = papuList[j].organisationId;
+        data[5] = papuList[j].programId;
         papuDataArr[count] = data;
         count++;
       }
@@ -800,10 +897,11 @@ class EditUserComponent extends Component {
     if (papuDataArr.length == 0) {
       data = [];
       data[0] = this.state.user.username;
-      data[1] = -1;
+      data[1] = "";
       data[2] = -1;
       data[3] = -1;
       data[4] = -1;
+      data[5] = -1;
       papuDataArr[0] = data;
     }
     this.el = jexcel(document.getElementById("paputableDiv"), "");
@@ -817,35 +915,45 @@ class EditUserComponent extends Component {
         {
           title: i18n.t("static.username.username"),
           type: "hidden",
-          readOnly: true, 
+          readOnly: true,
+        },
+        {
+          title: i18n.t("static.role.role"),
+          type: "dropdown",
+          source: roleList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.program.realmcountry"),
           type: "autocomplete",
-          source: countryList, 
+          source: countryList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.dashboard.healthareaheader"),
           type: "autocomplete",
-          source: healthAreaList, 
+          source: healthAreaList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.organisation.organisation"),
           type: "autocomplete",
-          source: organisationList, 
+          source: organisationList,
+          readOnly: !this.state.user.editable
         },
         {
           title: i18n.t("static.dashboard.programheader"),
           type: "autocomplete",
-          source: programList, 
+          source: programList,
           filter: this.filterProgramByCountryId,
+          readOnly: !this.state.user.editable
         },
       ],
       pagination: localStorage.getItem("sesRecordCount"),
       filters: true,
       search: true,
       columnSorting: true,
-      editable: true,
+      editable: this.state.user.editable,
       wordWrap: true,
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
@@ -904,6 +1012,7 @@ class EditUserComponent extends Component {
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
+                data[5] = "";
                 obj.insertRow(data, parseInt(y), 1);
               }.bind(this),
             });
@@ -918,6 +1027,7 @@ class EditUserComponent extends Component {
                 data[2] = "";
                 data[3] = "";
                 data[4] = "";
+                data[5] = "";
                 obj.insertRow(data, parseInt(y));
               }.bind(this),
             });
@@ -934,9 +1044,10 @@ class EditUserComponent extends Component {
                   data[2] = "";
                   data[3] = "";
                   data[4] = "";
+                  data[5] = "";
                   obj.insertRow(data, parseInt(y));
-                }else{
-                obj.deleteRow(parseInt(y));
+                } else {
+                  obj.deleteRow(parseInt(y));
                 }
               }.bind(this),
             });
@@ -966,10 +1077,10 @@ class EditUserComponent extends Component {
     var asterisk =
       document.getElementsByClassName("jss")[0].firstChild.nextSibling;
     var tr = asterisk.firstChild;
-    tr.children[2].classList.add("AsteriskTheadtrTd");
     tr.children[3].classList.add("AsteriskTheadtrTd");
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
+    tr.children[6].classList.add("AsteriskTheadtrTd");
   };
   /**
    * This function is called when user clicks on add row in access control table to add the access control
@@ -981,6 +1092,7 @@ class EditUserComponent extends Component {
     data[2] = "";
     data[3] = "";
     data[4] = "";
+    data[5] = "";
     this.el.insertRow(data, 0, 1);
   }
   /**
@@ -1009,61 +1121,116 @@ class EditUserComponent extends Component {
   checkValidation() {
     var valid = true;
     var json = this.el.getJson(null, false);
-    for (var y = 0; y < json.length; y++) {
-      var col = "B".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(1, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
+    var hasApplicationRole = false;
+    if (json.length >= 2) {
+      hasApplicationRole = json.filter(c => c[1] == 'ROLE_APPLICATION_ADMIN').length > 0 ? true : false
+    }
+    if (hasApplicationRole) {
+      this.setState({
+        aclMessage: i18n.t('static.common.roleinvalidtext')
+      }, () => {
+        hideFirstComponent()
+      })
+      return false;
+    } else {
+      this.setState({
+        aclMessage: ""
+      })
+      let tempArray = json;
+      let seen = new Set();
+      var hasDuplicate = false;
+      const columnIndexes = [1, 2, 3, 4, 5];
+      tempArray.forEach(v => {
+        // Create a composite key by joining values from the selected columns
+        const key = columnIndexes.map(index => v[Object.keys(v)[index]]).join('|');
+        // Check if the key already exists in the set
+        if (seen.has(key)) {
+          hasDuplicate = true;
+        } else {
+          seen.add(key);
+        }
+      });
+      if (hasDuplicate) {
+        this.setState({
+          aclMessage: i18n.t('static.message.user.duplicateacl')
+        }, () => {
+          hideFirstComponent();
+        })
+        return false;
       } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "C".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(2, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "D".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(3, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
-      }
-      var col = "E".concat(parseInt(y) + 1);
-      var value = this.el.getValueFromCoords(4, y);
-      if (value == "") {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setStyle(col, "background-color", "yellow");
-        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
-        valid = false;
-      } else {
-        this.el.setStyle(col, "background-color", "transparent");
-        this.el.setComments(col, "");
+        this.setState({
+          aclMessage: ""
+        }, () => {
+        })
+        for (var y = 0; y < json.length; y++) {
+          var col = "B".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(1, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "C".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(2, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "D".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(3, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "E".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(4, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "F".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(5, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+        }
+        return valid;
       }
     }
-    return valid;
   }
   /**
    * This function is used to get the user details
    */
   componentDidMount() {
-    document.getElementById("roleValid").value = false;
+    // document.getElementById("roleValid").value = false;
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
+        console.log("Respons.data Test@123", response.data)
         if (response.status == 200) {
           this.setState(
             {
@@ -1093,14 +1260,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -1133,8 +1307,8 @@ class EditUserComponent extends Component {
         if (response.status == 200) {
           var listArray = response.data;
           listArray.sort((a, b) => {
-            var itemLabelA = a.label.label_en.toUpperCase(); 
-            var itemLabelB = b.label.label_en.toUpperCase(); 
+            var itemLabelA = a.label.label_en.toUpperCase();
+            var itemLabelB = b.label.label_en.toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -1159,14 +1333,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -1202,11 +1383,11 @@ class EditUserComponent extends Component {
             var itemLabelA = getLabelText(
               a.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             var itemLabelB = getLabelText(
               b.label,
               this.state.lang
-            ).toUpperCase(); 
+            ).toUpperCase();
             return itemLabelA > itemLabelB ? 1 : -1;
           });
           this.setState({
@@ -1231,14 +1412,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -1269,15 +1457,23 @@ class EditUserComponent extends Component {
     UserService.getRoleList()
       .then((response) => {
         if (response.status == 200) {
-          var roleList = [{ value: "-1", label: i18n.t("static.common.all") }];
+          var roleList = [];
           for (var i = 0; i < response.data.length; i++) {
-            roleList[i + 1] = {
+            roleList[i] = {
               value: response.data[i].roleId,
               label: getLabelText(response.data[i].label, this.state.lang),
             };
           }
+          this.state.user.userAclList.map(item => {
+            if (roleList.findIndex(c => c.value == item.roleId) == -1) {
+              roleList.push({
+                value: item.roleId,
+                label: getLabelText(item.roleDesc, this.state.lang),
+              })
+            }
+          });
           this.setState({
-            roleList,
+            selRoleList: roleList,
             loading: false,
           });
         } else {
@@ -1298,14 +1494,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -1362,7 +1565,7 @@ class EditUserComponent extends Component {
         <Row>
           <Col sm={12} md={6} style={{ flexBasis: "auto" }}>
             <Card>
-                            <Formik
+              <Formik
                 enableReinitialize={true}
                 initialValues={{
                   username: this.state.user.username,
@@ -1371,7 +1574,7 @@ class EditUserComponent extends Component {
                   orgAndCountry: this.state.user.orgAndCountry,
                   roles: this.state.user.roleList,
                   languageId: this.state.user.language.languageId,
-                  roleId: this.state.user.roleList,
+                  // roleId: this.state.user.roleList,
                 }}
                 validationSchema={validationSchema}
                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -1388,7 +1591,8 @@ class EditUserComponent extends Component {
                       var map1 = new Map(Object.entries(tableJson[i]));
                       let json = {
                         userId: "",
-                        realmCountryId: parseInt(map1.get("1")),
+                        roleId: map1.get("1"),
+                        realmCountryId: parseInt(map1.get("2")),
                         countryName: {
                           createdBy: null,
                           createdDate: null,
@@ -1401,7 +1605,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        healthAreaId: parseInt(map1.get("2")),
+                        healthAreaId: parseInt(map1.get("3")),
                         healthAreaName: {
                           createdBy: null,
                           createdDate: null,
@@ -1414,7 +1618,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        organisationId: parseInt(map1.get("3")),
+                        organisationId: parseInt(map1.get("4")),
                         organisationName: {
                           createdBy: null,
                           createdDate: null,
@@ -1427,7 +1631,7 @@ class EditUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        programId: parseInt(map1.get("4")),
+                        programId: parseInt(map1.get("5")),
                         programName: {
                           createdBy: null,
                           createdDate: null,
@@ -1454,8 +1658,8 @@ class EditUserComponent extends Component {
                         if (response.status == 200) {
                           this.props.history.push(
                             `/user/listUser/` +
-                              "green/" +
-                              i18n.t(response.data.messageCode, { entityname })
+                            "green/" +
+                            i18n.t(response.data.messageCode, { entityname })
                           );
                         } else {
                           this.setState(
@@ -1475,8 +1679,8 @@ class EditUserComponent extends Component {
                             message: API_URL.includes("uat")
                               ? i18n.t("static.common.uatNetworkErrorMessage")
                               : API_URL.includes("demo")
-                              ? i18n.t("static.common.demoNetworkErrorMessage")
-                              : i18n.t("static.common.prodNetworkErrorMessage"),
+                                ? i18n.t("static.common.demoNetworkErrorMessage")
+                                : i18n.t("static.common.prodNetworkErrorMessage"),
                             loading: false,
                           });
                         } else {
@@ -1485,6 +1689,13 @@ class EditUserComponent extends Component {
                               this.props.history.push(
                                 `/login/static.message.sessionExpired`
                               );
+                              break;
+                            case 409:
+                              this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                              });
                               break;
                             case 403:
                               this.props.history.push(`/accessDenied`);
@@ -1545,7 +1756,7 @@ class EditUserComponent extends Component {
                       style={{ display: this.state.loading ? "none" : "block" }}
                     >
                       <Input type="hidden" name="roleValid" id="roleValid" />
-                                            <FormGroup>
+                      <FormGroup>
                         <Label htmlFor="realmId">
                           {i18n.t("static.realm.realm")}
                           <span class="red Reqasterisk">*</span>
@@ -1570,6 +1781,7 @@ class EditUserComponent extends Component {
                           id="username"
                           bsSize="sm"
                           valid={!errors.username}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.username && !!errors.username) ||
                             !!errors.username
@@ -1598,6 +1810,7 @@ class EditUserComponent extends Component {
                           id="emailId"
                           bsSize="sm"
                           valid={!errors.emailId}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.emailId && !!errors.emailId) ||
                             !!errors.emailId
@@ -1615,7 +1828,7 @@ class EditUserComponent extends Component {
                           {errors.emailId}
                         </FormFeedback>
                       </FormGroup>
-                                            <FormGroup>
+                      <FormGroup>
                         <Label for="orgAndCountry">
                           {i18n.t("static.user.orgAndCountry")}
                           <span class="red Reqasterisk">*</span>
@@ -1626,6 +1839,7 @@ class EditUserComponent extends Component {
                           id="orgAndCountry"
                           bsSize="sm"
                           valid={!errors.orgAndCountry}
+                          readOnly={!this.state.user.editable}
                           invalid={
                             (touched.orgAndCountry && !!errors.orgAndCountry) ||
                             !!errors.orgAndCountry
@@ -1643,44 +1857,6 @@ class EditUserComponent extends Component {
                           {errors.orgAndCountry}
                         </FormFeedback>
                       </FormGroup>
-                      <FormGroup className="Selectcontrol-bdrNone">
-                        <Label htmlFor="roleId">
-                          {i18n.t("static.role.role")}
-                          <span class="red Reqasterisk">*</span>
-                        </Label>
-                        <Select
-                        // styles={customStyles}
-                          className={classNames(
-                            "form-control",
-                            "d-block",
-                            "w-100",
-                            "bg-light",
-                            { "is-valid": !errors.roleId },
-                            {
-                              "is-invalid":
-                                (touched.roleId && !!errors.roleId) ||
-                                this.state.user.roles.length == 0 ||
-                                this.state.appAdminRole,
-                            }
-                          )}
-                          bsSize="sm"
-                          onChange={(e) => {
-                            handleChange(e);
-                            setFieldValue("roleId", e);
-                            this.roleChange(e);
-                          }}
-                          onBlur={() => setFieldTouched("roleId", true)}
-                          name="roleId"
-                          id="roleId"
-                          multi
-                          options={this.state.roleList}
-                          value={this.state.user.roles}
-                         
-                        />
-                        <FormFeedback className="red">
-                          {errors.roleId}
-                        </FormFeedback>
-                      </FormGroup>
                       <FormGroup>
                         <Label htmlFor="languageId">
                           {i18n.t("static.language.language")}
@@ -1691,6 +1867,7 @@ class EditUserComponent extends Component {
                           name="languageId"
                           id="languageId"
                           bsSize="sm"
+                          disabled={!this.state.user.editable}
                           valid={!errors.languageId}
                           invalid={
                             (touched.languageId && !!errors.languageId) ||
@@ -1722,6 +1899,7 @@ class EditUserComponent extends Component {
                             className="form-check-input"
                             type="radio"
                             id="active1"
+                            disabled={!this.state.user.editable}
                             name="active"
                             value={true}
                             checked={this.state.user.active === true}
@@ -1744,6 +1922,7 @@ class EditUserComponent extends Component {
                             type="radio"
                             id="active2"
                             name="active"
+                            disabled={!this.state.user.editable}
                             value={false}
                             checked={this.state.user.active === false}
                             onChange={(e) => {
@@ -1771,6 +1950,9 @@ class EditUserComponent extends Component {
                           display: this.state.loading1 ? "none" : "block",
                         }}
                       >
+                        <h5 className="red" id="div1">
+                          {i18n.t(this.state.aclMessage)}
+                        </h5>
                         <div
                           id="paputableDiv"
                           className="RowheightForjexceladdRow consumptionDataEntryTable"
@@ -1802,7 +1984,7 @@ class EditUserComponent extends Component {
                         </div>
                       </div>
                     </CardBody>
-                    <CardFooter
+                    {this.state.user.editable && <CardFooter
                       style={{ display: this.state.loading ? "none" : "block" }}
                     >
                       <FormGroup>
@@ -1819,7 +2001,7 @@ class EditUserComponent extends Component {
                         </Button>
                         &nbsp;
                       </FormGroup>
-                    </CardFooter>
+                    </CardFooter>}
                     <CardFooter
                       style={{ display: this.state.loading ? "none" : "block" }}
                     >
@@ -1834,7 +2016,7 @@ class EditUserComponent extends Component {
                           <i className="fa fa-times"></i>{" "}
                           {i18n.t("static.common.cancel")}
                         </Button>
-                        <Button
+                        {this.state.user.editable && <Button
                           type="button"
                           size="md"
                           color="warning"
@@ -1843,8 +2025,8 @@ class EditUserComponent extends Component {
                         >
                           <i className="fa fa-refresh"></i>{" "}
                           {i18n.t("static.common.reset")}
-                        </Button>
-                        <Button
+                        </Button>}
+                        {this.state.user.editable && <Button
                           type="submit"
                           size="md"
                           color="success"
@@ -1852,7 +2034,7 @@ class EditUserComponent extends Component {
                         >
                           <i className="fa fa-check"></i>
                           {i18n.t("static.common.update")}
-                        </Button>
+                        </Button>}
                         &nbsp;
                       </FormGroup>
                     </CardFooter>
@@ -1892,8 +2074,8 @@ class EditUserComponent extends Component {
   cancelClicked() {
     this.props.history.push(
       `/user/listUser/` +
-        "red/" +
-        i18n.t("static.message.cancelled", { entityname })
+      "red/" +
+      i18n.t("static.message.cancelled", { entityname })
     );
   }
   /**
@@ -1918,14 +2100,21 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-              ? i18n.t("static.common.demoNetworkErrorMessage")
-              : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t("static.common.demoNetworkErrorMessage")
+                : i18n.t("static.common.prodNetworkErrorMessage"),
             loading: false,
           });
         } else {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);

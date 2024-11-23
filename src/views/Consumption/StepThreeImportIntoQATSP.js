@@ -345,6 +345,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                         }
                                     }
                                     generalProgramJson.actionList = actionList;
+                                    generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                     programDataJson.planningUnitDataList = planningUnitDataList;
                                     programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
                                     programRequest.result.programData = programDataJson;
@@ -499,7 +500,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                             v15: regionFilter[0].forecastPercentage,// % of forecast
                                             v16: primaryConsumptionData[i].monthlyForecastData[j].month + "~" + selectedSupplyPlanPlanningUnit[0].supplyPlanPlanningUnitId + "~" + regionFilter[0].supplyPlanRegionId,
                                             v17: primaryConsumptionData[i].selectedForecast.label_en + " from " + this.props.items.selectedForecastProgramDesc + " v" + this.props.items.versionId,
-                                            v18: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
+                                            v18: AuthenticationService.checkUserACL([this.props.items.programId.split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : isOldDate
                                         });
                                     }
                                 }
@@ -531,6 +532,13 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
@@ -886,7 +894,11 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 </div>
                 <FormGroup>
                     <Button color="success" size="md" className="float-right mr-1" id="stepThreeImportBtn" type="button" onClick={this.formSubmit}> <i className="fa fa-check"></i>{i18n.t('static.importFromQATSupplyPlan.Import')}</Button>
+<<<<<<< HEAD
                     {/* <span class="red float-right " style={{marginTop: '7px', marginRight: '5px', display: this.props.items.isForecastOver ? "block" : "none"}}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.forecastRestrictionNotes')}</i></span> */}
+=======
+                    <span class="red float-right " style={{ marginTop: '7px', marginRight: '5px', display: this.props.items.isForecastOver ? "block" : "none" }}>{i18n.t('static.versionSettings.note')}: <i>{i18n.t('static.importIntoSupplyPlan.forecastRestrictionNotes')}</i></span>
+>>>>>>> QAT-469
                     &nbsp;
                     <Button color="info" size="md" className="float-left mr-1 px-4" type="button" onClick={this.props.previousToStepTwo} > <i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>
                     &nbsp;

@@ -294,6 +294,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             tesError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             arimaError: { "rmse": "", "mape": "", "mse": "", "wape": "", "rSqd": "" },
             dataChanged: false,
+            methodChanged:false,
             notesChanged: false,
             noDataMessage: "",
             noDataMessage1: "",
@@ -448,7 +449,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({ loading: true })
         if (localStorage.getItem('sessionType') === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            DropdownService.getFCProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = [];
                     if (response.status == 200) {
@@ -576,6 +577,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         })
                     }, () => {
                         this.setForecastProgramId(event);
+<<<<<<< HEAD
                     })
                 } else if (localStorage.getItem("sesDatasetId") != "" && proList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
                     event.target.value = localStorage.getItem("sesDatasetId");
@@ -594,7 +596,12 @@ export default class ExtrapolateDataComponent extends React.Component {
                         loading: false
                     },()=>{
                         this.setForecastProgramId(event);
+=======
+>>>>>>> QAT-469
                     })
+                } else if (localStorage.getItem("sesDatasetId") != "" && proList.filter(c => c.id == localStorage.getItem("sesDatasetId")).length > 0) {
+                    event.target.value = localStorage.getItem("sesDatasetId");
+                    this.setForecastProgramId(event);
                 } else {
                     this.setState({
                         forecastProgramList: proList.sort(function (a, b) {
@@ -1315,7 +1322,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             const program = this.state.forecastProgramList.filter(c => c.id == forecastProgramId)
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -1338,6 +1345,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
@@ -1396,7 +1410,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             const program = this.state.forecastProgramList.filter(c => c.id == programId)
             if (program.length == 1) {
                 if (localStorage.getItem('sessionType') === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -1419,6 +1433,13 @@ export default class ExtrapolateDataComponent extends React.Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
@@ -1781,7 +1802,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         })
                         putRequest.onerror = function (event) {
                         }.bind(this);
@@ -1800,6 +1822,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             this.setState({
                                 loading: false,
                                 dataChanged: false,
+                                methodChanged: false,
                                 message: i18n.t('static.compareAndSelect.dataSaved'),
                                 extrapolateClicked: false,
                                 notesChanged: false
@@ -2010,7 +2033,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         })
                         putRequest.onerror = function (event) {
                         }.bind(this);
@@ -2029,6 +2053,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             this.setState({
                                 loading: false,
                                 dataChanged: false,
+                                methodChanged: false,
                                 message: i18n.t('static.compareAndSelect.dataSaved'),
                                 extrapolateClicked: false,
                                 notesChanged: false
@@ -2068,7 +2093,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 planningUnitId: planningUnitId,
                 showData: false,
                 dataEl: "",
-                dataChanged: false
+                dataChanged: false,
+                methodChanged:false,
             }, () => {
                 this.showDataOnPlanningAndRegionChange();
             })
@@ -2099,7 +2125,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 regionId: regionId,
                 showData: false,
                 dataEl: "",
-                dataChanged: false
+                dataChanged: false,
+                methodChanged:false
             }, () => {
                 this.showDataOnPlanningAndRegionChange();
             })
@@ -2732,7 +2759,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (count == 0) {
                         this.setState({
                             startBulkExtrapolation: false,
-                            dataChanged: false
+                            dataChanged: false,
+                            methodChanged:false
                         }, () => {
                             localStorage.setItem("isExtrapolation", true);
                             localStorage.setItem("messageColor", "red");
@@ -2912,6 +2940,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             startBulkExtrapolation: false,
             dataChanged: false,
+            methodChanged: false,
             loading: true
         }, () => {
             var db1;
@@ -3183,7 +3212,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         event.stopPropagation();
         this.setState({
             startBulkExtrapolation: false,
-            dataChanged: false
+            dataChanged: false,
+            methodChanged:false
         }, () => {
             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
@@ -3571,7 +3601,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             movingAvgId: movingAvgId,
             show: false,
-            dataChanged: true
+            dataChanged: !movingAvgId?this.state.dataChanged:true,
+            methodChanged:!movingAvgId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3584,7 +3615,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var semiAvgId = e.target.checked;
         this.setState({
             semiAvgId: semiAvgId,
-            dataChanged: true
+            dataChanged: !semiAvgId?this.state.dataChanged:true,
+            methodChanged:!semiAvgId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3597,7 +3629,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var linearRegressionId = e.target.checked;
         this.setState({
             linearRegressionId: linearRegressionId,
-            dataChanged: true
+            dataChanged: !linearRegressionId?this.state.dataChanged:true,
+            methodChanged:!linearRegressionId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3610,8 +3643,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         var smoothingId = e.target.checked;
         this.setState({
             smoothingId: smoothingId,
-            dataChanged: true,
-            offlineTES: false
+            dataChanged: !smoothingId?this.state.dataChanged:true,
+            offlineTES: false,
+            methodChanged:!smoothingId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -3624,8 +3658,9 @@ export default class ExtrapolateDataComponent extends React.Component {
         var arimaId = e.target.checked;
         this.setState({
             arimaId: arimaId,
-            dataChanged: true,
-            offlineArima: false
+            dataChanged: !arimaId?this.state.dataChanged:true,
+            offlineArima: false,
+            methodChanged:!arimaId?true:false
         }, () => {
             this.buildActualJxl()
         })
@@ -4408,7 +4443,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <FormGroup className="col-md-3">
                                             <div className="d-flex align-items-center">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+<<<<<<< HEAD
                                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && localStorage.getItem("sessionType") === "Online" &&
+=======
+                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') && localStorage.getItem("sessionType") === "Online" &&
+>>>>>>> QAT-469
                                                     <div className="d-flex align-items-center ml-3 col-md-12">
                                                         <Input
                                                             className="form-check-input MarginTopCheck"
@@ -4457,17 +4496,29 @@ export default class ExtrapolateDataComponent extends React.Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-6 pl-lg-3 pt-lg-4">
+<<<<<<< HEAD
                                             {this.state.forecastProgramId && this.state.versionId &&
+=======
+                                            {this.state.forecastProgramId && this.state.versionId && this.state.versionId.toString().includes('Local') && 
+>>>>>>> QAT-469
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(1, true) }}><small className="supplyplanformulas">{i18n.t('static.extrapolation.bulkExtrapolation')}</small></span>
                                                 </a>
                                             }
+<<<<<<< HEAD
                                             {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' &&
+=======
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.versionId.toString().includes('Local') && 
+>>>>>>> QAT-469
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(2, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulas">{i18n.t('static.extrapolation.optimizeTES&ARIMA')}</small></span>
                                                 </a>
                                             }
+<<<<<<< HEAD
                                             {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA &&
+=======
+                                            {this.state.forecastProgramId && this.state.versionId && localStorage.getItem("sessionType") === 'Online' && this.state.showMissingTESANDARIMA && this.state.versionId.toString().includes('Local') && 
+>>>>>>> QAT-469
                                                 <a className="card-header-action">
                                                     <span style={{ cursor: 'pointer' }} onClick={() => { this.setModalValues(3, true) }}><small className="text-blackD" style={{ paddingRight: "8px" }}>|</small><small className="supplyplanformulasRed">{i18n.t('static.extrapolation.missingTES&ARIMA')}</small></span>
                                                 </a>
@@ -5036,14 +5087,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                             </div>
                                                             <div>
                                                                 <FormGroup className="pl-lg-5">
-                                                                    <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-0 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') && <Button type="button" size="md" color="danger" className="float-right mr-1 mt-lg-0 pb-1 pt-2" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
                                                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') &&
                                                                         (this.state.dataChanged && this.state.extrapolateClicked) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                         (this.state.dataChanged && this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
                                                                             (!this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> :
-                                                                                (this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
+                                                                                ((this.state.dataChanged && !this.state.extrapolateClicked && this.state.notesChanged) || (this.state.methodChanged)) ? <div className="row float-right mt-lg-0 mr-0 pb-1"> <Button type="submit" id="formSubmitButton" size="md" color="success" className="float-right mr-0" onClick={() => this.setButtonFlag(1)}><i className="fa fa-check"></i>{i18n.t('static.pipeline.save')}</Button>&nbsp;</div> : ""
                                                                     }
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
+                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EXTRAPOLATION') && !this.state.isDisabled && this.state.forecastProgramId != "" && this.state.planningUnitId > 0 && this.state.regionId > 0 && ((this.state.dataChanged || this.state.notesChanged) && !this.state.extrapolateClicked) && <div className="row float-right mt-lg-0 mr-3 pb-1 "><Button type="submit" id="extrapolateButton" size="md" color="info" className="float-right mr-1" onClick={() => this.setButtonFlag(0)}><i className="fa fa-check"></i>{i18n.t('static.tree.extrapolate')}</Button></div>}
                                                                 </FormGroup>
                                                             </div>
                                                         </div>

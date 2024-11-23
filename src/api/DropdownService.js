@@ -14,6 +14,22 @@ class DropdownService {
       {}
     );
   }
+  // Below 2 methods are replacement of api/dropdown/program/programType/${programTypeId}/filter/multipleRealmCountry
+
+  getSPProgramWithFilterForMultipleRealmCountryForDropdown(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/program/sp/filter/multipleRealmCountry`,
+      json,
+      {}
+    );
+  }
+  getFCProgramWithFilterForMultipleRealmCountryForDropdown(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/program/fc/filter/multipleRealmCountry`,
+      json,
+      {}
+    );
+  }
   getPlanningUnitDropDownList() {
     return axios.get(`${API_URL}/api/dropdown/planningUnit`, {});
   }
@@ -81,6 +97,18 @@ class DropdownService {
       {}
     );
   }
+  getVersionListForSPProgram(programId) {
+    return axios.get(
+      `${API_URL}/api/dropdown/version/filter/sp/programId/${programId}`,
+      {}
+    );
+  }
+  getVersionListForFCProgram(programId) {
+    return axios.get(
+      `${API_URL}/api/dropdown/version/filter/fc/programId/${programId}`,
+      {}
+    );
+  }
   getBudgetDropdownBasedOnProgram(programId) {
     return axios.get(
       `${API_URL}/api/dropdown/budget/program/${programId}`,
@@ -97,9 +125,16 @@ class DropdownService {
       {}
     );
   }
-  getVersionListForPrograms(programTypeId, json) {
+  getVersionListForSPPrograms(json) {
     return axios.post(
-      `${API_URL}/api/dropdown/version/filter/programTypeId/${programTypeId}/programs`,
+      `${API_URL}/api/dropdown/version/filter/sp/programs`,
+      json,
+      {}
+    );
+  }
+  getVersionListForFCPrograms(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/version/filter/fc/programs`,
       json,
       {}
     );
@@ -110,12 +145,21 @@ class DropdownService {
       {}
     );
   }
-  getProgramBasedOnRealmIdAndProgramTypeId(realmId, programTypeId) {
+  // Below 2 methods are replacement of api/dropdown/program/realm/{realmId}/programType/{programTypeId}/expanded
+  getSPProgramBasedOnRealmId(realmId) {
     return axios.get(
-      `${API_URL}/api/dropdown/program/realm/${realmId}/programType/${programTypeId}/expanded`,
+      `${API_URL}/api/dropdown/program/sp/expanded/realm/${realmId}`,
       {}
     );
   }
+
+  getFCProgramBasedOnRealmId(realmId) {
+    return axios.get(
+      `${API_URL}/api/dropdown/program/fc/expanded/realm/${realmId}`,
+      {}
+    );
+  }
+
   getTreeTemplateListForDropdown() {
     return axios.get(
       `${API_URL}/api/dropdown/treeTemplate`,
@@ -138,6 +182,10 @@ class DropdownService {
   }
   getFundingSourceTypeForProgramsDropdownList(json) {
     return axios.post(`${API_URL}/api/dropdown/fundingSourceType/programs`, json, {}
+    );
+  }
+  getAllProgramListByRealmId(realmId) {
+    return axios.get(`${API_URL}/api/dropdown/program/all/expanded/realm/${realmId}`, {}
     );
   }
 }

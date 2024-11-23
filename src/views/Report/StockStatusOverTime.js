@@ -131,7 +131,7 @@ class StockStatusOverTime extends Component {
         var dt1 = new Date();
         dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
         this.state = {
-            isDarkMode:false,
+            isDarkMode: false,
             matricsList: [],
             dropdownOpen: false,
             radioSelected: 2,
@@ -207,7 +207,7 @@ class StockStatusOverTime extends Component {
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
@@ -235,6 +235,13 @@ class StockStatusOverTime extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -380,7 +387,7 @@ class StockStatusOverTime extends Component {
                         planningUnitValues: [],
                         planningUnitLabels: []
                     }, () => {
-                        DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                        DropdownService.getVersionListForSPProgram(programId)
                             .then(response => {
                                 this.setState({
                                     versions: []
@@ -406,6 +413,13 @@ class StockStatusOverTime extends Component {
                                         switch (error.response ? error.response.status : "") {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
                                                 break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
@@ -492,7 +506,7 @@ class StockStatusOverTime extends Component {
                         var programData = databytes.toString(CryptoJS.enc.Utf8)
                         var version = JSON.parse(programData).currentVersion
                         version.versionId = `${version.versionId} (Local)`
-                        version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
                         verList.push(version)
                     }
                 }
@@ -543,12 +557,12 @@ class StockStatusOverTime extends Component {
                 this.setState({ message: i18n.t('static.program.validversion'), matricsList: [] });
             } else {
                 localStorage.setItem("sesVersionIdReport", versionId);
-                var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==versionId)[0].cutOffDate;
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == versionId)[0].cutOffDate;
                 var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                 var rangeValue = this.state.rangeValue;
                 if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                    var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                    rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                     // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                 }
                 this.setState({
@@ -622,6 +636,13 @@ class StockStatusOverTime extends Component {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
                                         break;
@@ -679,18 +700,18 @@ class StockStatusOverTime extends Component {
                 versionId: event.target.value
             }, () => {
                 // if (this.state.versionId.includes("Local")) {
-                    var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
-                    var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-                    var rangeValue = this.state.rangeValue;
-                    if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                        var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                        rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
-                        // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
-                    }
-                    this.setState({
-                      minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-                      rangeValue: rangeValue
-                    })
+                var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
+                var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+                var rangeValue = this.state.rangeValue;
+                if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+                    var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                    rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
+                    // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+                }
+                this.setState({
+                    minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+                    rangeValue: rangeValue
+                })
                 //   }
                 localStorage.setItem("sesVersionIdReport", this.state.versionId);
                 this.fetchData();
@@ -708,19 +729,19 @@ class StockStatusOverTime extends Component {
      */
     componentDidMount() {
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
 
 
 
@@ -783,7 +804,7 @@ observer.observe(document.documentElement, {
                         planningunitRequest.onsuccess = function (e) {
                             var myResult = [];
                             myResult = planningunitRequest.result;
-                            
+
                             planningUnitIds.map(planningUnitId => {
                                 var ppu = myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0];
                                 monthsInPastForAmc = ppu.monthsInPastForAmc;
@@ -842,7 +863,7 @@ observer.observe(document.documentElement, {
                                                     var amcArrayForMonth = amcBeforeArray.filter(c => c.month == dtstr);
                                                 }
                                             }
-    
+
                                             for (var c = 0; c < monthsInFutureForAmc; c++) {
                                                 var month1MonthsAfter = moment(dt).add(c, 'months').format("YYYY-MM-DD");
                                                 var consumptionListForAMC = consumptionList.filter(con => con.consumptionDate == month1MonthsAfter);
@@ -926,7 +947,7 @@ observer.observe(document.documentElement, {
                             })
                         }.bind(this);
 
-                        
+
                     }.bind(this)
                 }.bind(this)
             } else {
@@ -960,6 +981,13 @@ observer.observe(document.documentElement, {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -1113,7 +1141,7 @@ observer.observe(document.documentElement, {
         const headers = [[i18n.t('static.common.month'), i18n.t('static.report.qatPID'), i18n.t('static.planningunit.planningunit'), i18n.t('static.report.stock'), i18n.t('static.report.consupmtionqty'), i18n.t('static.report.mospast'), i18n.t('static.report.mosfuture'), i18n.t('static.report.amc'), i18n.t('static.report.mos')]];
         const data = [];
         // this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(elt.stock,0), formatter(elt.consumptionQty,0), formatter(roundAMC(elt.amc),0), elt.amcMonthCount, elt.mos != null ? roundN(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
-        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(roundARU(elt.stock,1),0), formatter(roundARU(elt.consumptionQty,1),0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc),0), elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
+        this.state.matricsList.map(elt => data.push([dateFormatter(elt.dt), elt.planningUnit.id, getLabelText(elt.planningUnit.label, this.state.lang), formatter(roundARU(elt.stock, 1), 0), formatter(roundARU(elt.consumptionQty, 1), 0), elt.mosPast, elt.mosFuture, formatter(roundAMC(elt.amc), 0), elt.mos != null ? roundAMC(elt.mos) : i18n.t("static.supplyPlanFormula.na")]));
         doc.addPage()
         startYtable = 80
         let content = {
@@ -1139,97 +1167,97 @@ observer.observe(document.documentElement, {
 
 
 
-const { isDarkMode } = this.state;
-const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#fff';
+        const { isDarkMode } = this.state;
+        const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#fff';
 
-const options = {
-    title: {
-        display: true,
-        text: i18n.t('static.dashboard.stockstatusovertime'),
-        fontColor:fontColor
-    },
-    scales: {
-        yAxes: [
-            {
-                scaleLabel: {
-                    display: true,
-                    labelString: i18n.t('static.report.mos'),
-                    fontColor:fontColor
-                },
-                ticks: {
-                    beginAtZero: true,
-                    fontColor:fontColor,
-                    callback: function (value) {
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
+        const options = {
+            title: {
+                display: true,
+                text: i18n.t('static.dashboard.stockstatusovertime'),
+                fontColor: fontColor
+            },
+            scales: {
+                yAxes: [
+                    {
+                        scaleLabel: {
+                            display: true,
+                            labelString: i18n.t('static.report.mos'),
+                            fontColor: fontColor
+                        },
+                        ticks: {
+                            beginAtZero: true,
+                            fontColor: fontColor,
+                            callback: function (value) {
+                                var cell1 = value
+                                cell1 += '';
+                                var x = cell1.split('.');
+                                var x1 = x[0];
+                                var x2 = x.length > 1 ? '.' + x[1] : '';
+                                var rgx = /(\d+)(\d{3})/;
+                                while (rgx.test(x1)) {
+                                    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                                }
+                                return x1 + x2;
+                            }
+                        },
+                        gridLines: {
+                            color: gridLineColor,
+                            drawBorder: true,
+                            lineWidth: 0,
+                            zeroLineColor: gridLineColor
                         }
-                        return x1 + x2;
                     }
-                },
-                gridLines: {
-                    color: gridLineColor,
-                    drawBorder: true,
-                    lineWidth: 0,
-                    zeroLineColor: gridLineColor 
+                ], xAxes: [{
+                    scaleLabel: {
+                        display: true,
+                        labelString: i18n.t('static.common.month'),
+                        fontColor: fontColor,
+                        fontStyle: "normal",
+                        fontSize: "12"
+                    },
+                    ticks: {
+                        fontColor: fontColor
+                    },
+                    gridLines: {
+                        color: gridLineColor,
+                        drawBorder: true,
+                        lineWidth: 0,
+                        zeroLineColor: gridLineColor
+                    }
+                }]
+            },
+            tooltips: {
+                mode: 'index',
+                enabled: false,
+                custom: CustomTooltips,
+                callback: function (value) {
+                    var cell1 = value
+                    cell1 += '';
+                    var x = cell1.split('.');
+                    var x1 = x[0];
+                    var x2 = x.length > 1 ? '.' + x[1] : '';
+                    var rgx = /(\d+)(\d{3})/;
+                    while (rgx.test(x1)) {
+                        x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                    }
+                    return x1 + x2;
+                }
+            },
+            maintainAspectRatio: false,
+            legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                    usePointStyle: true,
+                    fontColor: fontColor,
+                    fontSize: 12,
+                    boxWidth: 9,
+                    boxHeight: 2
                 }
             }
-        ], xAxes: [{
-            scaleLabel: {
-                display: true,
-                labelString: i18n.t('static.common.month'),
-                fontColor:fontColor,
-                fontStyle: "normal",
-                fontSize: "12"
-            },
-            ticks: {
-                fontColor:fontColor
-            },
-            gridLines: {
-                color: gridLineColor, 
-                drawBorder: true,
-                lineWidth: 0,
-                zeroLineColor: gridLineColor 
-            }
-        }]
-    },
-    tooltips: {
-        mode: 'index',
-        enabled: false,
-        custom: CustomTooltips,
-        callback: function (value) {
-            var cell1 = value
-            cell1 += '';
-            var x = cell1.split('.');
-            var x1 = x[0];
-            var x2 = x.length > 1 ? '.' + x[1] : '';
-            var rgx = /(\d+)(\d{3})/;
-            while (rgx.test(x1)) {
-                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-            }
-            return x1 + x2;
         }
-    },
-    maintainAspectRatio: false,
-    legend: {
-        display: true,
-        position: 'bottom',
-        labels: {
-            usePointStyle: true,
-            fontColor:fontColor,
-            fontSize: 12,
-            boxWidth: 9,
-            boxHeight: 2
-        }
-    }
-}
         const { planningUnits } = this.state;
         let planningUnitList = planningUnits.length > 0
             && planningUnits.map((item, i) => {
@@ -1249,30 +1277,30 @@ const options = {
             && versions.map((item, i) => {
                 return (
                     <option key={i} value={item.versionId}>
-                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+                        {((item.versionStatus.id == 2 && item.versionType.id == 2) ? item.versionId + '*' : item.versionId)} ({(moment(item.createdDate).format(`MMM DD YYYY`))}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
                     </option>
                 )
             }, this);
-            const darkModeColors = [
-                '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-                 '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                 '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-                 '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
-                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                 '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-             ];
-             
-             const lightModeColors = [
-                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-                 '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-                 '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                 '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                 '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-             ];
-             
+        const darkModeColors = [
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#205493', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+        ];
+
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
+            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
+            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+        ];
+
         // const backgroundColor = [
         //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
         //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -1314,25 +1342,25 @@ const options = {
                                 this.state.matricsList.length > 0 &&
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                        var curTheme = localStorage.getItem("theme");
+                                        if (curTheme == "dark") {
+                                            this.setState({
+                                                isDarkMode: false
+                                            }, () => {
+                                                setTimeout(() => {
+                                                    this.exportPDF();
+                                                    if (curTheme == "dark") {
+                                                        this.setState({
+                                                            isDarkMode: true
+                                                        })
+                                                    }
+                                                }, 0)
+                                            })
+                                        } else {
+                                            this.exportPDF();
+                                        }
+                                    }}
+                                    />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </a>
                             }
@@ -1407,8 +1435,10 @@ const options = {
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     labelledBy={i18n.t('static.common.select')}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                 />
                                             </div>
                                         </FormGroup>
@@ -1513,19 +1543,19 @@ const options = {
                                                                 {getLabelText(item.planningUnit.label, this.state.lang)}
                                                             </td>
                                                             <td>
-                                                                {formatter(roundARU(item.stock,1),0)}
+                                                                {formatter(roundARU(item.stock, 1), 0)}
+                                                            </td >
+                                                            <td>
+                                                                {formatter(roundARU(item.consumptionQty, 1), 0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(roundARU(item.consumptionQty,1),0)}
+                                                                {formatter(item.mosPast, 0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.mosPast,0)}
+                                                                {formatter(item.mosFuture, 0)}
                                                             </td>
                                                             <td>
-                                                                {formatter(item.mosFuture,0)}
-                                                            </td>
-                                                            <td>
-                                                                {formatter(roundAMC(item.amc,0))}
+                                                                {formatter(roundAMC(item.amc, 0))}
                                                             </td>
                                                             {/* <td>
                                                                 {formatter(item.amcMonthCount,0)}

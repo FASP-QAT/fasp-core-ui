@@ -1729,6 +1729,13 @@ export default class BuildTree extends Component {
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -2754,6 +2761,7 @@ export default class BuildTree extends Component {
         }
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
+<<<<<<< HEAD
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level != "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
@@ -2766,6 +2774,17 @@ export default class BuildTree extends Component {
             //         levelNo: i
             //     })
             // }
+=======
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null).map(x => x.level))];
+        if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
+            copyModalParentLevelList = [];
+            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+                copyModalParentLevelList.push({
+                    label: { label_en: "Level " + i },
+                    levelNo: i
+                })
+            }
+>>>>>>> QAT-469
         } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
@@ -3127,7 +3146,11 @@ export default class BuildTree extends Component {
                     calculateAllScenario: false
                 })
                 if (isCopy) {
+<<<<<<< HEAD
                     calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate, true).then(() => {
+=======
+                    calculateModelingData(dataSetObj, this, '', -1, -1, type, [this.state.treeId, this.state.copyModalTree].toString(), false, false, this.state.autoCalculate).then(() => {
+>>>>>>> QAT-469
                         resolve();
                     });
                 } else {
@@ -4377,7 +4400,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
-                    readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
+                    readOnly: AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') ? false : true,
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
@@ -5959,7 +5982,7 @@ export default class BuildTree extends Component {
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-            if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -7525,12 +7548,15 @@ export default class BuildTree extends Component {
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
                 child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
+<<<<<<< HEAD
                 if (child.payload.nodeType.id == 6 && this.state.copyModalTree != this.state.treeId) {
                     child.payload.downwardAggregationList = [];
                 }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
+=======
+>>>>>>> QAT-469
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == this.state.copyModalParentNode) : items.filter(c => c.parent == this.state.copyModalParentNode);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -7551,12 +7577,15 @@ export default class BuildTree extends Component {
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
                 child.level = child.parent.level + 1;
+<<<<<<< HEAD
                 if (child.payload.nodeType.id == 6) {
                     child.payload.downwardAggregationList = [];
                 }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
+=======
+>>>>>>> QAT-469
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == parentNode.newId) : items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -11951,7 +11980,7 @@ export default class BuildTree extends Component {
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -12012,9 +12041,15 @@ export default class BuildTree extends Component {
                                     <div style={{ 'float': 'right', 'fontSize': '18px' }}><b>{i18n.t('static.supplyPlan.total')}: {this.state.scalingTotal !== "" && addCommas(parseFloat(this.state.scalingTotal).toFixed(4))}</b></div><br /><br />
                                 </div>
                             }
+<<<<<<< HEAD
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 6 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
                                 {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                 {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+=======
+                            <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+>>>>>>> QAT-469
                             </div>
                         </div>
                         {this.state.showCalculatorFields &&
@@ -12338,8 +12373,13 @@ export default class BuildTree extends Component {
                                 <div className="col-md-12 pr-lg-0">
                                     {this.state.currentItemConfig.context.payload.nodeType.id != 6 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
+<<<<<<< HEAD
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>}
                                     {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 6 &&
+=======
+                                    }}><i className="fa fa-times"></i> {'Close'}</Button>
+                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
+>>>>>>> QAT-469
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12438,7 +12478,7 @@ export default class BuildTree extends Component {
                                             })
                                         }
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -13159,7 +13199,11 @@ export default class BuildTree extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
+<<<<<<< HEAD
                         {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+=======
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+>>>>>>> QAT-469
                             <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -13181,7 +13225,7 @@ export default class BuildTree extends Component {
                         }
                         {itemConfig.parent != null &&
                             <>
-                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -13203,7 +13247,7 @@ export default class BuildTree extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -13212,7 +13256,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-sitemap" aria-hidden="true"></i>
                             </button>
                         }
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     this.setState({
@@ -13415,7 +13459,7 @@ export default class BuildTree extends Component {
                                 }}>
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') &&
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     var items = this.state.items;
@@ -13570,7 +13614,7 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
-                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     <InputGroupText className='SettingIcon'>
                                                                         <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
@@ -13740,16 +13784,22 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
                                                     )} />
                                         </div>
                                         <div className="row ml-lg-1 pb-lg-2">
+<<<<<<< HEAD
                                             <b className='text-blackD'>{i18n.t('static.tree.editIn')} {<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
                                             <FormGroup>
                                                 <div className="check inline paddinCheckbox pt-lg-0">
+=======
+                                            <b>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
+                                            <FormGroup className="col-md-2" style={{ marginLeft: '2%' }}>
+                                                <div className="check inline  pl-lg-1 pt-lg-0">
+>>>>>>> QAT-469
                                                     <div>
                                                         <Input
                                                             className="form-check-input checkboxMargin"
@@ -14714,7 +14764,11 @@ export default class BuildTree extends Component {
                                                 </Input>
                                                 <div className="red">{errors.parentNodeDropdown}</div>
                                             </FormGroup>
+<<<<<<< HEAD
                                             <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>", this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : this.state.invalidNodeType == 5 ? "PU" : "Funnel node").replace("<parentNodeType>", this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : this.state.invalidParentNodeType == 5 ? "PU" : "Funnel node")}</p>
+=======
+                                            <p className="red" style={{ display: this.state.invalidNodeError ? "block" : "none" }}>{i18n.t('static.tree.invalidNodeError').replace("<nodeName>", this.state.copyModalNode.payload.label.label_en).replace("<nodeType>", this.state.invalidNodeType == 1 ? "Σ" : this.state.invalidNodeType == 2 ? "#" : this.state.invalidNodeType == 3 ? "%" : this.state.invalidNodeType == 4 ? "FU" : "PU").replace("<parentNodeType>", this.state.invalidParentNodeType == 1 ? "Σ" : this.state.invalidParentNodeType == 2 ? "#" : this.state.invalidParentNodeType == 3 ? "%" : this.state.invalidParentNodeType == 4 ? "FU" : "PU")}</p>
+>>>>>>> QAT-469
                                             <p>{i18n.t('static.tree.moveCopyNote')}</p>
                                         </div>
                                     </div>

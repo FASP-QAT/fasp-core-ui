@@ -359,9 +359,9 @@ export default class AddInventory extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            label: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            label: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             value: myResult[i].id
                         }
                         proList.push(programJson)
@@ -498,8 +498,8 @@ export default class AddInventory extends Component {
                             var cutOffDate = programJson.cutOffDate != undefined && programJson.cutOffDate != null && programJson.cutOffDate != "" ? programJson.cutOffDate : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
                             var rangeValue = this.state.rangeValue;
                             if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+                                var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+                                rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
                                 localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
                             }
                             this.setState({
@@ -605,8 +605,8 @@ export default class AddInventory extends Component {
                 document.getElementById("adjustmentsTableDiv").style.display = "block";
                 if (document.getElementById("addRowButtonId") != null) {
                     document.getElementById("addRowButtonId").style.display = "block";
-                    var roleList = AuthenticationService.getLoggedInUserRole();
-                    if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                    // var roleList = AuthenticationService.getLoggedInUserRole();
+                    if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                         document.getElementById("addRowButtonId").style.display = "none";
                     }
                 }
@@ -661,32 +661,32 @@ export default class AddInventory extends Component {
                             var batchInfoList = programJson.batchInfoList;
                             var batchList = [];
                             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==puList[pu].value).flatMap(consumption => consumption.batchInfoList);
-                            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==puList[pu].value).flatMap(inventory => inventory.batchInfoList);
-                            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
+                            var consumptionBatchList = programJson.consumptionList.filter(c => c.planningUnit.id == puList[pu].value).flatMap(consumption => consumption.batchInfoList);
+                            var inventoryBatchList = programJson.inventoryList.filter(c => c.planningUnit.id == puList[pu].value).flatMap(inventory => inventory.batchInfoList);
+                            var shipmentBatchList = shipmentList.flatMap(shipment => shipment.batchInfoList);
                             for (var sl = 0; sl < shipmentList.length; sl++) {
                                 var bdl = shipmentList[sl].batchInfoList;
                                 for (var bd = 0; bd < bdl.length; bd++) {
                                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                     if (index == -1) {
-                                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var shipmentTotal=0;
-                                        var consumptionTotal=0;
-                                        var inventoryTotal=0;
-                                        shipmentBatchListFiltered.map(item=>{
-                                            shipmentTotal+=Number(item.shipmentQty);
+                                        var shipmentBatchListFiltered = shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var consumptionBatchListFiltered = consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var inventoryBatchListFiltered = inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var shipmentTotal = 0;
+                                        var consumptionTotal = 0;
+                                        var inventoryTotal = 0;
+                                        shipmentBatchListFiltered.map(item => {
+                                            shipmentTotal += Number(item.shipmentQty);
                                         })
-                                        consumptionBatchListFiltered.map(item=>{
-                                            consumptionTotal+=Number(item.consumptionQty);
+                                        consumptionBatchListFiltered.map(item => {
+                                            consumptionTotal += Number(item.consumptionQty);
                                         })
-                                        inventoryBatchListFiltered.map(item=>{
-                                            inventoryTotal+=Number(item.adjustmentQty)
+                                        inventoryBatchListFiltered.map(item => {
+                                            inventoryTotal += Number(item.adjustmentQty)
                                         })
                                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == puList[pu].value && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                         if (batchDetailsToPush.length > 0) {
-                                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
+                                            batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
                                             batchList.push(batchDetailsToPush[0]);
                                         }
                                     }

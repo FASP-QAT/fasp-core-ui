@@ -18,8 +18,6 @@ import {
     Modal,
     ModalBody,
     ModalHeader,
-    Popover,
-    PopoverBody,
     Table
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -898,7 +896,7 @@ class CompareAndSelectScenario extends Component {
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
-                    editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? true : false
+                    editable: this.state.datasetId != "" && AuthenticationService.checkUserACL([this.state.datasetId.split("_")[0].toString()], 'ROLE_BF_COMPARE_AND_SELECT') ? true : false
                 };
                 var languageEl = jexcel(document.getElementById("table1"), options);
                 this.el = languageEl;
@@ -2842,7 +2840,7 @@ class CompareAndSelectScenario extends Component {
                                                                     id="forecastNotes"
                                                                     value={this.state.forecastNotes}
                                                                     onChange={(e) => { this.setForecastNotes(e); }}
-                                                                    readOnly={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') ? false : true}
+                                                                    readOnly={this.state.datasetId != "" && AuthenticationService.checkUserACL([this.state.datasetId.split("_")[0].toString()], 'ROLE_BF_COMPARE_AND_SELECT') ? false : true}
                                                                     bsSize="sm"
                                                                 >
                                                                 </Input>
@@ -3148,7 +3146,7 @@ class CompareAndSelectScenario extends Component {
                     <CardFooter>
                         <FormGroup>
                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            {this.state.datasetId != "" && AuthenticationService.checkUserACL([this.state.datasetId.split("_")[0].toString()], 'ROLE_BF_COMPARE_AND_SELECT') && this.state.showAllData && this.state.changed && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={this.submitScenario}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                             &nbsp;
                         </FormGroup>
                     </CardFooter>

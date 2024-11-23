@@ -98,6 +98,13 @@ export default class PlanningUnitListComponent extends Component {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
                             break;
@@ -189,6 +196,13 @@ export default class PlanningUnitListComponent extends Component {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
                                             break;
@@ -227,6 +241,13 @@ export default class PlanningUnitListComponent extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -303,6 +324,13 @@ export default class PlanningUnitListComponent extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -431,7 +459,7 @@ export default class PlanningUnitListComponent extends Component {
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
-                    if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT')) {
+                    if (obj.options.allowInsertRow == true && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PLANNING_UNIT_CAPACITY')) {
                         items.push({
                             title: i18n.t('static.planningunit.capacityupdate'),
                             onclick: function () {
@@ -506,6 +534,13 @@ export default class PlanningUnitListComponent extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -655,6 +690,13 @@ export default class PlanningUnitListComponent extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)

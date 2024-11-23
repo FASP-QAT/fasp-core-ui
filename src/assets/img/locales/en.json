@@ -3493,9 +3493,25 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
+<<<<<<< HEAD
   "static.budgetReport.noBudgetNote":"No budgets found for select report period, program(s), and funding source(s). Note that if the start or end date of a budget falls outside of the selected report period, the budget will not be shown. Program Admins can add or edit a budget in Program Management > Budget.",
   "static.versionSettings.updateForecastTree":"Updating Forecast Trees",
   "static.versionSettings.noteInTreeSync":"We are automatically updating the forecast trees for your selected program and version based on the new forecast period. This may take a moment.",
   "static.versionSettings.noteInTreeSyncPart2":"Once the process is complete, no further action is required. Please wait while the system updates the data.",
   "static.versionSettings.noteInTreeSyncPart3":"Thank you for your patience!"
 }
+=======
+  "static.realm.noOfMonthsInFutureForTopDashboard":"No of months in future for top dashboard",
+  "static.realm.noOfMonthsInPastForBottomDashboard":"No of months in past for bottom dashboard",
+  "static.validated.restrictionNoOfMonthsInFutureForTopDashboard":"Please enter No of months in future for top dashboard",
+  "static.validated.restrictionNoOfMonthsInPastForBottomDashboard":"Please enter No of months in past for bottom dashboard",
+  "static.common.accessDenied":"You do not have access to view or edit this data or setting.",
+  "static.message.addUpdateSuccess": "{{entityname}} added/updated successfully",
+  "static.tooltip.aruProgram":"To edit, you must have editable access to all selected programs. If you lack editable access to any selected program, the screen will be view-only",
+  "static.validated.restrictionNoOfMonthsInPastForTopDashboard":"Please enter No of months in past for top dashboard",
+  "static.validated.restrictionNoOfMonthsInFutureForBottomDashboard":"Please enter No of months in future for bottom dashboard",
+  "static.realm.noOfMonthsInPastForTopDashboard":"No of months in past for top dashboard",
+  "static.realm.noOfMonthsInFutureForBottomDashboard":"No of months in future for bottom dashboard",
+  "static.realm.settingChangeWarning":"One of the dashboard settings has been updated. In order for this change to reflect, please re-download or upload the program."
+}
+>>>>>>> QAT-469

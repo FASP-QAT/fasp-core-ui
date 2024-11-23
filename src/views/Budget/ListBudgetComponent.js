@@ -15,6 +15,7 @@ import FundingSourceService from '../../api/FundingSourceService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { message } from 'antd';
 // Localized entity name
 const entityname = i18n.t('static.dashboard.budget');
 /**
@@ -217,6 +218,8 @@ class ListBudgetComponent extends Component {
       data[14] = budgetList[j].budgetAmt;
       data[15] = budgetList[j].usedUsdAmt;
       data[16] = budgetList[j].stopDate;
+      data[17] = budgetList[j].programs.filter(x => x.id != 0).map(x => x.id.toString())
+
       budgetArray[count] = data;
       count++;
     }
@@ -300,6 +303,10 @@ class ListBudgetComponent extends Component {
           title: 'Date',
           type: 'hidden',
         },
+        {
+          title: 'programIds',
+          type: 'hidden'
+        },
       ],
       editable: false,
       license: JEXCEL_PRO_KEY,
@@ -344,10 +351,15 @@ class ListBudgetComponent extends Component {
       if ((x == 0 && value != 0) || (y == 0)) {
       } else {
         if (this.state.selBudget.length != 0) {
-          if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_BUDGET')) {
+          let program = this.el.getValueFromCoords(17, x);
+          if (AuthenticationService.checkUserACL(program, 'ROLE_BF_EDIT_BUDGET')) {
             this.props.history.push({
               pathname: `/budget/editBudget/${this.el.getValueFromCoords(0, x)}`,
             });
+          }else{
+            this.setState({
+              message:i18n.t('static.common.accessDenied')
+            })
           }
         }
       }
@@ -392,7 +404,7 @@ class ListBudgetComponent extends Component {
     // Fetch realmId
     let realmId = AuthenticationService.getRealmId();
     //Fetch Program list
-    DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+    DropdownService.getSPProgramBasedOnRealmId(realmId)
       .then(response => {
         if (response.status == 200) {
           var listArray = response.data.filter(c => c.active);
@@ -416,6 +428,7 @@ class ListBudgetComponent extends Component {
       })
       .catch(
         error => {
+          console.log("============??????", error)
           if (error.message === "Network Error") {
             this.setState({
               message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -425,6 +438,13 @@ class ListBudgetComponent extends Component {
             switch (error.response ? error.response.status : "") {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
                 break;
               case 403:
                 this.props.history.push(`/accessDenied`)
@@ -483,6 +503,13 @@ class ListBudgetComponent extends Component {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
                 break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
               case 403:
                 this.props.history.push(`/accessDenied`)
                 break;
@@ -538,6 +565,13 @@ class ListBudgetComponent extends Component {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`)
                 break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
               case 403:
                 this.props.history.push(`/accessDenied`)
                 break;
@@ -582,7 +616,7 @@ class ListBudgetComponent extends Component {
         {i18n.t('static.common.result', { from, to, size })}
       </span>
     );
-    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c=>this.state.programId==0 || this.state.programId==-1?1==1:[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
+    let fundingSources = fundingSourceList.length > 0 && fundingSourceList.filter(c => this.state.programId == 0 || this.state.programId == -1 ? 1 == 1 : [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId))).map((item, i) => {
       return (
         <option key={i} value={item.fundingSourceId}>
           {getLabelText(item.label, this.state.lang)}

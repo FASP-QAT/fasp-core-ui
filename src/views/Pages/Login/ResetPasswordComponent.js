@@ -84,6 +84,13 @@ class ResetPasswordComponent extends Component {
                         switch (error.response.status) {
                             case 500:
                             case 401:
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.setState({ display: 0 })
                             case 404:
@@ -163,6 +170,13 @@ class ResetPasswordComponent extends Component {
                                                                             break;
                                                                         case 500:
                                                                         case 401:
+                                                                        case 409:
+                                                                            this.setState({
+                                                                                message: i18n.t('static.common.accessDenied'),
+                                                                                loading: false,
+                                                                                color: "#BA0C2F",
+                                                                            });
+                                                                            break;
                                                                         case 403:
                                                                         case 406:
                                                                         case 412:
@@ -171,6 +185,13 @@ class ResetPasswordComponent extends Component {
                                                                                     document.getElementById('div1').style.display = 'block';
                                                                                     hideFirstComponent();
                                                                                 });
+                                                                            break;
+                                                                        case 409:
+                                                                            this.setState({
+                                                                                message: i18n.t('static.common.accessDenied'),
+                                                                                loading: false,
+                                                                                color: "#BA0C2F",
+                                                                            });
                                                                             break;
                                                                         case 403:
                                                                         default:

@@ -1632,6 +1632,13 @@ export default class CreateTreeTemplate extends Component {
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -6332,12 +6339,15 @@ export default class CreateTreeTemplate extends Component {
                 child.payload.parentNodeId = this.state.copyModalParentNode;
                 child.id = nodeId;
                 child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
+<<<<<<< HEAD
                 // if(child.payload.nodeType.id == 6 ){
                 //     child.payload.downwardAggregationList = [];
                 // }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
+=======
+>>>>>>> QAT-469
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = items.filter(c => c.parent == itemConfig.parent);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6358,12 +6368,15 @@ export default class CreateTreeTemplate extends Component {
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
                 child.level = child.parent.level + 1;
+<<<<<<< HEAD
                 if (child.payload.nodeType.id == 6) {
                     child.payload.downwardAggregationList = [];
                 }
                 if (child.payload.downwardAggregationAllowed) {
                     child.payload.downwardAggregationAllowed = false;
                 }
+=======
+>>>>>>> QAT-469
                 var parentSortOrder = parentNode.newSortOrder;
                 var childList1 = items.filter(c => c.parent == parentNode.newId);
                 var maxSortOrder = childList1.length > 0 ? Math.max(...childList1.map(o => o.sortOrder.replace(parentSortOrder + '.', ''))) : 0;
@@ -6653,6 +6666,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -6755,6 +6775,13 @@ export default class CreateTreeTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -7147,7 +7174,14 @@ export default class CreateTreeTemplate extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -7483,6 +7517,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -7541,6 +7582,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -7590,6 +7638,13 @@ export default class CreateTreeTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -7641,6 +7696,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -7690,6 +7752,13 @@ export default class CreateTreeTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -7741,6 +7810,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -7791,6 +7867,13 @@ export default class CreateTreeTemplate extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -7839,6 +7922,13 @@ export default class CreateTreeTemplate extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -7960,6 +8050,13 @@ export default class CreateTreeTemplate extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -12783,6 +12880,13 @@ export default class CreateTreeTemplate extends Component {
                                                                     case 401:
                                                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                                                         break;
+                                                                    case 409:
+                                                                        this.setState({
+                                                                            message: i18n.t('static.common.accessDenied'),
+                                                                            loading: false,
+                                                                            color: "#BA0C2F",
+                                                                        });
+                                                                        break;
                                                                     case 403:
                                                                         this.props.history.push(`/accessDenied`)
                                                                         break;
@@ -12866,6 +12970,13 @@ export default class CreateTreeTemplate extends Component {
                                                             switch (error.response ? error.response.status : "") {
                                                                 case 401:
                                                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                    break;
+                                                                case 409:
+                                                                    this.setState({
+                                                                        message: i18n.t('static.common.accessDenied'),
+                                                                        loading: false,
+                                                                        color: "#BA0C2F",
+                                                                    });
                                                                     break;
                                                                 case 403:
                                                                     this.props.history.push(`/accessDenied`)

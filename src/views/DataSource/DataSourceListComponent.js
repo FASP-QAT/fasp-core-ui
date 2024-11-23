@@ -49,11 +49,11 @@ export default class DataSourceListComponent extends Component {
         let dataSourceTypeId = document.getElementById("dataSourceTypeId").value;
         let programId = document.getElementById("programId").value;
         let realmId = 0;
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_SHOW_REALM_COLUMN')) {
+        if (AuthenticationService.checkUserACL([programId.toString()], 'ROLE_BF_SHOW_REALM_COLUMN')) {
             realmId = document.getElementById("realmId").value;
         }
         if (realmId != 0 && dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && c.dataSourceType.id == dataSourceTypeId && (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
@@ -65,13 +65,13 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (realmId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => c.realm.id == realmId && (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
                 () => { this.buildJexcel() });
         } else if (dataSourceTypeId != 0 && programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0) && c.dataSourceType.id == dataSourceTypeId)
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id == 0) && c.dataSourceType.id == dataSourceTypeId)
             this.setState({
                 selSource
             },
@@ -89,7 +89,7 @@ export default class DataSourceListComponent extends Component {
             },
                 () => { this.buildJexcel() });
         } else if (programId != 0) {
-            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id==0))
+            const selSource = this.state.dataSourceList.filter(c => (c.program == null || c.program.id == programId || c.program.id == 0))
             this.setState({
                 selSource
             },
@@ -118,6 +118,7 @@ export default class DataSourceListComponent extends Component {
             data[5] = dataSourceList[j].lastModifiedBy.username;
             data[6] = (dataSourceList[j].lastModifiedDate ? moment(dataSourceList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[7] = dataSourceList[j].active;
+            data[8] = dataSourceList[j].program != null ? dataSourceList[j].program.id : null
             dataSourceArray[count] = data;
             count++;
         }
@@ -166,6 +167,10 @@ export default class DataSourceListComponent extends Component {
                         { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
                 },
+                {
+                    title: 'programId',
+                    type: 'hidden'
+                }
             ],
             editable: false,
             onload: loadedForNonEditableTables,
@@ -200,7 +205,7 @@ export default class DataSourceListComponent extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var proList = []
@@ -242,6 +247,13 @@ export default class DataSourceListComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -298,6 +310,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -348,6 +367,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -392,6 +418,13 @@ export default class DataSourceListComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -427,7 +460,8 @@ export default class DataSourceListComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATA_SOURCE')) {
+                var roleList = AuthenticationService.getLoggedInUserRole();
+                if ((this.el.getValueFromCoords(8, x).toString() != null && this.el.getValueFromCoords(8, x).toString() != "" && AuthenticationService.checkUserACL([this.el.getValueFromCoords(8, x).toString()], 'ROLE_BF_EDIT_DATA_SOURCE')) || ((this.el.getValueFromCoords(8, x).toString() == null || this.el.getValueFromCoords(8, x).toString() == "") && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_EDIT_DATA_SOURCE"))) {
                     this.props.history.push({
                         pathname: `/dataSource/editDataSource/${this.el.getValueFromCoords(0, x)}`,
                     });
