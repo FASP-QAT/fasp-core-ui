@@ -114,7 +114,12 @@ class EditUserComponent extends Component {
       loading1: true,
       programListForFilter: [],
       addUserEL: "",
-      aclMessage: ""
+      aclMessage: "",
+      selRoleList: [],
+      selProgram: [],
+      selRealmCountry: [],
+      selOrganisation: [],
+      selHealthArea: []
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -308,7 +313,7 @@ class EditUserComponent extends Component {
         if (response.status == 200) {
           var listArray = response.data;
           this.state.user.userAclList.map(item => {
-            if (listArray.findIndex(c => c.id == item.realmCountryId) == -1 && item.realmCountryId!=-1) {
+            if (listArray.findIndex(c => c.id == item.realmCountryId) == -1 && item.realmCountryId != -1) {
               listArray.push({
                 id: item.realmCountryId,
                 label: item.countryName,
@@ -335,7 +340,7 @@ class EditUserComponent extends Component {
               if (response.status == "200") {
                 var listArray = response.data;
                 this.state.user.userAclList.map(item => {
-                  if (listArray.findIndex(c => c.id == item.organisationId) == -1 && item.organisationId!=-1) {
+                  if (listArray.findIndex(c => c.id == item.organisationId) == -1 && item.organisationId != -1) {
                     listArray.push({
                       id: item.organisationId,
                       label: item.organisationName,
@@ -362,7 +367,7 @@ class EditUserComponent extends Component {
                     if (response.status == "200") {
                       var listArray = response.data;
                       this.state.user.userAclList.map(item => {
-                        if (listArray.findIndex(c => c.id == item.healthAreaId) == -1 && item.healthAreaId!=-1) {
+                        if (listArray.findIndex(c => c.id == item.healthAreaId) == -1 && item.healthAreaId != -1) {
                           listArray.push({
                             id: item.healthAreaId,
                             label: item.healthAreaName,
@@ -389,15 +394,15 @@ class EditUserComponent extends Component {
                           if (response1.status == "200") {
                             var listArray = response1.data;
                             this.state.user.userAclList.map(item => {
-                              if (listArray.findIndex(c => c.id == item.programId) == -1 && item.programId!=-1) {
+                              if (listArray.findIndex(c => c.id == item.programId) == -1 && item.programId != -1) {
                                 listArray.push({
                                   id: item.programId,
                                   label: item.programName,
-                                  code:item.programCode,
-                                  realmCountry:{
-                                    id:this.state.user.realm.realmId,
+                                  code: item.programCode,
+                                  realmCountry: {
+                                    id: this.state.user.realm.realmId,
                                   },
-                                  programTypeId:item.programTypeId
+                                  programTypeId: item.programTypeId
                                 })
                               }
                             });
@@ -410,13 +415,103 @@ class EditUserComponent extends Component {
                               {
                                 programs: listArray,
                                 selProgram: listArray,
+                              })
+                            UserService.getRoleList()
+                              .then((response) => {
+                                if (response.status == 200) {
+                                  var roleList = [];
+                                  for (var i = 0; i < response.data.length; i++) {
+                                    roleList[i] = {
+                                      value: response.data[i].roleId,
+                                      label: getLabelText(response.data[i].label, this.state.lang),
+                                    };
+                                  }
+                                  this.state.user.userAclList.map(item => {
+                                    if (roleList.findIndex(c => c.value == item.roleId) == -1) {
+                                      roleList.push({
+                                        value: item.roleId,
+                                        label: getLabelText(item.roleDesc, this.state.lang),
+                                      })
+                                    }
+                                  });
+                                  this.setState({
+                                    selRoleList: roleList,
+                                    loading: false,
+                                  }
+                                    ,
+                                    () => {
+                                      this.filterData();
+                                      this.filterOrganisation();
+                                      this.filterHealthArea();
+                                      this.filterProgram();
+                                      this.buildJexcel();
+                                    }
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                if (error.message === "Network Error") {
+                                  this.setState({
+                                    message: API_URL.includes("uat")
+                                      ? i18n.t("static.common.uatNetworkErrorMessage")
+                                      : API_URL.includes("demo")
+                                        ? i18n.t(
+                                          "static.common.demoNetworkErrorMessage"
+                                        )
+                                        : i18n.t(
+                                          "static.common.prodNetworkErrorMessage"
+                                        ),
+                                    loading: false,
+                                  });
+                                } else {
+                                  switch (
+                                  error.response ? error.response.status : ""
+                                  ) {
+                                    case 401:
+                                      this.props.history.push(
+                                        `/login/static.message.sessionExpired`
+                                      );
+                                      break;
+                                    case 409:
+                                      this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                      });
+                                      break;
+                                    case 403:
+                                      this.props.history.push(`/accessDenied`);
+                                      break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                      });
+                                      break;
+                                    case 412:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                      });
+                                      break;
+                                    default:
+                                      this.setState({
+                                        message: "static.unkownError",
+                                        loading: false,
+                                      });
+                                      break;
+                                  }
+                                }
+                              });
+                          } else {
+                            this.setState(
+                              {
+                                message: response.data.messageCode,
                               },
                               () => {
-                                this.filterData();
-                                this.filterOrganisation();
-                                this.filterHealthArea();
-                                this.filterProgram();
-                                this.buildJexcel();
+                                this.hideSecondComponent();
                               }
                             );
                           }
@@ -427,18 +522,12 @@ class EditUserComponent extends Component {
                               message: API_URL.includes("uat")
                                 ? i18n.t("static.common.uatNetworkErrorMessage")
                                 : API_URL.includes("demo")
-                                  ? i18n.t(
-                                    "static.common.demoNetworkErrorMessage"
-                                  )
-                                  : i18n.t(
-                                    "static.common.prodNetworkErrorMessage"
-                                  ),
+                                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                                  : i18n.t("static.common.prodNetworkErrorMessage"),
                               loading: false,
                             });
                           } else {
-                            switch (
-                            error.response ? error.response.status : ""
-                            ) {
+                            switch (error.response ? error.response.status : "") {
                               case 401:
                                 this.props.history.push(
                                   `/login/static.message.sessionExpired`
@@ -478,14 +567,9 @@ class EditUserComponent extends Component {
                           }
                         });
                     } else {
-                      this.setState(
-                        {
-                          message: response.data.messageCode,
-                        },
-                        () => {
-                          this.hideSecondComponent();
-                        }
-                      );
+                      this.setState({
+                        message: response.data.message,
+                      });
                     }
                   })
                   .catch((error) => {
@@ -539,9 +623,14 @@ class EditUserComponent extends Component {
                     }
                   });
               } else {
-                this.setState({
-                  message: response.data.message,
-                });
+                this.setState(
+                  {
+                    message: response.data.messageCode,
+                  },
+                  () => {
+                    this.hideSecondComponent();
+                  }
+                );
               }
             })
             .catch((error) => {
@@ -557,9 +646,7 @@ class EditUserComponent extends Component {
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 401:
-                    this.props.history.push(
-                      `/login/static.message.sessionExpired`
-                    );
+                    this.props.history.push(`/login/static.message.sessionExpired`);
                     break;
                   case 409:
                     this.setState({
@@ -593,7 +680,7 @@ class EditUserComponent extends Component {
                     break;
                 }
               }
-            });
+            })
         } else {
           this.setState(
             {
@@ -611,14 +698,22 @@ class EditUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t(
+                  "static.common.demoNetworkErrorMessage"
+                )
+                : i18n.t(
+                  "static.common.prodNetworkErrorMessage"
+                ),
             loading: false,
           });
         } else {
-          switch (error.response ? error.response.status : "") {
+          switch (
+          error.response ? error.response.status : ""
+          ) {
             case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
+              this.props.history.push(
+                `/login/static.message.sessionExpired`
+              );
               break;
             case 409:
               this.setState({
@@ -653,6 +748,7 @@ class EditUserComponent extends Component {
           }
         }
       });
+    ;
   }
   /**
    * This function is called when something in the access control table is changed to add the validation and set values of other cell
@@ -1454,88 +1550,6 @@ class EditUserComponent extends Component {
           }
         }
       });
-    UserService.getRoleList()
-      .then((response) => {
-        if (response.status == 200) {
-          var roleList = [];
-          for (var i = 0; i < response.data.length; i++) {
-            roleList[i] = {
-              value: response.data[i].roleId,
-              label: getLabelText(response.data[i].label, this.state.lang),
-            };
-          }
-          this.state.user.userAclList.map(item => {
-            if (roleList.findIndex(c => c.value == item.roleId) == -1) {
-              roleList.push({
-                value: item.roleId,
-                label: getLabelText(item.roleDesc, this.state.lang),
-              })
-            }
-          });
-          this.setState({
-            selRoleList: roleList,
-            loading: false,
-          });
-        } else {
-          this.setState(
-            {
-              message: response.data.messageCode,
-              loading: false,
-            },
-            () => {
-              this.hideSecondComponent();
-            }
-          );
-        }
-      })
-      .catch((error) => {
-        if (error.message === "Network Error") {
-          this.setState({
-            message: API_URL.includes("uat")
-              ? i18n.t("static.common.uatNetworkErrorMessage")
-              : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
-            loading: false,
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
-              break;
-            case 409:
-              this.setState({
-                message: i18n.t('static.common.accessDenied'),
-                loading: false,
-                color: "#BA0C2F",
-              });
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`);
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false,
-              });
-              break;
-            case 412:
-              this.setState({
-                message: error.response.data.messageCode,
-                loading: false,
-              });
-              break;
-            default:
-              this.setState({
-                message: "static.unkownError",
-                loading: false,
-              });
-              break;
-          }
-        }
-      });
   }
   /**
    * This is used to display the content
@@ -1954,6 +1968,7 @@ class EditUserComponent extends Component {
                           {i18n.t(this.state.aclMessage)}
                         </h5>
                         <div
+                          style={{ width: '100%' }}
                           id="paputableDiv"
                           className="RowheightForjexceladdRow consumptionDataEntryTable"
                         ></div>
