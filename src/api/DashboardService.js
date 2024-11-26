@@ -2,21 +2,20 @@ import axios from "axios";
 import { API_URL } from '../Constants.js';
 class DashboardService {
     applicationLevelDashboard() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboard`, {}
+        return axios.get(`${API_URL}/api/dashboard/applicationLevel`, {}
         );
     }
     realmLevelDashboard(realmId) {
         realmId = 1;
-        return axios.get(`${API_URL}/api/realmLevelDashboard`, {
+        return axios.get(`${API_URL}/api/dashboard/realmLevel`, {
         });
     }
     applicationLevelDashboardUserList() {
-        return axios.get(`${API_URL}/api/applicationLevelDashboardUserList`, {
+        return axios.get(`${API_URL}/api/dashboard/applicationLevel/userList`, {
         });
     }
-    realmLevelDashboardUserList(realmId) {
-        realmId = 1;
-        return axios.get(`${API_URL}/api/realmLevelDashboardUserList`, {
+    realmLevelDashboardUserList() {
+        return axios.get(`${API_URL}/api/dashboard/realmLevel/userList`, {
         });
     }
     openIssues() {
@@ -24,7 +23,15 @@ class DashboardService {
         });
     }
     supplyPlanReviewerLevelDashboard() {
-        return axios.get(`${API_URL}/api/supplyPlanReviewerLevelDashboard`, {
+        return axios.get(`${API_URL}/api/dashboard/supplyPlanReviewerLevel`, {
+        });
+    }
+    getDashboardTop(json) {
+        return axios.post(`${API_URL}/api/dashboard/supplyPlanTop`, json, {
+        });
+    }
+    getDashboardBottom(json) {
+        return axios.post(`${API_URL}/api/dashboard/supplyPlanBottom`, json, {
         });
     }
 }

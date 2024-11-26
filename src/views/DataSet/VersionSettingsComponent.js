@@ -28,6 +28,7 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { consumptionExtrapolationNotesClicked, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
 import { filterOptions, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { message } from 'antd';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -561,6 +562,9 @@ class VersionSettingsComponent extends Component {
      * Handles form submission and save version setting details in indexed db
      */
     formSubmit() {
+        this.setState({
+            message:""
+        })
         var validation = this.checkValidation();
         if (validation == true) {
             var cont = true;
@@ -580,12 +584,14 @@ class VersionSettingsComponent extends Component {
                         var stopDate = map1.get("9");
                         var id = map1.get("11");
                         var noOfDaysInMonth = Number(map1.get("13"));
-                        if((moment(startDate).format("YYYY-MM")!=moment(map1.get("19")).format("YYYY-MM")) || (moment(stopDate).format("YYYY-MM") != moment(map1.get("20")).format("YYYY-MM"))){
-                            programsForWhichDateIsChanged.push(id);
-                        }
                         var program = (this.state.datasetList.filter(x => x.id == id)[0]);
                         var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
                         var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        if((moment(startDate).format("YYYY-MM")!=moment(map1.get("19")).format("YYYY-MM")) || (moment(stopDate).format("YYYY-MM") != moment(map1.get("20")).format("YYYY-MM"))){
+                            if(programData.treeList.length>0){
+                                programsForWhichDateIsChanged.push(id);
+                            }
+                        }
                         programData.currentVersion.forecastStartDate = moment(startDate).startOf('month').format("YYYY-MM-DD");
                         programData.currentVersion.forecastStopDate = moment(stopDate).startOf('month').format("YYYY-MM-DD");
                         programData.currentVersion.daysInMonth = noOfDaysInMonth;
@@ -632,13 +638,16 @@ class VersionSettingsComponent extends Component {
                                 }
                             })
                             this.setState({
-                                loading: false,
-                                message: i18n.t('static.mt.dataUpdateSuccess'),
-                                color: "green",
-                                isChanged: false
+                                loading:false
                             }, () => {
                                 if(programsForWhichDateIsChanged.length==0){
-                                    hideSecondComponent();
+                                    this.setState({
+                                        message: i18n.t('static.mt.dataUpdateSuccess'),
+                                        color: "green",
+                                        isChanged: false
+                                    },()=>{
+                                        hideSecondComponent();
+                                    })
                                 }else{
                                     this.setState({
                                         syncPrograms:true,
@@ -990,7 +999,7 @@ class VersionSettingsComponent extends Component {
                 } else {
                     data[9] = pd.currentVersion.forecastStopDate
                 }
-                data[10] = 1
+                data[10] = AuthenticationService.checkUserACL([versionSettingsList[j].programId.toString()], 'ROLE_BF_EDIT_VERSION_SETTINGS') ? 1 : 0
                 data[11] = versionSettingsList[j].id
                 data[12] = 0
                 data[13] = pd.currentVersion.daysInMonth != null ? pd.currentVersion.daysInMonth : '0'
@@ -1144,7 +1153,7 @@ class VersionSettingsComponent extends Component {
             onchange: this.changed,
             onchangepage: this.onchangepage,
             oneditionend: this.oneditionend,
-            editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
+            // editable: ((AuthenticationService.checkUserACL(this.state.programValues.map(c => c.value.toString()), 'ROLE_BF_EDIT_VERSION_SETTINGS')) ? true : false),
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1166,8 +1175,8 @@ class VersionSettingsComponent extends Component {
                                     pageName: i18n.t('static.versionSettings.versionSettings'),
                                     programNameOriginal: getLabelText(rowData[18].label, this.state.lang),
                                     programId: rowData[11],
-                                    forecastStartDate:rowData[7],
-                                    forecastStopDate:rowData[9]
+                                    forecastStartDate: rowData[7],
+                                    forecastStopDate: rowData[9]
                                 })
                                 this.openModalPopup(rowData[18]);
                             }.bind(this)
@@ -1187,8 +1196,8 @@ class VersionSettingsComponent extends Component {
                                             pageName: i18n.t('static.versionSettings.versionSettings'),
                                             programNameOriginal: getLabelText(responseData.label, this.state.lang),
                                             programId: rowData[0],
-                                            forecastStartDate:rowData[7],
-                                            forecastStopDate:rowData[9]
+                                            forecastStartDate: rowData[7],
+                                            forecastStopDate: rowData[9]
                                         })
                                         this.openModalPopup(responseData);
                                     }
@@ -1301,7 +1310,7 @@ class VersionSettingsComponent extends Component {
      */
     componentDidMount() {
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+        DropdownService.getFCProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;
@@ -1805,6 +1814,7 @@ class VersionSettingsComponent extends Component {
                                     <strong>{i18n.t('static.program.treeSync')}</strong>
                                 </CardHeader>
                                 <CardBody>
+                                    <h6><b>{i18n.t('static.versionSettings.updateForecastTree')}</b></h6><h6>{i18n.t('static.versionSettings.noteInTreeSync')}</h6><h6>{i18n.t('static.versionSettings.noteInTreeSyncPart2')}</h6><h6>{i18n.t('static.versionSettings.noteInTreeSyncPart3')}</h6>
                                     <div className="text-center text-blackD">{this.state.syncedProgramPercentage}% ({this.state.syncedPrograms} {i18n.t('static.masterDataSync.of')} {this.state.totalProgramCount} {i18n.t('static.dashboard.program')})</div>
                                     <Progress value={this.state.syncedPrograms} max={this.state.totalProgramCount} />
                                 </CardBody>

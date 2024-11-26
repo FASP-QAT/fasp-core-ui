@@ -38,19 +38,19 @@ class UserService {
         });
     }
     updateExpiredPassword(emailId, oldPassword, newPassword) {
-        return axios.post(`${API_URL}/api/updateExpiredPassword`, { emailId, oldPassword, newPassword }, {});
+        return axios.post(`${API_URL}/api/user/updateExpiredPassword`, { emailId, oldPassword, newPassword }, {});
     }
     changePassword(userId, oldPassword, newPassword) {
-        return axios.post(`${API_URL}/api/changePassword`, { userId, oldPassword, newPassword }, {});
+        return axios.post(`${API_URL}/api/user/changePassword`, { userId, oldPassword, newPassword }, {});
     }
     forgotPassword(emailId) {
-        return axios.post(`${API_URL}/api/forgotPassword`, { emailId });
+        return axios.post(`${API_URL}/api/user/forgotPassword`, { emailId });
     }
     confirmForgotPasswordToken(emailId, token) {
-        return axios.post(`${API_URL}/api/confirmForgotPasswordToken`, { emailId, token }, {});
+        return axios.post(`${API_URL}/api/user/confirmForgotPasswordToken`, { emailId, token }, {});
     }
     updatePassword(emailId, token, password) {
-        return axios.post(`${API_URL}/api/updatePassword`, { emailId, token, password }, {});
+        return axios.post(`${API_URL}/api/user/updatePassword`, { emailId, token, password }, {});
     }
     getRoleById(json) {
         return axios.get(`${API_URL}/api/role/${json}`, {}
@@ -66,12 +66,20 @@ class UserService {
         return axios.post(`${API_URL}/api/user/module/${json}`, {}
         );
     }
-    updateUserTheme(json){
+    getUserDetails() {
+        return axios.get(`${API_URL}/api/user/details`, {
+        });
+    }
+    updateUserTheme(json) {
         return axios.post(`${API_URL}/api/user/theme/${json}`, {}
         );
     }
-    updateUserDecimalPreference(json){
+    updateUserDecimalPreference(json) {
         return axios.post(`${API_URL}/api/user/decimalPreference/${json}`, {}
+        );
+    }
+    getAccessControls() {
+        return axios.get(`${API_URL}/api/user/accessControls`, {}
         );
     }
 }

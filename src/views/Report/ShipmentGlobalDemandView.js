@@ -36,10 +36,10 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, filterOptions, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
- const pickerLang = {
-     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
-     from: 'From', to: 'To',
- }
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
 // const options = {
 //     plugins: {
 //         datalabels: {
@@ -225,7 +225,7 @@ class ShipmentGlobalDemandView extends Component {
                     position: 'bottom'
                 }
             }],
-            isDarkMode:false,
+            isDarkMode: false,
             dropdownOpen: false,
             radioSelected: 2,
             lang: localStorage.getItem('lang'),
@@ -573,6 +573,13 @@ class ShipmentGlobalDemandView extends Component {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
                                         break;
@@ -863,19 +870,19 @@ class ShipmentGlobalDemandView extends Component {
      */
     componentDidMount() {
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
 
 
         Chart.plugins.register({
@@ -973,6 +980,13 @@ observer.observe(document.documentElement, {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1076,6 +1090,13 @@ observer.observe(document.documentElement, {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1173,6 +1194,13 @@ observer.observe(document.documentElement, {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -1327,6 +1355,13 @@ observer.observe(document.documentElement, {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1410,7 +1445,7 @@ observer.observe(document.documentElement, {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
             if (newCountryList.length > 0) {
-                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -1435,6 +1470,13 @@ observer.observe(document.documentElement, {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -1667,6 +1709,13 @@ observer.observe(document.documentElement, {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
+                                                break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
                                                 break;
@@ -1831,11 +1880,11 @@ observer.observe(document.documentElement, {
      * @returns {JSX.Element} - Shipment Global Demand View report table.
      */
     render() {
-                
+
         const { isDarkMode } = this.state;
-// const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const options = {
             plugins: {
                 datalabels: {
@@ -1847,7 +1896,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
@@ -1855,13 +1904,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         fontStyle: "normal",
                         fontSize: "12"
                     },
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1879,22 +1928,22 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         display: false,
                         lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     }
                 }],
                 yAxes: [{
                     stacked: true,
                     labelString: i18n.t('static.common.product'),
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                     ticks: {
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             return (value.length > 40) ? value.substr(0, 40) + "..." : value;
                         },
                     },
-                    gridLines:{
+                    gridLines: {
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     }
                 }],
             },
@@ -1925,7 +1974,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -1940,7 +1989,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 xAxes: [{
@@ -1948,13 +1997,13 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         fontStyle: "normal",
                         fontSize: "12"
                     },
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             var cell1 = value
                             cell1 += '';
@@ -1972,17 +2021,17 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                         display: true,
                         color: gridLineColor,
                         zeroLineColor: gridLineColor,
-                        lineWidth: 0, 
+                        lineWidth: 0,
                     }
                 }],
                 yAxes: [{
                     stacked: true,
                     labelString: i18n.t('static.common.product'),
-                    fontColor:fontColor,
-                    gridLines:{
-                        
-        borderColor: 'red'
-      
+                    fontColor: fontColor,
+                    gridLines: {
+
+                        borderColor: 'red'
+
                     },
                 }],
             },
@@ -1992,7 +2041,7 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }
             }
         }
@@ -2077,7 +2126,6 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             }
             ]
         };
-        
         const darkModeColors = [
             '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
             '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
@@ -2117,14 +2165,14 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         
                 legend: {
                     position: 'bottom',
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }
             }],
         }
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
-            fontColor:fontColor,
+            fontColor: fontColor,
         }
         const { rangeValue } = this.state
         const checkOnline = localStorage.getItem('sessionType');
@@ -2133,15 +2181,15 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
             title: {
                 display: true,
                 text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
-                fontColor:fontColor,
+                fontColor: fontColor,
                 padding: 30
             },
             legend: {
                 position: 'bottom',
-                fontColor:fontColor,
+                fontColor: fontColor,
                 labels: {
                     padding: 25,
-                    fontColor:fontColor,
+                    fontColor: fontColor,
                 }
             },
             tooltips: {
@@ -2166,25 +2214,25 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                             <div className="card-header-actions">
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                                        var curTheme = localStorage.getItem("theme");
+                                        if (curTheme == "dark") {
+                                            this.setState({
+                                                isDarkMode: false
+                                            }, () => {
+                                                setTimeout(() => {
+                                                    this.exportPDF();
+                                                    if (curTheme == "dark") {
+                                                        this.setState({
+                                                            isDarkMode: true
+                                                        })
+                                                    }
+                                                }, 0)
+                                            })
+                                        } else {
+                                            this.exportPDF();
+                                        }
+                                    }}
+                                    />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </a>
                             </div>
@@ -2221,8 +2269,10 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleChange(e) }}
                                                     options={countryList && countryList.length > 0 ? countryList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2239,8 +2289,10 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleChangeProgram(e) }}
                                                     options={programList && programList.length > 0 ? programList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2302,8 +2354,10 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handlePlanningUnitChange(e) }}
                                                     options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2341,8 +2395,10 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleFundingSourceChange(e) }}
                                                     options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
@@ -2359,8 +2415,10 @@ const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
                                                     onChange={(e) => { this.handleShipmentStatusChange(e) }}
                                                     options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
                                                     disabled={this.state.loading}
-                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>

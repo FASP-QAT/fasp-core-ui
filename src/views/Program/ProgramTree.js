@@ -20,7 +20,7 @@ import {
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
 import { decompressJson, hideFirstComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { API_URL, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import ProgramService from "../../api/ProgramService";
 import RealmCountryService from "../../api/RealmCountryService";
 import RealmService from '../../api/RealmService';
@@ -61,7 +61,7 @@ class Program extends Component {
         };
         this.pickRange = React.createRef();
         this.getPrograms = this.getPrograms.bind(this);
-        this.checkNewerVersions = this.checkNewerVersions.bind(this);
+        // this.checkNewerVersions = this.checkNewerVersions.bind(this);
         this.getMoreVersions = this.getMoreVersions.bind(this);
         this.getLocalPrograms = this.getLocalPrograms.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
@@ -140,6 +140,13 @@ class Program extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -181,15 +188,15 @@ class Program extends Component {
      * Checks for newer versions of programs.
      * @param {Array} programs - An array of programs to check for newer versions.
      */
-    checkNewerVersions(programs) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-            ProgramService.checkNewerVersions(programs)
-                .then(response => {
-                    localStorage.removeItem("sesLatestProgram");
-                    localStorage.setItem("sesLatestProgram", response.data);
-                })
-        }
-    }
+    // checkNewerVersions(programs) {
+    //     if (localStorage.getItem("sessionType") === 'Online') {
+    //         ProgramService.checkNewerVersions(programs)
+    //             .then(response => {
+    //                 localStorage.removeItem("sesLatestProgram");
+    //                 localStorage.setItem("sesLatestProgram", response.data);
+    //             })
+    //     }
+    // }
     /**
      * Calls getLocalPrograms and getPrograms function and load the realm list on component mount
      */
@@ -232,6 +239,13 @@ class Program extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -375,6 +389,13 @@ class Program extends Component {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                                 break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
+                                                break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
                                                 break;
@@ -433,6 +454,13 @@ class Program extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -535,7 +563,7 @@ class Program extends Component {
                         proList.push(programJson)
                     }
                 }
-                this.checkNewerVersions(proList);
+                // this.checkNewerVersions(proList);
             }.bind(this);
         }.bind(this)
     }
@@ -956,7 +984,6 @@ class Program extends Component {
                             delete generalData.supplyPlan;
                             delete generalData.planningUnitList;
                             generalData.actionList = [];
-                            var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
                             var planningUnitDataList = [];
                             for (var pu = 0; pu < planningUnitList.length; pu++) {
                                 var planningUnitDataJson = {
@@ -966,9 +993,13 @@ class Program extends Component {
                                     batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
                                     supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
                                 }
+                                if(generalData.dashboardData.topPuData[planningUnitList[pu].id]!=undefined){
+                                    generalData.dashboardData.topPuData[planningUnitList[pu].id].linkedShipmentsCount=planningUnitDataJson.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length;
+                                }
                                 var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
                                 planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
                             }
+                            var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
                             var programDataJson = {
                                 generalData: generalEncryptedData,
                                 planningUnitDataList: planningUnitDataList
@@ -1208,6 +1239,13 @@ class Program extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)

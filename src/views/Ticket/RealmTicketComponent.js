@@ -40,6 +40,26 @@ const validationSchema = function (values) {
             .matches(/^\S*$/, i18n.t('static.validNoSpace.string'))
             .required(i18n.t('static.realm.realmCodeText'))
             .max(6, i18n.t('static.realm.realmCodeLength')),
+        noOfMonthsInFutureForTopDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForTopDashboard')),
+        noOfMonthsInPastForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForBottomDashboard')),
+        noOfMonthsInPastForTopDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInPastForTopDashboard')),
+        noOfMonthsInFutureForBottomDashboard: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard')),
     })
 }
 /**
@@ -57,7 +77,11 @@ export default class RealmTicketComponent extends Component {
                 minMosMaxGaurdrail: "",
                 maxMosMaxGaurdrail: "",
                 notes: "",
-                priority: 3
+                priority: 3,
+                noOfMonthsInPastForBottomDashboard: 6,
+                noOfMonthsInFutureForBottomDashboard: 18,
+                noOfMonthsInPastForTopDashboard: 0,
+                noOfMonthsInFutureForTopDashboard: 18
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -86,6 +110,18 @@ export default class RealmTicketComponent extends Component {
         if (event.target.name == "minMosMinGaurdrail") {
             realm.minMosMinGaurdrail = event.target.value;
         }
+        if (event.target.name === "noOfMonthsInFutureForTopDashboard") {
+            realm.noOfMonthsInFutureForTopDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
+            realm.noOfMonthsInPastForBottomDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInPastForTopDashboard") {
+            realm.noOfMonthsInPastForTopDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
+            realm.noOfMonthsInFutureForBottomDashboard = event.target.value
+        }
         if (event.target.name == "minMosMaxGaurdrail") {
             realm.minMosMaxGaurdrail = event.target.value;
         }
@@ -111,7 +147,7 @@ export default class RealmTicketComponent extends Component {
      * This function is used to update the ticket priority in state
      * @param {*} newState - This the selected priority
      */
-    updatePriority(newState){
+    updatePriority(newState) {
         // console.log('priority - : '+newState);
         let { realm } = this.state;
         realm.priority = newState;
@@ -136,6 +172,10 @@ export default class RealmTicketComponent extends Component {
         realm.maxMosMaxGaurdrail = '';
         realm.notes = '';
         realm.priority = 3;
+        realm.noOfMonthsInPastForBottomDashboard = 6;
+        realm.noOfMonthsInFutureForBottomDashboard = 18;
+        realm.noOfMonthsInPastForTopDashboard = 0;
+        realm.noOfMonthsInFutureForTopDashboard = 18;
         this.setState({
             realm
         },
@@ -162,7 +202,11 @@ export default class RealmTicketComponent extends Component {
                             minMosMaxGaurdrail: this.state.realm.minMosMaxGaurdrail,
                             maxMosMaxGaurdrail: this.state.realm.maxMosMaxGaurdrail,
                             notes: this.state.realm.notes,
-                            priority: 3
+                            priority: 3,
+                            noOfMonthsInFutureForTopDashboard: this.state.noOfMonthsInFutureForTopDashboard,
+                            noOfMonthsInPastForBottomDashboard: this.state.noOfMonthsInPastForBottomDashboard,
+                            noOfMonthsInPastForTopDashboard: this.state.noOfMonthsInPastForTopDashboard,
+                            noOfMonthsInFutureForBottomDashboard: this.state.noOfMonthsInFutureForBottomDashboard
                         }}
                         validationSchema={validationSchema}
                         onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -202,6 +246,13 @@ export default class RealmTicketComponent extends Component {
                                         switch (error.response ? error.response.status : "") {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
                                                 break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
@@ -318,6 +369,62 @@ export default class RealmTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.maxMosMaxGaurdrail}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInPastForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInPastForTopDashboard"
+                                            id="noOfMonthsInPastForTopDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInPastForTopDashboard && this.state.realm.noOfMonthsInPastForTopDashboard != ''}
+                                            invalid={touched.noOfMonthsInPastForTopDashboard && !!errors.noOfMonthsInPastForTopDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInPastForTopDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInPastForTopDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInFutureForTopDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInFutureForTopDashboard"
+                                            id="noOfMonthsInFutureForTopDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInFutureForTopDashboard && this.state.realm.noOfMonthsInFutureForTopDashboard != ''}
+                                            invalid={touched.noOfMonthsInFutureForTopDashboard && !!errors.noOfMonthsInFutureForTopDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInFutureForTopDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInFutureForTopDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInPastForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInPastForBottomDashboard"
+                                            id="noOfMonthsInPastForBottomDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInPastForBottomDashboard && this.state.realm.noOfMonthsInPastForBottomDashboard != ''}
+                                            invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInPastForBottomDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInPastForBottomDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label>{i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard')}<span class="red Reqasterisk">*</span></Label>
+                                        <Input type="number"
+                                            name="noOfMonthsInFutureForBottomDashboard"
+                                            id="noOfMonthsInFutureForBottomDashboard"
+                                            bsSize="sm"
+                                            valid={!errors.noOfMonthsInFutureForBottomDashboard && this.state.realm.noOfMonthsInFutureForBottomDashboard != ''}
+                                            invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
+                                            onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                            onBlur={handleBlur}
+                                            value={this.state.realm.noOfMonthsInFutureForBottomDashboard}
+                                            required />
+                                        <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup>
                                         <Label for="notes">{i18n.t('static.common.notes')}</Label>
                                         <Input type="textarea" name="notes" id="notes"
                                             bsSize="sm"
@@ -331,7 +438,7 @@ export default class RealmTicketComponent extends Component {
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
                                     </FormGroup>
                                     <FormGroup>
-                                        <TicketPriorityComponent priority={this.state.realm.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
+                                        <TicketPriorityComponent priority={this.state.realm.priority} updatePriority={this.updatePriority} errors={errors} touched={touched} />
                                     </FormGroup>
                                     <ModalFooter className="pb-0 pr-0">
                                         <Button type="button" size="md" color="info" className="mr-1 pr-3 pl-3" onClick={this.props.toggleMaster}><i className="fa fa-angle-double-left "></i>  {i18n.t('static.common.back')}</Button>

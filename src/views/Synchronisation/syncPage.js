@@ -32,7 +32,7 @@ import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
 import getProblemDesc from '../../CommonComponent/getProblemDesc';
 import getSuggestion from '../../CommonComponent/getSuggestion';
-import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED, NO_REVIEW_NEEDED_VERSION_STATUS } from '../../Constants.js';
+import { ACTUAL_CONSUMPTION_MODIFIED, ADJUSTMENT_MODIFIED, API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, FINAL_VERSION_TYPE, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_MODIFIED, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, OPEN_PROBLEM_STATUS_ID, PENDING_APPROVAL_VERSION_STATUS, PROBLEM_STATUS_IN_COMPLIANCE, SECRET_KEY, SHIPMENT_MODIFIED, NO_REVIEW_NEEDED_VERSION_STATUS, CANCELLED_SHIPMENT_STATUS } from '../../Constants.js';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -80,7 +80,8 @@ export default class syncPage extends Component {
       conflictsCountConsumption: 0,
       conflictsCountInventory: 0,
       conflictsCountShipment: 0,
-      conflictsCountQPL: 0
+      conflictsCountQPL: 0,
+      programModified:0
     }
     this.toggle = this.toggle.bind(this);
     this.getDataForCompare = this.getDataForCompare.bind(this);
@@ -1330,7 +1331,8 @@ export default class syncPage extends Component {
               label: myResult[i].programCode + "~v" + myResult[i].version,
               value: myResult[i].id,
               version: myResult[i].version,
-              programId: myResult[i].programId
+              programId: myResult[i].programId,
+              programModified: myResult[i].programModified
             }
             proList.push(programJson)
           }
@@ -1393,6 +1395,13 @@ export default class syncPage extends Component {
                 switch (error.response ? error.response.status : "") {
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
                     break;
                   case 403:
                     this.props.history.push(`/accessDenied`)
@@ -1461,6 +1470,10 @@ export default class syncPage extends Component {
     var programId = value != "" && value != undefined ? value.value : 0;
     var programVersion = (this.state.programList).filter(c => c.value == programId)[0].version;
     var singleProgramId = (this.state.programList).filter(c => c.value == programId)[0].programId;
+    var programModified=(this.state.programList).filter(c => c.value == programId)[0].programModified;
+    this.setState({
+      programModified:programModified
+    })
     if (programId != 0) {
       localStorage.setItem("sesProgramId", programId);
       ProgramService.getLastModifiedDateForProgram(singleProgramId, programVersion).then(response1 => {
@@ -1488,6 +1501,9 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
+              console.log("Last modified Date Test@123",lastModifiedDate);
+              console.log("Last sync Date Test@123",moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss"));
+              console.log("Condition Test@123",moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss"));
               if (lastModifiedDate != undefined && lastModifiedDate != null && lastModifiedDate != "" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
                 this.props.history.push(`/syncProgram`)
@@ -1508,6 +1524,13 @@ export default class syncPage extends Component {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`)
@@ -2680,6 +2703,13 @@ export default class syncPage extends Component {
                     case 401:
                       this.props.history.push(`/login/static.message.sessionExpired`)
                       break;
+                    case 409:
+                      this.setState({
+                        message: i18n.t('static.common.accessDenied'),
+                        loading: false,
+                        color: "#BA0C2F",
+                      });
+                      break;
                     case 403:
                       this.props.history.push(`/accessDenied`)
                       break;
@@ -2729,6 +2759,13 @@ export default class syncPage extends Component {
               switch (error.response ? error.response.status : "") {
                 case 401:
                   this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
                   break;
                 case 403:
                   this.props.history.push(`/accessDenied`)
@@ -3416,9 +3453,9 @@ export default class syncPage extends Component {
           elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 2, true);
         }
-        this.setState({
-          isChanged: true
-        })
+        // this.setState({
+        //   isChanged: true
+        // })
       } else if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -3426,9 +3463,9 @@ export default class syncPage extends Component {
           elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
           elInstance.setValueFromCoords(20, c, 3, true);
         }
-        this.setState({
-          isChanged: true
-        })
+        // this.setState({
+        //   isChanged: true
+        // })
       } else if ((jsonData[c])[18] != "" && (jsonData[c])[17] != "" && (jsonData[c])[20] != 1) {
         var oldData = (jsonData[c])[17];
         var latestData = (jsonData[c])[18];
@@ -3437,9 +3474,9 @@ export default class syncPage extends Component {
           var col = ("K").concat(parseInt(c) + 1);
           elInstance.setStyle(col, "background-color", "transparent");
         } else {
-          this.setState({
-            isChanged: true
-          })
+          // this.setState({
+          //   isChanged: true
+          // })
           if ((jsonData[c])[19] != "" && oldData[10] == downloadedData[10]) {
             if (latestData[12] != PROBLEM_STATUS_IN_COMPLIANCE) {
               var col = ("K").concat(parseInt(c) + 1);
@@ -3779,7 +3816,7 @@ export default class syncPage extends Component {
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-4">
                                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                  {((this.state.isChanged.toString() == "true" && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  {(((this.state.isChanged.toString() == "true" || this.state.programModified==1) && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.checkUserACL([this.state.programId.programId.toString()],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                                   &nbsp;
                                 </FormGroup>
                               </div>
@@ -3961,7 +3998,7 @@ export default class syncPage extends Component {
       problemReportList = problemReportList.filter(c => c.planningUnitActive != false && c.regionActive != false);
       if (problemReportList.filter(c =>
         c.problemStatus.id == OPEN_PROBLEM_STATUS_ID
-      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+      ).length > 0 && document.getElementById("versionType").value == FINAL_VERSION_TYPE && !AuthenticationService.checkUserACL([this.state.programId.programId.toString()],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
         alert(i18n.t("static.commitVersion.cannotCommitWithOpenProblems"))
         this.setState({ loading: false });
       } else {
@@ -4114,6 +4151,13 @@ export default class syncPage extends Component {
                       switch (error.response ? error.response.status : "") {
                         case 401:
                           this.props.history.push(`/login/static.message.sessionExpired`)
+                          break;
+                        case 409:
+                          this.setState({
+                            message: i18n.t('static.common.accessDenied'),
+                            loading: false,
+                            color: "#BA0C2F",
+                          });
                           break;
                         case 403:
                           this.props.history.push(`/accessDenied`)
@@ -4277,7 +4321,6 @@ export default class syncPage extends Component {
           delete generalData.supplyPlan;
           delete generalData.planningUnitList;
           generalData.actionList = [];
-          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var planningUnitDataList = [];
           for (var pu = 0; pu < planningUnitList.length; pu++) {
             var planningUnitDataJson = {
@@ -4287,9 +4330,13 @@ export default class syncPage extends Component {
               batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
               supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
             }
+            if(generalData.dashboardData.topPuData[planningUnitList[pu].id]!=undefined){
+              generalData.dashboardData.topPuData[planningUnitList[pu].id].linkedShipmentsCount=planningUnitDataJson.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length;
+            }
             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
           }
+          var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
           var programDataJson = {
             generalData: generalEncryptedData,
             planningUnitDataList: planningUnitDataList

@@ -476,7 +476,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[0].text),
       doc.internal.pageSize.width / 8 + 20,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -485,7 +485,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[1].text),
       doc.internal.pageSize.width / 8 + 120,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -494,7 +494,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[2].text),
       doc.internal.pageSize.width / 8 + 220,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -503,7 +503,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[3].text),
       doc.internal.pageSize.width / 8 + 320,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -512,7 +512,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
     doc.text(
       i18n.t(legendcolor[4].text),
       doc.internal.pageSize.width / 8 + 420,
-      y+10,
+      y + 10,
       {
         align: "left",
       }
@@ -715,6 +715,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
               break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
+              break;
             case 403:
               this.props.history.push(`/accessDenied`);
               break;
@@ -817,8 +824,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
       () => {
         if (countryIds.length != 0) {
           let newCountryList = [...new Set(countryIds)];
-          DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(
-            PROGRAM_TYPE_SUPPLY_PLAN,
+          DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(
             newCountryList
           )
             .then((response) => {
@@ -868,6 +874,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                     this.props.history.push(
                       `/login/static.message.sessionExpired`
                     );
+                    break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
                     break;
                   case 403:
                     this.props.history.push(`/accessDenied`);
@@ -989,6 +1002,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
             switch (error.response ? error.response.status : "") {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`);
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
                 break;
               case 403:
                 this.props.history.push(`/accessDenied`);
@@ -1200,6 +1220,13 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -1514,7 +1541,7 @@ class StockStatusAccrossPlanningUnitGlobalView extends Component {
                               <thead>
                                 <tr>
                                   <th
-                                    className="text-center Firstcolum1SSAPUGV" 
+                                    className="text-center Firstcolum1SSAPUGV"
                                   >
                                     {i18n.t("static.planningunit.planningunit")}
                                   </th>

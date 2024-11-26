@@ -1729,6 +1729,13 @@ export default class BuildTree extends Component {
                         });
                     } else {
                         switch (error.response ? error.response.status : "") {
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -3674,7 +3681,7 @@ export default class BuildTree extends Component {
                             var nodeId = nodeDataMomList[i].nodeId;
                             var nodeDataMomListForNode = nodeDataMomList[i].nodeDataMomList;
                             var node = items.filter(n => n.id == nodeId)[0];
-                            (node.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataMomList = nodeDataMomListForNode;
+                            (node.payload.nodeDataMap[nodeDataMomList[i].scenarioId])[0].nodeDataMomList = nodeDataMomListForNode;
                             var findNodeIndex = items.findIndex(n => n.id == nodeId);
                             items[findNodeIndex] = node;
                         } catch (e) {
@@ -4377,7 +4384,7 @@ export default class BuildTree extends Component {
                     disabledMaskOnEdition: true,
                     textEditor: true,
                     mask: '#,##0.00%', decimal: '.',
-                    readOnly: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') ? false : true,
+                    readOnly: AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') ? false : true,
                 },
                 {
                     title: i18n.t('static.tree.%of') + " " + getLabelText(this.state.currentItemConfig.parentItem.payload.label, this.state.lang),
@@ -5959,7 +5966,7 @@ export default class BuildTree extends Component {
      */
     selected = function (instance, cell, x, y, value, e) {
         if (e.buttons == 1) {
-            if (y == 8 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
+            if (y == 8 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) {
                 var elInstance = this.state.modelingEl;
                 var rowData = elInstance.getRowData(x);
                 if (rowData[4] != "" && rowData[4] != null && rowData[1] != "" && rowData[1] != null && rowData[2] != "" && rowData[2] != null) {
@@ -7539,7 +7546,8 @@ export default class BuildTree extends Component {
                     oldId: itemConfig.id,
                     newId: nodeId,
                     oldSortOrder: itemConfig.sortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             } else {
@@ -7550,7 +7558,7 @@ export default class BuildTree extends Component {
                 child.id = nodeId;
                 child.parent = parentNode.newId;
                 child.payload.parentNodeId = child.parent;
-                child.level = child.parent.level + 1;
+                child.level = parentNode.newLevel + 1;
                 if (child.payload.nodeType.id == 6) {
                     child.payload.downwardAggregationList = [];
                 }
@@ -7565,7 +7573,8 @@ export default class BuildTree extends Component {
                     oldId: oldId,
                     newId: nodeId,
                     oldSortOrder: oldSortOrder,
-                    newSortOrder: child.sortOrder
+                    newSortOrder: child.sortOrder,
+                    newLevel: child.level
                 }
                 childListArr.push(json);
             }
@@ -8697,7 +8706,6 @@ export default class BuildTree extends Component {
      * Calls multiple function on component mount
      */
     componentDidMount() {
-        console.log("Test@123 inside componentDidMount")
         // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
@@ -11952,7 +11960,7 @@ export default class BuildTree extends Component {
                                                 })
                                             }
                                         }}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                        {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
+                                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2) && (this.state.isChanged == true) && <><Button type="button" size="md" color="warning" className="float-right mr-1" onClick={() => { this.resetNodeData(); this.nodeTypeChange(this.state.currentItemConfig.context.payload.nodeType.id) }} ><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>
                                             <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
                                     </FormGroup>
                                 </Form>
@@ -12014,8 +12022,8 @@ export default class BuildTree extends Component {
                                 </div>
                             }
                             <div>{this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 6 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.showMomData()}><i className={this.state.viewMonthlyData ? "fa fa-eye" : "fa fa-eye-slash"} style={{ color: '#fff' }}></i> {this.state.viewMonthlyData ? i18n.t('static.tree.viewMonthlyData') : i18n.t('static.tree.hideMonthlyData')}</Button>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
-                                {this.state.aggregationNode && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && (this.state.isChanged == true) && <><Button color="success" size="md" className="float-right mr-1" type="button" onClick={(e) => this.formSubmitLoader(e)}> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button></>}
+                                {this.state.aggregationNode && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                             </div>
                         </div>
                         {this.state.showCalculatorFields &&
@@ -12321,7 +12329,7 @@ export default class BuildTree extends Component {
                                     </FormGroup>
                                 </div>
                                 {this.state.currentItemConfig.context.payload.nodeType.id == 6 && <div className="pt-lg-2 pl-lg-0"><i>
-                                    {i18n.t('static.tree.tableDisplays') + " " + i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a sum of <b>{this.state.currentItemConfig.context.payload.downwardAggregationList.length} nodes</b></i>
+                                    {i18n.t('static.tree.tableDisplays') + " " + i18n.t('static.tree.forNode')} <b>{this.state.currentItemConfig.context.payload.label != null ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) : ''}</b> as a sum of <b>{this.state.currentItemConfig.context.payload.downwardAggregationList!=undefined?this.state.currentItemConfig.context.payload.downwardAggregationList.length:0} nodes</b></i>
                                 </div>}
                                 <div className="col-md-12 pl-lg-0 pr-lg-0 modelingTransferTable" style={{ display: 'inline-block' }}>
                                     <div id="momJexcel" className="RowClickable consumptionDataEntryTable" style={{ display: this.state.momJexcelLoader ? "none" : "block" }}>
@@ -12340,7 +12348,7 @@ export default class BuildTree extends Component {
                                     {this.state.currentItemConfig.context.payload.nodeType.id != 6 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={() => {
                                         this.setState({ showMomData: false, isChanged: false, viewMonthlyData: true })
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>}
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 6 &&
+                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 && this.state.currentItemConfig.context.payload.nodeType.id != 6 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -12439,7 +12447,7 @@ export default class BuildTree extends Component {
                                             })
                                         }
                                     }}><i className="fa fa-times"></i> {'Close'}</Button>
-                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                         <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateMomDataInDataSet(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
                                 </div>
                             </fieldset>
@@ -13160,7 +13168,7 @@ export default class BuildTree extends Component {
                 },
                 onButtonsRender: (({ context: itemConfig }) => {
                     return <>
-                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="2" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -13182,7 +13190,7 @@ export default class BuildTree extends Component {
                         }
                         {itemConfig.parent != null &&
                             <>
-                                {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                     <button key="3" type="button" className="StyledButton TreeIconStyle TreeIconStyleDeletePaddingTop" style={{ background: 'none' }}
                                         onClick={(event) => {
                                             event.stopPropagation();
@@ -13204,7 +13212,7 @@ export default class BuildTree extends Component {
                                         <i class="fa fa-trash-o" aria-hidden="true" style={{ fontSize: '16px' }}></i>
                                     </button>}
                             </>}
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="4" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     event.stopPropagation();
@@ -13213,7 +13221,7 @@ export default class BuildTree extends Component {
                                 <i class="fa fa-sitemap" aria-hidden="true"></i>
                             </button>
                         }
-                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                        {!this.state.hideActionButtons && parseInt(itemConfig.payload.nodeType.id) != 5 && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                             <button key="1" type="button" className="StyledButton TreeIconStyle TreeIconStylePlusPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     this.setState({
@@ -13416,7 +13424,7 @@ export default class BuildTree extends Component {
                                 }}>
                                 <i class="fa fa-plus" aria-hidden="true"></i>
                             </button>}
-                        {!this.state.hideActionButtons && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') &&
+                        {!this.state.hideActionButtons && AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') &&
                             <button key="5" type="button" className="StyledButton TreeIconStyle TreeIconStyleCopyPaddingTop" style={{ background: 'none' }}
                                 onClick={(event) => {
                                     var items = this.state.items;
@@ -13571,7 +13579,7 @@ export default class BuildTree extends Component {
                                                                 <option value="">{i18n.t('static.common.select')}</option>
                                                                 {scenarios}
                                                             </Input>
-                                                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
+                                                            {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 &&
                                                                 <InputGroupAddon addonType="append" onClick={this.toggleDropdown}>
                                                                     <InputGroupText className='SettingIcon'>
                                                                         <ButtonDropdown isOpen={this.state.dropdownOpen[0]} toggle={() => { this.toggleDeropdownSetting(0); }}>
@@ -13741,14 +13749,13 @@ export default class BuildTree extends Component {
                                                                     </FormGroup>
                                                                 </FormGroup>
                                                                 <FormGroup className="col-md-3 pt-lg-4">
-                                                                    {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
+                                                                    {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.isTreeDataChanged && <Button type="submit" size="md" color="success" className="submitBtn float-right mr-1"> <i className="fa fa-check"></i>{i18n.t('static.common.update')}</Button>}
                                                                 </FormGroup>
                                                             </Row>
                                                         </Form>
                                                     )} />
                                         </div>
-                                        <div className="row ml-lg-1 pb-lg-2">
-                                            <b className='text-blackD'>{i18n.t('static.tree.editIn')} {<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
+                                        <div className="row ml-lg-1 pb-lg-2"><b className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
                                             <FormGroup>
                                                 <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>

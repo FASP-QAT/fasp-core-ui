@@ -58,7 +58,8 @@ class AddprogramPlanningUnit extends Component {
             tempSortOrder: '',
             sortOrderLoading: true,
             dropdownList: [],
-            active:1
+            active: 1,
+            hasAccess:false,
         }
         this.submitForm = this.submitForm.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
@@ -90,7 +91,7 @@ class AddprogramPlanningUnit extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     let myReasponse = response.data.sort((a, b) => {
@@ -122,6 +123,13 @@ class AddprogramPlanningUnit extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -170,15 +178,16 @@ class AddprogramPlanningUnit extends Component {
         var programId = document.getElementById("programId").value;
         this.setState({
             programId: programId,
+            hasAccess:AuthenticationService.checkUserACL([programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
         },
             () => {
                 this.buildJexcel();
             })
     }
-    setStatus(event){
+    setStatus(event) {
         this.setState({
-            active:event.target.value
-        },()=>{
+            active: event.target.value
+        }, () => {
             this.buildJexcel();
         })
     }
@@ -285,7 +294,7 @@ class AddprogramPlanningUnit extends Component {
                                                     data[22] = indexVar;//to identify if new row added
                                                     if((this.state.active==0 && myReasponse[j].active.toString()=="false") || (this.state.active==1 && myReasponse[j].active.toString()=="true") || (this.state.active==-1)){
                                                         productDataArr.push(data);
-                                                    }else{
+                                                    } else {
                                                         productDataArr2.push(data);
                                                     }
                                                     indexVar = indexVar + 1;
@@ -331,7 +340,8 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: productCategoryListNew,
                                                         width: 150,
-                                                        required: true
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.dashboard.product'),
@@ -359,7 +369,8 @@ class AddprogramPlanningUnit extends Component {
                                                         },
                                                         filter: this.dropdownFilter,
                                                         width: 150,
-                                                        required: true
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.conversion.ConversionFactorFUPU'),
@@ -372,8 +383,9 @@ class AddprogramPlanningUnit extends Component {
                                                         type: 'dropdown',
                                                         source: [{ id: 1, name: i18n.t('static.report.mos') }, { id: 2, name: i18n.t('static.report.qty') }],
                                                         tooltip: i18n.t("static.programPU.planByTooltip"),
-                                                        width:120,
-                                                        required: true
+                                                        width: 120,
+                                                        required: true,
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.reorderFrequency'),
@@ -387,7 +399,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.minMonthOfStock'),
@@ -395,7 +408,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip")
+                                                        tooltip: i18n.t("static.programPU.minMonthsOfStockTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.minQuantity'),
@@ -403,7 +417,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.minQtyTooltip")
+                                                        tooltip: i18n.t("static.programPU.minQtyTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.monthfutureamc'),
@@ -417,7 +432,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.monthpastamc'),
@@ -431,7 +447,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -446,7 +463,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_DECIMAL_LEAD_TIME,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.product.distributionLeadTime'),
@@ -454,7 +472,8 @@ class AddprogramPlanningUnit extends Component {
                                                         textEditor: true,
                                                         mask: '#,##',
                                                         disabledMaskOnEdition: true,
-                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip")
+                                                        tooltip: i18n.t("static.programPU.distributionLeadTimeTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.report.shelfLife'),
@@ -469,7 +488,8 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.pu.forecastErrorThresholdPercentage'),
@@ -484,7 +504,8 @@ class AddprogramPlanningUnit extends Component {
                                                             ex: JEXCEL_INTEGER_REGEX,
                                                             text: i18n.t('static.message.invalidnumber')
                                                         },
-                                                        tooltip:i18n.t("static.programPlanningUnit.forecastErrorTooltip")
+                                                        tooltip: i18n.t("static.programPlanningUnit.forecastErrorTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.procurementAgentPlanningUnit.catalogPrice'),
@@ -498,13 +519,15 @@ class AddprogramPlanningUnit extends Component {
                                                         regex: {
                                                             ex: JEXCEL_DECIMAL_CATELOG_PRICE,
                                                             text: i18n.t('static.message.invalidnumber')
-                                                        }
+                                                        },
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: i18n.t('static.program.notes'),
                                                         type: 'text',
                                                         width: 200,
-                                                        tooltip: i18n.t("static.pu.puNotesTooltip")
+                                                        tooltip: i18n.t("static.pu.puNotesTooltip"),
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: 'Id',
@@ -513,7 +536,8 @@ class AddprogramPlanningUnit extends Component {
                                                     },
                                                     {
                                                         title: i18n.t('static.common.active'),
-                                                        type: 'checkbox'
+                                                        type: 'checkbox',
+                                                        readonly: !AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT')
                                                     },
                                                     {
                                                         title: 'Changed Flag',
@@ -543,6 +567,7 @@ class AddprogramPlanningUnit extends Component {
                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                     var elInstance = el;
                                                     var rowData = elInstance.getRowData(y);
+                                                    if(this.state.hasAccess){
                                                     var programPlanningUnitId = rowData[15];
                                                     if (programPlanningUnitId == 0) {
                                                         var cell1 = elInstance.getCell(`B${parseInt(y) + 1}`)
@@ -570,24 +595,26 @@ class AddprogramPlanningUnit extends Component {
                                                         var cell1 = elInstance.getCell(`F${parseInt(y) + 1}`)
                                                         cell1.classList.add('readonly');
                                                     }
-                                                    var colArr=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X']
+                                                }
+                                                    var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X']
                                                     if (rowData[16].toString() == "true") {
                                                         for (var c = 0; c < colArr.length; c++) {
-                                                            try{
-                                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                                            cell.classList.remove('shipmentEntryDoNotInclude');
-                                                            }catch(err){}
+                                                            try {
+                                                                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                                                cell.classList.remove('shipmentEntryDoNotInclude');
+                                                            } catch (err) { }
                                                         }
                                                     } else {
                                                         for (var c = 0; c < colArr.length; c++) {
-                                                            try{
-                                                            var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                                                            cell.classList.add('shipmentEntryDoNotInclude');
-                                                            }catch(err){}
+                                                            try {
+                                                                var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                                                                cell.classList.add('shipmentEntryDoNotInclude');
+                                                            } catch (err) { }
                                                         }
                                                     }
-
-                                                },
+                                                
+                                                }.bind(this),
+                                                editable: AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT'),
                                                 onsearch: function (el) {
                                                 },
                                                 onfilter: function (el) {
@@ -736,7 +763,7 @@ class AddprogramPlanningUnit extends Component {
                                                         }
                                                         if (x) {
                                                         }
-                                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')) {
+                                                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES').includes(programId)) {
                                                             let cordsValue = `${this.el.getValueFromCoords(1, y)}`;
                                                             if (obj.options.allowInsertRow == true) {
                                                                 if (cordsValue.length != 0) {
@@ -761,7 +788,7 @@ class AddprogramPlanningUnit extends Component {
                                             if (productDataArr.length == 0) {
                                                 this.el.getCell(("B").concat(parseInt(0) + 1)).classList.add('typing-' + this.state.lang);
                                             }
-                                            this.setState({ mapPlanningUnitEl: elVar, loading: false,productDataArr2:productDataArr2 });
+                                            this.setState({ mapPlanningUnitEl: elVar, loading: false, productDataArr2: productDataArr2 });
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode, loading: false, color: '#BA0C2F'
@@ -778,6 +805,13 @@ class AddprogramPlanningUnit extends Component {
                                                 switch (error.response ? error.response.status : "") {
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 409:
+                                                        this.setState({
+                                                            message: i18n.t('static.common.accessDenied'),
+                                                            loading: false,
+                                                            color: "#BA0C2F",
+                                                        });
                                                         break;
                                                     case 403:
                                                         this.props.history.push(`/accessDenied`)
@@ -825,6 +859,13 @@ class AddprogramPlanningUnit extends Component {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
                                             break;
@@ -870,6 +911,13 @@ class AddprogramPlanningUnit extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1397,6 +1445,15 @@ class AddprogramPlanningUnit extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    },()=>{
+                                        hideSecondComponent();
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -1545,8 +1602,8 @@ class AddprogramPlanningUnit extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 style={{ color: this.state.color }} id="div2">{this.state.message}</h5>
                 {/* <div style={{ flexBasis: 'auto' }}> */}
-                    <Card>
-                        <CardBody className="pb-lg-5 pt-lg-1">
+                <Card>
+                    <CardBody className="pb-lg-5 pt-lg-1">
                         <Col md="12 pl-0">
                             {this.state.programId != "" && this.state.programId != null && this.state.programId != undefined && this.state.programId != 0 && <img className='float-right mr-1' style={{ height: '25px', width: '25px', cursor: 'Pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             <div className='row'>
@@ -1587,37 +1644,37 @@ class AddprogramPlanningUnit extends Component {
                                         </InputGroup>
                                     </div>
                                 </FormGroup>
+                            </div>
+                        </Col>
+                        <div>
+                            <h4 className="red">{this.props.message}</h4>
+                            <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
+                            <div className="consumptionDataEntryTable FreezePlaningUnitColumn1 CursorDrag FreezePlaningUnitColumn1New" style={{ display: this.state.loading ? "none" : "block" }}>
+                                <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
                                 </div>
-                                </Col>
-                            <div>
-                                <h4 className="red">{this.props.message}</h4>
-                                <h5>{i18n.t('static.updatePU.noteText1')} <a href="/#/programProduct/addCountrySpecificPrice">{i18n.t('static.countrySpecificPrices.countrySpecificPrices')}</a> {i18n.t("static.updatePU.noteText2")}</h5>
-                                <div className="consumptionDataEntryTable FreezePlaningUnitColumn1 CursorDrag FreezePlaningUnitColumn1New" style={{ display: this.state.loading ? "none" : "block" }}>
-                                    <div id="mapPlanningUnit" className="RowheightForaddprogaddRow TableWidth100">
-                                    </div>
-                                </div>
-                                <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                    <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                        <div class="align-items-center">
-                                            <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
-                                            <div class="spinner-border blue ml-4" role="status">
-                                            </div>
+                            </div>
+                            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                                    <div class="align-items-center">
+                                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                                        <div class="spinner-border blue ml-4" role="status">
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </CardBody>
-                        <CardFooter>
-                            <FormGroup>
-                                {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
-                                &nbsp;
-                                {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                &nbsp;
-                                {this.state.isValidData && this.state.programId != 0 && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
-                                &nbsp;
-                            </FormGroup>
-                        </CardFooter>
-                    </Card>
+                        </div>
+                    </CardBody>
+                    <CardFooter>
+                        <FormGroup>
+                            {this.state.isValidData && this.state.programId != 0 && <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
+                            &nbsp;
+                            {this.state.isChanged && this.state.isValidData && this.state.programId != 0 && <Button type="submit" size="md" color="success" onClick={this.submitForm} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                            &nbsp;
+                            {this.state.isValidData && this.state.programId != 0 && AuthenticationService.checkUserACL([this.state.programId.toString()],'ROLE_BF_ADD_PROGRAM_PRODUCT') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addRowInJexcel}> <i className="fa fa-plus"></i>{i18n.t('static.common.addRow')}</Button>}
+                            &nbsp;
+                        </FormGroup>
+                    </CardFooter>
+                </Card>
                 {/* </div> */}
             </div>
         );

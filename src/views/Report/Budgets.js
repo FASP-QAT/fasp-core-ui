@@ -146,6 +146,13 @@ class Budgets extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -434,6 +441,13 @@ class Budgets extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -488,7 +502,7 @@ class Budgets extends Component {
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
@@ -523,6 +537,13 @@ class Budgets extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -946,6 +967,7 @@ class Budgets extends Component {
                                 </FormGroup>
                             </div>
                         </Col>
+                        {this.state.programValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.selBudget.length==0 && <h5 className='red'>{i18n.t('static.budgetReport.noBudgetNote')}</h5>}
                         <div style={{ display: this.state.loading ? "none" : "block" }}>
                             <Col md="12 pl-0">
                                 <div className="row">

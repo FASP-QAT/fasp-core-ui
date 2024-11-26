@@ -9,7 +9,7 @@ import {
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
+import { CANCELLED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
@@ -541,7 +541,7 @@ export default class SyncProgram extends Component {
             var checkboxesChecked = [];
             for (var i = 0; i < programIds.length; i++) {
                 var program = this.state.programList.filter(c => c.programId == programIds[i])[0];
-                checkboxesChecked.push({ programId: program.programId, versionId: -1,'cutOffDate':program.cutOffDate!=undefined && program.cutOffDate!=null && program.cutOffDate!=""?program.cutOffDate:"" })
+                checkboxesChecked.push({ programId: program.programId, versionId: -1, 'cutOffDate': program.cutOffDate != undefined && program.cutOffDate != null && program.cutOffDate != "" ? program.cutOffDate : "" })
             }
             ProgramService.getAllProgramData(checkboxesChecked)
                 .then(response => {
@@ -563,7 +563,6 @@ export default class SyncProgram extends Component {
                         delete generalData.supplyPlan;
                         delete generalData.planningUnitList;
                         generalData.actionList = [];
-                        var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
                         var planningUnitDataList = [];
                         for (var pu = 0; pu < planningUnitList.length; pu++) {
                             var planningUnitDataJson = {
@@ -573,9 +572,13 @@ export default class SyncProgram extends Component {
                                 batchInfoList: batchInfoList.filter(c => c.planningUnitId == planningUnitList[pu].id),
                                 supplyPlan: supplyPlan.filter(c => c.planningUnitId == planningUnitList[pu].id)
                             }
+                            if(generalData.dashboardData.topPuData[planningUnitList[pu].id]!=undefined){
+                                generalData.dashboardData.topPuData[planningUnitList[pu].id].linkedShipmentsCount=planningUnitDataJson.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length;
+                            }
                             var encryptedPlanningUnitDataText = CryptoJS.AES.encrypt(JSON.stringify(planningUnitDataJson), SECRET_KEY).toString();
                             planningUnitDataList.push({ planningUnitId: planningUnitList[pu].id, planningUnitData: encryptedPlanningUnitDataText })
                         }
+                        var generalEncryptedData = CryptoJS.AES.encrypt(JSON.stringify(generalData), SECRET_KEY).toString();
                         var programDataJson = {
                             generalData: generalEncryptedData,
                             planningUnitDataList: planningUnitDataList
@@ -681,7 +684,7 @@ export default class SyncProgram extends Component {
                                                         addressedCount: 0,
                                                         programModified: 0,
                                                         readonly: 0,
-                                                        cutOffDate:json[r].cutOffDate
+                                                        cutOffDate: json[r].cutOffDate
                                                     };
                                                     programIds.push(json[r].programId + "_v" + json[r].currentVersion.versionId + "_uId_" + userId);
                                                     programQPLDetailsOs.put(programQPLDetailsJson);

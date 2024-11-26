@@ -97,7 +97,7 @@ class EditSupplyPlanStatus extends Component {
         var currentDate = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
         const monthDifference = moment(new Date(date)).diff(new Date(currentDate), 'months', true) + MONTHS_IN_PAST_FOR_SUPPLY_PLAN;
         this.state = {
-            isDarkMode:false,
+            isDarkMode: false,
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
             startDate: JSON.parse(localStorage.getItem("sesStartDate")),
@@ -156,7 +156,7 @@ class EditSupplyPlanStatus extends Component {
             jsonArrForGraph: [],
             display: 'none',
             lang: localStorage.getItem('lang'),
-            theme:localStorage.getItem('theme'),
+            theme: localStorage.getItem('theme'),
             unmetDemand: [],
             expiredStock: [],
             versionId: "",
@@ -688,8 +688,8 @@ class EditSupplyPlanStatus extends Component {
             });
             this.formSubmit(monthCountConsumption);
         } else if (supplyPlanType == 'SuggestedShipments') {
-            var roleList = AuthenticationService.getLoggedInUserRole();
-            if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+            // var roleList = AuthenticationService.getLoggedInUserRole();
+            if (AuthenticationService.checkUserACLBasedOnRoleId([this.props.match.params.programId.toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
             } else {
                 var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                 this.setState({
@@ -914,8 +914,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -961,10 +961,8 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
-                        console.log("Error 1 Test@123",error)
                     });
                 }).catch(error => {
-                    console.log("Error 2 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1034,8 +1032,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -1087,10 +1085,8 @@ class EditSupplyPlanStatus extends Component {
                             }
                         })
                     }).catch(error => {
-                        console.log("Error 3 Test@123",error)
                     });
                 }).catch(error => {
-                    console.log("Error 4 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1166,8 +1162,8 @@ class EditSupplyPlanStatus extends Component {
                                 multiplier: c.multiplier,
                                 active: c.active,
                                 label: c.label,
-                                conversionNumber:c.conversionNumber,
-                                conversionMethod:c.conversionMethod
+                                conversionNumber: c.conversionNumber,
+                                conversionMethod: c.conversionMethod
                             })
                         })
                         this.setState({
@@ -1287,25 +1283,18 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             })
                                         }).catch(error => {
-                                            console.log("Error 5 Test@123",error)
                                          });
                                     }).catch(error => {
-                                        console.log("Error 6 Test@123",error)
                                      });
                                 }).catch(error => { 
-                                    console.log("Error 7 Test@123",error)
                                 });
                             }).catch(error => {
-                                console.log("Error 8 Test@123",error)
                              });
                         }).catch(error => {
-                            console.log("Error 9 Test@123",error)
                          });
                     }).catch(error => { 
-                        console.log("Error 10 Test@123",error)
                     });
                 }).catch(error => { 
-                    console.log("Error 11 Test@123",error)
                 });
             }.bind(this)
         }.bind(this)
@@ -1697,7 +1686,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                paColor1 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -1732,7 +1721,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                paColor2 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -1767,7 +1756,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                paColor3 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -1802,7 +1791,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                paColor4 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -1837,7 +1826,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                paColor5 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -2050,17 +2039,17 @@ class EditSupplyPlanStatus extends Component {
                                 }
                                 var consumptionListForRegion = (programJson.consumptionList).filter(c => (c.consumptionDate >= m[n].startDate && c.consumptionDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
                                 var inventoryListForRegion = (programJson.inventoryList).filter(c => (c.inventoryDate >= m[n].startDate && c.inventoryDate <= m[n].endDate) && c.planningUnit.id == planningUnitId && c.active == true);
-                                var adjustmentCount=0;
-                                var adjustmentTotal=0;
-                                inventoryListForRegion.map(item=>{
+                                var adjustmentCount = 0;
+                                var adjustmentTotal = 0;
+                                inventoryListForRegion.map(item => {
                                     if (item.adjustmentQty != undefined && item.adjustmentQty != null && item.adjustmentQty !== "") {
-                                        adjustmentCount+=1;
-                                        adjustmentTotal+=Number((Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
+                                        adjustmentCount += 1;
+                                        adjustmentTotal += Number((Math.round(item.adjustmentQty) * parseFloat(item.multiplier)))
                                     }
                                 })
-                                adjustmentTotalData.push(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):"");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null ? roundARU(Number(jsonList[0].nationalAdjustment),1) : "");
-                                inventoryTotalData.push((adjustmentCount>0 || (jsonList[0].regionCountForStock > 0&& roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment!="" && jsonList[0].nationalAdjustment!=null))?roundARU(Number(adjustmentCount>0?roundARU(Number(adjustmentTotal), 1):0)+Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment),1) : 0),1):"");
+                                adjustmentTotalData.push(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : "");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
+                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -2119,7 +2108,7 @@ class EditSupplyPlanStatus extends Component {
                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[r].id, "adjustmentsQty": adjustmentsQtyForRegion, "actualQty": actualQtyForRegion, "month": m[n] })
                                 }
                                 consumptionArrayForRegion.push({ "regionId": -1, "qty": roundARU(consumptionTotalForRegion, 1), "actualFlag": true, "month": m[n] })
-                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0)-(jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand!=null ? jsonList[0].unmetDemand : 0);
+                                var projectedInventoryForRegion = jsonList[0].closingBalance - (jsonList[0].nationalAdjustment != "" ? jsonList[0].nationalAdjustment : 0) - (jsonList[0].unmetDemand != "" && jsonList[0].unmetDemand != null ? jsonList[0].unmetDemand : 0);
                                 if (regionsReportingActualInventory.length != totalNoOfRegions) {
                                     totalActualQtyForRegion = i18n.t('static.supplyPlan.notAllRegionsHaveActualStock');
                                 }
@@ -2210,8 +2199,8 @@ class EditSupplyPlanStatus extends Component {
                             plannedShipmentsTotalData: plannedShipmentsTotalData,
                             onholdShipmentsTotalData: onholdShipmentsTotalData,
                             inventoryTotalData: inventoryTotalData,
-                            adjustmentTotalData:adjustmentTotalData,
-                            nationalAdjustmentTotalData:nationalAdjustmentTotalData,
+                            adjustmentTotalData: adjustmentTotalData,
+                            nationalAdjustmentTotalData: nationalAdjustmentTotalData,
                             monthsOfStockArray: monthsOfStockArray,
                             maxQtyArray: maxQtyArray,
                             amcTotalData: amcTotalData,
@@ -2276,7 +2265,6 @@ class EditSupplyPlanStatus extends Component {
         })
             .catch(
                 error => {
-                    console.log("Error 12 Test@123",error)
                     this.setState({
                         planningUnits: [],
                     })
@@ -2289,6 +2277,13 @@ class EditSupplyPlanStatus extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -2365,19 +2360,19 @@ class EditSupplyPlanStatus extends Component {
      */
     componentDidMount() {
         // Detect initial theme
-const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-this.setState({ isDarkMode });
+        const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+        this.setState({ isDarkMode });
 
-// Listening for theme changes
-const observer = new MutationObserver(() => {
-    const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
-    this.setState({ isDarkMode: updatedDarkMode });
-});
+        // Listening for theme changes
+        const observer = new MutationObserver(() => {
+            const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
+            this.setState({ isDarkMode: updatedDarkMode });
+        });
 
-observer.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ['data-theme'],
-});
+        observer.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ['data-theme'],
+        });
 
         this.setState({
             loading: true
@@ -2396,12 +2391,13 @@ observer.observe(document.documentElement, {
                     }
                     regionList[i] = regionJson
                 }
-                var hasRole = false;
-                AuthenticationService.getLoggedInUserRole().map(c => {
-                    if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-                        hasRole = true;
-                    }
-                });
+                let hasRole = AuthenticationService.checkUserACLBasedOnRoleId([program.programId.toString()], "ROLE_SUPPLY_PLAN_REVIEWER");
+
+                // AuthenticationService.getLoggedInUserRole().map(c => {
+                //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+                //         hasRole = true;
+                //     }
+                // });
                 var programQPLDetails = [];
                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
@@ -2415,7 +2411,7 @@ observer.observe(document.documentElement, {
                     addressedCount: 0,
                     programModified: 0,
                     readonly: 0,
-                    cutOffDate:""
+                    cutOffDate: ""
                 })
                 this.setState({
                     program,
@@ -2452,7 +2448,6 @@ observer.observe(document.documentElement, {
             })
             .catch(
                 error => {
-                    console.log("Error 13 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -2462,6 +2457,13 @@ observer.observe(document.documentElement, {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -2497,7 +2499,6 @@ observer.observe(document.documentElement, {
         })
             .catch(
                 error => {
-                    console.log("Error 14 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -2510,6 +2511,13 @@ observer.observe(document.documentElement, {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -2555,7 +2563,6 @@ observer.observe(document.documentElement, {
         })
             .catch(
                 error => {
-                    console.log("Error 15 Test@123",error)
                     this.setState({
                         statuses: [],
                     })
@@ -2568,6 +2575,13 @@ observer.observe(document.documentElement, {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -2728,23 +2742,23 @@ observer.observe(document.documentElement, {
             return '?'
         }
         const darkModeColors = [
-            '#d4bbff', 
-            '#757575' ,   
+            '#d4bbff',
+            '#757575',
         ];
-        
+
         const lightModeColors = [
             '#002F6C',  // Color 1 
-            '#cfcdc9',   
+            '#cfcdc9',
         ];
         const { isDarkMode } = this.state;
-    const colors = isDarkMode ? darkModeColors : lightModeColors;
-    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
-    const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+        const colors = isDarkMode ? darkModeColors : lightModeColors;
+        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
         const chartOptions = {
             title: {
                 display: true,
                 text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [{
@@ -2752,12 +2766,12 @@ observer.observe(document.documentElement, {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
@@ -2765,7 +2779,7 @@ observer.observe(document.documentElement, {
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     position: 'left',
                 },
@@ -2774,29 +2788,29 @@ observer.observe(document.documentElement, {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     position: 'right',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -2829,7 +2843,7 @@ observer.observe(document.documentElement, {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -2837,7 +2851,7 @@ observer.observe(document.documentElement, {
             title: {
                 display: true,
                 text: this.state.planningUnitName != "" && this.state.planningUnitName != undefined && this.state.planningUnitName != null ? (this.state.program.programCode + "~v" + this.state.program.currentVersion.versionId + " - " + this.state.planningUnitName) : entityname,
-                fontColor:fontColor
+                fontColor: fontColor
             },
             scales: {
                 yAxes: [{
@@ -2845,12 +2859,12 @@ observer.observe(document.documentElement, {
                     scaleLabel: {
                         display: true,
                         labelString: i18n.t('static.shipment.qty'),
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     stacked: false,
                     ticks: {
                         beginAtZero: true,
-                        fontColor:fontColor,
+                        fontColor: fontColor,
                         callback: function (value) {
                             return value.toLocaleString();
                         }
@@ -2858,19 +2872,19 @@ observer.observe(document.documentElement, {
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     },
                     position: 'left',
                 }
                 ],
                 xAxes: [{
                     ticks: {
-                        fontColor:fontColor
+                        fontColor: fontColor
                     },
                     gridLines: {
                         drawBorder: true, lineWidth: 0,
                         color: gridLineColor,
-                        zeroLineColor: gridLineColor 
+                        zeroLineColor: gridLineColor
                     }
                 }]
             },
@@ -2903,7 +2917,7 @@ observer.observe(document.documentElement, {
                 position: 'bottom',
                 labels: {
                     usePointStyle: true,
-                    fontColor:fontColor
+                    fontColor: fontColor
                 }
             }
         }
@@ -3500,46 +3514,46 @@ observer.observe(document.documentElement, {
                                                             }
                                                         </tr>
                                                         <tr>
-                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
-                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
-                                            </td>
-                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
-                                            {
-                                                this.state.inventoryTotalData.map((item1, count) => {
-                                                    if (item1 != null) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                    } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                    }
-                                                })
-                                            }
-                                        </tr>
-                                        <tr className="totalAdjustments">
-                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
-                                            {
-                                                this.state.adjustmentTotalData.map((item1, count) => {
-                                                    if (item1 != null) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                    } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                    }
-                                                })
-                                            }
-                                        </tr>
-                                        <tr className="totalAdjustments">
-                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
-                                            {
-                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
-                                                    if (item1 != null) {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
-                                                    } else {
-                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
-                                                    }
-                                                })
-                                            }
-                                        </tr>
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1" onClick={() => this.toggleAccordionTotalAdjustments()}>
+                                                                {this.state.showTotalAdjustment ? <i className="fa fa-minus-square-o supplyPlanIcon" ></i> : <i className="fa fa-plus-square-o supplyPlanIcon" ></i>}
+                                                            </td>
+                                                            <td align="left" className="sticky-col first-col clone"><b>+/- {i18n.t('static.supplyPlan.totalAdjustment')}</b></td>
+                                                            {
+                                                                this.state.inventoryTotalData.map((item1, count) => {
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+                                                        <tr className="totalAdjustments">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.manualAdjustment')}</td>
+                                                            {
+                                                                this.state.adjustmentTotalData.map((item1, count) => {
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
+                                                        <tr className="totalAdjustments">
+                                                            <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
+                                                            <td align="left" className="sticky-col first-col clone">&emsp;&emsp;{i18n.t('static.supplyPlan.nationalAdjustment')}</td>
+                                                            {
+                                                                this.state.nationalAdjustmentTotalData.map((item1, count) => {
+                                                                    if (item1 != null) {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>)
+                                                                    } else {
+                                                                        return (<td align="right" className="hoverTd" onClick={() => this.toggleLarge('Adjustments', '', '', '', '', '', '', count)}>{""}</td>)
+                                                                    }
+                                                                })
+                                                            }
+                                                        </tr>
                                                         <tr>
                                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                                             <td align="left" className="sticky-col first-col clone"><b>- {i18n.t('static.supplyplan.exipredStock')}</b></td>
@@ -4357,7 +4371,6 @@ observer.observe(document.documentElement, {
             })
             .catch(
                 error => {
-                    console.log("Error 16 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4369,6 +4382,13 @@ observer.observe(document.documentElement, {
                                 break;
                             case 500:
                             case 401:
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                             case 406:
                             case 412:
@@ -4461,7 +4481,6 @@ observer.observe(document.documentElement, {
             })
             .catch(
                 error => {
-                    console.log("Error 17 Test@123",error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -4473,6 +4492,13 @@ observer.observe(document.documentElement, {
                                 break;
                             case 500:
                             case 401:
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                             case 406:
                             case 412:
@@ -4515,86 +4541,86 @@ observer.observe(document.documentElement, {
             loadingForNotes: true
         })
         ProgramService.getNotesHistory(programId)
-        .then(response => {
-            var data = response.data;
-            const listArray = [];
-            const grouped = data.reduce((acc, item) => {
-                acc[item.versionId] = acc[item.versionId] || [];
-                acc[item.versionId].push(item);
-                return acc;
-            }, {});
-        
-            Object.values(grouped).forEach(entries => {
-                const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
-                if (pendingEntries.length) {
-                    listArray.push(pendingEntries[0]);
-                    if (pendingEntries.length > 1) {
-                        listArray.push(pendingEntries[pendingEntries.length - 1]);
+            .then(response => {
+                var data = response.data;
+                const listArray = [];
+                const grouped = data.reduce((acc, item) => {
+                    acc[item.versionId] = acc[item.versionId] || [];
+                    acc[item.versionId].push(item);
+                    return acc;
+                }, {});
+
+                Object.values(grouped).forEach(entries => {
+                    const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+                    if (pendingEntries.length) {
+                        listArray.push(pendingEntries[0]);
+                        if (pendingEntries.length > 1) {
+                            listArray.push(pendingEntries[pendingEntries.length - 1]);
+                        }
                     }
+                    listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+                });
+                if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+                    jexcel.destroy(document.getElementById("notesTransTable"), true);
                 }
-                listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
-            });
-            if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
-                jexcel.destroy(document.getElementById("notesTransTable"), true);
-            }
-            var json=[];
-            for (var sb = listArray.length-1; sb >= 0; sb--) {
-                var data = [];
-                data[0] = listArray[sb].versionId; 
-                data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
-                data[2] = listArray[sb].versionType.id==1?"":getLabelText(listArray[sb].versionStatus.label, this.state.lang);
-                data[3] = listArray[sb].notes;
-                data[4] = listArray[sb].lastModifiedBy.username;
-                data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");                
-                json.push(data);
-            }
-        var options = {
-            data: json,
-            columnDrag: false,
-            columns: [
-                { title: i18n.t('static.report.version'), type: 'text', width: 50 },
-                { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
-                { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
-                { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
-                {
-                    title: i18n.t("static.common.lastModifiedBy"),
-                    type: "text",
-                  },
-                  {
-                    title: i18n.t("static.common.lastModifiedDate"),
-                    type: "calendar",
-                    options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
-                  },
-            ],
-            editable: false,
-            onload: function (instance, cell) {
-                jExcelLoadedFunction(instance,1);
-            }.bind(this),
-            pagination: localStorage.getItem("sesRecordCount"),
-            search: true,
-            columnSorting: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: false,
-            // onselection: this.selected,
-            oneditionend: this.onedit,
-            copyCompatibility: true,
-            allowExport: false,
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            position: "top",
-            filters: true,
-            license: JEXCEL_PRO_KEY,
-            contextMenu: function (obj, x, y, e) {
-                return false;
-            }.bind(this),
-        };
-        var elVar = jexcel(document.getElementById("notesTransTable"), options);
-        this.el = elVar;
-        this.setState({ notesTransTableEl: elVar,loadingForNotes:false });
-            
-        }).catch(
-            error => {
+                var json = [];
+                for (var sb = listArray.length - 1; sb >= 0; sb--) {
+                    var data = [];
+                    data[0] = listArray[sb].versionId;
+                    data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+                    data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+                    data[3] = listArray[sb].notes;
+                    data[4] = listArray[sb].lastModifiedBy.username;
+                    data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+                    json.push(data);
+                }
+                var options = {
+                    data: json,
+                    columnDrag: false,
+                    columns: [
+                        { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+                        { title: i18n.t('static.report.versiontype'), type: 'text', width: 80 },
+                        { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 80 },
+                        { title: i18n.t('static.program.notes'), type: 'text', width: 250 },
+                        {
+                            title: i18n.t("static.common.lastModifiedBy"),
+                            type: "text",
+                        },
+                        {
+                            title: i18n.t("static.common.lastModifiedDate"),
+                            type: "calendar",
+                            options: { isTime: 1, format: "DD-Mon-YY HH24:MI" },
+                        },
+                    ],
+                    editable: false,
+                    onload: function (instance, cell) {
+                        jExcelLoadedFunction(instance, 1);
+                    }.bind(this),
+                    pagination: localStorage.getItem("sesRecordCount"),
+                    search: true,
+                    columnSorting: true,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: false,
+                    // onselection: this.selected,
+                    oneditionend: this.onedit,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    paginationOptions: JEXCEL_PAGINATION_OPTION,
+                    position: "top",
+                    filters: true,
+                    license: JEXCEL_PRO_KEY,
+                    contextMenu: function (obj, x, y, e) {
+                        return false;
+                    }.bind(this),
+                };
+                var elVar = jexcel(document.getElementById("notesTransTable"), options);
+                this.el = elVar;
+                this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+
+            }).catch(
+                error => {
                     this.setState({
                         loadingForNotes: false
                     })
@@ -4607,6 +4633,13 @@ observer.observe(document.documentElement, {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -5293,12 +5326,12 @@ observer.observe(document.documentElement, {
                                                         ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
                                                             <tr>
                                                                 <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.openingBalance,1)} /></td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.consumptionQty,1)} /></td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentQty,1)} /></td>
-                                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.shipmentQty,1)} />}</td>
-                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(0 - Number(item.unallocatedQty),1)} /></td>
-                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></td>}
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.openingBalance, 1)} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.consumptionQty, 1)} /></td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentQty, 1)} /></td>
+                                                                <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.shipmentQty, 1)} />}</td>
+                                                                <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(0 - Number(item.unallocatedQty), 1)} /></td>
+                                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></td>}
                                                             </tr>
                                                         ))
                                                     }
@@ -5306,7 +5339,7 @@ observer.observe(document.documentElement, {
                                                 <tfoot>
                                                     <tr>
                                                         <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry")}</b></td>
-                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty,1)} /></b></td>
+                                                        <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty, 1)} /></b></td>
                                                     </tr>
                                                 </tfoot>
                                             </Table>
@@ -5427,7 +5460,6 @@ observer.observe(document.documentElement, {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
                                                                     } catch (err) { 
-                                                                        console.log("Error 19 Test@123",err)
                                                                     }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",
@@ -5447,7 +5479,6 @@ observer.observe(document.documentElement, {
                                                             })
                                                             .catch(
                                                                 error => {
-                                                                    console.log("Error 20 Test@123",error)
                                                                     if (error.message === "Network Error") {
                                                                         this.setState({
                                                                             // message: 'static.unkownError',
@@ -5462,6 +5493,13 @@ observer.observe(document.documentElement, {
 
                                                                             case 401:
                                                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                                                                break;
+                                                                            case 409:
+                                                                                this.setState({
+                                                                                    message: i18n.t('static.common.accessDenied'),
+                                                                                    loading: false,
+                                                                                    color: "#BA0C2F",
+                                                                                });
                                                                                 break;
                                                                             case 403:
                                                                                 this.props.history.push(`/accessDenied`)
@@ -5501,7 +5539,7 @@ observer.observe(document.documentElement, {
                                                             );
                                                     } else {
                                                         this.setState({
-                                                            loading:false
+                                                            loading: false
                                                         })
                                                         document.getElementById("submitButton").disabled = false;
                                                         alert("To approve a supply plan – Reviewed must all be checked.");
@@ -5534,7 +5572,6 @@ observer.observe(document.documentElement, {
                                         })
                                         .catch(
                                             error => {
-                                                console.log("Error 21 Test@123",error)
                                                 if (error.message === "Network Error") {
                                                     this.setState({
                                                         // message: 'static.unkownError',
@@ -5546,6 +5583,13 @@ observer.observe(document.documentElement, {
 
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                                            break;
+                                                        case 409:
+                                                            this.setState({
+                                                                message: i18n.t('static.common.accessDenied'),
+                                                                loading: false,
+                                                                color: "#BA0C2F",
+                                                            });
                                                             break;
                                                         case 403:
                                                             this.props.history.push(`/accessDenied`)
@@ -5602,7 +5646,7 @@ observer.observe(document.documentElement, {
                                                 <Col md="12 pl-0">
                                                     <div className="row">
                                                         <FormGroup className="col-md-3">
-                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span  style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"("+i18n.t('static.problemContext.viewTrans')+")"}</small></span>
+                                                            <Label htmlFor="versionNotes">{i18n.t('static.program.programDiscription')}</Label>&nbsp;<span style={{ cursor: 'pointer' }} onClick={() => { this.toggleLargeNotes() }}><small className="supplyplanformulas">{"(" + i18n.t('static.problemContext.viewTrans') + ")"}</small></span>
                                                             <Input
                                                                 type="textarea"
                                                                 maxLength={65535}
@@ -5708,22 +5752,22 @@ observer.observe(document.documentElement, {
         let start = moment(createdDate).format("YYYY-MM");
         let end = moment(expiryDate).format("YYYY-MM");
         let months = new Set(ledgerForBatch.map(e => e.transDate));
-        var batchInventortList=this.state.generalProgramJson.batchInventoryList;
-        if(batchInventortList==undefined){
-            batchInventortList=[]
+        var batchInventortList = this.state.generalProgramJson.batchInventoryList;
+        if (batchInventortList == undefined) {
+            batchInventortList = []
         }
         while (moment(start).format("YYYY-MM") <= moment(end).format("YYYY-MM")) {
             let month = moment(start).startOf('month').format("YYYY-MM-DD");
             var ledgerData;
             if (months.has(month)) {
-                var ledgerData=ledgerForBatch.find(e => e.transDate === month);
-                ledgerData.actualInventoryBatch=batchInventortList.filter(c=>moment(c.inventoryDate).format("YYYY-MM")==moment(month).format("YYYY-MM")).flatMap(c=>c.batchList).length>0?true:false;
-                var projectedBalance=Number(ledgerData.openingBalance)-Number(ledgerData.consumptionQty)+Number(ledgerData.adjustmentQty)+Number(ledgerData.shipmentQty)-Number(ledgerData.unallocatedQty);
-                if(projectedBalance!=Number(ledgerData.qty)){
-                    ledgerData.unallocatedQty=Number(ledgerData.unallocatedQty)-Number((Number(ledgerData.qty)-Number(projectedBalance)))
+                var ledgerData = ledgerForBatch.find(e => e.transDate === month);
+                ledgerData.actualInventoryBatch = batchInventortList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(month).format("YYYY-MM")).flatMap(c => c.batchList).length > 0 ? true : false;
+                var projectedBalance = Number(ledgerData.openingBalance) - Number(ledgerData.consumptionQty) + Number(ledgerData.adjustmentQty) + Number(ledgerData.shipmentQty) - Number(ledgerData.unallocatedQty);
+                if (projectedBalance != Number(ledgerData.qty)) {
+                    ledgerData.unallocatedQty = Number(ledgerData.unallocatedQty) - Number((Number(ledgerData.qty) - Number(projectedBalance)))
                 }
             } else {
-                ledgerData = { transDate: month, openingBalance: 0, consumptionQty: null, adjustmentQty: null, shipmentQty: null, unallocatedQty: null, qty: 0, stockQty: 0, actualInventoryBatch: false, expiryDate:expiryDate, expiredQty:0 }
+                ledgerData = { transDate: month, openingBalance: 0, consumptionQty: null, adjustmentQty: null, shipmentQty: null, unallocatedQty: null, qty: 0, stockQty: 0, actualInventoryBatch: false, expiryDate: expiryDate, expiredQty: 0 }
             }
             finalLedger.push(ledgerData);
             start = moment(start).add(1, 'month').format('YYYY-MM')

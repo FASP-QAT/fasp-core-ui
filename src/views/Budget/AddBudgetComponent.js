@@ -158,8 +158,8 @@ class AddBudgetComponent extends Component {
         },
             () => {
                 let programIds = this.state.budget.programs.map((ele) =>
-            Number(ele.id)
-        );
+                    Number(ele.id)
+                );
                 DropdownService.getFundingSourceForProgramsDropdownList(programIds).then(response => {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -183,7 +183,14 @@ class AddBudgetComponent extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -210,7 +217,7 @@ class AddBudgetComponent extends Component {
                         }
                     }
                 );
-             });
+            });
     }
     /**
      * Show budget date range picker
@@ -293,7 +300,7 @@ class AddBudgetComponent extends Component {
         // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch Program list
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
@@ -322,6 +329,7 @@ class AddBudgetComponent extends Component {
                 }
             }).catch(
                 error => {
+                    console.log("erroror==>1", error)
                     if (error.message === "Network Error") {
                         this.setState({
                             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -331,6 +339,13 @@ class AddBudgetComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -360,7 +375,7 @@ class AddBudgetComponent extends Component {
                 }
             );
         //Fetch currency list
-        CurrencyService.getCurrencyList().then(response => {
+        CurrencyService.getCurrencyListActive().then(response => {
             if (response.status == 200) {
                 var listArray = response.data;
                 listArray.sort((a, b) => {
@@ -376,6 +391,8 @@ class AddBudgetComponent extends Component {
             }
         }).catch(
             error => {
+                console.log("erroror==>2", error)
+
                 if (error.message === "Network Error") {
                     this.setState({
                         message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -385,6 +402,13 @@ class AddBudgetComponent extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -506,18 +530,24 @@ class AddBudgetComponent extends Component {
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
+                                                        case 409:
+                                                            this.setState({
+                                                                message: i18n.t('static.common.accessDenied'),
+                                                                loading: false,
+                                                                color: "#BA0C2F",
+                                                            });
+                                                            break;
                                                         case 403:
                                                             this.props.history.push(`/accessDenied`)
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
                                                                 loading: false
                                                             });
                                                             break;
-                                                        case 409:
+                                                        case 406:
                                                             this.setState({
                                                                 message: i18n.t('static.budget.duplicateDisplayName'),
                                                                 loading: false

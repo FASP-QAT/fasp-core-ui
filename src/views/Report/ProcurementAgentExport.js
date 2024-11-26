@@ -128,7 +128,7 @@ class ProcurementAgentExport extends Component {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then((response) => {
           var proList = [];
           for (var i = 0; i < response.data.length; i++) {
@@ -172,6 +172,13 @@ class ProcurementAgentExport extends Component {
             switch (error.response ? error.response.status : "") {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`);
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
                 break;
               case 403:
                 this.props.history.push(`/accessDenied`);
@@ -343,6 +350,13 @@ class ProcurementAgentExport extends Component {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`);
                 break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
               case 403:
                 this.props.history.push(`/accessDenied`);
                 break;
@@ -462,8 +476,7 @@ class ProcurementAgentExport extends Component {
               versions: [],
             },
             () => {
-              DropdownService.getVersionListForProgram(
-                PROGRAM_TYPE_SUPPLY_PLAN,
+              DropdownService.getVersionListForSPProgram(
                 programId
               )
                 .then((response) => {
@@ -503,6 +516,13 @@ class ProcurementAgentExport extends Component {
                         this.props.history.push(
                           `/login/static.message.sessionExpired`
                         );
+                        break;
+                      case 409:
+                        this.setState({
+                          message: i18n.t('static.common.accessDenied'),
+                          loading: false,
+                          color: "#BA0C2F",
+                        });
                         break;
                       case 403:
                         this.props.history.push(`/accessDenied`);
@@ -598,7 +618,7 @@ class ProcurementAgentExport extends Component {
             var programData = databytes.toString(CryptoJS.enc.Utf8);
             var version = JSON.parse(programData).currentVersion;
             version.versionId = `${version.versionId} (Local)`;
-            version.cutOffDate = JSON.parse(programData).cutOffDate!=undefined && JSON.parse(programData).cutOffDate!=null && JSON.parse(programData).cutOffDate!=""?JSON.parse(programData).cutOffDate:""
+            version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
             verList.push(version);
           }
         }
@@ -671,12 +691,12 @@ class ProcurementAgentExport extends Component {
           );
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
-          var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
+          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
           var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
           var rangeValue = this.state.rangeValue;
           if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-              var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-              rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
+            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
           }
           this.setState({
             minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
@@ -783,6 +803,13 @@ class ProcurementAgentExport extends Component {
                       this.props.history.push(
                         `/login/static.message.sessionExpired`
                       );
+                      break;
+                    case 409:
+                      this.setState({
+                        message: i18n.t('static.common.accessDenied'),
+                        loading: false,
+                        color: "#BA0C2F",
+                      });
                       break;
                     case 403:
                       this.props.history.push(`/accessDenied`);
@@ -1866,6 +1893,13 @@ class ProcurementAgentExport extends Component {
                       `/login/static.message.sessionExpired`
                     );
                     break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
+                    break;
                   case 403:
                     this.props.history.push(`/accessDenied`);
                     break;
@@ -2073,7 +2107,7 @@ class ProcurementAgentExport extends Component {
                       var simpleFSObject = {
                         id: fundingSource[0].id,
                         label: fundingSource[0].label,
-                        code: fundingSource[0].code,                        
+                        code: fundingSource[0].code,
                       };
                     }
                     let json = {
@@ -2242,6 +2276,13 @@ class ProcurementAgentExport extends Component {
                     this.props.history.push(
                       `/login/static.message.sessionExpired`
                     );
+                    break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
                     break;
                   case 403:
                     this.props.history.push(`/accessDenied`);
@@ -2585,6 +2626,13 @@ class ProcurementAgentExport extends Component {
                       `/login/static.message.sessionExpired`
                     );
                     break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
+                    break;
                   case 403:
                     this.props.history.push(`/accessDenied`);
                     break;
@@ -2738,18 +2786,18 @@ class ProcurementAgentExport extends Component {
         },
         () => {
           // if (this.state.versionId.includes("Local")) {
-            var cutOffDateFromProgram=this.state.versions.filter(c=>c.versionId==this.state.versionId)[0].cutOffDate;
-            var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-            var rangeValue = this.state.rangeValue;
-            if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-                var cutOffEndDate=moment(cutOffDate).add(18,'months').startOf('month').format("YYYY-MM-DD");
-                rangeValue= { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: {year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M"))}};
-                // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
-            }
-            this.setState({
-              minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-              rangeValue: rangeValue
-            })
+          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
+          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+          var rangeValue = this.state.rangeValue;
+          if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
+            // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
+          }
+          this.setState({
+            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+            rangeValue: rangeValue
+          })
           // }
           localStorage.setItem("sesVersionIdReport", this.state.versionId);
           this.fetchData();
@@ -2777,7 +2825,7 @@ class ProcurementAgentExport extends Component {
     if (localStorage.getItem("sessionType") === 'Online') {
       //Fetch all funding source type list
       let programIds = [Number(document.getElementById("programId").value)];
-                DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
+      DropdownService.getFundingSourceTypeForProgramsDropdownList(programIds)
         .then(response => {
           if (response.status == 200) {
             var fundingSourceTypes = response.data;
@@ -2818,6 +2866,13 @@ class ProcurementAgentExport extends Component {
               switch (error.response ? error.response.status : "") {
                 case 401:
                   this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
                   break;
                 case 403:
                   this.props.history.push(`/accessDenied`)
@@ -2872,53 +2927,53 @@ class ProcurementAgentExport extends Component {
       };
       getRequest.onsuccess = function (event) {
         var transaction1 = db1.transaction(["fundingSource"], "readwrite");
-      var fundingSource = transaction1.objectStore("fundingSource");
-      var getRequest1 = fundingSource.getAll();
-      getRequest1.onerror = function (event) {
-      };
-      getRequest1.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result.filter(c => c.realm.id == realmId);
-        var fundingSourceList=getRequest1.result.filter(c=>[...new Set(c.programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value)));
-        const fundingSourceTypeIds = [...new Set(fundingSourceList.map(fs => fs.fundingSourceType.id))];
-        var userBytes = CryptoJS.AES.decrypt(
-          localStorage.getItem("curUser"),
-          SECRET_KEY
-        );
-        for (var i = 0; i < myResult.length; i++) {
-          if(fundingSourceTypeIds.includes(myResult[i].fundingSourceTypeId)){
-          var f = 0;
-          for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
-            if (
-              this.state.fundingSourceTypes[k].id ==
-              myResult[i].fundingSourceTypeId
-            ) {
-              f = 1;
+        var fundingSource = transaction1.objectStore("fundingSource");
+        var getRequest1 = fundingSource.getAll();
+        getRequest1.onerror = function (event) {
+        };
+        getRequest1.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result.filter(c => c.realm.id == realmId);
+          var fundingSourceList = getRequest1.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value)));
+          const fundingSourceTypeIds = [...new Set(fundingSourceList.map(fs => fs.fundingSourceType.id))];
+          var userBytes = CryptoJS.AES.decrypt(
+            localStorage.getItem("curUser"),
+            SECRET_KEY
+          );
+          for (var i = 0; i < myResult.length; i++) {
+            if (fundingSourceTypeIds.includes(myResult[i].fundingSourceTypeId)) {
+              var f = 0;
+              for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
+                if (
+                  this.state.fundingSourceTypes[k].id ==
+                  myResult[i].fundingSourceTypeId
+                ) {
+                  f = 1;
+                }
+              }
+              // var fstData = myResult[i];
+              if (f == 0) {
+                var json = {
+                  id: myResult[i].fundingSourceTypeId,
+                  code: myResult[i].fundingSourceTypeCode,
+                  label: myResult[i].label
+                }
+                fstList.push(json);
+              }
             }
           }
-          // var fstData = myResult[i];
-          if (f == 0) {
-            var json={
-              id:myResult[i].fundingSourceTypeId,
-              code:myResult[i].fundingSourceTypeCode,
-              label:myResult[i].label
-            }
-            fstList.push(json);
-          }
-        }
-        }
-        var lang = this.state.lang;
-        var fundingSourceTypesCombined = fstList.sort(function (a, b) {
-          a = a.code.toLowerCase();
-          b = b.code.toLowerCase();
-          return a < b ? -1 : a > b ? 1 : 0;
-        });
-        this.setState({
-          fundingSourceTypes: fundingSourceTypesCombined,
-          fundingSourceTypeValues: [],
-          fundingSourceTypeLabels: []
-        });
-      }.bind(this);
+          var lang = this.state.lang;
+          var fundingSourceTypesCombined = fstList.sort(function (a, b) {
+            a = a.code.toLowerCase();
+            b = b.code.toLowerCase();
+            return a < b ? -1 : a > b ? 1 : 0;
+          });
+          this.setState({
+            fundingSourceTypes: fundingSourceTypesCombined,
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: []
+          });
+        }.bind(this);
       }.bind(this);
     }.bind(this);
   };
@@ -2966,7 +3021,7 @@ class ProcurementAgentExport extends Component {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online') {
       let programIds = [Number(document.getElementById("programId").value)];
-                DropdownService.getFundingSourceForProgramsDropdownList(programIds)
+      DropdownService.getFundingSourceForProgramsDropdownList(programIds)
         .then((response) => {
           this.setState(
             {
@@ -3001,6 +3056,13 @@ class ProcurementAgentExport extends Component {
             switch (error.response ? error.response.status : "") {
               case 401:
                 this.props.history.push(`/login/static.message.sessionExpired`);
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
                 break;
               case 403:
                 this.props.history.push(`/accessDenied`);
@@ -3061,27 +3123,27 @@ class ProcurementAgentExport extends Component {
           SECRET_KEY
         );
         for (var i = 0; i < myResult.length; i++) {
-          if([...new Set(myResult[i].programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value))){
-          var f = 0;
-          for (var k = 0; k < this.state.fundingSources.length; k++) {
-            if (
-              this.state.fundingSources[k].id ==
-              myResult[i].fundingSourceId
-            ) {
-              f = 1;
+          if ([...new Set(myResult[i].programList.map(ele => ele.id))].includes(parseInt(document.getElementById("programId").value))) {
+            var f = 0;
+            for (var k = 0; k < this.state.fundingSources.length; k++) {
+              if (
+                this.state.fundingSources[k].id ==
+                myResult[i].fundingSourceId
+              ) {
+                f = 1;
+              }
+            }
+            // var programData = myResult[i];
+            if (f == 0) {
+              var json = {
+                id: myResult[i].fundingSourceId,
+                code: myResult[i].fundingSourceCode,
+                label: myResult[i].label,
+                fundingSourceType: myResult[i].fundingSourceType
+              }
+              proList.push(json);
             }
           }
-          // var programData = myResult[i];
-          if (f == 0) {
-            var json={
-              id:myResult[i].fundingSourceId,
-              code:myResult[i].fundingSourceCode,
-              label:myResult[i].label,
-              fundingSourceType:myResult[i].fundingSourceType
-            }
-            proList.push(json);
-          }
-        }
         }
         var lang = this.state.lang;
         var fundingSourcesCombined = proList.sort(function (a, b) {
@@ -3127,7 +3189,7 @@ class ProcurementAgentExport extends Component {
             {item.versionStatus.id == 2 && item.versionType.id == 2
               ? item.versionId + "*"
               : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate!=undefined && item.cutOffDate!=null && item.cutOffDate!=''?" ("+i18n.t("static.supplyPlan.start")+" "+moment(item.cutOffDate).format('MMM YYYY')+")":""}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
           </option>
         );
       }, this);

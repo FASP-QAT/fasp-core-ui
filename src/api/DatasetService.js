@@ -22,7 +22,7 @@ class DatasetService {
         });
     }
     getUsageTypeList() {
-        return axios.get(`${API_URL}/api/usageType`, {
+        return axios.get(`${API_URL}/api/master/usageType`, {
         });
     }
     addTreeTemplate(json) {
@@ -34,7 +34,7 @@ class DatasetService {
         });
     }
     saveDatasetData(json, comparedVersionId) {
-        return axios.put(`${API_URL}/api/datasetData/${comparedVersionId}`, json, {}
+        return axios.put(`${API_URL}/api/commit/datasetData/${comparedVersionId}`, json, {}
         );
     }
     getDatasetData(programId, versionId) {
