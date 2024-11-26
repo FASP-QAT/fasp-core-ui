@@ -65,6 +65,8 @@ export default class ProgramOnboarding extends Component {
                 airFreightPerc: '',
                 seaFreightPerc: '',
                 roadFreightPerc: '',
+                noOfMonthsInPastForBottomDashboard:'',
+                noOfMonthsInFutureForBottomDashboard:'',
                 draftToSubmittedLeadTime: '',
                 plannedToDraftLeadTime: '',
                 submittedToApprovedLeadTime: '',
@@ -176,6 +178,13 @@ export default class ProgramOnboarding extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -320,6 +329,13 @@ export default class ProgramOnboarding extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -502,6 +518,12 @@ export default class ProgramOnboarding extends Component {
         if (event.target.name == 'roadFreightPerc') {
             program.roadFreightPerc = event.target.value;
         }
+        if (event.target.name === "noOfMonthsInPastForBottomDashboard") {
+            program.noOfMonthsInPastForBottomDashboard = event.target.value
+        }
+        if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
+            program.noOfMonthsInFutureForBottomDashboard = event.target.value
+        }
         if (event.target.name == 'uniqueCode') {
             var dname = this.state.program.programCode;
             var email_array = dname.split('-');
@@ -578,6 +600,13 @@ export default class ProgramOnboarding extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)

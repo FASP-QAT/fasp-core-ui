@@ -117,6 +117,7 @@ class ListProcurementAgentComponent extends Component {
      */
     buildJExcel() {
         let procurementAgentList = this.state.selProcurementAgent;
+        console.log("hello",procurementAgentList)
         let procurementAgentArray = [];
         let count = 0;
         for (var j = 0; j < procurementAgentList.length; j++) {
@@ -134,6 +135,7 @@ class ListProcurementAgentComponent extends Component {
             data[10] = procurementAgentList[j].lastModifiedBy.username;
             data[11] = (procurementAgentList[j].lastModifiedDate ? moment(procurementAgentList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
             data[12] = procurementAgentList[j].active;
+            data[13] = procurementAgentList[j].programList.map(x => x.id.toString());;
             procurementAgentArray[count] = data;
             count++;
         }
@@ -202,6 +204,10 @@ class ListProcurementAgentComponent extends Component {
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
+                },
+                {
+                    title: 'ProgramIds',
+                    type: 'hidden',
                 },
             ],
             editable: false,
@@ -279,7 +285,7 @@ class ListProcurementAgentComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(13, x), 'ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
                     this.props.history.push({
                         pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
                     });
@@ -336,6 +342,13 @@ class ListProcurementAgentComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -395,6 +408,13 @@ class ListProcurementAgentComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)

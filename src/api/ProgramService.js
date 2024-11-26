@@ -66,7 +66,7 @@ class ProgramService {
         );
     }
     saveProgramData(json, comparedVersionId) {
-        return axios.put(`${API_URL}/api/programData/${comparedVersionId}`, json, {}
+        return axios.put(`${API_URL}/api/commit/programData/${comparedVersionId}`, json, {}
         );
     }
     programInitialize(json) {
@@ -74,7 +74,7 @@ class ProgramService {
         );
     }
     getVersionStatusList() {
-        return axios.get(`${API_URL}/api/versionStatus`, {}
+        return axios.get(`${API_URL}/api/master/versionStatus`, {}
         );
     }
     updateProgramStatus(json, reviewedProblemList) {
@@ -86,7 +86,7 @@ class ProgramService {
         );
     }
     getVersionTypeList() {
-        return axios.get(`${API_URL}/api/versionType`, {}
+        return axios.get(`${API_URL}/api/master/versionType`, {}
         );
     }
     checkNewerVersions(json) {
@@ -138,11 +138,11 @@ class ProgramService {
         );
     }
     getCommitRequests(json, requestStatus) {
-        return axios.post(`${API_URL}/api/getCommitRequest/${requestStatus}`, json, {}
+        return axios.post(`${API_URL}/api/commit/getCommitRequest/${requestStatus}`, json, {}
         );
     }
     sendNotificationAsync(commitRequestId) {
-        return axios.get(`${API_URL}/api/sendNotification/${commitRequestId}`, {}
+        return axios.get(`${API_URL}/api/commit/sendNotification/${commitRequestId}`, {}
         );
     }
     getPlanningUnitByProgramId(programId, json) {

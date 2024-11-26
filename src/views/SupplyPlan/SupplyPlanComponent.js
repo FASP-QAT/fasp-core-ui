@@ -4336,8 +4336,8 @@ export default class SupplyPlanComponent extends React.Component {
                     this.formSubmit(this.state.planningUnit, monthCountConsumption);
                 });
             } else if (supplyPlanType == 'SuggestedShipments') {
-                var roleList = AuthenticationService.getLoggedInUserRole();
-                if ((roleList.length == 1 && roleList[0].roleId == 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
+                // var roleList = AuthenticationService.getLoggedInUserRole();
+                if (AuthenticationService.checkUserACLBasedOnRoleId([(document.getElementById("programId").value).toString().split("_")[0].toString()], 'ROLE_GUEST_USER') || this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly) {
                 } else {
                     var monthCountShipments = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
                     this.setState({
@@ -6828,6 +6828,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             showPlanningUnitAndQtyList: showPlanningUnitAndQtyList
                                         })
                                         generalProgramJson.actionList = actionList;
+                                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         programRequest.result.programData.planningUnitDataList = planningUnitDataList;
                                         programRequest.result.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString();

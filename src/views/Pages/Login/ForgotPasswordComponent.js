@@ -101,6 +101,13 @@ class ForgotPasswordComponent extends Component {
                                                                         break;
                                                                     case 500:
                                                                     case 401:
+                                                                    case 409:
+                                                                        this.setState({
+                                                                            message: i18n.t('static.common.accessDenied'),
+                                                                            loading: false,
+                                                                            color: "#BA0C2F",
+                                                                        });
+                                                                        break;
                                                                     case 403:
                                                                     case 406:
                                                                     case 412:

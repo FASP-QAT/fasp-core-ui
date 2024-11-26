@@ -140,6 +140,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -416,6 +423,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -498,7 +512,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     programCode: programCode,
                     versionId: versionId,
                     rowSequence: i
-                };                
+                };
 
                 if (versionId != 0 && programId > 0 && forecastProgramId > 0) {
                     let selectedSupplyPlanProgram = this.state.programs.filter(c => c.programId == programId)[0];
@@ -552,6 +566,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                         switch (error.response ? error.response.status : "") {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
                                                 break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
@@ -695,7 +716,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
         //fetch version list here
         if (spProgramId != 0) {
 
-            await DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, spProgramId)
+            await DropdownService.getVersionListForSPProgram(spProgramId)
                 .then(response => {
                     let newSource = (response.data.filter(function (x, i, a) {
                         return a.indexOf(x) === i;
@@ -732,7 +753,14 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -850,7 +878,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     source: this.state.versionList,
                     filter: this.versionFilterNew,
                     required: true,
-                },                
+                },
             ],
             // onchangepage: this.onchangepage,
             pagination: false,
@@ -865,7 +893,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             allowDeleteRow: true,
             onchange: this.changed2,
             oninsertrow: function (el, x, y, source, value, id) {
-                el.setStyle(('B').concat(x+2), "height", "25px");
+                el.setStyle(('B').concat(x + 2), "height", "25px");
             },
             // onchange: this.handleChange.bind(this),//remove this function
             copyCompatibility: true,
@@ -947,7 +975,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
 
     callFilterData() {
         var validation = this.checkValidationTable1();
-        if (validation == true) {     
+        if (validation == true) {
             this.setState({
                 spProgramVersionChanged: true
             }, () => {
@@ -1004,11 +1032,11 @@ export default class StepOneImportMapPlanningUnits extends Component {
                         this.el2.setComments(col, "");
                     }
                 }
-            }           
+            }
 
         }
         return valid;
-    }    
+    }
 
     /**
      * Function to add a new row to the jexcel table.
@@ -1116,7 +1144,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             });
                         } else {
                             data[6] = ''
-                            data[7] = this.state.toggleDoNotImport? -1 : '';//change here for do not
+                            data[7] = this.state.toggleDoNotImport ? -1 : '';//change here for do not
                             data[8] = ''
                             data[9] = ''
                             data[10] = ''
@@ -1392,7 +1420,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 versions: [],
             }, () => {
-                DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                DropdownService.getVersionListForSPProgram(programId)
                     .then(response => {
                         this.setState({
                             versions: []
@@ -1417,6 +1445,13 @@ export default class StepOneImportMapPlanningUnits extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -1518,7 +1553,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var tempId = sel.options[sel.selectedIndex].text;
             let forecastProgramVersionId = tempId.split('~')[1];
             let selectedForecastProgram = this.state.datasetList.filter(c => c.programId == event.target.value && c.versionId == forecastProgramVersionId)[0]
-            
+
             let startDateSplit = selectedForecastProgram.forecastStartDate.split('-');
             let forecastStopDate = new Date('01-' + selectedForecastProgram.forecastStartDate);
             forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
@@ -1564,7 +1599,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             var tracerCategoryId = this.el.getValueFromCoords(5, y);
             if (value != -1 && isProgramHeader != 1) {
                 var col = ("H").concat(parseInt(y) + 1);
-                if(value == ""){
+                if (value == "") {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, "This field is required");
@@ -1590,7 +1625,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                             this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                             i = -1;
                             valid = false;
-                        } 
+                        }
                         // else {
                         //     this.el.setStyle(col, "background-color", "transparent");
                         //     this.el.setComments(col, "");
@@ -1638,18 +1673,18 @@ export default class StepOneImportMapPlanningUnits extends Component {
             let changedpapuList = [];
 
             for (var i = 0; i < tableJson.length; i++) {
-                var map1 = new Map(Object.entries(tableJson[i]));               
+                var map1 = new Map(Object.entries(tableJson[i]));
 
                 //skip program code headaer row
                 let isProgramCodeHeader = parseInt(map1.get("12"));
-                if(isProgramCodeHeader == 1) {
+                if (isProgramCodeHeader == 1) {
                     continue;
                 }
                 let json = {
                     supplyPlanPlanningUnitId: parseInt(map1.get("1")),
                     forecastPlanningUnitId: parseInt(map1.get("7")),
                     multiplier: map1.get("9").toString().replace(/,/g, ""),
-                    supplyPlanProgramId:parseInt(map1.get("13")),
+                    supplyPlanProgramId: parseInt(map1.get("13")),
                     supplyPlanVersionId: parseInt(map1.get("14")),
                     supplyPlanProgramCode: map1.get("15")
                 }
@@ -1700,7 +1735,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             this.setState({
                 filteredSupplyPlanProgramList: filteredSupplyPlanProgramList
             }, () => {
-                
+
             });
         } else {
             this.setState({

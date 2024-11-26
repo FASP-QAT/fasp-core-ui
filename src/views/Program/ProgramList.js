@@ -238,7 +238,7 @@ export default class ProgramList extends Component {
       filters: true,
       license: JEXCEL_PRO_KEY,
       contextMenu: function (obj, x, y, e) {
-        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_INTEGRATION_PROGRAM') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_MAP_PROCUREMENT_AGENT')) {
+        if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, y).toString()], 'ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
           var items = [];
           if (y != null) {
             if (obj.options.allowInsertRow == true) {
@@ -284,10 +284,7 @@ export default class ProgramList extends Component {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
       } else {
-        if (
-          AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes(
-            "ROLE_BF_EDIT_PROGRAM"
-          )
+        if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, x).toString()], 'ROLE_BF_EDIT_PROGRAM')
         ) {
           this.props.history.push({
             pathname: `/program/editProgram/${this.el.getValueFromCoords(
@@ -346,6 +343,13 @@ export default class ProgramList extends Component {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);
@@ -411,6 +415,13 @@ export default class ProgramList extends Component {
           switch (error.response ? error.response.status : "") {
             case 401:
               this.props.history.push(`/login/static.message.sessionExpired`);
+              break;
+            case 409:
+              this.setState({
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
               break;
             case 403:
               this.props.history.push(`/accessDenied`);

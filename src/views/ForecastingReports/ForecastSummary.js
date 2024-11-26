@@ -1351,7 +1351,7 @@ class ForecastSummary extends Component {
                                                 }
                                             }
                                         },
-                                        editable: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
+                                        editable: AuthenticationService.checkUserACL([this.state.programId.toString()], 'ROLE_BF_LIST_FORECAST_SUMMARY') ? true : false,
                                         onload: function (instance, cell, x, y, value) {
                                             jExcelLoadedFunctionOnlyHideRow(instance);
                                             var elInstance = instance.worksheets[0];
@@ -1637,6 +1637,13 @@ class ForecastSummary extends Component {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
                                         break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
                                         break;
@@ -1794,7 +1801,7 @@ class ForecastSummary extends Component {
     getPrograms() {
         if (isSiteOnline()) {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_DATASET)
+            DropdownService.getFCProgramBasedOnRealmId(realmId)
                 .then(response => {
                     let datasetList = response.data;
                     this.setState({
@@ -1815,7 +1822,14 @@ class ForecastSummary extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -2136,7 +2150,7 @@ class ForecastSummary extends Component {
             const program = this.state.programs.filter(c => c.id == programId)
             if (program.length == 1) {
                 if (isSiteOnline()) {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_DATASET, programId)
+                    DropdownService.getVersionListForFCProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -2160,6 +2174,13 @@ class ForecastSummary extends Component {
 
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)

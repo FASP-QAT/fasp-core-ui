@@ -366,6 +366,13 @@ class SupplyPlanVersionAndReview extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -406,10 +413,11 @@ class SupplyPlanVersionAndReview extends Component {
                     var elInstance = instance;
                     var rowData = elInstance.getRowData(x);
                     let programId = rowData[11];
+                    let versionId = rowData[1];
                     let versionStatusId = rowData[10];
                     let versionTypeId = rowData[9];
                     this.props.history.push({
-                        pathname: `/report/editStatus/${programId}/${this.el.getValueFromCoords(1, x)}`,
+                        pathname: `/report/editStatus/${programId}/${versionId}`,
                     });
                 }
             }
@@ -478,6 +486,13 @@ class SupplyPlanVersionAndReview extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -524,7 +539,7 @@ class SupplyPlanVersionAndReview extends Component {
                 } else {
                     newCountryList = [CountryIds];
                 }
-                DropdownService.getProgramWithFilterForMultipleRealmCountryForDropdown(PROGRAM_TYPE_SUPPLY_PLAN, newCountryList)
+                DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
                         var listArray = response.data;
                         listArray.sort((a, b) => {
@@ -553,6 +568,13 @@ class SupplyPlanVersionAndReview extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -616,6 +638,13 @@ class SupplyPlanVersionAndReview extends Component {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
                             break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
+                            break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
                             break;
@@ -678,6 +707,13 @@ class SupplyPlanVersionAndReview extends Component {
                     switch (error.response ? error.response.status : "") {
                         case 401:
                             this.props.history.push(`/login/static.message.sessionExpired`)
+                            break;
+                        case 409:
+                            this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                            });
                             break;
                         case 403:
                             this.props.history.push(`/accessDenied`)
@@ -762,6 +798,13 @@ class SupplyPlanVersionAndReview extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -961,8 +1004,8 @@ class SupplyPlanVersionAndReview extends Component {
         this.setState({
             versionTypeIdResetQPL: e,
             versionTypeIdResetQPLString: e.map(ele => ele.value).toString(),
-            versionStatusIdResetQPL:[],
-            versionStatusIdResetQPLString:""
+            versionStatusIdResetQPL: [],
+            versionStatusIdResetQPLString: ""
         }, () => {
             this.getProgramListForResetQPL()
         })
@@ -979,12 +1022,15 @@ class SupplyPlanVersionAndReview extends Component {
                 .then(response => {
                     var listArray = response.data;
                     var proList = [];
+                    var allowedProgramIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_RESET_BULK_QPL')
                     for (var i = 0; i < listArray.length; i++) {
+                        if(allowedProgramIds.includes(listArray[i].id)){
                         var productJson = {
                             label: listArray[i].code,
                             value: listArray[i].id
                         }
                         proList.push(productJson);
+                    }
                     }
                     this.setState({
                         programIdsList: proList.sort(function (a, b) {
@@ -1013,6 +1059,13 @@ class SupplyPlanVersionAndReview extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -1081,6 +1134,13 @@ class SupplyPlanVersionAndReview extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -1172,9 +1232,9 @@ class SupplyPlanVersionAndReview extends Component {
             }, this);
         var statusMultiselect = [];
         statuses.length > 0 && statuses.map((item, i) => {
-            if(this.state.versionTypeIdResetQPLString.split(",").includes(DRAFT_VERSION_TYPE.toString()) && item.id==PENDING_APPROVAL_VERSION_STATUS){
+            if (this.state.versionTypeIdResetQPLString.split(",").includes(DRAFT_VERSION_TYPE.toString()) && item.id == PENDING_APPROVAL_VERSION_STATUS) {
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
-            }else if(this.state.versionTypeIdResetQPLString.split(",").includes(FINAL_VERSION_TYPE.toString())){
+            } else if (this.state.versionTypeIdResetQPLString.split(",").includes(FINAL_VERSION_TYPE.toString())) {
                 statusMultiselect.push({ label: getLabelText(item.label, this.state.lang), value: item.id })
             }
         }, this);
@@ -1355,7 +1415,7 @@ class SupplyPlanVersionAndReview extends Component {
                             <FormGroup className="col-md-12">
                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.versiontype')}</Label>
                                 <div className="controls">
-                                <MultiSelect
+                                    <MultiSelect
                                         name="versionTypeIdResetQPL"
                                         id="versionTypeIdResetQPL"
                                         filterOptions={this.filterOptions}

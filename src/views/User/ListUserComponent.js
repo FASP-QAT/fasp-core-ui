@@ -3,23 +3,20 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import {
-    Button,
     Card,
     CardBody,
     Col,
     FormGroup, Input, InputGroup,
     Label,
-    
+
     Nav, NavItem, NavLink,
     TabContent, TabPane
 } from 'reactstrap';
-import * as Yup from 'yup';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE } from '../../Constants.js';
-import LanguageService from "../../api/LanguageService";
+import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
@@ -37,6 +34,7 @@ class ListUserComponent extends Component {
             userList: [],
             message: '',
             selUserList: [],
+            userAclList: [],
             lang: localStorage.getItem('lang'),
             loading: true,
             activeTab1: new Array(3).fill('1'),
@@ -84,7 +82,7 @@ class ListUserComponent extends Component {
         this.toggleModal = this.toggleModal.bind(this);
         this.buildJExcel1 = this.buildJExcel1.bind(this);
         this.buildJExcel2 = this.buildJExcel2.bind(this);
-        this.getUserDetails = this.getUserDetails.bind(this);
+        this.getAccessControls = this.getAccessControls.bind(this);
     }
     /**
      * This function is used to hide the messages that are there in div1 after 30 seconds
@@ -126,14 +124,14 @@ class ListUserComponent extends Component {
                 selUserList
             }, () => {
                 this.buildJExcel1();
-                this.buildJExcel2();
+                // this.buildJExcel2();
             });
         } else {
             this.setState({
                 selUserList: this.state.userList
             }, () => {
                 this.buildJExcel1();
-                this.buildJExcel2();
+                // this.buildJExcel2();
             });
         }
     }
@@ -201,6 +199,13 @@ class ListUserComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -248,8 +253,8 @@ class ListUserComponent extends Component {
                                     }
                                     var listArray = roleList;
                                     listArray.sort((a, b) => {
-                                        var itemLabelA = a.label.toUpperCase(); 
-                                        var itemLabelB = b.label.toUpperCase(); 
+                                        var itemLabelA = a.label.toUpperCase();
+                                        var itemLabelB = b.label.toUpperCase();
                                         return itemLabelA > itemLabelB ? 1 : -1;
                                     });
                                     this.setState({
@@ -260,7 +265,6 @@ class ListUserComponent extends Component {
                                     },
                                         () => {
                                             this.buildJExcel1();
-                                            this.buildJExcel2();
                                         })
                                 } else {
                                     this.setState({
@@ -281,6 +285,13 @@ class ListUserComponent extends Component {
                                         switch (error.response ? error.response.status : "") {
                                             case 401:
                                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                                break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
                                                 break;
                                             case 403:
                                                 this.props.history.push(`/accessDenied`)
@@ -331,6 +342,13 @@ class ListUserComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -358,6 +376,15 @@ class ListUserComponent extends Component {
                     }
                 }
             );
+        UserService.getRoleList()
+            .then((response) => {
+                console.log("Test@123", response.data)
+                if (response.status == 200) {
+                    this.setState({
+                        currentUserRole: response.data,
+                    });
+                }
+            })
     }
     /**
      * This function is used to toggle the tab for user list and user access control
@@ -372,7 +399,7 @@ class ListUserComponent extends Component {
         }, () => {
             if (tab == 1) {
             } else if (tab == 2) {
-                this.getUserDetails();
+                this.getAccessControls();
             }
         });
     }
@@ -384,30 +411,33 @@ class ListUserComponent extends Component {
         return (
             <>
                 <TabPane tabId="1" className='pb-lg-0'>
-                                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                                                <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        <div id="tableDiv1" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                     </CardBody>
-                                                        </TabPane>
+                </TabPane>
                 <TabPane tabId="2" className='pb-lg-0'>
-                                        <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                                                <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
+                    <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        <div id="tableDiv2" className={AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USER') ? "jexcelremoveReadonlybackground RowClickable" : "jexcelremoveReadonlybackground"} style={{ display: this.state.loading ? "none" : "block" }}>
                         </div>
                     </CardBody>
-                                                        </TabPane>
+                </TabPane>
             </>
         );
     }
     /**
      * This function is used to get list of user from api
      */
-    getUserDetails() {
-        UserService.getUserList()
+    getAccessControls() {
+        this.setState({
+            loading: true
+        });
+        UserService.getAccessControls()
             .then(response => {
                 if (response.status == 200) {
                     this.setState({
-                        userList: response.data,
-                        selUserList: response.data
+                        // userList: response.data,
+                        userAclList: response.data
                     },
                         () => { this.buildJExcel2() })
                 }
@@ -431,6 +461,13 @@ class ListUserComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -474,7 +511,7 @@ class ListUserComponent extends Component {
             data[2] = userList[j].username;
             data[3] = userList[j].orgAndCountry;
             data[4] = userList[j].emailId;
-            data[5] = userList[j].roleList.map(a => getLabelText(a.label,this.state.lang)).toString().trim().replaceAll(',', ';');
+            data[5] = userList[j].roleList.map(a => getLabelText(a.label, this.state.lang)).toString().trim().replaceAll(',', ';');
             data[6] = userList[j].faildAttempts;
             data[7] = (userList[j].lastLoginDate ? moment(userList[j].lastLoginDate).format("YYYY-MM-DD") : null)
             data[8] = userList[j].lastModifiedBy.username;
@@ -582,17 +619,17 @@ class ListUserComponent extends Component {
      * This function is used to display the user access control details in tabular format
      */
     buildJExcel2() {
-        let userList = this.state.selUserList;
+        let userAclList = this.state.userAclList;
         let userArray = [];
         let count = 0;
-        for (var j = 0; j < userList.length; j++) {
+        for (var j = 0; j < userAclList.length; j++) {
             data = [];
-            data[0] = userList[j].userId
-            data[1] = userList[j].username
-            data[2] = ([...new Set(userList[j].userAclList.map(a => a.countryName.label_en == "" || a.countryName.label_en == null ? "All" : a.countryName.label_en))]).toString();
-            data[3] = ([...new Set(userList[j].userAclList.map(a => a.healthAreaName.label_en == "" || a.healthAreaName.label_en == null ? "All" : a.healthAreaName.label_en))]).toString();
-            data[4] = ([...new Set(userList[j].userAclList.map(a => a.organisationName.label_en == "" || a.organisationName.label_en == null ? "All" : a.organisationName.label_en))]).toString();
-            data[5] = ([...new Set(userList[j].userAclList.map(a => a.programName.label_en == "" || a.programName.label_en == null ? "All" : a.programName.label_en))]).toString();
+            data[0] = userAclList[j].userId
+            data[1] = userAclList[j].username
+            data[2] = (userAclList[j].countryName == "" || userAclList[j].countryName == null ? "All" : userAclList[j].countryName.label_en).toString();
+            data[3] = (userAclList[j].healthAreaName == "" || userAclList[j].healthAreaName == null ? "All" : userAclList[j].healthAreaName.label_en).toString();
+            data[4] = (userAclList[j].organisationName == "" || userAclList[j].organisationName == null ? "All" : userAclList[j].organisationName.label_en).toString();
+            data[5] = (userAclList[j].programName == "" || userAclList[j].programName == null ? "All" : userAclList[j].programName.label_en).toString();
             userArray[count] = data;
             count++;
         }
@@ -606,7 +643,7 @@ class ListUserComponent extends Component {
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 {
-                    title: 'userId', 
+                    title: 'userId',
                     type: 'hidden',
                 },
                 {
@@ -697,7 +734,7 @@ class ListUserComponent extends Component {
                 <h5 className={this.state.color} id="div3">{this.state.message}</h5>
                 <Card>
                     <div className="Card-header-addicon">
-                                                <div className="card-header-actions">
+                        <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USER') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewUser}><i className="fa fa-plus-square"></i></a>}
                             </div>
@@ -720,7 +757,7 @@ class ListUserComponent extends Component {
                                                 <option value="0">{i18n.t('static.common.all')}</option>
                                                 {realmList}
                                             </Input>
-                                                                                    </InputGroup>
+                                        </InputGroup>
                                     </div>
                                 </FormGroup>
                             </Col>

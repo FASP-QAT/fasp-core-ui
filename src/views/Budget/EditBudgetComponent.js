@@ -187,7 +187,7 @@ class EditBudgetComponent extends Component {
         // Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         //Fetch Program list
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var programList = [];
@@ -225,6 +225,13 @@ class EditBudgetComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -300,6 +307,13 @@ class EditBudgetComponent extends Component {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
                                 break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
                                 break;
@@ -351,6 +365,13 @@ class EditBudgetComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -425,7 +446,7 @@ class EditBudgetComponent extends Component {
         let selectedProgramIds = this.state.budget.programs.map((ele) =>
             Number(ele.id)
         );
-        
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -438,9 +459,10 @@ class EditBudgetComponent extends Component {
         const { fundingSources } = this.state;
         let fundingSourceList = fundingSources.length > 0 && fundingSources.filter(item => {
             // Check if the funding source is available in at least one of the selected programs
-            return selectedProgramIds.some(programId => 
-              item.programList.some(program => program.id === programId)
-            );}).map((item, i) => {
+            return selectedProgramIds.some(programId =>
+                item.programList.some(program => program.id === programId)
+            );
+        }).map((item, i) => {
             return (
                 <option key={i} value={item.fundingSourceId}>
                     {getLabelText(item.label, this.state.lang)}
@@ -507,18 +529,24 @@ class EditBudgetComponent extends Component {
                                                         case 401:
                                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                                             break;
+                                                        case 409:
+                                                            this.setState({
+                                                                message: i18n.t('static.common.accessDenied'),
+                                                                loading: false,
+                                                                color: "#BA0C2F",
+                                                            });
+                                                            break;
                                                         case 403:
                                                             this.props.history.push(`/accessDenied`)
                                                             break;
                                                         case 500:
                                                         case 404:
-                                                        case 406:
                                                             this.setState({
                                                                 message: error.response.data.messageCode,
                                                                 loading: false
                                                             });
                                                             break;
-                                                        case 409:
+                                                        case 406:
                                                             this.setState({
                                                                 message: i18n.t('static.budget.duplicateDisplayName'),
                                                                 loading: false
@@ -593,7 +621,7 @@ class EditBudgetComponent extends Component {
                                                         onChange={(e) => { handleChange(e); this.dataChange(e) }}
                                                         onBlur={handleBlur}
                                                         required
-                                                        disabled={!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
+                                                        disabled={!AuthenticationService.checkUserACL(this.state.programs.map(c => c.value.toString()), "ROLE_BF_READONLY_ACCESS_REALM_ADMIN") ? true : false}
                                                         value={this.state.budget.fundingSource.fundingSourceId}
                                                     >
                                                         <option value="">{i18n.t('static.common.select')}</option>
@@ -787,6 +815,13 @@ class EditBudgetComponent extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)

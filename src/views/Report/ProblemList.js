@@ -142,9 +142,9 @@ export default class ProblemList extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var cutOffDate=myResult[i].cutOffDate!=undefined && myResult[i].cutOffDate!=null && myResult[i].cutOffDate!=""?myResult[i].cutOffDate:""
+                        var cutOffDate = myResult[i].cutOffDate != undefined && myResult[i].cutOffDate != null && myResult[i].cutOffDate != "" ? myResult[i].cutOffDate : ""
                         var programJson = {
-                            name: myResult[i].programCode + "~v" + myResult[i].version+(cutOffDate!=""?" ("+i18n.t("static.supplyPlan.start")+" "+moment(cutOffDate).format('MMM YYYY')+")":""),
+                            name: myResult[i].programCode + "~v" + myResult[i].version + (cutOffDate != "" ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
                             id: myResult[i].id
                         }
                         proList[i] = programJson
@@ -283,12 +283,13 @@ export default class ProblemList extends React.Component {
      * This function is used to filter the problem status list based on reviewer role and for in-compliance status
      */
     filterProblemStatus = function (instance, cell, c, r, source) {
-        var hasRole = false;
-        AuthenticationService.getLoggedInUserRole().map(c => {
-            if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
-                hasRole = true;
-            }
-        });
+        var pId = document.getElementById('programId').value;
+        var hasRole = AuthenticationService.checkUserACLBasedOnRoleId([pId.toString().split("_")[0].toString()], "ROLE_SUPPLY_PLAN_REVIEWER");
+        // AuthenticationService.getLoggedInUserRole().map(c => {
+        //     if (c.roleId == 'ROLE_SUPPLY_PLAN_REVIEWER') {
+        //         hasRole = true;
+        //     }
+        // });
         var mylist = [];
         mylist = this.state.problemStatusList;
         mylist = hasRole == true ? mylist.filter(c => c.id != 4) : mylist.filter(c => c.id != 2 && c.id != 4);
@@ -440,10 +441,12 @@ export default class ProblemList extends React.Component {
                             }
                             programJson.problemReportList = problemReportListForUpdate;
                             programJson.currentVersionNotes = this.state.currentVersionNotes;
+                            programJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
                             programQPLDetails.addressedCount = addressedCount;
+                            programQPLDetails.programModified = 1;
                             programObj.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                             var problemTransaction = db1.transaction(['programData'], 'readwrite');
                             var problemOs = problemTransaction.objectStore('programData');
@@ -882,10 +885,10 @@ export default class ProblemList extends React.Component {
                 if ((x == 0 && value != 0) || (y == 0)) {
                 } else {
                     if (this.state.data.length != 0) {
-                        if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROBLEM')) {
+                        var programId = document.getElementById('programId').value;
+                        if (AuthenticationService.checkUserACL([programId.toString().split("_")[0]], 'ROLE_BF_EDIT_PROBLEM')) {
                             if (this.el.getValueFromCoords(12, x) != 4 && this.el.getValueFromCoords(12, x) != 2) {
                                 var planningunitId = this.el.getValueFromCoords(13, x);
-                                var programId = document.getElementById('programId').value;
                                 var versionId = this.el.getValueFromCoords(3, x)
                                 window.open(window.location.origin + `/#${this.el.getValueFromCoords(15, x)}/${programId}/${versionId}/${planningunitId}`);
                             }
@@ -1168,6 +1171,13 @@ export default class ProblemList extends React.Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)

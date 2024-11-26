@@ -172,7 +172,7 @@ class ForcastMatrixOverTime extends Component {
     doc.addImage(canvasImg, 'png', 50, 220, 750, 210, 'CANVAS');
     const headers = [[i18n.t('static.report.month'),
     i18n.t('static.report.forecastConsumption'), i18n.t('static.report.actualConsumption'), i18n.t('static.report.error')]];
-    const data = this.state.matricsList.map(elt => [dateFormatter(elt.month), formatter(elt.forecastedConsumption,0), formatter(elt.actualConsumption,0), elt.message == null ? PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
+    const data = this.state.matricsList.map(elt => [dateFormatter(elt.month), formatter(elt.forecastedConsumption, 0), formatter(elt.actualConsumption, 0), elt.message == null ? PercentageFormatter(elt.forecastError) : i18n.t(elt.message)]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: height,
@@ -191,7 +191,7 @@ class ForcastMatrixOverTime extends Component {
   getPrograms = () => {
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+      DropdownService.getSPProgramBasedOnRealmId(realmId)
         .then(response => {
           var proList = []
           for (var i = 0; i < response.data.length; i++) {
@@ -219,6 +219,13 @@ class ForcastMatrixOverTime extends Component {
               switch (error.response ? error.response.status : "") {
                 case 401:
                   this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
                   break;
                 case 403:
                   this.props.history.push(`/accessDenied`)
@@ -330,7 +337,7 @@ class ForcastMatrixOverTime extends Component {
             versions: [],
             planningUnits: []
           }, () => {
-            DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+            DropdownService.getVersionListForSPProgram(programId)
               .then(response => {
                 this.setState({
                   versions: []
@@ -355,6 +362,13 @@ class ForcastMatrixOverTime extends Component {
                     switch (error.response ? error.response.status : "") {
                       case 401:
                         this.props.history.push(`/login/static.message.sessionExpired`)
+                        break;
+                      case 409:
+                        this.setState({
+                          message: i18n.t('static.common.accessDenied'),
+                          loading: false,
+                          color: "#BA0C2F",
+                        });
                         break;
                       case 403:
                         this.props.history.push(`/accessDenied`)
@@ -552,6 +566,13 @@ class ForcastMatrixOverTime extends Component {
                 switch (error.response ? error.response.status : "") {
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
+                    break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
                     break;
                   case 403:
                     this.props.history.push(`/accessDenied`)
@@ -769,6 +790,13 @@ class ForcastMatrixOverTime extends Component {
                   case 401:
                     this.props.history.push(`/login/static.message.sessionExpired`)
                     break;
+                  case 409:
+                    this.setState({
+                      message: i18n.t('static.common.accessDenied'),
+                      loading: false,
+                      color: "#BA0C2F",
+                    });
+                    break;
                   case 403:
                     this.props.history.push(`/accessDenied`)
                     break;
@@ -973,7 +1001,7 @@ class ForcastMatrixOverTime extends Component {
       from: 'From', to: 'To',
     }
     const { rangeValue } = this.state
-   
+
     return (
       <div className="animated fadeIn" >
         <AuthenticationServiceComponent history={this.props.history} />
@@ -992,25 +1020,25 @@ class ForcastMatrixOverTime extends Component {
                     this.state.matricsList.length > 0 &&
                     <a className="card-header-action">
                       <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-    var curTheme = localStorage.getItem("theme");
-    if(curTheme == "dark") {
-        this.setState({
-            isDarkMode: false
-        }, () => {
-            setTimeout(() => {
-                this.exportPDF();
-                if(curTheme == "dark") {
-                    this.setState({
-                        isDarkMode: true
-                    })
-                }
-            }, 0)
-        })
-    } else {
-        this.exportPDF();
-    }
-}}
- />
+                        var curTheme = localStorage.getItem("theme");
+                        if (curTheme == "dark") {
+                          this.setState({
+                            isDarkMode: false
+                          }, () => {
+                            setTimeout(() => {
+                              this.exportPDF();
+                              if (curTheme == "dark") {
+                                this.setState({
+                                  isDarkMode: true
+                                })
+                              }
+                            }, 0)
+                          })
+                        } else {
+                          this.exportPDF();
+                        }
+                      }}
+                      />
                       <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                     </a>
                   }
@@ -1157,10 +1185,10 @@ class ForcastMatrixOverTime extends Component {
                                       <tr id="addr0" key={idx} className={this.rowtextFormatClassName(item)} >
                                         <td>{dateFormatter(this.state.matricsList[idx].month)}</td>
                                         <td className="textcolor-purple">
-                                          {formatter(this.state.matricsList[idx].forecastedConsumption,0)}
+                                          {formatter(this.state.matricsList[idx].forecastedConsumption, 0)}
                                         </td>
                                         <td>
-                                          {formatter(this.state.matricsList[idx].actualConsumption,0)}
+                                          {formatter(this.state.matricsList[idx].actualConsumption, 0)}
                                         </td>
                                         <td>
                                           {this.state.matricsList[idx].message == null ? PercentageFormatter(this.state.matricsList[idx].forecastError) : i18n.t(this.state.matricsList[idx].message)}

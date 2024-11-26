@@ -87,7 +87,14 @@ export default class ProgramList extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
-                                case 403:
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
                                 case 500:
@@ -252,7 +259,7 @@ export default class ProgramList extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_DATASET')) {
+                if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, x).toString()], 'ROLE_BF_EDIT_DATASET')) {
                     this.props.history.push({
                         pathname: `/dataset/editDataSet/${this.el.getValueFromCoords(0, x)}`,
                     });
@@ -294,6 +301,13 @@ export default class ProgramList extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -349,6 +363,13 @@ export default class ProgramList extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)

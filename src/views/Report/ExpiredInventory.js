@@ -141,7 +141,7 @@ export default class ExpiredInventory extends Component {
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
@@ -169,6 +169,13 @@ export default class ExpiredInventory extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -274,7 +281,7 @@ export default class ExpiredInventory extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                    DropdownService.getVersionListForSPProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -297,6 +304,13 @@ export default class ExpiredInventory extends Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
@@ -491,6 +505,13 @@ export default class ExpiredInventory extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -688,6 +709,13 @@ export default class ExpiredInventory extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)
@@ -933,13 +961,16 @@ export default class ExpiredInventory extends Component {
                 },
                 {
                     type: 'hidden'
+                    // title: 'A',
+                    // type: 'text',
+                    // visible: false
                 },
                 {
                     type: 'hidden'
                 },
                 {
                     title: i18n.t('static.shipment.totalCost'),
-                    type: 'numeric', mask: '#,##',
+                    type: 'numeric', mask: '$#,##',
                 }
             ],
             editable: false,

@@ -1594,7 +1594,6 @@ export default class CommitTreeComponent extends React.Component {
                                     data[3] = regionalSelectedForecastData != undefined && total != null ? total.toFixed(2) : "";
                                     data[4] = regionalSelectedForecastData != undefined ? regionalSelectedForecastData.notes : "";
                                     var regionalSelectedForecastData1 = selectedForecastData1[regionSet[k]];
-                                    console.log("regionalSelectedForecastData1 Test@123",regionalSelectedForecastData1)
                                     var selectedScenarioId1="";
                                     var ce1 = regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.consumptionExtrapolationId != null ? consumptionExtrapolation1.filter(c => c.consumptionExtrapolationId == regionalSelectedForecastData1.consumptionExtrapolationId) : [];
                                     if (regionalSelectedForecastData1 != undefined && regionalSelectedForecastData1.treeAndScenario!=undefined && regionalSelectedForecastData1.treeAndScenario.length>0) {
@@ -1622,7 +1621,6 @@ export default class CommitTreeComponent extends React.Component {
                                                 count1+=1;
                                                 var flatList1 = tsListFilter1[0].tree.flatList;
                                                 var flatListFilter1 = flatList1.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
-                                                console.log("flatListFilter1 Test@123",flatListFilter1)
                                                 var nodeDataMomList1 = [];
                                                 for (var fl1 = 0; fl1 < flatListFilter1.length; fl1++) {
                                                     nodeDataMomList1 = nodeDataMomList1.concat(flatListFilter1[fl1].payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData1.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData1.currentVersion.forecastStopDate).format("YYYY-MM")));
@@ -2907,7 +2905,6 @@ export default class CommitTreeComponent extends React.Component {
                                 }
                                 programJson.planningUnitList = planningUnitToUpdate;
                                 programJson.treeList = treeList;
-                                console.log("Program Json Test@123",programJson)
                                 const compressedData = isCompress(programJson);
                                 DatasetService.saveDatasetData(compressedData, this.state.comparedLatestVersion).then(response => {
                                     if (response.status == 200) {
@@ -2946,6 +2943,13 @@ export default class CommitTreeComponent extends React.Component {
                                                 switch (error.response ? error.response.status : "") {
                                                     case 401:
                                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                                        break;
+                                                    case 409:
+                                                        this.setState({
+                                                            message: i18n.t('static.common.accessDenied'),
+                                                            loading: false,
+                                                            color: "#BA0C2F",
+                                                        });
                                                         break;
                                                     case 403:
                                                         this.props.history.push(`/accessDenied`)

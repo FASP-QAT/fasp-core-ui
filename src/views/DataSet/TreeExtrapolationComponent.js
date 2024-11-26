@@ -17,7 +17,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
+import { INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL, JEXCEL_DECIMAL_MONTHLY_CHANGE_8_DECIMAL_POSITIVE, JEXCEL_DECIMAL_NO_REGEX_LONG_4_DECIMAL, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import { JEXCEL_INTEGER_REGEX } from '../../Constants.js';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
@@ -693,21 +693,37 @@ export default class TreeExtrapolationComponent extends React.Component {
                     this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
                     this.state.dataExtrapolation.setComments(col, "");
                 }
-                var col = ("K").concat(parseInt(y) + 1);
-                var value = this.el.getValueFromCoords(10, y);
-                var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
-                value = value.toString().replaceAll(",", "");
-                if (value != "" && !(reg.test(value))) {
-                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
-                    this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
-                    this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
-                    valid = false;
-                }
-                else {
-                    this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
-                    this.state.dataExtrapolation.setComments(col, "");
-                }
             }
+            var col = ("K").concat(parseInt(y) + 1);
+            var value = this.el.getValueFromCoords(10, y, true);
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
+            value = value.toString().replaceAll(",", "");
+            if (value != "" && !(reg.test(value))) {
+                this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                valid = false;
+            }
+            else {
+                this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                this.state.dataExtrapolation.setComments(col, "");
+            }
+            var col = ("L").concat(parseInt(y) + 1);
+            var value = this.state.dataExtrapolation.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
+            var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_8_DECIMAL_POSITIVE;
+            value = value.toString().replaceAll(",", "");
+            console.log("Value Test@123",value);
+            if (value != "" && !(reg.test(value))) {
+                this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
+                this.state.dataExtrapolation.setComments(col, i18n.t('static.message.invalidnumber'));
+                valid = false;
+            }
+            else {
+                this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
+                this.state.dataExtrapolation.setComments(col, "");
+            }
+
         }
         return valid;
     }
@@ -1863,8 +1879,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             var col = ("K").concat(parseInt(y) + 1);
             var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL;
             value = value.toString().replaceAll(",", "");
-            var actualValue = instance.getValue(`B${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
-            if (actualValue != "" && value != "" && !(reg.test(value))) {
+            if (value != "" && !(reg.test(value))) {
                 instance.setStyle(col, "background-color", "transparent");
                 instance.setStyle(col, "background-color", "yellow");
                 instance.setComments(col, i18n.t('static.message.invalidnumber'));

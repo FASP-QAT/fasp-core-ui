@@ -176,6 +176,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
                                     break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
                                     break;
@@ -324,7 +331,7 @@ class StockStatusAcrossPlanningUnits extends Component {
     getPrograms = () => {
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
-            DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+            DropdownService.getSPProgramBasedOnRealmId(realmId)
                 .then(response => {
                     var proList = []
                     for (var i = 0; i < response.data.length; i++) {
@@ -352,6 +359,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -459,7 +473,7 @@ class StockStatusAcrossPlanningUnits extends Component {
             const program = this.state.programs.filter(c => c.programId == programId)
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    DropdownService.getVersionListForProgram(PROGRAM_TYPE_SUPPLY_PLAN, programId)
+                    DropdownService.getVersionListForSPProgram(programId)
                         .then(response => {
                             this.setState({
                                 versions: []
@@ -484,6 +498,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                                     switch (error.response ? error.response.status : "") {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
+                                            break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
                                             break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
@@ -787,6 +808,7 @@ class StockStatusAcrossPlanningUnits extends Component {
      * Callback function triggered when the Jexcel instance is loaded to format the table.
      */
     loaded = function (instance, cell, x, y, value) {
+        try{
         jExcelLoadedFunction(instance);
         var elInstance = instance.worksheets[0];
         var json = elInstance.getJson();
@@ -828,6 +850,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 cell.classList.add('legendColor4');
             }
         }
+    }catch(err){}
     }
     /**
      * Filters data based on the selected stock status and updates the component state.
@@ -1050,6 +1073,13 @@ class StockStatusAcrossPlanningUnits extends Component {
                                 switch (error.response ? error.response.status : "") {
                                     case 401:
                                         this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
                                         break;
                                     case 403:
                                         this.props.history.push(`/accessDenied`)

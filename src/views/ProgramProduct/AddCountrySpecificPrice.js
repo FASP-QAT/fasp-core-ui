@@ -136,17 +136,20 @@ class CountrySpecificPrices extends Component {
     componentDidMount() {
         hideFirstComponent();
         let realmId = AuthenticationService.getRealmId();
-        DropdownService.getProgramForDropdown(realmId, PROGRAM_TYPE_SUPPLY_PLAN)
+        DropdownService.getSPProgramBasedOnRealmId(realmId)
             .then(response => {
                 var proList = []
+                var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                 for (var i = 0; i < response.data.length; i++) {
                     if (response.data[i].active == true) {
+                        if(programIds.includes(response.data[i].id)){
                         var programJson = {
                             programId: response.data[i].id,
                             label: response.data[i].label,
                             programCode: response.data[i].code
                         }
                         proList.push(programJson)
+                    }
                     }
                 }
                 this.setState({
@@ -186,6 +189,13 @@ class CountrySpecificPrices extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -280,6 +290,13 @@ class CountrySpecificPrices extends Component {
                         switch (error.response ? error.response.status : "") {
                             case 401:
                                 this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
                                 break;
                             case 403:
                                 this.props.history.push(`/accessDenied`)
@@ -391,6 +408,13 @@ class CountrySpecificPrices extends Component {
                                         case 401:
                                             this.props.history.push(`/login/static.message.sessionExpired`)
                                             break;
+                                        case 409:
+                                            this.setState({
+                                                message: i18n.t('static.common.accessDenied'),
+                                                loading: false,
+                                                color: "#BA0C2F",
+                                            });
+                                            break;
                                         case 403:
                                             this.props.history.push(`/accessDenied`)
                                             break;
@@ -442,6 +466,13 @@ class CountrySpecificPrices extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
@@ -1034,6 +1065,13 @@ class CountrySpecificPrices extends Component {
                             switch (error.response ? error.response.status : "") {
                                 case 401:
                                     this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
                                     break;
                                 case 403:
                                     this.props.history.push(`/accessDenied`)
