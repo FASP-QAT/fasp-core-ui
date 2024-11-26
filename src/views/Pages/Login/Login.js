@@ -290,6 +290,7 @@ class Login extends Component {
    * @returns {JSX.Element} - Login form.
    */
   render() {
+    console.log("in render")
     return (
       <div className="main-content flex-row align-items-center bg-height">
         {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
