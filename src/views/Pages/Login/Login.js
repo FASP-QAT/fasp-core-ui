@@ -333,7 +333,7 @@ class Login extends Component {
       <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
       <h3 style={{ marginTop: 0, color: '#333' }}>New Enhanced Supply Planning Dashboard Released!</h3>
       <p>
-        We’re excited to announce the release of our enhanced Supply Planning Dashboard. To view the updated data for downloaded programs, please re-download the program(s).
+        We’re excited to announce the release of our enhanced Supply Planning Dashboard. <b>To view the updated data for downloaded programs, please re-download the program(s).</b>
       </p>
       <p>
         <strong>Note:</strong> This step is not necessary for server versions, as they will automatically display the latest data.
@@ -344,7 +344,7 @@ class Login extends Component {
       <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
   <h3 style={{ marginTop: 0, color: '#333' }}>¡Nueva versión mejorada del Panel de Planificación de Suministros lanzada!</h3>
   <p>
-    Estamos emocionados de anunciar el lanzamiento de nuestra versión mejorada del Panel de Planificación de Suministros. Para ver los datos actualizados de los programas descargados, por favor, vuelva a descargar el/los programa(s).
+    Estamos emocionados de anunciar el lanzamiento de nuestra versión mejorada del Panel de Planificación de Suministros. <b>Para ver los datos actualizados de los programas descargados, por favor, vuelva a descargar el/los programa(s).</b>
   </p>
   <p>
     <strong>Nota:</strong> Este paso no es necesario para las versiones de servidor, ya que mostrarán automáticamente los datos más recientes.
@@ -355,7 +355,7 @@ class Login extends Component {
       <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
   <h3 style={{ marginTop: 0, color: '#333' }}>Nouvelle version améliorée du tableau de bord de planification des approvisionnements publiée !</h3>
   <p>
-    Nous sommes ravis d'annoncer le lancement de notre tableau de bord de planification des approvisionnements amélioré. Pour afficher les données mises à jour des programmes téléchargés, veuillez retélécharger le(s) programme(s).
+    Nous sommes ravis d'annoncer le lancement de notre tableau de bord de planification des approvisionnements amélioré. <b>Pour afficher les données mises à jour des programmes téléchargés, veuillez retélécharger le(s) programme(s).</b>
   </p>
   <p>
     <strong>Remarque :</strong> Cette étape n'est pas nécessaire pour les versions serveur, car elles afficheront automatiquement les données les plus récentes.
@@ -366,7 +366,7 @@ class Login extends Component {
  <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
  <h3 style={{ marginTop: 0, color: '#333' }}>Nova versão aprimorada do Painel de Planejamento de Suprimentos lançada!</h3>
  <p>
-   Estamos animados em anunciar o lançamento de nossa versão aprimorada do Painel de Planejamento de Suprimentos. Para visualizar os dados atualizados dos programas baixados, faça o download novamente do(s) programa(s).
+   Estamos animados em anunciar o lançamento de nossa versão aprimorada do Painel de Planejamento de Suprimentos. <b>Para visualizar os dados atualizados dos programas baixados, faça o download novamente do(s) programa(s).</b>
  </p>
  <p>
    <strong>Nota:</strong> Este passo não é necessário para versões de servidor, pois elas exibirão automaticamente os dados mais recentes.
