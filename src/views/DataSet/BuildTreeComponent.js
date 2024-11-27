@@ -8804,6 +8804,17 @@ export default class BuildTree extends Component {
                     scenarioId = '';
                     scenario1.active = false;
                     scenarioList[findNodeIndex] = scenario1;
+                    scenarioList=scenarioList.filter(x => x.id != this.state.selectedScenario);
+                    var tree=curTreeObj.tree;
+                    var flatList=tree.flatList;
+                    for(var fl=0;fl<flatList.length;fl++){
+                        var nodeDataMap=flatList[fl].payload.nodeDataMap;
+                        delete nodeDataMap[this.state.selectedScenario];
+                        flatList[fl].payload.nodeDataMap=flatList[fl].payload.nodeDataMap;
+                        flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.scenarioId!=this.state.selectedScenario);
+                    }
+                    tree.flatList=flatList;
+                    curTreeObj.tree=tree;
                 }
             }
             curTreeObj.scenarioList = scenarioList;
