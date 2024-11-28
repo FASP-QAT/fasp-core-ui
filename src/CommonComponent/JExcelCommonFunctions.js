@@ -708,3 +708,51 @@ export function changed(worksheets, cell, x, y, value) {
 export function loadedForNonEditableTables(instance, cell) {
     jExcelLoadedFunction(instance);
 }
+export function jExcelLoadedFunctionForNotes(instance,number) {
+    if (number == undefined) {
+        number = 0;
+    }
+    var obj = {};
+    obj.options = {};
+    var elInstance = instance.worksheets[0];
+    elInstance.hideIndex(0);
+    var pagignation = document.getElementsByClassName('jss_pagination')[number];
+    pagignation.classList.add('row');
+    // console.log("pagignation", pagignation.firstChild.innerHTML)
+    // pagignation.firstChild.innerHTML = i18n.t('static.common.result', { from:1, size:20 });
+    var searchContainer = document.getElementsByClassName('jss_search_container')[number];
+    var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
+    document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
+    var clearBtn = document.createElement('button');
+    clearBtn.type = "button";
+    clearBtn.classList.add('btn-default');
+    clearBtn.classList.add('btn');
+    clearBtn.classList.add('jexcel_clear_btn');
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
+    clearBtn.setAttribute("id", "clearBtnID");
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jss_search")[number].value = "";
+        elInstance.search('')
+    };
+    clearBtn.appendChild(clarText);
+    searchContainer.appendChild(clearBtn);
+    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
+    jexcel_pagination.lastChild.classList.add('order-3');
+    jexcel_pagination.firstChild.classList.add('order-2');
+    jexcel_pagination.firstChild.classList.add('mr-auto');
+    jexcel_pagination.firstChild.classList.add('pl-0');
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
+    pageSelect.options[3].innerHTML = "All";
+    pageSelect.addEventListener("change", () => paginationChange(number));
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
+    var filter = jexcel_filterFirstdiv.firstChild;
+    filter.classList.add('order-1');
+    filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
+    jexcel_pagination.appendChild(filter);
+    var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
+    jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
+}
