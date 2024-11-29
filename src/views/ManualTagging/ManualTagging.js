@@ -1574,7 +1574,7 @@ export default class ManualTagging extends Component {
                                 }else{
                                     shipmentList[shipmentIndex].erpFlag = false;
                                 }
-                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex].tempShipmentId))
+                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex].tempShipmentId))
                                 shipmentList[shipmentIndex].lastModifiedBy.userId = curUser;
                                 shipmentList[shipmentIndex].lastModifiedBy.username = username;
                                 shipmentList[shipmentIndex].lastModifiedDate = curDate;
@@ -1846,7 +1846,7 @@ export default class ManualTagging extends Component {
                                                     notes+=shipmentList[shipmentIndex1].notes;
                                                 }
 
-                                                shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex1].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex1].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex1].tempShipmentId))
+                                                shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentList[shipmentIndex1].shipmentId>0)?(c.shipmentId!=shipmentList[shipmentIndex1].shipmentId):(c.tempShipmentId!=shipmentList[shipmentIndex1].tempShipmentId))
                                                 shipmentList[shipmentIndex1].active = false;
                                                 shipmentList[shipmentIndex1].parentLinkedShipmentId = this.state.finalShipmentId[0].shipmentId > 0 ? this.state.finalShipmentId[0].shipmentId : null;
                                                 shipmentList[shipmentIndex1].tempParentLinkedShipmentId = this.state.finalShipmentId[0].tempShipmentId;
@@ -1899,7 +1899,7 @@ export default class ManualTagging extends Component {
                                                     if (this.state.active4 && uq == 0) {
                                                         var c = (cRequest.result.filter(c => c.currencyId == USD_CURRENCY_ID)[0]);
                                                         var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-                                                        var tempShipmentId = ppuObject.planningUnit.id.toString().concat(shipmentList.length);
+                                                        var tempShipmentId=ppuObject.planningUnit.id.toString().concat(shipmentList.length);
                                                         var tempNotes=notes;
                                                         if(tableJson[y][13]!=""){
                                                             if(tempNotes!=""){
@@ -2012,7 +2012,7 @@ export default class ManualTagging extends Component {
                                                         lastModifiedDate: curDate,
                                                     })
                                                     var rcpu = this.state.realmCountryPlanningUnitList.filter(c => c.id == this.state.instance.getValueFromCoords(9, y))[0];
-                                                    var tempShipmentId = shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
+                                                    var tempShipmentId=shipmentList[shipmentIndex].planningUnit.id.toString().concat(shipmentList.length);
                                                     var tempNotes=notes;
                                                         if(getUniqueOrderNoAndPrimeLineNoList[uq][13]!=""){
                                                             if(tempNotes!=""){

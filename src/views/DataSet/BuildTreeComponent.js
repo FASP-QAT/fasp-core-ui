@@ -8806,6 +8806,17 @@ export default class BuildTree extends Component {
                     scenarioId = '';
                     scenario1.active = false;
                     scenarioList[findNodeIndex] = scenario1;
+                    scenarioList=scenarioList.filter(x => x.id != this.state.selectedScenario);
+                    var tree=curTreeObj.tree;
+                    var flatList=tree.flatList;
+                    for(var fl=0;fl<flatList.length;fl++){
+                        var nodeDataMap=flatList[fl].payload.nodeDataMap;
+                        delete nodeDataMap[this.state.selectedScenario];
+                        flatList[fl].payload.nodeDataMap=flatList[fl].payload.nodeDataMap;
+                        flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.scenarioId!=this.state.selectedScenario);
+                    }
+                    tree.flatList=flatList;
+                    curTreeObj.tree=tree;
                 }
             }
             curTreeObj.scenarioList = scenarioList;
@@ -13760,8 +13771,7 @@ export default class BuildTree extends Component {
                                                         </Form>
                                                     )} />
                                         </div>
-                                        <div className="row ml-lg-1 pb-lg-2">
-                                            <b className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
+                                        <div className="row ml-lg-1 pb-lg-2"><b className='text-blackD'>{i18n.t('static.tree.editIn')}&nbsp;{<a href={`/#/dataSet/treeTable/tree/${this.state.treeId}/${this.state.programId}`} target='_blank'>{i18n.t('static.common.treeTable')}</a>}</b>
                                             <FormGroup>
                                                 <div className="check inline paddinCheckbox pt-lg-0">
                                                     <div>

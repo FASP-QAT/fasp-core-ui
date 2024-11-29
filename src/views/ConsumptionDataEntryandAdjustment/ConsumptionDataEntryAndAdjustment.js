@@ -3513,7 +3513,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                             </FormGroup>
                           </div>
                           <div className="row">
-                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') && localStorage.getItem("sessionType") === "Online" &&
                               <FormGroup className="col-md-3 ">
                                 <div className="tab-ml-1 ml-lg-3">
                                   <Input

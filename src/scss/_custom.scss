@@ -17900,7 +17900,7 @@ label.arrow_label:before {
 }
 .fixTableHeadTopDashboard {
   max-height: calc(100vh - 50vh) !important;
-  overflow: scroll;
+  overflow: auto;
   border-top: 1px solid #2a303d;
 }
 // .sidebar-minimized .sidebar .myMarquee{

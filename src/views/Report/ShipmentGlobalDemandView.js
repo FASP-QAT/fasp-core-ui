@@ -2126,7 +2126,6 @@ class ShipmentGlobalDemandView extends Component {
             }
             ]
         };
-        
         const darkModeColors = [
             '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
             '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',

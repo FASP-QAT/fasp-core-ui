@@ -551,7 +551,7 @@ export default class SyncMasterData extends Component {
                                                         }else{
                                                             shipmentDataList[shipmentIndex].erpFlag = false;
                                                         }
-                                                        shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentDataList[shipmentIndex].shipmentId > 0 ? (c.shipmentId != shipmentDataList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentDataList[shipmentIndex].tempShipmentId)));
+                                                        shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentDataList[shipmentIndex].shipmentId>0?(c.shipmentId!=shipmentDataList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentDataList[shipmentIndex].tempShipmentId)));
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.userId = curUser;
                                                         shipmentDataList[shipmentIndex].lastModifiedBy.username = username;
                                                         shipmentDataList[shipmentIndex].lastModifiedDate = curDate;
