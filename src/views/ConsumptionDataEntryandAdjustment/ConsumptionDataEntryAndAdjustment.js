@@ -2080,7 +2080,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
   */
   getPrograms() {
     this.setState({ loading: true })
-    if (localStorage.getItem('sessionType') === 'Online') {
+    if (localStorage.getItem('sessionType') === 'Online' && !this.state.onlyDownloadedProgram) {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getFCProgramBasedOnRealmId(realmId)
         .then(response => {
@@ -2150,34 +2150,13 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         let downloadedProgramData = [];
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId) {
-            var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-            var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-            programData.code = programData.programCode;
-            programData.id = programData.programId;
-            var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
-            var regionList = programData.regionList;
-            planningUnitList.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
-            regionList.sort((a, b) => {
-              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-              return itemLabelA > itemLabelB ? 1 : -1;
-            });
             var forecastProgramJson = {
-              name: programData.programCode,
+              name: myResult[i].programCode,
               id: myResult[i].id.split("_")[0],
-              regionList: regionList,
-              planningUnitList: planningUnitList,
-              dataset: programData
             }
             var f = 0
             for (var k = 0; k < this.state.datasetList.length; k++) {
-              if (this.state.datasetList[k].id == programData.programId) {
+              if (this.state.datasetList[k].id == myResult[i].id.split("_")[0]) {
                 f = 1;
               }
             }
@@ -2187,7 +2166,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               if (f == 0) {
                 proList.push(forecastProgramJson)
               } else if (f == 1) {
-                proList[proList.findIndex(m => m.id === programData.programId)] = forecastProgramJson;
+                proList[proList.findIndex(m => m.id === myResult[i].id.split("_")[0])] = forecastProgramJson;
               }
             }
             downloadedProgramData.push(forecastProgramJson);
