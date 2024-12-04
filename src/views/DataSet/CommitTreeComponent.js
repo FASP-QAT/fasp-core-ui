@@ -2840,12 +2840,12 @@ export default class CommitTreeComponent extends React.Component {
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
                                             var findNodeIndexParent=1;
-                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2) {
+                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2 || completeFlatList[i].payload.nodeType.id == 6) {
                                             }else{
                                                 findNodeIndexParent = completeFlatList.findIndex(n => n.id == node.parent);
                                             }
                                             if(findNodeIndexParent!=-1){
-                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
+                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3 || node.payload.nodeType.id == 6) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
                                             } else if (node.payload.nodeType.id == 4) {
