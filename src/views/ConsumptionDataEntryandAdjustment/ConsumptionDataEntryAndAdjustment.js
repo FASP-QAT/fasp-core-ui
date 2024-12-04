@@ -2136,8 +2136,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
-      var transaction = db1.transaction(['datasetData'], 'readwrite');
-      var program = transaction.objectStore('datasetData');
+      var transaction = db1.transaction(['datasetDetails'], 'readwrite');
+      var program = transaction.objectStore('datasetDetails');
       var getRequest = program.getAll();
       getRequest.onerror = function (event) {
       };
