@@ -4592,12 +4592,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                             suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                                         }
                                                         if (suggestedOrd <= 0) {
-                                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                         } else {
-                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1),"suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                         }
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     }
                                                     suggestedShipmentsTotalData.push(sstd);
                                                 } else {
@@ -4655,12 +4655,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                             suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                         }
                                                         if (suggestedOrd <= 0) {
-                                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                         } else {
-                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1),"suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                         }
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     }
                                                     suggestedShipmentsTotalData.push(sstd);
                                                 }
@@ -4771,7 +4771,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: roundARU(lastClosingBalance, 1) });
                                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                                 shipmentsTotalData.push("");
-                                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
                                                 deliveredShipmentsTotalData.push("");
                                                 shippedShipmentsTotalData.push("");
                                                 orderedShipmentsTotalData.push("");
@@ -5377,7 +5377,7 @@ export default class WhatIfReportComponent extends React.Component {
             emergencyOrder = false;
         }
         var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
-        var freightCost = Number(programPlanningUnit.catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
+        var freightCost = Number(programPlanningUnit.catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQtyRounded) * (Number(Number(seaFreightPercentage) / 100));
         var rcpuFilter = this.state.realmCountryPlanningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
         var rcpuObject = {
             id: "",
@@ -5398,10 +5398,10 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
         var json = {
-            shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
-            shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQty / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQty,
+            shipmentQty: suggestedShipmentList[0].suggestedOrderQtyRounded,
+            shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQtyRounded / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQtyRounded,
             index: -1,
-            suggestedQty: suggestedShipmentList[0].suggestedOrderQty,
+            suggestedQty: suggestedShipmentList[0].suggestedOrderQtyRounded,
             emergencyOrder: emergencyOrder,
             shipmentId: 0,
             accountFlag: true,

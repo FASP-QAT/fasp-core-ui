@@ -134,6 +134,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 }
             }
         }
+        suggestedOrd=Math.round(Number(suggestedOrd));
         if (suggestShipment) {
             if (suggestedOrd <= 0) {
             } else {
