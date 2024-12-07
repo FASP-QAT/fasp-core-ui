@@ -191,7 +191,7 @@
   "static.placeholder.LagInMonthFUNode": "Use this feature for phased product usage. For example, if the lag is 2, the product usage will begin 2 months after the parent node dates.",
   "static.import.doNoImportCheckbox": "Do not import all unmapped planning units",
   "static.priority.medium": "Medium",
-  "static.mt.reminders4A": "If you delink a shipment, the QAT shipment will revert to the original shipment’s note and not carry over any updates you made after linking. For this, we recommend copying the note before de-linking and pasting it into the QAT shipment after.",
+  "static.mt.reminders4A": "If you delink a shipment, the manual QAT shipment will retain the linked details. If the linked shipment has not been uploaded to the server, it will revert to the original manual shipment`s details.",
   "static.dataentry.maxRange": "Please select date range within 36 months",
   "static.program.programmanager": "Program manager",
   "static.currency.currencysymbol": "Currency symbol",

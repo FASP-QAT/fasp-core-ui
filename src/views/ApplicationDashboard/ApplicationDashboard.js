@@ -2584,7 +2584,7 @@ class ApplicationDashboard extends Component {
         label: 'Forecast Consumption Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
-          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= 1 ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= 1 ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#edba26" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2627,7 +2627,7 @@ class ApplicationDashboard extends Component {
         label: 'Actual Inventory Dataset',
         data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
-          (inventoryQplCorrectCount / inventoryQplPuCount) >= 1 ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#f48521" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (inventoryQplCorrectCount / inventoryQplPuCount) >= 1 ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#edba26" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2670,7 +2670,7 @@ class ApplicationDashboard extends Component {
         label: 'Actual Consumption Dataset',
         data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
-          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= 1 ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= 1 ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#edba26" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2713,7 +2713,7 @@ class ApplicationDashboard extends Component {
         label: 'Shipments Dataset',
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
-          (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#f48521" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#edba26" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4

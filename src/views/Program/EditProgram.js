@@ -866,8 +866,8 @@ export default class EditProgram extends Component {
                                     regionId: this.state.program.regionArray,
                                     programCode1: this.state.uniqueCode,
                                     programCode: this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode,
-                                    noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard,
-                                    noOfMonthsInFutureForBottomDashboard:this.state.program.noOfMonthsInFutureForBottomDashboard
+                                    noOfMonthsInPastForBottomDashboard:this.state.program.noOfMonthsInPastForBottomDashboard!=null?this.state.program.noOfMonthsInPastForBottomDashboard:'',
+                                    noOfMonthsInFutureForBottomDashboard:this.state.program.noOfMonthsInFutureForBottomDashboard!=null?this.state.program.noOfMonthsInFutureForBottomDashboard:''
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
