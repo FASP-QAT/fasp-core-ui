@@ -4113,7 +4113,7 @@ export default class syncPage extends Component {
               if(programJson.batchInventoryList==undefined){
                 programJson.batchInventoryList=[];
               }
-              console.log("Program Json Test@123",programJson);
+              delete programJson.dashboardData;
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
                 if (response.status == 200) {
