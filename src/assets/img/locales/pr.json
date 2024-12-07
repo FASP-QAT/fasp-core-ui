@@ -191,7 +191,7 @@
   "static.placeholder.LagInMonthFUNode": "Use esse recurso para uso do produto em fases. Por exemplo, se o atraso for 2, o uso do produto começará 2 meses após as datas do nó de origem.",
   "static.import.doNoImportCheckbox": "Não importe todas as unidades de planejamento não mapeadas",
   "static.priority.medium": "Médio",
-  "static.mt.reminders4A": "Se você desvincular um pedido, o pedido QAT reverterá para a nota original e não carregará nenhuma atualização feita após a vinculação. Para isso, recomendamos copiar a nota antes de desvincular e colá-la no embarque QAT depois.",
+  "static.mt.reminders4A": "Se desvincular uma remessa, a remessa QAT manual manterá os dados vinculados. Se a remessa vinculada não tiver sido carregada no servidor, os detalhes da remessa manual original serão revertidos.",
   "static.dataentry.maxRange": "Selecione o intervalo de datas dentro de 36 meses",
   "static.program.programmanager": "Gestor do programa",
   "static.currency.currencysymbol": "Símbolo da moeda",
