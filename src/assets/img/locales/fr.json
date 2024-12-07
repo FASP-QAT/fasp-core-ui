@@ -191,7 +191,7 @@
   "static.placeholder.LagInMonthFUNode": "Utilisez cette fonctionalité pour les produits échelonnés. Par exemple, si le délai avant usage est de 2, l'usage du produit commencera 2 mois après les dates du nœud source",
   "static.import.doNoImportCheckbox": "Ne pas importer toutes les unités de planification non mappées",
   "static.priority.medium": "Moyen",
-  "static.mt.reminders4A": "Si vous dissociez une expédition, l’expédition QAT reviendra à la note d’expédition originale et ne reportera pas les mises à jour que vous avez effectuées après la liaison. Pour cela, nous vous recommandons de copier la note avant de la dissocier et de la coller dans l'expédition QAT après.",
+  "static.mt.reminders4A": "Si vous supprimez le lien d`une expédition, l`expédition manuelle QAT conservera les détails liés. Si l`expédition liée n`a pas été téléchargée sur le serveur, elle reviendra aux détails de l`expédition manuelle d`origine.",
   "static.dataentry.maxRange": "Veuillez sélectionner une plage de dates dans les 36 mois",
   "static.program.programmanager": "Gestionnaire de programme",
   "static.currency.currencysymbol": "Symbole de la devise",
