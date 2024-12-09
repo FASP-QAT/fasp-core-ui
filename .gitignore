@@ -15,5 +15,7 @@
 node_modules/.cache
 node_modules/
 build/
-# End of https://www.gitignore.io/api/visualstudiocode
-/nbproject/private/
+# Testing
+/coverage
+coverage/
+*.lcov
