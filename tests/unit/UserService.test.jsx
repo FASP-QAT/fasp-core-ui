@@ -126,7 +126,11 @@ describe('UserService', () => {
         const newPassword = 'newpassword';
         await userService.updateExpiredPassword(emailId, oldPassword, newPassword);
         expect(postSpy).toHaveBeenCalledTimes(1);
-        expect(postSpy).toHaveBeenCalledWith(`${API_URL}/api/updateExpiredPassword`, { emailId, oldPassword, newPassword }, {});
+        expect(postSpy).toHaveBeenCalledWith(
+          `${API_URL}/api/user/updateExpiredPassword`,
+          { emailId, oldPassword, newPassword },
+          {}
+        );
       });
     });
 
@@ -140,7 +144,11 @@ describe('UserService', () => {
         const newPassword = 'newpassword';
         await userService.changePassword(userId, oldPassword, newPassword);
         expect(postSpy).toHaveBeenCalledTimes(1);
-        expect(postSpy).toHaveBeenCalledWith(`${API_URL}/api/changePassword`, { userId, oldPassword, newPassword }, {});
+        expect(postSpy).toHaveBeenCalledWith(
+          `${API_URL}/api/user/changePassword`,
+          { userId, oldPassword, newPassword },
+          {}
+        );
       });
     });
     describe('forgotPassword', () => {
@@ -151,7 +159,10 @@ describe('UserService', () => {
           const emailId = 'johndoe@example.com';
           await userService.forgotPassword(emailId);
           expect(postSpy).toHaveBeenCalledTimes(1);
-          expect(postSpy).toHaveBeenCalledWith(`${API_URL}/api/forgotPassword`, { emailId });
+          expect(postSpy).toHaveBeenCalledWith(
+            `${API_URL}/api/user/forgotPassword`,
+            { emailId }
+          );
         });
       });
 
@@ -164,7 +175,11 @@ describe('UserService', () => {
         const token = 'token';
         await userService.confirmForgotPasswordToken(emailId, token);
         expect(postSpy).toHaveBeenCalledTimes(1);
-        expect(postSpy).toHaveBeenCalledWith(`${API_URL}/api/confirmForgotPasswordToken`, { emailId, token }, {});
+        expect(postSpy).toHaveBeenCalledWith(
+          `${API_URL}/api/user/confirmForgotPasswordToken`,
+          { emailId, token },
+          {}
+        );
       });
     });
 
@@ -178,7 +193,11 @@ describe('UserService', () => {
         const password = 'newpassword';
         await userService.updatePassword(emailId, token, password);
         expect(postSpy).toHaveBeenCalledTimes(1);
-        expect(postSpy).toHaveBeenCalledWith(`${API_URL}/api/updatePassword`, { emailId, token, password }, {});
+        expect(postSpy).toHaveBeenCalledWith(
+          `${API_URL}/api/user/updatePassword`,
+          { emailId, token, password },
+          {}
+        );
       });
     });
 

@@ -236,7 +236,11 @@ describe('AddRealmComponent', () => {
         inventoryMonthsInPast: 6,
         minCountForMode: '1',
         minPercForMode: '50',
-        defaultRealm: true
+        defaultRealm: true,
+        noOfMonthsInFutureForBottomDashboard: 18,
+        noOfMonthsInFutureForTopDashboard: 18,
+        noOfMonthsInPastForBottomDashboard: 6,
+        noOfMonthsInPastForTopDashboard: 0
       };
 
       // Submit form
