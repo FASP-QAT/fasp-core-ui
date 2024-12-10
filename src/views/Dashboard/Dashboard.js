@@ -40,7 +40,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var programJson = JSON.parse(programData);
                                     var generalProgramJson = programJson;
                                     var dashboardData = generalProgramJson.dashboardData;
-                                    console.log("dashboardData Test@123", dashboardData)
                                     if (dashboardData != undefined) {
                                         var topPuData = dashboardData.topPuData;
                                         var stockedOutCount = 0;
@@ -86,7 +85,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var itemLabelB = b.program.code.toUpperCase();
                                     return itemLabelA > itemLabelB ? 1 : -1;
                                 });
-                                console.log("dashboradTopList Test@123", dashboradTopList)
                                 props.updateStateDashboard("dashboardTopList", dashboradTopList);
                                 props.updateStateDashboard("topSubmitLoader", false);
                             } catch (err) {
@@ -231,7 +229,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 "expiryTotal": expiryTotal,
                                 "shipmentTotal": shipmentTotal
                             }
-                            console.log("dashboardBottomData Test@123", dashboardBottomData)
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                             props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
                             props.updateStateDashboard("dashboardBottomData", dashboardBottomData);

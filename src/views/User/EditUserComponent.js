@@ -1326,7 +1326,6 @@ class EditUserComponent extends Component {
     // document.getElementById("roleValid").value = false;
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
-        console.log("Respons.data Test@123", response.data)
         if (response.status == 200) {
           this.setState(
             {
