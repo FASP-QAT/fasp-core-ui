@@ -3190,8 +3190,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                             localStorage.setItem("sesDatasetId", document.getElementById("forecastProgramId").value);
                             localStorage.setItem("sesVersionId", document.getElementById("versionId").value);
                             localStorage.setItem("messageColor", "green");
-                            console.log("this.state.bulkExtrapolation Test@123",this.state.bulkExtrapolation);
-                            console.log("this.state.optimizeTESAndARIMA Test@123",this.state.optimizeTESAndARIMA);
                             localStorage.setItem("message", (this.state.type==1?(i18n.t('static.extrapolation.bulkExtrapolationSuccess')):(this.state.type==2?i18n.t('static.extrapolation.optimiseTESAndARIMASuccess'):i18n.t('static.extrapolation.missingTESAndARIMASuccess'))));
                             localStorage.setItem("isExtrapolation", true);
                             window.location.reload();
@@ -3409,7 +3407,6 @@ export default class ExtrapolateDataComponent extends React.Component {
             B = [];
             var consumptionData = actualConsumptionList.filter(c => moment(c.month).format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)
             var movingAvgDataFilter = this.state.movingAvgData.length > 0 ? this.state.movingAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
-            console.log("movingAvgDataFilter Test@123",movingAvgDataFilter);
             var semiAvgDataFilter = this.state.semiAvgData.length > 0 ? this.state.semiAvgData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
             var linearRegressionDataFilter = this.state.linearRegressionData.length > 0 ? this.state.linearRegressionData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""
             var tesDataFilter = this.state.tesData.length > 0 ? this.state.tesData.filter(c => moment(startMonth).add(c.month - 1, 'months').format("YYYY-MM") == moment(monthArray[j]).format("YYYY-MM")) : ""

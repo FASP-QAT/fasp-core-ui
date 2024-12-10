@@ -378,7 +378,6 @@ class ListUserComponent extends Component {
             );
         UserService.getRoleList()
             .then((response) => {
-                console.log("Test@123", response.data)
                 if (response.status == 200) {
                     this.setState({
                         currentUserRole: response.data,

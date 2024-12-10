@@ -65,7 +65,6 @@ export default class SyncMasterData extends Component {
         let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
         // UserService.getUserByUserId(decryptedCurUser).then(response => {
         UserService.getUserDetails(decryptedCurUser).then(response => {
-            // console.log("Response.data Test@123",response.data);
             var userObj = response.data;
             var user = response.data.user;
             var aclList = []
@@ -76,7 +75,6 @@ export default class SyncMasterData extends Component {
                 aclList.push(acl);
             });
             user.userAclList = aclList;
-            console.log("User Test@123", user);
             localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response.data.user).toString(), `${SECRET_KEY}`));
             // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","100"],'ROLE_BF_MANUAL_TAGGING'));
             // console.log("Test UserACL",AuthenticationService.checkUserACL(["2008","2007"],'ROLE_BF_MANUAL_TAGGING'));

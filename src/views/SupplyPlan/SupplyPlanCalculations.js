@@ -1088,7 +1088,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     supplyPlanData.push(json);
                                 }
-                                console.log("supplyPlanData Test@123",supplyPlanData)
                                 programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                                 programJsonForStoringTheResult.supplyPlan = supplyPlanData;
                                 var dashboardData=generalProgramJson.dashboardData;

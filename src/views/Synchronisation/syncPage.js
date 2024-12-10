@@ -1501,9 +1501,6 @@ export default class syncPage extends Component {
               } else {
                 lastSyncDate = lastSyncDate.lastSyncDate;
               }
-              console.log("Last modified Date Test@123",lastModifiedDate);
-              console.log("Last sync Date Test@123",moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss"));
-              console.log("Condition Test@123",moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss"));
               if (lastModifiedDate != undefined && lastModifiedDate != null && lastModifiedDate != "" && moment(lastModifiedDate).format("YYYY-MM-DD HH:mm:ss") > moment(lastSyncDate).format("YYYY-MM-DD HH:mm:ss")) {
                 alert(i18n.t('static.commitVersion.outdatedsync'));
                 this.props.history.push(`/syncProgram`)

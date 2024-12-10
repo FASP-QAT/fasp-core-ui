@@ -1034,7 +1034,6 @@ export default class SupplyPlanComponent extends React.Component {
                     if(parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length>maxDecimals){
                         maxDecimals=parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length;
                     }
-                    console.log("Item Test@123", batchInfoList[j]);
                     data[0] = item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD");
                     data[1] = moment(item.createdDate).format(DATE_FORMAT_CAP);
                     data[2] = moment(item.expiryDate).format("MMM-YY");
@@ -1287,7 +1286,6 @@ export default class SupplyPlanComponent extends React.Component {
                     var json = this.state.actualInventoryEl.getJson(null, false).filter(c => c[0] != -1);
                     for (var j = 0; j < json.length; j++) {
                         var batchDetails = this.state.actualBatchList.filter(c => (c.batchNo == (json[j][0]).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((json[j][0]).split("~")[1]).format("YYYY-MM")));
-                        console.log("Test@123", Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",", "")))
                         if (batchDetails.length > 0) {
                             batchDetailsList.push({
                                 batchInventoryTransId: 0,
