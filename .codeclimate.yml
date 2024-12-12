@@ -1,0 +1,57 @@
+version: "2"
+checks:
+  argument-count:
+    enabled: true
+    config:
+      threshold: 4
+  complex-logic:
+    enabled: true
+    config:
+      threshold: 4
+  file-lines:
+    enabled: true
+    config:
+      threshold: 250  # Maximum lines per file
+  method-complexity:
+    enabled: true
+    config:
+      threshold: 5    # Cyclomatic complexity threshold
+  method-count:
+    enabled: true
+    config:
+      threshold: 20   # Maximum methods per class/module
+  method-lines:
+    enabled: true
+    config:
+      threshold: 25   # Maximum lines per method
+  nested-control-flow:
+    enabled: true
+    config:
+      threshold: 4    # Maximum nesting depth
+  return-statements:
+    enabled: true
+    config:
+      threshold: 4    # Maximum return statements per function
+  similar-code:
+    enabled: true
+  identical-code:
+    enabled: true
+
+exclude_patterns:
+  - "test/"
+  - "tests/"
+  - "**/test/"
+  - "**/tests/"
+  - "**/*.test.js"
+  - "**/*.test.jsx"
+  - "**/*.spec.js"
+  - "**/*.spec.jsx"
+  - "build/"
+  - "dist/"
+  - "node_modules/"
+  - "public/"
+  - "coverage/"
+  - "docs/"
+  - "*.md"
+  - ".github/"
+  -

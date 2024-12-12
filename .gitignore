@@ -17,3 +17,5 @@ node_modules/
 build/
 # End of https://www.gitignore.io/api/visualstudiocode
 /nbproject/private/
+coverage/
+/coverage/
