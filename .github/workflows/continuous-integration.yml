@@ -22,7 +22,7 @@ env:
   NODE_VERSION: '16'
 
 jobs:
-  continuous-integration:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
