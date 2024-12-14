@@ -259,7 +259,7 @@ export default class ManualTagging extends Component {
             allowManualInsertRow: false,
             allowExport: false,
             editable: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onload: this.loadedOrderHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -328,7 +328,7 @@ export default class ManualTagging extends Component {
             allowManualInsertRow: false,
             allowExport: false,
             editable: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onload: this.loadedShipmentHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -3198,7 +3198,7 @@ export default class ManualTagging extends Component {
                         allowDeleteRow: false,
                         filters: false,
                         onchange: this.changedTab1,
-                        license: JEXCEL_PRO_KEY,
+                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                         contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
@@ -3443,7 +3443,7 @@ export default class ManualTagging extends Component {
                         copyCompatibility: true,
                         allowManualInsertRow: false,
                         parseFormulas: true,
-                        license: JEXCEL_PRO_KEY,
+                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                         contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
@@ -3652,7 +3652,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
@@ -3940,7 +3940,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     updateTable: function (el, cell, x, y, source, value, id) {
                         var elInstance = el;
                         if (y != null) {
@@ -4144,7 +4144,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),

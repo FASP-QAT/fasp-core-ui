@@ -3939,8 +3939,8 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
-            editable: false
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -4234,7 +4234,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4610,7 +4610,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),

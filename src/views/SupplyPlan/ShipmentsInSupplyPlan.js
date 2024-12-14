@@ -782,7 +782,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 allowExport: false,
                                                 parseFormulas: true,
                                                 filters: filterOption,
-                                                license: JEXCEL_PRO_KEY,
+                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                                 onchangepage: this.onchangepage,
                                                 oneditionend: this.oneditionend,
                                                 oncreateeditor: function (a, b, c, d, e) {
@@ -1156,7 +1156,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                                                 contextMenu: function (obj, x, y, e) {
                                                                                     return false;
                                                                                 },
-                                                                                license: JEXCEL_PRO_KEY,
+                                                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                                                                 onload: this.loadedShipmentDates,
                                                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                                                     var elInstance = el;
@@ -1839,7 +1839,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             allowExport: false,
             parseFormulas: true,
             onload: this.loadedBatchInfoShipment,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
             contextMenu: function (obj, x, y, e) {
@@ -4758,7 +4758,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 allowManualInsertRow: false,
                 allowExport: false,
                 editable: tableEditable,
-                license: JEXCEL_PRO_KEY,
+                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                 contextMenu: function (obj, x, y, e) {
                     return false;
                 },
@@ -4823,7 +4823,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                     allowExport: false,
                     editable: true,
                     onload: this.loadedQtyCalculator1,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     },

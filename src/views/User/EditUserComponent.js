@@ -1062,7 +1062,7 @@ class EditUserComponent extends Component {
       parseFormulas: true,
       onpaste: this.onPaste,
       onload: this.loaded,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {

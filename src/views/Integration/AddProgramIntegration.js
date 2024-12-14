@@ -259,7 +259,7 @@ class ProgramIntegration extends Component {
                                                         copyCompatibility: true,
                                                         onpaste: this.onPaste,
                                                         allowManualInsertRow: false,
-                                                        license: JEXCEL_PRO_KEY,
+                                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                                         editable: true,
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {

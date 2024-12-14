@@ -907,7 +907,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 jExcelLoadedFunctionWithoutPagination(instance);
             },
             editable: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -1359,7 +1359,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             parseFormulas: true,
             onload: this.loaded,
             editable: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

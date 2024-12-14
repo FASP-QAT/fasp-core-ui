@@ -293,7 +293,7 @@ export default class StepTwoImportMapPlanningUnits extends Component {
             parseFormulas: true,
             onload: loadedForNonEditableTables,
             editable: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

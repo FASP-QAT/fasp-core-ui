@@ -750,7 +750,7 @@ class CountrySpecificPrices extends Component {
                 copyCompatibility: true,
                 onpaste: this.onPaste,
                 allowManualInsertRow: false,
-                license: JEXCEL_PRO_KEY,
+                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                 onload: this.loaded,
                 updateTable: function (el, cell, x, y, source, value, id) {
                     if (y != null) {

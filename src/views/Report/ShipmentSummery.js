@@ -1421,7 +1421,7 @@ class ShipmentSummery extends Component {
         },
       ],
       editable: false,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       filters: true,
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),

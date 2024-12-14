@@ -3055,7 +3055,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onpaste: function (instance, data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].x == 6) {
@@ -4007,7 +4007,7 @@ export default class TreeTable extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
             onchangepage: this.onChangePageTab2,
@@ -4620,7 +4620,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onload: this.loadedTab3,
             onchange: this.onChangeTab3Data,
             onchangepage: this.onChangePageTab3,

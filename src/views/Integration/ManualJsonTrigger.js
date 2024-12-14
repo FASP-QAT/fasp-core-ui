@@ -203,7 +203,7 @@ export default class ConsumptionDetails extends Component {
       onchange: this.changed,
       copyCompatibility: true,
       allowManualInsertRow: false,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       editable: true,
       onload: this.loadedModal,
       contextMenu: function (obj, x, y, e) {
@@ -1128,7 +1128,7 @@ export default class ConsumptionDetails extends Component {
                 allowDeleteRow: false,
                 copyCompatibility: true,
                 allowManualInsertRow: false,
-                license: JEXCEL_PRO_KEY,
+                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                 editable: false,
                 onload: loadedForNonEditableTables,
                 contextMenu: function (obj, x, y, e) {
