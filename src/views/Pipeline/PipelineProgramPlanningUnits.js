@@ -727,7 +727,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 allowInsertRow: false,
                                                 onload: this.loadedJexcelCommonFunction,
                                                 oneditionend: this.oneditionend,
-                                                license: JEXCEL_PRO_KEY,
+                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                             };
                                             var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                             this.el = elVar;

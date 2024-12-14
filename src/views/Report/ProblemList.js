@@ -666,7 +666,7 @@ export default class ProblemList extends React.Component {
             allowDeleteRow: false,
             onselection: this.selected,
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             onchange: this.rowChanged,
             copyCompatibility: true,
             allowExport: false,
@@ -1266,7 +1266,7 @@ export default class ProblemList extends React.Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: "top",
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),

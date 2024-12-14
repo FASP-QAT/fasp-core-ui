@@ -777,7 +777,7 @@ class ModelingValidation extends Component {
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 position: 'top',
                 filters: true,
-                license: JEXCEL_PRO_KEY,
+                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),
@@ -804,7 +804,7 @@ class ModelingValidation extends Component {
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 position: 'top',
                 filters: true,
-                license: JEXCEL_PRO_KEY,
+                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
                 }.bind(this),

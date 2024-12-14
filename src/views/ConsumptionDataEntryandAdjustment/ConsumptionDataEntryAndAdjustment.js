@@ -408,7 +408,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: 'top',
           filters: false,
-          license: JEXCEL_PRO_KEY,
+          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
           parseFormulas: true,
           editable: AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
           contextMenu: function (obj, x, y, e) {
@@ -4016,7 +4016,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       allowManualInsertRow: false,
       parseFormulas: true,
       editable: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),

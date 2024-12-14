@@ -432,7 +432,7 @@ export default class QunatimedImportStepTwo extends Component {
                             onchange: this.programPlanningUnitChanged,
                             allowDeleteRow: false,
                             onload: this.loaded,
-                            license: JEXCEL_PRO_KEY,
+                            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                             filters: true,
                             editable: true,
                         };

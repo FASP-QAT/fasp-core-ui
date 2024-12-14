@@ -392,7 +392,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         copyCompatibility: true,
                         parseFormulas: true,
                         filters: filterOption,
-                        license: JEXCEL_PRO_KEY,
+                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                         onpaste: this.onPaste,
                         oneditionend: this.oneditionend,
                         onchangepage: this.onchangepage,
@@ -609,7 +609,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             parseFormulas: true,
             editable: inventoryBatchEditable,
             onload: this.loadedBatchInfoInventory,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
             contextMenu: function (obj, x, y, e) {

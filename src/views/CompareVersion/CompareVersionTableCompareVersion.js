@@ -330,7 +330,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             position: 'top',
             filters: true,
             editable: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];

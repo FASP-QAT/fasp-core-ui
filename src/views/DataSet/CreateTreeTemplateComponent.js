@@ -1351,7 +1351,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -2378,7 +2378,7 @@ export default class CreateTreeTemplate extends Component {
             // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5105,7 +5105,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: this.state.editable,
             contextMenu: function (obj, x, y, e) {
                 return false;
@@ -5273,7 +5273,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5584,7 +5584,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -6131,7 +6131,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
         };
         var modelingPerEl = jexcel(document.getElementById("modelingJexcelPercent"), options);
         this.el = modelingPerEl;
@@ -9544,7 +9544,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

@@ -1374,7 +1374,7 @@ class ForecastSummary extends Component {
                                                 colCount = colCount + 2;
                                             }
                                         },
-                                        license: JEXCEL_PRO_KEY,
+                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                         contextMenu: function (obj, x, y, e) {
                                             return false;
                                         }.bind(this),
@@ -1611,7 +1611,7 @@ class ForecastSummary extends Component {
                                         colCount = colCount + 2;
                                     }
                                 },
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     return false;
                                 }.bind(this),
