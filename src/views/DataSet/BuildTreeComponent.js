@@ -5830,9 +5830,9 @@ export default class BuildTree extends Component {
             oneditionstart: function (el, cell, x, y) {
                 let tempConfig = el.getConfig();
                 if((x == 1 || x == 2) && el.getValueFromCoords(14, y) == 1) {
-                    tempConfig.columns[2].options.validRange =  [null, null]
-                } else {
-                    tempConfig.columns[2].options.validRange =  [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth]
+                    tempConfig.columns[x].options.validRange =  [null, null]
+                } else if((x == 1 || x == 2)){
+                    tempConfig.columns[x].options.validRange =  [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth]
                 }
                 el.setConfig(tempConfig);
             }.bind(this),
