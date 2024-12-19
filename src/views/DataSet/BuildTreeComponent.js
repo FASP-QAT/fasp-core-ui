@@ -10605,7 +10605,7 @@ export default class BuildTree extends Component {
                 pointHoverBackgroundColor: 'transparent',
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
-                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.currentItemConfig.context.payload.nodeType.id == 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
             }
             )
             bar1 = {
