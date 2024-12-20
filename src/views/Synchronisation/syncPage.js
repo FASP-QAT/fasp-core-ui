@@ -2807,7 +2807,11 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R']
     elInstance.options.editable = true;
+    var localDataChanged = 0;
+    var serverDataChanged = 0;
     for (var c = 0; c < jsonData.length; c++) {
+      localDataChanged = 0;
+      serverDataChanged = 0;
       if ((jsonData[c])[16] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2847,12 +2851,14 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
               (jsonData[c])[18] = 3;
+              serverDataChanged++;
             } else if ((jsonData[c])[17] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
               (jsonData[c])[18] = 2;
+              localDataChanged++;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -2882,11 +2888,13 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 3, true);
+              serverDataChanged++;
             } else if ((jsonData[c])[17] != "" && latestData[13] == downloadedData[13]) {
               var col = (colArr[14]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(18, c, 2, true);
+              localDataChanged++
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -2900,6 +2908,19 @@ export default class syncPage extends Component {
               }
             }
           }
+        }
+      }
+      if (localDataChanged > 0 && serverDataChanged > 0) {
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1,
+          conflictsCountConsumption: this.state.conflictsCountConsumption + 1,
+          isChanged: true
+        })
+        elInstance.setValueFromCoords(18, c, 1, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
         }
       }
     }
@@ -2918,7 +2939,11 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S']
     elInstance.options.editable = true;
+    var localDataChanged = 0;
+    var serverDataChanged = 0;
     for (var c = 0; c < jsonData.length; c++) {
+      localDataChanged = 0;
+      serverDataChanged = 0;
       if ((jsonData[c])[17] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -2958,12 +2983,14 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 3, true);
               (jsonData[c])[19] = 3;
+              serverDataChanged++;
             } else if ((jsonData[c])[18] != "" && latestData[j] == downloadedData[j]) {
               var col = (colArr[j]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 2, true);
               (jsonData[c])[19] = 2;
+              localDataChanged++;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -2993,11 +3020,13 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 3, true);
+              serverDataChanged++;
             } else if ((jsonData[c])[18] != "" && latestData[14] == downloadedData[14]) {
               var col = (colArr[15]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(19, c, 2, true);
+              localDataChanged++;
             } else {
               this.setState({
                 conflictsCount: this.state.conflictsCount + 1,
@@ -3011,6 +3040,19 @@ export default class syncPage extends Component {
               }
             }
           }
+        }
+      }
+      if (localDataChanged > 0 && serverDataChanged > 0) {
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1,
+          conflictsCountInventory: this.state.conflictsCountInventory + 1,
+          isChanged:true
+        })
+        elInstance.setValueFromCoords(19, c, 1, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
         }
       }
     }
@@ -3310,7 +3352,11 @@ export default class syncPage extends Component {
     var jsonData = elInstance.getJson();
     var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI']
     elInstance.options.editable = true;
+    var localDataChanged = 0;
+    var serverDataChanged = 0;
     for (var c = 0; c < jsonData.length; c++) {
+      localDataChanged = 0;
+      serverDataChanged = 0;
       if ((jsonData[c])[34] == "") {
         for (var i = 0; i < colArr.length; i++) {
           var col = (colArr[i]).concat(parseInt(c) + 1);
@@ -3352,6 +3398,7 @@ export default class syncPage extends Component {
                   elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
                   elInstance.setValueFromCoords(36, c, 3, true);
                   (jsonData[c])[36] = 3;
+                  serverDataChanged++;
                 }
               } else if ((jsonData[c])[35] != "" && latestData[j] == downloadedData[j]) {
                 var col = (colArr[j]).concat(parseInt(c) + 1);
@@ -3359,6 +3406,7 @@ export default class syncPage extends Component {
                 elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
                 elInstance.setValueFromCoords(36, c, 2, true);
                 (jsonData[c])[36] = 2;
+                localDataChanged++;
               } else {
                 this.setState({
                   conflictsCount: this.state.conflictsCount + 1,
@@ -3389,11 +3437,13 @@ export default class syncPage extends Component {
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LATEST_VERSION_COLOUR);
               elInstance.setValueFromCoords(36, c, 3, true);
+              serverDataChanged++;
             } else if ((jsonData[c])[35] != "" && latestData[31] == downloadedData[31]) {
               var col = (colArr[32]).concat(parseInt(c) + 1);
               elInstance.setStyle(col, "background-color", "transparent");
               elInstance.setStyle(col, "background-color", LOCAL_VERSION_COLOUR);
               elInstance.setValueFromCoords(36, c, 2, true);
+              localDataChanged++;
             } else {
               if (jsonData[c][26].toString() != "true") {
                 this.setState({
@@ -3409,6 +3459,19 @@ export default class syncPage extends Component {
               }
             }
           }
+        }
+      }
+      if (localDataChanged > 0 && serverDataChanged > 0) {
+        this.setState({
+          conflictsCount: this.state.conflictsCount + 1,
+          conflictsCountShipment: this.state.conflictsCountShipment + 1,
+          isChanged: true
+        })
+        elInstance.setValueFromCoords(36, c, 1, true);
+        for (var j = 0; j < colArr.length; j++) {
+          var col = (colArr[j]).concat(parseInt(c) + 1);
+          elInstance.setStyle(col, "background-color", "transparent");
+          elInstance.setStyle(col, "background-color", "yellow");
         }
       }
     }
