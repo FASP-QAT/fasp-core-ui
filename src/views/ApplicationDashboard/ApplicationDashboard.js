@@ -1155,6 +1155,7 @@ class ApplicationDashboard extends Component {
         bottomProgramId: "",
         rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
       }, () => {
+        localStorage.setItem("bottomProgramId", "")
         this.getPrograms();
       })
     }
