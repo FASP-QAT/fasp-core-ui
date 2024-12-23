@@ -4273,7 +4273,7 @@ export default class BuildTree extends Component {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
                 var tempNoOfMonths = Number(tempMonth) - Math.floor(Number(tempMonth));
                 tempCalculatedValue = 0;
-                var f = momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD"));
+                var f = momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD") && moment((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month).format("YYYY-MM") <= moment(c.month).format("YYYY-MM"));
                 f.map((item, index) => {
                     if (f.length > 1 && (index != f.length - 1)) {
                         tempCalculatedValue += item.calculatedValue;
