@@ -658,9 +658,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       onpaste: this.onPaste,
       oneditionend: this.oneditionend,
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       onload: this.loaded,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {

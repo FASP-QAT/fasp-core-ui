@@ -115,7 +115,7 @@ export default class PipelineProgramList extends Component {
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

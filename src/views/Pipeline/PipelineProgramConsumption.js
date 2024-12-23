@@ -460,7 +460,7 @@ export default class PipelineProgramConsumption extends Component {
                                         copyCompatibility: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
-                                        license: JEXCEL_PRO_KEY,
+                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                         filters: true,
                                         editable: true,
                                         onload: this.loadedJexcelCommonFunctionTwo,

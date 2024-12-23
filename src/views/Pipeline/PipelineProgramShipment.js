@@ -1117,7 +1117,7 @@ export default class PipelineProgramShipment extends Component {
             }.bind(this),
             onload: this.loadedCommonFunctionJExcel,
             oneditionend: this.oneditionend,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
         };
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();
