@@ -814,7 +814,7 @@
   "static.treeTable.tab1": "Nodo Agregación/Número/Porcentaje",
   "static.NodeData.ModelingTransferTab": "Pestaña Modelado/Transferencia",
   "static.extrapolation.SeeSections": "Consulte las secciones 3 y 4 a continuación para obtener una explicación de los métodos de extrapolación y cómo elegir mejor los métodos para su estimación.",
-  "static.report.forecastErrorMonthlyFormulaupdatethreshold": "El administrador del programa puede actualizar este umbral de error de pronóstico por unidad de planificación en la pantalla \"\"Actualizar unidades de planificación\"\". El umbral de error de pronóstico predeterminado es del 50%.",
+  "static.report.forecastErrorMonthlyFormulaupdatethreshold": "El administrador del programa puede actualizar este umbral de error de pronóstico por unidad de planificación en la pantalla \"Actualizar unidades de planificación\". El umbral de error de pronóstico predeterminado es del 50%.",
   "static.dashboard.shipmentGlobalDemandViewheader": "Información General de los Pedidos",
   "static.supplyPlan.duplicateShipment": "Pedido duplicado",
   "static.user.username": "Nombre",

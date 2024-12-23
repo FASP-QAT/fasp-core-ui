@@ -814,7 +814,7 @@
   "static.treeTable.tab1": "Aggregation/Number/Percentage Node",
   "static.NodeData.ModelingTransferTab": "Modeling/Transfer Tab",
   "static.extrapolation.SeeSections": "See sections 3 and 4 below for an explanation of the extrapolation methods and how to best choose methods for your forecast",
-  "static.report.forecastErrorMonthlyFormulaupdatethreshold": "This forecast error threshold can be updated per planning unit by the program administrator in the \"\"Update Planning Units\"\" screen. The default forecast error threshold is 50%.",
+  "static.report.forecastErrorMonthlyFormulaupdatethreshold": "This forecast error threshold can be updated per planning unit by the program administrator in the \"Update Planning Units\" screen. The default forecast error threshold is 50%.",
   "static.dashboard.shipmentGlobalDemandViewheader": "Shipment Overview",
   "static.supplyPlan.duplicateShipment": "Duplicate shipment",
   "static.user.username": "Name",
