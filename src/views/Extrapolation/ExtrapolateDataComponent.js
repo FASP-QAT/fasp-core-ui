@@ -1020,7 +1020,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             columnSorting: false,
             contextMenu: function (obj, x, y, e) {
                 return [];

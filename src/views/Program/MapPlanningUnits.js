@@ -951,7 +951,7 @@ export default class MapPlanningUnits extends Component {
                         onpaste: this.onPaste,
                         onload: this.loaded,
                         oneditionend: this.oneditionend,
-                        license: JEXCEL_PRO_KEY,
+                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                         contextMenu: function (obj, x, y, e) {
                             var items = [];
                             if (y == null) {

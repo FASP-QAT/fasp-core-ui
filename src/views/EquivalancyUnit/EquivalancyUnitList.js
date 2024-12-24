@@ -449,7 +449,7 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             oneditionend: this.oneditionend1,
             onload: this.loaded1,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: true,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -769,7 +769,7 @@ class EquivalancyUnit extends Component {
             oneditionend: this.oneditionend,
             onload: this.loaded,
             editable: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {

@@ -30,7 +30,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, filterOptions, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundN2 } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 /**
  * Component for Forecast Metrics Report.
@@ -516,7 +516,11 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = (consumptions[j].program.code)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      data[2] = consumptions[j].message != null ? "" : roundN2(consumptions[j].forecastError);
+      if(consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined && consumptions[j].forecastError>consumptions[j].forecastErrorThreshold){
+        data[2] = consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div  class='jexcelRedCell'>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+      }else{
+        data[2] = consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+      }
       data[3] = consumptions[j].monthCount;
       data[4] = roundN2(consumptions[j].forecastError);
       data[5] = consumptions[j].forecastErrorThreshold;
@@ -542,8 +546,11 @@ class ForecastMetrics extends Component {
         },
         {
           title: i18n.t('static.report.error'),
-          type: 'numeric',
-          mask: '#,##.00%', decimal: '.'
+          type: 'html',
+          editable: false,
+          readOnly: true,
+          mask: "#,##.00%",
+          decimal: ".",
         },
         {
           title: i18n.t('static.report.noofmonth'),
@@ -578,7 +585,7 @@ class ForecastMetrics extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -1193,10 +1200,11 @@ class ForecastMetrics extends Component {
               </Form>
             </div>
             <div className="" style={{position: "relative"}}>
-            <ul className="legendcommitversion" style={{position: "absolute", top: "19px", left: "-40px", display: this.state.consumptions.length > 0 ? "block" : "none"}}>
+            <ul className="legendcommitversion" style={{position: "absolute", left: "-40px", display: this.state.consumptions.length > 0 ? "block" : "none"}}>
+              <li className='DarkThColr'><i class="fa fa-exclamation-triangle red"></i>{i18n.t('static.forecastErrorReport.missingDataNote')}</li>
               <li className='DarkThColr'><span className="redlegend legendcolor"></span> <span className="legendcommitversionText"><i>{i18n.t('static.forecastErrorReport.planningUnitAboveThreshold')}</i></span></li>
             </ul>
-              <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
+              <div id="tableDiv" className="jexcelremoveReadonlybackground consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block", "top":"19px" }}>
               </div>
             </div>
             <div style={{ display: this.state.loading ? "block" : "none" }}>

@@ -3939,7 +3939,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
@@ -3961,7 +3961,7 @@ class EditSupplyPlanStatus extends Component {
      */
     buildJExcel() {
         let problemList = this.state.problemList;
-        problemList = problemList;
+        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(c=>c.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.regionId).includes(c.region.id))));
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -4234,7 +4234,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4610,7 +4610,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),

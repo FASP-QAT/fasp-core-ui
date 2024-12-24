@@ -312,7 +312,7 @@ export default class StepSix extends Component {
                                         bsSize="sm"
                                         valid={!errors.noOfMonthsInPastForBottomDashboard}
                                         invalid={touched.noOfMonthsInPastForBottomDashboard && !!errors.noOfMonthsInPastForBottomDashboard}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         onBlur={handleBlur}
                                         value={this.props.items.program.noOfMonthsInPastForBottomDashboard}
                                     />
@@ -326,7 +326,7 @@ export default class StepSix extends Component {
                                         bsSize="sm"
                                         valid={!errors.noOfMonthsInFutureForBottomDashboard}
                                         invalid={touched.noOfMonthsInFutureForBottomDashboard && !!errors.noOfMonthsInFutureForBottomDashboard}
-                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                        onChange={(e) => { handleChange(e); this.props.dataChange(e) }}
                                         onBlur={handleBlur}
                                         value={this.props.items.program.noOfMonthsInFutureForBottomDashboard}
                                     />

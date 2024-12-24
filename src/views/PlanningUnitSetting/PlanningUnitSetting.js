@@ -1263,7 +1263,7 @@ export default class PlanningUnitSetting extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);

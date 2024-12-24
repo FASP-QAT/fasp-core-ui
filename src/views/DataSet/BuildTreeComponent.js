@@ -1960,7 +1960,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -2523,7 +2523,7 @@ export default class BuildTree extends Component {
             // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -2761,7 +2761,7 @@ export default class BuildTree extends Component {
         }
         copyModalTreeList = this.state.treeData;
         copyModalParentLevelList = this.state.curTreeObj.levelList;
-        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level != "").map(x => x.level))];
+        tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level !== "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
             for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
                 copyModalParentLevelList.pop()
@@ -4274,7 +4274,7 @@ export default class BuildTree extends Component {
                 var tempMonth = ((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.usageType.id == 2 ? Number(fuPerMonth).toFixed(4) : (this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.repeatCount / tempRepeatCountConvertToMonth);
                 var tempNoOfMonths = Number(tempMonth) - Math.floor(Number(tempMonth));
                 tempCalculatedValue = 0;
-                var f = momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD"));
+                var f = momListParent.filter(c => c.month > moment(momList[j].month).subtract(Math.ceil(tempMonth), 'months').format("YYYY-MM-DD") && c.month <= moment(momList[j].month).format("YYYY-MM-DD") && moment((this.state.currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].month).format("YYYY-MM") <= moment(c.month).format("YYYY-MM"));
                 f.map((item, index) => {
                     if (f.length > 1 && (index != f.length - 1)) {
                         tempCalculatedValue += item.calculatedValue;
@@ -4459,7 +4459,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -4609,7 +4609,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5827,13 +5827,22 @@ export default class BuildTree extends Component {
                     }
                 }
             }.bind(this),
+            oneditionstart: function (el, cell, x, y) {
+                let tempConfig = el.getConfig();
+                if((x == 1 || x == 2) && el.getValueFromCoords(14, y) == 1) {
+                    tempConfig.columns[x].options.validRange =  [null, null]
+                } else if((x == 1 || x == 2)){
+                    tempConfig.columns[x].options.validRange =  [moment(this.state.currentScenario.month).startOf('month').add(1, 'months').format("YYYY-MM-DD"), this.state.maxMonth]
+                }
+                el.setConfig(tempConfig);
+            }.bind(this),
             onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -10110,7 +10119,7 @@ export default class BuildTree extends Component {
             allowExport: false,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
@@ -10605,7 +10614,7 @@ export default class BuildTree extends Component {
                 pointHoverBackgroundColor: 'transparent',
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
-                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.currentItemConfig.context.payload.nodeType.id == 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
             }
             )
             bar1 = {
@@ -11420,7 +11429,7 @@ export default class BuildTree extends Component {
                                                             </FormGroup>
                                                             <FormGroup className="col-md-6"></FormGroup>
                                                             <FormGroup className="col-md-6">
-                                                                <Label htmlFor="currencyId"># PU / {this.state.parentScenario.fuNode.usageType.id == 2 ? "Interval / " : ""}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
+                                                                <Label htmlFor="currencyId"># PU / {this.state.parentScenario.fuNode.usageType.id == 2 ? "Month / " : ""}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s) (Calculated)</Label>
                                                                 <Input type="text"
                                                                     id="puPerVisitQATCalculated"
                                                                     name="puPerVisitQATCalculated"
@@ -11433,7 +11442,7 @@ export default class BuildTree extends Component {
                                                             {/* <FormGroup className="col-md-6"></FormGroup> */}
                                                             {this.state.parentScenario.fuNode != null && (this.state.currentScenario.puNode.sharePlanningUnit == "false" || this.state.currentScenario.puNode.sharePlanningUnit == false) &&
                                                                 <FormGroup className="col-md-6">
-                                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Interval / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
+                                                                    <Label htmlFor="currencyId">{this.state.currentItemConfig.parentItem != null && this.state.parentScenario.fuNode != null && this.state.parentScenario.fuNode.usageType.id == 2 ? "# PU / Month / " : "# PU / "}{this.state.currentItemConfig.parentItem != null && this.state.currentItemConfig.parentItem.parent != null && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id).length > 0 && this.state.unitList.filter(c => c.unitId == this.state.items.filter(x => x.id == this.state.currentItemConfig.parentItem.parent)[0].payload.nodeUnit.id)[0].label.label_en}(s)</Label>
                                                                     <Input type="text"
                                                                         id="puPerVisit"
                                                                         name="puPerVisit"
@@ -11647,52 +11656,6 @@ export default class BuildTree extends Component {
                                             </FormGroup>
                                         </div>
                                         <div className="row">
-                                            <div>
-                                                <Popover placement="top" isOpen={this.state.popoverOneTimeDispensing} target="Popover20" trigger="hover" toggle={this.toggleOneTimeDispensing}>
-                                                    <PopoverBody>{i18n.t('static.tooltip.oneTimeDispensing')}</PopoverBody>
-                                                </Popover>
-                                            </div>
-                                            <FormGroup className="col-md-6" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
-                                                <FormGroup check inline>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="radio"
-                                                        id="oneTimeDispensingTrue"
-                                                        name="oneTimeDispensing"
-                                                        value={"true"}
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? true : false}
-                                                        onChange={(e) => {
-                                                            this.dataChange(e)
-                                                        }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio1">
-                                                        {i18n.t('static.realm.yes')}
-                                                    </Label>
-                                                </FormGroup>
-                                                <FormGroup check inline>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="radio"
-                                                        id="oneTimeDispensingFalse"
-                                                        name="oneTimeDispensing"
-                                                        value={"false"}
-                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? false : true}
-                                                        onChange={(e) => {
-                                                            this.dataChange(e)
-                                                        }}
-                                                    />
-                                                    <Label
-                                                        className="form-check-label"
-                                                        check htmlFor="inline-radio2">
-                                                        {i18n.t('static.program.no')}
-                                                    </Label>
-                                                </FormGroup>
-                                            </FormGroup>
-                                        </div>
-                                        <div className="row">
                                             <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'block' : 'none' }}>
                                                 <Label htmlFor="currencyId">{i18n.t('static.usageTemplate.every')}<span class="red Reqasterisk">*</span></Label>
                                             </FormGroup>
@@ -11797,7 +11760,55 @@ export default class BuildTree extends Component {
                                                     </Input>
                                                     <FormFeedback className="red">{errors.oneTimeUsage}</FormFeedback>
                                                 </FormGroup>
+                                                
+
                                                 <>
+                                            <div>
+                                                <Popover placement="top" isOpen={this.state.popoverOneTimeDispensing} target="Popover20" trigger="hover" toggle={this.toggleOneTimeDispensing}>
+                                                    <PopoverBody>{i18n.t('static.tooltip.oneTimeDispensing')}</PopoverBody>
+                                                </Popover>
+                                            </div>
+                                            <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
+                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingTrue"
+                                                        name="oneTimeDispensing"
+                                                        value={"true"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? true : false}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio1">
+                                                        {i18n.t('static.tree.allInFirstMonth')}
+                                                    </Label>
+                                                </FormGroup>
+                                                <FormGroup check inline>
+                                                    <Input
+                                                        className="form-check-input"
+                                                        type="radio"
+                                                        id="oneTimeDispensingFalse"
+                                                        name="oneTimeDispensing"
+                                                        value={"false"}
+                                                        checked={(this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage.toString() != "true" ? (this.state.currentScenario.fuNode.oneTimeDispensing != undefined && this.state.currentScenario.fuNode.oneTimeDispensing != null && this.state.currentScenario.fuNode.oneTimeDispensing.toString() != "" ? this.state.currentScenario.fuNode.oneTimeDispensing.toString() : "true") : "") == "true" ? false : true}
+                                                        onChange={(e) => {
+                                                            this.dataChange(e)
+                                                        }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label"
+                                                        check htmlFor="inline-radio2">
+                                                        {i18n.t('static.tree.monthByMonth')}
+                                                    </Label>
+                                                </FormGroup>
+                                            </FormGroup>
+                                        </>
+                                        <>
                                                     <FormGroup className="col-md-2" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}></FormGroup>
                                                     <FormGroup className="col-md-4" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
                                                         <Input type="text"

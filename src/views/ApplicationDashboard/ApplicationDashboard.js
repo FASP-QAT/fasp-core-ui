@@ -450,7 +450,7 @@ class ApplicationDashboard extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: "top",
           filters: true,
-          license: JEXCEL_PRO_KEY,
+          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
           contextMenu: function (obj, x, y, e) {
             return false;
           }.bind(this),
@@ -1155,6 +1155,7 @@ class ApplicationDashboard extends Component {
         bottomProgramId: "",
         rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
       }, () => {
+        localStorage.setItem("bottomProgramId", "")
         this.getPrograms();
       })
     }
@@ -1832,7 +1833,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 10,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1895,7 +1896,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1959,7 +1960,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -2036,7 +2037,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
