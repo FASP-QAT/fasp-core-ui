@@ -1183,7 +1183,7 @@ export default class SupplyPlanComponent extends React.Component {
                     allowExport: false,
                     position: 'top',
                     filters: false,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         var items = [];
                         if (y != null) {

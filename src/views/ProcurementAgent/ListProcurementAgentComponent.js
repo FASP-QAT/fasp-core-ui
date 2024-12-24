@@ -226,7 +226,7 @@ class ListProcurementAgentComponent extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
@@ -285,7 +285,7 @@ class ListProcurementAgentComponent extends Component {
         if (e.buttons == 1) {
             if ((x == 0 && value != 0) || (y == 0)) {
             } else {
-                if (AuthenticationService.checkUserACL(this.el.getValueFromCoords(13, x), 'ROLE_BF_EDIT_PROCUREMENT_AGENT')) {
+                if ((this.el.getValueFromCoords(13, x)==0 && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PROCUREMENT_AGENT')) || (AuthenticationService.checkUserACL(this.el.getValueFromCoords(13, x), 'ROLE_BF_EDIT_PROCUREMENT_AGENT'))) {
                     this.props.history.push({
                         pathname: `/procurementAgent/editProcurementAgent/${this.el.getValueFromCoords(0, x)}`,
                     });

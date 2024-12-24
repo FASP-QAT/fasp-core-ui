@@ -825,18 +825,19 @@ class SupplyPlanFormulas extends Component {
                   <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3')} <b>{i18n.t('static.report.timeWindow')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew3a')}</p>
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
                   <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew4a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew4b')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew4c')}</p>
-                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew4a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew5a')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew5b')}</p>
-                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew6')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate4')} <i class="fa fa-exclamation-triangle" style={{color:'red'}} aria-hidden="true"></i> {i18n.t('static.report.forecastErrorMonthlyFormulaupdate41')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdate42')}</b></p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate5')} <span style={{color:'red'}}>{i18n.t('static.report.forecastErrorMonthlyFormulaupdateredtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormulaupdateindicates')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdatecalculated')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaupdatethreshold')}</p>
+                  <p>{"6) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew6')}</p>
                   <p><b>{""+i18n.t('static.dataEntryAndAdjustments.StockOutRate')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6a')}</p>
                   <p><b>{""+i18n.t('static.dataentry.adjustedConsumption')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6b')}</p>
-                  <p>{"6) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew7')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew7a')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew7b')}
+                  <p>{"7) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew7')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew7a')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew7b')}
                   <ol>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew8")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew9")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew10")}</li>
                   </ol>
                   </p>
-                  <p>{"7) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew11a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew11b')}</b>
+                  <p>{"8) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew11a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew11b')}</b>
                   <ol>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew12")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew13")}</li>
@@ -858,11 +859,11 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
                   <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
-                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula5')}</p>
-                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula6')}</p>
-                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula7')}</p>
-                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4')}</p>
-                  <p>{i18n.t("static.report.wapeFormulaNote")}</p>
+                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula8')}</p>
+                  <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula6nomonth')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula7consumption')}</p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4row')} <span style={{color:'red'}}>{i18n.t('static.report.forecastErrorMonthlyFormula4redtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormula4indicatesthat')} <b>{i18n.t('static.report.forecastErrorMonthlyFormula4thresholdper')}</b> {i18n.t('static.report.forecastErrorMonthlyFormula4UpdatePlanningFe')}</p>
+                  {/* <p>{i18n.t("static.report.wapeFormulaNote")}</p> */}
                 </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
