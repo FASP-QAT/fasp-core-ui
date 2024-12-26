@@ -106,6 +106,7 @@ class StockStatus extends Component {
       onlyShowAllPUs: false,
       ppuList: [],
       graphAggregatedBy: 1,
+      versionId: "",
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -120,6 +121,7 @@ class StockStatus extends Component {
     this.setPlanningUnitExport = this.setPlanningUnitExport.bind(this);
     this.setRealmCountryPlanningUnitExport = this.setRealmCountryPlanningUnitExport.bind(this);
     this.setGraphAggregatedBy = this.setGraphAggregatedBy.bind(this);
+    this.setVersionId = this.setVersionId.bind(this);
   }
   setGraphAggregatedBy(e) {
     this.setState({
@@ -160,8 +162,23 @@ class StockStatus extends Component {
       // equivalencyUnitId: "",
       // dataList: [],
     }, () => {
-      this.getDropdownLists()
+      this.filterVersion();
     })
+  }
+  /**
+   * Sets the version ID and updates the tracer category list.
+   * @param {Object} event - The event object containing the version ID value.
+   */
+  setVersionId(event) {
+    this.setState(
+      {
+        versionId: event.target.value,
+      },
+      () => {
+        if(this.state.versionId != "")
+          this.getDropdownLists();
+      }
+    );
   }
 
   getDropdownLists() {
@@ -169,76 +186,158 @@ class StockStatus extends Component {
       programIds: this.state.programId.map(ele => ele.value),
       onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
     }
-    ReportService.getDropdownListByProgramIds(json).then(response => {
-      this.setState({
-        equivalencyUnitList: response.data.equivalencyUnitList,
-        planningUnitListAll: response.data.planningUnitList,
-        realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
-        planningUnitList: response.data.planningUnitList,
-        realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList,
-        planningUnitId: [],
-        realmCountryPlanningUnitId: [],
-        stockStatusList: []
-      }, () => {
-        if (this.state.yaxisEquUnit != -1) {
-          var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
-          var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-          var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-          this.setState({
-            planningUnitList: planningUnitList,
-            realmCountryPlanningUnitList: realmCountryPlanningUnitList,
-          })
-        }
-      })
-    }).catch(
-      error => {
+    if (this.state.versionId.includes("Local")) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(
+        INDEXED_DB_NAME,
+        INDEXED_DB_VERSION
+      );
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var planningunitTransaction = db1.transaction(
+          ["programPlanningUnit"],
+          "readwrite"
+        );
+        var planningunitOs = planningunitTransaction.objectStore(
+          "programPlanningUnit"
+        );
+        var planningunitRequest = planningunitOs.getAll();
+        planningunitRequest.onerror = function (event) {
+        };
+        planningunitRequest.onsuccess = function (e) {
+          var myResult = [];
+          myResult = planningunitRequest.result;
+          var programId = this.state.programId[0].value;
+          var proList = [];
+          let incrmental = 0;
+          let planningUnitListAll = myResult.filter(epu => epu.program.id == programId).map(pu => pu.planningUnit);
+          
+          var realmCountryPlanningunitTransaction = db1.transaction(
+            ["realmCountryPlanningUnit"],
+            "readwrite"
+          );
+          var realmCountryPlanningunitOs = realmCountryPlanningunitTransaction.objectStore(
+            "realmCountryPlanningUnit"
+          );
+          var realmCountryPlanningunitRequest = realmCountryPlanningunitOs.getAll();
+          realmCountryPlanningunitRequest.onerror = function (event) {
+          };
+          realmCountryPlanningunitRequest.onsuccess = function (e) {
+            var programTransaction = db1.transaction(
+              ["program"],
+              "readwrite"
+            );
+            var programOs = programTransaction.objectStore(
+              "program"
+            );
+            var programRequest = programOs.get(programId);
+            programRequest.onerror = function (event) {
+            };
+            programRequest.onsuccess = function (e) {
+              var programResult;
+              programResult = programRequest.result;
+
+              var myResult = [];
+              myResult = realmCountryPlanningunitRequest.result;
+              let realmCountryPlanningUnitListAll = myResult.filter(ercpu => [...new Set(planningUnitListAll.map(x => x.id))].includes(ercpu.planningUnit.id) && programResult.realmCountry.realmCountryId == ercpu.realmCountry.id).map(rcpu => rcpu.planningUnit);
+              var lang = this.state.lang;
+              this.setState({
+                // equivalencyUnitList: response.data.equivalencyUnitList,
+                planningUnitListAll: planningUnitListAll,
+                realmCountryPlanningUnitListAll: realmCountryPlanningUnitListAll,
+                planningUnitList: planningUnitListAll,
+                realmCountryPlanningUnitList: realmCountryPlanningUnitListAll,
+                planningUnitId: [],
+                realmCountryPlanningUnitId: [],
+                stockStatusList: []
+              }, () => {
+                if (this.state.yaxisEquUnit != -1) {
+                  var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+                  var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+                  var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+                  this.setState({
+                    planningUnitList: planningUnitList,
+                    realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                  })
+                }
+              });
+            }.bind(this);
+          }.bind(this);
+        }.bind(this);
+      }.bind(this);
+    } else {
+      ReportService.getDropdownListByProgramIds(json).then(response => {
         this.setState({
-          stockStatusList: [], loading: false
+          equivalencyUnitList: response.data.equivalencyUnitList,
+          planningUnitListAll: response.data.planningUnitList,
+          realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
+          planningUnitList: response.data.planningUnitList,
+          realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList,
+          planningUnitId: [],
+          realmCountryPlanningUnitId: [],
+          stockStatusList: []
+        }, () => {
+          if (this.state.yaxisEquUnit != -1) {
+            var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+            var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+            var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+            this.setState({
+              planningUnitList: planningUnitList,
+              realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+            })
+          }
         })
-        if (error.message === "Network Error") {
+      }).catch(
+        error => {
           this.setState({
-            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-            loading: false
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`)
-              break;
-            case 409:
-              this.setState({
-                message: i18n.t('static.common.accessDenied'),
-                loading: false,
-                color: "#BA0C2F",
-              });
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`)
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                loading: false
-              });
-              break;
-            case 412:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                loading: false
-              });
-              break;
-            default:
-              this.setState({
-                message: 'static.unkownError',
-                loading: false
-              });
-              break;
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
           }
         }
-      }
-    );
+      );
+    }
   }
   /**
    * Toggles the value of the 'show' state variable.
@@ -1722,6 +1821,187 @@ class StockStatus extends Component {
     }
   }
   /**
+   * Filters versions based on the selected program ID and updates the state accordingly.
+   * Sets the selected program ID in local storage.
+   * Fetches version list for the selected program and updates the state with the fetched versions.
+   * Handles error cases including network errors, session expiry, access denial, and other status codes.
+   */
+  filterVersion = () => {
+    let programId = this.state.programId;
+    if (programId.length == 1) {
+      programId = programId[0].value
+      const program = this.state.programs.filter(
+        (c) => c.programId == programId
+      );
+      if (program.length == 1) {
+        if (localStorage.getItem("sessionType") === 'Online') {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              DropdownService.getVersionListForSPProgram(
+                programId
+              )
+                .then((response) => {
+                  this.setState(
+                    {
+                      versions: [],
+                    },
+                    () => {
+                      this.setState(
+                        {
+                          versions: response.data,
+                        },
+                        () => {
+                          this.consolidatedVersionList(programId);
+                        }
+                      );
+                    }
+                  );
+                })
+                .catch((error) => {
+                  this.setState({
+                    programs: [],
+                    loading: false,
+                  });
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      message: API_URL.includes("uat")
+                        ? i18n.t("static.common.uatNetworkErrorMessage")
+                        : API_URL.includes("demo")
+                          ? i18n.t("static.common.demoNetworkErrorMessage")
+                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                      loading: false,
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+                      case 401:
+                        this.props.history.push(
+                          `/login/static.message.sessionExpired`
+                        );
+                        break;
+                      case 409:
+                        this.setState({
+                          message: i18n.t('static.common.accessDenied'),
+                          loading: false,
+                          color: "#BA0C2F",
+                        });
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`);
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: "static.unkownError",
+                          loading: false,
+                        });
+                        break;
+                    }
+                  }
+                });
+            }
+          );
+        } else {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              this.consolidatedVersionList(programId);
+            }
+          );
+        }
+      } else {
+        this.setState({
+          versions: [],
+        });
+      }
+    } else {
+      this.setState({
+        versions: [],
+      });
+    }
+  };
+  /**
+   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
+   * Filters out duplicate versions and reverses the list.
+   * Sets the version list in the state and triggers fetching of planning units.
+   * Handles cases where a version is selected from local storage or the default version is selected.
+   * @param {number} programId - The ID of the selected program
+   */
+  consolidatedVersionList = (programId) => {
+    const { versions } = this.state;
+    var verList = versions;
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(["programData"], "readwrite");
+      var program = transaction.objectStore("programData");
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(
+          localStorage.getItem("curUser"),
+          SECRET_KEY
+        );
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (
+            myResult[i].userId == userId &&
+            myResult[i].programId == programId
+          ) {
+            var databytes = CryptoJS.AES.decrypt(
+              myResult[i].programData.generalData,
+              SECRET_KEY
+            );
+            var programData = databytes.toString(CryptoJS.enc.Utf8);
+            var version = JSON.parse(programData).currentVersion;
+            version.versionId = `${version.versionId} (Local)`;
+            version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
+            verList.push(version);
+          }
+        }
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+        this.setState(
+          {
+            versions: versionList,
+            versionId: versionList[0].versionId,
+          },
+          () => {
+            this.getDropdownLists();
+          }
+        );
+      }.bind(this);
+    }.bind(this);
+  };
+  /**
     * Sets the planning unit based on the provided event data.
     * @param {Object} e - Event data containing planning unit information.
     */
@@ -1977,92 +2257,240 @@ class StockStatus extends Component {
     this.setState({
       loading: true
     })
-    let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
-    let inputjson = {
-      "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
-      "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
-      "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
-      "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
-      "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
-      "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
-      "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
-      "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitId.map(ele => ele.value).toString(), // Will be used only if aggregate is false
-      "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
-    }
-    ReportService.getStockStatusData(inputjson).then((response) => {
-      var inventoryList = [];
-      var consumptionList = [];
-      var shipmentList = [];
-      var responseData = response.data.stockStatusVerticalAggregateList;
-      let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
-      var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-      filteredResponseData.map(c => {
-        c.inventoryInfo.map(i => inventoryList.push(i))
-        c.consumptionInfo.map(ci => consumptionList.push(ci))
-        c.shipmentInfo.map(si => shipmentList.push(si))
-      }
-      );
-      this.setState({
-        firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
-        firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
-        stockStatusList: filteredResponseData,
-        message: '', loading: false,
-        planningUnitLabel: "",//document.getElementById("planningUnitId").selectedOptions[0].text,
-        inList: inventoryList,
-        coList: consumptionList,
-        shList: shipmentList,
-        ppuList: response.data.programPlanningUnitList,
-        loading: false
-      })
-    }).catch(
-      error => {
-        this.setState({
-          stockStatusList: [], loading: false
-        })
-        if (error.message === "Network Error") {
+
+    if(this.state.versionId.includes("Local")) {
+      let programId = this.state.programId[0].value+"_v"+this.state.versionId.split(" ")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
+      console.log("Test@123 programId",programId)
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
           this.setState({
-            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-            loading: false
-          });
-        } else {
-          switch (error.response ? error.response.status : "") {
-            case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`)
-              break;
-            case 409:
+              message: i18n.t('static.program.errortext'),
+              color: '#BA0C2F'
+          })
+          this.hideFirstComponent()
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+          db1 = e.target.result;
+          var transaction = db1.transaction(['programData'], 'readwrite');
+          var programTransaction = transaction.objectStore('programData');
+          var programRequest = programTransaction.get(programId);
+          programRequest.onerror = function (event) {
               this.setState({
-                message: i18n.t('static.common.accessDenied'),
-                loading: false,
-                color: "#BA0C2F",
-              });
-              break;
-            case 403:
-              this.props.history.push(`/accessDenied`)
-              break;
-            case 500:
-            case 404:
-            case 406:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                loading: false
-              });
-              break;
-            case 412:
-              this.setState({
-                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                loading: false
-              });
-              break;
-            default:
-              this.setState({
-                message: 'static.unkownError',
-                loading: false
-              });
-              break;
+                  message: i18n.t('static.program.errortext'),
+                  color: '#BA0C2F'
+              })
+              this.hideFirstComponent()
+          }.bind(this);
+          programRequest.onsuccess = function (event) {
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var puData = [];
+              var planningUnitList = this.state.planningUnitId;
+              var consumptionList = [], inventoryList = [], shipmentList = [], supplyPlanList = [], programPlanningUnitList = [], stockStatusVerticalAggregateList = [];
+              for (var pu = 0; pu < planningUnitList.length; pu++) {
+                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitList[pu].value);
+                var programJson = {};
+                if (planningUnitDataFilter.length > 0) {
+                    var planningUnitData = planningUnitDataFilter[0]
+                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                    programJson = JSON.parse(programData);
+                    consumptionList = consumptionList.concat(programJson.consumptionList);
+                    inventoryList = inventoryList.concat(programJson.inventoryList);
+                    shipmentList = shipmentList.concat(programJson.shipmentList);
+                    supplyPlanList = supplyPlanList.concat(programJson.supplyPlan);
+                    programPlanningUnitList.push({
+                      "programId": programId.split("_")[0],
+                      "planningUnitId": planningUnitList[pu].value
+                    })
+                } else {
+                    programJson = {
+                        consumptionList: [],
+                        inventoryList: [],
+                        shipmentList: [],
+                        batchInfoList: [],
+                        supplyPlan: [],
+                    }
+                    programPlanningUnitList.push({
+                      "programId": programId.split("_")[0],
+                      "planningUnitId": planningUnitList[pu].value
+                    })
+                }
+                
+              }
+
+              let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
+              let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+              console.log("Test@123",startDate,stopDate)
+              for(let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1,"months").format("YYYY-MM")){
+                let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
+                stockStatusVerticalAggregateList.push({
+                  "dt": m+"-01",
+                  "reportingUnit": {
+                    "id": this.state.planningUnitId[0].value,
+                    "label": {
+                      "label_en": this.state.planningUnitId[0].label
+                    }
+                  },
+                  "openingBalance": sp.reduce((sum, value) => sum+value.openingBalance, 0),
+                  "actualConsumption": sp.filter(x => x.actualFlag).length == sp.length,
+                  "actualConsumptionQty": sp.reduce((sum, value) => sum+(value.actualFlag ? value.consumptionQty : 0), 0),
+                  "forecastedConsumptionQty": sp.reduce((sum, value) => sum+(value.actualFlag ? 0 : value.consumptionQty), 0),
+                  "finalConsumptionQty": sp.reduce((sum, value) => sum+value.consumptionQty, 0),
+                  "shipmentQty": sp.reduce((sum, value) => sum+value.shipmentTotalQty, 0),
+                  "adjustment": sp.reduce((sum, value) => sum+value.adjustmentQty, 0),
+                  "expiredStock": sp.reduce((sum, value) => sum+value.expiredStock, 0),
+                  "closingBalance": sp.reduce((sum, value) => sum+value.closingBalance, 0),
+                  "amc": sp.reduce((sum, value) => sum+value.amc, 0),
+                  "mos": sp.reduce((sum, value) => sum+value.closingBalance, 0)/sp.reduce((sum, value) => sum+value.amc, 0),
+                  "minStockMos": sp.reduce((sum, value) => sum+value.minStockMoS, 0)/sp.length,
+                  "maxStockMos": sp.reduce((sum, value) => sum+value.maxStockMoS, 0)/sp.length,
+                  "minStockQty": sp.reduce((sum, value) => sum+value.minStock, 0)/sp.length,
+                  "maxStockQty": sp.reduce((sum, value) => sum+value.maxStock, 0)/sp.length,
+                  "unmetDemand": sp.reduce((sum, value) => sum+value.unmetDemand, 0),
+                  "regionCount": sp[0].regionCount,
+                  "regionCountForStock": sp[0].regionCountForStock,
+                  "nationalAdjustment": sp.reduce((sum, value) => sum+value.nationalAdjustment, 0),
+                  "planBasedOn": 1,
+                  "ppuNotes": null
+                })
+              }
+              console.log("Test@123",programPlanningUnitList,stockStatusVerticalAggregateList)
+              // {
+              //   "stockStatusVerticalAggregateList": [
+              //       {
+              //           
+              //           "shipmentInfo": [],
+              //           "consumptionInfo": [
+              //               {
+              //                   "consumptionId": 558830,
+              //                   "consumptionDate": "2025-12-01",
+              //                   "dataSource": {
+              //                       "id": 31,
+              //                       "label": {
+              //                           "label_en": "QAT",
+              //                           "label_sp": "QAT",
+              //                           "label_fr": "QAT",
+              //                           "label_pr": "QAT"
+              //                       }
+              //                   },
+              //                   "region": {
+              //                       "id": 67,
+              //                       "label": {
+              //                           "label_en": "National",
+              //                           "label_sp": "Nacional",
+              //                           "label_fr": "National",
+              //                           "label_pr": "Nacional"
+              //                       }
+              //                   },
+              //                   "notes": "Imported on 14-May-2024 by Jan de Jong from ARVs for treatment and prevention-Default from AGO-ARV-MOH v17",
+              //                   "actualFlag": false
+              //               }
+              //           ],
+              //           "inventoryInfo": [],
+              //           "planBasedOn": 1,
+              //           "ppuNotes": null
+              //       }
+              //   ],
+              //   "programPlanningUnitList": [
+              //       {
+              //           "programId": 2571,
+              //           "planningUnitId": 1073
+              //       }
+              //   ]
+              // }
+          }.bind(this)
+      }.bind(this)
+    } else {
+      let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
+      let inputjson = {
+        "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
+        "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
+        "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
+        "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
+        "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
+        "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
+        "reportingUnitIds": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value) : this.state.realmCountryPlanningUnitId.map(ele => ele.value),
+        "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitId.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitId.map(ele => ele.value).toString(), // Will be used only if aggregate is false
+        "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
+      }
+      ReportService.getStockStatusData(inputjson).then((response) => {
+        console.log("Test@123",response.data)
+        var inventoryList = [];
+        var consumptionList = [];
+        var shipmentList = [];
+        var responseData = response.data.stockStatusVerticalAggregateList;
+        let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
+        var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+        filteredResponseData.map(c => {
+          c.inventoryInfo.map(i => inventoryList.push(i))
+          c.consumptionInfo.map(ci => consumptionList.push(ci))
+          c.shipmentInfo.map(si => shipmentList.push(si))
+        }
+        );
+        this.setState({
+          firstMonthRegionCount: responseData.length > 0 ? responseData[0].regionCount : 1,
+          firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
+          stockStatusList: filteredResponseData,
+          message: '', loading: false,
+          planningUnitLabel: "",//document.getElementById("planningUnitId").selectedOptions[0].text,
+          inList: inventoryList,
+          coList: consumptionList,
+          shList: shipmentList,
+          ppuList: response.data.programPlanningUnitList,
+          loading: false
+        })
+      }).catch(
+        error => {
+          this.setState({
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
           }
         }
-      }
-    );
+      );
+    }
   }
   /**
    * Calls the get programs function on page load
@@ -2146,6 +2574,20 @@ class StockStatus extends Component {
     let programList = programs.length > 0
       && programs.map((item) => {
         return { value: item.programId, label: item.programCode }
+      }, this);
+
+    const { versions } = this.state;
+    let versionList =
+      versions.length > 0 &&
+      versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionStatus.id == 2 && item.versionType.id == 2
+              ? item.versionId + "*"
+              : item.versionId}{" "}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
+          </option>
+        );
       }, this);
 
     const { planningUnitList, lang } = this.state;
@@ -2836,6 +3278,28 @@ class StockStatus extends Component {
                           />
                         </div>
                       </FormGroup>
+                      {this.state.programId.length == 1 && <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                        <div className="controls">
+                        <InputGroup>
+                          <Input
+                            type="select"
+                            name="versionId"
+                            id="versionId"
+                            bsSize="sm"
+                            onChange={(e) => {
+                              this.setVersionId(e);
+                            }}
+                            value={this.state.versionId}
+                          >
+                            <option value="0">
+                              {i18n.t("static.common.select")}
+                            </option>
+                            {versionList}
+                          </Input>
+                        </InputGroup>
+                        </div>
+                      </FormGroup>}
                       <FormGroup className="col-md-2" id="equivelencyUnitDiv">
                         <Label htmlFor="appendedInputButton">{i18n.t("static.forecastReport.yAxisInEquivalencyUnit")}</Label>
                         <div className="controls ">
