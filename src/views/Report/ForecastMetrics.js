@@ -107,7 +107,7 @@ class ForecastMetrics extends Component {
     re = this.state.consumptions
     for (var item = 0; item < re.length; item++) {
       A.push([addDoubleQuoteToRowContent([(getLabelText(re[item].program.label).replaceAll(',', '%20')).replaceAll(' ', '%20'), re[item].planningUnit.id, re[item].planningUnit.id == 0 ? '' : (getLabelText(re[item].planningUnit.label)).replaceAll(' ', '%20'),
-      re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : roundN2(re[item].forecastError) + '%', re[item].monthCount])])
+      re[item].message != null ? (i18n.t(re[item].message)).replaceAll(' ', '%20') : roundN2(re[item].forecastError) + '%', (re[item].forecastError !== "" && re[item].forecastError != null && re[item].forecastError != "null" && re[item].forecastError != undefined)?re[item].monthCount:""])])
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -224,7 +224,7 @@ class ForecastMetrics extends Component {
     const headers = [[i18n.t('static.program.program'), i18n.t('static.report.qatPID'), i18n.t('static.dashboard.planningunit'),
     i18n.t('static.report.error'), i18n.t('static.report.noofmonth')]]
     const data = this.state.consumptions.map(elt => [getLabelText(elt.program.label), elt.planningUnit.id, getLabelText(elt.planningUnit.label),
-    elt.message != null ? i18n.t(elt.message) : roundN2(elt.forecastError) + '%', elt.monthCount]);
+    elt.message != null ? i18n.t(elt.message) : roundN2(elt.forecastError) + '%', (elt.forecastError !== "" && elt.forecastError != null && elt.forecastError != "null" && elt.forecastError != undefined)?elt.monthCount:""]);
     let content = {
       margin: { top: 80, bottom: 50 },
       startY: startYtable,
@@ -516,12 +516,16 @@ class ForecastMetrics extends Component {
       data = [];
       data[0] = (consumptions[j].program.code)
       data[1] = getLabelText(consumptions[j].planningUnit.label, this.state.lang)
-      if(consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined && consumptions[j].forecastError>consumptions[j].forecastErrorThreshold){
-        data[2] = consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div  class='jexcelRedCell'>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+      if(consumptions[j].forecastError !== "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined && consumptions[j].forecastError>consumptions[j].forecastErrorThreshold){
+        data[2] = consumptions[j].forecastError !== "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div  class='jexcelRedCell'>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
       }else{
-        data[2] = consumptions[j].forecastError != "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
+        data[2] = consumptions[j].forecastError !== "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined ? "<div>"+formatter(Number(Number(consumptions[j].forecastError)).toFixed(2)) + "%</div>" : "<i class='fa fa-exclamation-triangle red' title='Current report period does not contain forecasted consumption and/or actual consumption'></i>";
       }
-      data[3] = consumptions[j].monthCount;
+      if(consumptions[j].forecastError !== "" && consumptions[j].forecastError != null && consumptions[j].forecastError != "null" && consumptions[j].forecastError != undefined){
+        data[3] = consumptions[j].monthCount;
+      }else{
+        data[3] = "";
+      }
       data[4] = roundN2(consumptions[j].forecastError);
       data[5] = consumptions[j].forecastErrorThreshold;
       consumptionArray[count] = data;
