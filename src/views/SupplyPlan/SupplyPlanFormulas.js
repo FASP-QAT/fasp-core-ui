@@ -859,7 +859,7 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItemText className="formulastext">
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
                   <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormula1')}</p>
-                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula5')}</p>
+                  <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula8')}</p>
                   <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula6nomonth')}</p>
                   <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula7consumption')}</p>
                   <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4row')} <span style={{color:'red'}}>{i18n.t('static.report.forecastErrorMonthlyFormula4redtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormula4indicatesthat')} <b>{i18n.t('static.report.forecastErrorMonthlyFormula4thresholdper')}</b> {i18n.t('static.report.forecastErrorMonthlyFormula4UpdatePlanningFe')}</p>

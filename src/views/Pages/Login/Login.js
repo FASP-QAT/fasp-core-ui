@@ -126,17 +126,17 @@ class Login extends Component {
       var transaction = db1.transaction(['language'], 'readwrite');
       var program = transaction.objectStore('language');
       delete axios.defaults.headers.common["Authorization"];
-        MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
-          var transaction = db1.transaction(['language'], 'readwrite');
-          var program = transaction.objectStore('language');
-          var json = (response.data);
-          for (var i = 0; i < json.length; i++) {
-            var psuccess = program.put(json[i]);
-          }
-          this.getAllLanguages();
-        }).catch(error=>{
-          this.getAllLanguages();  
-        });
+      MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
+        var transaction = db1.transaction(['language'], 'readwrite');
+        var program = transaction.objectStore('language');
+        var json = (response.data);
+        for (var i = 0; i < json.length; i++) {
+          var psuccess = program.put(json[i]);
+        }
+        this.getAllLanguages();
+      }).catch(error => {
+        this.getAllLanguages();
+      });
     }.bind(this)
   }
   /**
@@ -158,7 +158,7 @@ class Login extends Component {
    */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
-    localStorage.setItem("theme", localStorage.getItem('theme')==undefined?'light':localStorage.getItem('theme'));
+    localStorage.setItem("theme", localStorage.getItem('theme') == undefined ? 'light' : localStorage.getItem('theme'));
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     AuthenticationService.clearUserDetails()
@@ -304,7 +304,7 @@ class Login extends Component {
                       <i className={this.state.icon}></i>  &nbsp;{i18n.t(this.state.staticLabel)}
                     </DropdownToggle>
                     <DropdownMenu right>
-                                            {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
+                      {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
                         language =>
                           <>
                             <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode, "flag-icon flag-icon-" + language.countryCode, getLabelText(language.label, this.state.lang))}>
@@ -312,72 +312,15 @@ class Login extends Component {
                             </DropdownItem>
                           </>
                       )}
-                                          </DropdownMenu>
+                    </DropdownMenu>
                   </ButtonDropdown>
                 </div>
               </Col>
-              {/* <Col md="12">
+              <Col md="12">
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
-              </Col> */}
-              <Row className='pb-lg-5'>
-                <Col md="3">
-                <div className="upper-logo logo-MarginTop">
-                  <img src={image1} className="img-fluid " />
-                </div>
-                </Col>
-                <Col md="8" lg="7">
-  <div style={{ marginBottom: '25px', marginTop:'-25px',fontSize:'14px' }}>
-    {this.state.lang === 'en' ?
-      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
-      <h3 style={{ marginTop: 0, color: '#333' }}>New Enhanced Supply Planning Dashboard Released!</h3>
-      <p>
-        We’re excited to announce the release of our enhanced Supply Planning Dashboard. <b>To view the updated data for downloaded programs, please re-download the program(s).</b>
-      </p>
-      <p>
-        <strong>Note:</strong> This step is not necessary for server versions, as they will automatically display the latest data.
-      </p>
-      <p>Thank you for using our tool, and we hope you enjoy the improved features!</p>
-    </div>:
-      this.state.lang === 'sp' ?
-      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
-  <h3 style={{ marginTop: 0, color: '#333' }}>¡Nueva versión mejorada del Panel de Planificación de Suministros lanzada!</h3>
-  <p>
-    Estamos emocionados de anunciar el lanzamiento de nuestra versión mejorada del Panel de Planificación de Suministros. <b>Para ver los datos actualizados de los programas descargados, por favor, vuelva a descargar el/los programa(s).</b>
-  </p>
-  <p>
-    <strong>Nota:</strong> Este paso no es necesario para las versiones de servidor, ya que mostrarán automáticamente los datos más recientes.
-  </p>
-  <p>¡Gracias por usar nuestra herramienta y esperamos que disfrute las funciones mejoradas!</p>
-</div>:
-      this.state.lang === 'fr' ?
-      <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
-  <h3 style={{ marginTop: 0, color: '#333' }}>Nouvelle version améliorée du tableau de bord de planification des approvisionnements publiée !</h3>
-  <p>
-    Nous sommes ravis d'annoncer le lancement de notre tableau de bord de planification des approvisionnements amélioré. <b>Pour afficher les données mises à jour des programmes téléchargés, veuillez retélécharger le(s) programme(s).</b>
-  </p>
-  <p>
-    <strong>Remarque :</strong> Cette étape n'est pas nécessaire pour les versions serveur, car elles afficheront automatiquement les données les plus récentes.
-  </p>
-  <p>Merci d'utiliser notre outil et nous espérons que vous apprécierez les fonctionnalités améliorées !</p>
-</div>
- :
- <div style={{ padding: '16px', fontFamily: 'Arial, sans-serif', margin: 'auto' }}>
- <h3 style={{ marginTop: 0, color: '#333' }}>Nova versão aprimorada do Painel de Planejamento de Suprimentos lançada!</h3>
- <p>
-   Estamos animados em anunciar o lançamento de nossa versão aprimorada do Painel de Planejamento de Suprimentos. <b>Para visualizar os dados atualizados dos programas baixados, faça o download novamente do(s) programa(s).</b>
- </p>
- <p>
-   <strong>Nota:</strong> Este passo não é necessário para versões de servidor, pois elas exibirão automaticamente os dados mais recentes.
- </p>
- <p>Obrigado por usar nossa ferramenta e esperamos que você aproveite os recursos aprimorados!</p>
-</div>
-
-    }
-  </div>
               </Col>
-              </Row>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
                   <div className="p-4 Login-card card-marginTop" >
@@ -409,10 +352,10 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
-                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
-                                localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
-                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString()=="true"?false:true);
-                                sessionStorage.setItem('defaultModuleId', decoded.user.defaultModuleId.toString()=="1"?1:2);
+                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId == 1 ? 'light' : 'dark');
+                                localStorage.setItem('theme', decoded.user.defaultThemeId == 1 ? 'light' : 'dark');
+                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString() == "true" ? false : true);
+                                sessionStorage.setItem('defaultModuleId', decoded.user.defaultModuleId.toString() == "1" ? 1 : 2);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -475,10 +418,10 @@ class Login extends Component {
                                   localStorage.setItem('sessionType', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
-                                  localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
-                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
-                                  localStorage.setItem('showDecimals', user.showDecimals.toString()=="true"?false:true);
-                                  sessionStorage.setItem('defaultModuleId', user.defaultModuleId.toString()=="1"?1:2);
+                                  localStorage.setItem('theme', user.defaultThemeId == 1 ? 'light' : 'dark');
+                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId == 1 ? 'light' : 'dark');
+                                  localStorage.setItem('showDecimals', user.showDecimals.toString() == "true" ? false : true);
+                                  sessionStorage.setItem('defaultModuleId', user.defaultModuleId.toString() == "1" ? 1 : 2);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());
@@ -557,7 +500,7 @@ class Login extends Component {
                                   required />
                                 <FormFeedback>{errors.password}</FormFeedback>
                               </InputGroup>
-                              {this.state.apiVersionForDisplay!="Offline" && <Row>
+                              {this.state.apiVersionForDisplay != "Offline" && <Row>
                                 <InputGroup check inline className="mb-4 ml-3">
                                   <Input
                                     type="checkbox"
@@ -580,7 +523,7 @@ class Login extends Component {
                               </Row>}
                               <Row>
                                 <Col xs="6" className='DarkMode'>
-                                  <Button type="submit" id="loginBtn" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                  <Button type="submit" id="loginBtn" color="primary" className="px-4 btn-primary" onClick={() => { this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
                                 <Col xs="6" className="text-right DarkMode">
                                   <Button type="button" color="link" className="px-0 btn-link" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
@@ -593,9 +536,9 @@ class Login extends Component {
                 </CardGroup>
                 <div className='row align-items-center'>
                   <div className='col-md-6 col-sm-6'>
-                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} /> 
-                      {" "+i18n.t('static.ticket.header')}
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{ color: '#002f6c' }}>
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} />
+                      {" " + i18n.t('static.ticket.header')}
                     </a>
                   </div>
                   <div className='col-md-6 col-sm-12'>
