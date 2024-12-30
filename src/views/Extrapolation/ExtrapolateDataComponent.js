@@ -4419,6 +4419,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                         </div>
                         <div className="Card-header-reporticon pb-0">
                             <div className="card-header-actions">
+                                <a className="card-header-action">
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
                                 {this.state.showData && <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />}
                             </div>
                         </div>
