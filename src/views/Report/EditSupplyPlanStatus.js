@@ -3961,7 +3961,7 @@ class EditSupplyPlanStatus extends Component {
      */
     buildJExcel() {
         let problemList = this.state.problemList;
-        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(c=>c.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.regionId).includes(c.region.id))));
+        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu=>pu.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.id).includes(c.region.id))));
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
