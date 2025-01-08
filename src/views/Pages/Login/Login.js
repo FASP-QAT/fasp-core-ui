@@ -126,17 +126,17 @@ class Login extends Component {
       var transaction = db1.transaction(['language'], 'readwrite');
       var program = transaction.objectStore('language');
       delete axios.defaults.headers.common["Authorization"];
-        MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
-          var transaction = db1.transaction(['language'], 'readwrite');
-          var program = transaction.objectStore('language');
-          var json = (response.data);
-          for (var i = 0; i < json.length; i++) {
-            var psuccess = program.put(json[i]);
-          }
-          this.getAllLanguages();
-        }).catch(error=>{
-          this.getAllLanguages();  
-        });
+      MasterSyncService.getLanguageListForSync(lastSyncDateRealm).then(response => {
+        var transaction = db1.transaction(['language'], 'readwrite');
+        var program = transaction.objectStore('language');
+        var json = (response.data);
+        for (var i = 0; i < json.length; i++) {
+          var psuccess = program.put(json[i]);
+        }
+        this.getAllLanguages();
+      }).catch(error => {
+        this.getAllLanguages();
+      });
     }.bind(this)
   }
   /**
@@ -158,7 +158,7 @@ class Login extends Component {
    */
   componentDidMount() {
     localStorage.setItem("loginOnline", this.state.loginOnline);
-    localStorage.setItem("theme", localStorage.getItem('theme')==undefined?'light':localStorage.getItem('theme'));
+    localStorage.setItem("theme", localStorage.getItem('theme') == undefined ? 'light' : localStorage.getItem('theme'));
     delete axios.defaults.headers.common["Authorization"];
     this.logoutMessagehide();
     AuthenticationService.clearUserDetails()
@@ -293,7 +293,7 @@ class Login extends Component {
     return (
       <div className="main-content flex-row align-items-center bg-height">
         {/* <div className="Login-component" style={{ backgroundImage: "url(" + InnerBgImg + ")" }}> */}
-        <div className="Login-component InnerBgImg" >
+        <div className="Login-component InnerBgImg ScrollLogin" >
           <Container className="container-login">
             <Row className="justify-content-center">
               <Col className="float-right pr-5" style={{ width: '100%' }}>
@@ -304,7 +304,7 @@ class Login extends Component {
                       <i className={this.state.icon}></i>  &nbsp;{i18n.t(this.state.staticLabel)}
                     </DropdownToggle>
                     <DropdownMenu right>
-                                            {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
+                      {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
                         language =>
                           <>
                             <DropdownItem onClick={this.changeLanguage.bind(this, language.languageCode, "flag-icon flag-icon-" + language.countryCode, getLabelText(language.label, this.state.lang))}>
@@ -312,7 +312,7 @@ class Login extends Component {
                             </DropdownItem>
                           </>
                       )}
-                                          </DropdownMenu>
+                    </DropdownMenu>
                   </ButtonDropdown>
                 </div>
               </Col>
@@ -352,10 +352,10 @@ class Login extends Component {
                                 localStorage.setItem('lastActionTaken', CryptoJS.AES.encrypt((moment(new Date()).format("YYYY-MM-DD HH:mm:ss")).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('curUser', CryptoJS.AES.encrypt((decoded.userId).toString(), `${SECRET_KEY}`));
                                 localStorage.setItem('lang', decoded.user.language.languageCode);
-                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId==1?'light':'dark');
-                                localStorage.setItem('theme', decoded.user.defaultThemeId==1?'light':'dark');
-                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString()=="true"?false:true);
-                                sessionStorage.setItem('defaultModuleId', decoded.user.defaultModuleId.toString()=="1"?1:2);
+                                document.documentElement.setAttribute("data-theme", decoded.user.defaultThemeId == 1 ? 'light' : 'dark');
+                                localStorage.setItem('theme', decoded.user.defaultThemeId == 1 ? 'light' : 'dark');
+                                localStorage.setItem('showDecimals', decoded.user.showDecimals.toString() == "true" ? false : true);
+                                sessionStorage.setItem('defaultModuleId', decoded.user.defaultModuleId.toString() == "1" ? 1 : 2);
                                 localStorage.setItem('i18nextLng', decoded.user.language.languageCode);
                                 localStorage.setItem('lastLoggedInUsersLanguage', decoded.user.language.languageCode);
                                 localStorage.setItem("lastFocus", new Date());
@@ -418,10 +418,10 @@ class Login extends Component {
                                   localStorage.setItem('sessionType', "Offline");
                                   localStorage.setItem('curUser', CryptoJS.AES.encrypt((user.userId).toString(), `${SECRET_KEY}`));
                                   localStorage.setItem('lang', user.language.languageCode);
-                                  localStorage.setItem('theme', user.defaultThemeId==1?'light':'dark');
-                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId==1?'light':'dark');
-                                  localStorage.setItem('showDecimals', user.showDecimals.toString()=="true"?false:true);
-                                  sessionStorage.setItem('defaultModuleId', user.defaultModuleId.toString()=="1"?1:2);
+                                  localStorage.setItem('theme', user.defaultThemeId == 1 ? 'light' : 'dark');
+                                  document.documentElement.setAttribute("data-theme", user.defaultThemeId == 1 ? 'light' : 'dark');
+                                  localStorage.setItem('showDecimals', user.showDecimals.toString() == "true" ? false : true);
+                                  sessionStorage.setItem('defaultModuleId', user.defaultModuleId.toString() == "1" ? 1 : 2);
                                   localStorage.setItem('i18nextLng', user.language.languageCode);
                                   localStorage.setItem('lastLoggedInUsersLanguage', user.language.languageCode);
                                   localStorage.setItem("lastFocus", new Date());
@@ -500,7 +500,7 @@ class Login extends Component {
                                   required />
                                 <FormFeedback>{errors.password}</FormFeedback>
                               </InputGroup>
-                              {this.state.apiVersionForDisplay!="Offline" && <Row>
+                              {this.state.apiVersionForDisplay != "Offline" && <Row>
                                 <InputGroup check inline className="mb-4 ml-3">
                                   <Input
                                     type="checkbox"
@@ -523,7 +523,7 @@ class Login extends Component {
                               </Row>}
                               <Row>
                                 <Col xs="6" className='DarkMode'>
-                                  <Button type="submit" id="loginBtn" color="primary" className="px-4 btn-primary" onClick={() => {this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
+                                  <Button type="submit" id="loginBtn" color="primary" className="px-4 btn-primary" onClick={() => { this.incorrectPassmessageHide() }} >{i18n.t('static.login.login')}</Button>
                                 </Col>
                                 <Col xs="6" className="text-right DarkMode">
                                   <Button type="button" color="link" className="px-0 btn-link" onClick={this.forgotPassword}>{i18n.t('static.login.forgotpassword')}?</Button>
@@ -536,9 +536,9 @@ class Login extends Component {
                 </CardGroup>
                 <div className='row align-items-center'>
                   <div className='col-md-6 col-sm-6'>
-                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{color: '#002f6c'}}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} /> 
-                      {" "+i18n.t('static.ticket.header')}
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{ color: '#002f6c' }}>
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} />
+                      {" " + i18n.t('static.ticket.header')}
                     </a>
                   </div>
                   <div className='col-md-6 col-sm-12'>

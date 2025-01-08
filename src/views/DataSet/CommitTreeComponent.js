@@ -230,7 +230,7 @@ export default class CommitTreeComponent extends React.Component {
             pagination: false,
             search: false,
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -461,7 +461,7 @@ export default class CommitTreeComponent extends React.Component {
             pagination: false,
             search: false,
             filters: false,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -857,7 +857,7 @@ export default class CommitTreeComponent extends React.Component {
                                 allowDeleteRow: false,
                                 onload: this.loadedFunctionForVersionSettings,
                                 filters: true,
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
@@ -1054,7 +1054,7 @@ export default class CommitTreeComponent extends React.Component {
                                 allowDeleteRow: false,
                                 onload: this.loadedFunctionForPlanningUnits,
                                 filters: true,
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
@@ -1206,7 +1206,7 @@ export default class CommitTreeComponent extends React.Component {
                                 }.bind(this),
                                 onload: this.loadedFunctionForConsumption,
                                 filters: true,
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
@@ -1389,7 +1389,7 @@ export default class CommitTreeComponent extends React.Component {
                                     }
                                 }.bind(this),
                                 filters: true,
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
@@ -1728,7 +1728,7 @@ export default class CommitTreeComponent extends React.Component {
                                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                                 position: 'top',
                                 filters: true,
-                                license: JEXCEL_PRO_KEY,
+                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     var items = [];
                                     var rowData = obj.getRowData(y)
@@ -2841,12 +2841,12 @@ export default class CommitTreeComponent extends React.Component {
                                         for (let i = 0; i < completeFlatList.length; i++) {
                                             var node = completeFlatList[i];
                                             var findNodeIndexParent=1;
-                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2) {
+                                            if (completeFlatList[i].payload.nodeType.id == 1 || completeFlatList[i].payload.nodeType.id == 2 || completeFlatList[i].payload.nodeType.id == 6) {
                                             }else{
                                                 findNodeIndexParent = completeFlatList.findIndex(n => n.id == node.parent);
                                             }
                                             if(findNodeIndexParent!=-1){
-                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3) {
+                                            if (node.payload.nodeType.id == 1 || node.payload.nodeType.id == 2 || node.payload.nodeType.id == 3 || node.payload.nodeType.id == 6) {
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode = null;
                                                 node.payload.nodeDataMap[scenarioList[ndm].id][0].puNode = null;
                                             } else if (node.payload.nodeType.id == 4) {

@@ -40,7 +40,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var programJson = JSON.parse(programData);
                                     var generalProgramJson = programJson;
                                     var dashboardData = generalProgramJson.dashboardData;
-                                    console.log("dashboardData Test@123", dashboardData)
                                     if (dashboardData != undefined) {
                                         var topPuData = dashboardData.topPuData;
                                         var stockedOutCount = 0;
@@ -86,7 +85,6 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                     var itemLabelB = b.program.code.toUpperCase();
                                     return itemLabelA > itemLabelB ? 1 : -1;
                                 });
-                                console.log("dashboradTopList Test@123", dashboradTopList)
                                 props.updateStateDashboard("dashboardTopList", dashboradTopList);
                                 props.updateStateDashboard("topSubmitLoader", false);
                             } catch (err) {
@@ -214,24 +212,23 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 "forecastErrorList": [],
                                 "forecastConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id!=4 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
                                 },
                                 "actualConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id!=4 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
                                 },
                                 "inventoryQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id!=4 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
                                 },
                                 "shipmentQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id!=4 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
                                 },
                                 "expiryTotal": expiryTotal,
                                 "shipmentTotal": shipmentTotal
                             }
-                            console.log("dashboardBottomData Test@123", dashboardBottomData)
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                             props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
                             props.updateStateDashboard("dashboardBottomData", dashboardBottomData);

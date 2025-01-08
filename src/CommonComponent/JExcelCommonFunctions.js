@@ -708,7 +708,6 @@ export function changed(worksheets, cell, x, y, value) {
 export function loadedForNonEditableTables(instance, cell) {
     jExcelLoadedFunction(instance);
 }
-
 export function jExcelLoadedFunctionForNotes(instance,number) {
     if (number == undefined) {
         number = 0;

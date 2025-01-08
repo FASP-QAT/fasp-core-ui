@@ -87,6 +87,12 @@ class ProblemListFormulas extends Component {
                             </ListGroupItem><br></br>
                             <h5><span className="formulastext-p"><b>{i18n.t('static.problemReport.supplyPlanStatus')}</b></span></h5>
                             <ListGroupItem >
+                                <ListGroupItemHeading className="formulasheading">{i18n.t('static.problemReport.pendingapproval')}</ListGroupItemHeading>
+                                <ListGroupItemText className="formulastext">
+                                    <p><span className="">{i18n.t('static.problemReport.pendingapprovalDesc')}</span></p>
+                                </ListGroupItemText>
+                            </ListGroupItem>
+                            <ListGroupItem >
                                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.problemReport.rejected')}</ListGroupItemHeading>
                                 <ListGroupItemText className="formulastext">
                                     <p><span className="">{i18n.t('static.problemReport.rejectedDesc')}</span></p>
@@ -96,6 +102,12 @@ class ProblemListFormulas extends Component {
                                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.problemReport.approved')}</ListGroupItemHeading>
                                 <ListGroupItemText className="formulastext">
                                     <p><span className="">{i18n.t('static.problemReport.approvedDesc')}</span></p>
+                                </ListGroupItemText>
+                            </ListGroupItem>
+                            <ListGroupItem >
+                                <ListGroupItemHeading className="formulasheading">{i18n.t('static.problemReport.noreviewneeded')}</ListGroupItemHeading>
+                                <ListGroupItemText className="formulastext">
+                                    <p><span className="">{i18n.t('static.problemReport.noreviewneededDesc')}</span></p>
                                 </ListGroupItemText>
                             </ListGroupItem>
                         </ListGroup>

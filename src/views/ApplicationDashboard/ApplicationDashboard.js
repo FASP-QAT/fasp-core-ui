@@ -127,8 +127,15 @@ class ApplicationDashboard extends Component {
       topSubmitLoader: false,
       bottomSubmitLoader: false,
       fullDashbaordTopList: [],
-      topProgramIdChange: false
+      topProgramIdChange: false,
+      multipleQPLRebuild: false,
+      totalCount:0,
+      initialCount:0
     };
+    localStorage.setItem("bottomLocalProgram", localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true);
+    localStorage.setItem("bottomProgramId",localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('bottomProgramId') : localStorage.getItem("bottomLocalProgram") == "false" ? "" : localStorage.getItem('bottomProgramId') : "")
+    localStorage.setItem("topLocalProgram", localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true);
+    localStorage.setItem("topProgramId", localStorage.getItem('topProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('topProgramId') : localStorage.getItem("topLocalProgram") == "false" ? [] : localStorage.getItem('topProgramId') : [])
     this.next = this.next.bind(this);
     this.previous = this.previous.bind(this);
     this.goToIndex = this.goToIndex.bind(this);
@@ -343,6 +350,7 @@ class ApplicationDashboard extends Component {
       localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId)
     } else {
       let pId, vId;
+      if(this.state.bottomProgramId!="" && this.state.bottomProgramId!=undefined){
       if (this.state.bottomProgramId.toString().split("_").length > 0) {
         pId = this.state.bottomProgramId.toString().split("_")[0];
         vId = this.state.programList.filter(x => x.id == this.state.bottomProgramId)[0].versionId + " (Local)";
@@ -352,6 +360,7 @@ class ApplicationDashboard extends Component {
       }
       localStorage.setItem("sesProgramIdReport", pId)
       localStorage.setItem("sesVersionIdReport", vId)
+    }
     }
     this.props.history.push(url)
   }
@@ -441,7 +450,7 @@ class ApplicationDashboard extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: "top",
           filters: true,
-          license: JEXCEL_PRO_KEY,
+          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
           contextMenu: function (obj, x, y, e) {
             return false;
           }.bind(this),
@@ -1146,6 +1155,7 @@ class ApplicationDashboard extends Component {
         bottomProgramId: "",
         rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
       }, () => {
+        localStorage.setItem("bottomProgramId", "")
         this.getPrograms();
       })
     }
@@ -1207,7 +1217,6 @@ class ApplicationDashboard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-    console.log("Test@123 resolution width: ", window.innerWidth, " height:", window.innerHeight)
     var db1;
     let tempProgramList = [];
     let shipmentStatusList = [];
@@ -1692,8 +1701,19 @@ class ApplicationDashboard extends Component {
     })
   }
   fetchData() {
-    Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
-    this.onTopSubmit();
+    if(this.state.multipleQPLRebuild){
+      this.setState({
+        initialCount:this.state.initialCount+1
+      },()=>{
+        if(this.state.initialCount==this.state.totalCount){
+          Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+          this.onTopSubmit();
+        }
+      })
+    }else{
+      Dashboard(this, this.state.bottomProgramId, this.state.displayBy, false, true);
+      this.onTopSubmit();
+    }
   }
   /**
    * Retrieves the problem list after calculation for a specific program ID.
@@ -1715,6 +1735,12 @@ class ApplicationDashboard extends Component {
    * @param {number} id The ID of the program for which to retrieve the problem list. 
    */
   getProblemListAfterCalculationMultiple() {
+    this.setState({
+      multipleQPLRebuild:true,
+      totalCount:this.state.topProgramId.length,
+      initialCount:0,
+      topSubmitLoader:true
+    })
     let i = 0;
     for (i = 0; i < this.state.topProgramId.length; i++) {
       this.updateState(this.state.topProgramId[i].value, true);
@@ -1807,7 +1833,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 10,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1870,7 +1896,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1934,7 +1960,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -2011,7 +2037,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -2584,7 +2610,7 @@ class ApplicationDashboard extends Component {
         label: 'Forecast Consumption Dataset',
         data: [forecastConsumptionQplCorrectCount, forecastConsumptionQplPuCount - forecastConsumptionQplCorrectCount],
         backgroundColor: [
-          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= 1 ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= 1 ? "#118b70" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (2 / 3) ? "#edba26" : (forecastConsumptionQplCorrectCount / forecastConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2627,7 +2653,7 @@ class ApplicationDashboard extends Component {
         label: 'Actual Inventory Dataset',
         data: [inventoryQplCorrectCount, inventoryQplPuCount - inventoryQplCorrectCount],
         backgroundColor: [
-          (inventoryQplCorrectCount / inventoryQplPuCount) >= 1 ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#f48521" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (inventoryQplCorrectCount / inventoryQplPuCount) >= 1 ? "#118b70" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (2 / 3) ? "#edba26" : (inventoryQplCorrectCount / inventoryQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2670,7 +2696,7 @@ class ApplicationDashboard extends Component {
         label: 'Actual Consumption Dataset',
         data: [actualConsumptionQplCorrectCount, actualConsumptionQplPuCount - actualConsumptionQplCorrectCount],
         backgroundColor: [
-          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= 1 ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#f48521" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= 1 ? "#118b70" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (2 / 3) ? "#edba26" : (actualConsumptionQplCorrectCount / actualConsumptionQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2713,7 +2739,7 @@ class ApplicationDashboard extends Component {
         label: 'Shipments Dataset',
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
-          (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#f48521" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#edba26" : "#BA0C2F",
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#edba26" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -2788,7 +2814,14 @@ class ApplicationDashboard extends Component {
     } else {
       shipmentsPieHeight = 240;
     }
-
+    const topProgramId=this.state.topProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.topProgramId : localStorage.getItem("topLocalProgram") == "false" ? [] : this.state.topProgramId : [];
+    var topProgramIdAvailable=[];
+    for(var i=0;i<topProgramId.length;i++){
+      if(topProgramList.filter(c=>c.value==topProgramId[i].value).length>0){
+        topProgramIdAvailable.push(topProgramId[i]);
+      }
+    }
+    localStorage.setItem("topProgramId", JSON.stringify(topProgramIdAvailable));
     return (
       <div className="animated fadeIn">
         <QatProblemActionNew ref="problemListChild" updateState={this.updateState} fetchData={this.fetchData} objectStore="programData" page="dashboard"></QatProblemActionNew>
@@ -3235,7 +3268,7 @@ class ApplicationDashboard extends Component {
                         name="topProgramId"
                         id="topProgramId"
                         bsSize="sm"
-                        value={this.state.topProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.topProgramId : localStorage.getItem("topLocalProgram") == "false" ? [] : this.state.topProgramId : []}
+                        value={topProgramIdAvailable}
                         onChange={(e) => { this.handleTopProgramIdChange(e) }}
                         options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
                         labelledBy={i18n.t('static.common.regiontext')}

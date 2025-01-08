@@ -1686,7 +1686,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor1 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
+                                                paColor1 = this.state.theme == "dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -1721,7 +1721,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor2 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
+                                                paColor2 = this.state.theme == "dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -1756,7 +1756,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor3 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
+                                                paColor3 = this.state.theme == "dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -1791,7 +1791,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor4 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
+                                                paColor4 = this.state.theme == "dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -1826,7 +1826,7 @@ class EditSupplyPlanStatus extends Component {
                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                paColor5 = this.state.theme == "Dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
+                                                paColor5 = this.state.theme == "dark" ? procurementAgent.colorHtmlDarkCode : procurementAgent.colorHtmlCode;
                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                 if (index == -1) {
                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -3939,8 +3939,8 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
-            editable: false
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -3961,7 +3961,7 @@ class EditSupplyPlanStatus extends Component {
      */
     buildJExcel() {
         let problemList = this.state.problemList;
-        problemList = problemList;
+        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu=>pu.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.id).includes(c.region.id))));
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -4234,7 +4234,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4610,7 +4610,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY,
+                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),

@@ -292,7 +292,7 @@ class AddprogramPlanningUnit extends Component {
                                                     data[20] = myReasponse[j].minQty;
                                                     data[21] = myReasponse[j].distributionLeadTime;
                                                     data[22] = indexVar;//to identify if new row added
-                                                    if ((this.state.active == 0 && myReasponse[j].active.toString() == "false") || (this.state.active == 1 && myReasponse[j].active.toString() == "true") || (this.state.active == -1)) {
+                                                    if((this.state.active==0 && myReasponse[j].active.toString()=="false") || (this.state.active==1 && myReasponse[j].active.toString()=="true") || (this.state.active==-1)){
                                                         productDataArr.push(data);
                                                     } else {
                                                         productDataArr2.push(data);
@@ -649,7 +649,7 @@ class AddprogramPlanningUnit extends Component {
                                                 onpaste: this.onPaste,
                                                 oneditionend: this.oneditionend,
                                                 onload: this.loaded,
-                                                license: JEXCEL_PRO_KEY,
+                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                     var items = [];
                                                     if (y == null) {

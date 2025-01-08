@@ -4310,7 +4310,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor1 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                                paColor1 = this.state.theme=="dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor1);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor1, text: procurementAgent.procurementAgentCode })
@@ -4345,7 +4345,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor2 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                                paColor2 = this.state.theme=="dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor2);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor2, text: procurementAgent.procurementAgentCode })
@@ -4380,7 +4380,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor3 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                                paColor3 = this.state.theme=="dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor3);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor3, text: procurementAgent.procurementAgentCode })
@@ -4415,7 +4415,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor4 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                                paColor4 = this.state.theme=="dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor4);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor4, text: procurementAgent.procurementAgentCode })
@@ -4453,7 +4453,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                                 var procurementAgent = papuResult.filter(c => c.procurementAgentId == shipmentDetails[i].procurementAgent.id)[0];
                                                                 var shipmentStatus = shipmentStatusResult.filter(c => c.shipmentStatusId == shipmentDetails[i].shipmentStatus.id)[0];
                                                                 var shipmentDetail = procurementAgent.procurementAgentCode + " - " + Number(shipmentDetails[i].shipmentQty).toLocaleString() + " - " + getLabelText(shipmentStatus.label, this.state.lang) + "\n";
-                                                                paColor5 = this.state.theme=="Dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
+                                                                paColor5 = this.state.theme=="dark"?procurementAgent.colorHtmlDarkCode:procurementAgent.colorHtmlCode;
                                                                 var index = paColors.findIndex(c => c.color == paColor5);
                                                                 if (index == -1) {
                                                                     paColors.push({ color: paColor5, text: procurementAgent.procurementAgentCode })
@@ -4592,12 +4592,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                             suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                                         }
                                                         if (suggestedOrd <= 0) {
-                                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                         } else {
-                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1),"suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                         }
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     }
                                                     suggestedShipmentsTotalData.push(sstd);
                                                 } else {
@@ -4655,12 +4655,12 @@ export default class WhatIfReportComponent extends React.Component {
                                                             suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                         }
                                                         if (suggestedOrd <= 0) {
-                                                            sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                         } else {
-                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, 1),"suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                         }
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     }
                                                     suggestedShipmentsTotalData.push(sstd);
                                                 }
@@ -4771,7 +4771,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: roundARU(lastClosingBalance, 1) });
                                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                                 shipmentsTotalData.push("");
-                                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "","suggestedOrderQtyRounded": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
                                                 deliveredShipmentsTotalData.push("");
                                                 shippedShipmentsTotalData.push("");
                                                 orderedShipmentsTotalData.push("");
@@ -5377,7 +5377,7 @@ export default class WhatIfReportComponent extends React.Component {
             emergencyOrder = false;
         }
         var seaFreightPercentage = this.state.generalProgramJson.seaFreightPerc;
-        var freightCost = Number(programPlanningUnit.catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQty) * (Number(Number(seaFreightPercentage) / 100));
+        var freightCost = Number(programPlanningUnit.catalogPrice) * Number(suggestedShipmentList[0].suggestedOrderQtyRounded) * (Number(Number(seaFreightPercentage) / 100));
         var rcpuFilter = this.state.realmCountryPlanningUnitListAll.filter(c => c.planningUnit.id == document.getElementById("planningUnitId").value);
         var rcpuObject = {
             id: "",
@@ -5398,10 +5398,10 @@ export default class WhatIfReportComponent extends React.Component {
             }
         }
         var json = {
-            shipmentQty: suggestedShipmentList[0].suggestedOrderQty,
-            shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQty / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQty,
+            shipmentQty: suggestedShipmentList[0].suggestedOrderQtyRounded,
+            shipmentRcpuQty: rcpuFilter.length == 1 ? suggestedShipmentList[0].suggestedOrderQtyRounded / rcpuObject.multiplier : suggestedShipmentList[0].suggestedOrderQtyRounded,
             index: -1,
-            suggestedQty: suggestedShipmentList[0].suggestedOrderQty,
+            suggestedQty: suggestedShipmentList[0].suggestedOrderQtyRounded,
             emergencyOrder: emergencyOrder,
             shipmentId: 0,
             accountFlag: true,

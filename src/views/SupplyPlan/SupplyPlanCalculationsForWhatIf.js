@@ -36,9 +36,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var spd1 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).format("YYYY-MM"));
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2, 'months').format("YYYY-MM"));
-            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
-            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
-            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
+            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? Number(spd1[0].mos) : null : 0;
+            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? Number(spd2[0].mos) : null : 0;
+            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? Number(spd3[0].mos) : null : 0;
             var suggestShipment = false;
             var useMax = false;
             if (compare) {
@@ -85,9 +85,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
             var spd2 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(1 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
             var spd3 = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM") == moment(curDate).add(2 + props.state.distributionLeadTime, 'months').format("YYYY-MM"));
             var amc = spd1.length > 0 ? Number(spd1[0].amc) : 0;
-            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? parseFloat(spd1[0].mos).toFixed(1) : null : 0;
-            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? parseFloat(spd2[0].mos).toFixed(1) : null : 0;
-            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? parseFloat(spd3[0].mos).toFixed(1) : null : 0;
+            var mosForMonth1 = spd1.length > 0 ? spd1[0].mos != null ? Number(spd1[0].mos) : null : 0;
+            var mosForMonth2 = spd2.length > 0 ? spd2[0].mos != null ? Number(spd2[0].mos) : null : 0;
+            var mosForMonth3 = spd3.length > 0 ? spd3[0].mos != null ? Number(spd3[0].mos) : null : 0;
             var cbForMonth1 = spd1.length > 0 ? spd1[0].closingBalance : 0;
             var cbForMonth2 = spd2.length > 0 ? spd2[0].closingBalance : 0;
             var cbForMonth3 = spd3.length > 0 ? spd3[0].closingBalance : 0;
@@ -134,6 +134,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 }
             }
         }
+        suggestedOrd=Math.round(Number(suggestedOrd));
         if (suggestShipment) {
             if (suggestedOrd <= 0) {
             } else {

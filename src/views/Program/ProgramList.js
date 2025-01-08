@@ -239,7 +239,7 @@ export default class ProgramList extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
       filters: true,
-      license: JEXCEL_PRO_KEY,
+      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         if (AuthenticationService.checkUserACL([this.el.getValueFromCoords(0, y).toString()], 'ROLE_BF_ADD_INTEGRATION_PROGRAM')) {
           var items = [];

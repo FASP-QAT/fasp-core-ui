@@ -378,7 +378,6 @@ class ListUserComponent extends Component {
             );
         UserService.getRoleList()
             .then((response) => {
-                console.log("Test@123", response.data)
                 if (response.status == 200) {
                     this.setState({
                         currentUserRole: response.data,
@@ -598,7 +597,7 @@ class ListUserComponent extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y != null) {
@@ -684,7 +683,7 @@ class ListUserComponent extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: true,
             contextMenu: function (obj, x, y, e) {
                 var items = [];

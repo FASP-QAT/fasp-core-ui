@@ -206,7 +206,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         onload: this.loadedJexcelCommonFunction,
-                                        license: JEXCEL_PRO_KEY,
+                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
                                     };
                                     var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
                                     this.el = elVar;

@@ -1088,7 +1088,6 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     }
                                     supplyPlanData.push(json);
                                 }
-                                console.log("supplyPlanData Test@123",supplyPlanData)
                                 programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
                                 programJsonForStoringTheResult.supplyPlan = supplyPlanData;
                                 var dashboardData=generalProgramJson.dashboardData;
@@ -1436,7 +1435,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.updateState("loading1", false);
                                     props.updateState("planningUnitIdUpdated", "");
                                     props.toggleLarge();
-                                    props.hideSecondComponent();
+                                    // props.hideSecondComponent();
                                     if (props.state.active1) {
                                         props.getVersionList()
                                     } else {
@@ -1448,7 +1447,7 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                     props.updateState("changedDataForTab2", false);
                                     props.updateState("loading", false);
                                     props.updateState("planningUnitIdUpdated", "");
-                                    props.hideSecondComponent();
+                                    // props.hideSecondComponent();
                                     if (props.state.active1 || props.state.active2) {
                                         props.getVersionList()
                                     } else {

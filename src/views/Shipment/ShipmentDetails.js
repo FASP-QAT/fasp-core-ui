@@ -1729,6 +1729,7 @@ export default class ShipmentDetails extends React.Component {
                                                     var planningUnitId = planningUnitsIds[pu].value;
                                                     var batchNo = (BATCH_PREFIX).concat(paddingZero(programId, 0, 6)).concat(paddingZero(planningUnitId, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
                                                     var expiryDate = moment(month).add(programPlanningUnit.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                                    suggestedOrd=Math.round(Number(suggestedOrd));
                                                     var batchInfo = [{
                                                         shipmentTransBatchInfoId: 0,
                                                         batch: {

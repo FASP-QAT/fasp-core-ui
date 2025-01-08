@@ -712,7 +712,6 @@ export default class TreeExtrapolationComponent extends React.Component {
             var value = this.state.dataExtrapolation.getValue(`L${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
             var reg = JEXCEL_DECIMAL_MONTHLY_CHANGE_8_DECIMAL_POSITIVE;
             value = value.toString().replaceAll(",", "");
-            console.log("Value Test@123",value);
             if (value != "" && !(reg.test(value))) {
                 this.state.dataExtrapolation.setStyle(col, "background-color", "transparent");
                 this.state.dataExtrapolation.setStyle(col, "background-color", "yellow");
@@ -1655,7 +1654,7 @@ export default class TreeExtrapolationComponent extends React.Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return [];
             }.bind(this),

@@ -449,7 +449,7 @@ class EquivalancyUnit extends Component {
             parseFormulas: true,
             oneditionend: this.oneditionend1,
             onload: this.loaded1,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             editable: true,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
@@ -769,7 +769,7 @@ class EquivalancyUnit extends Component {
             oneditionend: this.oneditionend,
             onload: this.loaded,
             editable: true,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -1248,21 +1248,29 @@ class EquivalancyUnit extends Component {
      * Reterives forecast program list from server
      */
     getType() {
-        ProgramService.getDataSetList()
+        let realmId = AuthenticationService.getRealmId();
+        DropdownService.getAllProgramListByRealmId(realmId)
             .then(response => {
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
-                        var itemLabelA = a.programCode.toUpperCase();
-                        var itemLabelB = b.programCode.toUpperCase();
+                        var itemLabelA = a.code.toUpperCase();
+                        var itemLabelB = b.code.toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     let tempProgramList = [];
                     if (listArray.length > 0) {
                         for (var i = 0; i < listArray.length; i++) {
                             var paJson = {
-                                name: listArray[i].programCode,
-                                id: listArray[i].programId,
+                                name: listArray[i].code +
+                                " (" +
+                                (listArray[i].programTypeId == 1
+                                  ? "SP"
+                                  : listArray[i].programTypeId == 2
+                                    ? "FC"
+                                    : "") +
+                                ")",
+                                id: listArray[i].id,
                                 active: listArray[i].active,
                             }
                             tempProgramList[i] = paJson
