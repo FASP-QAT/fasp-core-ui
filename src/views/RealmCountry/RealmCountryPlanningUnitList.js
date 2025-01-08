@@ -656,6 +656,11 @@ export default class RealmCountryPlanningUnitList extends Component {
       allowManualInsertRow: false,
       parseFormulas: true,
       onpaste: this.onPaste,
+      oncopy: function (instance, cells, data) {
+        if(cells[0]==1){
+          return data.toString().split("|")[0]
+        }
+      },
       oneditionend: this.oneditionend,
       filters: true,
       license: JEXCEL_PRO_KEY, allowRenameColumn: false,
