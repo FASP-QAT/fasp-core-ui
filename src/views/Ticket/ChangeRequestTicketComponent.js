@@ -23,9 +23,7 @@ const validationSchema = function (values) {
             .matches(SPACE_REGEX, i18n.t('static.common.spacenotallowed'))
             .required(i18n.t('static.common.summarytext')),
         description: Yup.string()
-            .required(i18n.t('static.common.descriptiontext')),
-        attachFile: Yup.string()
-            .required(i18n.t('static.program.selectfile'))
+            .required(i18n.t('static.common.descriptiontext'))
     })
 }
 /**
@@ -240,17 +238,14 @@ export default class ChangeRequestTicketComponent extends Component {
                                     </FormGroup>
                                     <FormGroup >
                                         <Col>
-                                            <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}<span class="red Reqasterisk">*</span></Label>
+                                            <Label className="uploadfilelable" htmlFor="attachFile">{i18n.t('static.ticket.uploadScreenshot')}</Label>
                                         </Col>
                                         <div className="custom-file">
                                             <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg"
-                                                valid={!errors.attachFile && this.state.changeRequest.attachFile != ''}
-                                                invalid={touched.attachFile && !!errors.attachFile}
                                                 onChange={(e) => { handleChange(e); this.dataChange(e); }}
                                                 onBlur={handleBlur}
                                             />
                                             <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.changeRequest.attachFile}</label>
-                                            <FormFeedback className="red">{errors.attachFile}</FormFeedback>
                                         </div>
                                         <br></br><br></br>
                                         <div>
