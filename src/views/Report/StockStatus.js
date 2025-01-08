@@ -1130,6 +1130,7 @@ class StockStatus extends Component {
       "aggregate": this.state.isAggregate == "true" ? true : false, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
       "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
       "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
+      "versionId": parseInt(this.state.versionId),
       "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
       "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
       "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
@@ -2408,6 +2409,7 @@ class StockStatus extends Component {
         "aggregate": true, // True if you want the results to be aggregated and False if you want Individual Supply Plans for the Multi-Select information
         "programIds": this.state.programId.map(ele => ele.value), // Will be used when singleProgram is false
         "programId": this.state.programId.map(ele => ele.value), // Will be used only if aggregate is false
+        "versionId": parseInt(this.state.versionId),
         "startDate": startDate.startOf('month').format('YYYY-MM-DD'),
         "stopDate": this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate(),
         "viewBy": this.state.viewById, // 1 for PU, 2 for ARU
