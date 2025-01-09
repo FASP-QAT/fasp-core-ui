@@ -7194,6 +7194,7 @@ export default class BuildTree extends Component {
             this.setState({
                 curTreeObj,
                 scenarioList: curTreeObj.scenarioList,
+                cursorItem: curTreeObj1[0].id,
                 // allScenarioList: curTreeObj.scenarioList,
                 regionValues
             }, () => {
@@ -8745,6 +8746,11 @@ export default class BuildTree extends Component {
             this.getModelingTypeList();
             this.getRegionList();
             this.procurementAgentList();
+            setTimeout(() => {
+                this.setState({
+                    cursorItem: null
+                })
+            }, 5000)
         })
     }
     /**
