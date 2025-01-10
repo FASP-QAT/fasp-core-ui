@@ -1,6 +1,9 @@
+const { DefinePlugin } = require('webpack');
 const HtmlWebPackPlugin = require('html-webpack-plugin');
-const path = require('path');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const path = require('path');
+const pkg = require('./package.json');
+
 // var enUs = require( 'json-loader!../public/locales/en.json' );
 // var en = require('./public/locales/en.json');
 // const en = require('./public/locales/en.json');
@@ -114,6 +117,9 @@ module.exports = {
         ]
     },
     plugins: [
+        new DefinePlugin({
+            'process.env.REACT_APP_VERSION': JSON.stringify(pkg.version)
+        }),
         new HtmlWebPackPlugin({
             template: path.resolve(__dirname, 'src/assets/img/index.html'),
             filename: 'index.html'
