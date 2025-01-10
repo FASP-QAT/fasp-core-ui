@@ -845,6 +845,40 @@ Cypress.Commands.add('mockRealApiCalls', () => {
     }
   }).as('versionRequest');
 
+  cy.intercept('GET', `${API_URL}/api/erpLinking/getNotificationCount`, {
+    statusCode: 200,
+    body: 0
+  }).as('notificationCount');
+
+  cy.intercept('GET', `${API_URL}/api/ticket/openIssues`, {
+    statusCode: 200,
+    body: 0
+  }).as('openIssues');
+
+  cy.intercept('GET', `${API_URL}/api/dashboard/realmLevel`, {
+    statusCode: 200,
+    body: []
+  }).as('realmLevel');
+
+  cy.intercept('GET', `${API_URL}/api/dashboard/realmLevel/userList`, {
+    statusCode: 200,
+    body: []
+  }).as('userList');
+
+  cy.intercept('GET', `${API_URL}/api/dropdown/program/sp/expanded/realm/1`, {
+    statusCode: 200,
+    body: []
+  }).as('programList');
+
+  cy.intercept('GET', `${API_URL}/api/dropdown/realmCountry/realm/1`, {
+    statusCode: 200,
+    body: []
+  }).as('realmCountry');
+
+  cy.intercept('GET', `${API_URL}/api/logout`, {
+    statusCode: 200
+  }).as('logout');
+
   // Mock health check
   cy.intercept('GET', `${API_URL}/actuator/health`, {
     statusCode: 200,
