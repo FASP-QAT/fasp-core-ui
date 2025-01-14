@@ -11564,8 +11564,8 @@ export default class BuildTree extends Component {
                                                 <div className="controls ">
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' },
-                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId) }
+                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' && this.state.currentScenario.isFUMappingCorrect == 1 },
+                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId || this.state.currentScenario.isFUMappingCorrect == 0) },
                                                         )}
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
@@ -12787,6 +12787,18 @@ export default class BuildTree extends Component {
                     }
                 }
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = fuPerMonth;
+
+                var forecastingUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
+                var planningUnitList = [];
+                if (this.state.programId != null && this.state.programId != "") {
+                    planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
+                    var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == forecastingUnitId);
+                    if (planningUnitListFilter.length > 0) {
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isFUMappingCorrect = 1
+                    } else {
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isFUMappingCorrect = 0
+                    }
+                }
             }
             if (items[i].payload.nodeType.id == 5) {
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
@@ -12796,7 +12808,7 @@ export default class BuildTree extends Component {
                 if (this.state.programId != null && this.state.programId != "") {
                     planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
                     var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.id == planningUnitId);
-                    if (planningUnitListFilter.length > 0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id == forecastingUnitId) {
+                    if (planningUnitListFilter.length > 0) {
                         (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 1
                     } else {
                         (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 0
@@ -12864,7 +12876,7 @@ export default class BuildTree extends Component {
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
                     </div>
                     :
-                    <div className={(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
+                    <div className={(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0 || itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isFUMappingCorrect == 0)) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                         <div className={outerLink ? itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : "ContactTitleBackground TemplateTitleBgpurple" : itemConfig.payload.nodeType.id == 5
                             || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                             (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
