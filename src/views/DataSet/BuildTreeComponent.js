@@ -11784,7 +11784,7 @@ export default class BuildTree extends Component {
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId" className='LabelWd'>{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"
