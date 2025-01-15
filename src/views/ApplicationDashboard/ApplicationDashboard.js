@@ -1285,9 +1285,25 @@ class ApplicationDashboard extends Component {
             bottomSubmitLoader: true,
           })
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-        } else if (localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
+        } else if (!this.state.onlyDownloadedTopProgram) {
           this.setState({
-            dashboardTopList: JSON.parse(localStorage.getItem("dashboardTopList"))
+            topSubmitLoader:true
+          })
+          var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
+          DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
+            localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+            this.setState({
+              dashboardTopList: (response.data).sort((a, b) => {
+                var itemLabelA = a.program.code.toUpperCase();
+                var itemLabelB = b.program.code.toUpperCase();
+                return itemLabelA > itemLabelB ? 1 : -1;
+              }),
+              topSubmitLoader: false
+            })
+          }).catch(e => {
+            this.setState({
+              topSubmitLoader: false
+            })
           })
         }
         tempProgramList.sort(function (a, b) {
