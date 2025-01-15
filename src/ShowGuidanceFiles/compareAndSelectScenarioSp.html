@@ -101,21 +101,8 @@
 												pronóstico particular.</li>
 											<li>Revise los pronósticos disponibles usando la siguiente información en la
 												pantalla:<ul type="a">
-													<li> <b>Error de previsión (%):</b> este error se calcula utilizando
-														el
-														Cálculo del error porcentual absoluto ponderado (WAPE). si el
-														el error de pronóstico se resalta en <span
-															style="color:#86cd99">texto verde</span>, esto
-														El pronóstico tiene el error de pronóstico más bajo de los
-														disponibles.
-														previsiones. Ejemplo de cálculo de WAPE utilizando el período
-														predeterminado de 6 meses
-														ventana de tiempo: <img class="img-fluid"
-															src="/ForecastError-Formula.png"><br>Si 6 meses de datos son
-														no está disponible, QAT utilizará tantos meses como estén
-														disponibles y
-														indíquelo en esta columna.
-													</li>
+													<li> <b>Error de pronóstico (%):</b> este error se calcula utilizando el cálculo del error porcentual absoluto ponderado (WAPE) de la misma manera que se calcula en la pantalla de extrapolación de consumo. Si el error de pronóstico está resaltado en <span
+														style="color:#86cd99">texto verde</span>, este pronóstico tiene el error de pronóstico más bajo de los pronósticos disponibles. </li>
 													<li> <b>Comparar con el pronóstico de consumo:</b> QAT compara los
 														disponibles
 														Previsiones de Consumo y Previsiones de Árboles. Para cualquier
@@ -144,6 +131,20 @@
 																los datos en cursiva violeta</span></b> se encuentran
 														dentro del
 														período de pronóstico. </li>
+														<li><b>Ver las previsiones en agregaciones de año calendario o año fiscal:</b>
+															De forma predeterminada, QAT muestra el pronóstico en cifras mensuales, pero los usuarios tienen la 
+															opción para ver una agregación de esas cifras por año calendario o por año fiscal
+															 año (y definir el inicio/final del año fiscal que 
+															 funciona en su contexto).
+															 <ul>
+																<li>
+																	Al elegir ver por calendario/año fiscal, aparece una nueva tabla 
+																	entre el gráfico y la tabla de datos detallada. Esta nueva tabla muestra 
+																	los valores de pronóstico agregados por año calendario o fiscal, y denota 
+																	el número de meses utilizados en el cálculo de ese año. 
+																</li>
+															 </ul> 
+														</li>
 												</ul>
 											</li>
 											<li>
@@ -164,6 +165,15 @@
 													target="_blank" style="text-decoration: underline;">Mensualmente
 													Previsión</a> para verificar todas las unidades de planificación juntas.
 											</li>
+											<li>
+												Repita los pasos 1 a 3 para cada unidad de planificación y región hasta que no haya más <i class="fa fa-exclamation-triangle"
+												Los símbolos aria-hidden="true"></i> permanecen. Una vez completado, continúe hasta <a href="/#/forecastReport/forecastOutput"
+												target="_blank" style="text-decoration: underline;">Mensualmente
+												Previsión</a>
+												para verificar todas las unidades de planificación juntas. 
+
+											</li>
+
 										</ol>
 										<p style="font-style: italic;">Nota: Los usuarios pueden seleccionar varios pronósticos de árboles como pronóstico final, lo que
 											agregará las cantidades previstas mensualmente; sin embargo, los usuarios no pueden seleccionar
