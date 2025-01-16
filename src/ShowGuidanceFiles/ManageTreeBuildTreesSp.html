@@ -54,26 +54,94 @@ a {
 										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo</span> Permita que los usuarios administren y construyan árboles de pronóstico y escenarios, para cualquier pronóstico que no 
 											sea de consumo (demográfico, morbilidad, servicios, etc.). Tenga en cuenta que hay más orientación disponible después de hacer clic en cualquier nodo específico.</p>
 											<p style="font-size: 13px;">
-												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pantalla :</span>
+												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando esta pantalla :</span> <!--Using this screen : -->
 												<br>
-												<span style="font-weight: bold;">Administrar el árbol:</span> Haga clic en el icono de engranaje <i class="fa fa-cog" aria-hidden="true"></i> para mostrar y editar u ocultar el método de pronóstico, el nombre del árbol y la región.</p>
-												<p style="font-size: 13px;"><span style="font-weight: bold; font-size: 13px;">Construyendo el árbol:</span>El árbol de pronóstico se construye de arriba hacia 
-													abajo, utilizando diferentes tipos de nodos. Consulte los tipos de nodos y las 
-													acciones de nodos a continuación. Cada árbol de pronóstico debe incluir uno o 
-													más nodos de unidades de planificación, que forman la salida del pronóstico, para 
-													que ese árbol esté disponible en la pantalla "<a href="/#/report/compareAndSelectScenario" target="_blank">Comparar y seleccionar</a>". Cada Nodo de 
-													Unidad de Planificación debe provenir de un Nodo de Unidad de Pronóstico.  </p>
 
-													<p style="font-size: 13px; font-weight: bold;"><span class="">Acciones de nodo :</span></p>
-													<ul class="pl-lg-4" style="font-size: 13px;">
-														<li><i class="fa fa-trash-o" aria-hidden="true" ></i> Eliminar: elimina el nodo seleccionado </li>
-														<li><i class="fa fa-clone" aria-hidden="true"></i> Duplicar: Duplica el nodo seleccionado bajo el mismo padre </li>
-														<li><i class="fa fa-plus-square-o" aria-hidden="true" ></i> Agregar: agrega un hijo al nodo seleccionado.</li>
+												<!-- Start of Navigation sec -->
+												<span style="font-weight: bold;">Navegación:</span>
+												<ul class="pl-lg-4" style="font-size: 13px;">
+													<li>
+														Comience seleccionando el <strong>Programa</strong> y el <strong>Árbol</strong> en los menús desplegables. Tenga en cuenta que sólo están disponibles los programas descargados. Haga clic en el ícono de ajustes <i class="fa fa-cog" aria-hidden="true"></i> para mostrar/ocultar o editar los detalles del árbol (método de pronóstico, nombre del árbol y región).
+													</li> <!--Point 1-->
+													<li>Consulte la siguiente sección para <strong>escenarios</strong>.</li> <!--Point 2-->
+													<li>Los valores de los nodos del árbol se muestran en la fecha que se muestra en <strong>Fecha de visualización</strong>. Cambie esta fecha para ver valores en otros meses.</li> <!--Point 3-->
+													
+													<li>Los usuarios también pueden editar el árbol en la pantalla <a href="/#/dataSet/treeTable/tree/{{treeId}}/{{programId}}" target="_blank">Tabla de árbol</a>, 
+														que permite la edición por lotes de valores de nodos, pero no permite ninguna edición en la estructura del árbol ni cambios a lo largo del tiempo.</li> <!--Point 4-->
+
+													<li><Input
+														className="form-check-input checkboxMargin"
+														type="checkbox"
+														id="checkBox1"
+														name="checkBox1"																										
+													/>
+													<strong>Casillas de verificación "Ocultar" </strong>- utilice estas casillas de verificación para ocultar ciertos elementos del árbol para una visualización más limpia.
+													</li>	 <!--Point 5-->
+													<li><Input
+														className="form-check-input checkboxMargin"
+														type="checkbox"
+														id="checkBox2"
+														name="checkBox2"																										
+													/>
+														<strong>Autocalcular</strong> - Si QAT es lento mientras edita su árbol, desmarque la casilla de cálculo automático para detener los cálculos. Para actualizar los cálculos, vuelva a marcar la casilla de verificación 'cálculo automático' o haga clic en el ícono de recalcular <i class="fa fa-refresh" aria-hidden="true"></i>.
+													</li> <!--Point 6-->
+
+													<li>Haga clic en los <strong>niveles</strong> del árbol (cuadros rectangulares de color azul oscuro a la izquierda del árbol) para:</li> <!--Point 7-->
+													<ul>
+														<li>Nombra los niveles de un árbol. Esto hará que el árbol sea más fácil de leer y se usará en los menús desplegables y en el eje de la pantalla <a href="/#/validation/modelingValidation" target="_blank">Validación de modelado</a>.</li> <!--Point 7.1-->
+														<li>Reordene las ramas de su árbol como desee utilizando las flechas hacia arriba y hacia abajo para indicar la posición de izquierda a derecha de las ramas. Si la lista es larga, utilice el menú desplegable "ver hijos de" para filtrar los nodos.</li> <!--Point 7.2-->
 													</ul>
+												</ul>
+
+												<!-- End of Navigation sec -->
+
+												<!-- Start of Building the Tree para -->
+												<p style="font-size: 13px;"><span
+													style="font-weight: bold; font-size: 13px;">Construyendo el árbol:</span>El árbol de pronóstico se construye de arriba hacia abajo, utilizando diferentes tipos de "nodos".  
+													Consulte los tipos de nodos y las acciones de los nodos a continuación. 
+													Cada árbol de pronóstico debe incluir uno o más nodos de unidad de planificación, que forman el resultado del pronóstico, para que ese árbol esté disponible en la pantalla "<a href="/#/report/compareAndSelectScenario" target="_blank">Comparar y seleccionar</a>". 
+													Cada Nodo de Unidad de Planificación debe surgir de un Nodo de Unidad de Previsión. 
+												</p>
+												<!-- End of Building the Tree para -->
+
+												<!-- Start of Node Actions sec -->
+												<p>
+													<p style="font-size: 13px; font-weight: bold;"><span class="">Acciones de nodo:</span></p>
+													<ul class="pl-lg-4" style="font-size: 13px;">
+														<li>Haga clic en un nodo para abrirlo y editarlo o verlo.</li>
+														<li>Pase el cursor sobre un nodo para ver las notas del nodo sin abrir el nodo.</li>
+														<li><i class="fa fa-paste"></i><strong>
+															Copiar / Mover</strong>: Copia o mueve el nodo seleccionado y todos sus hijos. El usuario puede seleccionar el destino.
+														</li>
+		
+		
+														<li><i class="fa fa-trash-o" aria-hidden="true"
+																></i> <strong>Borrar</strong>: Elimina el nodo seleccionado y todos sus hijos.</li>
+														<li><i class="fa fa-sitemap" aria-hidden="true"
+																></i> <strong>Agregar plantilla de sucursal</strong>: Agrega una plantilla de árbol como una rama debajo del nodo elegido. </li>
+														<li><i class="fa fa-plus-square-o" aria-hidden="true"
+																></i> <strong>Agregar</strong>: Agrega un nodo secundario al nodo seleccionado.</li>
+		
+														<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Contraer/Expandir</strong>: Contraer/expandir el nodo actual y todos sus hijos.</li>
+														<ul>
+															<li>En modo contraído, los nodos estarán representados por puntos. Pase el cursor sobre cualquier punto/nodo y haga clic una vez para expandir ese nodo y todos sus hijos.</li>
+															<li>“<strong>Árbol colapsado</strong>” casilla de verificación 
+																<Input
+																	className="form-check-input checkboxMargin"
+																	type="checkbox"
+																	id="checkBox2"
+																	name="checkBox2"																										
+																/> 
+																en la parte superior de la pantalla que colapsa todos los nodos excepto el nodo superior.
+															</li>
+														</ul>
+													</ul>
+												</p>
+												<!-- End of Node Actions sec -->
 
 													<p style="font-size: 13px;">
 														<p style="font-size: 14px; font-weight: bold;">
-															<span class="">Tipo de nodo  :</span>
+															<span class="">Tipos de nodos  :</span>
 														</p>
 														<div class="pl-lg-4 pr-lg-4 pt-lg-4 table1">
 															<table style="border-collapse: collapse;">
@@ -95,43 +163,57 @@ a {
 																	<tr>
 																		<td class="BgLightBlue"><b>Número #</b></td>
 																		<td>Definido en este nodo</td>
-																		<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td>% o <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
 																	</tr>
 																	<tr>
 																		<td class="BgLightBlue"><b>Porcentaje %</b></td>
 																		<td>Un porcentaje del padre</td>
-																		<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td>% o <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link">,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></i></td>
 																	</tr>
-																	<tr>
-																		<td class="BgDarkBlue"><b>Unidad de previsión <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-																		<td>Un porcentaje de los parámetros de la unidad principal y de pronóstico</td>
+																	<tr> <!--Funnel -->
+																		<td style="background:#002f6c;color: #fff;"><b>Embudo <i><img
+																						src="../ShowGuidanceFiles/img/funnel1.png"
+																						width="18" height="18" /></i></b></td>
+																		<td>Suma de nodos de origen vinculados
+																			(<i><img class="Iconclr"
+																					src="../ShowGuidanceFiles/img/aggregateAllowed.png"
+																					width="20" height="20" /></i>)</td>
+																		<td>% o</td>
+																		<td>-</td>
+																	</tr>
+
+																	<tr> <!--Forecasting Unit-->
+																		<td class="BgDarkBlue"><b>Unidad de pronóstico <i class="fa fa-cube" aria-hidden="true"></i></b></td>
+																		<td>Un porcentaje de los parámetros de la unidad principal y de previsión. Pueden ser dos tipos de uso diferentes:
+																			<br>
+																			<b style="background: #002f6c;">
+																				<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;c </b>
+																			</b>: Continuo
+																			<br>
+																			<b style="background: #002f6c;">
+																				<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;d </b>
+																			</b>: Discreto
+																		</td>
 																		<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 																	</tr>
-																	<tr>
+
+																	<tr> <!--Planning Unit -->
 																		<td class="BgDarkBlue"><b>Unidad de Planificación <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 																		<td>Un porcentaje de los parámetros de la unidad principal y de planificación</td>
 																		<td>-</td>
 																		<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 																	</tr>
-																	<tr>
-																		<td style="background:#002f6c;color: #fff;"><b>Embudo <i><img
-																						src="../ShowGuidanceFiles/img/funnel1.png"
-																						width="18" height="18" /></i></b></td>
-																		<td>Suma de nodos de origen vinculados
-																			<i><img class="Iconclr"
-																					src="../ShowGuidanceFiles/img/aggregateAllowed.png"
-																					width="20" height="20" /></i></td>
-																		<td>% or</td>
-																		<td>-</td>
-																	</tr>
+																	
 																</tbody>
 															</table>
 														</div>
 													</p>
-													<p style="font-size: 13px;">
+
+													<!-- Start of  Changes Over Time Sec -->
+													<p style="font-size: 13px;"> 
 														<span style="font-size: 13px; font-weight: bold;">Cambios a lo largo del tiempo</span>
 														<p>Si bien la estructura del árbol se mantiene constante a lo largo del tiempo, los porcentajes de nodos y
 															Los valores pueden cambiar con el tiempo. Utilice el menú desplegable de fechas para ver el árbol en cualquier
@@ -144,6 +226,7 @@ a {
 															<li><b><i class="fa fa-line-chart"></i> Extrapolación:</b> Permite a los usuarios utilizar datos históricos para extrapolar cambios futuros</li>
 														</ul>
 													</p>
+													<!-- End of  Changes Over Time Sec -->
 
 													<p style="font-size: 13px;">
 														<span style="font-size: 13px; font-weight: bold;">Uso de escenarios :</span><br>Los escenarios se utilizan para modelar diferentes valores para el mismo árbol. 
@@ -173,6 +256,10 @@ a {
 																	<tr>
 																		<td></td>
 																		<td>Modelado/Transferencia/Extrapolación</td>
+																	</tr>
+																	<tr>
+																		<td></td>
+																		<td>Conexiones de embudo</td>
 																	</tr>
 																</tbody>
 															</table>
