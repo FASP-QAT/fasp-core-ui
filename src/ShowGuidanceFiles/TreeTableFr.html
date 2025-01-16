@@ -50,7 +50,7 @@ a {
 									
 									<td style="padding:0 0 10px 0;color:#153643;">
 										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Table d'arbre</h3>
-										
+										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objectif</span> Autoriser la modification par lots de valeurs des nœuds. Remarque : Cet écran ne permet pas de modifier la structure de l'arborescence ni de modifier au fil du temps. Utilisez l'écran « Construire l'arborescence » pour ces modifications. </p>
 										<p><p style="font-size: 14px; font-weight: bold;"><span class="">Type de nœud:</span></p>
 										<div class="pl-lg-4 pr-lg-4 table1">
 											<table  style="border-collapse: collapse;">
@@ -66,107 +66,248 @@ a {
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Agrégation ∑</b></td>
 														<td>Somme des dérivés</td>
-														<td><b style="color: rgb(0, 47, 108);">∑</b> ou #</td>
+														<td><b style="color: rgb(0, 47, 108);">∑</b> ou Nombre</td>
 														<td>-</td>
 													</tr>
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Nombre #</b></td>
 														<td>Défini à ce nœud</td>
 														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i>,<i><img src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i><i><img class="img-fluid"
+															src="/aggregateAllowed.png" width="25px"></i></td>
 													</tr>
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Pourcentage %</b></td>
-														<td>Un pourcentage du parent/source</td>
+														<td>Défini comme un pourcentage du parent/source</td>
 														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i><i><img class="img-fluid"
+															src="/aggregateAllowed.png" width="25px"></i></td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Entonnoir
+																<i><img class="img-fluid" src="/funnel1-2.png"></i></b>
+														</td>
+														<td>Somme des nœuds sources liés
+															(<i><img
+																	src="/aggregateAllowed.png" width="24"></i>)</td>
+														<td>% or <b style=" color: rgb(0, 47, 108); padding: 3px;"></b>
+														</td>
+														<td>-</td>
 													</tr>
 													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td>Un pourcentage de la source et des paramètres de l'unité de prévision</td>
-														<td><b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														<td>Défini en pourcentage de l'unité parent et de l'unité de prévision
+															paramètres. Il peut s'agir de deux types d'utilisation différents :
+															<ul>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>C</b></span> :Continu
+																</li>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>D</b></span>:Discret
+																</li>
+															</ul>
+														</td>
+
 													</tr>
 													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Unité de planification <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-														<td>Un pourcentage du parent/source et des paramètres de l'unité de planification</td>
+														<td>Défini comme un pourcentage du parent/source et des paramètres de l'unité de planification</td>
 														<td>-</td>
 														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-													</tr>
-													<tr>
-														<td style="background:#002f6c;color: #fff;"><b>Entonnoir <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
-														<td>Somme des nœuds sources liés
-															<i><img src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
-														<td>% or</td>
-														<td>-</td>
 													</tr>
 												</tbody>
 											</table>
 										</div>
 									</p>
 											
-										<p style="font-size: 13px;">
-											<span style="font-size: 13px; font-weight: bold;">Using Scenarios :</span>Les scénarios sont utilisés pour modéliser différentes valeurs pour 
-											le même arbre.
+									<p>
+										<span style="font-size: 13px; font-weight: bold;">Using Scenarios :</span>Scenarios are used to model different values for 
+										the same tree.
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table  style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Fixed for All Scenarios</th>
+														<th style="width: 230px;">Unique to each Scenario</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>Tree structure</td>
+														<td>Node value</td>
+													</tr>
+													<tr>
+														<td>Node Title</td>
+														<td>Month</td>
+													</tr>
+													<tr>
+														<td>Node Type</td>
+														<td>Notes</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>Modeling/Transfer/Extrapolation</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>
+															Funnel Connections </td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</p>
+									<p style="font-size: 13px;">
+										<span classnames="UnderLineText" style="font-size: 13px;"><b>Conseils pour
+											cas d'utilisation spécifiques :</b></span>
+											<ul style="font-size: 13px;">
+												<b>Utilisation du produit retardée ou progressive ? </b>Parfois, la consommation du produit
+												est en retard par rapport aux autres niveaux supérieurs de l'arbre. Dans le
+												nœud <b>Unité de prévision</b> pertinent, utilisez le champ <b>Décalage</b> pour indiquer
+												ce retard.
+												<ul>
+													<li>
+	
+														Par exemple, si l'utilisation du produit commence 2 mois après la
+														mère
+														dates de nœud, entrez « 2 » dans ce champ.
+													</li>
+													<li>
+														Ce champ peut également être utilisé lorsque le produit change au fil du temps –
+														pour
+														Par exemple, si les unités de prévision A, B et C sont utilisées en sécession pour
+														deux
+														mois à la fois, vous pouvez configurer votre arbre avec l'unité de prévision A.
+														(discret pendant 2 mois, décalage = 0), unité de prévision B (discret pendant 2 mois
+														mois, décalage = 2), Unité de prévision C (discrète sur 2 mois, décalage = 4).
+													</li>
+												</ul>
+												<b>Utilisation discrète du produit sur une période plus longue ? (premier mois
+													distribution vs distribution mois par mois) :</b> QAT a la possibilité de
+												calculez l'utilisation discrète des produits dans les nœuds d'unité de prévision de deux manières :
+												<ul>
+													<li>en préalimentant la quantité discrète consommée par patient au cours du mois
+														1 (choisissez "Calculer" = "Tout le premier mois") ou </li>
+	
+													<li>en ventilant la quantité discrète consommée par patient par
+														mois (choisissez "Calculer" = "Mois par mois"). </li>
+	
+													<li>Par défaut, QAT supposera « Tout au cours du premier mois » (chargement anticipé) ;
+														cependant, les utilisateurs ont la possibilité de sélectionner « Mois par mois » pour le
+														méthode alternative.
+														Ce calcul alternatif pourrait être utile pour les unités de planification
+														(PU) qui
+														ont de faibles habitudes de consommation sur une période donnée ou si vous postulez
+														à un nouveau
+														groupe de patients initié. Par exemple, si une femme enceinte est
+														obligé de prendre
+														un complément nutritionnel une fois/mois pendant toute la durée du
+														grossesse (neuf mois),
+														par défaut, QAT calculerait neuf suppléments au cours du mois 1
+														(chargement anticipé). Sans
+														en frontloading, QAT calculerait un supplément au cours du mois 1, un
+														supplément au mois 2,
+														un supplément au mois 3, et ainsi de suite. </li>
+												</ul>
+												<b>Vous souhaitez une valeur spécifique pour le nombre d'unités de planification par patient ? </b>Un
+										l'utilisateur peut spécifier une valeur spécifique pour le nombre d'unités de planification par unité*
+										(discret) ou par unité* par mois (continu) en choisissant « Non » pour « Utiliser
+										Calcul automatique de QAT pour le nombre d'unités de planification ? » Sauf remplacement par un utilisateur,
+										QAT utilisera le calcul automatique par défaut. (* Dans ce cas, l'unité
+										peut être patient, test, client, etc.).
+										<ul>
+											<li><b>Exemple discret :</b> Si chaque flacon de bupivacaïne est supposé
+												à utiliser toutes les 5 procédures, puis le nombre d'unités de prévision
+												/ procédures est de 0,2 flacon. Avec une unité de planification de 5 flacons, QAT
+												calcule que 0,2/5 = 0,04 unités de planification sont utilisées par procédure.
+												Cependant, un utilisateur peut basculer le bouton radio sur « Non » et choisir de
+												remplacez cela par la connaissance des taux d'utilisation réels et entrez 0,05
+												unités de planification. Ajoutez toujours une note lorsque vous remplacez les QAT
+												calcul. </li>
 
-											<div class="pl-lg-4 pr-lg-4 table1">
-												<table  style="border-collapse: collapse;">
-													<thead>
-														<tr>
-															<th style="width: 130px;">Corrigé pour tous les scénarios
-															</th>
-															<th style="width: 230px;">Unique à chaque scénario
-															</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td>Arborescence</td>
-															<td>Valeur du nœud</td>
-														</tr>
-														<tr>
-															<td>Titre du nœud</td>
-															<td>Mois</td>
-														</tr>
-														<tr>
-															<td>Type de nœud
-															</td>
-															<td>Remarques</td>
-														</tr>
-														<tr>
-															<td></td>
-															<td>Modélisation/Transfert/Extrapolation
-															</td>
-														</tr>
-													</tbody>
-												</table>
-											</div>
-										</p>
-										<p style="font-size: 13px;">
-											<span classnames="UnderLineText" style="font-size: 13px;"><b>Tips for specific use cases:</b></span>
-											<ul style="font-size: 13px;">
-												<li><b> Type de nœud de prévision :</b> Sélectionnez discret si ce produit sera utilisé pendant une durée limitée et continue. 
-													s'il sera utilisé indéfiniment.
-</li>
-												<li><b> Utilisation retardée ou échelonnée du produit ?</b> Parfois, la consommation du produit est retardée par rapport à l'autre plus élevée. 
-													niveaux de l'arbre. Dans le nœud <b> Unité de prévision </b> approprié, utilisez le champ <b>Décalage</b> 
-													pour signaler ce retard.
-											<ul style="font-size: 13px;">
-												<li>Par exemple, si l'utilisation du produit commence 2 mois après les dates du nœud parent, 
-													entrez 2 dans ce champ.  </li>
-												<li>Ce champ peut également être utilisé lorsque le produit change au fil du temps, par exemple : 
-													si les unités de prévision A, B et C sont utilisées en sécession pendant deux mois à la fois, 
-													vous pouvez paramétrer votre arbre avec l'Unité de Prévision A (discrète sur 2 mois, lag=0), 
-													Unité de prévision B (discrète sur 2 mois, décalage = 2), unité de prévision C 
-													(discret pendant 2 mois, décalage = 4).</li>
-													<li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same 
-														settings, consider using the <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Usage Templates </a>screen to save your common usages, and then using 
-														the “Copy from Template” field to populate the fields in the forecasting unit nodes. </li>
-											</ul>
+											<li><b>Exemple continu :</b> Si un patient a besoin de 1 comprimé par jour
+												indéfiniment d'un flacon de 30 comprimés TLD, QAT calculera cela comme
+												30,4167/mois ou 1,0139/jour pour tenir compte des mois de 30 jours,
+												31 jours, 28 jours, etc. Cependant, un utilisateur peut choisir de basculer le
+												bouton radio sur « Non » et choisissez de remplacer cela par 1 planification
+												unité/mois. fournissez la valeur de remplacement de 1. Ajoutez toujours une note lorsque
+												vous remplacez le calcul de QAT. </li>
+										</ul>
+										<li><b>Utilisations répétées des prévisions ? </b>Si plusieurs nœuds d'unité de prévision
+											partagent les mêmes paramètres, pensez à utiliser l'écran Modèle d'utilisation pour
+											enregistrez vos utilisations courantes, puis en utilisant le champ « Copier à partir du modèle »
+											pour remplir les champs des nœuds de l'unité de prévision.
+										</li>
+										<li><b>Agréger les valeurs des nœuds pour des calculs ultérieurs ? (Nœuds d'entonnoir) :</b> Dans
+											dans certains cas, les utilisateurs peuvent souhaiter lier la valeur d'un nœud à un autre
+											nœud, ou regroupez plusieurs nœuds en un seul nœud avant d'en ajouter d'autres.
+											nœuds ci-dessous. **Veuillez noter que cette fonctionnalité est différente des nœuds de liaison
+											via la modélisation/transfert, qui sert à relier les modifications dans un nœud à
+											changements dans un autre nœud, plutôt que l’agrégation. C'est aussi différent
+											d'utiliser des nœuds d'agrégation, qui agrègent uniquement vers le haut, et non
+											permettre un calcul supplémentaire**
+
+										</li>
+										<b>Cas d'utilisation : </b>
+										<ul>
+											<li>Les tests de charge virale sont utilisés par diverses populations, mais tous
+												les populations utiliseront la même combinaison d’instruments. Commencez par un
+												arbre démographique qui se termine par plusieurs populations. Le différent
+												les populations doivent être additionnées et les différentes branches d'instruments
+												asseyez-vous sous la somme.
 											</li>
-											
-											</ul>
-										</p>
+											<li>
+												Les patients atteints du paludisme entrent dans le système de santé par différents canaux
+												(agents de santé communautaires vs établissements de santé publics), qui ont
+												différents algorithmes de test, mais une fois qu'un patient est testé positif,
+												ils reçoivent le même « mélange » de traitements. Les différentes populations
+												les tests positifs doivent être additionnés et les différents schémas thérapeutiques
+												s'asseoir sous la somme
+											</li>
+											<li>
+												Différentes méthodes contraceptives diffèrent dans la manière dont elles sont calculées, mais
+												ils proviennent tous de la même population nationale, ce qui doit être
+												mis à jour chaque quantification, et peut avoir une modélisation au fil du temps. Un
+												un arbre peut être construit pour les implants et les injectables, et un autre construit
+												pour les préservatifs, mais les deux arbres sont liés à la campagne
+												nœud de population, afin que leurs valeurs restent cohérentes
+											</li>
+
+										</ul>
+										<b>Comment lier des valeurs </b>
+										<ol>
+											<li>Indiquez (sur # ou % nœuds) qu'il s'agit de <b>"nœuds sources"</b> </li>
+
+											<li>Créez de nouveaux <b>"nœuds d'entonnoir"</b> et sélectionnez les nœuds sources à
+												agrégat à partir de. Remarque : les nœuds d'entonnoir peuvent « s'asseoir » n'importe où sur l'arborescence –
+												c'est-à-dire que vous pouvez faire du premier nœud d'un arbre un nœud d'entonnoir, ou
+												créez des nœuds d'entonnoir sous n'importe quelle agrégation, nombre de nœuds de pourcentage.
+												En effet, la valeur des nœuds d'entonnoir ne dérive pas de leur
+												parent, mais à partir des sources auxquelles ils sont liés.
+											</li>
+											<li>
+												Ajoutez des nœuds « enfants » sous les nœuds de l'entonnoir : ils seront probablement
+												les nœuds du produit. Les nœuds d'entonnoir offrent une grande flexibilité car
+												ils peuvent être utilisés dans un ou plusieurs arbres, peuvent être utilisés sur
+												n'importe quel niveau, et
+												<ul>
+													<li>L'utilisateur peut créer un lien <b>en interne au sein d'une arborescence </b>
+													</li>
+													<li>
+														Les utilisateurs peuvent établir des liens <b>en externe entre les arbres</b> (nœuds sources
+														sur un arbre, les nœuds d'entonnoir sur un autre arbre)
+													</li>
+												</ul>
+											</li>
+										</ol>
+
+	
+
+	</ul>
+	
+										
+									</p>
+
 
 									</li>
 								</ol>
