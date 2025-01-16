@@ -90,7 +90,7 @@
 												<li>See below section for <strong>Scenarios</strong>.</li>
 												<li>The values of the tree nodes is displayed in the date show in the <strong>Display Date</strong>. Change this date to see values in other months.</li>
 												
-												<li>Users can also edit the tree in the <a href="/#" target="_blank">Tree Table</a> screen, which allows batch editing of node values,
+												<li>Users can also edit the tree in the <a href="/#/dataSet/treeTable/tree/{{treeId}}/{{programId}}" target="_blank">Tree Table</a> screen, which allows batch editing of node values,
 													 but does not allow any edits to the structure of the tree or changes over time.</li>
 
 												<li><Input
@@ -129,38 +129,38 @@
 											Node must stem from a Forecasting Unit Node. </p>
 
 										<p>
-										<p style="font-size: 13px; font-weight: bold;"><span class="">Node Actions
-												:</span></p>
-										<ul class="pl-lg-4" style="font-size: 13px;">
-											<li>Click on a node to open it for editing or viewing.</li>
-											<li>Hover over a node to view node notes without opening the node.</li>
-											<li><i class="fa fa-paste"></i><strong>
-												Copy / Move</strong>: Copies or moves the selected node and all its children. The user can select the destination.
-											</li>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Node Actions
+													:</span></p>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Click on a node to open it for editing or viewing.</li>
+												<li>Hover over a node to view node notes without opening the node.</li>
+												<li><i class="fa fa-paste"></i><strong>
+													Copy / Move</strong>: Copies or moves the selected node and all its children. The user can select the destination.
+												</li>
 
 
-											<li><i class="fa fa-trash-o" aria-hidden="true"
-													></i> <strong>Delete</strong>: Deletes the selected node and all its children.</li>
-											<li><i class="fa fa-sitemap" aria-hidden="true"
-													></i> <strong>Add Branch Template</strong>: Adds a tree template as a branch below the chosen node. </li>
-											<li><i class="fa fa-plus-square-o" aria-hidden="true"
-													></i> <strong>Add</strong>: Adds a child to the
-												selected node.</li>
+												<li><i class="fa fa-trash-o" aria-hidden="true"
+														></i> <strong>Delete</strong>: Deletes the selected node and all its children.</li>
+												<li><i class="fa fa-sitemap" aria-hidden="true"
+														></i> <strong>Add Branch Template</strong>: Adds a tree template as a branch below the chosen node. </li>
+												<li><i class="fa fa-plus-square-o" aria-hidden="true"
+														></i> <strong>Add</strong>: Adds a child to the
+													selected node.</li>
 
-												<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Collapse/Expand</strong>: Collapse/Expands the current node and all its children.</li>
-												<ul>
-													<li>In collapsed mode, nodes will be represented by dots. Hover over any dot/node and click once to expand that node and all its children.</li>
-													<li>“<strong>Collapse Tree</strong>” checkbox 
-														<Input
-															className="form-check-input checkboxMargin"
-															type="checkbox"
-															id="checkBox2"
-															name="checkBox2"																										
-														/> 
-														at the top of the screen that collapses every node except for the top node.
-													</li>
-												</ul>
-										</ul>
+													<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Collapse/Expand</strong>: Collapse/Expands the current node and all its children.</li>
+													<ul>
+														<li>In collapsed mode, nodes will be represented by dots. Hover over any dot/node and click once to expand that node and all its children.</li>
+														<li>“<strong>Collapse Tree</strong>” checkbox 
+															<Input
+																className="form-check-input checkboxMargin"
+																type="checkbox"
+																id="checkBox2"
+																name="checkBox2"																										
+															/> 
+															at the top of the screen that collapses every node except for the top node.
+														</li>
+													</ul>
+											</ul>
 										</p>
 
 										<p>
@@ -311,6 +311,10 @@
 													<tr>
 														<td></td>
 														<td>Modeling/Transfer/Extrapolation</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>Funnel Connections</td>
 													</tr>
 												</tbody>
 											</table>
