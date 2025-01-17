@@ -31,7 +31,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import SupplyPlanFormulas from '../SupplyPlan/SupplyPlanFormulas';
-import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, dateFormatterCSV, makeText, roundAMC, roundN, formatter, hideSecondComponent, filterOptions, roundARU, roundARUWithoutRounding } from '../../CommonComponent/JavascriptCommonFunctions';
 export const DEFAULT_MIN_MONTHS_OF_STOCK = 3
 export const DEFAULT_MAX_MONTHS_OF_STOCK = 18
 const entityname1 = i18n.t('static.dashboard.stockstatus')
@@ -175,7 +175,7 @@ class StockStatus extends Component {
         versionId: event.target.value,
       },
       () => {
-        if(this.state.versionId != "")
+        if (this.state.versionId != "")
           this.getDropdownLists();
       }
     );
@@ -195,13 +195,8 @@ class StockStatus extends Component {
       );
       openRequest.onsuccess = function (e) {
         db1 = e.target.result;
-        var planningunitTransaction = db1.transaction(
-          ["programPlanningUnit"],
-          "readwrite"
-        );
-        var planningunitOs = planningunitTransaction.objectStore(
-          "programPlanningUnit"
-        );
+        var planningunitTransaction = db1.transaction(["programPlanningUnit"], "readwrite");
+        var planningunitOs = planningunitTransaction.objectStore("programPlanningUnit");
         var planningunitRequest = planningunitOs.getAll();
         planningunitRequest.onerror = function (event) {
         };
@@ -211,26 +206,16 @@ class StockStatus extends Component {
           var programId = this.state.programId[0].value;
           var proList = [];
           let incrmental = 0;
-          let planningUnitListAll = myResult.filter(epu => epu.program.id == programId).map(pu => pu.planningUnit);
-          
-          var realmCountryPlanningunitTransaction = db1.transaction(
-            ["realmCountryPlanningUnit"],
-            "readwrite"
-          );
-          var realmCountryPlanningunitOs = realmCountryPlanningunitTransaction.objectStore(
-            "realmCountryPlanningUnit"
-          );
+          var ppuResult = myResult.filter(epu => epu.program.id == programId && epu.active);
+          let planningUnitListAll = ppuResult.map(pu => pu.planningUnit);
+          var realmCountryPlanningunitTransaction = db1.transaction(["realmCountryPlanningUnit"], "readwrite");
+          var realmCountryPlanningunitOs = realmCountryPlanningunitTransaction.objectStore("realmCountryPlanningUnit");
           var realmCountryPlanningunitRequest = realmCountryPlanningunitOs.getAll();
           realmCountryPlanningunitRequest.onerror = function (event) {
           };
           realmCountryPlanningunitRequest.onsuccess = function (e) {
-            var programTransaction = db1.transaction(
-              ["program"],
-              "readwrite"
-            );
-            var programOs = programTransaction.objectStore(
-              "program"
-            );
+            var programTransaction = db1.transaction(["program"], "readwrite");
+            var programOs = programTransaction.objectStore("program");
             var programRequest = programOs.get(programId);
             programRequest.onerror = function (event) {
             };
@@ -240,7 +225,17 @@ class StockStatus extends Component {
 
               var myResult = [];
               myResult = realmCountryPlanningunitRequest.result;
-              let realmCountryPlanningUnitListAll = myResult.filter(ercpu => [...new Set(planningUnitListAll.map(x => x.id))].includes(ercpu.planningUnit.id) && programResult.realmCountry.realmCountryId == ercpu.realmCountry.id).map(rcpu => rcpu.planningUnit);
+              let realmCountryPlanningUnitList = myResult.filter(ercpu => [...new Set(planningUnitListAll.map(x => x.id))].includes(ercpu.planningUnit.id) && programResult.realmCountry.realmCountryId == ercpu.realmCountry.id);
+              var realmCountryPlanningUnitListAll = [];
+              realmCountryPlanningUnitList.map(item => {
+                realmCountryPlanningUnitListAll.push({
+                  "id": item.realmCountryPlanningUnitId,
+                  "label": item.label,
+                  "planningUnit": item.planningUnit,
+                  "forecastingUnitId": ppuResult.filter(c => c.planningUnit.id == item.planningUnit.id)[0].forecastingUnit.id,
+                  "multiplier": item.multiplier
+                })
+              })
               var lang = this.state.lang;
               this.setState({
                 // equivalencyUnitList: response.data.equivalencyUnitList,
@@ -268,6 +263,7 @@ class StockStatus extends Component {
       }.bind(this);
     } else {
       ReportService.getDropdownListByProgramIds(json).then(response => {
+        console.log("Response Dropdoen Test@123", response.data);
         this.setState({
           equivalencyUnitList: response.data.equivalencyUnitList,
           planningUnitListAll: response.data.planningUnitList,
@@ -1767,6 +1763,8 @@ class StockStatus extends Component {
           this.setState({
             programs: proList, message: '',
             loading: false
+          }, () => {
+            this.consolidatedProgramList();
           })
         }).catch(
           error => {
@@ -1819,8 +1817,51 @@ class StockStatus extends Component {
         );
     } else {
       this.setState({ loading: false })
+      this.consolidatedProgramList();
     }
   }
+  /**
+     * Consolidates the list of programs obtained from Server and local programs.
+     */
+  consolidatedProgramList = () => {
+    const { programs } = this.state;
+    var proList = programs;
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(["programQPLDetails"], "readwrite");
+      var program = transaction.objectStore("programQPLDetails");
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(
+          localStorage.getItem("curUser"),
+          SECRET_KEY
+        );
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (myResult[i].userId == userId) {
+            if (![...new Set(programs.map(ele => (ele.programId)))].includes(myResult[i].programId)) {
+              programs.push({
+                programId: myResult[i].programId,
+                label: myResult[i].programCode,
+                programCode: myResult[i].programCode,
+              })
+            }
+          }
+        }
+        this.setState({
+          programs: programs, message: '',
+          loading: false
+        })
+      }.bind(this);
+    }.bind(this);
+  };
   /**
    * Filters versions based on the selected program ID and updates the state accordingly.
    * Sets the selected program ID in local storage.
@@ -1972,7 +2013,6 @@ class StockStatus extends Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (
-            myResult[i].userId == userId &&
             myResult[i].programId == programId
           ) {
             var databytes = CryptoJS.AES.decrypt(
@@ -2085,6 +2125,18 @@ class StockStatus extends Component {
         value: Number(realmCountryPlanningUnitId),
         label: realmCountryPlanningUnitLabel
       }]
+      if (this.state.versionId.includes("Local")) {
+        var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(realmCountryPlanningUnitId));
+        var planningUnitLabel = rcpu[0].planningUnit.label
+        var planningUnit = [{
+          value: Number(rcpu[0].planningUnit.id),
+          label: planningUnitLabel
+        }]
+        this.setState({
+          planningUnitId: planningUnit,
+          planningUnitIdExport: planningUnit,
+        })
+      }
       this.setState({
         realmCountryPlanningUnitId: realmCountryPlanningUnit,
         realmCountryPlanningUnitIdExport: realmCountryPlanningUnit,
@@ -2259,149 +2311,163 @@ class StockStatus extends Component {
       loading: true
     })
 
-    if(this.state.versionId.includes("Local")) {
-      let programId = this.state.programId[0].value+"_v"+this.state.versionId.split(" ")[0]+"_uId_"+AuthenticationService.getLoggedInUserId();
-      console.log("Test@123 programId",programId)
+    if (this.state.versionId.includes("Local")) {
+      let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
       var db1;
       getDatabase();
       var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
       openRequest.onerror = function (event) {
-          this.setState({
-              message: i18n.t('static.program.errortext'),
-              color: '#BA0C2F'
-          })
-          this.hideFirstComponent()
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F'
+        })
+        this.hideFirstComponent()
       }.bind(this);
       openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-          programRequest.onerror = function (event) {
-              this.setState({
-                  message: i18n.t('static.program.errortext'),
-                  color: '#BA0C2F'
-              })
-              this.hideFirstComponent()
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
+        programRequest.onerror = function (event) {
+          this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: '#BA0C2F'
+          })
+          this.hideFirstComponent()
+        }.bind(this);
+        programRequest.onsuccess = function (event) {
+          var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+          var ppuOS = ppuTransaction.objectStore('programPlanningUnit');
+          var ppuRequest = ppuOS.getAll();
+          ppuRequest.onerror = function (event) {
+            this.setState({
+              message: i18n.t('static.program.errortext'),
+              color: '#BA0C2F'
+            })
+            this.hideFirstComponent()
           }.bind(this);
-          programRequest.onsuccess = function (event) {
-              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
-              var puData = [];
-              var planningUnitList = this.state.planningUnitId;
-              var consumptionList = [], inventoryList = [], shipmentList = [], supplyPlanList = [], programPlanningUnitList = [], stockStatusVerticalAggregateList = [];
-              for (var pu = 0; pu < planningUnitList.length; pu++) {
-                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitList[pu].value);
-                var programJson = {};
-                if (planningUnitDataFilter.length > 0) {
-                    var planningUnitData = planningUnitDataFilter[0]
-                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    programJson = JSON.parse(programData);
-                    consumptionList = consumptionList.concat(programJson.consumptionList);
-                    inventoryList = inventoryList.concat(programJson.inventoryList);
-                    shipmentList = shipmentList.concat(programJson.shipmentList);
-                    supplyPlanList = supplyPlanList.concat(programJson.supplyPlan);
-                    programPlanningUnitList.push({
-                      "programId": programId.split("_")[0],
-                      "planningUnitId": planningUnitList[pu].value
-                    })
-                } else {
-                    programJson = {
-                        consumptionList: [],
-                        inventoryList: [],
-                        shipmentList: [],
-                        batchInfoList: [],
-                        supplyPlan: [],
-                    }
-                    programPlanningUnitList.push({
-                      "programId": programId.split("_")[0],
-                      "planningUnitId": planningUnitList[pu].value
-                    })
+          ppuRequest.onsuccess = function (event) {
+            var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+            var puData = [];
+            var planningUnitList = this.state.planningUnitId;
+            var consumptionList = [], inventoryList = [], shipmentList = [], supplyPlanList = [], programPlanningUnitList = [], stockStatusVerticalAggregateList = [];
+            for (var pu = 0; pu < planningUnitList.length; pu++) {
+              var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitList[pu].value);
+              var programJson = {};
+              if (planningUnitDataFilter.length > 0) {
+                var planningUnitData = planningUnitDataFilter[0]
+                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                programJson = JSON.parse(programData);
+                consumptionList = consumptionList.concat(programJson.consumptionList);
+                inventoryList = inventoryList.concat(programJson.inventoryList);
+                shipmentList = shipmentList.concat(programJson.shipmentList);
+                supplyPlanList = supplyPlanList.concat(programJson.supplyPlan);
+                programPlanningUnitList.push({
+                  "programId": programId.split("_")[0],
+                  "planningUnitId": planningUnitList[pu].value
+                })
+              } else {
+                programJson = {
+                  consumptionList: [],
+                  inventoryList: [],
+                  shipmentList: [],
+                  batchInfoList: [],
+                  supplyPlan: [],
                 }
-                
-              }
-
-              let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
-              let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-              console.log("Test@123",startDate,stopDate)
-              for(let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1,"months").format("YYYY-MM")){
-                let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
-                stockStatusVerticalAggregateList.push({
-                  "dt": m+"-01",
-                  "reportingUnit": {
-                    "id": this.state.planningUnitId[0].value,
-                    "label": {
-                      "label_en": this.state.planningUnitId[0].label
-                    }
-                  },
-                  "openingBalance": sp.reduce((sum, value) => sum+value.openingBalance, 0),
-                  "actualConsumption": sp.filter(x => x.actualFlag).length == sp.length,
-                  "actualConsumptionQty": sp.reduce((sum, value) => sum+(value.actualFlag ? value.consumptionQty : 0), 0),
-                  "forecastedConsumptionQty": sp.reduce((sum, value) => sum+(value.actualFlag ? 0 : value.consumptionQty), 0),
-                  "finalConsumptionQty": sp.reduce((sum, value) => sum+value.consumptionQty, 0),
-                  "shipmentQty": sp.reduce((sum, value) => sum+value.shipmentTotalQty, 0),
-                  "adjustment": sp.reduce((sum, value) => sum+value.adjustmentQty, 0),
-                  "expiredStock": sp.reduce((sum, value) => sum+value.expiredStock, 0),
-                  "closingBalance": sp.reduce((sum, value) => sum+value.closingBalance, 0),
-                  "amc": sp.reduce((sum, value) => sum+value.amc, 0),
-                  "mos": sp.reduce((sum, value) => sum+value.closingBalance, 0)/sp.reduce((sum, value) => sum+value.amc, 0),
-                  "minStockMos": sp.reduce((sum, value) => sum+value.minStockMoS, 0)/sp.length,
-                  "maxStockMos": sp.reduce((sum, value) => sum+value.maxStockMoS, 0)/sp.length,
-                  "minStockQty": sp.reduce((sum, value) => sum+value.minStock, 0)/sp.length,
-                  "maxStockQty": sp.reduce((sum, value) => sum+value.maxStock, 0)/sp.length,
-                  "unmetDemand": sp.reduce((sum, value) => sum+value.unmetDemand, 0),
-                  "regionCount": sp[0].regionCount,
-                  "regionCountForStock": sp[0].regionCountForStock,
-                  "nationalAdjustment": sp.reduce((sum, value) => sum+value.nationalAdjustment, 0),
-                  "planBasedOn": 1,
-                  "ppuNotes": null
+                programPlanningUnitList.push({
+                  "programId": programId.split("_")[0],
+                  "planningUnitId": planningUnitList[pu].value
                 })
               }
-              console.log("Test@123",programPlanningUnitList,stockStatusVerticalAggregateList)
-              // {
-              //   "stockStatusVerticalAggregateList": [
-              //       {
-              //           
-              //           "shipmentInfo": [],
-              //           "consumptionInfo": [
-              //               {
-              //                   "consumptionId": 558830,
-              //                   "consumptionDate": "2025-12-01",
-              //                   "dataSource": {
-              //                       "id": 31,
-              //                       "label": {
-              //                           "label_en": "QAT",
-              //                           "label_sp": "QAT",
-              //                           "label_fr": "QAT",
-              //                           "label_pr": "QAT"
-              //                       }
-              //                   },
-              //                   "region": {
-              //                       "id": 67,
-              //                       "label": {
-              //                           "label_en": "National",
-              //                           "label_sp": "Nacional",
-              //                           "label_fr": "National",
-              //                           "label_pr": "Nacional"
-              //                       }
-              //                   },
-              //                   "notes": "Imported on 14-May-2024 by Jan de Jong from ARVs for treatment and prevention-Default from AGO-ARV-MOH v17",
-              //                   "actualFlag": false
-              //               }
-              //           ],
-              //           "inventoryInfo": [],
-              //           "planBasedOn": 1,
-              //           "ppuNotes": null
-              //       }
-              //   ],
-              //   "programPlanningUnitList": [
-              //       {
-              //           "programId": 2571,
-              //           "planningUnitId": 1073
-              //       }
-              //   ]
-              // }
+
+            }
+            var ppuResult = ppuRequest.result;
+            var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && c.planningUnit.id == this.state.planningUnitId[0].value);
+            let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
+            let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+            for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
+              let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
+              var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true");
+              var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true");
+              var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+              var multiplier = 1;
+              if (this.state.viewById == 2) {
+                multiplier = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == this.state.realmCountryPlanningUnitId[0].value)[0].multiplier
+              }
+              shipList.map(c => {
+                c.shipmentQty = roundARU(c.shipmentQty, multiplier)
+              })
+              stockStatusVerticalAggregateList.push({
+                "dt": m + "-01",
+                "reportingUnit": this.state.viewById == 1 ? {
+                  "id": this.state.planningUnitId[0].value,
+                  "label": {
+                    "label_en": this.state.planningUnitId[0].label
+                  }
+                } : {
+                  "id": this.state.realmCountryPlanningUnitId[0].value,
+                  "label": {
+                    "label_en": this.state.realmCountryPlanningUnitId[0].label
+                  }
+                },
+                "openingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding((value.openingBalance), multiplier), 0),
+                "actualConsumption": sp.filter(x => x.actualFlag).length == sp.length,
+                "actualConsumptionQty": conList.filter(c => c.actualFlag.toString() == "true").length > 0 ? conList.filter(c => c.actualFlag.toString() == "true").reduce((sum, value) => sum + roundARUWithoutRounding((value.consumptionQty), multiplier), 0) : null,
+                "forecastedConsumptionQty": conList.filter(c => c.actualFlag.toString() == "false").length > 0 ? conList.filter(c => c.actualFlag.toString() == "false").reduce((sum, value) => sum + roundARUWithoutRounding((value.consumptionQty), multiplier), 0) : null,
+                "finalConsumptionQty": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.consumptionQty, multiplier), 0),
+                "shipmentQty": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.shipmentTotalQty, multiplier), 0),
+                "adjustment": invList.filter(c => c.adjustmentQty != null).length > 0 ? invList.reduce((sum, value) => sum + roundARUWithoutRounding(value.adjustmentQty, multiplier), 0) : null,
+                "expiredStock": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.expiredStock, multiplier), 0),
+                "closingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.closingBalance, multiplier), 0),
+                "amc": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.amc, multiplier), 0),
+                "mos": sp.reduce((sum, value) => sum + value.closingBalance, 0) / sp.reduce((sum, value) => sum + value.amc, 0),
+                "minStockMos": ppu[0].minMonthsOfStock,
+                "maxStockMos": Number(ppu[0].minMonthsOfStock) + Number(ppu[0].reorderFrequencyInMonths),
+                "minStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu[0].minMonthsOfStock),
+                "maxStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu[0].minMonthsOfStock) + Number(ppu[0].reorderFrequencyInMonths)),
+                "unmetDemand": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.unmetDemand, multiplier), 0),
+                "regionCount": sp[0].regionCount,
+                "regionCountForStock": sp[0].regionCountForStock,
+                "nationalAdjustment": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.nationalAdjustment, multiplier), 0),
+                "planBasedOn": ppu[0].planBasedOn,
+                "ppuNotes": ppu[0].notes == "" ? null : ppu[0].notes,
+                "consumptionInfo": conList,
+                "inventoryInfo": invList,
+                "shipmentInfo": shipList
+              })
+            }
+            var stockStatusVerticalAggregateListJson = {
+              "programPlanningUnitList": programPlanningUnitList,
+              "stockStatusVerticalAggregateList": stockStatusVerticalAggregateList
+            }
+            console.log("stockStatusVerticalAggregateListJson Test@123", stockStatusVerticalAggregateListJson)
+            var inventoryList = [];
+            var consumptionList = [];
+            var shipmentList = [];
+            var responseData = stockStatusVerticalAggregateListJson.stockStatusVerticalAggregateList;
+            startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
+            var filteredResponseData = (responseData).filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+            filteredResponseData.map(c => {
+              c.inventoryInfo.map(i => inventoryList.push(i))
+              c.consumptionInfo.map(ci => consumptionList.push(ci))
+              c.shipmentInfo.map(si => shipmentList.push(si))
+            }
+            );
+            this.setState({
+              firstMonthRegionCount: stockStatusVerticalAggregateList.length > 0 ? responseData[0].regionCount : 1,
+              firstMonthRegionCountForStock: responseData.length > 0 ? responseData[0].regionCountForStock : 0,
+              stockStatusList: responseData,
+              message: '', loading: false,
+              planningUnitLabel: "",//document.getElementById("planningUnitId").selectedOptions[0].text,
+              inList: inventoryList,
+              coList: consumptionList,
+              shList: shipmentList,
+              ppuList: stockStatusVerticalAggregateListJson.programPlanningUnitList,
+              loading: false
+            })
           }.bind(this)
+        }.bind(this)
       }.bind(this)
     } else {
       let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
@@ -2418,7 +2484,7 @@ class StockStatus extends Component {
         "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
       }
       ReportService.getStockStatusData(inputjson).then((response) => {
-        console.log("Test@123",response.data)
+        console.log("Test@123", response.data)
         var inventoryList = [];
         var consumptionList = [];
         var shipmentList = [];
@@ -3283,23 +3349,23 @@ class StockStatus extends Component {
                       {this.state.programId.length == 1 && <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                         <div className="controls">
-                        <InputGroup>
-                          <Input
-                            type="select"
-                            name="versionId"
-                            id="versionId"
-                            bsSize="sm"
-                            onChange={(e) => {
-                              this.setVersionId(e);
-                            }}
-                            value={this.state.versionId}
-                          >
-                            <option value="0">
-                              {i18n.t("static.common.select")}
-                            </option>
-                            {versionList}
-                          </Input>
-                        </InputGroup>
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="versionId"
+                              id="versionId"
+                              bsSize="sm"
+                              onChange={(e) => {
+                                this.setVersionId(e);
+                              }}
+                              value={this.state.versionId}
+                            >
+                              <option value="0">
+                                {i18n.t("static.common.select")}
+                              </option>
+                              {versionList}
+                            </Input>
+                          </InputGroup>
                         </div>
                       </FormGroup>}
                       <FormGroup className="col-md-2" id="equivelencyUnitDiv">
