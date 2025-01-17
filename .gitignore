@@ -1,4 +1,3 @@
-
 # Created by https://www.gitignore.io/api/visualstudiocode
 # Edit at https://www.gitignore.io/?templates=visualstudiocode
 
@@ -17,3 +16,10 @@ node_modules/
 build/
 # End of https://www.gitignore.io/api/visualstudiocode
 /nbproject/private/
+coverage/
+/coverage/
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/
