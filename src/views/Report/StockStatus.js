@@ -186,7 +186,7 @@ class StockStatus extends Component {
       programIds: this.state.programId.map(ele => ele.value),
       onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
     }
-    if (this.state.versionId.includes("Local")) {
+    if (this.state.versionId.toString().includes("Local")) {
       var db1;
       getDatabase();
       var openRequest = indexedDB.open(
@@ -207,56 +207,83 @@ class StockStatus extends Component {
           var proList = [];
           let incrmental = 0;
           var ppuResult = myResult.filter(epu => epu.program.id == programId && epu.active);
-          let planningUnitListAll = ppuResult.map(pu => pu.planningUnit);
+          let planningUnitListAll = []
+          ppuResult.map(pu =>
+            planningUnitListAll.push({
+              id: pu.planningUnit.id,
+              label: pu.planningUnit.label,
+              forecastingUnitId: pu.forecastingUnit.id
+            }
+            )
+          );
           var realmCountryPlanningunitTransaction = db1.transaction(["realmCountryPlanningUnit"], "readwrite");
           var realmCountryPlanningunitOs = realmCountryPlanningunitTransaction.objectStore("realmCountryPlanningUnit");
           var realmCountryPlanningunitRequest = realmCountryPlanningunitOs.getAll();
           realmCountryPlanningunitRequest.onerror = function (event) {
           };
           realmCountryPlanningunitRequest.onsuccess = function (e) {
-            var programTransaction = db1.transaction(["program"], "readwrite");
-            var programOs = programTransaction.objectStore("program");
-            var programRequest = programOs.get(programId);
-            programRequest.onerror = function (event) {
+            var euTransaction = db1.transaction(["equivalencyUnit"], "readwrite");
+            var euOs = euTransaction.objectStore("equivalencyUnit");
+            var euRequest = euOs.getAll();
+            euRequest.onerror = function (event) {
             };
-            programRequest.onsuccess = function (e) {
-              var programResult;
-              programResult = programRequest.result;
+            euRequest.onsuccess = function (e) {
+              var programTransaction = db1.transaction(["program"], "readwrite");
+              var programOs = programTransaction.objectStore("program");
+              var programRequest = programOs.get(programId);
+              programRequest.onerror = function (event) {
+              };
+              programRequest.onsuccess = function (e) {
+                var programResult;
+                programResult = programRequest.result;
 
-              var myResult = [];
-              myResult = realmCountryPlanningunitRequest.result;
-              let realmCountryPlanningUnitList = myResult.filter(ercpu => [...new Set(planningUnitListAll.map(x => x.id))].includes(ercpu.planningUnit.id) && programResult.realmCountry.realmCountryId == ercpu.realmCountry.id);
-              var realmCountryPlanningUnitListAll = [];
-              realmCountryPlanningUnitList.map(item => {
-                realmCountryPlanningUnitListAll.push({
-                  "id": item.realmCountryPlanningUnitId,
-                  "label": item.label,
-                  "planningUnit": item.planningUnit,
-                  "forecastingUnitId": ppuResult.filter(c => c.planningUnit.id == item.planningUnit.id)[0].forecastingUnit.id,
-                  "multiplier": item.multiplier
-                })
-              })
-              var lang = this.state.lang;
-              this.setState({
-                // equivalencyUnitList: response.data.equivalencyUnitList,
-                planningUnitListAll: planningUnitListAll,
-                realmCountryPlanningUnitListAll: realmCountryPlanningUnitListAll,
-                planningUnitList: planningUnitListAll,
-                realmCountryPlanningUnitList: realmCountryPlanningUnitListAll,
-                planningUnitId: [],
-                realmCountryPlanningUnitId: [],
-                stockStatusList: []
-              }, () => {
-                if (this.state.yaxisEquUnit != -1) {
-                  var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
-                  var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-                  var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-                  this.setState({
-                    planningUnitList: planningUnitList,
-                    realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                var myResult = [];
+                myResult = realmCountryPlanningunitRequest.result;
+                let realmCountryPlanningUnitList = myResult.filter(ercpu => [...new Set(planningUnitListAll.map(x => x.id))].includes(ercpu.planningUnit.id) && programResult.realmCountry.realmCountryId == ercpu.realmCountry.id);
+                var realmCountryPlanningUnitListAll = [];
+                realmCountryPlanningUnitList.map(item => {
+                  realmCountryPlanningUnitListAll.push({
+                    "id": item.realmCountryPlanningUnitId,
+                    "label": item.label,
+                    "planningUnit": item.planningUnit,
+                    "forecastingUnitId": ppuResult.filter(c => c.planningUnit.id == item.planningUnit.id)[0].forecastingUnit.id,
+                    "multiplier": item.multiplier
                   })
-                }
-              });
+                })
+                var lang = this.state.lang;
+                var fuIds = [...new Set(ppuResult.map(c => c.forecastingUnit.id.toString()))];
+                var equivalencyUnitList = [];
+                var euResults = euRequest.result.filter(c => (c.program == null || (c.program != null && c.program.id == programId)) && fuIds.includes(c.forecastingUnit.id.toString()) && c.active && c.equivalencyUnit.active)
+                euResults.map(item => {
+                  if (equivalencyUnitList.findIndex(c => c.id == item.equivalencyUnit.equivalencyUnitId) == -1) {
+                    equivalencyUnitList.push({
+                      id: item.equivalencyUnit.equivalencyUnitId,
+                      label: item.equivalencyUnit.label,
+                      forecastingUnitIds: euResults.filter(c => c.equivalencyUnit.equivalencyUnitId == item.equivalencyUnit.equivalencyUnitId && c.active && c.equivalencyUnit.active).map(c => c.forecastingUnit.id.toString())
+                    })
+                  }
+                });
+                this.setState({
+                  equivalencyUnitList: equivalencyUnitList,
+                  planningUnitListAll: planningUnitListAll,
+                  realmCountryPlanningUnitListAll: realmCountryPlanningUnitListAll,
+                  planningUnitList: planningUnitListAll,
+                  realmCountryPlanningUnitList: realmCountryPlanningUnitListAll,
+                  planningUnitId: [],
+                  realmCountryPlanningUnitId: [],
+                  stockStatusList: []
+                }, () => {
+                  if (this.state.yaxisEquUnit != -1) {
+                    var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+                    var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+                    var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+                    this.setState({
+                      planningUnitList: planningUnitList,
+                      realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                    })
+                  }
+                });
+              }.bind(this);
             }.bind(this);
           }.bind(this);
         }.bind(this);
@@ -2125,7 +2152,7 @@ class StockStatus extends Component {
         value: Number(realmCountryPlanningUnitId),
         label: realmCountryPlanningUnitLabel
       }]
-      if (this.state.versionId.includes("Local")) {
+      if (this.state.versionId.toString().includes("Local")) {
         var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(realmCountryPlanningUnitId));
         var planningUnitLabel = rcpu[0].planningUnit.label
         var planningUnit = [{
@@ -2311,7 +2338,7 @@ class StockStatus extends Component {
       loading: true
     })
 
-    if (this.state.versionId.includes("Local")) {
+    if (this.state.versionId.toString().includes("Local")) {
       let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
       var db1;
       getDatabase();
@@ -2364,7 +2391,7 @@ class StockStatus extends Component {
                 shipmentList = shipmentList.concat(programJson.shipmentList);
                 supplyPlanList = supplyPlanList.concat(programJson.supplyPlan);
                 programPlanningUnitList.push({
-                  "programId": programId.split("_")[0],
+                  "programId": Number(programId.split("_")[0]),
                   "planningUnitId": planningUnitList[pu].value
                 })
               } else {
@@ -2376,21 +2403,40 @@ class StockStatus extends Component {
                   supplyPlan: [],
                 }
                 programPlanningUnitList.push({
-                  "programId": programId.split("_")[0],
+                  "programId": Number(programId.split("_")[0]),
                   "planningUnitId": planningUnitList[pu].value
                 })
               }
 
             }
             var ppuResult = ppuRequest.result;
-            var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && c.planningUnit.id == this.state.planningUnitId[0].value);
+            var planningUnitArray = [...new Set(this.state.planningUnitId).map(c => Number(c.value))];
+            var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(c.planningUnit.id));
             let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
             let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
               let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
-              var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true");
-              var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true");
-              var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == this.state.planningUnitId[0].value && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+              var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+              conList.map(item => {
+                item.program = {
+                  id: this.state.programId[0].value,
+                  label: this.state.programId[0].label
+                }
+              })
+              var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+              invList.map(item => {
+                item.program = {
+                  id: this.state.programId[0].value,
+                  label: this.state.programId[0].label
+                }
+              })
+              var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+              shipList.map(item => {
+                item.program = {
+                  id: this.state.programId[0].value,
+                  label: this.state.programId[0].label
+                }
+              })
               var multiplier = 1;
               if (this.state.viewById == 2) {
                 multiplier = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == this.state.realmCountryPlanningUnitId[0].value)[0].multiplier
@@ -2398,9 +2444,25 @@ class StockStatus extends Component {
               shipList.map(c => {
                 c.shipmentQty = roundARU(c.shipmentQty, multiplier)
               })
+              var eq = {};
+              if (this.state.yaxisEquUnit != -1) {
+                eq = this.state.equivalencyUnitList.filter(c => c.id == this.state.yaxisEquUnit)[0]
+              }
+              var notes = "";
+              ppu.map(item => {
+                if (item.notes != null && item.notes != "") {
+                  if (notes == "") {
+                    notes += this.state.programId[0].label + ": " + item.notes
+                  } else {
+                    notes += "|" + this.state.programId[0].label + ": " + item.notes
+                  }
+                }
+
+              })
+              console.log("Notes Test@123", notes)
               stockStatusVerticalAggregateList.push({
                 "dt": m + "-01",
-                "reportingUnit": this.state.viewById == 1 ? {
+                "reportingUnit": this.state.yaxisEquUnit == -1 ? this.state.viewById == 1 ? {
                   "id": this.state.planningUnitId[0].value,
                   "label": {
                     "label_en": this.state.planningUnitId[0].label
@@ -2409,6 +2471,11 @@ class StockStatus extends Component {
                   "id": this.state.realmCountryPlanningUnitId[0].value,
                   "label": {
                     "label_en": this.state.realmCountryPlanningUnitId[0].label
+                  }
+                } : {
+                  "id": eq.id,
+                  "label": {
+                    "label_en": eq.label.label_en
                   }
                 },
                 "openingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding((value.openingBalance), multiplier), 0),
@@ -2422,16 +2489,16 @@ class StockStatus extends Component {
                 "closingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.closingBalance, multiplier), 0),
                 "amc": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.amc, multiplier), 0),
                 "mos": sp.reduce((sum, value) => sum + value.closingBalance, 0) / sp.reduce((sum, value) => sum + value.amc, 0),
-                "minStockMos": ppu[0].minMonthsOfStock,
-                "maxStockMos": Number(ppu[0].minMonthsOfStock) + Number(ppu[0].reorderFrequencyInMonths),
-                "minStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu[0].minMonthsOfStock),
-                "maxStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu[0].minMonthsOfStock) + Number(ppu[0].reorderFrequencyInMonths)),
+                "minStockMos": ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length,
+                "maxStockMos": Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length),
+                "minStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length),
+                "maxStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length)),
                 "unmetDemand": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.unmetDemand, multiplier), 0),
                 "regionCount": sp[0].regionCount,
                 "regionCountForStock": sp[0].regionCountForStock,
                 "nationalAdjustment": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.nationalAdjustment, multiplier), 0),
-                "planBasedOn": ppu[0].planBasedOn,
-                "ppuNotes": ppu[0].notes == "" ? null : ppu[0].notes,
+                "planBasedOn": ppu.some(c => c.planBasedOn == 1) ? 1 : 2,
+                "ppuNotes": ppu.length > 1 ? (notes == "" ? null : notes) : (ppu[0].notes == "" ? null : this.state.programId[0].label + ": " + ppu[0].notes),
                 "consumptionInfo": conList,
                 "inventoryInfo": invList,
                 "shipmentInfo": shipList
@@ -3307,7 +3374,7 @@ class StockStatus extends Component {
                               </Picker>
                             </div>
                           </FormGroup>
-                          {this.state.yaxisEquUnit != -1 &&
+                          {this.state.yaxisEquUnit != -1 && (this.state.programId.length > 1 || this.state.programId.length == 0) &&
                             <FormGroup className="col-md-12">
                               <Label htmlFor="appendedInputButton">{i18n.t("static.stockStatus.graphAggregatedBy")}</Label>
                               <div className="controls ">
@@ -3517,6 +3584,28 @@ class StockStatus extends Component {
                           </div>
                         </FormGroup>}
                       </FormGroup>
+                      {this.state.yaxisEquUnit != -1 && this.state.programId.length == 1 &&
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="appendedInputButton">{i18n.t("static.stockStatus.graphAggregatedBy")}</Label>
+                          <div className="controls ">
+                            <InputGroup>
+                              <Input
+                                type="select"
+                                name="graphAggregatedBy"
+                                id="graphAggregatedBy"
+                                value={this.state.graphAggregatedBy}
+                                onChange={(e) => this.setGraphAggregatedBy(e)}
+                                bsSize="sm"
+                              >
+                                <option value="1">{i18n.t('static.program.programMaster')}</option>
+                                <option value="2">{this.state.viewById == 1 ? i18n.t('static.report.planningUnit') : i18n.t('static.dashboad.planningunitcountry')}</option>
+                                <option value="3">{i18n.t("static.stockStatus.programPlanningUnit")}</option>
+                              </Input>
+
+                            </InputGroup>
+                          </div>
+                        </FormGroup>
+                      }
                       {/* <FormGroup style={{ "marginTop": "-10px" }}>
                         <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
                           <Input
