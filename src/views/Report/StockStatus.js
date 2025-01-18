@@ -2877,6 +2877,8 @@ class StockStatus extends Component {
     } else {
       this.setState({
         versions: [],
+      },()=>{
+        this.getDropdownLists();
       });
     }
   };
