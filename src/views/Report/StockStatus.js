@@ -290,7 +290,6 @@ class StockStatus extends Component {
       }.bind(this);
     } else {
       ReportService.getDropdownListByProgramIds(json).then(response => {
-        console.log("Response Dropdoen Test@123", response.data);
         this.setState({
           equivalencyUnitList: response.data.equivalencyUnitList,
           planningUnitListAll: response.data.planningUnitList,
@@ -1162,42 +1161,44 @@ class StockStatus extends Component {
       "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
     }
     if (this.state.versionId.toString().includes("Local")) {
-      if (this.state.isAggregate.toString() == "true") {
-        let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+      let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F'
+        })
+        this.hideFirstComponent()
+      }.bind(this);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['programData'], 'readwrite');
+        var programTransaction = transaction.objectStore('programData');
+        var programRequest = programTransaction.get(programId);
+        programRequest.onerror = function (event) {
           this.setState({
             message: i18n.t('static.program.errortext'),
             color: '#BA0C2F'
           })
           this.hideFirstComponent()
         }.bind(this);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var transaction = db1.transaction(['programData'], 'readwrite');
-          var programTransaction = transaction.objectStore('programData');
-          var programRequest = programTransaction.get(programId);
-          programRequest.onerror = function (event) {
+        programRequest.onsuccess = function (event) {
+          var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+          var ppuOS = ppuTransaction.objectStore('programPlanningUnit');
+          var ppuRequest = ppuOS.getAll();
+          ppuRequest.onerror = function (event) {
             this.setState({
               message: i18n.t('static.program.errortext'),
               color: '#BA0C2F'
             })
             this.hideFirstComponent()
           }.bind(this);
-          programRequest.onsuccess = function (event) {
-            var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-            var ppuOS = ppuTransaction.objectStore('programPlanningUnit');
-            var ppuRequest = ppuOS.getAll();
-            ppuRequest.onerror = function (event) {
-              this.setState({
-                message: i18n.t('static.program.errortext'),
-                color: '#BA0C2F'
-              })
-              this.hideFirstComponent()
-            }.bind(this);
-            ppuRequest.onsuccess = function (event) {
+          ppuRequest.onsuccess = function (event) {
+            let tempOutput;
+            var ppuList;
+            if (this.state.isAggregate.toString() == "true") {
               var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
               var puData = [];
               var planningUnitList = this.state.planningUnitIdExport;
@@ -1292,7 +1293,6 @@ class StockStatus extends Component {
                   }
 
                 })
-                console.log("Notes Test@123", notes)
                 stockStatusVerticalAggregateList.push({
                   "dt": m + "-01",
                   "reportingUnit": this.state.yaxisEquUnit == -1 ? this.state.viewById == 1 ? {
@@ -1341,573 +1341,698 @@ class StockStatus extends Component {
                 "programPlanningUnitList": programPlanningUnitList,
                 "stockStatusVerticalAggregateList": stockStatusVerticalAggregateList
               }
-              console.log("stockStatusVerticalAggregateListJson Test@123", stockStatusVerticalAggregateListJson)
-              let tempOutput;
-              var ppuList;
               var tempKey = this.state.programId.map(ele => ele.value).toString() + "~" + (this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString());
               tempOutput = {
                 [tempKey]: stockStatusVerticalAggregateListJson.stockStatusVerticalAggregateList
               }
               ppuList = stockStatusVerticalAggregateListJson.programPlanningUnitList;
-              var tempOutputIndex = Object.keys(tempOutput);
-              var tempOutputProgramId = tempOutputIndex.map(a => a.split("~")[0]);
-              var tempOutputPlanningUnitId = tempOutputIndex.map(a => a.split("~")[1]);
-              tempOutput = Object.values(tempOutput);
-              // var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
-              //   a = a.label.toLowerCase();
-              //   b = b.label.toLowerCase();
-              //   return a < b ? -1 : a > b ? 1 : 0;
-              // });
-              // First, create an array of indices to keep track of sorting order
-              const indices = tempOutput.map((_, index) => index);
-
-              // Sort `indices` based on the corresponding values in `programList` and `planningUnitList`
-              indices.sort((indexA, indexB) => {
-                const programA = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexA])[0].programCode.toString();
-                const programB = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexB])[0].programCode.toString()
-
-                const planningUnitA = getLabelText(tempOutput[indexA].reportingUnit.label, this.state.lang);
-                const planningUnitB = getLabelText(tempOutput[indexB].reportingUnit.label, this.state.lang);
-
-                // First compare by program
-                const programComparison = programA.localeCompare(programB);
-
-                // If programs are the same, compare by planning unit
-                if (programComparison === 0) {
-                  return planningUnitA.localeCompare(planningUnitB);
-                }
-
-                return programComparison;
-              });
-
-              // Use the sorted indices to rearrange `tempOutput`, `programList`, and `planningUnitList`
-              const sortedTempOutput = indices.map(index => tempOutput[index]);
-              const sortedProgramList = indices.map(index => tempOutputProgramId[index]);
-              const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[index]);
-              sortedTempOutput.map((plannningUnitItem, outputIndex) => {
-                var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
-                let startDateForFilter = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
-                var filteredPlanningUnitData = this.state.isAggregate.toString() == "true" ? plannningUnitItem : plannningUnitItem.stockStatusVertical; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
-                var datasets = [
-                  {
-                    label: i18n.t('static.supplyplan.exipredStock'),
-                    yAxisID: 'A',
-                    type: 'line',
-                    stack: 7,
-                    order: 0,
-                    data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
-                    fill: false,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    showLine: false,
-                    pointStyle: 'triangle',
-                    pointBackgroundColor: '#ED8944',
-                    pointBorderColor: '#212721',
-                    pointRadius: 10
-                  },
-                  {
-                    type: "line",
-                    yAxisID: 'A',
-                    label: i18n.t('static.supplyPlan.consumption'),
-                    backgroundColor: 'transparent',
-                    borderColor: '#ba0c2f',
-                    order: 7,
-                    ticks: {
-                      fontSize: 2,
-                      fontColor: 'transparent',
-                    },
-                    lineTension: 0,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointRadius: 0,
-                    yValueFormatString: "$#,##0",
-                    data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
-                  },
-                  {
-                    label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) ? i18n.t('static.stockStatus.consensusConsumption') : i18n.t('static.report.actualConsumption'),
-                    yAxisID: 'A',
-                    type: 'line',
-                    stack: 7,
-                    order: 7,
-                    data: filteredPlanningUnitData.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
-                    fill: false,
-                    borderColor: 'rgb(75, 192, 192)',
-                    tension: 0.1,
-                    showLine: false,
-                    pointStyle: 'point',
-                    pointBackgroundColor: '#ba0c2f',
-                    pointBorderColor: '#ba0c2f',
-                    pointRadius: 3
-                  },
-                  {
-                    label: i18n.t('static.report.stock'),
-                    yAxisID: 'A',
-                    type: 'line',
-                    stack: 7,
-                    order: 7,
-                    borderColor: '#cfcdc9',
-                    ticks: {
-                      fontSize: 2,
-                      fontColor: 'transparent',
-                    },
-                    lineTension: 0,
-                    pointStyle: 'circle',
-                    pointRadius: 0,
-                    showInLegend: true,
-                    data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
-                  },
-                  {
-                    type: "line",
-                    yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
-                    label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
-                    backgroundColor: 'rgba(255,193,8,0.2)',
-                    borderColor: '#59cacc',
-                    borderStyle: 'dotted',
-                    order: 7,
-                    borderDash: [10, 10],
-                    fill: '+1',
-                    backgroundColor: 'transparent',
-                    ticks: {
-                      fontSize: 2,
-                      fontColor: 'transparent',
-                    },
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointRadius: 0,
-                    yValueFormatString: "$#,##0",
-                    lineTension: 0,
-                    data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.minStockMos, 1) : roundAMC(item.minStockQty, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.minMos : item.minStock))))
+            } else {
+              var stockStatusVerticalAggregateListJson = {};
+              var planningUnitList = this.state.planningUnitIdExport;
+              var ppuResult = ppuRequest.result;
+              var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+              var eq = {};
+              if (this.state.yaxisEquUnit != -1) {
+                eq = this.state.equivalencyUnitList.filter(c => c.id == this.state.yaxisEquUnit)[0]
+              }
+              for (var pu = 0; pu < planningUnitList.length; pu++) {
+                var ppu = ppuResult.filter(c => c.planningUnit.id == planningUnitList[pu].value);
+                var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitList[pu].value);
+                var programJson = {};
+                if (planningUnitDataFilter.length > 0) {
+                  var planningUnitData = planningUnitDataFilter[0]
+                  var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                  var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                  programJson = JSON.parse(programData);
+                  consumptionList = programJson.consumptionList;
+                  inventoryList = programJson.inventoryList;
+                  shipmentList = programJson.shipmentList;
+                  supplyPlanList = programJson.supplyPlan;
+                } else {
+                  programJson = {
+                    consumptionList: [],
+                    inventoryList: [],
+                    shipmentList: [],
+                    batchInfoList: [],
+                    supplyPlan: [],
                   }
-                  , {
-                    type: "line",
-                    yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
-                    label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
-                    backgroundColor: 'rgba(0,0,0,0)',
-                    borderColor: '#59cacc',
-                    order: 7,
-                    borderStyle: 'dotted',
-                    backgroundColor: 'transparent',
-                    borderDash: [10, 10],
-                    fill: true,
-                    ticks: {
-                      fontSize: 2,
-                      fontColor: 'transparent',
-                    },
-                    lineTension: 0,
-                    pointStyle: 'line',
-                    pointRadius: 0,
-                    showInLegend: true,
-                    yValueFormatString: "$#,##0",
-                    data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.maxStockMos, 1) : roundAMC(item.maxStock, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos : roundAMC(item.maxStock, 1)))))
-                  }
-                ];
-                if ((this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1) {
-                  datasets.push({
-                    type: "line",
-                    yAxisID: 'B',
-                    label: i18n.t('static.report.mos'),
-                    borderColor: '#118b70',
-                    backgroundColor: 'transparent',
-                    ticks: {
-                      fontSize: 2,
-                      fontColor: 'transparent',
-                    },
-                    lineTension: 0,
-                    order: 7,
-                    showInLegend: true,
-                    pointStyle: 'line',
-                    pointRadius: 0,
-                    yValueFormatString: "$#,##0",
-                    data: filteredPlanningUnitData.map((item, index) => (roundN(item.mos)))
-                  })
                 }
-                var graphLabel = "";
-                var height = 400;
-                if (this.state.isAggregate.toString() == "true") {
-                  var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
-                  graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
-                  var count = 0;
-                  var programCount = 0;
-                  var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-                  var newDatasetArray = [];
-                  var graphAggregatedBy = this.state.graphAggregatedBy;
-                  this.state.programId.map((e, i) => {
-                    reportingUnitList.map((r, j) => {
-                      var viewBy = this.state.viewById;
-                      var planningUnitId = "";
-                      if (viewBy == 1) {
-                        planningUnitId = r.value;
-                      } else {
-                        var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
-                        planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
-                      }
-                      if (ppuList.filter(c => c.programId == e.value && c.planningUnitId == planningUnitId).length > 0) {
-                        programCount += 1;
-                        if (count >= 10) {
-                          count = 0;
-                        }
-                        newDatasetArray.push({
-                          label: reportingUnitList.length > 1 ? this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label) : (e.label),
-                          yAxisID: 'A',
-                          stack: 1,
-                          order: 1,
-                          programId: graphAggregatedBy == 1 ? e.value : r.value,
-                          programLabel: graphAggregatedBy == 1 ? e.label : r.label,
-                          backgroundColor: colourArray[count],
-                          borderColor: colourArray[count],
-                          pointBackgroundColor: colourArray[count],
-                          pointBorderColor: colourArray[count],
-                          pointHoverBackgroundColor: colourArray[count],
-                          pointHoverBorderColor: colourArray[count],
-                          data: filteredPlanningUnitData.map((item, index) => {
-                            let count = 0;
-                            (item.shipmentInfo.map((ele, index) => {
-                              (ele.program.id == e.value && ele.planningUnit.id == planningUnitId) ? count = count + Number(ele.shipmentQty) : count = count
-                            }))
-                            return count
-                          })
-                        })
-                        count += 1;
-                      }
-                    })
+                let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
+                let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+                var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.consumptionDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && c.active.toString() == "true");
+                conList.map(item => {
+                  item.program = {
+                    id: this.state.programId[0].value,
+                    label: {
+                      "label_en": this.state.programId[0].label
+                    },
+                    code: this.state.programId[0].label
+                  }
+                })
+                var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") >= moment(startDate).format("YYYY-MM") && moment(c.inventoryDate).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM") && c.active.toString() == "true");
+                invList.map(item => {
+                  item.program = {
+                    id: this.state.programId[0].value,
+                    label: {
+                      "label_en": this.state.programId[0].label
+                    },
+                    code: this.state.programId[0].label
+                  }
+                })
+                var stockStatusVertical = [];
+                for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
+                  let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
+                  var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+                  shipList.map(item => {
+                    item.program = {
+                      id: this.state.programId[0].value,
+                      label: {
+                        "label_en": this.state.programId[0].label
+                      },
+                      code: this.state.programId[0].label
+                    }
                   })
-                  newDatasetArray = newDatasetArray.filter(c => c.data.some(c => c != 0));
-                  if (this.state.yaxisEquUnit != -1 && (graphAggregatedBy == 1 || graphAggregatedBy == 2)) {
-                    var count = 0;
-                    var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-                    const combinedDataset = newDatasetArray.reduce((acc, item) => {
-                      const existingItem = acc.find((entry) => entry.programId === item.programId);
+                  var multiplier = 1;
+                  var conListPU = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true");
+                  var invListPU = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true");
+                  stockStatusVertical.push(
+                    {
+                      "dt": m + "-01",
+                      "openingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding((value.openingBalance), multiplier), 0),
+                      "actualConsumption": sp.filter(x => x.actualFlag).length == sp.length,
+                      "actualConsumptionQty": conListPU.filter(c => c.actualFlag.toString() == "true").length > 0 ? conListPU.filter(c => c.actualFlag.toString() == "true").reduce((sum, value) => sum + roundARUWithoutRounding((value.consumptionQty), multiplier), 0) : null,
+                      "forecastedConsumptionQty": conListPU.filter(c => c.actualFlag.toString() == "false").length > 0 ? conListPU.filter(c => c.actualFlag.toString() == "false").reduce((sum, value) => sum + roundARUWithoutRounding((value.consumptionQty), multiplier), 0) : null,
+                      "finalConsumptionQty": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.consumptionQty, multiplier), 0),
+                      "shipmentQty": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.shipmentTotalQty, multiplier), 0),
+                      "adjustment": invListPU.filter(c => c.adjustmentQty != null).length > 0 ? invListPU.reduce((sum, value) => sum + roundARUWithoutRounding(value.adjustmentQty, multiplier), 0) : null,
+                      "expiredStock": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.expiredStock, multiplier), 0),
+                      "closingBalance": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.closingBalance, multiplier), 0),
+                      "amc": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.amc, multiplier), 0),
+                      "mos": sp.reduce((sum, value) => sum + value.closingBalance, 0) / sp.reduce((sum, value) => sum + value.amc, 0),
+                      "minMos": ppu[0].minMonthsOfStock,
+                      "maxMos": Number(ppu[0].minMonthsOfStock) + Number(ppu[0].reorderFrequencyInMonths),
+                      "unmetDemand": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.unmetDemand, multiplier), 0),
+                      "regionCount": sp[0].regionCount,
+                      "regionCountForStock": sp[0].regionCountForStock,
+                      "nationalAdjustment": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.nationalAdjustment, multiplier), 0),
+                      "minStock": ppu[0].planBasedOn == 1 ? Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) : (ppu[0].minQty),
+                      "maxStock": ppu[0].planBasedOn == 1 ? Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length)) : (Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * ppu[0].minQty),
+                      "shipmentInfo": shipList
+                    }
+                  )
+                }
+                stockStatusVerticalAggregateListJson[this.state.programId[0].value + "~" + planningUnitList[pu].value] = {
+                  "reportingUnit": this.state.yaxisEquUnit == -1 ? this.state.viewById == 1 ? {
+                    "id": this.state.planningUnitIdExport[0].value,
+                    "label": {
+                      "label_en": this.state.planningUnitIdExport[0].label
+                    }
+                  } : {
+                    "id": this.state.realmCountryPlanningUnitIdExport[0].value,
+                    "label": {
+                      "label_en": this.state.realmCountryPlanningUnitIdExport[0].label
+                    }
+                  } : {
+                    "id": eq.id,
+                    "label": {
+                      "label_en": eq.label.label_en
+                    }
+                  },
+                  "reorderFrequencyInMonths": ppu[0].reorderFrequencyInMonths,
+                  "minMonthsOfStock": ppu[0].minMonthsOfStock,
+                  "localProcurementLeadTime": ppu[0].localProcurementLeadTime,
+                  "shelfLife": ppu[0].shelfLife,
+                  "monthsInFutureForAmc": ppu[0].monthsInFutureForAmc,
+                  "monthsInPastForAmc": ppu[0].monthsInPastForAmc,
+                  "planBasedOn": ppu[0].planBasedOn,
+                  "minQty": ppu[0].minQty,
+                  "distributionLeadTime": ppu[0].distributionLeadTime,
+                  "notes": ppu[0].notes,
+                  "consumptionInfo": conList,
+                  "inventoryInfo": invList,
+                  "stockStatusVertical": stockStatusVertical,
+                  "ppuNotes": ppu[0].notes
+                }
+              }
+              tempOutput = stockStatusVerticalAggregateListJson;
+            }
+            var tempOutputIndex = Object.keys(tempOutput);
+            var tempOutputProgramId = tempOutputIndex.map(a => a.split("~")[0]);
+            var tempOutputPlanningUnitId = tempOutputIndex.map(a => a.split("~")[1]);
+            tempOutput = Object.values(tempOutput);
+            // var sortedPlanningUnitData = this.state.planningUnitList.filter(c => this.state.planningUnitId.map(x => x.value).includes(c.id)).sort(function (a, b) {
+            //   a = a.label.toLowerCase();
+            //   b = b.label.toLowerCase();
+            //   return a < b ? -1 : a > b ? 1 : 0;
+            // });
+            // First, create an array of indices to keep track of sorting order
+            const indices = tempOutput.map((_, index) => index);
 
-                      if (existingItem) {
-                        // Sum the data arrays if the programId already exists
-                        existingItem.data = existingItem.data.map((value, index) =>
-                          value + (item.data[index] || 0)
-                        );
-                      } else {
-                        if (count >= 10) {
-                          count = 0;
-                        }
-                        item.label = item.programLabel;
-                        item.backgroundColor = colourArray[count];
-                        item.borderColor = colourArray[count];
-                        item.pointBackgroundColor = colourArray[count];
-                        item.pointBorderColor = colourArray[count];
-                        item.pointHoverBackgroundColor = colourArray[count];
-                        item.pointHoverBorderColor = colourArray[count];
-                        // Add a new entry for the programId if it doesn't exist in the accumulator
-                        acc.push({ ...item });
-                        count += 1;
-                      }
+            // Sort `indices` based on the corresponding values in `programList` and `planningUnitList`
+            indices.sort((indexA, indexB) => {
+              const programA = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexA])[0].programCode.toString();
+              const programB = this.state.programs.filter(c => c.programId == tempOutputProgramId[indexB])[0].programCode.toString()
 
-                      return acc;
-                    }, []);
-                    datasets = datasets.concat(combinedDataset);
-                  } else {
-                    var count = 0;
-                    var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
-                    newDatasetArray.map(item => {
+              const planningUnitA = getLabelText(tempOutput[indexA].reportingUnit.label, this.state.lang);
+              const planningUnitB = getLabelText(tempOutput[indexB].reportingUnit.label, this.state.lang);
+
+              // First compare by program
+              const programComparison = programA.localeCompare(programB);
+
+              // If programs are the same, compare by planning unit
+              if (programComparison === 0) {
+                return planningUnitA.localeCompare(planningUnitB);
+              }
+
+              return programComparison;
+            });
+
+            // Use the sorted indices to rearrange `tempOutput`, `programList`, and `planningUnitList`
+            const sortedTempOutput = indices.map(index => tempOutput[index]);
+            const sortedProgramList = indices.map(index => tempOutputProgramId[index]);
+            const sortedPlanningUnitList = indices.map(index => tempOutputPlanningUnitId[index]);
+            sortedTempOutput.map((plannningUnitItem, outputIndex) => {
+              var planningUnitItemFilter = plannningUnitItem; //.filter(c => c.reportingUnit.id == plannningUnitItem.value);
+              let startDateForFilter = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
+              var filteredPlanningUnitData = this.state.isAggregate.toString() == "true" ? plannningUnitItem : plannningUnitItem.stockStatusVertical; //planningUnitItemFilter.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDateForFilter).format("YYYY-MM"));
+              var datasets = [
+                {
+                  label: i18n.t('static.supplyplan.exipredStock'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  stack: 7,
+                  order: 0,
+                  data: filteredPlanningUnitData.map((item, index) => (item.expiredStock > 0 ? item.expiredStock : null)),
+                  fill: false,
+                  borderColor: 'rgb(75, 192, 192)',
+                  tension: 0.1,
+                  showLine: false,
+                  pointStyle: 'triangle',
+                  pointBackgroundColor: '#ED8944',
+                  pointBorderColor: '#212721',
+                  pointRadius: 10
+                },
+                {
+                  type: "line",
+                  yAxisID: 'A',
+                  label: i18n.t('static.supplyPlan.consumption'),
+                  backgroundColor: 'transparent',
+                  borderColor: '#ba0c2f',
+                  order: 7,
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  showInLegend: true,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  yValueFormatString: "$#,##0",
+                  data: filteredPlanningUnitData.map((item, index) => (item.finalConsumptionQty))
+                },
+                {
+                  label: (this.state.isAggregate.toString() == "true" && (this.state.programId.length > 0 || this.state.planningUnitIdExport.length > 0 || this.state.realmCountryPlanningUnitIdExport.length > 0)) ? i18n.t('static.stockStatus.consensusConsumption') : i18n.t('static.report.actualConsumption'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  stack: 7,
+                  order: 7,
+                  data: filteredPlanningUnitData.map((item, index) => (item.actualConsumption ? item.finalConsumptionQty : null)),
+                  fill: false,
+                  borderColor: 'rgb(75, 192, 192)',
+                  tension: 0.1,
+                  showLine: false,
+                  pointStyle: 'point',
+                  pointBackgroundColor: '#ba0c2f',
+                  pointBorderColor: '#ba0c2f',
+                  pointRadius: 3
+                },
+                {
+                  label: i18n.t('static.report.stock'),
+                  yAxisID: 'A',
+                  type: 'line',
+                  stack: 7,
+                  order: 7,
+                  borderColor: '#cfcdc9',
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  pointStyle: 'circle',
+                  pointRadius: 0,
+                  showInLegend: true,
+                  data: filteredPlanningUnitData.map((item, index) => (item.closingBalance))
+                },
+                {
+                  type: "line",
+                  yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
+                  label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.minmonth') : i18n.t('static.product.minQuantity'),
+                  backgroundColor: 'rgba(255,193,8,0.2)',
+                  borderColor: '#59cacc',
+                  borderStyle: 'dotted',
+                  order: 7,
+                  borderDash: [10, 10],
+                  fill: '+1',
+                  backgroundColor: 'transparent',
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  showInLegend: true,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  yValueFormatString: "$#,##0",
+                  lineTension: 0,
+                  data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.minStockMos, 1) : roundAMC(item.minStockQty, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.minMos : item.minStock))))
+                }
+                , {
+                  type: "line",
+                  yAxisID: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? 'B' : 'A',
+                  label: (this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1 ? i18n.t('static.report.maxmonth') : i18n.t('static.supplyPlan.maxQty'),
+                  backgroundColor: 'rgba(0,0,0,0)',
+                  borderColor: '#59cacc',
+                  order: 7,
+                  borderStyle: 'dotted',
+                  backgroundColor: 'transparent',
+                  borderDash: [10, 10],
+                  fill: true,
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  showInLegend: true,
+                  yValueFormatString: "$#,##0",
+                  data: this.state.isAggregate.toString() == "true" ? (filteredPlanningUnitData.map((item, index) => ((filteredPlanningUnitData[0].planBasedOn == 1 ? roundAMC(item.maxStockMos, 1) : roundAMC(item.maxStock, 1))))) : (filteredPlanningUnitData.map((item, index) => ((plannningUnitItem.planBasedOn == 1 ? item.maxMos : roundAMC(item.maxStock, 1)))))
+                }
+              ];
+              if ((this.state.isAggregate.toString() == "false" ? plannningUnitItem.planBasedOn : filteredPlanningUnitData[0].planBasedOn) == 1) {
+                datasets.push({
+                  type: "line",
+                  yAxisID: 'B',
+                  label: i18n.t('static.report.mos'),
+                  borderColor: '#118b70',
+                  backgroundColor: 'transparent',
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: 'transparent',
+                  },
+                  lineTension: 0,
+                  order: 7,
+                  showInLegend: true,
+                  pointStyle: 'line',
+                  pointRadius: 0,
+                  yValueFormatString: "$#,##0",
+                  data: filteredPlanningUnitData.map((item, index) => (roundN(item.mos)))
+                })
+              }
+              var graphLabel = "";
+              var height = 400;
+              if (this.state.isAggregate.toString() == "true") {
+                var reportingUnitList = this.state.viewById == 1 ? this.state.planningUnitIdExport : this.state.realmCountryPlanningUnitIdExport;
+                graphLabel = this.state.programId != undefined && reportingUnitList != undefined && this.state.programId.length > 0 && reportingUnitList.length > 0 ? entityname1 + " - " + (this.state.programId.map(ele => ele.label).toString() + " - " + reportingUnitList.map(ele => ele.label).toString()) : entityname1;
+                var count = 0;
+                var programCount = 0;
+                var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+                var newDatasetArray = [];
+                var graphAggregatedBy = this.state.graphAggregatedBy;
+                this.state.programId.map((e, i) => {
+                  reportingUnitList.map((r, j) => {
+                    var viewBy = this.state.viewById;
+                    var planningUnitId = "";
+                    if (viewBy == 1) {
+                      planningUnitId = r.value;
+                    } else {
+                      var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == r.value)[0].forecastingUnitId;
+                      planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+                    }
+                    if (ppuList.filter(c => c.programId == e.value && c.planningUnitId == planningUnitId).length > 0) {
+                      programCount += 1;
                       if (count >= 10) {
                         count = 0;
                       }
+                      newDatasetArray.push({
+                        label: reportingUnitList.length > 1 ? this.state.viewById == 2 ? (e.label + " - " + r.label + " | " + r.value) : (e.label + " - " + r.label) : (e.label),
+                        yAxisID: 'A',
+                        stack: 1,
+                        order: 1,
+                        programId: graphAggregatedBy == 1 ? e.value : r.value,
+                        programLabel: graphAggregatedBy == 1 ? e.label : r.label,
+                        backgroundColor: colourArray[count],
+                        borderColor: colourArray[count],
+                        pointBackgroundColor: colourArray[count],
+                        pointBorderColor: colourArray[count],
+                        pointHoverBackgroundColor: colourArray[count],
+                        pointHoverBorderColor: colourArray[count],
+                        data: filteredPlanningUnitData.map((item, index) => {
+                          let count = 0;
+                          (item.shipmentInfo.map((ele, index) => {
+                            (ele.program.id == e.value && ele.planningUnit.id == planningUnitId) ? count = count + Number(ele.shipmentQty) : count = count
+                          }))
+                          return count
+                        })
+                      })
+                      count += 1;
+                    }
+                  })
+                })
+                newDatasetArray = newDatasetArray.filter(c => c.data.some(c => c != 0));
+                if (this.state.yaxisEquUnit != -1 && (graphAggregatedBy == 1 || graphAggregatedBy == 2)) {
+                  var count = 0;
+                  var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+                  const combinedDataset = newDatasetArray.reduce((acc, item) => {
+                    const existingItem = acc.find((entry) => entry.programId === item.programId);
+
+                    if (existingItem) {
+                      // Sum the data arrays if the programId already exists
+                      existingItem.data = existingItem.data.map((value, index) =>
+                        value + (item.data[index] || 0)
+                      );
+                    } else {
+                      if (count >= 10) {
+                        count = 0;
+                      }
+                      item.label = item.programLabel;
                       item.backgroundColor = colourArray[count];
                       item.borderColor = colourArray[count];
                       item.pointBackgroundColor = colourArray[count];
                       item.pointBorderColor = colourArray[count];
                       item.pointHoverBackgroundColor = colourArray[count];
                       item.pointHoverBorderColor = colourArray[count];
+                      // Add a new entry for the programId if it doesn't exist in the accumulator
+                      acc.push({ ...item });
                       count += 1;
-                    })
-
-                    const smallScreen = window.matchMedia('(max-width: 768px)');
-                    const mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1366px)');
-                    const largeScreen = window.matchMedia('(min-width: 1367px) and (max-width: 1919px)');
-                    const extraLargeScreen = window.matchMedia('(min-width: 1920px)');
-
-                    if (newDatasetArray.length > 10) {
-                      if (extraLargeScreen.matches) {
-                        height = 400 + (10 * newDatasetArray.length);
-                      } else if (largeScreen.matches) {
-                        height = 400 + (12 * newDatasetArray.length);
-                      } else if (mediumScreen.matches) {
-                        height = 400 + (16 * newDatasetArray.length);
-                      } else if (smallScreen.matches) {
-                        height = 400 + (21 * newDatasetArray.length);
-                      }
                     }
-                    datasets = datasets.concat(newDatasetArray);
-                  }
+
+                    return acc;
+                  }, []);
+                  datasets = datasets.concat(combinedDataset);
                 } else {
-                  graphLabel = entityname1 + " - " + (this.state.programs.filter(c => c.programId == sortedProgramList[outputIndex])[0].programCode.toString() + " - " + getLabelText(planningUnitItemFilter.reportingUnit.label, this.state.lang));
-                  datasets.push({
-                    label: i18n.t('static.supplyPlan.delivered'),
-                    yAxisID: 'A',
-                    stack: 1,
-                    order: 1,
-                    backgroundColor: '#002f6c',
-                    borderColor: '#002f6c',
-                    pointBackgroundColor: '#002f6c',
-                    pointBorderColor: '#002f6c',
-                    pointHoverBackgroundColor: '#002f6c',
-                    pointHoverBorderColor: '#002f6c',
-                    data: filteredPlanningUnitData.map((item, index) => {
-                      let count = 0;
-                      (item.shipmentInfo.map((ele, index) => {
-                        ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
-                      }))
-                      return count
-                    })
-                  });
-                  datasets.push({
-                    label: i18n.t('static.supplyPlan.shipped'),
-                    yAxisID: 'A',
-                    stack: 1,
-                    order: 1,
-                    backgroundColor: '#49A4A1',
-                    borderColor: '#49A4A1',
-                    pointBackgroundColor: '#49A4A1',
-                    pointBorderColor: '#49A4A1',
-                    pointHoverBackgroundColor: '#49A4A1',
-                    pointHoverBorderColor: '#49A4A1',
-                    data: filteredPlanningUnitData.map((item, index) => {
-                      let count = 0;
-                      (item.shipmentInfo.map((ele, index) => {
-                        (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
-                      }))
-                      return count
-                    })
-                  });
-                  datasets.push({
-                    label: i18n.t('static.supplyPlan.approved'),
-                    yAxisID: 'A',
-                    stack: 1,
-                    order: 1,
-                    backgroundColor: '#0067B9',
-                    borderColor: '#0067B9',
-                    pointBackgroundColor: '#0067B9',
-                    pointBorderColor: '#0067B9',
-                    pointHoverBackgroundColor: '#0067B9',
-                    pointHoverBorderColor: '#0067B9',
-                    data: filteredPlanningUnitData.map((item, index) => {
-                      let count = 0;
-                      (item.shipmentInfo.map((ele, index) => {
-                        (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
-                      }))
-                      return count
-                    })
-                  });
-                  datasets.push({
-                    label: i18n.t('static.supplyPlan.planned'),
-                    backgroundColor: '#A7C6ED',
-                    borderColor: '#A7C6ED',
-                    pointBackgroundColor: '#A7C6ED',
-                    pointBorderColor: '#A7C6ED',
-                    pointHoverBackgroundColor: '#A7C6ED',
-                    pointHoverBorderColor: '#A7C6ED',
-                    yAxisID: 'A',
-                    stack: 1,
-                    order: 1,
-                    data: filteredPlanningUnitData.map((item, index) => {
-                      let count = 0;
-                      (item.shipmentInfo.map((ele, index) => {
-                        (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
-                      }))
-                      return count
-                    })
-                  });
+                  var count = 0;
+                  var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#f0bc52", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
+                  newDatasetArray.map(item => {
+                    if (count >= 10) {
+                      count = 0;
+                    }
+                    item.backgroundColor = colourArray[count];
+                    item.borderColor = colourArray[count];
+                    item.pointBackgroundColor = colourArray[count];
+                    item.pointBorderColor = colourArray[count];
+                    item.pointHoverBackgroundColor = colourArray[count];
+                    item.pointHoverBorderColor = colourArray[count];
+                    count += 1;
+                  })
+
+                  const smallScreen = window.matchMedia('(max-width: 768px)');
+                  const mediumScreen = window.matchMedia('(min-width: 769px) and (max-width: 1366px)');
+                  const largeScreen = window.matchMedia('(min-width: 1367px) and (max-width: 1919px)');
+                  const extraLargeScreen = window.matchMedia('(min-width: 1920px)');
+
+                  if (newDatasetArray.length > 10) {
+                    if (extraLargeScreen.matches) {
+                      height = 400 + (10 * newDatasetArray.length);
+                    } else if (largeScreen.matches) {
+                      height = 400 + (12 * newDatasetArray.length);
+                    } else if (mediumScreen.matches) {
+                      height = 400 + (16 * newDatasetArray.length);
+                    } else if (smallScreen.matches) {
+                      height = 400 + (21 * newDatasetArray.length);
+                    }
+                  }
+                  datasets = datasets.concat(newDatasetArray);
                 }
-                // const mediaQuery = window.matchMedia('(min-width: 1920px)')
-                // if (programCount > 10) {
-                //   if (mediaQuery.matches) {
-                //     height = 400 + (10 * programCount);
-                //   } else {
-                //     height = 400 + (21 * programCount);
-                //   }
-                // }
-                var bar = {
-                  labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
-                  datasets: datasets,
-                };
-                var chartOptions = {
-                  title: {
-                    display: false,
-                    text: entityname1
-                  },
-                  scales: {
-                    yAxes: [{
-                      id: 'A',
-                      position: 'left',
-                      // stacked: true,
-                      scaleLabel: {
-                        labelString: i18n.t('static.shipment.qty'),
-                        display: true,
-                        fontSize: "12",
-                        fontColor: 'black'
-                      },
-                      // stacked: true,
-                      ticks: {
-                        beginAtZero: true,
-                        fontColor: 'black',
-                        callback: function (value) {
-                          var cell1 = value
-                          cell1 += '';
-                          var x = cell1.split('.');
-                          var x1 = x[0];
-                          var x2 = x.length > 1 ? '.' + x[1] : '';
-                          var rgx = /(\d+)(\d{3})/;
-                          while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                          }
-                          return x1 + x2;
-                        }
-                      }, gridLines: {
-                        color: 'rgba(171,171,171,1)',
-                        lineWidth: 0
-                      }
-                    }
-                      , {
-                      id: 'B',
-                      position: 'right',
-                      scaleLabel: {
-                        labelString: i18n.t('static.supplyPlan.monthsOfStock'),
-                        fontColor: 'black',
-                        display: true,
-                      },
-                      ticks: {
-                        beginAtZero: true,
-                        fontColor: 'black',
-                        callback: function (value) {
-                          var cell1 = value
-                          cell1 += '';
-                          var x = cell1.split('.');
-                          var x1 = x[0];
-                          var x2 = x.length > 1 ? '.' + x[1] : '';
-                          var rgx = /(\d+)(\d{3})/;
-                          while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                          }
-                          return x1 + x2;
-                        }
-                      },
-                      gridLines: {
-                        color: 'rgba(171,171,171,1)',
-                        lineWidth: 0
-                      }
-                    }],
-                    xAxes: [{
-                      scaleLabel: {
-                        display: true,
-                        labelString: i18n.t('static.common.month'),
-                        fontColor: 'black',
-                        fontStyle: "normal",
-                        fontSize: "12"
-                      },
-                      stacked: true,
-                      ticks: {
-                        fontColor: 'black',
-                        fontStyle: "normal",
-                        fontSize: "12"
-                      },
-                      gridLines: {
-                        color: 'rgba(171,171,171,1)',
-                        lineWidth: 0
-                      }
-                    }]
-                  },
-                  tooltips: {
-                    enabled: false,
-                    custom: CustomTooltips,
-                    callbacks: {
-                      label: function (tooltipItem, data) {
-                        if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] != 0) {
-                          let label = data.labels[tooltipItem.index];
-                          let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                          var cell1 = value
-                          cell1 += '';
-                          var x = cell1.split('.');
-                          var x1 = x[0];
-                          var x2 = x.length > 1 ? '.' + x[1] : '';
-                          var rgx = /(\d+)(\d{3})/;
-                          while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                          }
-                          return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                        } else {
-                          return false
-                        }
-                      }
-                    }
-                  },
-                  maintainAspectRatio: false,
-                  legend: {
-                    display: true,
-                    position: 'bottom',
-                    labels: {
-                      usePointStyle: true,
+              } else {
+                graphLabel = entityname1 + " - " + (this.state.programs.filter(c => c.programId == sortedProgramList[outputIndex])[0].programCode.toString() + " - " + getLabelText(planningUnitItemFilter.reportingUnit.label, this.state.lang));
+                datasets.push({
+                  label: i18n.t('static.supplyPlan.delivered'),
+                  yAxisID: 'A',
+                  stack: 1,
+                  order: 1,
+                  backgroundColor: '#002f6c',
+                  borderColor: '#002f6c',
+                  pointBackgroundColor: '#002f6c',
+                  pointBorderColor: '#002f6c',
+                  pointHoverBackgroundColor: '#002f6c',
+                  pointHoverBorderColor: '#002f6c',
+                  data: filteredPlanningUnitData.map((item, index) => {
+                    let count = 0;
+                    (item.shipmentInfo.map((ele, index) => {
+                      ele.shipmentStatus.id == 7 ? count = count + ele.shipmentQty : count = count
+                    }))
+                    return count
+                  })
+                });
+                datasets.push({
+                  label: i18n.t('static.supplyPlan.shipped'),
+                  yAxisID: 'A',
+                  stack: 1,
+                  order: 1,
+                  backgroundColor: '#49A4A1',
+                  borderColor: '#49A4A1',
+                  pointBackgroundColor: '#49A4A1',
+                  pointBorderColor: '#49A4A1',
+                  pointHoverBackgroundColor: '#49A4A1',
+                  pointHoverBorderColor: '#49A4A1',
+                  data: filteredPlanningUnitData.map((item, index) => {
+                    let count = 0;
+                    (item.shipmentInfo.map((ele, index) => {
+                      (ele.shipmentStatus.id == 5 || ele.shipmentStatus.id == 6) ? count = count + ele.shipmentQty : count = count
+                    }))
+                    return count
+                  })
+                });
+                datasets.push({
+                  label: i18n.t('static.supplyPlan.approved'),
+                  yAxisID: 'A',
+                  stack: 1,
+                  order: 1,
+                  backgroundColor: '#0067B9',
+                  borderColor: '#0067B9',
+                  pointBackgroundColor: '#0067B9',
+                  pointBorderColor: '#0067B9',
+                  pointHoverBackgroundColor: '#0067B9',
+                  pointHoverBorderColor: '#0067B9',
+                  data: filteredPlanningUnitData.map((item, index) => {
+                    let count = 0;
+                    (item.shipmentInfo.map((ele, index) => {
+                      (ele.shipmentStatus.id == 3 || ele.shipmentStatus.id == 4) ? count = count + ele.shipmentQty : count = count
+                    }))
+                    return count
+                  })
+                });
+                datasets.push({
+                  label: i18n.t('static.supplyPlan.planned'),
+                  backgroundColor: '#A7C6ED',
+                  borderColor: '#A7C6ED',
+                  pointBackgroundColor: '#A7C6ED',
+                  pointBorderColor: '#A7C6ED',
+                  pointHoverBackgroundColor: '#A7C6ED',
+                  pointHoverBorderColor: '#A7C6ED',
+                  yAxisID: 'A',
+                  stack: 1,
+                  order: 1,
+                  data: filteredPlanningUnitData.map((item, index) => {
+                    let count = 0;
+                    (item.shipmentInfo.map((ele, index) => {
+                      (ele.shipmentStatus.id == 1 || ele.shipmentStatus.id == 2 || ele.shipmentStatus.id == 9) ? count = count + ele.shipmentQty : count = count
+                    }))
+                    return count
+                  })
+                });
+              }
+              // const mediaQuery = window.matchMedia('(min-width: 1920px)')
+              // if (programCount > 10) {
+              //   if (mediaQuery.matches) {
+              //     height = 400 + (10 * programCount);
+              //   } else {
+              //     height = 400 + (21 * programCount);
+              //   }
+              // }
+              var bar = {
+                labels: filteredPlanningUnitData.map((item, index) => (dateFormatter(item.dt))),
+                datasets: datasets,
+              };
+              var chartOptions = {
+                title: {
+                  display: false,
+                  text: entityname1
+                },
+                scales: {
+                  yAxes: [{
+                    id: 'A',
+                    position: 'left',
+                    // stacked: true,
+                    scaleLabel: {
+                      labelString: i18n.t('static.shipment.qty'),
+                      display: true,
+                      fontSize: "12",
                       fontColor: 'black'
+                    },
+                    // stacked: true,
+                    ticks: {
+                      beginAtZero: true,
+                      fontColor: 'black',
+                      callback: function (value) {
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return x1 + x2;
+                      }
+                    }, gridLines: {
+                      color: 'rgba(171,171,171,1)',
+                      lineWidth: 0
                     }
                   }
-                }
-                var data = this.state.isAggregate.toString() == "true" ? planningUnitItemFilter : planningUnitItemFilter.stockStatusVertical;
-                let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
-                var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
-                var planningUnit = this.state.planningUnitListAll.filter(e => e.id == sortedPlanningUnitList[outputIndex])[0];
-                var conList = [];
-                var invList = [];
-                var shipList = [];
-                if (this.state.isAggregate.toString() == "true") {
-                  filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
-                  filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
-                } else {
-                  conList = planningUnitItemFilter.consumptionInfo;
-                  invList = planningUnitItemFilter.inventoryInfo;
-                }
-                filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
-                var planningUnitexport = {
-                  planningUnit: planningUnit,
-                  firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
-                  firstMonthRegionCountForStock: data.length > 0 ? data[0].regionCountForStock : 0,
-                  data: filteredData,
-                  bar: bar,
-                  chartOptions: chartOptions,
-                  height: height,
-                  inList: invList,
-                  coList: conList,
-                  shList: shipList,
-                  planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
-                  programId: sortedProgramList[outputIndex],
-                  PlanningUnitIdDataForExport: planningUnitItemFilter,
-                  reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.id == sortedPlanningUnitList[outputIndex])[0]
-                }
-                PlanningUnitDataForExport.push(planningUnitexport)
-                PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]
-                ProgramIdForExport = sortedProgramList[outputIndex]
-                PlanningUnitIdDataForExport = this.state.isAggregate.toString() == "false" ? planningUnitItemFilter : "";
-              })
-              this.setState({
-                PlanningUnitDataForExport: PlanningUnitDataForExport,
-                PlanningUnitIdForExport: PlanningUnitIdForExport,
-                ProgramIdForExport: ProgramIdForExport,
-                PlanningUnitIdDataForExport: PlanningUnitIdDataForExport,
-                message: '', loading: false
-              }, () => {
-                setTimeout(() => {
-                  if (report == 1) {
-                    this.exportPDF()
-                    document.getElementById("bars_div").style.display = 'none';
-                  } else {
-                    this.exportCSV()
+                    , {
+                    id: 'B',
+                    position: 'right',
+                    scaleLabel: {
+                      labelString: i18n.t('static.supplyPlan.monthsOfStock'),
+                      fontColor: 'black',
+                      display: true,
+                    },
+                    ticks: {
+                      beginAtZero: true,
+                      fontColor: 'black',
+                      callback: function (value) {
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return x1 + x2;
+                      }
+                    },
+                    gridLines: {
+                      color: 'rgba(171,171,171,1)',
+                      lineWidth: 0
+                    }
+                  }],
+                  xAxes: [{
+                    scaleLabel: {
+                      display: true,
+                      labelString: i18n.t('static.common.month'),
+                      fontColor: 'black',
+                      fontStyle: "normal",
+                      fontSize: "12"
+                    },
+                    stacked: true,
+                    ticks: {
+                      fontColor: 'black',
+                      fontStyle: "normal",
+                      fontSize: "12"
+                    },
+                    gridLines: {
+                      color: 'rgba(171,171,171,1)',
+                      lineWidth: 0
+                    }
+                  }]
+                },
+                tooltips: {
+                  enabled: false,
+                  custom: CustomTooltips,
+                  callbacks: {
+                    label: function (tooltipItem, data) {
+                      if (data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index] != 0) {
+                        let label = data.labels[tooltipItem.index];
+                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                        var cell1 = value
+                        cell1 += '';
+                        var x = cell1.split('.');
+                        var x1 = x[0];
+                        var x2 = x.length > 1 ? '.' + x[1] : '';
+                        var rgx = /(\d+)(\d{3})/;
+                        while (rgx.test(x1)) {
+                          x1 = x1.replace(rgx, '$1' + ',' + '$2');
+                        }
+                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+                      } else {
+                        return false
+                      }
+                    }
                   }
-                }, 2000)
-              })
-            }.bind(this)
+                },
+                maintainAspectRatio: false,
+                legend: {
+                  display: true,
+                  position: 'bottom',
+                  labels: {
+                    usePointStyle: true,
+                    fontColor: 'black'
+                  }
+                }
+              }
+              var data = this.state.isAggregate.toString() == "true" ? planningUnitItemFilter : planningUnitItemFilter.stockStatusVertical;
+              let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01');
+              var filteredData = data.filter(c => moment(c.dt).format("YYYY-MM") >= moment(startDate).format("YYYY-MM"));
+              var planningUnit = this.state.planningUnitListAll.filter(e => e.id == sortedPlanningUnitList[outputIndex])[0];
+              var conList = [];
+              var invList = [];
+              var shipList = [];
+              if (this.state.isAggregate.toString() == "true") {
+                filteredData.map(c => c.consumptionInfo.map(ci => conList.push(ci)));
+                filteredData.map(c => c.inventoryInfo.map(ii => invList.push(ii)));
+              } else {
+                conList = planningUnitItemFilter.consumptionInfo;
+                invList = planningUnitItemFilter.inventoryInfo;
+              }
+              filteredData.map(c => c.shipmentInfo.map(si => shipList.push(si)));
+              var planningUnitexport = {
+                planningUnit: planningUnit,
+                firstMonthRegionCount: data.length > 0 ? data[0].regionCount : 1,
+                firstMonthRegionCountForStock: data.length > 0 ? data[0].regionCountForStock : 0,
+                data: filteredData,
+                bar: bar,
+                chartOptions: chartOptions,
+                height: height,
+                inList: invList,
+                coList: conList,
+                shList: shipList,
+                planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
+                programId: sortedProgramList[outputIndex],
+                PlanningUnitIdDataForExport: planningUnitItemFilter,
+                reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.id == sortedPlanningUnitList[outputIndex])[0]
+              }
+              PlanningUnitDataForExport.push(planningUnitexport)
+              PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]
+              ProgramIdForExport = sortedProgramList[outputIndex]
+              PlanningUnitIdDataForExport = this.state.isAggregate.toString() == "false" ? planningUnitItemFilter : "";
+            })
+            this.setState({
+              PlanningUnitDataForExport: PlanningUnitDataForExport,
+              PlanningUnitIdForExport: PlanningUnitIdForExport,
+              ProgramIdForExport: ProgramIdForExport,
+              PlanningUnitIdDataForExport: PlanningUnitIdDataForExport,
+              message: '', loading: false
+            }, () => {
+              setTimeout(() => {
+                if (report == 1) {
+                  this.exportPDF()
+                  document.getElementById("bars_div").style.display = 'none';
+                } else {
+                  this.exportCSV()
+                }
+              }, 2000)
+            })
           }.bind(this)
         }.bind(this)
-      }
+      }.bind(this)
 
     } else {
       ReportService.getStockStatusData(inputjson)
         .then(response => {
-          console.log("Response json Test@123", response.data);
           let tempOutput;
           var ppuList;
           if (this.state.isAggregate.toString() == "true") {
@@ -2819,9 +2944,7 @@ class StockStatus extends Component {
     * @param {Object} e - Event data containing planning unit information.
     */
   setPlanningUnit(e) {
-    console.log("In e Test@123", e, this.state.yaxisEquUnit)
     if (this.state.yaxisEquUnit == -1) {
-      console.log("In if Test@123")
       var selectedText = e.map(item => item.label);
       var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
       this.setState({
@@ -2837,7 +2960,6 @@ class StockStatus extends Component {
       })
     } else {
       if (this.state.yaxisEquUnit > 0) {
-        console.log("In else Test@123")
         this.setState({
           planningUnitId: e.map(ele => ele),
           planningUnitIdExport: e.map(ele => ele),
@@ -2846,8 +2968,6 @@ class StockStatus extends Component {
           consumptionAdjForStockOutId: false,
           loading: false
         }, () => {
-          // document.getElementById("consumptionAdjusted").checked = false;
-          console.log("this.state.planningUnitId before Test@123", this.state.planningUnitId)
           if (this.state.planningUnitId.length > 0) {
             this.fetchData();
           } else {
@@ -2974,7 +3094,6 @@ class StockStatus extends Component {
     }
   }
   setRealmCountryPlanningUnitExport(e) {
-    console.log("E Test@123", e)
     this.setState({
       realmCountryPlanningUnitIdExport: e.map(ele => ele),
     }, () => {
@@ -3153,7 +3272,6 @@ class StockStatus extends Component {
             var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
             var puData = [];
             var planningUnitList = this.state.planningUnitId;
-            console.log("planningUnitList Test@123", this.state.planningUnitId);
             var consumptionList = [], inventoryList = [], shipmentList = [], supplyPlanList = [], programPlanningUnitList = [], stockStatusVerticalAggregateList = [];
             for (var pu = 0; pu < planningUnitList.length; pu++) {
               var planningUnitDataFilter = planningUnitDataList.filter(c => c.planningUnitId == planningUnitList[pu].value);
@@ -3245,7 +3363,6 @@ class StockStatus extends Component {
                 }
 
               })
-              console.log("Notes Test@123", notes)
               stockStatusVerticalAggregateList.push({
                 "dt": m + "-01",
                 "reportingUnit": this.state.yaxisEquUnit == -1 ? this.state.viewById == 1 ? {
@@ -3294,7 +3411,6 @@ class StockStatus extends Component {
               "programPlanningUnitList": programPlanningUnitList,
               "stockStatusVerticalAggregateList": stockStatusVerticalAggregateList
             }
-            console.log("stockStatusVerticalAggregateListJson Test@123", stockStatusVerticalAggregateListJson)
             var inventoryList = [];
             var consumptionList = [];
             var shipmentList = [];
@@ -3337,7 +3453,6 @@ class StockStatus extends Component {
         "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
       }
       ReportService.getStockStatusData(inputjson).then((response) => {
-        console.log("Test@123", response.data)
         var inventoryList = [];
         var consumptionList = [];
         var shipmentList = [];
