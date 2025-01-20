@@ -53,7 +53,7 @@ a {
 										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Objetivo</span> Permita que los usuarios administren y construyan árboles de pronóstico y escenarios, para cualquier pronóstico que no 
 											sea de consumo (demográfico, morbilidad, servicios, etc.). Tenga en cuenta que hay más orientación disponible después de hacer clic en cualquier nodo específico.</p>
 										<p>
-											<p style="font-size: 13px; font-weight: bold;"><span class="">Type de nœud:</span></p>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Tipos de nós:</span></p>
 										<div class="pl-lg-4 pr-lg-4 table1">
 											<table  style="border-collapse: collapse;">
 												<thead>
@@ -75,20 +75,47 @@ a {
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Nombre #</b></td>
 														<td>Défini à ce nœud</td>
 														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i><i><img class="img-fluid"
+															src="/aggregateAllowed.png" width="25px"></i></td>
 													</tr>
 													<tr>
 														<td style="background: #a7c6ed;color: #002f6c;"><b>Pourcentage %</b></td>
 														<td>Défini comme un pourcentage du parent/source</td>
 														<td>% or <b style=" color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i><i><img class="img-fluid"
+															src="/aggregateAllowed.png" width="25px"></i></td>
 													</tr>
 													<tr>
-														<td style="background:#002f6c;color: #fff;"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td>Défini comme un pourcentage de la source et des paramètres de l'unité de prévision</td>
-														<td><b style=" color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Funil
+																<i><img class="img-fluid" src="/funnel1-2.png"></i></b>
+														</td>
+														<td>Soma dos nós de origem vinculados (<i><img
+																	src="/agregateAllowed.png" width="24"></i>)</td>
+														<td>% ou <b style=" color: rgb(0, 47, 108); preenchimento: 3px;"></b>
+														</td>
+														<td>-</td>
 													</tr>
+
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Unidade de previsão
+																<i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>Definido como uma porcentagem da unidade pai e de previsão
+															parâmetros. Podem ser dois tipos de uso diferentes:
+															<ul>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>C</b></span>:Contínuo
+																</li>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>D</b></span>:Discreto
+																</li>
+															</ul>
+														</td>
+														<td><b style=" cor: rgb(0, 47, 108); preenchimento: 3px;"><i
+																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90"
+																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+
 													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Unité de planification <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 														<td>Défini comme un pourcentage du parent/source et des paramètres de l'unité de planification</td>
@@ -153,55 +180,159 @@ a {
 														<td></td>
 														<td>Modelado/Transferencia/Extrapolación</td>
 													</tr>
+													<tr>
+														<td></td>
+														<td>Conexiones de embudo</td>
+													</tr>
 												</tbody>
 											</table>
 										</div>
 									</p>
 												
 									<p style="font-size: 13px;">
-										<span classnames="UnderLineText" style="font-size: 13px;"><b>Consejos para casos de uso específicos:</b></span>
+										<span classnames="UnderLineText" style="font-size: 13px;"><b>Dicas para
+											casos de uso específicos:</b></span>
+
 										<ul style="font-size: 13px;">
-											<li>
-												<b> Tipo de nodo de previsión :</b> Seleccione discreto si este producto se usará por tiempo limitado y continuo 
-												si se usará indefinidamente.</li>
-												<li><b>¿Necesita calcular cantidades de uso de productos discretos?
-												</b>
-												QAT tiene la opción de calcular el uso de productos discretos en nodos de unidades de pronóstico en 
-												de dos maneras: anticipando la cantidad discreta consumida por paciente en el mes 1 
-												(elija "Calcular usando una dispensación única" = "Sí") o desagregando el 
-												cantidad discreta consumida por paciente por mes (elija "Calcular usando una dispensación única" = "No"). 
-												De forma predeterminada, QAT asumirá el método de distribución anticipada para calcular la unidad de pronóstico discreta. 
-												cantidades; sin embargo, los usuarios tienen la opción de elegir el método alternativo a través de una radio. 
-												botón. Este cálculo discreto alternativo podría ser útil para las Unidades de Planificación (PU) 
-												que tienen patrones de bajo consumo durante un período de tiempo. Por ejemplo, si una mujer embarazada 
-												Se requiere tomar un suplemento nutricional una vez al mes durante el embarazo. 
-												(nueve meses), QAT actualmente calcularía nueve suplementos en el mes 1 (distribución anticipada). 
-												Sin la distribución anticipada, QAT calcularía un suplemento en el mes 1, un suplemento en 
-												mes 2, un suplemento en el mes 3, y así sucesivamente.
-												</li>
-											<li><b> ¿Uso del producto retrasado o escalonado?</b> A veces, el consumo del producto se retrasa en relación a 
-												los otros niveles superiores del árbol. en lo pertinente <b> Unidad de previsión </b>nodo, utilice el <b>Retraso</b> campo para indicar este retraso.
+											<b>Uso do produto atrasado ou em fases? </b>Às vezes, o consumo do produto
+											está atrasado em relação aos demais níveis superiores da árvore. No
+											nó <b>Unidade de previsão</b> relevante, use o campo <b>Lag</b> para indicar
+											esse atraso.
 											<ul>
-												<li>Por ejemplo, si el uso del producto comenzará 2 meses después de las fechas del 
-													nodo principal, ingrese 2 en este campo.  </li>
-												<li>Este campo también se puede usar cuando el producto cambia con el tiempo, por 
-													ejemplo, si las unidades de pronóstico A, B y C se usan en secesión durante dos 
-													meses a la vez, puede configurar su árbol con la Unidad de pronóstico A 
-													(discreta para 2 meses). , lag=0), Unidad de Pronóstico B (discreta por 2 meses, lag=2), 
-													Unidad de Pronóstico C (discreta por 2 meses, lag = 4).
+												<li>
+
+													Por exemplo, se o uso do produto começar 2 meses após o
+													pai
+													datas dos nós, insira “2” neste campo.
+												</li>
+												<li>
+													Este campo também pode ser usado quando o produto muda ao longo do tempo –
+													para
+													Por exemplo, se as unidades de previsão A, B e C forem usadas em separação para
+													dois
+													meses de cada vez, você pode configurar sua árvore com a Unidade de Previsão A
+													(discreto para 2 meses, atraso = 0), Unidade de previsão B (discreta para 2
+													meses, defasagem = 2), Unidade de previsão C (discreta para 2 meses, defasagem = 4).
 												</li>
 											</ul>
-										</li>
-										<li><b> ¿Patrones de consumo de varios meses?</b> ¿Con qué frecuencia se consume realmente el producto? es mensual o 
-											cada tres meses? El consumo se puede definir en diferentes niveles dependiendo de su 
-											cadena de suministro. En el <b>Nodo de unidad de planificación</b>, utilizar el <b>Intervalo de consumo</b> campo a indicar. Por ejemplo, 
-											si el usuario final usa un producto a diario, pero solo recoge o compra el producto 
-											cada 2 meses, ingrese 2 en el campo Intervalo de consumo para dar cuenta de un patrón 
-											de consumo de varios meses. Tenga en cuenta que esto solo está disponible para los nodos 
-											continuos, ya que se supone que el producto se consume al comienzo del período de uso.</li>
-										<li><b>¿Usos de pronóstico repetidos?</b> Si varios nodos de Unidad de pronóstico 
-											comparten la misma configuración, considere usar el <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Plantilla de uso </a>pantalla para guardar sus usos comunes y luego usar el campo Copiar de plantilla para completar 
-											los campos en los nodos de la unidad de pronóstico. </li>
+											<b>Uso discreto do produto por um longo período de tempo? (primeiro mês
+												dispensação vs. dispensação mês a mês):</b> QAT tem a opção de
+											calcule o uso discreto do produto na previsão de nós de unidade de duas maneiras:
+											<ul>
+												<li>fornecendo antecipadamente a quantidade discreta consumida por paciente no mês
+													1 (escolha "Calcular" = "Tudo no primeiro mês") ou </li>
+
+												<li>desagregando a quantidade discreta consumida por paciente por
+													mês (escolha "Calcular" = "Mês a Mês"). </li>
+
+												<li>Por padrão, o QAT assumirá "Tudo no primeiro mês" (fornecimento antecipado);
+													no entanto, os usuários têm a opção de selecionar "Mês a mês" para o
+													método alternativo.
+													Este cálculo alternativo pode ser útil para Unidades de Planejamento
+													(PUs) que
+													têm padrões de baixo consumo durante um período de tempo ou se aplicarem
+													para um recém-
+													grupo de pacientes iniciado. Por exemplo, se uma mulher grávida estiver
+													obrigado a tomar
+													um suplemento nutricional uma vez por mês durante o período
+													gravidez (nove meses),
+													por padrão, o QAT calcularia nove suplementos no mês 1
+													(fornecimento antecipado). Sem
+													fornecimento antecipado, o QAT calcularia um suplemento no mês 1, um
+													suplemento no mês 2,
+													um suplemento no mês 3 e assim por diante. </li>
+											</ul>
+											<b>Deseja um valor específico para o número de Unidades de Planejamento por paciente? </b>Um
+											o usuário pode especificar um valor específico para o número de unidades de planejamento por unidade*
+											(discreto) ou por unidade* por mês (contínuo) escolhendo “Não” para “Usar
+											Cálculo automático do QAT para número de unidades de planejamento?” A menos que seja substituído por um usuário,
+											O QAT utilizará o cálculo automático por padrão. (* Neste caso, unidade
+											pode ser paciente, teste, cliente, etc.).
+											<ul>
+												<li><b>Exemplo discreto:</b> Se cada 1 frasco de bupivacaína for suposto
+													a ser usado a cada 5 procedimentos, então o número de unidades de previsão
+													/ procedimentos é de 0,2 frascos. Com uma unidade de planejamento de 5 frascos, QAT
+													calcula que 0,2/5 = 0,04 unidades de planejamento são usadas por procedimento.
+													No entanto, um usuário pode alternar o botão de opção para “Não” e optar por
+													substitua isso pelo conhecimento das taxas de uso reais e insira 0,05
+													unidades de planejamento. Sempre adicione uma nota ao substituir QATs
+													cálculo. </li>
+
+												<li><b>Exemplo contínuo:</b> se um paciente precisar de 1 comprimido por dia
+													indefinidamente do frasco de 30 comprimidos TLD, a QAT calculará isso como
+													30,4167/mês ou 1,0139/dia para contabilizar meses que possuem 30 dias,
+													31 dias, 28 dias, etc. No entanto, um usuário pode optar por alternar o
+													botão de opção para “Não” e opte por substituir isso por 1 planejamento
+													unidade/mês. forneça o valor de substituição de 1. Sempre adicione uma nota quando
+													você substitui o cálculo do QAT. </li>
+											</ul>
+											<li><b>Repetindo usos de previsão? </b>Se vários nós da unidade de previsão
+												compartilham as mesmas configurações, considere usar a tela Modelo de uso para
+												salve seus usos comuns e, em seguida, use o campo “Copiar do modelo”
+												para preencher os campos nos nós da unidade de previsão.
+											</li>
+											<li><b>Agregar valores de nós para cálculos adicionais? (Nós de funil):</b> Em
+												alguns casos, os usuários podem querer vincular o valor de um nó a outro
+												nó ou agregar vários nós em um nó antes de adicionar outros
+												nós abaixo. **Observe que este recurso é diferente da vinculação de nós
+												via modelagem/transferência, que serve para vincular mudanças em um nó a
+												mudanças em outro nó, em vez de agregação. Isso também é diferente
+												do uso de nós de agregação, que agregam apenas para cima e não
+												permitir cálculos adicionais **
+
+											</li>
+											<b>Casos de uso: </b>
+											<ul>
+												<li>Os testes de carga viral são usados ​​por diversas populações, mas todos
+													as populações usarão a mesma combinação de instrumentos. Comece com um
+													árvore demográfica que termina em múltiplas populações. O diferente
+													as populações precisam ser somadas e os vários ramos do instrumento
+													sente-se sob a soma.
+												</li>
+												<li>
+													Os pacientes com malária entram no sistema de saúde através de diferentes canais
+													(agentes comunitários de saúde versus unidades de saúde pública), que têm
+													algoritmos de teste diferentes, mas quando um paciente testa positivo,
+													eles recebem a mesma “combinação” de tratamentos. As diferentes populações
+													teste positivo precisa ser somado e os vários regimes de tratamento
+													sente-se sob a soma
+												</li>
+												<li>
+													Vários métodos contraceptivos diferem na forma como são calculados, mas
+													todos eles derivam da mesma população do país, que precisa ser
+													atualizou cada quantificação, podendo ter modelagem ao longo do tempo. Um
+													árvore pode ser construída para implantes e injetáveis, e outra construída
+													para preservativos, mas as duas árvores estão ligadas no país
+													nó de população, para que seus valores permaneçam consistentes
+												</li>
+											</ul>
+											<b>Como vincular valores </b>
+											<ol>
+												<li>Indique (em # ou % nós) que eles são <b>"nós de origem"</b> </li>
+
+												<li>Crie novos <b>"nós de funil"</b> e selecione quais nós de origem serão
+													agregado de. Observação: os nós do funil podem “ficar” em qualquer lugar da árvore –
+													isto é, você pode transformar o primeiro nó de uma árvore em um nó de funil ou
+													construir nós de funil em qualquer agregação, número de nó percentual.
+													Isso ocorre porque o valor dos nós do funil não deriva de sua
+													pai, mas das fontes às quais estão vinculados.
+												</li>
+												<li>
+													Adicione quaisquer nós "filhos" sob os nós do funil - eles provavelmente serão
+													os nós do produto. Os nós de funil permitem muita flexibilidade, pois
+													eles podem ser usados ​​em uma árvore ou em várias árvores, podem ser usados ​​em
+													qualquer nível, e
+													<ul>
+														<li>O usuário pode vincular <b>internamente em uma árvore </b>
+														</li>
+														<li>
+															Os usuários podem vincular <b>externamente entre árvores</b> (nós de origem
+															em uma árvore, nós de funil em uma árvore diferente)
+														</li>
+													</ul>
+												</li>
+											</ol>
+
 										</ul>
 									</p>
 								
