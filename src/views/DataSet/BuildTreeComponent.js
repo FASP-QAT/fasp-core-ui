@@ -2763,16 +2763,20 @@ export default class BuildTree extends Component {
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level !== "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
-            for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
-                copyModalParentLevelList.pop()
-            }
-            // copyModalParentLevelList = [];
-            // for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
-            //     copyModalParentLevelList.push({
-            //         label: { label_en: "Level " + i },
-            //         levelNo: i
-            //     })
+            // for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
+            //     copyModalParentLevelList.pop()
             // }
+            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+                if (!copyModalParentLevelList.filter(x => x.levelNo == i).length) {
+                    copyModalParentLevelList.push({
+                        label: { label_en: "Level " + i },
+                        levelNo: i
+                    })
+                }
+            }
+            copyModalParentLevelList.sort((a, b) => {
+                return a.levelNo > b.levelNo ? 1 : -1;
+            });
         } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
