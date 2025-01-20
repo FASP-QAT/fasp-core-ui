@@ -369,6 +369,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                <b>{i18n.t("static.supplyPlan.unmetDemandStr")}: </b>Occurs when the ending balance is '0' and part of consumption was unmet, or when adjusted consumption accounts for days stocked out. Unmet demand can also happen when a negative manual adjustment is larger than the projected ending balance.
                   <div className='formulaBox borderedBoxforformulae'>
                     <i>
                       <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalance1")}</p>
