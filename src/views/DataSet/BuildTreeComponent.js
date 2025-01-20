@@ -12810,11 +12810,37 @@ export default class BuildTree extends Component {
         }, () => {
         })
     }
+
+    /**
+     * This function replaces the html place holders with dynamic values of treeId & programId
+     * @param {*} htmlContent - HTML content to be render on show guidance popup of Manage Tree - Build Trees screen
+     * @returns 
+     */
+    injectDynamicValues = (htmlContent) => {
+        const { treeId, programId } = this.state;
+        return htmlContent
+            .replace(/{{treeId}}/g, treeId)
+            .replace(/{{programId}}/g, programId);
+    };
+
     /**
      * Renders the create tree screen.
      * @returns {JSX.Element} - Create Tree screen.
      */
     render() {
+        //to replace treeId & programId html place holders for show guidance popup
+        const currentLang = localStorage.getItem('lang');
+        const htmlContent =
+            currentLang === 'en'
+                ? showguidanceBuildTreeEn
+                : currentLang === 'fr'
+                ? showguidanceBuildTreeFr
+                : currentLang === 'sp'
+                ? showguidanceBuildTreeSp
+                : showguidanceBuildTreePr;
+
+        const updatedHtmlContent = this.injectDynamicValues(htmlContent);
+
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -13533,6 +13559,8 @@ export default class BuildTree extends Component {
                 },
             }]
         }
+
+
         return <div className="">
             <Prompt
                 when={this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true}
@@ -14115,7 +14143,7 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody className="ModalBodyPadding Darkmode">
+                    {/* <ModalBody className="ModalBodyPadding Darkmode">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
                                 showguidanceBuildTreeEn :
@@ -14124,6 +14152,11 @@ export default class BuildTree extends Component {
                                     localStorage.getItem('lang') == 'sp' ?
                                         showguidanceBuildTreeSp :
                                         showguidanceBuildTreePr
+                        }} />
+                    </ModalBody> */}
+                    <ModalBody className="ModalBodyPadding Darkmode">
+                        <div dangerouslySetInnerHTML={{
+                            __html: updatedHtmlContent
                         }} />
                     </ModalBody>
                 </div>
