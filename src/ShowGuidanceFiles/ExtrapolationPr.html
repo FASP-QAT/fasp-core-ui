@@ -235,6 +235,61 @@
 		</ul>
 	</p>
 </p>
+
+<b style="font-size: 13px;">5. Otimização dos parâmetros de previsão TES e ARIMA</b>
+<p class="pl-lg-3" style="font-size: 13px;">
+	
+	<p>QAT oferece aos usuários múltiplas opções de extrapolação, incluindo TES e ARIMA sazonal e não sazonal. Os usuários são livres para 
+		usar os padrões QAT ou inserir parâmetros de previsão alternativos com a intenção de reduzir as métricas de erro. 
+		aumentar a correspondência entre o método de previsão produz os pontos de dados reais no período de dados históricos. 
+		Se o usuário estiver trabalhando online, o QAT pode otimizar os parâmetros TES e ARIMA iterando, calculando o RMSE de cada iteração, 
+		e selecionar os parâmetros que produzem o RMSE mais baixo.</p> 
+
+	<p>Para o TES, o QAT calcula 125 iterações da previsão, testando cada um dos parâmetros alfa, beta e gama em combinação com o 
+		seguintes valores: 0, 0.2, 0.4, 0.8 e 1. Qualquer uma das 125 combinações para um determinado produto produz o resultado com 
+		o RMSE mais baixo será exibido na tela de extrapolação.</p>
+
+	<p>
+		Para ARIMA ou ARIMA sazonal, o QAT calcula 24 iterações da previsão, testando cada um dos parâmetros p, d e q em combinação, usando os seguintes valores:
+	</p>
+	<ul>
+		<li>p: 0 ou 1</li>
+		<li>d: 0, 1 ou 2</li>
+		<li>q: 0, 1, 2 ou 3</li>
+	</ul>
+	
+	<p>Qualquer uma das 24 combinações para um determinado produto que produza o resultado ARIMA com o RMSE mais baixo será exibida na tela de extrapolação.</p>
+	
+</p>
+
+<b style="font-size: 13px;">6. Extrapolação em massa</b>
+<p class="pl-lg-3" style="font-size: 13px;">
+	<p>
+		Na tela de extrapolação QAT, o usuário pode comparar os resultados dos vários métodos de extrapolação, tanto graficamente quanto 
+		em uma tabela de saída, produto por produto. Isso permite que o usuário desmarque métodos de extrapolação que eles acham que não se aplicam 
+		a um determinado produto para limitar as opções na tela Comparar e Selecionar apenas àquelas que o usuário escolhe exibir.
+	</p>
+
+	<p>
+		Se o usuário preferir enviar diretamente todos os resultados dos métodos de extrapolação disponíveis para mais de um produto 
+		para a tela Comparar e Selecionar, o usuário pode selecionar a extrapolação em massa. Na janela pop-up Extrapolação em massa, 
+		o usuário pode então selecionar um intervalo de datas histórico a partir do qual extrapolar a previsão (apenas um intervalo de datas por extrapolação em massa), 
+		se deve aplicar sazonalidade ao seu cálculo ARIMA, quais unidades de planejamento e regiões (se forem usados ​​dados regionais) incluir no 
+		a extrapolação em massa e se deve ou não otimizar os parâmetros ARIMA e TES para a extrapolação.
+	</p>
+
+	<p>
+		Depois de executar a extrapolação em massa, todos os resultados podem ser visualizados na tela Extrapolação, na tela Comparar e Selecionar e 
+		na caixa suspensa Tela Resumo da Previsão (regional). O usuário pode selecionar seu método de extrapolação preferido entre 
+		a tela Comparar e selecionar ou a tela Resumo de previsão (regional).
+	</p>
+
+	<p>
+		A extrapolação em massa no QAT é particularmente útil quando se trabalha com um grande conjunto de produtos para os quais 
+		dados precisos de consumo estão disponíveis por 12 meses ou mais.
+	</p>
+</p>
+
 <p style="font-size: 13px;">
 	<b>Observação :  Você tem 0 meses de dados de consumo real. Os valores mínimos necessários 
 		para os vários recursos estão abaixo: <br>
