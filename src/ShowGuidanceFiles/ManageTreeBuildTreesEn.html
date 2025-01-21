@@ -81,9 +81,42 @@
 												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Using
 												this screen :</span>
 											<br>
-											<span style="font-weight: bold;">Manage the Tree:</span> Click on the gear
-											icon <i class="fa fa-cog" aria-hidden="true"></i> to show and edit or hide
-											the forecast method, tree name, and region.
+											<span style="font-weight: bold;">Navigation:</span>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Begin by selecting the <strong>Program</strong> and <strong>Tree</strong> from the dropdowns. Note that only downloaded programs are available. Click on the gear icon <i class="fa fa-cog" aria-hidden="true"></i> 
+													to show/hide or edit the tree details (forecast method, tree name, and region).
+
+												</li>
+												<li>See below section for <strong>Scenarios</strong>.</li>
+												<li>The values of the tree nodes is displayed in the date show in the <strong>Display Date</strong>. Change this date to see values in other months.</li>
+												
+												<li>Users can also edit the tree in the <a href="/#/dataSet/treeTable/tree/{{treeId}}/{{programId}}" target="_blank">Tree Table</a> screen, which allows batch editing of node values,
+													 but does not allow any edits to the structure of the tree or changes over time.</li>
+
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"
+													id="checkBox1"
+													name="checkBox1"																										
+												/>
+													<strong>“Hide” checkboxes</strong> - use these checkboxes to hide certain elements of the tree for a cleaner display.</li>	 
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"
+													id="checkBox2"
+													name="checkBox2"																										
+												/>
+													<strong>Autocalculate</strong> - If QAT is slow while editing your tree, uncheck the auto-calculate box to stop calculations. 
+													To update the calculations, either re-check the 'auto-calculate' checkbox, or click the recalculate <i class="fa fa-refresh" aria-hidden="true"></i> icon.</li>
+												<li>Click on the tree <strong>Levels</strong> (dark blue rectangular boxes on the left of the tree) to:</li>
+												<ul>
+													<li>Name the levels of a tree. This will make a tree easier to read and will be used in the dropdowns and axis of the <a href="/#/validation/modelingValidation" target="_blank">Modeling Validation</a> screen.</li>
+													<li>Reorder branches of your tree as desired by using the up and down arrows to indicate the left-to-right position of the branches. 
+														If the list is long, use the “see children of” dropdown to filter the nodes.</li>
+												</ul>
+											</ul>
+											
+											
 										</p>
 										<p style="font-size: 13px;"><span
 												style="font-weight: bold; font-size: 13px;">Building the Tree:</span>The
@@ -96,24 +129,43 @@
 											Node must stem from a Forecasting Unit Node. </p>
 
 										<p>
-										<p style="font-size: 13px; font-weight: bold;"><span class="">Node Actions
-												:</span></p>
-										<ul class="pl-lg-4" style="font-size: 13px;">
-											<li><i class="fa fa-trash-o" aria-hidden="true"
-													></i> Delete: Deletes the selected
-												node </li>
-											<li><i class="fa fa-clone" aria-hidden="true"
-													></i> Duplicate: Duplicates the
-												selected node under the same parent </li>
-											<li><i class="fa fa-plus-square-o" aria-hidden="true"
-													></i> Add: Adds a child to the
-												selected node.</li>
-										</ul>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Node Actions
+													:</span></p>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Click on a node to open it for editing or viewing.</li>
+												<li>Hover over a node to view node notes without opening the node.</li>
+												<li><i class="fa fa-paste"></i><strong>
+													Copy / Move</strong>: Copies or moves the selected node and all its children. The user can select the destination.
+												</li>
+
+
+												<li><i class="fa fa-trash-o" aria-hidden="true"
+														></i> <strong>Delete</strong>: Deletes the selected node and all its children.</li>
+												<li><i class="fa fa-sitemap" aria-hidden="true"
+														></i> <strong>Add Branch Template</strong>: Adds a tree template as a branch below the chosen node. </li>
+												<li><i class="fa fa-plus-square-o" aria-hidden="true"
+														></i> <strong>Add</strong>: Adds a child to the
+													selected node.</li>
+
+													<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Collapse/Expand</strong>: Collapse/Expands the current node and all its children.</li>
+													<ul>
+														<li>In collapsed mode, nodes will be represented by dots. Hover over any dot/node and click once to expand that node and all its children.</li>
+														<li>“<strong>Collapse Tree</strong>” checkbox 
+															<Input
+																className="form-check-input checkboxMargin"
+																type="checkbox"
+																id="checkBox2"
+																name="checkBox2"																										
+															/> 
+															at the top of the screen that collapses every node except for the top node.
+														</li>
+													</ul>
+											</ul>
 										</p>
 
 										<p>
 										<p style="font-size: 13px; font-weight: bold;">
-											<span class="">Node Type :</span>
+											<span class="">Node Types :</span>
 										</p>
 										<div class="pl-lg-4 pr-lg-4 table1">
 											<table style="border-collapse: collapse;">
@@ -161,9 +213,27 @@
 																	width="20" height="20" /></i></td>
 													</tr>
 													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Funnel <i><img
+																		src="../ShowGuidanceFiles/img/funnel1.png"
+																		width="18" height="18" /></i></b></td>
+														<td>Sum of linked source nodes (<i><img class="Iconclr"
+																	src="../ShowGuidanceFiles/img/aggregateAllowed.png"
+																	width="20" height="20" /></i>)</td>
+														<td>% or</td>
+														<td>-</td>
+													</tr>
+													<tr>
 														<td style="background:#002f6c;color: #fff;"><b>Forecasting Unit
 																<i class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td>A percentage of the parent and forecasting unit parameters
+														<td>A percentage of the parent and forecasting unit parameters. Can be two different use types:
+															<br>
+															<b style="background: #002f6c;">
+																<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;c </b>
+															</b>: Continuous
+															<br>
+															<b style="background: #002f6c;">
+																<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;d </b>
+															</b>: Discrete
 														</td>
 														<td><b
 																style="color: rgb(0, 47, 108); padding: 3px;"><i
@@ -178,17 +248,7 @@
 														<td>-</td>
 														<td><i class="fa fa-exchange fa-rotate-90"
 																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-													</tr>
-													<tr>
-														<td style="background:#002f6c;color: #fff;"><b>Funnel <i><img
-																		src="../ShowGuidanceFiles/img/funnel1.png"
-																		width="18" height="18" /></i></b></td>
-														<td>Sum of linked source nodes <i><img class="Iconclr"
-																	src="../ShowGuidanceFiles/img/aggregateAllowed.png"
-																	width="20" height="20" /></i></td>
-														<td>% or</td>
-														<td>-</td>
-													</tr>
+													</tr>													
 												</tbody>
 											</table>
 										</div>
@@ -251,6 +311,10 @@
 													<tr>
 														<td></td>
 														<td>Modeling/Transfer/Extrapolation</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>Funnel Connections</td>
 													</tr>
 												</tbody>
 											</table>
