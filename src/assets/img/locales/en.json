@@ -3609,5 +3609,7 @@
   "static.supplyPlanFormula.monthsOfStockEx5Txt8": "Months Of Stock = 2.91",
   "static.supplyPlan.minMonthsOfStockNotes": "If the report includes multiple programs or planning units, QAT will use the average of the selected program & planning units’ Min Month Of Stock.",
   "static.supplyPlanFormula.maxMonthOfStockNotes": "If the report includes multiple programs or planning units, QAT will use the average of the selected program & planning units’ Max Month Of Stock.",
-  "static.supplyPlan.maxQtyNotes": "If the report includes multiple programs or planning units, QAT will use the average of the selected program & planning units’ Min/Max Quantity."
+  "static.supplyPlan.maxQtyNotes": "If the report includes multiple programs or planning units, QAT will use the average of the selected program & planning units’ Min/Max Quantity.",
+  "static.supplyPlan.unmetDemandDef": "Occurs when the ending balance is '0' and part of consumption was unmet, or when adjusted consumption accounts for days stocked out. Unmet demand can also happen when a negative manual adjustment is larger than the projected ending balance.",
+  "static.supplyPlanFormula.amcDef": "Uses adjusted consumption when available, factoring in the number of days stocked out and actual consumption."
 }
