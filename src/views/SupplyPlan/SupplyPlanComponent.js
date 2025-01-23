@@ -2203,7 +2203,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>}
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}</td>
+                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}
+                                                <i title={i18n.t("static.supplyPlanFormula.amcDef")} class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
+                                            </td>
                                             {
                                                 this.state.amcTotalData.map(item1 => (
                                                     <td align="right"><NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /></td>
@@ -2212,7 +2214,9 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}</td>
+                                            <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}
+                                                <i title={i18n.t("static.supplyPlan.unmetDemandDef")} class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
+                                            </td>
                                             {
                                                 this.state.unmetDemand.map(item1 => {
                                                     if (item1 != null) {
