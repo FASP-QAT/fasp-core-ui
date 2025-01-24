@@ -369,45 +369,52 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
-                <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>: {i18n.t("static.supplyPlan.unmetDemandDef")}
+                  <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>: {i18n.t("static.supplyPlan.unmetDemandDef")}
 
                   <div className='formulaBox borderedBoxforformulae'>
-                    <i>
-                      <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalance1")}</p>
-                      <p>{i18n.t("static.showFormula.endingBalance2")}</p>
-                      <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> {i18n.t("static.showFormula.endingBalance3")}</p>
-                      <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p>
-                      <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p>
-                    </i>
+                      <i>
+                        <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
+                        <p>{i18n.t("static.showFormula.endingBalance2")}</p>
+                        <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> {i18n.t("static.showFormula.endingBalance3.1")}</p>
+                        {/* <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p> */}
+                        {/* <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p> */}
+
+                        <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>
+                          <ul type='disc'>
+                            <li>{i18n.t("static.supplyPlan.unmetDemandP1")}</li>
+                            <li>{i18n.t("static.supplyPlan.unmetDemandP2")}</li>
+                          </ul>
+                        </p>
+                      </i>
                   </div>
-                  <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
+                  <p><span className="formulastext-p">{i18n.t("static.supplyPlan.exampleActualConsumption") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 5,698,925"}<br></br>
                     {i18n.t("static.supplyPlan.adjustments") + " = 0"}<br></br>
                     {i18n.t("static.dashboard.shipments") + " = 0"}<br></br>
-                    {i18n.t("static.supplyPlan.consumption") + " = 310,000"}<br></br>
+                    {i18n.t("static.supplyPlan.actualConsumption") + " = 310,000"}<br></br>
                     {i18n.t("static.showFormula.endingBalance7") + " = 10"}<br></br>
                     {i18n.t("static.showFormula.endingBalance8") + " = 31"}<br></br>
-                    {i18n.t("static.showFormula.endingBalance9") + " = (310,000 * 31) / (31 - 10)"}<br></br>
+                    {/* {i18n.t("static.showFormula.endingBalance9") + " = (310,000 * 31) / (31 - 10)"}<br></br> */}
                     {i18n.t("static.supplyPlanFormula.expiredStock") + " = 0"}<br></br>
                     <br></br>
                     <b>{i18n.t("static.supplyPlan.projectedInventory")}</b><br></br>
-                    {i18n.t("static.showFormula.endingBalance1")}<br />
-                    {" = 5,698,925 + 0 + 0 - 310,000 - 0"}<br></br>
+                    {i18n.t("static.showFormula.endingBalancePI1")}<br />
+                    {" = 5,698,925 - 310,000 + 0 + 0 - 0"}<br></br>
                     {" = 5,388,925"}<br></br><br></br>
                     <b>{i18n.t("static.supplyPlan.endingBalance")}</b><br></br>
                     {i18n.t("static.showFormula.endingBalance3")}<br></br>
                     {"= " + i18n.t("static.supplyPlan.max") + " (5,388,925 , 0)"}<br></br>
                     {"= 5,388,925"}<br></br>
                     <br></br>
-                    <b>{i18n.t("static.showFormula.endingBalance4")}</b><br></br>
+                    <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b><br></br>
                     {i18n.t("static.showFormula.endingBalance5")}<br></br>
                     {"= (310,000 * 10) / (31 - 10) "}<br></br>
                     {"= 147,619 "}<br></br>
                     <br></br>
-                    <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b><br></br>
+                    {/* <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b><br></br>
                     {i18n.t("static.showFormula.endingBalance6")}<br></br>
                     {"= 0 + 147,619"}<br></br>
-                    {"= 147,619"}
+                    {"= 147,619"} */}
                   </p>
                 </ListGroupItemText>
               </ListGroupItem>
