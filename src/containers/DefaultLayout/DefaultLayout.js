@@ -119,6 +119,7 @@ const EditForecastingUnit = React.lazy(() => import('../../views/ForecastingUnit
 const AddPlanningUnit = React.lazy(() => import('../../views/PlanningUnit/AddPlanningUnit'));
 const PlanningUnitList = React.lazy(() => import('../../views/PlanningUnit/PlanningUnitListComponent'));
 const EditPlanningUnit = React.lazy(() => import('../../views/PlanningUnit/EditPlanningUnitComponent'));
+const PlanningUnitDraft = React.lazy(() => import('../../views/PlanningUnitDraft/PlanningUnitDraft'));
 const ListProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/ListProcurementUnit'))
 const AddProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/AddProcurementUnit'))
 const EditProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/EditProcurementUnit'))
@@ -372,6 +373,7 @@ const routes = [
   { path: '/forecastingUnit/listForecastingUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.forecastingunit', component: ForecastingUnitList },
   { path: '/forecastingUnit/listForecastingUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.forecastingunit', component: ForecastingUnitList },
   { path: '/forecastingUnit/editForecastingUnit/:forecastingUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.forecastingunit', component: EditForecastingUnit },
+  { path: '/planningUnit/planningUnitDraft', name: 'static.breadcrum.list', entityname: 'static.planningunit.draftplanningunit', component: PlanningUnitDraft },
   { path: '/planningUnit/addPlanningUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.planningunitheader', component: AddPlanningUnit },
   { path: '/planningUnit/listPlanningUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
@@ -1334,6 +1336,17 @@ class DefaultLayout extends Component {
                                     }
                                   }
                                 },
+                                {
+                                  name: i18n.t('static.dashboard.planningUnitDraft'),
+                                  url: '/planningUnit/planningUnitDraft',
+                                  icon: 'fa fa-cubes',
+                                  attributes: {
+                                    hidden: (this.state.businessFunctions.includes('ROLE_BF_PLANNING_UNIT_DRAFT') && this.state.activeTab == 1 ? true : false),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                }
                               ]
                             },
                             {

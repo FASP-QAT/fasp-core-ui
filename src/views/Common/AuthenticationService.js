@@ -821,6 +821,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/planningUnit/planningUnitDraft":
+                        if (bfunction.includes("ROLE_BF_PLANNING_UNIT_DRAFT")) {
+                            return true;
+                        }
+                        break;
                     case "/procurementUnit/addProcurementUnit":
                         if (bfunction.includes("ROLE_BF_ADD_PROCUREMENT_UNIT")) {
                             return true;
