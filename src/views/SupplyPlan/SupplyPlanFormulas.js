@@ -375,7 +375,7 @@ class SupplyPlanFormulas extends Component {
                       <i>
                         <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
                         <p>{i18n.t("static.showFormula.endingBalance2")}</p>
-                        <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> {i18n.t("static.showFormula.endingBalance3.1")}</p>
+                        <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> = {i18n.t("static.showFormula.endingBalance3.1")}</p>
                         {/* <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p> */}
                         {/* <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p> */}
 
@@ -1227,7 +1227,7 @@ class SupplyPlanFormulas extends Component {
                     <i>
                       <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
                       <p>{i18n.t("static.showFormula.endingBalance2")}</p>
-                      <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> {i18n.t("static.showFormula.endingBalance3.1")}</p>
+                      <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> = {i18n.t("static.showFormula.endingBalance3.1")}</p>
                       {/* <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p> */}
                       {/* <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p> */}
 
