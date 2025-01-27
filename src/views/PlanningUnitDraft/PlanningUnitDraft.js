@@ -312,26 +312,20 @@ export default class PlanningUnitDraft extends Component {
      * Builds the jexcel component to display role list.
      */
     buildJExcel() {
-        let planningUnitList = this.state.selSource;
-        let planningUnitArray = [];
+        let planningUnitDraft = this.state.planningUnitDraft;
+        let planningUnitDraftArray = [];
         let count = 0;
-        for (var j = 0; j < planningUnitList.length; j++) {
+        for (var j = 0; j < planningUnitDraft.length; j++) {
             data = [];
-            data[0] = planningUnitList[j].planningUnitId
-            data[1] = getLabelText(planningUnitList[j].label, this.state.lang) + " | " + planningUnitList[j].planningUnitId
-            data[2] = getLabelText(planningUnitList[j].forecastingUnit.label, this.state.lang) + " | " + planningUnitList[j].forecastingUnit.forecastingUnitId
-            data[3] = getLabelText(planningUnitList[j].unit.label, this.state.lang)
-            data[4] = (planningUnitList[j].multiplier).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");;
-            data[5] = planningUnitList[j].countOfSpPrograms + planningUnitList[j].countOfFcPrograms;
-            data[6] = planningUnitList[j].lastModifiedBy.username;
-            data[7] = (planningUnitList[j].lastModifiedDate ? moment(planningUnitList[j].lastModifiedDate).format(`YYYY-MM-DD`) : null)
-            data[8] = planningUnitList[j].active;
-            planningUnitArray[count] = data;
+            data[0] = planningUnitDraft[j].productNameNoPack
+            data[1] = planningUnitDraft[j].subcategory
+            data[2] = planningUnitDraft[j].supplier
+            planningUnitDraftArray[count] = data;
             count++;
         }
         this.el = jexcel(document.getElementById("tableDiv"), '');
         jexcel.destroy(document.getElementById("tableDiv"), true);
-        var data = planningUnitArray;
+        var data = planningUnitDraftArray;
         var options = {
             data: data,
             columnDrag: false,
@@ -349,35 +343,6 @@ export default class PlanningUnitDraft extends Component {
                 {
                     title: i18n.t('static.planningUnit.associatedForecastingUnit'),
                     type: 'text',
-                },
-                {
-                    title: i18n.t('static.planningUnit.planningUnitOfMeasure'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.planningUnit.labelMultiplier'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.program.noOfProgramsUsingPU'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.common.lastModifiedBy'),
-                    type: 'text',
-                },
-                {
-                    title: i18n.t('static.common.lastModifiedDate'),
-                    type: 'calendar',
-                    options: { format: JEXCEL_DATE_FORMAT_SM },
-                },
-                {
-                    type: 'dropdown',
-                    title: i18n.t('static.common.status'),
-                    source: [
-                        { id: true, name: i18n.t('static.common.active') },
-                        { id: false, name: i18n.t('static.dataentry.inactive') }
-                    ]
                 },
             ],
             editable: false,
@@ -444,6 +409,9 @@ export default class PlanningUnitDraft extends Component {
     componentDidMount() {
         PlanningUnitDraftService.getDraftPlanningUnits().then(response => {
             console.log(response);
+            this.setState({planningUnitDraft:response.data},()=>{
+                this.buildJExcel();
+            })
         }).catch(error => {
                 if (error.message === "Network Error") {
                     this.setState({
