@@ -1,0 +1,9 @@
+services:
+  app:
+    build:
+      context: .
+      target: builder
+    ports:
+      - "${PORT:-4202}:${PORT:-4202}"
+    env_file:
+      - .env 

@@ -1,8 +1,18 @@
+// Environment variables
+export const PORT = process.env.REACT_APP_PORT;
+export const API_URL = process.env.REACT_APP_API_URL;
+export const SECRET_KEY = process.env.REACT_APP_SECRET_KEY;
+export const ENCRYPTION_EXPORT_PASSWORD = process.env.REACT_APP_ENCRYPTION_PASSWORD;
+export const JEXCEL_PRO_KEY = process.env.REACT_APP_JEXCEL_PRO_KEY;
+export const ASSIGNEE_ID_FOR_BUG_ISSUE = process.env.REACT_APP_ASSIGNEE_BUG;
+export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = process.env.REACT_APP_ASSIGNEE_NON_BUG;
+export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = process.env.REACT_APP_ASSIGNEE_CHANGE_REQUEST;
+
 // export const API_URL='https://fasp.altius.cc/FASP'
 // export const API_URL='https://api-mod2.altius.cc'
 // export const API_URL = 'https://uatqatapi.altius.cc'
 // export const API_URL = 'http://server6.altius.cc:8080/FASP'
-export const API_URL = 'http://localhost:8084'
+// export const API_URL = 'http://localhost:8084'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
 // export const API_URL = 'https://api.quantificationanalytics.org'
@@ -17,7 +27,6 @@ export const API_URL = 'http://localhost:8084'
 export const JIRA_SUBJECT_PREFIX_UAT = 'UAT - '
 export const JIRA_SUBJECT_PREFIX_DEMO = 'DEMO - '
 
-export const SECRET_KEY = 'afhghggrehreqiuhrjhjdbfjehgfuoerhfjhfyguayaegrf'
 export const MONTHS_IN_PAST_FOR_SUPPLY_PLAN = 3;
 export const TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN = 18
 export const MONTHS_IN_PAST_FOR_AMC = 3
@@ -97,7 +106,6 @@ export const QAT_HELPDESK_CUSTOMER_PORTAL_URL = 'https://qathelpdesk.atlassian.n
 export const JEXCEL_MONTH_PICKER_FORMAT = "Mon-YYYY"
 export const FINAL_VERSION_TYPE = 2;
 export const OPEN_PROBLEM_STATUS_ID = 1
-export const JEXCEL_PRO_KEY = "Y2NkZmExMmFlNDE2OTg0ZWMwZWU5MzVkM2ZlOGI0YzY2NjkwZGFmNmY0ZTQ2M2I3MTI2M2I4ODljZTNmY2EyZDkyMTZkZWQ2YzZmYTRkN2I5YzY0OTRhNWViZjRiNGU1ODgwNjQzMDRiNzJhOWYzZmU5NWRkN2Q0Y2UxNTc3NmYsZXlKdVlXMWxJam9pUVd4MGFYVnpJRU4xYzNSdmJXVnlJRk5sY25acFkyVnpJRkIyZENCTWRHUWlMQ0prWVhSbElqbzBOemMwTVRFNE5EQXdMQ0prYjIxaGFXNGlPbHNpYkc5allXeG9iM04wSWl3aWNYVmhiblJwWm1sallYUnBiMjVoYm1Gc2VYUnBZM011YjNKbklpd2lZV3gwYVhWekxtTmpJaXdpYlc5a01pNWhiSFJwZFhNdVkyTWlMQ0pzYjJOaGJHaHZjM1FpWFN3aWNHeGhiaUk2SWpJeElpd2ljMk52Y0dVaU9sc2lkamNpTENKMk9DSXNJblk1SWwxOQ=="
 export const SPECIAL_CHARECTER_WITHOUT_NUM = /^([^0-9\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM = /^([^\s])+$/
 export const SPECIAL_CHARECTER_WITH_NUM_NODOUBLESPACE = /^(?!.*\s\s)\S(.*\S)?$/
@@ -105,9 +113,6 @@ export const JEXCEL_DECIMAL_NO_REGEX_FOR_MULTIPLIER = /^\d{0,10}(\.\d{1,6})?$/
 export const JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY = /^[0-9]{0,15}$/
 export const JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY = /^[-+]?\d{0,15}$/
 export const JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY = /^\d{0,15}(\.\d{1,2})?$/
-export const ASSIGNEE_ID_FOR_BUG_ISSUE = "5f1af96c4be9da001d844be3"
-export const ASSIGNEE_ID_FOR_NON_BUG_ISSUE = "5e95b3262b755a0c091b38a1"
-export const ASSIGNEE_ID_FOR_CHANGE_REQUEST = "5f1af96c4be9da001d844be3"
 export const JIRA_PROJECT_ISSUE_TYPE_CHANGE_REQUEST = 'Change Request'
 export const JEXCEL_PIPELINE_CONVERSION_FACTOR = /^\d{0,10}(\.\d{1,6})?$/
 export const FORECASTED_CONSUMPTION_MODIFIED = 1;
@@ -115,7 +120,7 @@ export const ACTUAL_CONSUMPTION_MODIFIED = 2;
 export const INVENTORY_MODIFIED = 3;
 export const ADJUSTMENT_MODIFIED = 4;
 export const SHIPMENT_MODIFIED = 5;
-export const APPLICATION_STATUS_URL = API_URL + "/actuator/health"
+export const APPLICATION_STATUS_URL = `${API_URL}/actuator/health`
 export const PROBLEM_STATUS_IN_COMPLIANCE = 4
 export const MAX_PROGRAM_CODE_LENGTH = 50;
 export const TREE_DIMENSION_ID = 5;
@@ -143,7 +148,6 @@ export const PROGRAM_TYPE_DATASET = 2;
 export const COMPRESS_LIMIT_SIZE = 2;
 export const MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS=76;
 export const INTERPOLATE_DATA_SOURCE_ID=4;
-export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";
 export const DRAFT_VERSION_TYPE = 1;
 export const DECIMAL_NO_REGEX_8_DECIMALS = /^\d+(\.\d{1,8})?$/
 export const JEXCEL_DECIMAL_MONTHLY_CHANGE_8_DECIMAL_POSITIVE = /^\d{0,10}(\.\d{1,8})?$/

@@ -1,6 +1,8 @@
 const HtmlWebPackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const WorkboxPlugin = require('workbox-webpack-plugin');
+const webpack = require('webpack');
+const Dotenv = require('dotenv-webpack');
 // var enUs = require( 'json-loader!../public/locales/en.json' );
 // var en = require('./public/locales/en.json');
 // const en = require('./public/locales/en.json');
@@ -14,7 +16,8 @@ module.exports = {
         publicPath: '/'
     },
     devServer: {
-        port: 4202,
+        port: process.env.PORT || 4202,
+        host: '0.0.0.0',
         historyApiFallback: true,
         compress: true, 
         disableHostCheck: true
@@ -139,6 +142,9 @@ module.exports = {
             swDest: "faspsw.js",
             maximumFileSizeToCacheInBytes: 30 * 1024 * 1024
             // swSrc: './src/sw.js',
+        }),
+        new Dotenv({
+            systemvars: true, // Load Docker environment variables
         })
         // new WorkboxPlugin.GenerateSW({
         //     // Do not precache images
