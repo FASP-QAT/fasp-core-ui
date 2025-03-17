@@ -107,6 +107,7 @@
 											<li>Examinez les prévisions disponibles en utilisant les informations
 												suivantes sur le
 												écran:<ul type="a">
+<<<<<<< HEAD
 													<li> <b>Erreur de prévision (%) :</b> cette erreur est calculée à
 														l'aide du
 														Calcul du pourcentage d'erreur absolue pondérée (WAPE). Si le
@@ -127,6 +128,14 @@
 														ou
 														en dessous de la prévision de consommation la plus basse. La
 														comparaison sera
+=======
+													<li> <b>Erreur de prévision (%) :</b> cette erreur est calculée à l'aide du calcul du pourcentage d'erreur absolue pondérée (WAPE) de la même manière qu'elle est calculée dans l'écran Extrapolation de la consommation. Si l'erreur de prévision est mise en évidence dans <span
+														style="color:#86cd99">texte vert</span>, cette prévision présente l'erreur de prévision la plus faible parmi les prévisions disponibles. </li>
+													<li> <b>Comparer aux prévisions de consommation :</b> les comparaisons QAT disponibles
+														Prévisions de consommation et prévisions d'arbres. Pour n'importe quel arbre
+														Prévisions, QAT signalera le pourcentage supérieur au plus élevé ou
+														en dessous de la prévision de consommation la plus basse. La comparaison sera
+>>>>>>> QAT-5208
 														surligné en <span style="color: rgb(186, 12, 47);">rouge
 															texte</span> s'il est en dehors des pourcentages de seuil
 														défini par l'utilisateur dans le <br> <a
@@ -149,7 +158,21 @@
 																les données en italique violet</span></b> se situent
 														dans la
 														période de prévision.
-													</li>
+</li>
+<li><b>Affichage des prévisions sous forme d'agrégations d'année civile ou d'exercice fiscal :</b>
+	par défaut, QAT affiche les prévisions en chiffres mensuels, mais les utilisateurs ont le 
+	possibilité d'afficher une agrégation de ces chiffres par année civile ou par exercice
+	 année (et en définissant le début/la fin de l’année fiscale qui 
+	 fonctionne dans son contexte).
+	 <ul>
+		<li>
+			Lorsque vous choisissez d'afficher par année civile/fiscale, un nouveau tableau apparaît 
+			entre le graphique et le tableau de données détaillées. Ce nouveau tableau montre 
+			les valeurs prévisionnelles globales par année civile ou fiscale, et désigne 
+			le nombre de mois utilisé dans le calcul pour cette année. 
+		</li>
+	 </ul> 
+</li>
 												</ul>
 											</li>
 											<li>
@@ -172,6 +195,14 @@
 													target="_blank" style="text-decoration: underline;">Mensuel
 													Prévisions</a> pour vérifier toutes les unités de planification
 												ensemble.
+											</li>
+											<li>
+												Répétez les étapes 1 à 3 pour chaque unité de planification et région jusqu'à ce qu'il n'y ait plus de <i class="fa fa-exclamation-triangle"
+												Les symboles aria-hidden="true"></i> restent. Une fois terminé, continuez vers le <a href="/#/forecastReport/forecastOutput"
+												target="_blank" style="text-decoration: underline;">Mensuel
+												Prévisions</a>
+												pour vérifier toutes les unités de planification ensemble. 
+
 											</li>
 										</ol>
 										<p style="font-style: italic;">Remarque : Les utilisateurs peuvent sélectionner plusieurs prévisions d'arbres comme prévision finale, ce qui

@@ -91,19 +91,9 @@
 												previsão específica.</li>
 											<li>Revise as previsões disponíveis usando as seguintes informações na tela:
 												<ul type="a">
-													<li><b>Erro de previsão (%):</b> este erro é calculado usando o
-														Cálculo do erro percentual absoluto ponderado (WAPE). Se o
-														erro de previsão é destacado em <span
-															style="color: #86cd99;">texto verde</span>, este
-														previsão tem o menor erro de previsão dentre os disponíveis
-														previsões. Exemplo de cálculo WAPE usando o padrão de 6 meses
-														janela de tempo: <img class="img-fluid"
-															src="/ForecastError-Formula.png"><br>Se 6 meses de dados
-														forem
-														não estiver disponível, o QAT utilizará quantos meses estiverem
-														disponíveis e
-														indique-o nesta coluna.
-													</li>
+													<li> <b>Erro de Previsão (%):</b> este erro é calculado usando o cálculo do Erro Percentual Absoluto Ponderado (WAPE) da mesma maneira que é calculado na tela Extrapolação de Consumo. Se o erro de previsão estiver destacado em <span
+														style="color:#86cd99">texto verde</span>, esta previsão tem o menor erro de previsão entre as previsões disponíveis. </li>
+
 													<li> <b>Comparar com a previsão de consumo:</b> comparações QAT
 														disponíveis
 														Previsões de consumo e previsões de árvores. Para qualquer
@@ -132,6 +122,20 @@
 																os dados roxos em itálico</span></b> se enquadram no
 														período de previsão.
 													</li>
+													<li><b>Visualização das previsões em agregações de ano civil ou ano fiscal:</b>
+														por padrão, o QAT mostra a previsão em números mensais, mas os usuários têm a opção 
+														opção de visualizar uma agregação desses números por ano civil ou por ano fiscal
+														 ano (e definindo o início/fim do ano fiscal que 
+														 funciona em seu contexto).
+														 <ul>
+															<li>
+																Ao optar pela visualização por ano civil/ano fiscal, aparece uma nova tabela 
+																entre o gráfico e a tabela de dados detalhada. Esta nova tabela mostra 
+																os valores agregados de previsão por ano civil ou fiscal e denota 
+																o número de meses utilizados no cálculo daquele ano. 
+															</li>
+														 </ul> 
+													</li>
 												</ul>
 											</li>
 											<li>
@@ -151,6 +155,14 @@
 												continue em frente para <a href="/#/forecastReport/forecastOutput"
 													target="_blank" style="text-decoration: underline;">Mensalmente
 													Previsão</a> para verificar todas as unidades de planejamento juntas.
+											</li>
+											<li>
+												Repita as etapas 1 a 3 para cada unidade de planejamento e região até que não haja mais <i class="fa fa-exclamation-triangle"
+												os símbolos aria-hidden="true"></i> permanecem. Depois de concluído, prossiga para <a href="/#/forecastReport/forecastOutput"
+												target="_blank" style="text-decoration: underline;">Mensalmente
+												Previsão</a>
+												para verificar todas as unidades de planejamento juntas. 
+
 											</li>
 										</ol>
 										<p style="font-style: italic;">Nota: Os usuários podem selecionar várias previsões de árvores como previsão final, o que

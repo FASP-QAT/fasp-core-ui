@@ -51,33 +51,92 @@ a {
 									<td style="padding:0 0 10px 0;color:#153643;">
 										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Gestion de l'arbre de prévision - Construire des arbres de prévision</h3>
 										<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">But</span> Permettre aux utilisateurs de gérer et de construire des arbres de prévision et des scénarios, pour toutes prévisions autres que les consommations (démographique, morbidité, services, etc.). Notez que plus d'informations sont disponibles après avoir cliqué sur un quelconque nœud .</p>
-										<p>
-											<p style="font-size: 13px;">
-												<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Utilisation de cet écran :</span>
-												<br><span style="font-weight: bold;">Gérer l'arbre de prévision:</span> Cliquez sur l'icône de réglages <i class="fa fa-cog" aria-hidden="true"></i> pour afficher et modifier ou masquer la méthode de 
-												prévision, le nom de l'arbre de prévision et la région.</p>
-												<p style="font-size: 13px;">
-													<span style="font-weight: bold; font-size: 13px;">Construire l'arbre de prévision:</span>L'arbre de prévision est construit de haut en bas, en utilisant différents types de « nœuds ». 
-													Voir les types de nœuds et les actions de nœud ci-dessous. Chaque arbre de prévision 
-													doit inclure un ou plusieurs nœuds d'unité de planification, qui constituent les extrants 
-													de la prévision, pour que cet arbre soit disponible dans lécran "<a href="/#/report/compareAndSelectScenario" target="_blank">Comparaison  et 
-													sélection</a>. Chaque Nœud d'Unité de Planification doit être issu dun Nœud d'Unité de 
-													Prévision.  
-												</p>
-										</p>
-										<p>
-											<p style="font-size: 13px; font-weight: bold;">
-												<span class="">Actions de nœud :</span>
-											</p>
+										
+										<p style="font-size: 13px;">
+											<span
+												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">En utilisant cet écran :</span> <!--Using this screen : -->
+											<br>
+											<!-- Start of Navigation sec -->
+											<span style="font-weight: bold;">Navigation:</span> <!-- Navigation heading -->
 											<ul class="pl-lg-4" style="font-size: 13px;">
-												<li><i class="fa fa-trash-o" aria-hidden="true" ></i> Supprimer : Supprime le nœud sélectionné </li>
-												<li><i class="fa fa-clone" aria-hidden="true" ></i> Dupliquer : Duplique le nœud sélectionné sous le même Noeud Source </li>
-												<li><i class="fa fa-plus-square-o" aria-hidden="true"></i> Ajouter : ajoute un noeud dérivé du nœud sélectionné.</li>
+												<li>Commencez par sélectionner le <strong>programme</strong> et <strong>l'arborescence</strong> dans les listes déroulantes. Notez que seuls les programmes téléchargés sont disponibles. Cliquez sur l'icône d'engrenage <i class="fa fa-cog" aria-hidden="true"></i> pour afficher/masquer ou modifier les détails de l'arbre (méthode de prévision, nom de l'arbre et région).
+
+												</li> <!-- Point 1 -->
+												<li>Voir la section ci-dessous pour les <strong>scénarios</strong>.</li> <!-- Point 2 -->
+												<li>Les valeurs des nœuds de l'arborescence sont affichées dans la date affichée dans la <strong>date d'affichage</strong>. Modifiez cette date pour voir les valeurs des autres mois.</li> <!-- Point 3 -->
+												
+												<li>Les utilisateurs peuvent également modifier l'arborescence dans l'écran <a href="/#/dataSet/treeTable/tree/{{treeId}}/{{programId}}" target="_blank">Tree Table</a>, ce qui permet la modification par lots des valeurs de nœud, mais n'autorise aucune modification de la structure de l'arborescence ni aucune modification au fil du temps.</li> <!-- Point 4 -->
+
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"
+													id="checkBox1"
+													name="checkBox1"																										
+												/>
+												<strong>Cases à cocher « Masquer »</strong> - utilisez ces cases à cocher pour masquer certains éléments de l'arborescence pour un affichage plus propre.</li><!-- Point 5 -->
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"
+													id="checkBox2"
+													name="checkBox2"																										
+												/>
+												<strong>Calcul automatique</strong> - Si QAT est lent lors de la modification de votre arbre, décochez la case de calcul automatique pour arrêter les calculs. Pour mettre à jour les calculs, cochez à nouveau la case « Calculer automatiquement » ou cliquez sur l'icône Recalculer <i class="fa fa-refresh" aria-hidden="true"></i>.</li><!-- Point 6 -->
+												<li>Cliquez sur l'arborescence <strong>Niveaux</strong> (cases rectangulaires bleu foncé à gauche de l'arborescence) pour :</li><!-- Point 7 -->
+												<ul>
+													<li>Nommez les niveaux d’un arbre. Cela rendra l'arborescence plus facile à lire et sera utilisée dans les listes déroulantes et les axes de l'écran de <a href="/#/validation/modelingValidation" target="_blank">validation de la modélisation</a>.</li><!-- Point 7.1 -->
+													<li>Réorganisez les branches de votre arbre comme vous le souhaitez en utilisant les flèches haut et bas pour indiquer la position des branches de gauche à droite. Si la liste est longue, utilisez la liste déroulante « voir les enfants de » pour filtrer les nœuds.</li> <!-- Point 7.2 -->
+												</ul>
+											</ul>
+											<!-- end of Navigation sec -->										
+											
+										</p>
+
+										<!-- Start of Building the Tree para -->
+										<p style="font-size: 13px;"><span
+												style="font-weight: bold; font-size: 13px;">Construire l'arbre :</span>L’arbre de prévision est construit de haut en bas, en utilisant différents types de « nœuds ».  
+												Voir les types de nœuds et les actions de nœud ci-dessous. Chaque arbre de prévision doit inclure un ou plusieurs nœuds d'unité de planification, qui forment la sortie de prévision, pour que cet arbre soit disponible dans l'écran « <a href="/#/report/compareAndSelectScenario" target="_blank">Comparer et sélectionner</a> ». 
+												Chaque nœud d'unité de planification doit provenir d'un nœud d'unité de prévision. 
+										</p>
+
+										<!-- end of Building the Tree para -->
+
+										<!-- Start of Node Actions sec -->
+										<p>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Actions du nœud :</span></p>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Cliquez sur un nœud pour l'ouvrir pour le modifier ou le visualiser.</li>
+												<li>Passez la souris sur un nœud pour afficher les notes du nœud sans ouvrir le nœud.</li>
+												<li><i class="fa fa-paste"></i><strong>Copier / Déplacer</strong>: Copie ou déplace le nœud sélectionné et tous ses enfants. L'utilisateur peut sélectionner la destination.
+												</li>
+
+												<li><i class="fa fa-trash-o" aria-hidden="true"
+														></i> <strong>Supprimer </strong>: supprime le nœud sélectionné et tous ses enfants.</li>
+												<li><i class="fa fa-sitemap" aria-hidden="true"
+														></i> <strong>Ajouter un modèle de branche </strong>: ajoute un modèle d'arborescence sous forme de branche sous le nœud choisi. </li>
+												<li><i class="fa fa-plus-square-o" aria-hidden="true"
+														></i> <strong>Ajouter </strong>: ajoute un nœud enfant au nœud sélectionné.</li>
+
+												<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Réduire/Agrandir </strong>: Réduire/Agrandir le nœud actuel et tous ses enfants.</li>
+												<ul>
+													<li>En mode réduit, les nœuds seront représentés par des points. Passez la souris sur n'importe quel point/nœud et cliquez une fois pour développer ce nœud et tous ses enfants.</li>
+													<li>Case à cocher «<strong> Réduire l'arbre </strong>» 
+														<Input
+															className="form-check-input checkboxMargin"
+															type="checkbox"
+															id="checkBox2"
+															name="checkBox2"																										
+														/> 
+														en haut de l'écran qui réduit chaque nœud à l'exception du nœud supérieur.
+													</li>
+												</ul>
 											</ul>
 										</p>
+										<!-- End of Node Actions sec -->
+
+										<!-- Start of Node Types sec -->
 										<p>
 											<p style="font-size: 13px; font-weight: bold;">
-												<span class="">Type de nœud  :</span>
+												<span class="">Types de nœuds :</span>
 											</p>
 											<div class="pl-lg-4 pr-lg-4 table1">
 												<table  style="border-collapse: collapse;">
@@ -99,39 +158,53 @@ a {
 														<tr>
 															<td class="BgLightBlue"><b>Nombre #</b></td>
 															<td>Défini à ce nœud</td>
-															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>% ou <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
 														</tr>
 														<tr>
 															<td class="BgLightBlue"><b>Pourcentage %</b></td>
 															<td>Un pourcentage du parent/source</td>
-															<td>% or <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>% ou <b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
 														</tr>
-														<tr>
+
+														<tr> <!--  Funnel  -->
+															<td style="background:#002f6c;color: #fff;"><b>Entonnoir <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
+															<td>Somme des nœuds sources liés
+																(<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i>)</td>
+															<td>% ou</td>
+															<td>-</td>
+														</tr>
+
+														<tr> <!-- Forecasting Unit-->
 															<td class="BgDarkBlue"><b>Unité de prévision <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-															<td>Un pourcentage de la source et des paramètres de l'unité de prévision</td>
+															<td>Un pourcentage des paramètres du parent et de l'unité de prévision. Il peut s'agir de deux types d'utilisation différents :
+																<br>
+																<b style="background: #002f6c;">
+																	<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;c </b>
+																</b>: Continu
+																<br>
+																<b style="background: #002f6c;">
+																	<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;d </b>
+																</b>: Discret
+															</td>
 															<td><b style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 														</tr>
-														<tr>
+														<tr> <!-- Planning Unit-->
 															<td class="BgDarkBlue"><b>Unité de planification <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
 															<td>Un pourcentage des paramètres du parent et de l'unité de planification
 															</td>
 															<td>-</td>
 															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
 														</tr>
-														<tr>
-															<td style="background:#002f6c;color: #fff;"><b>Entonnoir <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
-															<td>Somme des nœuds sources liés
-																<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
-															<td>% or</td>
-															<td>-</td>
-														</tr>
+														
 													</tbody>
 												</table>
 											</div>
 										</p>
+										<!-- End of Node Types sec -->
+
 										<p style="font-size: 13px;">
 											<span style="font-size: 13px; font-weight: bold;">Variations au fil du temps</span>
 											<p>Bien que la structure arborescente reste constante dans le temps, les pourcentages et les valeurs des nœuds peuvent changer au fil du temps. Utilisez le menu déroulant des dates pour afficher l'arborescence à n'importe quel mois. Les trois fonctionnalités ci-dessous sont disponibles dans chaque nœud et permettent à l'utilisateur de contrôler la façon dont les nœuds évoluent au fil du temps :</p>
@@ -168,11 +241,15 @@ a {
 														</tr>
 														<tr>
 															<td>Type de nœud</td>
-															<td>Notes</td>
+															<td>Remarques</td>
 														</tr>
 														<tr>
 															<td></td>
 															<td>Modélisation/Transfert/Extrapolation</td>
+														</tr>
+														<tr>
+															<td></td>
+															<td>Connexions de l'entonnoir</td>
 														</tr>
 													</tbody>
 												</table>

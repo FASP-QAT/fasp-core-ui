@@ -576,7 +576,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
         var consumptionBatchEditable = consumptionEditable;
         var lastEditableDate = "";
         lastEditableDate = moment(Date.now()).subtract(this.state.realm.actualConsumptionMonthsInPast + 1, 'months').format("YYYY-MM-DD");
-        if (moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[13] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+        if (rowData[15] > 0 && moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[13] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
             consumptionBatchEditable = false;
         }
         if (document.getElementById("showConsumptionBatchInfoButtonsDiv") != null) {

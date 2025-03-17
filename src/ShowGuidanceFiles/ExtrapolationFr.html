@@ -266,6 +266,61 @@
 					</ul>
 				</p>
 			</p>
+
+			<b style="font-size: 13px;">5. Optimisation des paramètres de prévision TES et ARIMA</b>
+			<p class="pl-lg-3" style="font-size: 13px;">
+				
+				<p>QAT offre aux utilisateurs plusieurs options d'extrapolation, notamment TES et ARIMA saisonnier et non saisonnier. Les utilisateurs sont libres de 
+					utiliser les valeurs par défaut de QAT ou saisir des paramètres de prévision alternatifs dans le but de réduire ainsi les métriques d'erreur 
+					l'augmentation de la correspondance entre la méthode de prévision produit les points de données réels dans la période de données historiques. 
+					Si l'utilisateur travaille en ligne, QAT peut optimiser les paramètres TES et ARIMA par itération, en calculant le RMSE de chaque itération, 
+					et sélectionner les paramètres qui produisent le RMSE le plus bas.</p> 
+
+				<p>Pour TES, QAT calcule 125 itérations de la prévision, testant chacun des paramètres alpha, bêta et gamma en combinaison avec le 
+					valeurs suivantes : 0, 0.2, 0.4, 0.8 et 1. Laquelle des 125 combinaisons pour un produit donné produit le résultat avec 
+					le RMSE le plus bas sera affiché sur l’écran d’extrapolation.</p>
+
+				<p>
+					Pour ARIMA ou ARIMA saisonnier, QAT calcule 24 itérations de la prévision, testant chacun des paramètres p, d et q en combinaison, en utilisant les valeurs suivantes:
+				</p>
+				<ul>
+					<li>p: 0 ou 1</li>
+					<li>d: 0, 1 ou 2</li>
+					<li>q: 0, 1, 2 ou 3</li>
+				</ul>
+				
+				<p>Laquelle des 24 combinaisons pour un produit donné produit le résultat ARIMA avec le RMSE le plus bas sera affichée sur l'écran d'extrapolation.</p>
+				
+			</p>
+
+			<b style="font-size: 13px;">6. Extrapolation globale</b>
+			<p class="pl-lg-3" style="font-size: 13px;">
+				<p>
+					Dans l'écran d'extrapolation QAT, l'utilisateur peut comparer les résultats des différentes méthodes d'extrapolation à la fois graphiquement et 
+					dans un tableau de sortie, produit par produit. Cela permet à l'utilisateur de désélectionner les méthodes d'extrapolation qui, selon lui, ne s'appliquent pas. 
+					à un produit donné pour limiter les options de l'écran Comparer et sélectionner uniquement celles que l'utilisateur choisit d'afficher.
+				</p>
+
+				<p>
+					Si l'utilisateur préfère envoyer directement toutes les sorties des méthodes d'extrapolation disponibles pour plusieurs produits 
+					Sur l'écran Comparer et sélectionner, l'utilisateur peut sélectionner l'extrapolation groupée. Dans la fenêtre contextuelle Extrapolation groupée, 
+					l'utilisateur peut ensuite sélectionner une plage de dates historiques à partir de laquelle extrapoler la prévision (une seule plage de dates par extrapolation groupée), 
+					s'il faut appliquer la saisonnalité à leur calcul ARIMA, quelles unités de planification et régions (si des données régionales sont utilisées) inclure dans 
+					l'extrapolation globale et s'il convient ou non d'optimiser les paramètres ARIMA et TES pour l'extrapolation.
+				</p>
+
+				<p>
+					Après avoir exécuté l'extrapolation globale, tous les résultats peuvent être visualisés dans l'écran d'extrapolation, l'écran de comparaison et de sélection et 
+					la liste déroulante de l'écran Récapitulatif des prévisions (régional). L'utilisateur peut sélectionner sa méthode d'extrapolation préférée parmi 
+					l’écran Comparer et sélectionner ou l’écran Récapitulatif des prévisions (régional).
+				</p>
+
+				<p>
+					L'extrapolation globale dans QAT est particulièrement utile lorsque l'on travaille avec un large ensemble de produits pour lesquels des informations opportunes, complètes et 
+					des données de consommation précises sont disponibles pour 12 mois ou plus.
+				</p>
+			</p>
+
 			<p style="font-size: 13px;"><b>Note :  Vous avez 0 mois de données sur la consommation réelle. Les valeurs minimales nécessaires pour les différentes fonctionnalités sont ci-dessous: <br><span class="ml-lg-5">* LET, Holt-Winters: Au moins 24 mois de données de consommation réelle<br></span><span class="ml-lg-5">* ARIMA:  Au moins 14 mois de données de consommation réelle<br></span><span class="ml-lg-5">* Moyenne mobile, semi-moyennes et régression linéaire: Au moins 3 mois de données de consommation réelle</span></b></p>
 							
 				</td>

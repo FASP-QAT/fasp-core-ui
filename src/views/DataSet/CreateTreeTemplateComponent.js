@@ -8019,7 +8019,8 @@ export default class CreateTreeTemplate extends Component {
                         tempItems: items,
                         toggleArray: tempToggleList,
                         loading: true,
-                        treeTemplateList: treeTemplateList
+                        treeTemplateList: treeTemplateList,
+                        cursorItem: items[0].id
                     }, () => {
                         setTimeout(() => {
                             this.generateMonthList();
@@ -8032,6 +8033,11 @@ export default class CreateTreeTemplate extends Component {
                                 maxDate: maxMonth
                             }, () => {
                                 this.calculateMOMData(1, 0);
+                                setTimeout(() => {
+                                    this.setState({
+                                        cursorItem: null
+                                    })
+                                }, 2000)
                             })
                         }, 0)
                     })
@@ -11147,7 +11153,7 @@ export default class CreateTreeTemplate extends Component {
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.usageType.id == 1 && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != "true" && this.state.currentItemConfig.context.payload.nodeDataMap[0][0].fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId" className='LabelWd'>{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"

@@ -238,6 +238,61 @@
 								</p>
 							</ul>
 						</p>
+
+						<b style="font-size: 13px;">5. Optimization of TES and ARIMA forecast parameters</b>
+						<p class="pl-lg-3" style="font-size: 13px;">
+							
+							<p>QAT offers the users multiple extrapolation options including TES and seasonal and non-seasonal ARIMA. Users are free to 
+							use the QAT defaults or to enter alternative forecasting parameters with the intention of reducing the error metrics thereby 
+							increasing the correspondence between the forecast method outputs the real datapoints in the historical data period. 
+							If the user is working online, QAT can optimize the TES and ARIMA parameters by iterating, calculating the RMSE of each iteration, 
+							and selecting the parameters that produce the lowest RMSE.</p> 
+
+							<p>For TES, QAT calculates 125 iterations of the forecast, testing each of the alpha, beta and gamma parameters in combination with the 
+							following values: 0, 0.2, 0.4, 0.8 and 1. Whichever of the 125 combinations for a given product produces the result with 
+							the lowest RMSE will be displayed in the extrapolation screen.</p>
+
+							<p>
+								For ARIMA or seasonal ARIMA, QAT calculates 24 iterations of the forecast, testing each of the p, d and q parameters in combination, using the following values: 
+							</p>
+							<ul>
+								<li>p: 0 or 1</li>
+								<li>d: 0, 1 or 2</li>
+								<li>q: 0, 1, 2 or 3</li>
+							</ul>
+							
+							<p>Whichever of the 24 combinations for a given product produces the ARIMA result with the lowest RMSE will be displayed in the extrapolation screen. </p>
+							
+						</p>
+
+						<b style="font-size: 13px;">6. Bulk Extrapolation</b>
+						<p class="pl-lg-3" style="font-size: 13px;">
+							<p>
+								In the QAT extrapolation screen, the user can compare the outputs of the various extrapolation methods both graphically and 
+								in an output table, product by product. This allows the user to de-select extrapolation methods that they feel do not apply 
+								to a given product to limit the options in the Compare and Select screen to only those the user chooses to display.
+							</p>
+
+							<p>
+								If the user would prefer to send all the outputs of the available extrapolation methods for more than one product directly 
+								to the Compare and Select screen, the user can select bulk extrapolation. From the Bulk Extrapolation pop-up window, 
+								the user may then select an historical date range from which to extrapolate the forecast (only one date range per bulk extrapolation), 
+								whether to apply seasonality to their ARIMA calculation, which planning units and regions (if regional data are used) to include in 
+								the bulk extrapolation and whether or not to optimize ARIMA and TES parameters for the extrapolation.
+							</p>
+
+							<p>
+								After running the bulk extrapolation, all results can be viewed in the Extrapolation Screen, the Compare and Select Screen and 
+								the Forecast Summary (regional) Screen dropdown box. The user may select their preferred extrapolation method from either 
+								the Compare and Select Screen or the Forecast Summary (regional) Screen.
+							</p>
+
+							<p>
+								Bulk extrapolation in QAT is particularly useful when working with a large set of products for which timely, complete and 
+								accurate consumption data is available for 12 or more months.
+							</p>
+						</p>						
+
 					</p>
 		<p style="font-size: 13px;"><b>Note :  You have 0 months of acutal consumption data. The minimum values needed 
 			for the various features are below: <br><span class="ml-lg-5">* TES, Holt-Winters: At 

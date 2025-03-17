@@ -625,10 +625,11 @@ class ListUserComponent extends Component {
             data = [];
             data[0] = userAclList[j].userId
             data[1] = userAclList[j].username
-            data[2] = (userAclList[j].countryName == "" || userAclList[j].countryName == null ? "All" : userAclList[j].countryName.label_en).toString();
-            data[3] = (userAclList[j].healthAreaName == "" || userAclList[j].healthAreaName == null ? "All" : userAclList[j].healthAreaName.label_en).toString();
-            data[4] = (userAclList[j].organisationName == "" || userAclList[j].organisationName == null ? "All" : userAclList[j].organisationName.label_en).toString();
-            data[5] = (userAclList[j].programName == "" || userAclList[j].programName == null ? "All" : userAclList[j].programName.label_en).toString();
+            data[2] = getLabelText(userAclList[j].roleDesc,this.state.lang)
+            data[3] = (userAclList[j].countryName == "" || userAclList[j].countryName == null ? "All" : userAclList[j].countryName.label_en).toString();
+            data[4] = (userAclList[j].healthAreaName == "" || userAclList[j].healthAreaName == null ? "All" : userAclList[j].healthAreaName.label_en).toString();
+            data[5] = (userAclList[j].organisationName == "" || userAclList[j].organisationName == null ? "All" : userAclList[j].organisationName.label_en).toString();
+            data[6] = (userAclList[j].programName == "" || userAclList[j].programName == null ? "All" : userAclList[j].programName.label_en).toString();
             userArray[count] = data;
             count++;
         }
@@ -647,6 +648,10 @@ class ListUserComponent extends Component {
                 },
                 {
                     title: i18n.t('static.user.username'),
+                    type: 'text',
+                },
+                {
+                    title: i18n.t('static.roleHead.role'),
                     type: 'text',
                 },
                 {
