@@ -52,64 +52,96 @@ a {
 										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Tree Table</h3>
 										
 										<p>
+											<p style="font-size: 13px;"><span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Purpose</span> Allow batch editing of node values. Note: This screen does not allow edits to the structure of the tree or changes over time. Use "Build tree" screen for those changes. </p>
 											<p style="font-size: 13px; font-weight: bold;"><span class="">Node Type:</span></p>
-											<div class="pl-lg-4 pr-lg-4 table1">
-												<table  style="border-collapse: collapse;">
-													<thead>
-														<tr>
-															<th style="width: 130px;">Node Type</th>
-															<th>Value</th>
-															<th>Potential Children</th>
-															<th>Advanced Functionality</th>
-														</tr>
-													</thead>
-													<tbody>
-														<tr>
-															<td style="background: #a7c6ed;color: #002f6c;"><b>Aggregation ∑</b></td>
-															<td>Sum of children</td>
-															<td><b style="color: rgb(0, 47, 108);">∑</b> or #</td>
-															<td>-</td>
-														</tr>
-														<tr>
-															<td style="background: #a7c6ed;color: #002f6c;"><b>Number #</b></td>
-															<td>Defined at this node</td>
-															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i class="fa fa-line-chart"></i>,<i><img class="Iconclr"
-																src="../ShowGuidanceFiles/img/aggregateAllowed.png"
-																width="20" height="20" /></i></td>
-														</tr>
-														<tr>
-															<td style="background: #a7c6ed;color: #002f6c;"><b>Percentage %</b></td>
-															<td>Defined as a percentage of the parent</td>
-															<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cube" aria-hidden="true"></i></b></td>
-															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img class="Iconclr"
-																src="../ShowGuidanceFiles/img/aggregateAllowed.png"
-																width="20" height="20" /></i></td>
-														</tr>
-														<tr>
-															<td style="background:#002f6c;color: #fff;"><b>Forecasting Unit <i class="fa fa-cube" aria-hidden="true"></i></b></td>
-															<td>A percentage of the parent and forecasting unit parameters</td>
-															<td><b style="color: rgb(0, 47, 108); padding: 3px;"><i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-														</tr>
-														<tr>
-															<td style="background:#002f6c;color: #fff;"><b>Planning Unit <i class="fa fa-cubes" aria-hidden="true"></i></b></td>
-															<td>A percentage of the parent and planning unit parameters</td>
-															<td>-</td>
-															<td><i class="fa fa-exchange fa-rotate-90" aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-														</tr>
-														<tr>
-															<td style="background:#002f6c;color: #fff;"><b>Funnel <i><img
-																			src="../ShowGuidanceFiles/img/funnel1.png"
-																			width="18" height="18" /></i></b></td>
-															<td>Sum of linked source nodes <i><img class="Iconclr"
-																		src="../ShowGuidanceFiles/img/aggregateAllowed.png"
-																		width="20" height="20" /></i></td>
-															<td>% or</td>
-															<td>-</td>
-														</tr>
-													</tbody>
-												</table>
+											<div class="pl-lg-4 pr-lg-4">
+												<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+
+									<td style="padding:0 0 10px 0;color:#153643;">
+										
+										<div class="pl-lg-4 pr-lg-4 table1">
+											<table style="border-collapse: collapse;">
+												<thead>
+													<tr>
+														<th style="width: 130px;">Node Type</th>
+														<th>Value</th>
+														<th>Potential Children</th>
+														<th>Advanced Functionality</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Aggregation
+																∑</b></td>
+														<td>Sum of children</td>
+														<td><b style="color: rgb(0, 47, 108);">∑</b> or Number</td>
+														<td>-</td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Number #</b>
+														</td>
+														<td>Defined at this node</td>
+														<td>% or <b style="color: rgb(0, 47, 108); padding: 3px;"><i
+																	class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90"
+																aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i
+																class="fa fa-line-chart"></i><i><img class="img-fluid"
+																	src="/aggregateAllowed.png" width="25px"></i></td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Percentage
+																%</b></td>
+														<td>Defined as a percentage of the parent</td>
+														<td>% or <b style=" color: rgb(0, 47, 108); padding: 3px;"><i
+																	class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90"
+																aria-hidden="true"></i>,<i
+																class="fa fa-link"></i><i><img class="img-fluid"
+																	src="/aggregateAllowed.png" width="25px"></i></td>
+													</tr>
+													<tr>
+														<td style="background: #a7c6ed;color: #002f6c;"><b>Funnel
+																<i><img class="img-fluid" src="/funnel.png"></i></b>
+														</td>
+														<td>Sum of linked source nodes (<i><img
+																	src="/aggregateAllowed.png" width="24"></i>)</td>
+														<td>% or <b style=" color: rgb(0, 47, 108); padding: 3px;"></b>
+														</td>
+														<td>-</td>
+													</tr>
+													
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Forecasting Unit
+																<i class="fa fa-cube" aria-hidden="true"></i></b></td>
+														<td>Defined as a percentage of the parent and forecasting unit
+															parameters. Can be two different use types:
+															<ul>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>C</b></span>:Continuous
+																</li>
+																<li><span
+																		style="background-color: #002f6c;color: #fff;"><b>D</b></span>:Discrete
+																</li>
+															</ul>
+														</td>
+														<td><b style=" color: rgb(0, 47, 108); padding: 3px;"><i
+																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td><i class="fa fa-exchange fa-rotate-90"
+																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+													<tr>
+														<td style="background:#002f6c;color: #fff;"><b>Planning Unit <i
+																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
+														<td>Defined as a percentage of the parent and planning unit
+															parameters</td>
+														<td>-</td>
+														<td><i class="fa fa-exchange fa-rotate-90"
+																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+													</tr>
+												</tbody>
+											</table>
 											</div>
 										</p>
 									
@@ -141,33 +173,158 @@ a {
 															<td></td>
 															<td>Modeling/Transfer/Extrapolation</td>
 														</tr>
+														<tr>
+															<td></td>
+															<td>
+																Funnel Connections </td>
+														</tr>
 													</tbody>
 												</table>
 											</div>
 										</p>
 										<p style="font-size: 13px;">
-											<span classnames="UnderLineText" style="font-size: 13px;"><b>Tips for specific use cases:</b></span>
-											<ul style="font-size: 13px;">
-												<li><b> Forecasting Node-Type :</b> Select discrete if this product will be used for limited time, and continuous 
-													if it will be used indefinitely.</li>
-												<li><b> Delayed or phased product usage?</b> Sometimes, the product consumption is delayed in relation the other higher 
-													levels of the tree. In the relevant <b> Forecasting Unit </b>node, use the <b>Lag</b> field 
-													to indicate this delay.
-											<ul style="font-size: 13px;">
-												<li>For example, if the product usage will begin 2 months after the parent node dates, 
-													enter 2 in this field.  </li>
-												<li>This field can also be used where the product switches over time for example, 
-													if forecasting units A, B, and C are used in secession for two months at a time, 
-													you can set up your tree with Forecasting Unit A (discrete for 2 months, lag=0), 
-													Forecasting Unit B (discrete for 2 months, lag=2), Forecasting Unit C 
-													(discrete for 2 months, lag = 4).</li>
-													<li><b>Repeating Forecasting Usages?</b> If multiple Forecasting Unit nodes share the same 
-														settings, consider using the <a href="/#/usageTemplate/listUsageTemplate" target="_blank" style="text-decoration: underline;">Usage Templates </a>screen to save your common usages, and then using 
-														the “Copy from Template” field to populate the fields in the forecasting unit nodes. </li>
+											<span classnames="UnderLineText" style="font-size: 13px;"><b>Tips for
+													specific use cases:</b></span>
+										<ul style="font-size: 13px;">
+											<b>Delayed or phased product usage? </b>Sometimes, the product consumption
+											is delayed in relation to the other higher levels of the tree. In the
+											relevant <b>Forecasting Unit</b> node, use the <b>Lag</b> field to indicate
+											this delay.
+											<ul>
+												<li>
+
+													For example, if the product usage will begin 2 months after the
+													parent
+													node dates, enter “2” in this field.
+												</li>
+												<li>
+													This field can also be used where the product switches over time –
+													for
+													example, if forecasting units A, B, and C are used in secession for
+													two
+													months at a time, you can set up your tree with Forecasting Unit A
+													(discrete for 2 months, lag=0), Forecasting Unit B (discrete for 2
+													months, lag=2), Forecasting Unit C (discrete for 2 months, lag = 4).
+												</li>
 											</ul>
+											<b>Discrete product usage over a longer period of time? (first month
+												dispensing vs. dispensing month-by-month):</b> QAT has the option to
+											calculate discrete product usage in forecasting unit nodes in two ways:
+											<ul>
+												<li>by frontloading the discrete quantity consumed per patient in month
+													1 (choose "Calculate" = "All in the First Month") or </li>
+
+												<li>by disaggregating the discrete quantity consumed per patient by
+													month (choose "Calculate" = "Month-by-Month"). </li>
+
+												<li>By default, QAT will assume "All in the First Month" (frontloading);
+													however, users have the option to select "Month-by-Month" for the
+													alternative method.
+													This alternative calculation could be useful for Planning Units
+													(PUs) that
+													have low consumption patterns over a period of time or if applying
+													to a newly
+													initiated patient group. For example, if a pregnant woman is
+													required to take
+													a nutritional supplement once/month for the duration of the
+													pregnancy (nine months),
+													by default QAT would calculate nine supplements in month 1
+													(frontloading). Without
+													frontloading, QAT would calculate one supplement in month 1, one
+													supplement in month 2,
+													one supplement in month 3, and so forth. </li>
+											</ul>
+											<b>Desire a specific value for number of Planning Units per patient? </b>A
+											user can specify a specific value for number of Planning Units per unit*
+											(discrete) or per unit* per month (continuous) by choosing “No” for “Use
+											QAT's Autocalculation for # of Planning Units?” Unless overridden by a user,
+											QAT will utilize the auto-calculation by default. (* In this case, unit
+											could be patient, test, client, etc.).
+											<ul>
+												<li><b>Discrete Example:</b> If every 1 vial of bupivacaine is supposed
+													to be used every 5 procedures, then the number of forecasting units
+													/ procedures is 0.2 vials. With a planning unit of 5 vials, QAT
+													calculates that 0.2/5 = 0.04 planning units are used per procedure.
+													However, a user can toggle the radio button to “No” and choose to
+													override this with knowledge of actual usage rates and enter 0.05
+													planning units. Always add a note when you override QAT’s
+													calculation. </li>
+
+												<li><b>Continuous Example:</b> If a patient requires 1 tablet per day
+													indefinitely of TLD 30-tablet bottle, QAT will calculate this as
+													30.4167/month or 1.0139/day to account for months that have 30 days,
+													31 days, 28 days, etc. However, a user may choose to toggle the
+													radio button to “No” and choose to override this to 1 planning
+													unit/month. provide the override value of 1. Always add a note when
+													you override QAT’s calculation. </li>
+											</ul>
+											<li><b>Repeating Forecasting Usages? </b>If multiple Forecasting Unit nodes
+												share the same settings, consider using the Usage Template screen to
+												save your common usages, and then using the “Copy from Template” field
+												to populate the fields in the forecasting unit nodes.
 											</li>
-											
+											<li><b>Aggregate node values for further calculation? (Funnel Nodes):</b> In
+												some cases, users may want to link the value of one node to another
+												node, or aggregate multiple nodes into one node before adding additional
+												nodes below. **Please note this feature is different than linking nodes
+												via modeling/transfer, which is for linking changes in one node to
+												changes in another node, rather than aggregation. This is also different
+												from using aggregation nodes, which aggregate only upwards, and don’t
+												allow further calculation**
+
+											</li>
+											<b>Use cases: </b>
+											<ul>
+												<li>Viral Load tests are used by various populations, but all
+													populations will use the same mix of instruments. Start with a
+													demographic tree which ends in multiple populations. The different
+													populations need to be summed and the various instrument branches
+													sit under the sum.
+												</li>
+												<li>
+													Malaria Patients enter the health system through different channels
+													(community health workers vs public health facilities), which have
+													different testing algorithms, but once a patient tests positive,
+													they receive the same “mix” of treatments. The different populations
+													testing positive need to summed and the various treatment regimens
+													sit under the sum
+												</li>
+												<li>
+													Various Contraceptive Methods differ in how they are calculated, but
+													they all derive from the same country population, which needs to be
+													updated each quantification, and may have modeling over time. One
+													tree can be built for implants and injectables, and another built
+													for condoms, but the two trees are linked together at the country
+													population node, so their values remain consistent
+												</li>
 											</ul>
+											<b>How to link values </b>
+											<ol>
+												<li>Indicate (on # or % nodes) that they are <b>"source nodes"</b> </li>
+
+												<li>Create new <b>"funnel nodes"</b> and select which source nodes to
+													aggregate from. Note: Funnel nodes can “sit” anywhere on the tree –
+													that is, you can make the first node of a tree a funnel node, or
+													build funnel nodes under any aggregation, number of percentage node.
+													This is because the value of funnel nodes does not derive from their
+													parent, but from the sources they are linked to.
+												</li>
+												<li>
+													Add any "child" nodes under the funnel nodes - these will likely be
+													the product nodes. Funnel nodes allow for lots of flexibility as
+													they may be used within one tree or multiple trees, can be used on
+													any level, and
+													<ul>
+														<li>User can either link <b>internally within one tree </b>
+														</li>
+														<li>
+															Users can link <b>externally between trees</b> (source nodes
+															on one tree, funnel nodes on a different tree)
+														</li>
+													</ul>
+												</li>
+											</ol>
+										</ul>
 										</p>
 
 									</li>

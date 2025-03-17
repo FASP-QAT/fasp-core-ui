@@ -2763,16 +2763,20 @@ export default class BuildTree extends Component {
         copyModalParentLevelList = this.state.curTreeObj.levelList;
         tempCopyModalParentLevelList = [...new Set(copyModalTreeList.filter(x => x.treeId == copyModalTree)[0].tree.flatList.filter(x => x.level != null && x.level !== "").map(x => x.level))];
         if (tempCopyModalParentLevelList.length > copyModalParentLevelList.length) {
-            for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
-                copyModalParentLevelList.pop()
-            }
-            // copyModalParentLevelList = [];
-            // for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
-            //     copyModalParentLevelList.push({
-            //         label: { label_en: "Level " + i },
-            //         levelNo: i
-            //     })
+            // for (var i = 0; i < (tempCopyModalParentLevelList.length - copyModalParentLevelList.length); i++) {
+            //     copyModalParentLevelList.pop()
             // }
+            for (var i = 0; i < tempCopyModalParentLevelList.length; i++) {
+                if (!copyModalParentLevelList.filter(x => x.levelNo == i).length) {
+                    copyModalParentLevelList.push({
+                        label: { label_en: "Level " + i },
+                        levelNo: i
+                    })
+                }
+            }
+            copyModalParentLevelList.sort((a, b) => {
+                return a.levelNo > b.levelNo ? 1 : -1;
+            });
         } else if (tempCopyModalParentLevelList.length < copyModalParentLevelList.length) {
             copyModalParentLevelList = copyModalParentLevelList.filter(x => tempCopyModalParentLevelList.includes(x.levelNo))
         }
@@ -11549,8 +11553,8 @@ export default class BuildTree extends Component {
                                                 <div className="controls ">
                                                     <Select
                                                         className={classNames('form-control', 'd-block', 'w-100', 'bg-light',
-                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' },
-                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId) }
+                                                            { 'is-valid': !errors.forecastingUnitId && this.state.fuValues != '' && this.state.currentScenario.isFUMappingCorrect == 1 },
+                                                            { 'is-invalid': (touched.forecastingUnitId && !!errors.forecastingUnitId && (this.state.currentItemConfig.context.payload.nodeType.id != 4 ? false : true) || !!errors.forecastingUnitId || this.state.currentScenario.isFUMappingCorrect == 0) },
                                                         )}
                                                         id="forecastingUnitId"
                                                         name="forecastingUnitId"
@@ -11769,7 +11773,7 @@ export default class BuildTree extends Component {
                                                 </Popover>
                                             </div>
                                             <FormGroup className="col-md-12" style={{ display: this.state.currentItemConfig.context.payload.nodeType.id == 4 && this.state.currentItemConfig.context.payload.nodeDataMap != "" && this.state.currentScenario.fuNode.usageType.id == 1 && this.state.currentScenario.fuNode.oneTimeUsage != "true" && this.state.currentScenario.fuNode.oneTimeUsage != true ? 'block' : 'none' }}>
-                                                <Label htmlFor="currencyId">{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                <Label htmlFor="currencyId" className='LabelWd'>{i18n.t("static.tree.oneTimeDispensing")}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover20" onClick={this.toggleOneTimeDispensing} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                 <FormGroup check inline>
                                                     <Input
                                                         className="form-check-input"
@@ -12772,6 +12776,18 @@ export default class BuildTree extends Component {
                     }
                 }
                 (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuPerMonth = fuPerMonth;
+
+                var forecastingUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
+                var planningUnitList = [];
+                if (this.state.programId != null && this.state.programId != "") {
+                    planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
+                    var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.forecastingUnit.id == forecastingUnitId);
+                    if (planningUnitListFilter.length > 0) {
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isFUMappingCorrect = 1
+                    } else {
+                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isFUMappingCorrect = 0
+                    }
+                }
             }
             if (items[i].payload.nodeType.id == 5) {
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
@@ -12794,11 +12810,37 @@ export default class BuildTree extends Component {
         }, () => {
         })
     }
+
+    /**
+     * This function replaces the html place holders with dynamic values of treeId & programId
+     * @param {*} htmlContent - HTML content to be render on show guidance popup of Manage Tree - Build Trees screen
+     * @returns 
+     */
+    injectDynamicValues = (htmlContent) => {
+        const { treeId, programId } = this.state;
+        return htmlContent
+            .replace(/{{treeId}}/g, treeId)
+            .replace(/{{programId}}/g, programId);
+    };
+
     /**
      * Renders the create tree screen.
      * @returns {JSX.Element} - Create Tree screen.
      */
     render() {
+        //to replace treeId & programId html place holders for show guidance popup
+        const currentLang = localStorage.getItem('lang');
+        const htmlContent =
+            currentLang === 'en'
+                ? showguidanceBuildTreeEn
+                : currentLang === 'fr'
+                ? showguidanceBuildTreeFr
+                : currentLang === 'sp'
+                ? showguidanceBuildTreeSp
+                : showguidanceBuildTreePr;
+
+        const updatedHtmlContent = this.injectDynamicValues(htmlContent);
+
         jexcel.setDictionary({
             Show: " ",
             entries: " ",
@@ -12849,7 +12891,7 @@ export default class BuildTree extends Component {
                     <div style={{ background: itemConfig.payload.nodeType.id == 5 || itemConfig.payload.nodeType.id == 4 ? "#002F6C" : "#a7c6ed", width: "8px", height: "8px", borderRadius: "8px" }}>
                     </div>
                     :
-                    <div className={(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
+                    <div className={(itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined && (itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isPUMappingCorrect == 0 || itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].isFUMappingCorrect == 0)) || illegalNode ? "ContactTemplate boxContactTemplate contactTemplateBorderRed" : "ContactTemplate boxContactTemplate"} title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''}>
                         <div className={outerLink ? itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgPurpleSingle" : "ContactTitleBackground TemplateTitleBgpurple" : itemConfig.payload.nodeType.id == 5
                             || itemConfig.payload.nodeType.id == 4 ? (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgblueSingle" : "ContactTitleBackground TemplateTitleBgblue") :
                             (itemConfig.payload.label.label_en.length <= 20 ? "ContactTitleBackground TemplateTitleBgSingle" : "ContactTitleBackground TemplateTitleBg")}
@@ -13517,6 +13559,8 @@ export default class BuildTree extends Component {
                 },
             }]
         }
+
+
         return <div className="">
             <Prompt
                 when={this.state.isChanged == true || this.state.isTreeDataChanged == true || this.state.isScenarioChanged == true}
@@ -14099,7 +14143,7 @@ export default class BuildTree extends Component {
                     <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
                 </ModalHeader>
                 <div>
-                    <ModalBody className="ModalBodyPadding Darkmode">
+                    {/* <ModalBody className="ModalBodyPadding Darkmode">
                         <div dangerouslySetInnerHTML={{
                             __html: localStorage.getItem('lang') == 'en' ?
                                 showguidanceBuildTreeEn :
@@ -14108,6 +14152,11 @@ export default class BuildTree extends Component {
                                     localStorage.getItem('lang') == 'sp' ?
                                         showguidanceBuildTreeSp :
                                         showguidanceBuildTreePr
+                        }} />
+                    </ModalBody> */}
+                    <ModalBody className="ModalBodyPadding Darkmode">
+                        <div dangerouslySetInnerHTML={{
+                            __html: updatedHtmlContent
                         }} />
                     </ModalBody>
                 </div>

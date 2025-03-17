@@ -250,6 +250,61 @@
 </ul>
 </p>
 </p>
+
+<b style="font-size: 13px;">5. Optimización de los parámetros de pronóstico de TES y ARIMA.</b>
+<p class="pl-lg-3" style="font-size: 13px;">
+	
+	<p>QAT ofrece a los usuarios múltiples opciones de extrapolación, incluidos TES y ARIMA estacional y no estacional. Los usuarios son libres de 
+		utilizar los valores predeterminados de QAT o ingresar parámetros de pronóstico alternativos con la intención de reducir las métricas de error. 
+		aumentar la correspondencia entre el método de pronóstico genera los puntos de datos reales en el período de datos históricos. 
+		Si el usuario está trabajando en línea, QAT puede optimizar los parámetros TES y ARIMA iterando, calculando el RMSE de cada iteración, 
+		y seleccionar los parámetros que producen el RMSE más bajo.</p> 
+
+	<p>Para TES, QAT calcula 125 iteraciones del pronóstico, probando cada uno de los parámetros alfa, beta y gamma en combinación con el 
+		siguientes valores: 0, 0.2, 0.4, 0.8 y 1. Cualquiera de las 125 combinaciones para un producto determinado produce el resultado con 
+		el RMSE más bajo se mostrará en la pantalla de extrapolación.</p>
+
+	<p>
+		Para ARIMA o ARIMA estacional, QAT calcula 24 iteraciones del pronóstico, probando cada uno de los parámetros p, d y q en combinación, utilizando los siguientes valores:
+	</p>
+	<ul>
+		<li>p: 0 o 1</li>
+		<li>d: 0, 1 o 2</li>
+		<li>q: 0, 1, 2 o 3</li>
+	</ul>
+	
+	<p>Cualquiera de las 24 combinaciones para un producto determinado que produzca el resultado ARIMA con el RMSE más bajo se mostrará en la pantalla de extrapolación.</p>
+	
+</p>
+
+<b style="font-size: 13px;">6. Extrapolación masiva</b>
+<p class="pl-lg-3" style="font-size: 13px;">
+	<p>
+		En la pantalla de extrapolación QAT, el usuario puede comparar los resultados de los distintos métodos de extrapolación tanto gráficamente como 
+		en una tabla de salida, producto por producto. Esto permite al usuario anular la selección de métodos de extrapolación que considere no aplicables. 
+		a un producto determinado para limitar las opciones en la pantalla Comparar y Seleccionar solo aquellas que el usuario elija mostrar.
+	</p>
+
+	<p>
+		Si el usuario prefiere enviar todas las salidas de los métodos de extrapolación disponibles para más de un producto directamente 
+		En la pantalla Comparar y seleccionar, el usuario puede seleccionar la extrapolación masiva. Desde la ventana emergente Extrapolación masiva, 
+		el usuario puede entonces seleccionar un rango de fechas histórico desde el cual extrapolar el pronóstico (solo un rango de fechas por extrapolación masiva), 
+		si aplicar la estacionalidad a su cálculo ARIMA, qué unidades de planificación y regiones (si se utilizan datos regionales) incluir en 
+		la extrapolación masiva y si optimizar o no los parámetros ARIMA y TES para la extrapolación.
+	</p>
+
+	<p>
+		Después de ejecutar la extrapolación masiva, todos los resultados se pueden ver en la pantalla de extrapolación, la pantalla de comparación y selección y 
+		el cuadro desplegable Pantalla Resumen de pronóstico (regional). El usuario puede seleccionar su método de extrapolación preferido entre 
+		la pantalla Comparar y seleccionar o la pantalla Resumen de pronóstico (regional).
+	</p>
+
+	<p>
+		La extrapolación masiva en QAT es particularmente útil cuando se trabaja con un gran conjunto de productos para los cuales se requiere información oportuna, completa y 
+		Se dispone de datos precisos sobre el consumo durante 12 meses o más.
+	</p>
+</p>
+
 <p style="font-size: 13px;">
 	<b>Nota :  Tú tienes 0 meses de datos de consumo acutal. Los valores mínimos necesarios para 
 		las diversas características se encuentran a continuación.: <br><span class="ml-lg-5">* TES, Holt Winters: Al 

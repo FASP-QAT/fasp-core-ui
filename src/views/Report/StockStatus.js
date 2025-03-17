@@ -441,13 +441,13 @@ class StockStatus extends Component {
             csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (roundAMC(item.data[0].maxStockMos))).replaceAll(' ', '%20') + '"');
           }
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
-            var notes = item.data[0].ppuNotes.split("|");
+            var notes = item.data[0].ppuNotes.split("~");
             var finalNotes = "";
             notes.map((item, index) => {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += item.split(":")[0] + ": " + item.split(":")[1]
+              finalNotes += item.split(":")[0] + ": " + item.split(":").slice(1).join(':')
             })
             csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (finalNotes).replaceAll(' ', '%20') + '"'))
           }
@@ -703,13 +703,13 @@ class StockStatus extends Component {
           }
           y += 10;
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
-            var notes = item.data[0].ppuNotes.split("|");
+            var notes = item.data[0].ppuNotes.split("~");
             var finalNotes = "";
             notes.map((item, index) => {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += item.split(":")[0] + ": " + item.split(":")[1]
+              finalNotes += item.split(":")[0] + ": " + item.split(":").slice(1).join(':')
             })
             var planningText = doc.splitTextToSize(i18n.t('static.program.notes') + ': ' + finalNotes, doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 10, y, planningText)
@@ -4559,8 +4559,8 @@ class StockStatus extends Component {
                                 <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
                             </ul>
                             {this.state.stockStatusList[0].ppuNotes != undefined && this.state.stockStatusList[0].ppuNotes != null && this.state.stockStatusList[0].ppuNotes.length > 0 &&
-                              <span style={{ "marginTop": "10px" }} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("|").map((item, index) => {
-                                return (<>{(index != 0 ? ", " : "")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": " + item.toString().split(":")[1]}</>)
+                              <span style={{ "marginTop": "10px" }} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("~").map((item, index) => {
+                                return (<>{(index != 0 ? ", " : "")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": " + item.toString().split(":").slice(1).join(':')}</>)
                               })}</span>
                             }
                           </FormGroup>
