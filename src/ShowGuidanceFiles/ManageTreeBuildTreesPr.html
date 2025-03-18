@@ -80,12 +80,48 @@
 											serviços, etc). Observe que mais orientações
 											estão disponíveis após clicar em qualquer nó específico.</p>
 										<p>
-										<p style="font-size: 13px;"><span
-												style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando
-												esta tela</span><br><span style="font-weight: bold;">Gerencie a
-												árvore:</span>Clique no ícone de engrenagem <i class="fa fa-cog"
-												aria-hidden="true"></i> para mostrar e editar ou ocultar o método de
-											previsão, o nome da árvore e a região.</p>
+										<p style="font-size: 13px;">
+											<span style="text-decoration: underline;text-decoration-color: #272127;font-weight: bold;">Usando
+												esta tela</span><!--Using this screen-->
+											<br>
+											<!--Navigation sec-->
+											<span style="font-weight: bold;">Navegação:</span>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Comece selecionando o <strong>Programa</strong> e a <strong>Árvore</strong> nos menus suspensos. Observe que apenas programas baixados estão disponíveis. 
+													Clique no ícone de engrenagem <i class="fa fa-cog" aria-hidden="true"></i> para mostrar/ocultar ou editar os detalhes da árvore (método de previsão, nome da árvore e região).
+
+												</li> <!--Point 1-->
+												<li>Veja a seção abaixo para <strong>Cenários</strong>.</li> <!--Point 2-->
+												<li>Os valores dos nós da árvore são exibidos na data mostrada no <strong>Data de exibição</strong>. Altere esta data para ver valores em outros meses.</li> <!--Point 3-->
+												
+												<li>Os usuários também podem editar a árvore na tela <a href="/#/dataSet/treeTable/tree/{{treeId}}/{{programId}}" target="_blank">Tree Table</a>, que permite a edição em lote dos valores dos nós, mas não permite quaisquer edições na estrutura da árvore ou alterações ao longo do tempo.</li> <!--Point 4-->
+
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"
+													id="checkBox1"
+													name="checkBox1"																										
+												/>
+													<strong>Caixas de seleção “Ocultar”</strong> - use essas caixas de seleção para ocultar certos elementos da árvore para uma exibição mais limpa.</li><!--Point 5--> 
+												<li><Input
+													className="form-check-input checkboxMargin"
+													type="checkbox"“Hide” checkboxes
+													id="checkBox2"
+													name="checkBox2"																										
+												/>
+													<strong>Calcular automaticamente</strong> - Se o QAT estiver lento durante a edição da sua árvore, desmarque a caixa de cálculo automático para interromper os cálculos. Para atualizar os cálculos, marque novamente a caixa de seleção 'calcular automaticamente' ou clique no ícone <i class="fa fa-refresh" aria-hidden="true"></i> recalcular.
+												</li> <!--Point 6-->
+												<li>Clique nos <strong>Níveis</strong> da árvore (caixas retangulares azuis escuras à esquerda da árvore) para:</li> <!--Point 7-->
+												<ul>
+													<li>Nomeie os níveis de uma árvore. Isso tornará a árvore mais fácil de ler e será usada nos menus suspensos e no eixo da tela <a href="/#/validation/modelingValidation" target="_blank">Validação de Modelagem</a>.</li> <!--Point 7.1-->
+													<li>Reordene os galhos da sua árvore conforme desejado usando as setas para cima e para baixo para indicar a posição dos galhos da esquerda para a direita. Se a lista for longa, use o menu suspenso “ver filhos de” para filtrar os nós.</li> <!--Point 7.2-->
+												</ul>
+											</ul>
+											<!-- End of Navigation sec-->
+
+										</p>
+
+										<!--Building the Tree para-->
 										<p style="font-size: 13px;"><span
 												style="font-weight: bold; font-size: 13px;">Construindo a
 												árvore:</span>A árvore de previsão é construída de cima para baixo,
@@ -100,90 +136,125 @@
 											Cada Nó de Unidade de Planejamento deve derivar de um Nó de Unidade de
 											Previsão. </p>
 										</p>
+										<!--End of Building the Tree para-->
+
+										<!--start of Node actions sec-->
 										<p>
-										<p style="font-size: 13px; font-weight: bold;"><span class="">Ações do nó
-												:</span></p>
-										<ul class="pl-lg-4" style="font-size: 13px;">
-											<li><i class="fa fa-trash-o" aria-hidden="true"
-													style="color: rgb(0, 47, 108);"></i> Excluir: Exclui o nó
-												selecionado </li>
-											<li><i class="fa fa-clone" aria-hidden="true"
-													style="color: rgb(0, 47, 108);"></i> Duplicar: Duplica o nó
-												selecionado sob o mesmo pai </li>
-											<li><i class="fa fa-plus-square-o" aria-hidden="true"
-													style="color: rgb(0, 47, 108);"></i> Adicionar: Adiciona um filho ao
-												nó selecionado.</li>
-										</ul>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Ações do nó:</span></p>
+											<ul class="pl-lg-4" style="font-size: 13px;">
+												<li>Clique em um nó para abri-lo para edição ou visualização.</li>
+												<li>Passe o mouse sobre um nó para visualizar as notas do nó sem abri-lo.</li>
+												<li><i class="fa fa-paste"></i><strong>
+													Copiar / Mover</strong>: Copia ou move o nó selecionado e todos os seus filhos. O usuário pode selecionar o destino.
+												</li>
+
+
+												<li><i class="fa fa-trash-o" aria-hidden="true"
+														></i> <strong>Excluir</strong>: Exclui o nó selecionado e todos os seus filhos.</li>
+												<li><i class="fa fa-sitemap" aria-hidden="true"
+														></i> <strong>Adicionar modelo de filial</strong>: Adiciona um modelo de árvore como uma ramificação abaixo do nó escolhido. </li>
+												<li><i class="fa fa-plus-square-o" aria-hidden="true"
+														></i> <strong>Adicionar</strong>: Adiciona um nó filho ao nó selecionado. </li>
+
+													<li><i class="fa fa-caret-square-o-down" aria-hidden="true"></i> / <i class="fa fa-caret-square-o-left" aria-hidden="true"></i><strong> Recolher/Expandir</strong>: Recolhe/Expande o nó atual e todos os seus filhos.</li>
+													<ul>
+														<li>No modo recolhido, os nós serão representados por pontos. Passe o mouse sobre qualquer ponto/nó e clique uma vez para expandir esse nó e todos os seus filhos.</li>
+														<li>“<strong>Recolher árvore</strong>” caixa de seleção 
+															<Input
+																className="form-check-input checkboxMargin"
+																type="checkbox"
+																id="checkBox3"
+																name="checkBox3"																										
+															/> 
+															na parte superior da tela que recolhe todos os nós, exceto o nó superior.
+														</li>
+													</ul>
+											</ul>
 										</p>
+										<!--End of Node actions sec-->
+
+										<!--Start of Node Types sec-->
 										<p>
-										<p style="font-size: 13px; font-weight: bold;"><span class="">Tipo de nó
-												:</span></p>
-										<div class="pl-lg-4 pr-lg-4 table1">
-											<table style="border-collapse: collapse;">
-												<thead>
-													<tr>
-														<th style="width: 130px;">Tipo de nó</th>
-														<th>Valor </th>
-														<th>Filhos em Potencial</th>
-														<th>Funcionalidade avançada</th>
-													</tr>
-												</thead>
-												<tbody>
-													<tr>
-														<td class="BgLightBlue"><b>Agregação ∑</b></td>
-														<td>Soma de filhos</td>
-														<td><b style="color: rgb(0, 47, 108);">∑</b> ou #</td>
-														<td>-</td>
-													</tr>
-													<tr>
-														<td class="BgLightBlue"><b>Número #</b></td>
-														<td>Definido neste nó</td>
-														<td>% or <b
-																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
-																	class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90"
-																aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i
-																class="fa fa-line-chart"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
-													</tr>
-													<tr>
-														<td class="BgLightBlue"><b>Percentagem %</b></td>
-														<td>Uma porcentagem do pai</td>
-														<td>% or <b
-																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
-																	class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90"
-																aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
-													</tr>
-													<tr>
-														<td class="BgDarkBlue"><b>Unidade de previsão <i
-																	class="fa fa-cube" aria-hidden="true"></i></b></td>
-														<td>Uma porcentagem dos parâmetros da unidade pai
-															e de previsão</td>
-														<td><b
-																style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
-																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
-														<td><i class="fa fa-exchange fa-rotate-90"
-																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-													</tr>
-													<tr>
-														<td class="BgDarkBlue"><b>Unidade de Planejamento <i
-																	class="fa fa-cubes" aria-hidden="true"></i></b></td>
-														<td>Definido como uma porcentagem dos parâmetros da unidade pai
-															e de planejamento</td>
-														<td>-</td>
-														<td><i class="fa fa-exchange fa-rotate-90"
-																aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
-													</tr>
-													<tr>
-														<td style="background:#002f6c;color: #fff;"><b>Funil <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
-														<td>Soma dos nós de origem vinculados <i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
-														<td>% or</td>
-														<td>-</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
+											<p style="font-size: 13px; font-weight: bold;"><span class="">Tipos de nós:</span></p>
+											<div class="pl-lg-4 pr-lg-4 table1">
+												<table style="border-collapse: collapse;">
+													<thead>
+														<tr>
+															<th style="width: 130px;">Tipo de nó</th>
+															<th>Valor </th>
+															<th>Filhos em Potencial</th>
+															<th>Funcionalidade avançada</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td class="BgLightBlue"><b>Agregação ∑</b></td>
+															<td>Soma de filhos</td>
+															<td><b style="color: rgb(0, 47, 108);">∑</b> ou #</td>
+															<td>-</td>
+														</tr>
+														<tr>
+															<td class="BgLightBlue"><b>Número #</b></td>
+															<td>Definido neste nó</td>
+															<td>% ou <b
+																	style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
+																		class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90"
+																	aria-hidden="true"></i>,<i class="fa fa-link"></i>, <i
+																	class="fa fa-line-chart"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
+														</tr>
+														<tr>
+															<td class="BgLightBlue"><b>Percentagem %</b></td>
+															<td>Uma porcentagem do pai</td>
+															<td>% ou <b
+																	style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
+																		class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90"
+																	aria-hidden="true"></i>,<i class="fa fa-link"></i>,<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i></td>
+														</tr>
+														<tr> <!--Funnel-->
+															<td style="background:#002f6c;color: #fff;"><b>Funil <i><img src="../ShowGuidanceFiles/img/funnel1.png" width="18" height="18"/></i></b></td>
+															<td>Soma dos nós de origem vinculados (<i><img class="Iconclr" src="../ShowGuidanceFiles/img/aggregateAllowed.png" width="20" height="20"/></i>)</td>
+															<td>% ou</td>
+															<td>-</td>
+														</tr>
+
+
+														<tr> <!--Forecasting Unit-->
+															<td class="BgDarkBlue"><b>Unidade de previsão <i
+																class="fa fa-cube" aria-hidden="true"></i></b></td>
+															<td>Uma porcentagem dos parâmetros pai e da unidade de previsão. Podem ser dois tipos de uso diferentes:
+																<br>
+																<b style="background: #002f6c;">
+																	<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;c </b>
+																</b>: Contínuo
+																<br>
+																<b style="background: #002f6c;">
+																	<b style="font-size: 14px; color: rgb(255, 255, 255);">&nbsp;d </b>
+																</b>: Discreto
+															</td>
+															<td><b
+																	style="background: rgb(255, 255, 255); color: rgb(0, 47, 108); padding: 3px;"><i
+																		class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td><i class="fa fa-exchange fa-rotate-90"
+																	aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														<tr> <!--Planning Unit-->
+															<td class="BgDarkBlue"><b>Unidade de Planejamento <i
+																		class="fa fa-cubes" aria-hidden="true"></i></b></td>
+															<td>Definido como uma porcentagem dos parâmetros da unidade pai
+																e de planejamento</td>
+															<td>-</td>
+															<td><i class="fa fa-exchange fa-rotate-90"
+																	aria-hidden="true"></i>,<i class="fa fa-link"></i></td>
+														</tr>
+														
+													</tbody>
+												</table>
+											</div>
 										</p>
+										<!--End of Node Types sec-->
+
 										<p style="font-size: 13px;">
 											<span style="font-size: 13px; font-weight: bold;">Mudanças ao longo do
 												tempo</span>
@@ -235,6 +306,10 @@
 													<tr>
 														<td></td>
 														<td>Modelagem/Transferência/Extrapolação</td>
+													</tr>
+													<tr>
+														<td></td>
+														<td>Conexões de funil</td>
 													</tr>
 												</tbody>
 											</table>
