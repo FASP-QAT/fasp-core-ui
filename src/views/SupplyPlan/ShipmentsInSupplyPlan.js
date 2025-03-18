@@ -806,7 +806,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                             });
                                                         }
                                                         var rowData = obj.getRowData(y);
-                                                        if (rowData[4] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[5]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1) {
+                                                        if (rowData[27] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[5]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1) {
                                                             var expectedDeliveryDate = rowData[5];
                                                             var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
                                                             var expectedTotalShipmentQty = this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty != "" ? (this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty) : 0;
