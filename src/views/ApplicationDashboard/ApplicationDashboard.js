@@ -1230,6 +1230,159 @@ class ApplicationDashboard extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
+
+      if (localStorage.getItem('sessionType') === 'Online') {
+        let topPIds = this.state.topProgramId.map(p => p.value.split("_")[0]);
+        if(topPIds.length > 0 && localStorage.getItem("topLocalProgram") == "true") {
+          for(var i = 0; i < topPIds.length; i++){
+            ProgramService.getProgramById(topPIds[i])
+              .then(response => {
+                if (response.status == 200) {
+                  var transaction = db1.transaction(['program'], 'readwrite');
+                  var programTransaction = transaction.objectStore('program');
+                  programTransaction.put(response.data);
+                } else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },
+                        () => {
+                            hideSecondComponent();
+                        })
+                }
+              }).catch(
+                  error => {
+                      if (error.message === "Network Error") {
+                          this.setState({
+                              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                              loading: false
+                          }, () => {
+                              hideSecondComponent()
+                          });
+                      } else {
+                          switch (error.response ? error.response.status : "") {
+                              case 401:
+                                  this.props.history.push(`/login/static.message.sessionExpired`)
+                                  break;
+                              case 409:
+                                  this.setState({
+                                      message: i18n.t('static.common.accessDenied'),
+                                      loading: false,
+                                      color: "#BA0C2F",
+                                  });
+                                  break;
+                      case 403:
+                                  this.props.history.push(`/accessDenied`)
+                                  break;
+                              case 500:
+                              case 404:
+                              case 406:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              case 412:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              default:
+                                  this.setState({
+                                      message: 'static.unkownError',
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                          }
+                      }
+                  }
+              );
+          }
+  
+          ProgramService.getAllProgramPlanningUnitList(topPIds)
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                    for (var i = 0; i < listArray.length; i++) {
+                        programPlanningUnitObjectStore.put(listArray[i]);
+                    }
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },() => {
+                        hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        }, () => {
+                            hideSecondComponent()
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        }
+      }
+      
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
