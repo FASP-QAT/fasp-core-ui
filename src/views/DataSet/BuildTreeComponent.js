@@ -3292,6 +3292,13 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             selectedScenarioLabel: selectedText,
         }, () => {
+            if(!this.state.loading){
+                setTimeout(() => {
+                    this.setState({
+                        cursorItem: null
+                    })
+                }, 1000)
+            }
             try {
                 if (localStorage.getItem("openNodeId")) {
                     let tempData = {
@@ -6804,7 +6811,13 @@ export default class BuildTree extends Component {
                             if (tree != null && tree.generateMom == 1) {
                                 this.calculateMOMData(0, 2, false);
                             } else {
-                                this.setState({ loading: false })
+                                this.setState({ loading: false }, () => {
+                                    setTimeout(() => {
+                                        this.setState({
+                                            cursorItem: null
+                                        })
+                                    }, 1000)
+                                })
                             }
                         });
                     } else {
@@ -8752,11 +8765,11 @@ export default class BuildTree extends Component {
             this.getModelingTypeList();
             this.getRegionList();
             this.procurementAgentList();
-            setTimeout(() => {
-                this.setState({
-                    cursorItem: null
-                })
-            }, 5000)
+            // setTimeout(() => {
+            //     this.setState({
+            //         cursorItem: null
+            //     })
+            // }, 5000)
         })
     }
     /**
