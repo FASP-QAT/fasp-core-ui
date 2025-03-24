@@ -147,7 +147,8 @@ class StockStatus extends Component {
       onlyShowAllPUs: false,
       realmCountryPlanningUnitId: [],
       stockStatusList: [],
-      yaxisEquUnit: -1
+      yaxisEquUnit: -1,
+      graphAggregatedBy: event.map(ele => ele).length > 1 ? this.state.graphAggregatedBy : 2 
       // planningUnits: [],
       // planningUnitsMulti: [],
       // planningUnitLabel: "",
@@ -4487,7 +4488,7 @@ class StockStatus extends Component {
                           </div>
                         </FormGroup>}
                       </FormGroup>
-                      {this.state.yaxisEquUnit != -1 && this.state.programId.length == 1 &&
+                      {/* {this.state.yaxisEquUnit != -1 && this.state.programId.length == 1 &&
                         <FormGroup className="col-md-3">
                           <Label htmlFor="appendedInputButton">{i18n.t("static.stockStatus.graphAggregatedBy")}</Label>
                           <div className="controls ">
@@ -4508,7 +4509,7 @@ class StockStatus extends Component {
                             </InputGroup>
                           </div>
                         </FormGroup>
-                      }
+                      } */}
                       {/* <FormGroup style={{ "marginTop": "-10px" }}>
                         <div className="col-md-12" style={{ "padding-left": "34px", "marginTop": "-25px !important" }}>
                           <Input
