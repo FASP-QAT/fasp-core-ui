@@ -263,7 +263,8 @@ export default class ExportProgram extends Component {
                                                                                             var txt1 = JSON.stringify(dArray)
                                                                                             var labelName = (programId[j].label).replaceAll("/", "-")
                                                                                             // zip.file(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1);
-                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@" + txt1, { password: ENCRYPTION_EXPORT_PASSWORD });
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + ".txt", txt + "@~-~@", { password: ENCRYPTION_EXPORT_PASSWORD });
+                                                                                            mz.append(labelName + "_" + parseInt(j + 1) + "_part.txt", txt1, { password: ENCRYPTION_EXPORT_PASSWORD });
                                                                                         } else {
                                                                                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
