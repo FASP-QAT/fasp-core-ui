@@ -382,6 +382,28 @@ export function roundARU(value, multiplier) {
   //   return value;
   // }
 }
+/**
+ * This is function is used to get supply plan values when displayed in ARU
+ * @param {*} amc The value of supply plan parameter
+ * @returns This function returns the rounded values in terms of ARU
+ */
+export function roundARUWithoutRounding(value, multiplier) {
+  // if (multiplier != 1) {
+  if (value != i18n.t('static.supplyPlan.notAllRegionsHaveActualStock')) {
+    if (value != null && value !== "") {
+      var aruValue = Number(value) / Number(multiplier);
+      return aruValue;
+    } else {
+      return "";
+    }
+  } else {
+    return value;
+  }
+  // } else {
+  //   return value;
+  // }
+}
+
 
 /**
  * Rounds a number to 1 decimal place.

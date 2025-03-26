@@ -8018,7 +8018,8 @@ export default class CreateTreeTemplate extends Component {
                         tempItems: items,
                         toggleArray: tempToggleList,
                         loading: true,
-                        treeTemplateList: treeTemplateList
+                        treeTemplateList: treeTemplateList,
+                        cursorItem: items[0].id
                     }, () => {
                         setTimeout(() => {
                             this.generateMonthList();
@@ -8031,6 +8032,11 @@ export default class CreateTreeTemplate extends Component {
                                 maxDate: maxMonth
                             }, () => {
                                 this.calculateMOMData(1, 0);
+                                setTimeout(() => {
+                                    this.setState({
+                                        cursorItem: null
+                                    })
+                                }, 2000)
                             })
                         }, 0)
                     })
