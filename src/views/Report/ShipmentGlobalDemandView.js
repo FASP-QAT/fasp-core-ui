@@ -1852,23 +1852,36 @@ class ShipmentGlobalDemandView extends Component {
      * Sets the group by & related flags to state based on the selected dropdown value.
      * @param {object} e - The event object containing checkbox information.
      */
-    setGroupByValues(e) {
+    setGroupByPAValues(e) {
         var groupByValue = e.target.value;
         var procurementAgentTypeId = this.state.procurementAgentTypeId;
-        var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if (groupByValue == 1) {//Procurement Agent Type
+        if (groupByValue == 1) {
             procurementAgentTypeId = true;
-            groupByFundingSourceType = false;
-        } else if (groupByValue == 2) {//Funding Source Type
-            groupByFundingSourceType = true;
-            procurementAgentTypeId = false;
         } else {
-            groupByFundingSourceType = false;
             procurementAgentTypeId = false;
         }
         this.setState({
-            groupByFundingSourceType: groupByFundingSourceType,
             procurementAgentTypeId: procurementAgentTypeId,
+            groupBy: groupByValue
+        }, () => {
+            this.fetchData();
+        })
+    }
+
+    /**
+     * Sets the group by & related flags to state based on the selected dropdown value.
+     * @param {object} e - The event object containing checkbox information.
+     */
+    setGroupByFSValues(e) {
+        var groupByValue = e.target.value;
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if (groupByValue == 1) {
+            groupByFundingSourceType = true;
+        } else {
+            groupByFundingSourceType = false;
+        } 
+        this.setState({
+            groupByFundingSourceType: groupByFundingSourceType,
             groupBy: groupByValue
         }, () => {
             this.fetchData();
@@ -2441,19 +2454,35 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupBy')}</Label>
+                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupByPA')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
                                                         type="select"
-                                                        name="groupBy"
-                                                        id="groupBy"
+                                                        name="groupByPA"
+                                                        id="groupByPA"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.setGroupByValues(e); }}
+                                                        onChange={(e) => { this.setGroupByPAValues(e); }}
                                                     >
-                                                        <option value="0">{i18n.t('static.supplyPlan.none')}</option>
+                                                        <option value="0">{i18n.t('static.report.procurementAgentName')}</option>
                                                         <option value="1">{i18n.t('static.dashboard.procurementagentType')}</option>
-                                                        <option value="2">{i18n.t('static.funderTypeHead.funderType')}</option>
+                                                    </Input>
+                                                </InputGroup>
+                                            </div>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupByFS')}</Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="groupByFS"
+                                                        id="groupByFS"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.setGroupByFSValues(e); }}
+                                                    >
+                                                        <option value="0">{i18n.t('static.fundingSourceHead.fundingSource')}</option>
+                                                        <option value="1">{i18n.t('static.funderTypeHead.funderType')}</option>
                                                     </Input>
                                                 </InputGroup>
                                             </div>
