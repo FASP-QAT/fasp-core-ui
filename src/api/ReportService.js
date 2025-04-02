@@ -116,5 +116,8 @@ class ReportService {
     getDropdownListByProgramIds(inputjson) {
         return axios.post(`${API_URL}/api/report/stockStatusVertical/dropdowns`, inputjson, {});
     }
+    getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId) {
+        return axios.get(`${API_URL}/api/program/${programId}/planningUnit/${planningUnitId}`, {});
+    }
 }
 export default new ReportService();

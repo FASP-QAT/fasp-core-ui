@@ -107,6 +107,8 @@ class StockStatus extends Component {
       ppuList: [],
       graphAggregatedBy: 1,
       versionId: "",
+      planningUnitDetails: "",
+      planningUnitDetailsExport: ""
     };
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -122,6 +124,8 @@ class StockStatus extends Component {
     this.setRealmCountryPlanningUnitExport = this.setRealmCountryPlanningUnitExport.bind(this);
     this.setGraphAggregatedBy = this.setGraphAggregatedBy.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
+    this.getPlanningUnitByProgramIdAndPlanningUnitId = this.getPlanningUnitByProgramIdAndPlanningUnitId.bind(this);
+    this.getPlanningUnitByProgramIdAndPlanningUnitIdExport = this.getPlanningUnitByProgramIdAndPlanningUnitIdExport.bind(this);
   }
   setGraphAggregatedBy(e) {
     this.setState({
@@ -148,7 +152,9 @@ class StockStatus extends Component {
       realmCountryPlanningUnitId: [],
       stockStatusList: [],
       yaxisEquUnit: -1,
-      graphAggregatedBy: event.map(ele => ele).length > 1 ? this.state.graphAggregatedBy : 2 
+      graphAggregatedBy: event.map(ele => ele).length > 1 ? this.state.graphAggregatedBy : 2,
+      planningUnitDetails: "",
+      planningUnitDetailsExport: ""
       // planningUnits: [],
       // planningUnitsMulti: [],
       // planningUnitLabel: "",
@@ -437,9 +443,21 @@ class StockStatus extends Component {
             csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnits') + ': ' + (document.getElementById("yaxisEquUnit").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
           }
           csvRow.push('"' + ((this.state.viewById == 1 ? i18n.t('static.planningunit.planningunit') : i18n.t('static.planningunit.countrysku')).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + planningUnitLabel).replaceAll(' ', '%20') + '"');
-          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (item.data[0].planBasedOn == 1 ? roundAMC(item.data[0].minStockMos) : roundAMC(item.data.minStockQty, 1))).replaceAll(' ', '%20') + '"');
+          if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+            csvRow.push("\"" + i18n.t("static.supplyPlan.amcPast").replaceAll(' ', '%20') + ' : ' + this.state.planningUnitDetailsExport.monthsInPastForAmc + "\"")
+            csvRow.push("\"" + i18n.t("static.supplyPlan.amcFuture").replaceAll(' ', '%20') + ' : ' + this.state.planningUnitDetailsExport.monthsInFutureForAmc + "\"")
+            csvRow.push("\"" + i18n.t("static.report.shelfLife").replaceAll(' ', '%20') + ' : ' + this.state.planningUnitDetailsExport.shelfLife + "\"")
+          }
+          csvRow.push('"' + (((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (item.data[0].planBasedOn == 1 ? roundAMC(item.data[0].minStockMos) : roundAMC(item.data[0].minStockQty, 1))).replaceAll(' ', '%20') + '"');
+          if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+            csvRow.push("\"" + i18n.t("static.supplyPlan.reorderInterval").replaceAll(' ', '%20').replaceAll('#', '%23') + ' : ' + this.state.planningUnitDetailsExport.reorderFrequencyInMonths + "\"")
+          }
           if (item.data[0].planBasedOn == 1) {
             csvRow.push('"' + (((i18n.t('static.supplyPlan.maxStockMos'))).replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (roundAMC(item.data[0].maxStockMos))).replaceAll(' ', '%20') + '"');
+          } else {
+            if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+              csvRow.push("\"" + i18n.t("static.product.distributionLeadTime").replaceAll(' ', '%20') + ' : ' + this.state.planningUnitDetailsExport.distributionLeadTime + "\"")
+            }
           }
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
             var notes = item.data[0].ppuNotes.split("~");
@@ -693,14 +711,41 @@ class StockStatus extends Component {
             }
           }
           // y=y-3
-          doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ': ' + (item.data[0].planBasedOn == 1 ? formatter(roundAMC(item.data[0].minStockMos, 1), 0) : formatter(roundAMC(item.data.minStockQty, 1), 0)), doc.internal.pageSize.width / 10, y, {
+          if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+            doc.text(i18n.t('static.supplyPlan.amcPast') + ' : ' + this.state.planningUnitDetailsExport.monthsInPastForAmc, doc.internal.pageSize.width / 10, y, {
+              align: 'left'
+            })
+            y += 10;
+            doc.text(i18n.t('static.supplyPlan.amcFuture') + ' : ' + this.state.planningUnitDetailsExport.monthsInFutureForAmc, doc.internal.pageSize.width / 10, y, {
+              align: 'left'
+            })
+            y += 10;
+            doc.text(i18n.t('static.report.shelfLife') + ' : ' + this.state.planningUnitDetailsExport.shelfLife, doc.internal.pageSize.width / 10, y, {
+              align: 'left'
+            })
+            y += 10;
+          }
+          doc.text((item.data[0].planBasedOn == 1 ? i18n.t('static.supplyPlan.minStockMos') : i18n.t('static.product.minQuantity')) + ': ' + (item.data[0].planBasedOn == 1 ? formatter(roundAMC(item.data[0].minStockMos, 1), 0) : formatter(roundAMC(item.data[0].minStockQty, 1), 0)), doc.internal.pageSize.width / 10, y, {
             align: 'left'
           })
+          if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+            y += 10;
+            doc.text(i18n.t('static.supplyPlan.reorderInterval') + ' : ' + this.state.planningUnitDetailsExport.reorderFrequencyInMonths, doc.internal.pageSize.width / 10, y, {
+              align: 'left'
+            })
+          }
           if (item.data[0].planBasedOn == 1) {
             y += 10;
             doc.text(i18n.t('static.supplyPlan.maxStockMos') + ': ' + formatter(roundAMC(item.data[0].maxStockMos), 0), doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
+          } else {
+            if (this.state.viewById == 1 ? this.state.planningUnitIdExport.length == 1 : this.state.realmCountryPlanningUnitIdExport.length == 1) {
+              y += 10;
+              doc.text(i18n.t('static.product.distributionLeadTime') + ' : ' + formatter(this.state.planningUnitDetailsExport.distributionLeadTime), doc.internal.pageSize.width / 10, y, {
+                align: 'left'
+              })
+            }
           }
           y += 10;
           if (item.data[0].ppuNotes != null && item.data[0].ppuNotes != undefined && item.data[0].ppuNotes.length > 0) {
@@ -1238,6 +1283,7 @@ class StockStatus extends Component {
               var ppuResult = ppuRequest.result;
               var planningUnitArray = [...new Set(this.state.planningUnitIdExport).map(c => Number(c.value))];
               var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(c.planningUnit.id));
+              console.log("PPu Test@123", ppu)
               let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
               let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
               for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
@@ -1325,14 +1371,14 @@ class StockStatus extends Component {
                   "mos": sp.reduce((sum, value) => sum + value.closingBalance, 0) / sp.reduce((sum, value) => sum + value.amc, 0),
                   "minStockMos": ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length,
                   "maxStockMos": Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length),
-                  "minStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length),
+                  "minStockQty": ppu.reduce((sum, value) => sum + value.minQty, 0) / ppu.length,
                   "maxStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length)),
                   "unmetDemand": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.unmetDemand, multiplier), 0),
                   "regionCount": sp[0].regionCount,
                   "regionCountForStock": sp[0].regionCountForStock,
                   "nationalAdjustment": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.nationalAdjustment, multiplier), 0),
                   "planBasedOn": ppu.some(c => c.planBasedOn == 1) ? 1 : 2,
-                  "ppuNotes": ppu.length > 1 ? (notes == "" ? null : notes) : (ppu[0].notes == "" ? null : this.state.programId[0].label + ": " + ppu[0].notes),
+                  "ppuNotes": ppu.length > 1 ? (notes == "" ? null : notes) : ((ppu[0].notes == "" || ppu[0].notes == null) ? null : this.state.programId[0].label + ": " + ppu[0].notes),
                   "consumptionInfo": conList,
                   "inventoryInfo": invList,
                   "shipmentInfo": shipList
@@ -2878,7 +2924,7 @@ class StockStatus extends Component {
     } else {
       this.setState({
         versions: [],
-      },()=>{
+      }, () => {
         this.getDropdownLists();
       });
     }
@@ -2956,7 +3002,9 @@ class StockStatus extends Component {
         show: false,
         dataList: [],
         consumptionAdjForStockOutId: false,
-        loading: false
+        loading: false,
+        planningUnitDetails: "",
+        planningUnitDetailsExport: ""
       }, () => {
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
@@ -3002,6 +3050,9 @@ class StockStatus extends Component {
         consumptionAdjForStockOutId: false,
         loading: false
       }, () => {
+        if (this.state.programId.length == 1) {
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId);
+        }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
       })
@@ -3044,6 +3095,17 @@ class StockStatus extends Component {
         consumptionAdjForStockOutId: false,
         loading: false
       }, () => {
+        if (this.state.programId.length == 1) {
+          var planningUnitId;
+          if (this.state.versionId.toString().includes("Local")) {
+            var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(realmCountryPlanningUnitId));
+            planningUnitId = Number(rcpu[0].planningUnit.id);
+          } else {
+            var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == realmCountryPlanningUnitId)[0].forecastingUnitId;
+            planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+          }
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId);
+        }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
       })
@@ -3054,9 +3116,173 @@ class StockStatus extends Component {
       })
     }
   }
+  getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId) {
+    if (this.state.versionId.toString().includes("Local")) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(["programPlanningUnit"], "readwrite");
+        var program = transaction.objectStore("programPlanningUnit");
+        var getRequest = program.getAll();
+        getRequest.onerror = function (event) {
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = getRequest.result;
+          this.setState({
+            planningUnitDetails: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+            planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+          }, () => {
+            console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
+          })
+        }.bind(this)
+      }.bind(this)
+    } else {
+      ReportService.getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId).then(response => {
+        this.setState({
+          planningUnitDetails: response.data,
+          planningUnitDetailsExport: response.data
+        }, () => {
+          console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
+        })
+      }).catch(
+        error => {
+          this.setState({
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+    }
+  }
+  getPlanningUnitByProgramIdAndPlanningUnitIdExport(programId, planningUnitId) {
+    if (this.state.versionId.toString().includes("Local")) {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(["programPlanningUnit"], "readwrite");
+        var program = transaction.objectStore("programPlanningUnit");
+        var getRequest = program.getAll();
+        getRequest.onerror = function (event) {
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = getRequest.result;
+          this.setState({
+            planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+          }, () => {
+            console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
+          })
+        }.bind(this)
+      }.bind(this)
+    } else {
+      ReportService.getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId).then(response => {
+        this.setState({
+          planningUnitDetailsExport: response.data
+        }, () => {
+          console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
+        })
+      }).catch(
+        error => {
+          this.setState({
+            stockStatusList: [], loading: false
+          })
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              loading: false
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+              case 409:
+                this.setState({
+                  message: i18n.t('static.common.accessDenied'),
+                  loading: false,
+                  color: "#BA0C2F",
+                });
+                break;
+              case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+              case 500:
+              case 404:
+              case 406:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                  loading: false
+                });
+                break;
+              default:
+                this.setState({
+                  message: 'static.unkownError',
+                  loading: false
+                });
+                break;
+            }
+          }
+        }
+      );
+    }
+  }
   setPlanningUnitExport(e) {
     this.setState({
       planningUnitIdExport: e.map(ele => ele),
+    }, () => {
+      if (this.state.programId.length == 1 && this.state.planningUnitIdExport.length == 1) {
+        this.getPlanningUnitByProgramIdAndPlanningUnitIdExport(this.state.programId[0].value, this.state.planningUnitIdExport[0].value);
+      }
     })
   }
   setRealmCountryPlanningUnit(e) {
@@ -3069,7 +3295,9 @@ class StockStatus extends Component {
         show: false,
         dataList: [],
         consumptionAdjForStockOutId: false,
-        loading: false
+        loading: false,
+        planningUnitDetails: "",
+        planningUnitDetailsExport: ""
       }, () => {
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
@@ -3110,6 +3338,17 @@ class StockStatus extends Component {
         this.setState({
           planningUnitIdExport: planningUnit,
         })
+      }
+      if (this.state.programId.length == 1 && this.state.realmCountryPlanningUnitIdExport.length == 1) {
+        var planningUnitId;
+        if (this.state.versionId.toString().includes("Local")) {
+          var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(this.state.realmCountryPlanningUnitIdExport[0].value));
+          planningUnitId = Number(rcpu[0].planningUnit.id);
+        } else {
+          var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == this.state.realmCountryPlanningUnitIdExport[0].value)[0].forecastingUnitId;
+          planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+        }
+        this.getPlanningUnitByProgramIdAndPlanningUnitIdExport(this.state.programId[0].value, this.state.planningUnitIdExport[0].value);
       }
     })
   }
@@ -3397,14 +3636,14 @@ class StockStatus extends Component {
                 "mos": sp.reduce((sum, value) => sum + value.closingBalance, 0) / sp.reduce((sum, value) => sum + value.amc, 0),
                 "minStockMos": ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length,
                 "maxStockMos": Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length),
-                "minStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length),
+                "minStockQty": ppu.reduce((sum, value) => sum + value.minQty, 0) / ppu.length,
                 "maxStockQty": Number(sp.reduce((sum, value) => sum + roundARU(value.amc, multiplier), 0)) * Number(Number(ppu.reduce((sum, value) => sum + value.minMonthsOfStock, 0) / ppu.length) + Number(ppu.reduce((sum, value) => sum + value.reorderFrequencyInMonths, 0) / ppu.length)),
                 "unmetDemand": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.unmetDemand, multiplier), 0),
                 "regionCount": sp.length > 0 ? sp[0].regionCount : 0,
                 "regionCountForStock": sp.length > 0 ? sp[0].regionCountForStock : 0,
                 "nationalAdjustment": sp.reduce((sum, value) => sum + roundARUWithoutRounding(value.nationalAdjustment, multiplier), 0),
                 "planBasedOn": ppu.some(c => c.planBasedOn == 1) ? 1 : 2,
-                "ppuNotes": ppu.length > 1 ? (notes == "" ? null : notes) : (ppu[0].notes == "" ? null : this.state.programId[0].label + ": " + ppu[0].notes),
+                "ppuNotes": ppu.length > 1 ? (notes == "" ? null : notes) : ((ppu[0].notes == "" || ppu[0].notes == null) ? null : this.state.programId[0].label + ": " + ppu[0].notes),
                 "consumptionInfo": conList,
                 "inventoryInfo": invList,
                 "shipmentInfo": shipList
@@ -3585,6 +3824,7 @@ class StockStatus extends Component {
    * @returns {JSX.Element} - Stock Status report table.
    */
   render() {
+    console.log("This.state.planningUnitDetails", this.state.planningUnitDetails != "" ? this.state.planningUnitDetails.monthsInPastForAmc : "");
     const darkModeColors = [
       '#d4bbff',
       '#757575',
@@ -4545,19 +4785,22 @@ class StockStatus extends Component {
                                   <b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b>
                                 </span>
                               </li>
-                              {this.state.stockStatusList[0].planBasedOn == 1 ? <>
-                                <li><span className="redlegend "></span>
+                              <>
+                                {this.state.programId.length == 1 && (this.state.viewById == 1 ? this.state.planningUnitId.length == 1 : this.state.realmCountryPlanningUnitId.length == 1) && <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.planningUnitDetails.monthsInPastForAmc}/{this.state.planningUnitDetails.monthsInFutureForAmc}</span></li>
+                                  <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.planningUnitDetails.shelfLife}</span></li></>}
+                                {this.state.stockStatusList[0].planBasedOn == 1 ? <li><span className="redlegend "></span>
                                   <span className="legendcommitversionText">
                                     <b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {formatter(roundAMC(this.state.stockStatusList[0].minStockMos), 0)}
                                   </span>
-                                </li>
-                                <li><span className="redlegend "></span>
+                                </li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li>}
+                                {this.state.programId.length == 1 && (this.state.viewById == 1 ? this.state.planningUnitId.length == 1 : this.state.realmCountryPlanningUnitId.length == 1) && <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.planningUnitDetails.reorderFrequencyInMonths}</span></li>}
+                                {this.state.stockStatusList[0].planBasedOn == 1 && <li><span className="redlegend "></span>
                                   <span className="legendcommitversionText">
                                     <b>{i18n.t("static.supplyPlan.maxStockMos")}</b>   : {formatter(roundAMC(this.state.stockStatusList[0].maxStockMos), 0)}
                                   </span>
-                                </li>
-                              </> :
-                                <><li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {formatter(this.state.stockStatusList[0].minStockQty, 0)}</span></li></>}
+                                </li>}
+                                {this.state.programId.length == 1 && (this.state.viewById == 1 ? this.state.planningUnitId.length == 1 : this.state.realmCountryPlanningUnitId.length == 1) && this.state.stockStatusList[0].planBasedOn == 2 && <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.state.planningUnitDetails.distributionLeadTime}</span></li>}
+                              </>
                             </ul>
                             {this.state.stockStatusList[0].ppuNotes != undefined && this.state.stockStatusList[0].ppuNotes != null && this.state.stockStatusList[0].ppuNotes.length > 0 &&
                               <span style={{ "marginTop": "10px" }} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("~").map((item, index) => {
