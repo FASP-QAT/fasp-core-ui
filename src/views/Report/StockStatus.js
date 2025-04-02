@@ -125,7 +125,6 @@ class StockStatus extends Component {
     this.setGraphAggregatedBy = this.setGraphAggregatedBy.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
     this.getPlanningUnitByProgramIdAndPlanningUnitId = this.getPlanningUnitByProgramIdAndPlanningUnitId.bind(this);
-    this.getPlanningUnitByProgramIdAndPlanningUnitIdExport = this.getPlanningUnitByProgramIdAndPlanningUnitIdExport.bind(this);
   }
   setGraphAggregatedBy(e) {
     this.setState({
@@ -3051,7 +3050,7 @@ class StockStatus extends Component {
         loading: false
       }, () => {
         if (this.state.programId.length == 1) {
-          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId);
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId, false);
         }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
@@ -3104,7 +3103,7 @@ class StockStatus extends Component {
             var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == realmCountryPlanningUnitId)[0].forecastingUnitId;
             planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
           }
-          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId);
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId, false);
         }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
@@ -3116,7 +3115,7 @@ class StockStatus extends Component {
       })
     }
   }
-  getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId) {
+  getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId, setOnlyExportValue) {
     if (this.state.versionId.toString().includes("Local")) {
       var db1;
       getDatabase();
@@ -3130,101 +3129,30 @@ class StockStatus extends Component {
         };
         getRequest.onsuccess = function (event) {
           var myResult = getRequest.result;
-          this.setState({
-            planningUnitDetails: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
-            planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
-          }, () => {
-            console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
-          })
-        }.bind(this)
-      }.bind(this)
-    } else {
-      ReportService.getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId).then(response => {
-        this.setState({
-          planningUnitDetails: response.data,
-          planningUnitDetailsExport: response.data
-        }, () => {
-          console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
-        })
-      }).catch(
-        error => {
-          this.setState({
-            stockStatusList: [], loading: false
-          })
-          if (error.message === "Network Error") {
+          if (setOnlyExportValue) {
             this.setState({
-              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-              loading: false
-            });
+              planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+            })
           } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`)
-                break;
-              case 409:
-                this.setState({
-                  message: i18n.t('static.common.accessDenied'),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`)
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                  loading: false
-                });
-                break;
-              default:
-                this.setState({
-                  message: 'static.unkownError',
-                  loading: false
-                });
-                break;
-            }
+            this.setState({
+              planningUnitDetails: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+              planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
+            })
           }
-        }
-      );
-    }
-  }
-  getPlanningUnitByProgramIdAndPlanningUnitIdExport(programId, planningUnitId) {
-    if (this.state.versionId.toString().includes("Local")) {
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(["programPlanningUnit"], "readwrite");
-        var program = transaction.objectStore("programPlanningUnit");
-        var getRequest = program.getAll();
-        getRequest.onerror = function (event) {
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = getRequest.result;
-          this.setState({
-            planningUnitDetailsExport: myResult.filter(c => c.program.id == programId && c.planningUnit.id == planningUnitId)[0],
-          }, () => {
-            console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
-          })
         }.bind(this)
       }.bind(this)
     } else {
       ReportService.getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId).then(response => {
-        this.setState({
-          planningUnitDetailsExport: response.data
-        }, () => {
-          console.log("Planning Unit Details Test@123", this.state.planningUnitDetails)
-        })
+        if (setOnlyExportValue) {
+          this.setState({
+            planningUnitDetailsExport: response.data
+          })
+        } else {
+          this.setState({
+            planningUnitDetails: response.data,
+            planningUnitDetailsExport: response.data
+          })
+        }
       }).catch(
         error => {
           this.setState({
@@ -3281,7 +3209,7 @@ class StockStatus extends Component {
       planningUnitIdExport: e.map(ele => ele),
     }, () => {
       if (this.state.programId.length == 1 && this.state.planningUnitIdExport.length == 1) {
-        this.getPlanningUnitByProgramIdAndPlanningUnitIdExport(this.state.programId[0].value, this.state.planningUnitIdExport[0].value);
+        this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, this.state.planningUnitIdExport[0].value, true);
       }
     })
   }
@@ -3348,7 +3276,7 @@ class StockStatus extends Component {
           var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == this.state.realmCountryPlanningUnitIdExport[0].value)[0].forecastingUnitId;
           planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
         }
-        this.getPlanningUnitByProgramIdAndPlanningUnitIdExport(this.state.programId[0].value, this.state.planningUnitIdExport[0].value);
+        this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, this.state.planningUnitIdExport[0].value, true);
       }
     })
   }
