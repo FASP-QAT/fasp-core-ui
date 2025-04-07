@@ -5453,10 +5453,10 @@ export default class ExtrapolateDataComponent extends React.Component {
                         <Col xs="12" sm="12">
                             <Card>
                                 <CardHeader>
-                                    <strong>{i18n.t('static.extrapolation.bulkExtrapolation')}<span className="float-right">{i18n.t('static.extrapolation.estimateTime')}{this.state.estimatedTime}</span></strong>
+                                    <strong>{this.state.type==1?i18n.t('static.extrapolation.bulkExtrapolation'):(this.state.type==2?i18n.t('static.extrapolation.optimizeTES&ARIMA'):i18n.t('static.extrapolation.missingTES&ARIMA'))}<span className="float-right">{this.state.type==1?i18n.t('static.extrapolation.estimateTimeBulkExtrapolation'):(this.state.type==2?i18n.t('static.extrapolation.estimateTimeOptimiseTESAndArmia'):i18n.t('static.extrapolation.estimateTimeMissingTes'))}{this.state.estimatedTime}</span></strong>
                                 </CardHeader>
                                 <CardBody>
-                                    <div className="text-center text-blackD">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {i18next.t('static.extrapolation.extrapolation')})</div>
+                                    <div className="text-center text-blackD">{this.state.syncedExtrapolationsPercentage}% ({this.state.syncedExtrapolations} {i18next.t('static.masterDataSync.of')} {this.state.totalExtrapolatedCount} {this.state.type==1?i18n.t('static.extrapolation.bulkExtrapolation'):(this.state.type==2?i18n.t('static.extrapolation.optimizeTES&ARIMA'):i18n.t('static.extrapolation.missingTES&ARIMA'))})</div>
                                     <Progress value={this.state.syncedExtrapolations} max={this.state.totalExtrapolatedCount} />
                                     <Button size="md" color="danger" className="submitBtn float-right mr-1 mt-3" onClick={(e) => this.cancelExtrapolation(e)}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 </CardBody>
