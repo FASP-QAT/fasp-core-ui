@@ -3611,5 +3611,8 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.extrapolation.estimateTimeBulkExtrapolation": "Estimated time for bulk extrapolation in seconds : ",
+  "static.extrapolation.estimateTimeOptimiseTESAndArmia": "Estimated time for Optimize TES & ARIMA in seconds : ",
+  "static.extrapolation.estimateTimeMissingTes": "Estimated time for Missing TES & ARIMA in seconds : "
 }
