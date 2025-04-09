@@ -543,31 +543,44 @@ export default class ImportDataset extends Component {
                     var fileName = []
                     var size = 0;
                     reader.onload = (e) => {
+                        const zipData = new Uint8Array(e.target.result);
+                        const mz = new Minizip(zipData);
+                        const files = mz.list(); // Ensure to list files first
                         try {
-                            const zipData = new Uint8Array(e.target.result);
-                            const mz = new Minizip(zipData);
-                            const files = mz.list(); // Ensure to list files first
                             files.forEach((fileInfo) => {
-                                size++;
-                                const fileDataList = mz.extract(fileInfo.filepath, { password });
-                                var fileData = new TextDecoder().decode(fileDataList)
-                                var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
-                                fileName[i] = {
-                                    value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.label), lan)) + "~v" + programDataJson.version, fileData: fileData
-                                }
-                                i++;
+                                const fileDataList = mz.extract(fileInfo.filepath);
                             });
                             this.updateStepOneData("loading", false);
                             this.setState({
-                                message: "",
-                                programList: fileName,
+                                message: "File is not encrypted",
                                 loading: false
                             }, () => {
-                                this.finishedStepOne();
+                                alert('Failed to extract the zip file.');
                             })
-                        } catch (error) {
-                            console.error('Extraction error:', error);
-                            alert('Failed to extract the zip file.');
+                        } catch (e) {
+                            try {
+                                files.forEach((fileInfo) => {
+                                    size++;
+                                    const fileDataList = mz.extract(fileInfo.filepath, { password });
+                                    var fileData = new TextDecoder().decode(fileDataList)
+                                    var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                    fileName[i] = {
+                                        value: fileInfo.filepath, label: (getLabelText((programDataJson.programData.label), lan)) + "~v" + programDataJson.version, fileData: fileData
+                                    }
+                                    i++;
+                                });
+                                this.updateStepOneData("loading", false);
+                                this.setState({
+                                    message: "",
+                                    programList: fileName,
+                                    loading: false
+                                }, () => {
+                                    this.finishedStepOne();
+                                })
+                            } catch (error) {
+                                console.error('Extraction error:', error);
+                                alert('Failed to extract the zip file.');
+                            }
                         }
                     };
                     reader.readAsArrayBuffer(file);
