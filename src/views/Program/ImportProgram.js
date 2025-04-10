@@ -602,56 +602,69 @@ export default class ImportProgram extends Component {
                     var fileName = []
                     var size = 0;
                     reader.onload = (e) => {
+                        const zipData = new Uint8Array(e.target.result);
+                        const mz = new Minizip(zipData);
+                        const files = mz.list(); // Ensure to list files first
+                        const fileMap = new Map();
+                        files.forEach((fileInfo) => {
+                            const baseName = fileInfo.filepath.replace(/_part\.txt$/, ".txt");
+                            if (!fileMap.has(baseName)) {
+                                fileMap.set(baseName, []);
+                            }
+                            fileMap.get(baseName).push(fileInfo);
+                        });
+                        let k = 0; 
                         try {
-                            const zipData = new Uint8Array(e.target.result);
-                            const mz = new Minizip(zipData);
-                            const files = mz.list(); // Ensure to list files first
-                            const fileMap = new Map();
-                            files.forEach((fileInfo) => {
-                                const baseName = fileInfo.filepath.replace(/_part\.txt$/, ".txt");
-                                if (!fileMap.has(baseName)) {
-                                    fileMap.set(baseName, []);
-                                }
-                                fileMap.get(baseName).push(fileInfo);
-                            });
-                            let k = 0; 
                             fileMap.forEach((fileGroup) => {
-                                var fileDataList, fileDataList2, fileData;
-                                size++;
-                                if (fileGroup.length === 1) {
-                                    fileDataList = mz.extract(fileGroup[0].filepath, { password });
-                                    fileData = new TextDecoder().decode(fileDataList);
-                                } else {
-                                    fileDataList = mz.extract(fileGroup[0].filepath, { password });
-                                    fileDataList2 = fileGroup.length > 1 ? mz.extract(fileGroup[1].filepath, { password }) : "";
-                                    
-                                    fileData = new TextDecoder().decode(fileDataList) + new TextDecoder().decode(fileDataList2);
-                                }
-                                var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
-                                
-                                console.log("programDataJson.programData.generalData", programDataJson.programData);
-                                
-                                var cutOffDate = programDataJson.programData.generalData.cutOffDate ? programDataJson.programData.generalData.cutOffDate : "";
-                                
-                                fileName[k] = {
-                                    value: fileGroup[0].filepath,
-                                    label: getLabelText(programDataJson.programData.generalData.label, lan) + "~v" + programDataJson.version +
-                                        (cutOffDate ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
-                                    fileData: fileData
-                                };
-                                k++;
+                               var fileDataList = mz.extract(fileGroup[0].filepath);
                             });
                             this.updateStepOneData("loading", false);
                             this.setState({
-                                message: "",
-                                programList: fileName,
+                                message: "File is not encrypted",
                                 loading: false
                             }, () => {
-                                this.finishedStepOne();
+                                alert('Failed to extract the zip file.');
                             })
-                        } catch (error) {
-                            console.error('Extraction error:', error);
-                            alert('Failed to extract the zip file.');
+                        } catch (e) {
+                            try{
+                                fileMap.forEach((fileGroup) => {
+                                    var fileDataList, fileDataList2, fileData;
+                                    size++;
+                                    if (fileGroup.length === 1) {
+                                        fileDataList = mz.extract(fileGroup[0].filepath, { password });
+                                        fileData = new TextDecoder().decode(fileDataList);
+                                    } else {
+                                        fileDataList = mz.extract(fileGroup[0].filepath, { password });
+                                        fileDataList2 = fileGroup.length > 1 ? mz.extract(fileGroup[1].filepath, { password }) : "";
+                                        
+                                        fileData = new TextDecoder().decode(fileDataList) + new TextDecoder().decode(fileDataList2);
+                                    }
+                                    var programDataJson = JSON.parse(fileData.split("@~-~@")[0]);
+                                    
+                                    console.log("programDataJson.programData.generalData", programDataJson.programData);
+                                    
+                                    var cutOffDate = programDataJson.programData.generalData.cutOffDate ? programDataJson.programData.generalData.cutOffDate : "";
+                                    
+                                    fileName[k] = {
+                                        value: fileGroup[0].filepath,
+                                        label: getLabelText(programDataJson.programData.generalData.label, lan) + "~v" + programDataJson.version +
+                                            (cutOffDate ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(cutOffDate).format('MMM YYYY') + ")" : ""),
+                                        fileData: fileData
+                                    };
+                                    k++;
+                                });
+                                this.updateStepOneData("loading", false);
+                                this.setState({
+                                    message: "",
+                                    programList: fileName,
+                                    loading: false
+                                }, () => {
+                                    this.finishedStepOne();
+                                })
+                            } catch (error) {
+                                console.error('Extraction error:', error);
+                                alert('Failed to extract the zip file.');
+                            }
                         }
                     };
                     reader.readAsArrayBuffer(file);

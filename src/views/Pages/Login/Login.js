@@ -317,9 +317,28 @@ class Login extends Component {
                 </div>
               </Col>
               <Col md="12">
-                <div className="upper-logo logo-MarginTop">
+                {/* <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
-                </div>
+                </div> */}
+                <Row className='pb-lg-5'>
+                  <Col md="4">
+                    <div className="upper-logo logo-MarginTop">
+                      <img src={image1} className="img-fluid " />
+                    </div>
+                  </Col>
+                  <Col md="5" lg="5">
+                    <div style={{ marginBottom: '20px', marginTop:'-25px',fontSize:'14px' }}>
+                      {this.state.lang === 'en' ?
+                        <p style={{color:'#002f6c'}}>QAT will be undergoing a maintenance event on <strong>April 19th, 2025</strong> at <strong>7:30 PM EDT (April 18th) // 12:30 AM WAT // 2:30 AM EAT // 5:00 AM IST</strong> for approximately <strong>5 hours</strong>. We apologize for any inconvenience and appreciate your understanding.</p>:
+                        this.state.lang === 'sp' ?
+                        <p style={{color:'#002f6c'}}>QAT se someterá a mantenimiento el <strong>19 de abril de 2025 a las 7:30 PM EDT (18 de abril) // 12:30 AM WAT // 2:30 AM EAT // 05:00 AM IST durante aproximadamente 5 horas.</strong> Disculpen las molestias y agradecemos su comprensión.</p>:
+                        this.state.lang === 'fr' ?
+                        <p style={{color:'#002f6c'}}>QAT subira une maintenance le <strong>19 avril 2025 à 19h30 HAE (18 avril) // 00h30 WAT // 2h30 EAT // 5h00 IST pendant environ 5 heures.</strong> Nous vous prions de nous excuser pour la gêne occasionnée et vous remercions de votre compréhension.</p> :
+                        <p style={{color:'#002f6c'}}>O QAT passará por um evento de manutenção em <strong>19 de abril de 2025 às 7:30 PM EDT (18 de abril) // 12:30 AM WAT // 2:30 AM EAT // 5:00 AM IST por aproximadamente 5 horas.</strong> Pedimos desculpas por qualquer inconveniente e agradecemos sua compreensão.</p>
+                      }
+                    </div>
+                  </Col>
+                </Row>
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
