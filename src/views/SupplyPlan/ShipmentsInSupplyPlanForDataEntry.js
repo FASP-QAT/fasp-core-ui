@@ -2248,7 +2248,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
                     var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                     var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
-                    shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[28] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                    shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[2] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                         .map(c => {
                             var batchInfoList = c.batchInfoList;
                             batchInfoList.map(bi => {
@@ -3234,7 +3234,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0]
                 var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                 var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
-                shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[28] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[2] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                     .map(c => {
                         var batchInfoList = c.batchInfoList;
                         batchInfoList.map(bi => {
