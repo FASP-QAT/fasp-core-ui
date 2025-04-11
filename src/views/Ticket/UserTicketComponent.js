@@ -79,6 +79,8 @@ export default class UserTicketComponent extends Component {
                 role: [],
                 language: "",
                 notes: '',
+                file: '',
+                attachFile: '',
                 priority: 3
             },
             lang: localStorage.getItem('lang'),
@@ -129,6 +131,10 @@ export default class UserTicketComponent extends Component {
         }
         if (event.target.name == "notes") {
             user.notes = event.target.value;
+        }
+        if (event.target.name == "attachFile") {
+            user.file = event.target.files[0];
+            user.attachFile = event.target.files[0].name;
         }
         this.setState({
             user
@@ -405,6 +411,8 @@ export default class UserTicketComponent extends Component {
         user.role = '';
         user.language = '';
         user.notes = '';
+        user.file = '';
+        user.attachFile = '';
         this.setState({
             user: user,
             realmId: this.props.items.userRealmId,
@@ -482,6 +490,8 @@ export default class UserTicketComponent extends Component {
                             JiraTikcetService.addUpdateUserRequest(this.state.user).then(response => {
                                 if (response.status == 200 || response.status == 201) {
                                     var msg = response.data.key;
+                                    JiraTikcetService.addIssueAttachment(this.state.user, response.data.id).then(response => {
+                                    });
                                     this.setState({
                                         message: msg, loading: false
                                     },
@@ -683,6 +693,23 @@ export default class UserTicketComponent extends Component {
                                             value={this.state.user.notes}
                                         />
                                         <FormFeedback className="red">{errors.notes}</FormFeedback>
+                                    </FormGroup>
+                                    <FormGroup >
+                                        <Label htmlFor="attachFile">{i18n.t('static.ticket.uploadFile')}</Label>
+                                        <div className="custom-file">
+                                            <Input type="file" className="custom-file-input" id="attachFile" name="attachFile" accept=".zip,.png,.jpg,.jpeg,.xls,.xlsx,.xlsm,.xlsb,.doc,.docx,.pdf"
+                                                valid={!errors.attachFile && this.state.user.attachFile != ''}
+                                                invalid={touched.attachFile && !!errors.attachFile}
+                                                onChange={(e) => { handleChange(e); this.dataChange(e); }}
+                                                onBlur={handleBlur}
+                                            />
+                                            <label className="custom-file-label" id="attachFile" data-browse={i18n.t('static.uploadfile.Browse')} >{this.state.user.attachFile}</label>
+                                            <FormFeedback className="red">{errors.attachFile}</FormFeedback>
+                                        </div>
+                                        <br></br><br></br>
+                                        <div>
+                                            <p>{i18n.t('static.ticket.filesuploadnote')}</p>
+                                        </div>
                                     </FormGroup>
                                     <FormGroup>
                                         <TicketPriorityComponent priority={this.state.user.priority} updatePriority={this.updatePriority} errors={errors} touched={touched}/>
