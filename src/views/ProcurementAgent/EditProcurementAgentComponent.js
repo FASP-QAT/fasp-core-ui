@@ -738,7 +738,7 @@ class EditProcurementAgentComponent extends Component {
                                                     </div>
                                                     {this.state.displayColorPicker ? <div style={styles.popover}>
                                                         <div style={styles.cover} onClick={this.handleClose} />
-                                                        <SketchPicker color={this.state.color} onChange={this.handleChangeColor} />
+                                                        <SketchPicker color={this.state.rgba} onChange={this.handleChangeColor} />
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
@@ -750,7 +750,7 @@ class EditProcurementAgentComponent extends Component {
                                                     </div>
                                                     {this.state.displayColorPickerDarkMode ? <div style={styles.popover}>
                                                         <div style={styles.cover} onClick={this.handleCloseDarkMode} />
-                                                        <SketchPicker color={this.state.colorDarkMode} onChange={this.handleChangeColorDarkMode} />
+                                                        <SketchPicker color={this.state.rgbaDarkMode} onChange={this.handleChangeColorDarkMode} />
                                                     </div> : null}
                                                 </FormGroup>
                                                 <FormGroup>
