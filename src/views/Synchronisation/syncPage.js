@@ -249,6 +249,7 @@ export default class syncPage extends Component {
         { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: this.state.planningUnitList, width: 200 },
         { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 90 },
         { title: i18n.t('static.region.region'), type: 'dropdown', source: this.state.regionList, width: 100 },
+        { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
         { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: this.state.dataSourceList, width: 100 },
         { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: this.state.realmCountryPlanningUnitList, width: 150 },
         { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
@@ -256,7 +257,6 @@ export default class syncPage extends Component {
         { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##',decimal:'.', width: 80 },
         { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
         { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-        { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
         { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
         { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
         { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 80 },
@@ -1927,18 +1927,18 @@ export default class syncPage extends Component {
                                                 data[1] = mergedConsumptionData[cd].planningUnit.id;
                                                 data[2] = moment(mergedConsumptionData[cd].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE);
                                                 data[3] = mergedConsumptionData[cd].region.id;
-                                                data[4] = mergedConsumptionData[cd].dataSource.id;
-                                                data[5] = mergedConsumptionData[cd].realmCountryPlanningUnit.id;
-                                                data[6] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty);
-                                                data[7] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                                                data[8] = (Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier);
-                                                data[9] = mergedConsumptionData[cd].dayOfStockOut;
+                                                data[4] = consumptionFlag;
+                                                data[5] = mergedConsumptionData[cd].dataSource.id;
+                                                data[6] = mergedConsumptionData[cd].realmCountryPlanningUnit.id;
+                                                data[7] = Math.round(mergedConsumptionData[cd].consumptionRcpuQty);
+                                                data[8] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                                                data[9] = (Math.round(mergedConsumptionData[cd].consumptionRcpuQty) * mergedConsumptionData[cd].multiplier);
+                                                data[10] = mergedConsumptionData[cd].dayOfStockOut;
                                                 if (mergedConsumptionData[cd].notes === null || ((mergedConsumptionData[cd].notes) == "NULL")) {
-                                                  data[10] = "";
+                                                  data[11] = "";
                                                 } else {
-                                                  data[10] = mergedConsumptionData[cd].notes;
+                                                  data[11] = mergedConsumptionData[cd].notes;
                                                 }
-                                                data[11] = consumptionFlag;
                                                 data[12] = mergedConsumptionData[cd].active;
                                                 data[13] = JSON.stringify(mergedConsumptionData[cd].batchInfoList != "" ? ((mergedConsumptionData[cd].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : "");
                                                 data[14] = "";
@@ -1946,21 +1946,21 @@ export default class syncPage extends Component {
                                                 var oldData = ""
                                                 if (oldDataList.length > 0) {
                                                   var rcpuForTableOldData = realmCountryPlanningUnitList.filter(c => c.id == oldDataList[0].realmCountryPlanningUnit.id);
-                                                  oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), (rcpuForTableOldData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableOldData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier), oldDataList[0].dayOfStockOut, oldDataList[0].notes, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                  oldData = [oldDataList[0].consumptionId, oldDataList[0].planningUnit.id, moment(oldDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), oldDataList[0].region.id, (oldDataList[0].actualFlag.toString() == "true" ? 1 : 0), oldDataList[0].dataSource.id, oldDataList[0].realmCountryPlanningUnit.id, Math.round(oldDataList[0].consumptionRcpuQty), (rcpuForTableOldData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableOldData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(oldDataList[0].consumptionRcpuQty) * oldDataList[0].multiplier), oldDataList[0].dayOfStockOut, oldDataList[0].notes, oldDataList[0].active, JSON.stringify(oldDataList[0].batchInfoList != "" ? ((oldDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                                 }
                                                 data[15] = oldData;
                                                 var latestDataList = latestProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                                 var latestData = ""
                                                 if (latestDataList.length > 0) {
                                                   var rcpuForTableLatestData = realmCountryPlanningUnitList.filter(c => c.id == latestDataList[0].realmCountryPlanningUnit.id);
-                                                  latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), (rcpuForTableLatestData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableLatestData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier), latestDataList[0].dayOfStockOut, latestDataList[0].notes, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                  latestData = [latestDataList[0].consumptionId, latestDataList[0].planningUnit.id, moment(latestDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), latestDataList[0].region.id, (latestDataList[0].actualFlag.toString() == "true" ? 1 : 0), latestDataList[0].dataSource.id, latestDataList[0].realmCountryPlanningUnit.id, Math.round(latestDataList[0].consumptionRcpuQty), (rcpuForTableLatestData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableLatestData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(latestDataList[0].consumptionRcpuQty) * latestDataList[0].multiplier), latestDataList[0].dayOfStockOut, latestDataList[0].notes, latestDataList[0].active, JSON.stringify(latestDataList[0].batchInfoList != "" ? ((latestDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                                 }
                                                 data[16] = latestData;
                                                 var downloadedDataList = downloadedProgramDataConsumption.filter(c => c.consumptionId == mergedConsumptionData[cd].consumptionId);
                                                 var downloadedData = "";
                                                 if (downloadedDataList.length > 0) {
                                                   var rcpuForTableDownloadedData = realmCountryPlanningUnitList.filter(c => c.id == downloadedDataList[0].realmCountryPlanningUnit.id);
-                                                  downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), (rcpuForTableDownloadedData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableDownloadedData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier), downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
+                                                  downloadedData = [downloadedDataList[0].consumptionId, downloadedDataList[0].planningUnit.id, moment(downloadedDataList[0].consumptionDate).format(DATE_FORMAT_CAP_WITHOUT_DATE), downloadedDataList[0].region.id, (downloadedDataList[0].actualFlag.toString() == "true" ? 1 : 0), downloadedDataList[0].dataSource.id, downloadedDataList[0].realmCountryPlanningUnit.id, Math.round(downloadedDataList[0].consumptionRcpuQty), (rcpuForTableDownloadedData[0].conversionMethod == 1 ? "*" : "/") + rcpuForTableDownloadedData[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), (Math.round(downloadedDataList[0].consumptionRcpuQty) * downloadedDataList[0].multiplier), downloadedDataList[0].dayOfStockOut, downloadedDataList[0].notes, downloadedDataList[0].active, JSON.stringify(downloadedDataList[0].batchInfoList != "" ? ((downloadedDataList[0].batchInfoList).map(function (a) { return { "batchNo": a.batch.batchNo, "qty": parseInt(a.consumptionQty) } })).sort(function (a, b) { return a.qty - b.qty; }) : ""), "", "", "", "", 4];
                                                 }
                                                 data[17] = downloadedData;
                                                 data[18] = 4;
@@ -1974,6 +1974,7 @@ export default class syncPage extends Component {
                                                   { title: i18n.t('static.planningunit.planningunit'), type: 'dropdown', source: planningUnitList, width: 200 },
                                                   { title: i18n.t('static.pipeline.consumptionDate'), type: 'text', width: 95 },
                                                   { title: i18n.t('static.region.region'), type: 'dropdown', source: regionList, width: 100 },
+                                                  { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                                                   { title: i18n.t('static.inventory.dataSource'), type: 'dropdown', source: dataSourceList, width: 100 },
                                                   { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'dropdown', source: realmCountryPlanningUnitList, width: 150 },
                                                   { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: 'numeric', mask: '#,##', width: 80 },
@@ -1981,7 +1982,6 @@ export default class syncPage extends Component {
                                                   { title: i18n.t('static.supplyPlan.quantityQATProduct'), type: 'numeric', mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##',decimal:'.', width: 80 },
                                                   { title: i18n.t('static.consumption.daysofstockout'), type: 'numeric', mask: '#,##', width: 80 },
                                                   { title: i18n.t('static.program.notes'), type: 'text', width: 200 },
-                                                  { type: 'dropdown', title: i18n.t('static.consumption.consumptionType'), source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.consumption.forcast') }], width: 100 },
                                                   { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 70 },
                                                   { type: 'hidden', title: i18n.t('static.supplyPlan.batchInfo'), width: 0 },
                                                   { type: 'text', title: i18n.t('static.supplyPlan.batchInfo'), width: 85 },
