@@ -1357,6 +1357,7 @@
   "static.importFromQATSupplyPlan.isRegionInForecastProgram": "La région est-elle dans le programme de prévision ?",
   "static.realm.no": "Non",
   "static.supplyPlan.exportAsPDF": "Exporter au format PDF",
+  "static.ticket.uploadFile": "Télécharger le fichier",
   "static.program.arrivedToReceivedLeadTime": "Entrez le délai entre l`arrivé et la reception «Arrivé à Reçu» (en mois)",
   "static.placeholder.usagePeriod": "Attention : Veuillez noter que toute modification apportée à cet écran aura un impact sur l'ensemble de l'application.",
   "static.inventory.adjustmentdetails": "Données sur les ajustements",
