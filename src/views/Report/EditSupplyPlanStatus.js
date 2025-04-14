@@ -4297,6 +4297,24 @@ class EditSupplyPlanStatus extends Component {
             loading: false,
             // loadSummaryTable:true
         })
+        setTimeout(() => {
+            const filterBtn = document.querySelectorAll('.jss_filters_icon');
+            filterBtn.forEach(btn => {
+              btn.addEventListener('click', () => {
+                // Wait for dropdown to render
+                setTimeout(() => {
+                  const dropdown = document.querySelector('.jss_filters_options');
+                  if (dropdown) {
+                    const options = Array.from(dropdown.querySelectorAll('label')).slice(1);
+                    const sorted = options.sort((a, b) =>
+                      a.textContent.localeCompare(b.textContent)
+                    );
+                    sorted.forEach(option => dropdown.appendChild(option));
+                  }
+                }, 50);
+              });
+            });
+        }, 100);
     }
     /**
  * This function is used to format the QPL table like add asterisk or info to the table headers
