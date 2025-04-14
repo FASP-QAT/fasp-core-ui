@@ -1661,7 +1661,7 @@ export default class syncPage extends Component {
                       }.bind(this);
                       rcpuRequest.onsuccess = function (event) {
                         var rcpuResult = [];
-                        rcpuResult = rcpuRequest.result.filter(c => (c.active).toString() == "true");
+                        rcpuResult = rcpuRequest.result;
                         for (var k = 0; k < rcpuResult.length; k++) {
                           var rcpuJson = {
                             name: getLabelText(rcpuResult[k].label, this.state.lang),
