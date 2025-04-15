@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
 import jsPDF from 'jspdf';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import { Bar } from 'react-chartjs-2';
@@ -408,7 +409,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: 'top',
           filters: false,
-          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+          license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
           parseFormulas: true,
           editable: AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? true : false,
           contextMenu: function (obj, x, y, e) {
@@ -4016,7 +4017,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
       allowManualInsertRow: false,
       parseFormulas: true,
       editable: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return [];
       }.bind(this),

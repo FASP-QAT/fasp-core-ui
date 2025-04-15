@@ -756,3 +756,18 @@ export function jExcelLoadedFunctionForNotes(instance,number) {
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
+export function onOpenFilter(worksheets,columnNumber,options){
+    var type=worksheets.getConfig().columns[columnNumber].type;
+    if(type=='dropdown' || type=='autocomplete'){
+        setTimeout(() => {
+            const dropdown = document.querySelector('.jss_filters_options');
+            if (dropdown) {
+                const options = Array.from(dropdown.querySelectorAll('label')).slice(1);
+                const sorted = options.sort((a, b) =>
+                    a.textContent.localeCompare(b.textContent)
+                );
+                sorted.forEach(option => dropdown.appendChild(option));
+            }
+        }, 50);
+    }
+}

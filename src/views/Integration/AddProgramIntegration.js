@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from "react";
 import {
     Button,
@@ -253,7 +254,7 @@ class ProgramIntegration extends Component {
                                                         copyCompatibility: true,
                                                         onpaste: this.onPaste,
                                                         allowManualInsertRow: false,
-                                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                         editable: true,
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {

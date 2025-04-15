@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import { Bar } from 'react-chartjs-2';
@@ -1183,7 +1184,7 @@ export default class SupplyPlanComponent extends React.Component {
                     allowExport: false,
                     position: 'top',
                     filters: false,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         var items = [];
                         if (y != null) {

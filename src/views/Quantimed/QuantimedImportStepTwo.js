@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import {
     Button,
@@ -432,7 +433,7 @@ export default class QunatimedImportStepTwo extends Component {
                             onchange: this.programPlanningUnitChanged,
                             allowDeleteRow: false,
                             onload: this.loaded,
-                            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                             filters: true,
                             editable: true,
                         };

@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from 'moment';
 import React, { Component } from 'react';
 import { CSVExport, Search } from 'react-bootstrap-table2-toolkit';

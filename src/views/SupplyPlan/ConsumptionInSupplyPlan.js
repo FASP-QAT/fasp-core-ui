@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -356,7 +357,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
                             copyCompatibility: true,
                             parseFormulas: true,
                             filters: filterOption,
-                            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                             onpaste: this.onPaste,
                             oneditionend: this.oneditionend,
                             onchangepage: this.onchangepage,
@@ -629,7 +630,7 @@ export default class ConsumptionInSupplyPlanComponent extends React.Component {
             allowExport: false,
             onchange: this.batchInfoChangedConsumption,
             editable: consumptionBatchEditable,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onpaste: this.onPasteForBatchInfo,
             onload: this.loadedBatchInfoConsumption,
             updateTable: function (el, cell, x, y, source, value, id) {

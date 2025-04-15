@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from 'moment';
 import React, { Component } from "react";
 import { Prompt } from 'react-router';
@@ -179,7 +180,7 @@ class UsagePeriod extends Component {
             parseFormulas: true,
             oneditionend: this.oneditionend,
             onload: this.loaded,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: ((AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_USAGE_PERIOD') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_USAGE_PERIOD')) ? true : false),
             contextMenu: function (obj, x, y, e) {
                 var items = [];

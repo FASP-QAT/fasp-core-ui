@@ -9,6 +9,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import pdfIcon from '../../assets/img/pdf.png';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -1351,7 +1352,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -2378,7 +2379,7 @@ export default class CreateTreeTemplate extends Component {
             // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5105,7 +5106,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: this.state.editable,
             contextMenu: function (obj, x, y, e) {
                 return false;
@@ -5273,7 +5274,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5584,7 +5585,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -6131,7 +6132,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
         };
         var modelingPerEl = jexcel(document.getElementById("modelingJexcelPercent"), options);
         this.el = modelingPerEl;
@@ -9550,7 +9551,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

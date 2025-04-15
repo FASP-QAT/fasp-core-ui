@@ -2,6 +2,7 @@ import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -666,7 +667,7 @@ export default class ProblemList extends React.Component {
             allowDeleteRow: false,
             onselection: this.selected,
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onchange: this.rowChanged,
             copyCompatibility: true,
             allowExport: false,
@@ -1266,7 +1267,7 @@ export default class ProblemList extends React.Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: "top",
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
