@@ -430,8 +430,8 @@ class StockStatus extends Component {
             csvRow.push('"' + (i18n.t('static.product.distributionLeadTime').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + item.data[0].distributionLeadTime + '"'))
           }
           csvRow.push('"' + (i18n.t('static.supplyPlan.reorderInterval').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + ppu.reorderFrequencyInMonths + '"'))
-          if (ppu.notes != null && ppu.notes != undefined && ppu.notes.length > 0) {
-            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (ppu.notes).replaceAll(' ', '%20') + '"'))
+          if (ppu.ppuNotes != null && ppu.ppuNotes != undefined && ppu.ppuNotes.length > 0) {
+            csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (ppu.ppuNotes).replaceAll(' ', '%20') + '"'))
           }
         } else {
           var programLabel = this.state.programId.map(ele => ele.label).join(', ');
@@ -465,7 +465,7 @@ class StockStatus extends Component {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += item.split(":")[0] + ": " + item.split(":").slice(1).join(':')
+              finalNotes += this.state.programId.length==1?item.split(":").slice(1).join(':'):item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
             })
             csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (finalNotes).replaceAll(' ', '%20') + '"'))
           }
@@ -666,9 +666,9 @@ class StockStatus extends Component {
               align: 'left'
             })
           }
-          if (ppu1.notes != null && ppu1.notes != undefined && ppu1.notes.length > 0) {
+          if (ppu1.ppuNotes != null && ppu1.ppuNotes != undefined && ppu1.ppuNotes.length > 0) {
             y += 10;
-            doc.text(i18n.t('static.program.notes') + ': ' + ppu1.notes, doc.internal.pageSize.width / 10, y, {
+            doc.text(i18n.t('static.program.notes') + ': ' + ppu1.ppuNotes, doc.internal.pageSize.width / 10, y, {
               align: 'left'
             })
           }
@@ -754,7 +754,7 @@ class StockStatus extends Component {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += item.split(":")[0] + ": " + item.split(":").slice(1).join(':')
+              finalNotes += this.state.programId.length==1?item.split(":").slice(1).join(':'):item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
             })
             var planningText = doc.splitTextToSize(i18n.t('static.program.notes') + ': ' + finalNotes, doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 10, y, planningText)
@@ -4732,7 +4732,11 @@ class StockStatus extends Component {
                             </ul>
                             {this.state.stockStatusList[0].ppuNotes != undefined && this.state.stockStatusList[0].ppuNotes != null && this.state.stockStatusList[0].ppuNotes.length > 0 &&
                               <span style={{ "marginTop": "10px" }} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("~").map((item, index) => {
-                                return (<>{(index != 0 ? ", " : "")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": " + item.toString().split(":").slice(1).join(':')}</>)
+                                if(this.state.programId.length==1){
+                                  return (<>{(index != 0 ? ", " : "")}{item.toString().split(":").slice(1).join(':')}</>)
+                                }else{
+                                  return (<>{(index != 0 ? ", " : "")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": " + item.toString().split(":").slice(1).join(':')}</>)
+                                }
                               })}</span>
                             }
                           </FormGroup>
