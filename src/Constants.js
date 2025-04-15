@@ -5,7 +5,7 @@
 // export const API_URL = 'http://localhost:8084'
 
 // export const API_URL = 'https://uat-api.quantificationanalytics.org'
-export const API_URL = 'https://api.quantificationanalytics.org'
+export const API_URL = 'https://uatqatapi.altius.cc'
 // export const API_URL = 'https://demo-api.quantificationanalytics.org'
 
 // export const API_URL = 'https://qatlocalapi.altius.cc'
