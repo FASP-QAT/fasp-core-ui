@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import { Button, Card, CardBody, CardFooter } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -64,7 +65,7 @@ export default class PlanningUnitListNegativeInventory extends Component {
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 };
                 var elVar = jexcel(document.getElementById("planningUnitList"), options);
                 this.el = elVar;

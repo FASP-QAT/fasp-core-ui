@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
@@ -1263,7 +1264,7 @@ export default class PlanningUnitSetting extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);

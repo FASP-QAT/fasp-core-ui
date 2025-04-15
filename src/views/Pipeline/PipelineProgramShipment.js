@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import { Button } from 'reactstrap';
@@ -1120,7 +1121,7 @@ export default class PipelineProgramShipment extends Component {
             }.bind(this),
             onload: this.loadedCommonFunctionJExcel,
             oneditionend: this.oneditionend,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
         };
         this.el = jexcel(document.getElementById("shipmenttableDiv"), options);
         this.loaded();

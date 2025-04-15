@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import { Formik } from "formik";
 import jsPDF from 'jspdf';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import { Line } from 'react-chartjs-2';
@@ -1020,7 +1021,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             filters: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             columnSorting: false,
             contextMenu: function (obj, x, y, e) {
                 return [];

@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from 'moment';
 import React, { Component } from 'react';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -460,7 +461,7 @@ export default class PipelineProgramConsumption extends Component {
                                         copyCompatibility: true,
                                         paginationOptions: JEXCEL_PAGINATION_OPTION,
                                         position: 'top',
-                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                         filters: true,
                                         editable: true,
                                         onload: this.loadedJexcelCommonFunctionTwo,

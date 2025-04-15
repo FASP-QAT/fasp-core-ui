@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -206,7 +207,7 @@ export default class PipelineProgramProcurementAgent extends Component {
                                         oneditionend: this.onedit,
                                         copyCompatibility: true,
                                         onload: this.loadedJexcelCommonFunction,
-                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                     };
                                     var elVar = jexcel(document.getElementById("mapProcurementAgent"), options);
                                     this.el = elVar;

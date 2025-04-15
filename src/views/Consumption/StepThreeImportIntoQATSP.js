@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
@@ -738,7 +739,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 jExcelLoadedFunction(obj);
             },
             editable: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: false,
         };
         var languageEl = jexcel(document.getElementById("mapImport"), options);

@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -487,7 +488,7 @@ export default class PipelineProgramInventory extends Component {
                                     editable: true,
                                     onload: this.loadedJexcelCommonFunction,
                                     oneditionend: this.oneditionend,
-                                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                 };
                                 this.el = jexcel(document.getElementById("inventorytableDiv"), options);
                                 this.loaded();

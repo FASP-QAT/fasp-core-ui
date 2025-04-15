@@ -1,7 +1,8 @@
 import CryptoJS from "crypto-js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import jexcel from "jspreadsheet";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from "react";
 import "react-bootstrap-table/dist/react-bootstrap-table-all.min.css";
@@ -1516,7 +1517,7 @@ class ProcurementAgentExport extends Component {
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),

@@ -14,6 +14,7 @@ import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFu
 import jexcel from 'jspreadsheet';
 import DropdownService from '../../api/DropdownService';
 import ProductService from '../../api/ProductService';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 // Localized entity name
 const entityname = i18n.t('static.forecastingunit.forecastingunit');
 /**
@@ -518,7 +519,7 @@ export default class EditForecastingUnitComponent extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;

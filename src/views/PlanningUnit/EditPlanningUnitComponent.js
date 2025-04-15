@@ -12,6 +12,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 // Localized entity name
 const entityname = i18n.t('static.planningunit.planningunit');
 /**
@@ -371,7 +372,7 @@ export default class EditPlanningUnitComponent extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = languageEl;
