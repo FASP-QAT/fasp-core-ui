@@ -1983,7 +1983,7 @@ class ApplicationDashboard extends Component {
         data = [];
         data[0] = expiriesList[j].planningUnit.label.label_en + " | " + expiriesList[j].planningUnit.id
         data[1] = roundARU(expiriesList[j].expiringQty, 1)
-        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[2] = expiriesList[j].expDate;
         data[3] = roundARU(expiriesList[j].expiryAmt, 1)
         dataArray[count] = data;
         count++;
@@ -2013,7 +2013,8 @@ class ApplicationDashboard extends Component {
         },
         {
           title: i18n.t("static.supplyPlan.expiryDate"),
-          type: 'text',
+          type: 'calendar',
+          options: { format: 'DD-MMMM-YYYY' },
           editable: false,
           readOnly: true
         },
