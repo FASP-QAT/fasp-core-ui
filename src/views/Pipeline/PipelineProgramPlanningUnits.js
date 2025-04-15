@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -727,7 +728,7 @@ export default class PipelineProgramPlanningUnits extends Component {
                                                 allowInsertRow: false,
                                                 onload: this.loadedJexcelCommonFunction,
                                                 oneditionend: this.oneditionend,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                             };
                                             var elVar = jexcel(document.getElementById("mapPlanningUnit"), options);
                                             this.el = elVar;

@@ -15,6 +15,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, DECIMAL_NO_REGEX_8_DECIMALS, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions.js";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -3055,7 +3056,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onpaste: function (instance, data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].x == 6) {
@@ -4007,7 +4008,7 @@ export default class TreeTable extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
             onchangepage: this.onChangePageTab2,
@@ -4620,7 +4621,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedTab3,
             onchange: this.onChangeTab3Data,
             onchangepage: this.onChangePageTab3,

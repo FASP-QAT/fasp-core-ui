@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import { Formik } from 'formik';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import Select from 'react-select';
@@ -268,7 +269,7 @@ export default class syncPage extends Component {
       pagination: false,
       search: false,
       filters: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -457,7 +458,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       filters: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -658,7 +659,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       filters: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -768,7 +769,7 @@ export default class syncPage extends Component {
       allowManualInsertColumn: false,
       allowDeleteRow: false,
       filters: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -2000,7 +2001,7 @@ export default class syncPage extends Component {
                                                 allowDeleteRow: false,
                                                 onload: this.loadedFunctionForMerge,
                                                 filters: true,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
@@ -2164,7 +2165,7 @@ export default class syncPage extends Component {
                                                 allowDeleteRow: false,
                                                 onload: this.loadedFunctionForMergeInventory,
                                                 filters: true,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
@@ -2328,7 +2329,7 @@ export default class syncPage extends Component {
                                                 allowDeleteRow: false,
                                                 onload: this.loadedFunctionForMergeShipment,
                                                 filters: true,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y)
@@ -2537,7 +2538,7 @@ export default class syncPage extends Component {
                                                 allowDeleteRow: false,
                                                 onload: this.loadedFunctionForMergeShipmentLinked,
                                                 filters: true,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                   var items = [];
                                                   var rowData = obj.getRowData(y);
@@ -4785,7 +4786,7 @@ export default class syncPage extends Component {
           allowDeleteRow: false,
           onload: this.loadedFunctionForMergeProblemList,
           filters: true,
-          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+          license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
           contextMenu: function (obj, x, y, e) {
             var items = [];
             var rowData = obj.getRowData(y)

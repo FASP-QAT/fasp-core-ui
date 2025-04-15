@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from "react";
 import { Prompt } from 'react-router';
 import {
@@ -649,7 +650,7 @@ class AddprogramPlanningUnit extends Component {
                                                 onpaste: this.onPaste,
                                                 oneditionend: this.oneditionend,
                                                 onload: this.loaded,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 contextMenu: function (obj, x, y, e) {
                                                     var items = [];
                                                     if (y == null) {

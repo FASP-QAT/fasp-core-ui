@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import { Search } from 'react-bootstrap-table2-toolkit';
@@ -670,7 +671,7 @@ class ProductCatalog extends Component {
                 },
             ],
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: false,
             onload: loadedForNonEditableTables,
             pagination: localStorage.getItem("sesRecordCount"),

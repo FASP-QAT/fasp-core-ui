@@ -2,6 +2,7 @@ import TextField from '@material-ui/core/TextField';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from 'moment';
 import React, { Component } from 'react';
 import BootstrapTable from 'react-bootstrap-table-next';
@@ -254,7 +255,7 @@ export default class ManualTagging extends Component {
             allowManualInsertRow: false,
             allowExport: false,
             editable: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedOrderHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -318,7 +319,7 @@ export default class ManualTagging extends Component {
             allowManualInsertRow: false,
             allowExport: false,
             editable: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedShipmentHistory,
             updateTable: function (el, cell, x, y, source, value, id) {
                 var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
@@ -3176,7 +3177,7 @@ export default class ManualTagging extends Component {
                         allowDeleteRow: false,
                         filters: false,
                         onchange: this.changedTab1,
-                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                         contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
@@ -3394,7 +3395,7 @@ export default class ManualTagging extends Component {
                         copyCompatibility: true,
                         allowManualInsertRow: false,
                         parseFormulas: true,
-                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                         contextMenu: function (obj, x, y, e) {
                             return false;
                         }.bind(this),
@@ -3597,7 +3598,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
@@ -3816,7 +3817,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     updateTable: function (el, cell, x, y, source, value, id) {
                         var elInstance = el;
                         if (y != null) {
@@ -4008,7 +4009,7 @@ export default class ManualTagging extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: true,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
