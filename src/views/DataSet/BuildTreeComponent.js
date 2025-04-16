@@ -6913,7 +6913,7 @@ export default class BuildTree extends Component {
                     })
                 }
                 for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId==this.state.selectedScenario && this.state.showConnections) {
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
                             fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -9834,7 +9834,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && (da.scenarioId==this.state.selectedScenario) && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? tl.scenarioList.map(s=>sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: s.id, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == s.id)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" })) : "")) : ""))
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -12899,11 +12899,11 @@ export default class BuildTree extends Component {
             }
             var sourceNodeUsageListCount = [];
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.scenarioId==this.state.selectedScenario && da.nodeId == itemConfig.payload.nodeId) ? tl.scenarioList.map(s=>sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: s.id, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == s.id)[0].label.label_en, nodeName: f.payload.label.label_en, })) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
-                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
+                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId==this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             } else if (itemConfig.payload.downwardAggregationList && itemConfig.payload.nodeType.id == 6) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId).length == itemConfig.payload.downwardAggregationList.length ? false : true;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.scenarioId==this.state.selectedScenario).length == itemConfig.payload.downwardAggregationList.length ? false : true;
             }
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
@@ -12957,7 +12957,7 @@ export default class BuildTree extends Component {
             var sourceNodeUsageListCount = [];
             var outerLink = false;
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.scenarioId==this.state.selectedScenario && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
             }
@@ -13128,7 +13128,7 @@ export default class BuildTree extends Component {
                     })
                 } else {
                     for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId==this.state.selectedScenario && this.state.showConnections) {
                             treeLevelItems.push(new ConnectorAnnotationConfig({
                                 annotationType: AnnotationType.Connector,
                                 fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
