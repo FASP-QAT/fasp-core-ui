@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="" />
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 {
+            /* width: 100%; */
+            border-collapse: collapse;
+        }
+
+        a {
+            color: #205493;
+            /* text-decoration: none; */
+            background-color: transparent;
+        }
+
+        .formulasheading {
+            font-size: 14px !important;
+            font-weight: bold !important;
+            color: #20a8d8 !important;
+        }
+
+        .formulastext {
+            color: #212721 !important;
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: -1px;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .list-group-itemFirst {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .formulastext-p {
+            color: #20a8d8 !important;
+        }
+    </style>
+</head>
+<div>
+    <p style="font-size: 13px;">
+        The supply planning table on this screen uses the same formulas as in the
+        Supply Plan screen. For guidance on how QAT calculates opening balance,
+        suggested shipments, projected inventory, average monthly consumption,
+        months of stock, and unmet demand, please refer to the Show Guidance on
+        the Supply Planning screen.
+    </p>
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Scenario: Increase forecasted consumption</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            User-entered percentage over selected period. Only applies to months
+            with forecasted consumption values and no actual consumption.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Example:</span><br />
+            Increase forecast by 10% from January to March<br />
+            Forecast consumption: Jan = 100, Feb = 110, Mar = 112<br />
+            Increased forecast consumption: Jan = 100 x 1.1, Feb = 110 x 1.1,
+            Mar = 112 x 1.1<br />
+            Increased forecast consumption: Jan = 110, Feb = 121, Mar = 123
+        </p>
+        </p>
+    </li>
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Decrease forecasted consumption</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            User-entered percentage over selected period. Only applies to months with
+            forecasted consumption values and no actual consumption.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Example:</span><br />
+            Decrease forecast by 10% from January to March<br />
+            Forecast consumption: Jan = 100, Feb = 110, Mar = 112<br />
+            Decreased forecast consumption: Jan = 100 x 0.9, Feb = 110 x 0.9, Mar =
+            112 x 0.9<br />
+            Decreased forecast consumption: Jan = 90, Feb = 99, Mar = 101
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Forecast phase in/out</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            User-selected period, starting value and ending value. QAT interpolates
+            the new forecast values in between the user-entered start and end values by using the straight-line formula
+            to calculate the value for the new forecast(s).
+        </p>
+        <p style="font-size: 13px;">
+            Mathematically: <br />
+        <ul>
+            <li>
+                Where xs represent months, and ys represent forecast consumption,</li>
+            <li>Where known data values are (x0 , y0) and (x1 , y1) </li>
+            <li>Where any unknown data values are (x, y)</li>
+            <li>The formula for the interpolated line is</li>
+        </ul>
+        <span><img class="formula-img-mr img-fluid mb-lg-0" src="../assets/img/dataentryScreenshot-1.png"
+                style="border: 1px solid #fff;width: 250px" /></span><br />
+        <span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../assets/img/dataentryScreenshot-2.png"
+                style="border: 1px solid #fff;width: 250px" /></span>
+        </p>
+        <p style="font-size: 13px;">
+            Only applies to months with forecasted consumption and no actual
+            consumption. Note that if there are consumption values after the selected period, those values are
+            unchanged.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Example:</span><br />
+            Phase out product from July to December (6-month period).<br />
+            Current forecast consumption: Jul = 200, Aug = 185, Sep = 177, Oct = 160,
+            Nov = 145, Dec = 150<br />
+            Jul starting value = 200 (auto-populated by QAT; can be edited)<br />
+            Dec ending value = 0 (user-entered)<br />
+            New forecast<br />
+            Jul = 200 (user-entered),<br />
+            Aug = 160, where y<sub>0</sub> is 200; y<sub>1</sub> is 0; x<sub>0</sub> is 6 (sixth month of the period);
+            and x<sub>0</sub> is 1 (first month of the period) à giving the 2<sup>nd</sup> point in the straight
+            line<br />
+            Sep = 120, where y<sub>0</sub> is 160; y<sub>1</sub> is 0; x<sub>0</sub> is 6; and x<sub>0</sub> is 2
+            (second month of the period) a giving the 3<sub>rd</sub> point in the straight line<br />
+            Oct = 80, where y<sub>0</sub> is 120; y<sub>1</sub> is 0; x<sub>0</sub> is 6; and x<sub>0</sub> is 3 (third
+            month of the period) a giving the 4<sub>th</sub> point in the straight line <br />
+            Nov = 40, where y<sub>0</sub> is 80; y<sub>1</sub> is 0; x<sub>0</sub> is 6; and x<sub>0</sub> is 4 (fourth
+            month of the period) a giving the 5<sub>th</sub> point in the straight line <br />
+            Dec = 0 (user-entered)
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Remove unfunded shipments</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT removes all shipments in a user-selected period with a funding source
+            = TBD, and therefore in Planned status.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Remove Planned shipments</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT removes all shipments with status = Planned. <br />
+            User has the option to only remove Planned shipments that do not comply with the lead time based on the
+            program’s lead time logic.
+        </p>
+        <span class="formulastext-p">Example:</span><br />
+        <p style="font-size: 13px;">
+            Removing all planned shipments<br />
+            Current month = Jan<br />
+            Lead time = 8 months<br />
+            Planned shipments for Feb, Apr, Jul, Oct, and Nov.<br />
+            New supply plan removes all five shipments.<br /><br />
+
+            Removing all planned shipments not complying with the lead time<br />
+            Planned shipments for Feb, Apr, Jul, Oct, and Nov. <br />
+            New supply plan removes shipments from months between Jan and Sep (i.e, Jan + 8 months). <br />
+            New supply has planned shipments in Oct and Nov.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Remove all Submitted shipments that do not comply with the lead time</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT removes all shipments with status = Submitted that do not comply with the lead time based on the
+            program’s lead time logic.
+        </p>
+        <span class="formulastext-p">Example:</span><br />
+        <p style="font-size: 13px;">
+            Removing all submitted shipments that do not comply with the lead time <br />
+            Current month = Jan<br />
+            Lead time from Submitted to Received = 4 months <br />
+            Submitted shipments with received dates in Feb, Apr, Jul, Oct, and Nov. <br />
+            New supply plan removes Submitted shipments from months between Jan and May (i.e, Jan + 4 months). <br />
+            New supply has planned shipments in Jul, Oct, and Nov.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scenario: Remove all On-hold shipments that do not comply with the lead time </h5>
+        <p style="font-size: 13px;">
+            QAT removes all shipments with status = On-hold that do not comply with the lead time based on the program’s
+            lead time logic.
+        </p>
+    </li>
+
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Scenario: Re-plan supply plan </h5>
+        <p style="font-size: 13px;">
+            For a user-entered period, QAT removes all Planned shipments from user-selected procurement agent(s) and
+            funding source(s); then uses the suggested shipments logic to create new shipments that comply with lead
+            time and MIN/MAX requirements
+        </p>
+
+        <h5 class="formulasheading">Suggested Shipments Logic - “Plan by MOS”</h5>
+        <p style="font-size: 13px;">
+            Note: Below is the logic for planning units that are planned by months of stock (MOS). Update the “plan by”
+            setting in <a href="/#/programProduct/addProgramProduct">Update planning unit</a> screen.
+        </p>
+        <p><em>Where Month N is the month QAT is calculating for:</em></p>
+
+        <ol>
+            <li>If AMC = 0 or N/A for Month N, no suggested shipment</li>
+
+            <li>If Month N is stocked out (Ending Balance = 0), QAT will always suggest a shipment
+                <ol type="a">
+                    <li>If both of next 2 months (N+1, N+2) are &lt; Min MOS, suggested shipment will bring month N to
+                        <strong>Max MOS</strong>. Suggested qty = (Max MOS for N) * (AMC for N) – (Ending Balance for N)
+                        + (Unmet Demand for N)
+                    </li>
+                    <li>If 1 or both of the next 2 months (N+1 or N+2) is &gt; Min MOS, suggested shipment will bring
+                        month N to <strong>Min MOS</strong>. Suggested qty = (Min MOS for N) * (AMC for N) – (Ending
+                        Balance for N) + (Unmet Demand for N)</li>
+                </ol>
+            </li>
+
+            <li>Is product is understocked (MOS &lt; Min MOS) for 3 straight months (Month N, N+1, N+2)?
+                <ol type="a">
+                    <li>If yes, suggested shipment to bring Month N to <strong>Max MOS</strong>. Suggested qty = (Max
+                        MOS for N) * (AMC for N) – (Ending Balance for N)</li>
+                    <li>If no, no suggested shipment</li>
+                </ol>
+            </li>
+        </ol>
+
+        <h5 class="formulasheading">Suggested Shipments - “Plan by Quantity”</h5>
+        <p style="font-size: 13px;">
+            Note: Below is the logic for planning units that are planned by months of stock (MOS). Update the “plan by”
+            setting in <a href="/#/programProduct/addProgramProduct">Update planning unit</a> screen.
+        </p>
+        <p><em>Where Month N is the month QAT is calculating for, and X = Distribution Lead Time:</em></p>
+
+        <ol>
+            <li>If AMC = 0 or N/A for Month N, no suggested shipment</li>
+
+            <li>If Month N is stocked out (Ending Balance = 0), QAT will always suggest a shipment
+                <ol type="a">
+                    <li>If both of next 2 months (N+1, N+2) are &lt; Min Qty, suggested shipment is the quantity that
+                        would bring Month N to <strong>Max Qty</strong>. Suggested Qty = (Max Qty for N) – (Ending
+                        Balance for N) + (Unmet Demand for N)</li>
+                    <li>If one or both of the next 2 months (N+1 or N+2) is &gt; Min Qty, suggested shipment is the
+                        quantity that would bring Month N to <strong>Min Qty</strong>. Suggested Qty = (Min Qty) –
+                        (Ending Balance for N) + (Unmet Demand for N)</li>
+                </ol>
+            </li>
+
+            <li>Is product understocked (Ending Balance &lt; Min Qty) for 3 straight months (Month N, N+1, N+2)?
+                <ol type="a">
+                    <li>If yes, suggested shipment is the quantity that would bring Month N to <strong>Max Qty</strong>.
+                        Suggested Qty = (Max Qty for N) – (Ending Balance for N)</li>
+                    <li>If no, no suggested shipment</li>
+                </ol>
+            </li>
+        </ol>
+        <p>QAT puts the suggested quantity in Month N–X. In other words, X months before Month N, where X is the
+            Distribution Lead Time.</p>
+    </li>
+</div>
+</html>
