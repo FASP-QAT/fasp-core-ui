@@ -526,7 +526,7 @@ class ShipmentGlobalDemandView extends Component {
             let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
             let groupByProcurementAgentType = this.state.procurementAgentTypeId;
             let groupByFundingSourceType = this.state.groupByFundingSourceType;
-
+            console.log("Hello",groupByProcurementAgentType, groupByFundingSourceType,)
             if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
                 this.setState({
                     message: '', loading: true
@@ -1830,57 +1830,30 @@ class ShipmentGlobalDemandView extends Component {
             this.fetchData();
         })
     }
-    /**
-     * Sets the group by funding source type flag based on the checkbox state.
-     * @param {object} e - The event object containing checkbox information.
-     */
-    setGroupByFundingSourceType(e) {
-        var groupByFundingSourceType = e.target.checked;
-        var procurementAgentTypeId = this.state.procurementAgentTypeId;
-        if (groupByFundingSourceType == true) {
-            procurementAgentTypeId = false;
-        }
-        this.setState({
-            groupByFundingSourceType: groupByFundingSourceType,
-            procurementAgentTypeId: procurementAgentTypeId
-        }, () => {
-            this.fetchData();
-        })
-    }
 
     /**
      * Sets the group by & related flags to state based on the selected dropdown value.
      * @param {object} e - The event object containing checkbox information.
      */
-    setGroupByPAValues(e) {
+    setGroupByValues(e) {
         var groupByValue = e.target.value;
         var procurementAgentTypeId = this.state.procurementAgentTypeId;
-        if (groupByValue == 1) {
-            procurementAgentTypeId = true;
-        } else {
+        var groupByFundingSourceType = this.state.groupByFundingSourceType;
+        if (groupByValue == 0) {
             procurementAgentTypeId = false;
+            groupByFundingSourceType = false;
+        } else if (groupByValue == 1) {
+            procurementAgentTypeId = true;
+            groupByFundingSourceType = false;
+        } else if (groupByValue == 2) {
+            procurementAgentTypeId = false;
+            groupByFundingSourceType = true;
+        } else {
+            procurementAgentTypeId = true;
+            groupByFundingSourceType = true;
         }
         this.setState({
             procurementAgentTypeId: procurementAgentTypeId,
-            groupBy: groupByValue
-        }, () => {
-            this.fetchData();
-        })
-    }
-
-    /**
-     * Sets the group by & related flags to state based on the selected dropdown value.
-     * @param {object} e - The event object containing checkbox information.
-     */
-    setGroupByFSValues(e) {
-        var groupByValue = e.target.value;
-        var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if (groupByValue == 1) {
-            groupByFundingSourceType = true;
-        } else {
-            groupByFundingSourceType = false;
-        } 
-        this.setState({
             groupByFundingSourceType: groupByFundingSourceType,
             groupBy: groupByValue
         }, () => {
@@ -2454,7 +2427,7 @@ class ShipmentGlobalDemandView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupByPA')}</Label>
+                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupBy')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                     <Input
@@ -2462,71 +2435,16 @@ class ShipmentGlobalDemandView extends Component {
                                                         name="groupByPA"
                                                         id="groupByPA"
                                                         bsSize="sm"
-                                                        onChange={(e) => { this.setGroupByPAValues(e); }}
+                                                        onChange={(e) => { this.setGroupByValues(e); }}
                                                     >
-                                                        <option value="0">{i18n.t('static.report.procurementAgentName')}</option>
-                                                        <option value="1">{i18n.t('static.dashboard.procurementagentType')}</option>
+                                                        <option value="0">{i18n.t('static.fundingSourceHead.fundingSource')} - {i18n.t('static.report.procurementAgentName')}</option>
+                                                        <option value="1">{i18n.t('static.fundingSourceHead.fundingSource')} - {i18n.t('static.dashboard.procurementagentType')}</option>
+                                                        <option value="2">{i18n.t('static.funderTypeHead.funderType')} - {i18n.t('static.report.procurementAgentName')}</option>
+                                                        <option value="3">{i18n.t('static.funderTypeHead.funderType')} - {i18n.t('static.dashboard.procurementagentType')}</option>
                                                     </Input>
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupByFS')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="groupByFS"
-                                                        id="groupByFS"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.setGroupByFSValues(e); }}
-                                                    >
-                                                        <option value="0">{i18n.t('static.fundingSourceHead.fundingSource')}</option>
-                                                        <option value="1">{i18n.t('static.funderTypeHead.funderType')}</option>
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        id="procurementAgentTypeId"
-                                                        name="procurementAgentTypeId"
-                                                        checked={this.state.procurementAgentTypeId}
-                                                        value={this.state.procurementAgentTypeId}
-                                                        onChange={(e) => { this.setProcurementAgentTypeId(e); }}
-                                                    />
-                                                </InputGroup>
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.shipment.groupByProcurementAgentType')}</b>
-                                                </Label>
-                                            </div>
-                                        </FormGroup> */}
-                                        {/* <FormGroup className="col-md-3 pl-lg-5 pt-lg-3">
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                        id="groupByFundingSourceType"
-                                                        name="groupByFundingSourceType"
-                                                        checked={this.state.groupByFundingSourceType}
-                                                        value={this.state.groupByFundingSourceType}
-                                                        onChange={(e) => { this.setGroupByFundingSourceType(e); }}
-                                                    />
-                                                </InputGroup>
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    <b>{i18n.t('static.shipment.groupByFundingSourceType')}</b>
-                                                </Label>
-                                            </div>
-                                        </FormGroup> */}
                                     </div>
                                 </div>
                             </Form>
