@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
@@ -427,7 +428,7 @@ export function buildJxl(props) {
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 position: 'top',
                 filters: true,
-                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 editable: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];

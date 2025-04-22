@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import { Search } from 'react-bootstrap-table2-toolkit';
@@ -180,7 +181,7 @@ class SupplierLeadTimes extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),

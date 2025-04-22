@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import {
@@ -330,7 +331,7 @@ export default class CompareVersionTableCompareVersion extends Component {
             position: 'top',
             filters: true,
             editable: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];

@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import Picker from 'react-month-picker';
@@ -907,7 +908,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                 jExcelLoadedFunctionWithoutPagination(instance);
             },
             editable: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -1359,7 +1360,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
             parseFormulas: true,
             onload: this.loaded,
             editable: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

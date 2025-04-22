@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="" />
+    <title>Mostrar Orientações</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td,
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formulasheading {
+            font-size: 14px !important;
+            font-weight: bold !important;
+            color: #20a8d8 !important;
+        }
+
+        .formulastext {
+            color: #212721 !important;
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: -1px;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .list-group-itemFirst {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .formulastext-p {
+            color: #20a8d8 !important;
+        }
+    </style>
+</head>
+<div>
+    <p style="font-size: 13px;">
+        A tabela de planejamento de suprimentos nesta tela usa as mesmas fórmulas da tela de Plano de Suprimentos.
+        Para orientações sobre como o QAT calcula o saldo inicial, remessas sugeridas, estoque projetado, consumo médio
+        mensal, meses de estoque e demanda não atendida, consulte Mostrar Orientações na tela de Planejamento de
+        Suprimentos.
+    </p>
+
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Cenário: Aumentar o consumo previsto</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Percentual inserido pelo usuário durante o período selecionado. Aplica-se apenas a meses com valores
+            previstos e sem consumo real.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemplo:</span><br />
+            Aumentar a previsão em 10% de janeiro a março<br />
+            Consumo previsto: Jan = 100, Fev = 110, Mar = 112<br />
+            Consumo previsto aumentado: Jan = 100 x 1.1, Fev = 110 x 1.1, Mar = 112 x 1.1<br />
+            Consumo previsto aumentado: Jan = 110, Fev = 121, Mar = 123
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Reduzir o consumo previsto</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Percentual inserido pelo usuário durante o período selecionado. Aplica-se apenas a meses com valores
+            previstos e sem consumo real.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemplo:</span><br />
+            Reduzir a previsão em 10% de janeiro a março<br />
+            Consumo previsto: Jan = 100, Fev = 110, Mar = 112<br />
+            Consumo previsto reduzido: Jan = 100 x 0.9, Fev = 110 x 0.9, Mar = 112 x 0.9<br />
+            Consumo previsto reduzido: Jan = 90, Fev = 99, Mar = 101
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Introdução/Retirada gradual da previsão</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Período, valor inicial e valor final selecionados pelo usuário. O QAT interpola os novos valores da previsão
+            entre os valores de início e fim usando fórmula de linha reta.
+        </p>
+        <p style="font-size: 13px;">
+            Matematicamente: <br />
+        <ul>
+            <li>Onde xs representam meses, e ys representam o consumo previsto,</li>
+            <li>Com dados conhecidos como (x0 , y0) e (x1 , y1)</li>
+            <li>Dados desconhecidos como (x, y)</li>
+            <li>A fórmula da linha interpolada é:</li>
+        </ul>
+        <span><img src="../assets/img/dataentryScreenshot-1.png"
+                style="border: 1px solid #fff;width: 250px" /></span><br />
+        <span><img src="../assets/img/dataentryScreenshot-2.png" style="border: 1px solid #fff;width: 250px" /></span>
+        </p>
+        <p style="font-size: 13px;">
+            Aplica-se apenas a meses com consumo previsto e sem consumo real. Se houver valores após o período
+            selecionado, esses permanecem inalterados.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemplo:</span><br />
+            Retirar o produto de julho a dezembro (período de 6 meses).<br />
+            Consumo previsto atual: Jul = 200, Ago = 185, Set = 177, Out = 160, Nov = 145, Dez = 150<br />
+            Valor inicial de Jul = 200 (auto-preenchido pelo QAT; pode ser editado)<br />
+            Valor final de Dez = 0 (inserido pelo usuário)<br />
+            Nova previsão:<br />
+            Jul = 200, Ago = 160, Set = 120, Out = 80, Nov = 40, Dez = 0
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Remover remessas sem financiamento</h5>
+        <p style="font-size: 13px;">
+            O QAT remove todas as remessas em um período selecionado pelo usuário com fonte de financiamento = A Definir
+            (TBD), e portanto em status Planejado.
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Remover remessas planejadas</h5>
+        <p style="font-size: 13px;">
+            O QAT remove todas as remessas com status = Planejado.<br />
+            O usuário pode optar por remover apenas as remessas que não cumprem o prazo de entrega conforme a lógica do
+            programa.
+        </p>
+        <span class="formulastext-p">Exemplo:</span><br />
+        <p style="font-size: 13px;">
+            Remover todas as remessas planejadas<br />
+            Mês atual = Jan<br />
+            Prazo de entrega = 8 meses<br />
+            Remessas planejadas para Fev, Abr, Jul, Out e Nov.<br />
+            O novo plano de suprimentos remove todas as cinco remessas.<br /><br />
+
+            Remover remessas que não cumprem o prazo<br />
+            Novamente, remessas para Fev, Abr, Jul, Out e Nov.<br />
+            Novo plano remove remessas entre Jan e Set (Jan + 8 meses).<br />
+            O novo plano mantém Out e Nov.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Remover todas as remessas enviadas que não cumprem o prazo</h5>
+        <p style="font-size: 13px;">
+            O QAT remove todas as remessas com status = Enviado (Submitted) que não cumprem o prazo com base na lógica
+            do programa.
+        </p>
+        <span class="formulastext-p">Exemplo:</span><br />
+        <p style="font-size: 13px;">
+            Mês atual = Jan<br />
+            Prazo entre Enviado e Recebido = 4 meses<br />
+            Remessas com datas de recebimento em Fev, Abr, Jul, Out e Nov.<br />
+            Novo plano remove remessas de Jan até Mai (Jan + 4 meses).<br />
+            Mantém Jul, Out e Nov.
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Cenário: Remover todas as remessas em espera que não cumprem o prazo</h5>
+        <p style="font-size: 13px;">
+            O QAT remove todas as remessas com status = Em Espera (On-hold) que não cumprem o prazo de entrega com base
+            na lógica do programa.
+        </p>
+    </li>
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Cenário: Replanejar plano de suprimentos</h5>
+        <p style="font-size: 13px;">
+            Para um período inserido pelo usuário, o QAT remove todas as remessas Planejadas dos agentes de compras e
+            fontes de financiamento selecionados pelo usuário; em seguida, usa a lógica de remessas sugeridas para criar
+            novas remessas que atendam aos requisitos de tempo de entrega e MIN/MÁX.
+        </p>
+
+        <h5 class="formulasheading">Lógica das Remessas Sugeridas - “Planejar por MOS”</h5>
+        <p style="font-size: 13px;">
+            Nota: Abaixo está a lógica para unidades de planejamento que são planejadas por meses de estoque (MOS).
+            Atualize a configuração “planejar por” na tela <a href="/#/programProduct/addProgramProduct">Atualizar
+                unidade de planejamento</a>.
+        </p>
+        <p><em>Onde Mês N é o mês para o qual o QAT está calculando:</em></p>
+
+        <ol>
+            <li>Se AMC = 0 ou N/A para o Mês N, nenhuma remessa sugerida</li>
+
+            <li>Se o Mês N estiver sem estoque (Saldo Final = 0), o QAT sempre sugerirá uma remessa
+                <ol type="a">
+                    <li>Se ambos os próximos 2 meses (N+1, N+2) forem < Min MOS, a remessa sugerida levará o mês N a
+                            <strong>Max MOS</strong>. Quantidade sugerida = (Max MOS para N) * (AMC para N) – (Saldo
+                            Final para N)
+                            + (Demanda Não Atendida para N)
+                    </li>
+                    <li>Se 1 ou ambos os próximos 2 meses (N+1 ou N+2) forem > Min MOS, a remessa sugerida levará o mês
+                        N a
+                        <strong>Min MOS</strong>. Quantidade sugerida = (Min MOS para N) * (AMC para N) – (Saldo Final
+                        para N)
+                        + (Demanda Não Atendida para N)
+                    </li>
+                </ol>
+            </li>
+
+            <li>Se o produto estiver com estoque insuficiente (MOS < Min MOS) por 3 meses consecutivos (Mês N, N+1,
+                    N+2)? <ol type="a">
+            <li>Se sim, a remessa sugerida levará o Mês N a <strong>Max MOS</strong>. Quantidade sugerida = (Max
+                MOS para N) * (AMC para N) – (Saldo Final para N)
+            </li>
+            <li>Se não, nenhuma remessa sugerida</li>
+        </ol>
+    </li>
+    </ol>
+
+    <h5 class="formulasheading">Remessas Sugeridas - “Planejar por Quantidade”</h5>
+    <p style="font-size: 13px;">
+        Nota: Abaixo está a lógica para unidades de planejamento que são planejadas por meses de estoque (MOS). Atualize
+        a configuração “planejar por” na tela <a href="/#/programProduct/addProgramProduct">Atualizar unidade de
+            planejamento</a>.
+    </p>
+    <p><em>Onde Mês N é o mês para o qual o QAT está calculando, e X = Tempo de Entrega da Distribuição:</em></p>
+
+    <ol>
+        <li>Se AMC = 0 ou N/A para o Mês N, nenhuma remessa sugerida</li>
+
+        <li>Se o Mês N estiver sem estoque (Saldo Final = 0), o QAT sempre sugerirá uma remessa
+            <ol type="a">
+                <li>Se ambos os próximos 2 meses (N+1, N+2) forem < Min Qty, a remessa sugerida é a quantidade que
+                        levaria o Mês N a <strong>Max Qty</strong>. Quantidade sugerida = (Max Qty para N) – (Saldo
+                        Final para N)
+                        + (Demanda Não Atendida para N)
+                </li>
+                <li>Se um ou ambos os próximos 2 meses (N+1 ou N+2) forem > Min Qty, a remessa sugerida é a quantidade
+                    que levaria o Mês N a <strong>Min Qty</strong>. Quantidade sugerida = (Min Qty) – (Saldo Final para
+                    N)
+                    + (Demanda Não Atendida para N)
+                </li>
+            </ol>
+        </li>
+
+        <li>Se o produto estiver com estoque insuficiente (Saldo Final < Min Qty) por 3 meses consecutivos (Mês N, N+1,
+                N+2)? <ol type="a">
+        <li>Se sim, a remessa sugerida é a quantidade que levaria o Mês N a <strong>Max Qty</strong>. Quantidade
+            sugerida = (Max Qty para N) – (Saldo Final para N)
+        </li>
+        <li>Se não, nenhuma remessa sugerida</li>
+    </ol>
+    </li>
+    </ol>
+    <p>O QAT coloca a quantidade sugerida no Mês N–X. Em outras palavras, X meses antes do Mês N, onde X é o Tempo de
+        Entrega da Distribuição.</p>
+    </li>
+</div>
+</html>
