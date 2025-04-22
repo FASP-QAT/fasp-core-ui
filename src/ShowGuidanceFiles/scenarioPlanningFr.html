@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="" />
+    <title>Afficher les conseils</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 {
+            /* width: 100%; */
+            border-collapse: collapse;
+        }
+
+        a {
+            color: #205493;
+            /* text-decoration: none; */
+            background-color: transparent;
+        }
+
+        .formulasheading {
+            font-size: 14px !important;
+            font-weight: bold !important;
+            color: #20a8d8 !important;
+        }
+
+        .formulastext {
+            color: #212721 !important;
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: -1px;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .list-group-itemFirst {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .formulastext-p {
+            color: #20a8d8 !important;
+        }
+    </style>
+</head>
+<div>
+    <p style="font-size: 13px;">
+        Le tableau de planification des approvisionnements de cet écran utilise les mêmes formules que l'écran Plan
+        d'approvisionnement. Pour plus d'informations sur le calcul du solde d'ouverture, des expéditions suggérées, des
+        stocks prévus, de la consommation mensuelle moyenne, des mois de stock et de la demande non satisfaite, veuillez
+        consulter la section « Afficher les instructions sur l'écran Planification des approvisionnements ».
+    </p>
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Scénario : Augmenter la consommation prévue</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Pourcentage saisi par l'utilisateur sur la période sélectionnée. S'applique uniquement aux mois avec des
+            valeurs de consommation prévues et sans consommation réelle.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemple:</span><br />
+            Augmentation prévue de 10 % de janvier à mars<br />
+            Consommation prévue : Jan = 100, Fév = 110, Mar = 112<br />
+            Augmentation de la consommation prévue : Jan = 100 x 1,1, Fév = 110 x 1,1, Mar = 112 x 1,1<br />
+            Augmentation de la consommation prévue : Jan = 110, Fév = 121, Mar = 123
+        </p>
+        </p>
+    </li>
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : Diminution de la consommation prévue</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Pourcentage saisi par l'utilisateur sur la période sélectionnée. S'applique uniquement aux mois avec des
+            valeurs de consommation prévues et sans consommation réelle.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemple:</span><br />
+            Baisse prévue de 10 % de janvier à mars<br />
+            Consommation prévue : Jan = 100, Fév = 110, Mar = 112<br />
+            Consommation prévue en baisse : Janv. = 100 x 0,9, Fév. = 110 x 0,9, Mar. = 112 x 0,9<br />
+            Consommation prévue en baisse : janv. = 90, févr. = 99, mars = 101
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : introduction/suppression progressive des prévisions</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            Période, valeur initiale et valeur finale sélectionnées par l'utilisateur. QAT interpole les nouvelles
+            valeurs de prévision entre les valeurs initiale et finale saisies par l'utilisateur en utilisant la formule
+            linéaire pour calculer la valeur des nouvelles prévisions.
+        </p>
+        <p style="font-size: 13px;">
+            Mathématiquement: <br />
+        <ul>
+            <li>
+                Où xs représente les mois et ys représente la consommation prévue,</li>
+            <li>Lorsque les valeurs de données connues sont (x0, y0) et (x1, y1)</li>
+            <li>Lorsque les valeurs de données inconnues sont (x, y)</li>
+            <li>La formule de la ligne interpolée est</li>
+        </ul>
+        <span><img class="formula-img-mr img-fluid mb-lg-0" src="../assets/img/dataentryScreenshot-1.png"
+                style="border: 1px solid #fff;width: 250px" /></span><br />
+        <span><img class="formula-img-mr img-fluid mb-lg-0 mt-lg-0" src="../assets/img/dataentryScreenshot-2.png"
+                style="border: 1px solid #fff;width: 250px" /></span>
+        </p>
+        <p style="font-size: 13px;">
+            S'applique uniquement aux mois avec consommation prévue et sans consommation réelle. Notez que si des
+            valeurs de consommation sont enregistrées après la période sélectionnée, elles restent inchangées.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Exemple:</span><br />
+            Produit à éliminer progressivement de juillet à décembre (période de 6 mois).<br />
+            Prévisions de consommation actuelles : juil. = 200, août = 185, sept. = 177, oct. = 160,
+            Nov = 145, Déc = 150<br />
+            Valeur de départ de juillet = 200 (auto-rempli par QAT ; peut être modifié)<br />
+            Valeur de fin de décembre = 0 (saisie par l'utilisateur)<br />
+            Nouvelles prévisions<br />
+            Juillet = 200 (saisi par l'utilisateur),<br />
+            Août = 160, où y<sub>0</sub>est 200; y<sub>1</sub>est 0; x<sub>0</sub>est 6 (sixième mois de la période) ;
+            et x<sub>0</sub>est 1 (premier mois de la période) à donner le 2<sup>nd</sup>point dans la ligne droite
+            doubler<br />
+            Sep = 120, où y<sub>0</sub>est 160; y<sub>1</sub>est 0; x<sub>0</sub>est 6; et x<sub>0</sub>est 2 (deuxième
+            mois de la période) donnant le 3<sub>rd</sub> point sur la ligne droite<br />
+            Oct = 80, où y<sub>0</sub>est 120; y<sub>1</sub>est 0; x<sub>0</sub>est 6; et x<sub>0</sub>est 3 (troisième
+            mois de la période) donnant le 4<sub>th</sub> point sur la ligne droite<br />
+            Nov = 40, où y<sub>0</sub>est 80; y<sub>1</sub>est 0; x<sub>0</sub>est 6; et x<sub>0</sub>est 4 (quatrième
+            mois de la période) donnant le 5<sub>th</sub> point sur la ligne droite <br />
+            Dec = 0 (saisi par l'utilisateur)
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : Supprimer les expéditions non financées</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT supprime toutes les expéditions dans une période sélectionnée par l'utilisateur avec une source de
+            financement = À déterminer, et donc dans le statut Planifié.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : supprimer les expéditions planifiées</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT supprime toutes les expéditions dont le statut est = Planifié.<br />
+            L'utilisateur a la possibilité de supprimer uniquement les expéditions planifiées qui ne respectent pas le
+            délai de livraison en fonction de la logique de délai de livraison du programme.
+        </p>
+        <span class="formulastext-p">Exemple:</span><br />
+        <p style="font-size: 13px;">
+            Suppression de toutes les expéditions prévues<br />
+            Mois en cours = Jan<br />
+            Délai de livraison = 8 mois<br />
+            Expéditions prévues pour février, avril, juillet, octobre et novembre.<br />
+            Le nouveau plan d’approvisionnement supprime les cinq expéditions.<br /><br />
+
+            Suppression de toutes les expéditions planifiées ne respectant pas le délai<br />
+            Expéditions prévues pour février, avril, juillet, octobre et novembre.<br />
+            Le nouveau plan d'approvisionnement supprime les expéditions des mois entre janvier et septembre
+            (c'est-à-dire janvier + 8 mois).<br />
+            De nouveaux approvisionnements sont prévus pour des expéditions en octobre et novembre.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : supprimer toutes les expéditions soumises qui ne respectent pas le délai
+            de livraison</h5>
+        <p class="formulastext" style="font-size: 13px;">
+        <p style="font-size: 13px;">
+            QAT supprime toutes les expéditions dont le statut est = Soumis qui ne respectent pas le délai de livraison
+            en fonction de la logique de délai de livraison du programme.
+        </p>
+        <span class="formulastext-p">Exemple:</span><br />
+        <p style="font-size: 13px;">
+            Suppression de toutes les expéditions soumises qui ne respectent pas le délai<br />
+            Mois en cours = Jan<br />
+            Délai de soumission à réception = 4 mois<br />
+            Expéditions soumises avec des dates de réception en février, avril, juillet, octobre et novembre.<br />
+            Le nouveau plan d'approvisionnement supprime les expéditions soumises des mois entre janvier et mai
+            (c'est-à-dire janvier + 4 mois).<br />
+            De nouveaux approvisionnements sont prévus pour des expéditions en juillet, octobre et novembre.
+        </p>
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Scénario : supprimer toutes les expéditions en attente qui ne respectent pas le
+            délai de livraison</h5>
+        <p style="font-size: 13px;">
+            QAT supprime toutes les expéditions dont le statut est = En attente qui ne respectent pas le délai de
+            livraison en fonction de la logique de délai de livraison du programme.
+        </p>
+    </li>
+
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Scénario : Replanifier le plan d’approvisionnement</h5>
+        <p style="font-size: 13px;">
+            Pour une période saisie par l'utilisateur, QAT supprime tous les envois planifiés des agents
+            d'approvisionnement
+            et des sources de financement sélectionnés par l'utilisateur ; puis utilise la logique des envois suggérés
+            pour
+            créer de nouveaux envois conformes aux délais et aux exigences MIN/MAX.
+        </p>
+
+        <h5 class="formulasheading">Logique des envois suggérés - “Planifier par MOS”</h5>
+        <p style="font-size: 13px;">
+            Remarque : Ci-dessous se trouve la logique pour les unités de planification basées sur les mois de stock
+            (MOS).
+            Mettez à jour le paramètre “planifier par” dans l'écran <a href="/#/programProduct/addProgramProduct">Mettre
+                à jour l’unité de planification</a>.
+        </p>
+        <p><em>Où le Mois N est le mois pour lequel QAT effectue le calcul :</em></p>
+
+        <ol>
+            <li>Si AMC = 0 ou N/A pour le Mois N, aucun envoi suggéré</li>
+
+            <li>Si le Mois N est en rupture de stock (Solde final = 0), QAT suggérera toujours un envoi
+                <ol type="a">
+                    <li>Si les 2 mois suivants (N+1, N+2) sont &lt; Min MOS, l’envoi suggéré amènera le Mois N à
+                        <strong>Max MOS</strong>. Qté suggérée = (Max MOS pour N) * (AMC pour N) – (Solde final pour N)
+                        + (Demande non satisfaite pour N)
+                    </li>
+                    <li>Si 1 ou les 2 mois suivants (N+1 ou N+2) sont &gt; Min MOS, l’envoi suggéré amènera le Mois N à
+                        <strong>Min MOS</strong>. Qté suggérée = (Min MOS pour N) * (AMC pour N) – (Solde final pour N)
+                        + (Demande non satisfaite pour N)
+                    </li>
+                </ol>
+            </li>
+
+            <li>Le produit est-il en sous-stock (MOS &lt; Min MOS) pendant 3 mois consécutifs (Mois N, N+1, N+2) ?
+                <ol type="a">
+                    <li>Si oui, envoi suggéré pour amener le Mois N à <strong>Max MOS</strong>. Qté suggérée = (Max MOS
+                        pour N) * (AMC pour N) – (Solde final pour N)</li>
+                    <li>Si non, aucun envoi suggéré</li>
+                </ol>
+            </li>
+        </ol>
+
+        <h5 class="formulasheading">Envois suggérés - “Planifier par quantité”</h5>
+        <p style="font-size: 13px;">
+            Remarque : Ci-dessous se trouve la logique pour les unités de planification basées sur les mois de stock
+            (MOS).
+            Mettez à jour le paramètre “planifier par” dans l'écran <a href="/#/programProduct/addProgramProduct">Mettre
+                à jour l’unité de planification</a>.
+        </p>
+        <p><em>Où le Mois N est le mois pour lequel QAT effectue le calcul, et X = délai de distribution :</em></p>
+
+        <ol>
+            <li>Si AMC = 0 ou N/A pour le Mois N, aucun envoi suggéré</li>
+
+            <li>Si le Mois N est en rupture de stock (Solde final = 0), QAT suggérera toujours un envoi
+                <ol type="a">
+                    <li>Si les 2 mois suivants (N+1, N+2) sont &lt; Min Qté, l’envoi suggéré est la quantité qui
+                        amènerait le Mois N à <strong>Max Qté</strong>. Qté suggérée = (Max Qté pour N) – (Solde final
+                        pour N) + (Demande non satisfaite pour N)</li>
+                    <li>Si 1 ou les 2 mois suivants (N+1 ou N+2) sont &gt; Min Qté, l’envoi suggéré est la quantité qui
+                        amènerait le Mois N à <strong>Min Qté</strong>. Qté suggérée = (Min Qté) – (Solde final pour N)
+                        + (Demande non satisfaite pour N)</li>
+                </ol>
+            </li>
+
+            <li>Le produit est-il en sous-stock (Solde final &lt; Min Qté) pendant 3 mois consécutifs (Mois N, N+1, N+2)
+                ?
+                <ol type="a">
+                    <li>Si oui, l’envoi suggéré est la quantité qui amènerait le Mois N à <strong>Max Qté</strong>.
+                        Qté suggérée = (Max Qté pour N) – (Solde final pour N)</li>
+                    <li>Si non, aucun envoi suggéré</li>
+                </ol>
+            </li>
+        </ol>
+        <p>QAT place la quantité suggérée au Mois N–X. En d’autres termes, X mois avant le Mois N, où X est le délai de
+            distribution.</p>
+    </li>
+</div>
+
+</html>
