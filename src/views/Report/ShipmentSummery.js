@@ -5,7 +5,8 @@ import {
 import CryptoJS from "crypto-js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import jexcel from "jspreadsheet";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from "react";
 import { Bar } from "react-chartjs-2";
@@ -1421,7 +1422,7 @@ class ShipmentSummery extends Component {
         },
       ],
       editable: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       filters: true,
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
