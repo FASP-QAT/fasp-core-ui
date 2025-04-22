@@ -12,6 +12,7 @@ import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import Skeleton from 'react-loading-skeleton'
@@ -450,7 +451,7 @@ class ApplicationDashboard extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: "top",
           filters: true,
-          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+          license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
           contextMenu: function (obj, x, y, e) {
             return false;
           }.bind(this),
@@ -1230,6 +1231,159 @@ class ApplicationDashboard extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
+
+      if (localStorage.getItem('sessionType') === 'Online') {
+        let topPIds = this.state.topProgramId.map(p => p.value.split("_")[0]);
+        if(topPIds.length > 0 && localStorage.getItem("topLocalProgram") == "true") {
+          for(var i = 0; i < topPIds.length; i++){
+            ProgramService.getProgramById(topPIds[i])
+              .then(response => {
+                if (response.status == 200) {
+                  var transaction = db1.transaction(['program'], 'readwrite');
+                  var programTransaction = transaction.objectStore('program');
+                  programTransaction.put(response.data);
+                } else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },
+                        () => {
+                            hideSecondComponent();
+                        })
+                }
+              }).catch(
+                  error => {
+                      if (error.message === "Network Error") {
+                          this.setState({
+                              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                              loading: false
+                          }, () => {
+                              hideSecondComponent()
+                          });
+                      } else {
+                          switch (error.response ? error.response.status : "") {
+                              case 401:
+                                  this.props.history.push(`/login/static.message.sessionExpired`)
+                                  break;
+                              case 409:
+                                  this.setState({
+                                      message: i18n.t('static.common.accessDenied'),
+                                      loading: false,
+                                      color: "#BA0C2F",
+                                  });
+                                  break;
+                      case 403:
+                                  this.props.history.push(`/accessDenied`)
+                                  break;
+                              case 500:
+                              case 404:
+                              case 406:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              case 412:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              default:
+                                  this.setState({
+                                      message: 'static.unkownError',
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                          }
+                      }
+                  }
+              );
+          }
+  
+          ProgramService.getAllProgramPlanningUnitList(topPIds)
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                    for (var i = 0; i < listArray.length; i++) {
+                        programPlanningUnitObjectStore.put(listArray[i]);
+                    }
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },() => {
+                        hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        }, () => {
+                            hideSecondComponent()
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        }
+      }
+      
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
@@ -1285,9 +1439,25 @@ class ApplicationDashboard extends Component {
             bottomSubmitLoader: true,
           })
           Dashboard(this, this.state.bottomProgramId, this.state.displayBy, true, false);
-        } else if (localStorage.getItem("dashboardTopList") && !this.state.onlyDownloadedTopProgram) {
+        } else if (!this.state.onlyDownloadedTopProgram) {
           this.setState({
-            dashboardTopList: JSON.parse(localStorage.getItem("dashboardTopList"))
+            topSubmitLoader:true
+          })
+          var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
+          DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
+            localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+            this.setState({
+              dashboardTopList: (response.data).sort((a, b) => {
+                var itemLabelA = a.program.code.toUpperCase();
+                var itemLabelB = b.program.code.toUpperCase();
+                return itemLabelA > itemLabelB ? 1 : -1;
+              }),
+              topSubmitLoader: false
+            })
+          }).catch(e => {
+            this.setState({
+              topSubmitLoader: false
+            })
           })
         }
         tempProgramList.sort(function (a, b) {
@@ -1833,7 +2003,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 10,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1896,7 +2066,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1960,7 +2130,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -2038,7 +2208,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;

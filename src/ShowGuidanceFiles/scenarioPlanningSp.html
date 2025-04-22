@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="" />
+    <title>Mostrar Guía</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td,
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formulasheading {
+            font-size: 14px !important;
+            font-weight: bold !important;
+            color: #20a8d8 !important;
+        }
+
+        .formulastext {
+            color: #212721 !important;
+        }
+
+        .list-group-item {
+            position: relative;
+            display: block;
+            padding: 0.75rem 1.25rem;
+            margin-bottom: -1px;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        .list-group-itemFirst {
+            border-top-left-radius: 0.25rem;
+            border-top-right-radius: 0.25rem;
+        }
+
+        .formulastext-p {
+            color: #20a8d8 !important;
+        }
+    </style>
+</head>
+<div>
+    <p style="font-size: 13px;">
+        La tabla de planificación de suministros en esta pantalla utiliza las mismas fórmulas que en la pantalla de
+        Plan de Suministro. Para obtener orientación sobre cómo QAT calcula el saldo inicial, los envíos sugeridos, el
+        inventario proyectado, el consumo mensual promedio, los meses de inventario y la demanda no satisfecha, consulte
+        la opción Mostrar Guía en la pantalla de Planificación de Suministros.
+    </p>
+
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Escenario: Aumentar el consumo pronosticado</h5>
+        <p class="formulastext" style="font-size: 13px;">
+            Porcentaje ingresado por el usuario durante el período seleccionado. Solo se aplica a meses con valores
+            pronosticados y sin consumo real.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Ejemplo:</span><br />
+            Aumentar el pronóstico en un 10% de enero a marzo<br />
+            Consumo pronosticado: Ene = 100, Feb = 110, Mar = 112<br />
+            Consumo pronosticado aumentado: Ene = 100 x 1.1, Feb = 110 x 1.1, Mar = 112 x 1.1<br />
+            Resultado: Ene = 110, Feb = 121, Mar = 123
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Disminuir el consumo pronosticado</h5>
+        <p style="font-size: 13px;">
+            Porcentaje ingresado por el usuario durante el período seleccionado. Solo se aplica a meses con valores
+            pronosticados y sin consumo real.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Ejemplo:</span><br />
+            Disminuir el pronóstico en un 10% de enero a marzo<br />
+            Consumo pronosticado: Ene = 100, Feb = 110, Mar = 112<br />
+            Consumo pronosticado disminuido: Ene = 100 x 0.9, Feb = 110 x 0.9, Mar = 112 x 0.9<br />
+            Resultado: Ene = 90, Feb = 99, Mar = 101
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Introducción/eliminación progresiva del pronóstico</h5>
+        <p style="font-size: 13px;">
+            Período seleccionado por el usuario, valor inicial y valor final. QAT interpola los nuevos valores de
+            pronóstico entre los valores de inicio y fin utilizando una fórmula de línea recta.
+        </p>
+        <p style="font-size: 13px;">
+            Matemáticamente: <br />
+        <ul>
+            <li>Dónde x representa los meses y y representa el consumo pronosticado,</li>
+            <li>Datos conocidos: (x0, y0) y (x1, y1)</li>
+            <li>Valores desconocidos: (x, y)</li>
+            <li>Fórmula de interpolación lineal:</li>
+        </ul>
+        <span><img src="../assets/img/dataentryScreenshot-1.png"
+                style="border: 1px solid #fff;width: 250px" /></span><br />
+        <span><img src="../assets/img/dataentryScreenshot-2.png" style="border: 1px solid #fff;width: 250px" /></span>
+        </p>
+        <p style="font-size: 13px;">
+            Solo se aplica a meses con consumo pronosticado y sin consumo real. Los valores después del período
+            seleccionado no se modifican.
+        </p>
+        <p style="font-size: 13px;">
+            <span class="formulastext-p">Ejemplo:</span><br />
+            Eliminación gradual del producto de julio a diciembre (6 meses).<br />
+            Consumo actual: Jul = 200, Ago = 185, Sep = 177, Oct = 160, Nov = 145, Dic = 150<br />
+            Valor inicial Jul = 200 (auto poblado por QAT; editable)<br />
+            Valor final Dic = 0 (ingresado por el usuario)<br />
+            Nuevo pronóstico:<br />
+            Jul = 200,<br />
+            Ago = 160,<br />
+            Sep = 120,<br />
+            Oct = 80,<br />
+            Nov = 40,<br />
+            Dic = 0
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Eliminar envíos no financiados</h5>
+        <p style="font-size: 13px;">
+            QAT elimina todos los envíos en un período seleccionado por el usuario con fuente de financiación = TBD y
+            estado = Planificado.
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Eliminar envíos planificados</h5>
+        <p style="font-size: 13px;">
+            QAT elimina todos los envíos con estado = Planificado.<br />
+            El usuario puede optar por eliminar solo los envíos planificados que no cumplan con el tiempo de entrega
+            según la lógica del programa.
+        </p>
+        <span class="formulastext-p">Ejemplo:</span><br />
+        <p style="font-size: 13px;">
+            Eliminar todos los envíos planificados<br />
+            Mes actual = Ene<br />
+            Tiempo de entrega = 8 meses<br />
+            Envíos planificados: Feb, Abr, Jul, Oct, Nov<br />
+            El nuevo plan elimina los cinco envíos.<br /><br />
+            Eliminar envíos que no cumplen con el tiempo de entrega<br />
+            Envíos planificados: Feb, Abr, Jul, Oct, Nov<br />
+            El nuevo plan elimina envíos entre Ene y Sep (Ene + 8 meses).<br />
+            El nuevo plan conserva los envíos de Oct y Nov.
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Eliminar todos los envíos Enviados que no cumplen con el tiempo de
+            entrega</h5>
+        <p style="font-size: 13px;">
+            QAT elimina todos los envíos con estado = Enviado que no cumplen con el tiempo de entrega según la lógica
+            del
+            programa.
+        </p>
+        <span class="formulastext-p">Ejemplo:</span><br />
+        <p style="font-size: 13px;">
+            Mes actual = Ene<br />
+            Tiempo de entrega desde Enviado hasta Recibido = 4 meses<br />
+            Envíos enviados con fechas de recepción en Feb, Abr, Jul, Oct, Nov<br />
+            El nuevo plan elimina envíos entre Ene y May (Ene + 4 meses)<br />
+            El nuevo plan conserva los envíos de Jul, Oct, y Nov.
+        </p>
+    </li>
+
+    <li class="list-group-item">
+        <h5 class="formulasheading">Escenario: Eliminar todos los envíos En espera que no cumplen con el tiempo de
+            entrega</h5>
+        <p style="font-size: 13px;">
+            QAT elimina todos los envíos con estado = En espera que no cumplen con el tiempo de entrega según la lógica
+            del programa.
+        </p>
+    </li>
+    <li class="list-group-item list-group-itemFirst">
+        <h5 class="formulasheading">Escenario: Replanificar el plan de suministro</h5>
+        <p style="font-size: 13px;">
+            Para un período ingresado por el usuario, QAT elimina todos los envíos planificados de los agentes de
+            adquisiciones y fuentes de financiamiento seleccionados por el usuario; luego utiliza la lógica de envíos
+            sugeridos para crear nuevos envíos que cumplan con los requisitos de tiempo de entrega y MIN/MÁX.
+        </p>
+
+        <h5 class="formulasheading">Lógica de envíos sugeridos - “Planificar por MES”</h5>
+        <p style="font-size: 13px;">
+            Nota: A continuación se muestra la lógica para las unidades de planificación que se planifican por meses de
+            inventario (MOS). Actualice la configuración de “planificar por” en la pantalla
+            <a href="/#/programProduct/addProgramProduct">Actualizar unidad de planificación</a>.
+        </p>
+        <p><em>Donde el Mes N es el mes para el que QAT está calculando:</em></p>
+
+        <ol>
+            <li>Si el CMM = 0 o N/D para el Mes N, no hay envío sugerido</li>
+
+            <li>Si el Mes N está agotado (Saldo Final = 0), QAT siempre sugerirá un envío
+                <ol type="a">
+                    <li>Si ambos de los siguientes 2 meses (N+1, N+2) están &lt; MOS Mínimo, el envío sugerido llevará
+                        el
+                        mes N a <strong>MOS Máximo</strong>. Cantidad sugerida = (MOS Máx para N) * (CMM para N) –
+                        (Saldo
+                        Final para N) + (Demanda no satisfecha para N)
+                    </li>
+                    <li>Si 1 o ambos de los próximos 2 meses (N+1 o N+2) están &gt; MOS Mínimo, el envío sugerido
+                        llevará el
+                        mes N a <strong>MOS Mínimo</strong>. Cantidad sugerida = (MOS Mín para N) * (CMM para N) –
+                        (Saldo
+                        Final para N) + (Demanda no satisfecha para N)</li>
+                </ol>
+            </li>
+
+            <li>¿El producto está con inventario insuficiente (MOS &lt; MOS Mínimo) durante 3 meses consecutivos (Mes N,
+                N+1, N+2)?
+                <ol type="a">
+                    <li>Si es así, el envío sugerido llevará el Mes N a <strong>MOS Máximo</strong>. Cantidad sugerida =
+                        (MOS
+                        Máx para N) * (CMM para N) – (Saldo Final para N)</li>
+                    <li>Si no, no hay envío sugerido</li>
+                </ol>
+            </li>
+        </ol>
+
+        <h5 class="formulasheading">Envíos sugeridos - “Planificar por Cantidad”</h5>
+        <p style="font-size: 13px;">
+            Nota: A continuación se muestra la lógica para las unidades de planificación que se planifican por meses de
+            inventario (MOS). Actualice la configuración de “planificar por” en la pantalla
+            <a href="/#/programProduct/addProgramProduct">Actualizar unidad de planificación</a>.
+        </p>
+        <p><em>Donde el Mes N es el mes que QAT está calculando, y X = Tiempo de Entrega de Distribución:</em></p>
+
+        <ol>
+            <li>Si el CMM = 0 o N/D para el Mes N, no hay envío sugerido</li>
+
+            <li>Si el Mes N está agotado (Saldo Final = 0), QAT siempre sugerirá un envío
+                <ol type="a">
+                    <li>Si ambos de los siguientes 2 meses (N+1, N+2) están &lt; Cantidad Mínima, el envío sugerido será
+                        la
+                        cantidad que lleve el Mes N a <strong>Cantidad Máxima</strong>. Cantidad Sugerida = (Cant. Máx
+                        para N)
+                        – (Saldo Final para N) + (Demanda no satisfecha para N)</li>
+                    <li>Si uno o ambos de los próximos 2 meses (N+1 o N+2) están &gt; Cantidad Mínima, el envío sugerido
+                        será
+                        la cantidad que lleve el Mes N a <strong>Cantidad Mínima</strong>. Cantidad Sugerida = (Cant.
+                        Mínima) –
+                        (Saldo Final para N) + (Demanda no satisfecha para N)</li>
+                </ol>
+            </li>
+
+            <li>¿El producto tiene inventario insuficiente (Saldo Final &lt; Cantidad Mínima) durante 3 meses
+                consecutivos (Mes N, N+1, N+2)?
+                <ol type="a">
+                    <li>Si es así, el envío sugerido es la cantidad que lleve el Mes N a <strong>Cantidad
+                            Máxima</strong>.
+                        Cantidad Sugerida = (Cant. Máx para N) – (Saldo Final para N)</li>
+                    <li>Si no, no hay envío sugerido</li>
+                </ol>
+            </li>
+        </ol>
+        <p>QAT coloca la cantidad sugerida en el Mes N–X. Es decir, X meses antes del Mes N, donde X es el Tiempo de
+            Entrega de Distribución.</p>
+    </li>
+</div>
+
+</html>

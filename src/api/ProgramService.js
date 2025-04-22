@@ -179,5 +179,9 @@ class ProgramService {
         return axios.put(`${API_URL}/api/programVersion/resetProblem`, json, {}
         );
     }
+    getAllProgramPlanningUnitList(programIds) {
+        return axios.post(`${API_URL}/api/programPlanningUnit/all`, programIds, {}
+        );
+    }
 }
 export default new ProgramService()

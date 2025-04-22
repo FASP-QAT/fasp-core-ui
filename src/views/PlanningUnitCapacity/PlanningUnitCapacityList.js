@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from 'moment';
 import React, { Component } from 'react';
 import { Search } from 'react-bootstrap-table2-toolkit';
@@ -122,7 +123,7 @@ export default class PlanningUnitCapacityList extends Component {
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
         };
         var planningUnitCapacityEl = jexcel(document.getElementById("tableDiv"), options);
         this.el = planningUnitCapacityEl;

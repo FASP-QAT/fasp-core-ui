@@ -4,6 +4,7 @@ import { Formik } from 'formik';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import { Bar } from 'react-chartjs-2';
@@ -48,6 +49,10 @@ import ShipmentsInSupplyPlanComponent from "../SupplyPlan/ShipmentsInSupplyPlan.
 import { calculateSupplyPlan } from "../SupplyPlan/SupplyPlanCalculations";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import SupplyPlanComparisionComponent from "../SupplyPlan/SupplyPlanComparisionComponent";
+import scenarioPlanningEn from '../../../src/ShowGuidanceFiles/scenarioPlanningEn.html';
+import scenarioPlanningFr from '../../../src/ShowGuidanceFiles/scenarioPlanningFr.html';
+import scenarioPlanningPr from '../../../src/ShowGuidanceFiles/scenarioPlanningPr.html';
+import scenarioPlanningSp from '../../../src/ShowGuidanceFiles/scenarioPlanningSp.html';
 const entityname = i18n.t('static.dashboard.whatIf')
 /**
  * This const is used to define the intial values of validation schema for scenario options
@@ -331,6 +336,14 @@ export default class WhatIfReportComponent extends React.Component {
         this.scenarioCheckedChanged = this.scenarioCheckedChanged.bind(this);
         this.saveScenario = this.saveScenario.bind(this);
         this.setFundingSource = this.setFundingSource.bind(this)
+    }
+    /**
+     * Toggles the visibility of guidance in the component state.
+     */
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        })
     }
     /**
      * This method is used to add commas to the number
@@ -7446,12 +7459,11 @@ export default class WhatIfReportComponent extends React.Component {
                 />
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h5 className={this.state.color} id="div1">{i18n.t(this.state.message, { entityname }) || this.state.supplyPlanError}</h5>
-                <SupplyPlanFormulas ref="formulaeChild" />
                 <Card>
                     <div className="Card-header-reporticon">
                         <div className="card-header-actions">
                             <a className="card-header-action">
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.refs.formulaeChild.toggle() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.supplyplan.supplyplanformula')}</small></span>
                             </a>
                         </div>
                     </div>
@@ -7597,6 +7609,25 @@ export default class WhatIfReportComponent extends React.Component {
                         {this.state.programModified == 1 && this.state.programQPLDetails.filter(c => c.id == this.state.programId).length > 0 && !this.state.programQPLDetails.filter(c => c.id == this.state.programId)[0].readonly && <Button style={{ display: this.state.display }} type="submit" size="md" color="success" className="float-right mr-1" onClick={this.saveSupplyPlan}><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
                     </CardFooter>
                 </Card>
+                <Modal isOpen={this.state.showGuidance}
+                    className={'modal-lg ' + this.props.className} >
+                    <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                        <strong className="TextWhite">{i18n.t('static.common.formulae')}</strong>
+                    </ModalHeader>
+                    <div>
+                        <ModalBody>
+                            <div dangerouslySetInnerHTML={{
+                                __html: localStorage.getItem('lang') == 'en' ?
+                                    scenarioPlanningEn :
+                                    localStorage.getItem('lang') == 'fr' ?
+                                        scenarioPlanningFr :
+                                        localStorage.getItem('lang') == 'sp' ?
+                                        scenarioPlanningSp :
+                                        scenarioPlanningPr
+                            }} />
+                        </ModalBody>
+                    </div>
+                </Modal>
             </div >
         )
     }

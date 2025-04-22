@@ -1,4 +1,5 @@
-import jexcel from "jspreadsheet";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from "react";
 import Picker from "react-month-picker";
@@ -203,7 +204,7 @@ export default class ConsumptionDetails extends Component {
       onchange: this.changed,
       copyCompatibility: true,
       allowManualInsertRow: false,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       editable: true,
       onload: this.loadedModal,
       contextMenu: function (obj, x, y, e) {
@@ -1128,7 +1129,7 @@ export default class ConsumptionDetails extends Component {
                 allowDeleteRow: false,
                 copyCompatibility: true,
                 allowManualInsertRow: false,
-                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 editable: false,
                 onload: loadedForNonEditableTables,
                 contextMenu: function (obj, x, y, e) {
