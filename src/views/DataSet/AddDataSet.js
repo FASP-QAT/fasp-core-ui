@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import { Formik } from 'formik';
 import moment from 'moment';
 import React, { Component } from "react";
+import CryptoJS from 'crypto-js';
 import Picker from 'react-month-picker';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -20,7 +21,8 @@ import {
 import * as Yup from 'yup';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL } from "../../Constants";
+import { SECRET_KEY, API_URL } from "../../Constants";
+import UserService from '../../api/UserService';
 import DropdownService from '../../api/DropdownService';
 import HealthAreaService from "../../api/HealthAreaService";
 import ProgramService from "../../api/ProgramService";
@@ -895,7 +897,22 @@ export default class AddForecastProgram extends Component {
                                     pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
                                     ProgramService.addDataset(pro).then(response => {
                                         if (response.status == 200) {
-                                            this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            AuthenticationService.setupAxiosInterceptors();
+                                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                                            UserService.getUserDetails(decryptedCurUser).then(response2 => {
+                                                var userObj = response2.data;
+                                                var user = response2.data.user;
+                                                var aclList = []
+                                                user.userAclList.map(item => {
+                                                    var acl = item;
+                                                    acl.businessFunctionList = userObj.bfAndProgramIdMap[item.roleId].businessFunctionList;
+                                                    acl.programList = userObj.bfAndProgramIdMap[item.roleId].programIdList;
+                                                    aclList.push(acl);
+                                                });
+                                                user.userAclList = aclList;
+                                                localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response2.data.user).toString(), `${SECRET_KEY}`));
+                                                this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                                            })
                                         } else {
                                             this.setState({
                                                 message: response.data.messageCode, loading: false
