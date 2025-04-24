@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import { Formik } from 'formik';
 import moment from 'moment';
 import React, { Component } from "react";
-import CryptoJS from 'crypto-js';
 import Picker from 'react-month-picker';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
@@ -21,7 +20,7 @@ import {
 import * as Yup from 'yup';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { SECRET_KEY, API_URL } from "../../Constants";
+import { API_URL } from "../../Constants";
 import DropdownService from '../../api/DropdownService';
 import HealthAreaService from "../../api/HealthAreaService";
 import ProgramService from "../../api/ProgramService";
@@ -896,16 +895,6 @@ export default class AddForecastProgram extends Component {
                                     pro.currentVersion.forecastStopDate = this.state.singleValue2.year + '-' + this.state.singleValue2.month + '-01';
                                     ProgramService.addDataset(pro).then(response => {
                                         if (response.status == 200) {
-                                            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-                                            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-                                            decryptedUser.userAclList = decryptedUser.userAclList.map(userAcl => {
-                                                return {
-                                                    ...userAcl,
-                                                    programList: [...userAcl.programList, response.data.data]
-                                                }
-                                            });
-                                            localStorage.removeItem('user-' + decryptedCurUser);
-                                            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
                                             this.props.history.push(`/dataSet/listDataSet/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
                                         } else {
                                             this.setState({
