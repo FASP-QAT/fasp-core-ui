@@ -48,47 +48,75 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const filterDataByFiscalYear = (data, fiscalStartMonth, forecastEndDate) => {
-    // fiscalStartMonth is 6 because July is the 7th month, so zero-indexed it is 6
+const filterDataByFiscalYear = (data, fiscalStartMonth, forecastStartDate, forecastEndDate) => {
     const result = {};
-    const yearWiseData = {};
-
-    data.forEach(item => {
-        let fiscalYearEnd = "";
-
-        const year = parseInt(moment(item[0]).format("YYYY"));
-        const forecastEndYear = parseInt(moment(forecastEndDate).format("YYYY"));
-        if (year <= forecastEndYear) {
-            const month = parseInt(moment(item[0]).format("MM")); // 0 = Jan, 11 = Dec
+    const getFiscalYear = (dateStr) => {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        if(fiscalStartMonth >= 7) {
             if (month >= fiscalStartMonth) {
-                fiscalYearEnd = year + 1;
+                return year + 1;
             } else {
-                fiscalYearEnd = year;
+                return year;
             }
-            const fiscalYearKey = `${fiscalYearEnd}`;
-            if (fiscalYearKey != "") {
-                if (yearWiseData[fiscalYearKey]) {
-                    yearWiseData[fiscalYearKey] += 1;
-                } else {
-                    yearWiseData[fiscalYearKey] = 1;
-                }
-                // Aggregate values based on the fiscal year
-                if (!result[fiscalYearKey]) {
-                    result[fiscalYearKey] = new Array(item.length).fill(0);
-                }
-
-                for (let i = 1; i < item.length; i++) {
-                    const value = parseFloat(item[i]) || 0; // Convert to float and handle empty strings
-                    result[fiscalYearKey][i] += value;
-                }
+        } else {
+            if (month >= fiscalStartMonth) {
+                return year;
+            } else {
+                return year-1;
             }
         }
-        // result[fiscalYearKey] += item.value;
-    });
-    for (const year in result) {
-        result[year].push(yearWiseData[year]);
+    };
+
+    const fiscalBuckets = {};
+    for (const row of data) {
+        const fiscalYear = getFiscalYear(row[0]);
+        if (!fiscalBuckets[fiscalYear]) {
+            fiscalBuckets[fiscalYear] = [];
+        }
+
+        fiscalBuckets[fiscalYear].push(row);
     }
-    return result;
+
+    for (const fy in fiscalBuckets) {
+        fiscalBuckets[fy].sort((a, b) => new Date(a[0]) - new Date(b[0]));
+    }
+
+    for (const [fy, entries] of Object.entries(fiscalBuckets)) {
+        let sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
+
+        for (const entry of entries) {
+            sum1 += parseFloat(entry[1]);
+            sum2 += parseFloat(entry[2]);
+            sum3 += parseFloat(entry[3]);
+            sum4 += parseFloat(entry[4]);
+        }
+
+        result[fy] = [
+            0,
+            sum1,
+            sum2,
+            sum3,
+            sum4,
+            entries.length
+        ];
+    }
+    
+    const filtered = {};
+    for (const y in result) {
+        const yearNum = parseInt(y);
+        if (yearNum >= parseInt(new Date(forecastStartDate).getFullYear()) && yearNum <= parseInt(new Date(forecastEndDate).getFullYear())) {
+            filtered[y] = result[y];
+        }
+    }
+    for (let y = parseInt(new Date(forecastStartDate).getFullYear()); y <= parseInt(new Date(forecastEndDate).getFullYear()); y++) {
+        const yearStr = y.toString();
+        if (!(yearStr in filtered)) {
+            filtered[yearStr] = ['', '', '', '', '', '']; // or some default placeholder
+        }
+    }
+    return filtered;
 }
 
 
@@ -680,7 +708,7 @@ class CompareAndSelectScenario extends Component {
                 var displayBy = this.state.xAxisDisplayBy;
                 var fiscalStartMonth = (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12
                 var forecastStartMonth = parseInt(moment(this.state.forecastStartDate).format("MM"));
-                var originalData = this.state.xAxisDisplayBy > 2 && fiscalStartMonth != forecastStartMonth ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStopDate) : calculateSums(dataArr1, this.state.forecastStopDate);
+                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStartDate, this.state.forecastStopDate) : calculateSums(dataArr1, this.state.forecastStopDate);
 
                 // Convert the object to an array
                 const transformedData = Object.keys(originalData).map((year, index) => ({
@@ -2311,7 +2339,7 @@ class CompareAndSelectScenario extends Component {
         let val;
         if (displayBy == 1) {
             val = this.state.singleValue2;
-        } else {
+        } else if (displayBy == 2) {
             val = {
                 from: {
                     year: this.state.singleValue2.from.year,
@@ -2320,6 +2348,17 @@ class CompareAndSelectScenario extends Component {
                 to: {
                     year: this.state.singleValue2.to.year,
                     month: 12,
+                }
+            }
+        } else {
+            val = {
+                from: {
+                    year: this.state.singleValue2.from.year,
+                    month: (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                },
+                to: {
+                    year: this.state.singleValue2.to.year,
+                    month: (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12,
                 }
             }
             // } else {
