@@ -48,7 +48,7 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const filterDataByFiscalYear = (data, fiscalStartMonth, forecastStartDate, forecastEndDate) => {
+const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     const result = {};
     const getFiscalYear = (dateStr) => {
         const date = new Date(dateStr);
@@ -102,7 +102,8 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, forecastStartDate, forec
             entries.length
         ];
     }
-    
+    var forecastStartDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+    var forecastEndDate = rangeValue.to.year + '-' + rangeValue.to.month + '-01';
     const filtered = {};
     for (const y in result) {
         const yearNum = parseInt(y);
@@ -708,7 +709,7 @@ class CompareAndSelectScenario extends Component {
                 var displayBy = this.state.xAxisDisplayBy;
                 var fiscalStartMonth = (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12
                 var forecastStartMonth = parseInt(moment(this.state.forecastStartDate).format("MM"));
-                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStartDate, this.state.forecastStopDate) : calculateSums(dataArr1, this.state.forecastStopDate);
+                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.singleValue2) : calculateSums(dataArr1, this.state.forecastStopDate);
 
                 // Convert the object to an array
                 const transformedData = Object.keys(originalData).map((year, index) => ({
