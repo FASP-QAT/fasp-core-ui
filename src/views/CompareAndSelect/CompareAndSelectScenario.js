@@ -2785,7 +2785,7 @@ class CompareAndSelectScenario extends Component {
                                     <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                <Label >{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2803,7 +2803,7 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
+                                                <Label >{i18n.t('static.program.region')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2872,7 +2872,7 @@ class CompareAndSelectScenario extends Component {
                                                     {/* <span><b>Total Forecast Qty</b> : 1234</span> */}
                                                     <br></br>
                                                     <FormGroup className="col-md-12">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                        <Label >{i18n.t('static.program.notes')}</Label>
                                                         <div className="controls">
                                                             <InputGroup>
                                                                 <Input
@@ -2943,7 +2943,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </FormGroup>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                                <Label >{i18n.t('static.report.planningUnit')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -2962,7 +2962,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                                <Label >{i18n.t('static.product.unit1')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -2982,7 +2982,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
+                                                                <Label >{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -3035,7 +3035,7 @@ class CompareAndSelectScenario extends Component {
                                                             </FormGroup>
                                                             {/* {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
                                                                 <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <Label >{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                                     <div className="controls edit">
                                                                         <Picker
                                                                             ref={this.pickAMonth3}
@@ -3051,7 +3051,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </FormGroup>
                                                             } */}
                                                             <FormGroup className="col-md-5">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
+                                                                <Label >{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
                                                                 <div className="controls ">
                                                                     <InputGroup>
                                                                         <Input
@@ -3082,7 +3082,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             {!this.state.showForecastPeriod && <FormGroup className="col-md-3 pickerRangeBox">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                                <Label >{i18n.t('static.report.dateRange')}
                                                                     <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
                                                                 </Label>
                                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (
