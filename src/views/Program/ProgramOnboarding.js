@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import CryptoJS from 'crypto-js';
 import 'react-select/dist/react-select.min.css';
 import { ProgressBar, Step } from "react-step-progress-bar";
 import {
@@ -11,7 +12,8 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/react-step-progress-bar/styles.css";
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL } from "../../Constants";
+import { SECRET_KEY, API_URL } from "../../Constants";
+import UserService from '../../api/UserService';
 import HealthAreaService from "../../api/HealthAreaService";
 import ProgramService from "../../api/ProgramService";
 import i18n from '../../i18n';
@@ -311,7 +313,22 @@ export default class ProgramOnboarding extends Component {
             this.setState({ loading: true });
             ProgramService.programInitialize(this.state.program).then(response => {
                 if (response.status == "200") {
-                    this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    AuthenticationService.setupAxiosInterceptors();
+                    let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+                    UserService.getUserDetails(decryptedCurUser).then(response2 => {
+                        var userObj = response2.data;
+                        var user = response2.data.user;
+                        var aclList = []
+                        user.userAclList.map(item => {
+                            var acl = item;
+                            acl.businessFunctionList = userObj.bfAndProgramIdMap[item.roleId].businessFunctionList;
+                            acl.programList = userObj.bfAndProgramIdMap[item.roleId].programIdList;
+                            aclList.push(acl);
+                        });
+                        user.userAclList = aclList;
+                        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(response2.data.user).toString(), `${SECRET_KEY}`));
+                        this.props.history.push(`/program/listProgram/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
+                    })
                 } else {
                     this.setState({
                         message: response.data.messageCode, loading: false
