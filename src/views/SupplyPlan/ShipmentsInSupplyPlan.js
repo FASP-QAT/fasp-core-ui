@@ -2893,7 +2893,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
             this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
         if (rowData[0] != "") {
-            if (rowData[0].length > 27) {
+            if (rowData[0].length >= 27) {
                 inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
             } else if (!BATCH_NO_REGEX.test(rowData[0])) {
                 inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
@@ -2964,7 +2964,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                 var rowData = elInstance.getRowData(y);
                 var value = rowData[0];
                 if (value != "") {
-                    if (value.length > 27) {
+                    if (value.length >= 27) {
                         inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
                         valid = false;
                     } else if (!BATCH_NO_REGEX.test(value)) {
