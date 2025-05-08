@@ -1212,14 +1212,14 @@ export default class syncPage extends Component {
           if (checkIfThereAreAnyActiveChildShipments.length == 0) {
             var shipmentIndex1 = shipmentData.findIndex(c => parentShipmentId > 0 ? (c.shipmentId > 0 ? (c.shipmentId == parentShipmentId) : (c.tempShipmentId == parentShipmentId)) : (c.shipmentId > 0 ? (c.shipmentId == tempParentShipmentId) : (c.tempShipmentId == tempParentShipmentId)));
             if (shipmentIndex1 != -1) {
-              shipmentData[shipmentIndex1].active = true;
+              // shipmentData[shipmentIndex1].active = true;
               shipmentData[shipmentIndex1].erpFlag = false;
             }
             var linkedParentShipmentIdList = shipmentData.filter(c => parentShipmentId > 0 ? (c.parentLinkedShipmentId == parentShipmentId) : (c.tempParentLinkedShipmentId == tempParentShipmentId));
             for (var l = 0; l < linkedParentShipmentIdList.length; l++) {
               var parentShipmentIndex1 = shipmentData.findIndex(c => linkedParentShipmentIdList[l].shipmentId > 0 ? c.shipmentId == linkedParentShipmentIdList[l].shipmentId : c.tempShipmentId == linkedParentShipmentIdList[l].tempShipmentId);
               if (parentShipmentIndex1 != -1) {
-                shipmentData[parentShipmentIndex1].active = true;
+                // shipmentData[parentShipmentIndex1].active = true;
                 shipmentData[parentShipmentIndex1].erpFlag = false;
                 shipmentData[parentShipmentIndex1].parentLinkedShipmentId = null;
                 shipmentData[parentShipmentIndex1].tempParentLinkedShipmentId = null;
