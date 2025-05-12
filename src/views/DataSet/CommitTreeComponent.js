@@ -2904,7 +2904,7 @@ export default class CommitTreeComponent extends React.Component {
                                         planningUnitToUpdate[pl].programPlanningUnitId=null;
                                     }
                                     for(var r=0;r<regionList.length;r++){
-                                    if(planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId]!=undefined && planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId].treeAndScenario.filter(c=>[...new Set(programJson.treeList.map(item=>item.treeId.toString()))].includes(c.treeId.toString())).length==0){
+                                    if(planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId]!=undefined && planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId].treeAndScenario!=undefined && planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId].treeAndScenario.filter(c=>[...new Set(programJson.treeList.map(item=>item.treeId.toString()))].includes(c.treeId.toString())).length==0){
                                         planningUnitToUpdate[pl].selectedForecastMap[regionList[r].regionId].treeAndScenario=[];
                                     }
                                 }
