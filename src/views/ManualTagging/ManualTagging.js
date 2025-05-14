@@ -3067,9 +3067,9 @@ export default class ManualTagging extends Component {
                         data1[6] = list[i].shipmentTransId;
                         data1[7] = list[i].receivedDate != "" && list[i].receivedDate != null && list[i].receivedDate != undefined && list[i].receivedDate != "Invalid date" ? list[i].receivedDate : list[i].expectedDeliveryDate;
                         data1[8] = getLabelText(list[i].shipmentStatus.label, this.state.lang)
-                        data1[9] = list[i].shipmentQty
+                        data1[9] = list[i].shipmentRcpuQty
                         data1[10] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data1[11] = (Number(list[i].shipmentQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
+                        data1[11] = (Number(list[i].shipmentRcpuQty) * Number(list[i].realmCountryPlanningUnit.multiplier));
                         data1[12] = list[i].notes
                         data1[13] = i;
                         data1[14] = list[i].tempShipmentId;
