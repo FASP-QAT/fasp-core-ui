@@ -2,6 +2,8 @@ import pako from 'pako';
 import moment from 'moment';
 import { APPLICATION_STATUS_URL, COMPRESS_LIMIT_SIZE, DATE_FORMAT_CAP_FOUR_DIGITS } from "../Constants";
 import i18n from '../i18n';
+import CryptoJS from 'crypto-js';
+import { SECRET_KEY } from '../Constants';
 /**
  * This function is used for padding a particular character till specified length
  * @param {*} string This is the string on which padding has to be done
@@ -446,4 +448,26 @@ export function formatterMOS(value, withRoundN) {
   else {
     return ''
   }
+}
+
+export function encryptFCData(unencryptedData) {
+  const jsonString = JSON.stringify(unencryptedData);
+  const chunkSize = 1024 * 1024; // 1 MB chunks
+  const encryptedChunks = [];
+
+  for (let i = 0; i < jsonString.length; i += chunkSize) {
+      const chunk = jsonString.slice(i, i + chunkSize);
+      const encryptedChunk = CryptoJS.AES.encrypt(chunk, SECRET_KEY).toString();
+      encryptedChunks.push(encryptedChunk);
+  }
+  return encryptedChunks;
+}
+
+export function decryptFCData(encryptedData) {
+  const decryptedChunks = encryptedData.map(chunk => {
+      const bytes = CryptoJS.AES.decrypt(chunk, SECRET_KEY);
+      return bytes.toString(CryptoJS.enc.Utf8);
+  });
+  const originalJsonString = decryptedChunks.join("");
+  return JSON.parse(originalJsonString);
 }

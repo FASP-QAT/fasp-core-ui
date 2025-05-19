@@ -18,6 +18,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import Skeleton from 'react-loading-skeleton'
 import '../../../node_modules/react-loading-skeleton/dist/skeleton.css'
 import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { encryptFCData, decryptFCData } from '../../CommonComponent/JavascriptCommonFunctions';
 import {
   Button,
   ButtonGroup,
@@ -803,9 +804,10 @@ class ApplicationDashboard extends Component {
           for (var i = 0; i < filteredGetRequestList.length; i++) {
             var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
+            const programJson1 = decryptFCData(filteredGetRequestList[i].programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson1 = JSON.parse(programData);
             var pqd = programList.filter(c => c.programId == filteredGetRequestList[i].programId);
             datasetList.push({
               programCode: filteredGetRequestList[i].programCode,
