@@ -54,7 +54,7 @@ import { calculateTES } from '../Extrapolation/TESNew';
 import { calculateError } from "./ErrorCalculations";
 import DropdownService from '../../api/DropdownService.js';
 import DatasetService from '../../api/DatasetService.js';
-import { addDoubleQuoteToRowContent, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { MultiSelect } from 'react-multi-select-component';
 import i18next from 'i18next';
 // Localized entity name
@@ -520,8 +520,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        var programData = decryptFCData(myResult[i].programData);
                         programData.code = programData.programCode;
                         programData.id = programData.programId;
                         var planningUnitList = programData.planningUnitList.filter(c => c.consuptionForecast && c.active == true);
@@ -1518,9 +1517,8 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
+                        var programData = decryptFCData(myResult[i].programData);
+                        var version = programData.currentVersion
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
                     }
@@ -1772,9 +1770,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     }.bind(this);
                     datasetRequest.onsuccess = function (event) {
                         var myResult = datasetRequest.result;
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
+                        var datasetJson = decryptFCData(myResult.programData);
                         var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var consumptionExtrapolationIndexTes = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 2);
                         var consumptionExtrapolationIndexArima = (datasetJson.consumptionExtrapolation).findIndex(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId && c.extrapolationMethod.id == 4);
@@ -1793,7 +1789,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             (datasetJson.consumptionExtrapolation)[consumptionExtrapolationIndexMovingAvg].notes = this.state.extrapolationNotes;
                         var pu = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId)[0]
                         this.deletesPUListForTesAndArimaExtrapolation(pu.planningUnit.id);
-                        datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                        var datasetData = encryptFCData(datasetJson);
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
@@ -1857,9 +1853,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     datasetRequest.onsuccess = function (event) {
                         var extrapolationMethodList = extrapolationMethodRequest.result;
                         var myResult = datasetRequest.result;
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
+                        var datasetJson = decryptFCData(myResult.programData);
                         var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var consumptionExtrapolationList = (datasetJson.consumptionExtrapolation).filter(c => c.planningUnit.id != this.state.planningUnitId || (c.planningUnit.id == this.state.planningUnitId && c.region.id != this.state.regionId));
                         var rangeValue = this.state.rangeValue1;
@@ -2024,7 +2018,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                             id += 1;
                         }
                         datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-                        datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                        var datasetData = encryptFCData(datasetJson);
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         this.setState({
@@ -2964,9 +2958,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     datasetRequest.onsuccess = function (event) {
                         var extrapolationMethodList = extrapolationMethodRequest.result;
                         var myResult = datasetRequest.result;
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
+                        var datasetJson = decryptFCData(myResult.programData);
                         var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                         var listOfPlanningUnits = this.state.planningUnitValues;
                         var regionList = this.state.regionValues;
@@ -3176,7 +3168,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         }
                         // console.log("consumptionExtrapolationList", consumptionExtrapolationList)
                         datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-                        datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                        var datasetData = encryptFCData(datasetJson);
                         myResult.programData = datasetData;
                         var putRequest = datasetTransaction.put(myResult);
                         putRequest.onerror = function (event) {

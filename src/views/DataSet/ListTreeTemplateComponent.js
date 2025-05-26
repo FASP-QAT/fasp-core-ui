@@ -21,7 +21,7 @@ import i18n from '../../i18n';
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree Template';
 /**
@@ -345,8 +345,7 @@ export default class ListTreeTemplate extends Component {
         if (datasetId != 0 && datasetId != "" && datasetId != null) {
             var program = this.state.datasetList.filter(c => c.id == datasetId);
             if (program.length > 0) {
-                var databytes = CryptoJS.AES.decrypt(program[0].programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                var programData = decryptFCData(program[0].programData);
                 regionList = programData.regionList;
                 regionList.map(c => {
                     regionMultiList.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
@@ -1258,8 +1257,7 @@ export default class ListTreeTemplate extends Component {
                     var programId = this.state.datasetIdModal.split("_")[0];
                     var versionId = (this.state.datasetIdModal.split("_")[1]).split("v")[1];
                     var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1271,7 +1269,7 @@ export default class ListTreeTemplate extends Component {
                     })
                     programData.planningUnitList = planningFullList;
                     let downloadedProgramData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1836,7 +1834,7 @@ export default class ListTreeTemplate extends Component {
                     treeList[findTreeIndex] = tree;
                     tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
-                    var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                    var programData = encryptFCData(tempProgram.programData);
                     tempProgram.programData = programData;
                     this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
                 }
@@ -1871,7 +1869,7 @@ export default class ListTreeTemplate extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
-            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var programData = encryptFCData(tempProgram);
             var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
             var json = {
                 id: id,

@@ -22,7 +22,7 @@ import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import StepOneImport from './StepOneImportDataset';
 import StepTwoImport from './StepTwoImportDataset';
-import { hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import Minizip from 'minizip-asm.js';
 // Initial values for form fields
 const initialValues = {
@@ -130,9 +130,7 @@ export default class ImportDataset extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson1 = JSON.parse(programData);
+                        var programJson1 = decryptFCData(myResult[i].programData);
                         var programJson = {
                             programId: programJson1.programId,
                             versionId: myResult[i].version
@@ -317,7 +315,7 @@ export default class ImportDataset extends Component {
                                 var programDataBytes = json.programData;
                                 var programData = programDataBytes;
                                 var programJson = (programData);
-                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                json.programData = encryptFCData(programJson);
                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                 var programn = transactionn.objectStore('datasetData');
                                 var addProgramDataRequest = programn.put(json);
@@ -465,7 +463,7 @@ export default class ImportDataset extends Component {
                                                 var programDataBytes = json.programData;
                                                 var programData = programDataBytes;
                                                 var programJson = (programData);
-                                                json.programData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
+                                                json.programData = encryptFCData(programJson);
                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                 var programn = transactionn.objectStore('datasetData');
                                                 var addProgramDataRequest = programn.put(json);

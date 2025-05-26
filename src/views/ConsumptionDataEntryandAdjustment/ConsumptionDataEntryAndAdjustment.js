@@ -49,7 +49,7 @@ import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
-import { addDoubleQuoteToRowContent, hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, hideFirstComponent, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions.js";
 import DropdownService from '../../api/DropdownService.js';
 import DatasetService from "../../api/DatasetService.js";
 import ForecastingUnitService from "../../api/ForecastingUnitService.js";
@@ -676,9 +676,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         datasetRequest.onsuccess = function (event) {
           var extrapolationMethodList = extrapolationMethodRequest.result;
           var myResult = datasetRequest.result;
-          var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-          var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-          var datasetJson = JSON.parse(datasetData);
+          var datasetJson = decryptFCData(myResult.programData);
           var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
           var regionList = this.state.regionList;
           var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
@@ -847,7 +845,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             }
           }
           datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-          datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+          var datasetData = encryptFCData(datasetJson);
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
           this.setState({
@@ -1353,9 +1351,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         }.bind(this);
         datasetRequest.onsuccess = function (event) {
           var myResult = datasetRequest.result;
-          var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-          var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-          var datasetJson = JSON.parse(datasetData);
+          var datasetJson = decryptFCData(myResult.programData);
           var elInstance = this.state.dataEl;
           var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
           var curUser = AuthenticationService.getLoggedInUserId();
@@ -1449,7 +1445,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
           }
           datasetJson.actualConsumptionList = fullConsumptionList;
           datasetJson.planningUnitList = planningUnitList;
-          datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+          var datasetData = encryptFCData(datasetJson);
           myResult.programData = datasetData;
           var putRequest = datasetTransaction.put(myResult);
           putRequest.onerror = function (event) {
@@ -1470,6 +1466,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
               message: i18n.t('static.compareAndSelect.dataSaved'),
               messageColor: "green",
               consumptionChanged: false,
+              loading: false,
               jsonDataMovingAvg: [],
               jsonDataSemiAverage: [],
               jsonDataLinearRegression: [],
@@ -2458,9 +2455,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var userId = userBytes.toString(CryptoJS.enc.Utf8);
         for (var i = 0; i < myResult.length; i++) {
           if (myResult[i].userId == userId && myResult[i].programId == programId) {
-            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-            var programData = databytes.toString(CryptoJS.enc.Utf8)
-            var version = JSON.parse(programData).currentVersion
+            var programData = decryptFCData(myResult[i].programData); 
+            var version = programData.currentVersion
             version.versionId = `${version.versionId} (Local)`
             verList.push(version)
           }
@@ -2658,9 +2654,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                 var puResult = [];
                 puResult = puRequest.result;
                 var datasetData = dsRequest.result;
-                var datasetDataBytes = CryptoJS.AES.decrypt(datasetData.programData, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
+                var datasetJson = decryptFCData(datasetData.programData);
                 var consumptionList = datasetJson.actualConsumptionList;
                 var planningUnitList = datasetJson.planningUnitList.filter(c => c.consuptionForecast && c.active);
                 planningUnitList.sort((a, b) => {

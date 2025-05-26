@@ -55,7 +55,7 @@ import CryptoJS from 'crypto-js'
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import DropdownService from '../../api/DropdownService';
 import { MultiSelect } from 'react-multi-select-component';
-import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -1055,8 +1055,7 @@ export default class CreateTreeTemplate extends Component {
         if (datasetId != 0 && datasetId != "" && datasetId != null) {
             var programForCreateTree = this.state.datasetListForCreateTree.filter(c => c.id == datasetId);
             if (programForCreateTree.length > 0) {
-                var databytes = CryptoJS.AES.decrypt(programForCreateTree[0].programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                var programData = decryptFCData(programForCreateTree[0].programData);
                 regionListForCreateTree = programData.regionList;
                 regionListForCreateTree.map(c => {
                     regionMultiListForCreateTree.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
@@ -1973,8 +1972,7 @@ export default class CreateTreeTemplate extends Component {
                     var programId = this.state.datasetIdModalForCreateTree.split("_")[0];
                     var versionId = (this.state.datasetIdModalForCreateTree.split("_")[1]).split("v")[1];
                     var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1986,7 +1984,7 @@ export default class CreateTreeTemplate extends Component {
                     })
                     programData.planningUnitList = planningFullList;
                     let downloadedProgramData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -3420,7 +3418,7 @@ export default class CreateTreeTemplate extends Component {
                     treeList[findTreeIndex] = tree;
                     tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
-                    var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                    var programData = encryptFCData(tempProgram.programData);
                     tempProgram.programData = programData;
                     this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
                 } catch (error) {
@@ -3460,7 +3458,7 @@ export default class CreateTreeTemplate extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
-            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var programData = encryptFCData(tempProgram);
             var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
             var json = {
                 id: id,

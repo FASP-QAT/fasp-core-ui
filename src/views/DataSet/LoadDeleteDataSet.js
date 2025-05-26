@@ -16,7 +16,7 @@ import {
     Row
 } from 'reactstrap';
 import { getDatabase } from '../../CommonComponent/IndexedDbFunctions';
-import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { decompressJson, encryptFCData, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
 import DatasetService from "../../api/DatasetService";
@@ -922,7 +922,7 @@ class LoadDeleteDataSet extends Component {
                                             var programSaveData = transactionForSavingData.objectStore('datasetData');
                                             for (var r = 0; r < json.length; r++) {
                                                 json[r].actionList = [];
-                                                var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                                                var encryptedText = encryptFCData(json[r]);
                                                 var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                                                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                                                 var version = json[r].currentVersion.versionId;
@@ -934,7 +934,7 @@ class LoadDeleteDataSet extends Component {
                                                     programId: json[r].programId,
                                                     version: version,
                                                     programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                                    programData: encryptedText.toString(),
+                                                    programData: encryptedText,
                                                     userId: userId,
                                                     programCode: json[r].programCode,
                                                 };
