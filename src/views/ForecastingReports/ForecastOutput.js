@@ -41,7 +41,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, filterOptions, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 const ref = React.createRef();
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
@@ -739,9 +739,7 @@ class ForecastOutput extends Component {
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
                         var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                         for (var i = 0; i < filteredGetRequestList.length; i++) {
-                            var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson1 = JSON.parse(programData);
+                            var programJson1 = decryptFCData(myResult[i].programData);
                             datasetList.push({
                                 programCode: filteredGetRequestList[i].programCode,
                                 programVersion: filteredGetRequestList[i].version,
@@ -1378,8 +1376,7 @@ class ForecastOutput extends Component {
                 let downloadedProgramData = [];
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        var programData = decryptFCData(myResult[i].programData);
                         programData.code = programData.programCode;
                         programData.id = programData.programId;
                         var f = 0
@@ -2056,9 +2053,8 @@ class ForecastOutput extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
+                        var programData = decryptFCData(myResult[i].programData);
+                        var version = programData.currentVersion
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
                     }

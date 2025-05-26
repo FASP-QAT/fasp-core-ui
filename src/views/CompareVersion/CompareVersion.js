@@ -19,6 +19,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import CompareVersionTableCompareVersion from './CompareVersionTableCompareVersion';
+import { decryptFCData } from '../../CommonComponent/JavascriptCommonFunctions.js';
 /**
  * Component for comparing versions.
  */
@@ -302,8 +303,7 @@ class CompareVersion extends Component {
                 for (var mr = 0; mr < myResult.length; mr++) {
                     if (myResult[mr].userId == userId) {
                         var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                        var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(myResult[mr].programData);
                         if (index == -1) {
                             var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                             var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);
@@ -379,9 +379,7 @@ class CompareVersion extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(myResult.programData);
                     var planningUnitList = datasetJson.planningUnitList;
                     var regionList = datasetJson.regionList
                     var list = [];
@@ -569,9 +567,7 @@ class CompareVersion extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(myResult.programData);
                     var planningUnitList = datasetJson.planningUnitList;
                     var regionList = datasetJson.regionList
                     var list = [];
