@@ -464,10 +464,17 @@ export function encryptFCData(unencryptedData) {
 }
 
 export function decryptFCData(encryptedData) {
-  const decryptedChunks = encryptedData.map(chunk => {
+  var programData;
+  if(Array.isArray(encryptedData)) {
+      const decryptedChunks = encryptedData.map(chunk => {
       const bytes = CryptoJS.AES.decrypt(chunk, SECRET_KEY);
       return bytes.toString(CryptoJS.enc.Utf8);
-  });
-  const originalJsonString = decryptedChunks.join("");
-  return JSON.parse(originalJsonString);
+    });
+    programData = decryptedChunks.join("");
+  } else {
+    const databytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
+    programData = databytes.toString(CryptoJS.enc.Utf8);
+  }
+  console.log("Hello",JSON.parse(programData))
+  return JSON.parse(programData);
 }
