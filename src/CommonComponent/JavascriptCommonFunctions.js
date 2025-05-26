@@ -475,6 +475,5 @@ export function decryptFCData(encryptedData) {
     const databytes = CryptoJS.AES.decrypt(encryptedData, SECRET_KEY);
     programData = databytes.toString(CryptoJS.enc.Utf8);
   }
-  console.log("Hello",JSON.parse(programData))
   return JSON.parse(programData);
 }
