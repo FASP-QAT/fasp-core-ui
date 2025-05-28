@@ -47,7 +47,7 @@ import AggregationDown from '../../assets/img/funnel.png';
 import AggregationAllowed from '../../assets/img/aggregateAllowed.png';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { addDoubleQuoteToRowContent, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -1529,7 +1529,7 @@ export default class TreeTable extends Component {
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
             programData.treeList = treeData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             tempProgram.programData = programData;
             var db1;
             getDatabase();
@@ -4936,8 +4936,7 @@ export default class TreeTable extends Component {
                     var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
                     if (dataSetObj != null) {
                         var dataEnc = JSON.parse(JSON.stringify(dataSetObj));
-                        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(dataSetObj.programData);
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
@@ -5201,8 +5200,7 @@ export default class TreeTable extends Component {
                 var programDataListForPuCheck = [];
                 if (this.state.programId != null && this.state.programId != "") {
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
-                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(dataSetObj.programData);
                     programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
@@ -5215,8 +5213,7 @@ export default class TreeTable extends Component {
                 } else {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId) {
-                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            var programData = decryptFCData(myResult[i].programData);
                             programDataListForPuCheck.push({ "programData": programData, "id": myResult[i].id });
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {
