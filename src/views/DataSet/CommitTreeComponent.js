@@ -32,7 +32,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import "../../../node_modules/react-step-progress-bar/styles.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { decompressJson, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, decryptFCData, encryptFCData, isCompress } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from "../../CommonComponent/getLabelText";
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, LATEST_VERSION_COLOUR, LOCAL_VERSION_COLOUR, SECRET_KEY } from "../../Constants";
 import { DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PRO_KEY } from '../../Constants.js';
@@ -653,9 +653,7 @@ export default class CommitTreeComponent extends React.Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
-                        var datasetDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                        var datasetJson = JSON.parse(datasetData);
+                        var datasetJson = decryptFCData(myResult[i].programData);
                         var programJson = {
                             name: datasetJson.programCode,
                             id: myResult[i].id,
@@ -1903,9 +1901,7 @@ export default class CommitTreeComponent extends React.Component {
             programRequest.onsuccess = function (event) {
                 var dataset = programRequest.result;
                 var programDataJson = programRequest.result.programData;
-                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJsonOriginal = JSON.parse(datasetData);
+                var datasetJsonOriginal = decryptFCData(programDataJson);
                 if (this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0) {
                     var programDataLocal = this.state.programDataLocal;
                     var programDataJson = this.state.programDataLocal;
@@ -2718,7 +2714,7 @@ export default class CommitTreeComponent extends React.Component {
                                     programId: json[r].programId,
                                     version: version,
                                     programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                                    programData: (CryptoJS.AES.encrypt(JSON.stringify((json[r])), SECRET_KEY)).toString(),
+                                    programData: encryptFCData(json[r]),
                                     userId: userId,
                                     programCode: json[r].programCode
                                 };
@@ -2816,9 +2812,7 @@ export default class CommitTreeComponent extends React.Component {
                             var programQPLDetailsGetRequest = programQPLDetailsOs1.get((this.state.programId));
                             programQPLDetailsGetRequest.onsuccess = function (event) {
                                 var programQPLDetails = programQPLDetailsGetRequest.result;
-                                var datasetDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8).replaceAll("\"null\"", null);
-                                var datasetJson = JSON.parse(datasetData);
+                                var datasetJson = decryptFCData(programRequest.result.programData);
                                 var programJson = this.state.finalProgramJson;
                                 programJson.currentVersion.versionType = { id: document.getElementById("versionTypeId").value };
                                 programJson.currentVersion.notes = document.getElementById("notes").value;;

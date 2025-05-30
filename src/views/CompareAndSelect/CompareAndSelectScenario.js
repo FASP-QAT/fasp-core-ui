@@ -38,7 +38,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { DatePicker } from 'antd';
 import "antd/dist/antd.css";
 const ref = React.createRef();
@@ -1979,9 +1979,7 @@ class CompareAndSelectScenario extends Component {
                     localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
                     localStorage.setItem("sesDatasetVersionId", versionIdSes);
                     var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
-                    var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(datasetFiltered.programJson);
                     var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                     var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                     var curDate = moment(startDate).format("YYYY-MM-DD");
@@ -2237,9 +2235,7 @@ class CompareAndSelectScenario extends Component {
             programRequest.onsuccess = function (event) {
                 var dataset = programRequest.result;
                 var programDataJson = programRequest.result.programData;
-                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
+                var datasetJson = decryptFCData(programDataJson);
                 var datasetForEncryption = datasetJson;
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
@@ -2248,7 +2244,7 @@ class CompareAndSelectScenario extends Component {
                 pu.selectedForecastMap[this.state.regionId] = { treeAndScenario: treeAndScenario, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": total, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
-                var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                var encryptedDatasetJson = encryptFCData(datasetForEncryption);
                 dataset.programData = encryptedDatasetJson;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');

@@ -21,6 +21,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import Minizip from 'minizip-asm.js';
+import { decryptFCData } from '../../CommonComponent/JavascriptCommonFunctions.js';
 // Initial values for form fields
 const initialValues = {
     programId: ''
@@ -77,9 +78,7 @@ export default class ExportDataset extends Component {
                 for (var i = 0; i < json.length; i++) {
                     var bytes = CryptoJS.AES.decrypt(json[i].programName, SECRET_KEY);
                     var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                    var bytes1 = CryptoJS.AES.decrypt(json[i].programData, SECRET_KEY);
-                    var programData = bytes1.toString(CryptoJS.enc.Utf8);
-                    var programJson = JSON.parse(programData);
+                    var programJson = decryptFCData(json[i].programData);
                     if (json[i].userId == userId) {
                         prgList.push({ value: json[i].id, label: programJson.programCode + "~v" + json[i].version })
                     }
@@ -244,9 +243,7 @@ export default class ExportDataset extends Component {
                                                                                                 myResult[i].readonly = 0;
                                                                                             }
                                                                                             if (isUnEncrepted) {
-                                                                                                var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                                                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                                var programJson1 = JSON.parse(programData);
+                                                                                                var programJson1 = decryptFCData(myResult[i].programData);
                                                                                                 myResult[i].programData = programJson1;
                                                                                                 var txt = JSON.stringify(myResult[i]);
                                                                                                 var txt1 = "";
@@ -256,9 +253,7 @@ export default class ExportDataset extends Component {
                                                                                                 var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                                                                                                 var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
                                                                                                 var programNameLabel1 = JSON.parse(programNameLabel);
-                                                                                                var programDataBytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                                                                                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                                                                                var programJson1 = JSON.parse(programData);
+                                                                                                var programJson1 = decryptFCData(myResult[i].programData);
                                                                                                 myResult[i].programName = programNameLabel1;
                                                                                                 myResult[i].programData = programJson1;
                                                                                                 var txt = JSON.stringify(myResult[i]);
