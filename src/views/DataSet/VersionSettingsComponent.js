@@ -28,7 +28,7 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { consumptionExtrapolationNotesClicked, exportPDF, missingMonthsClicked, nodeWithPercentageChildrenClicked } from '../DataSet/DataCheckComponent.js';
 import { buildJxl, buildJxl1, dataCheck } from "./DataCheckComponent";
-import { filterOptions, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, filterOptions, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import { message } from 'antd';
 const ref = React.createRef();
 const pickerLang = {
@@ -136,8 +136,7 @@ class VersionSettingsComponent extends Component {
             var programTransaction = transaction.objectStore('datasetData');            
             var programRequest = programTransaction.get(program);
             programRequest.onsuccess = function (e) {
-                var databytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                var programData = decryptFCData(programRequest.result.programData);
                 programRequest.result.programData=programData;
                 calculateModelingData(programRequest.result, this, '', 0, -1, 1, -1, false, false, true);
             }.bind(this)
@@ -145,7 +144,7 @@ class VersionSettingsComponent extends Component {
     })
     }
     saveTreeData(datasetObj) {
-        var programData = (CryptoJS.AES.encrypt(JSON.stringify(datasetObj.programData), SECRET_KEY)).toString();
+        var programData = encryptFCData(datasetObj.programData);
         datasetObj.programData = programData;
         var db1;
         getDatabase();
@@ -586,8 +585,7 @@ class VersionSettingsComponent extends Component {
                         var id = map1.get("11");
                         var noOfDaysInMonth = Number(map1.get("13"));
                         var program = (this.state.datasetList.filter(x => x.id == id)[0]);
-                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(program.programData);
                         if((moment(startDate).format("YYYY-MM")!=moment(map1.get("19")).format("YYYY-MM")) || (moment(stopDate).format("YYYY-MM") != moment(map1.get("20")).format("YYYY-MM"))){
                             if(programData.treeList.length>0){
                                 programsForWhichDateIsChanged.push(id);
@@ -600,7 +598,7 @@ class VersionSettingsComponent extends Component {
                         programData.currentVersion.freightPerc = this.el.getValue(`O${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
                         programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
                         programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
-                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        programData = encryptFCData(programData);
                         program.programData = programData;
                         programs.push(program);
                         count++;
@@ -968,8 +966,7 @@ class VersionSettingsComponent extends Component {
         var versionTypeId = document.getElementById('versionTypeId').value;
         for (var j = 0; j < versionSettingsList.length; j++) {
             if (versionSettingsList[j].programData) {
-                var bytes = CryptoJS.AES.decrypt(versionSettingsList[j].programData, SECRET_KEY);
-                var pd = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+                var pd = decryptFCData(versionSettingsList[j].programData);
                 data = [];
                 data[0] = versionSettingsList[j].programId
                 data[1] = versionSettingsList[j].programCode

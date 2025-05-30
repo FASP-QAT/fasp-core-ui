@@ -64,7 +64,7 @@ import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { forEach } from 'mathjs';
-import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -1231,8 +1231,7 @@ export default class BuildTree extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1247,7 +1246,7 @@ export default class BuildTree extends Component {
                     var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
                     programDataListForPuCheck[indexForPuCheck].programData = programData;
                     dataSetObj.programData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1310,8 +1309,7 @@ export default class BuildTree extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     var tableJson = this.el.getJson(null, false);
                     var updatedMissingPUList = [];
@@ -1349,7 +1347,7 @@ export default class BuildTree extends Component {
                     var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
                     programDataListForPuCheck[indexForPuCheck].programData = programData;
                     var datasetListJexcel = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -3782,7 +3780,7 @@ export default class BuildTree extends Component {
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
             programData.treeList = treeData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             tempProgram.programData = programData;
             var db1;
             getDatabase();
@@ -4679,8 +4677,7 @@ export default class BuildTree extends Component {
         if (programId != "") {
             var dataSetObj = JSON.parse(JSON.stringify(this.state.datasetList.filter(c => c.id == programId)[0]));;
             var datasetEnc = dataSetObj;
-            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = decryptFCData(dataSetObj.programData);
             programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
             dataSetObj.programData = programData;
             var treeList = programData.treeList;
@@ -6791,8 +6788,7 @@ export default class BuildTree extends Component {
                     var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
                     if (dataSetObj != null) {
                         var dataEnc = JSON.parse(JSON.stringify(dataSetObj));
-                        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(dataSetObj.programData);
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
@@ -7288,8 +7284,7 @@ export default class BuildTree extends Component {
                 var programDataListForPuCheck = [];
                 if (this.state.programId != null && this.state.programId != "") {
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
-                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(dataSetObj.programData);
                     programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
@@ -7302,8 +7297,7 @@ export default class BuildTree extends Component {
                 } else {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId) {
-                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            var programData = decryptFCData(myResult[i].programData);
                             programDataListForPuCheck.push({ "programData": programData, "id": myResult[i].id });
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {

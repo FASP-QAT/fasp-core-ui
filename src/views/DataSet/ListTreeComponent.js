@@ -19,7 +19,7 @@ import ListTreePr from '../../../src/ShowGuidanceFiles/ManageTreeListTreePr.html
 import ListTreeSp from '../../../src/ShowGuidanceFiles/ManageTreeListTreeSp.html';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
-import { decompressJson, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, decryptFCData, encryptFCData, hideFirstComponent, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_SM, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_DATASET, SECRET_KEY } from '../../Constants.js';
 import DatasetService from '../../api/DatasetService.js';
@@ -193,7 +193,7 @@ export default class ListTreeComponent extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
-            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var programData = encryptFCData(tempProgram);
             var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
             var json = {
                 id: id,
@@ -307,7 +307,7 @@ export default class ListTreeComponent extends Component {
                     treeList[findTreeIndex] = tree;
                     tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
-                    var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                    var programData = encryptFCData(tempProgram.programData);
                     tempProgram.programData = programData;
                     var treeTemplateId = document.getElementById('templateId').value;
                     this.saveTreeData(3, tempProgram, treeTemplateId, programId, this.state.tempTreeId, programCopy);
@@ -1088,8 +1088,7 @@ export default class ListTreeComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == (this.state.datasetIdModal + "_uId_" + userId).replace("~", "_"))[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1104,7 +1103,7 @@ export default class ListTreeComponent extends Component {
                     let downloadedProgramData = this.state.downloadedProgramData;
                     var index = downloadedProgramData.findIndex(c => c.programId == programData.programId && c.currentVersion.versionId == programData.currentVersion.versionId);
                     downloadedProgramData[index] = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1164,8 +1163,7 @@ export default class ListTreeComponent extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == (this.state.datasetIdModal + "_uId_" + userId).replace("~", "_"))[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     var tableJson = this.el.getJson(null, false);
                     var updatedMissingPUList = [];
@@ -1202,7 +1200,7 @@ export default class ListTreeComponent extends Component {
                     let downloadedProgramData = this.state.downloadedProgramData;
                     var index = downloadedProgramData.findIndex(c => c.programId == programData.programId && c.currentVersion.versionId == programData.currentVersion.versionId);
                     downloadedProgramData[index] = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1928,8 +1926,7 @@ export default class ListTreeComponent extends Component {
                         if (myResult[i].userId == userId) {
                             var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                            var programData = decryptFCData(myResult[i].programData);
                             programData.code = programData.programCode;
                             programData.id = programData.programId;
                             var f = 0
@@ -2158,9 +2155,8 @@ export default class ListTreeComponent extends Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
+                        var programData = decryptFCData(myResult[i].programData);
+                        var version = programData.currentVersion
                         version.versionId = `${version.versionId} (Local)`
                         version.isLocal = 1
                         verList.push(version)
@@ -2784,7 +2780,7 @@ export default class ListTreeComponent extends Component {
                 var json = response.data;
                 for (var r = 0; r < json.length; r++) {
                     json[r].actionList = [];
-                    var encryptedText = CryptoJS.AES.encrypt(JSON.stringify(json[r]), SECRET_KEY);
+                    var encryptedText = encryptFCData(json[r]);
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var version = json[r].currentVersion.versionId;

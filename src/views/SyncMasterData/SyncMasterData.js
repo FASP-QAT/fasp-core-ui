@@ -16,7 +16,7 @@ import CryptoJS from 'crypto-js'
 import UserService from '../../api/UserService';
 import { calculateSupplyPlan } from '../SupplyPlan/SupplyPlanCalculations';
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew'
-import { generateRandomAplhaNumericCode, paddingZero, decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { generateRandomAplhaNumericCode, paddingZero, decompressJson, decryptFCData, encryptFCData } from '../../CommonComponent/JavascriptCommonFunctions';
 import { calculateModelingData } from '../DataSet/ModelingDataCalculations.js';
 import ProgramService from '../../api/ProgramService';
 /**
@@ -1133,8 +1133,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                     var datasetDataObjectStore = datasetDataTransaction.objectStore('datasetData');
                                                                                                                                     for (var dl = 0; dl < datasetList.length; dl++) {
                                                                                                                                         if (datasetList[dl].userId == userId) {
-                                                                                                                                            var databytes = CryptoJS.AES.decrypt(datasetList[dl].programData, SECRET_KEY);
-                                                                                                                                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                                                                                                                                            const programData = decryptFCData(datasetList[dl].programData);
                                                                                                                                             var datasetPlanningUnitList = programData.planningUnitList;
                                                                                                                                             datasetPlanningUnitList.map(item => {
                                                                                                                                                 var planningUnitObj = response.planningUnitList.filter(c => c.planningUnitId == item.planningUnit.id);
@@ -1149,7 +1148,7 @@ export default class SyncMasterData extends Component {
                                                                                                                                                 }
                                                                                                                                             })
                                                                                                                                             programData.planningUnitList = datasetPlanningUnitList;
-                                                                                                                                            datasetList[dl].programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                                                                                                                                            datasetList[dl].programData = encryptFCData(programData);
                                                                                                                                             datasetDataObjectStore.put(datasetList[dl]);
                                                                                                                                         }
                                                                                                                                     }
