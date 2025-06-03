@@ -160,7 +160,7 @@ const validationSchemaNodeData = function (values) {
         noOfPersons:
             Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
                 function (value) {
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0$)\d{1,10}$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -170,7 +170,7 @@ const validationSchemaNodeData = function (values) {
         forecastingUnitPerPersonsFC:
             Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -180,7 +180,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyCon: Yup.string()
             .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -190,7 +190,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyDis: Yup.string()
             .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -226,7 +226,7 @@ const validationSchemaNodeData = function (values) {
                 }),
         repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
-                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+                var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
                     return false;
                 } else {
