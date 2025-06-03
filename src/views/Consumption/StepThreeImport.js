@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
@@ -24,7 +25,7 @@ import { calculateLinearRegression } from '../Extrapolation/LinearRegression';
 import { calculateMovingAvg } from '../Extrapolation/MovingAverages';
 import { calculateSemiAverages } from '../Extrapolation/SemiAverages';
 import { calculateTES } from '../Extrapolation/TESNew';
-import { addDoubleQuoteToRowContent, dateFormatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, dateFormatter, decryptFCData, encryptFCData } from '../../CommonComponent/JavascriptCommonFunctions';
 /**
  * Component for Import from QAT supply plan step three for the import
  */
@@ -362,9 +363,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 datasetRequest.onsuccess = function (event) {
                     var extrapolationMethodList = extrapolationMethodRequest.result;
                     var myResult = datasetRequest.result;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(myResult.programData);
                     var consumptionExtrapolationDataUnFiltered = (datasetJson.consumptionExtrapolation);
                     var listOfPlanningUnits = this.state.listOfPlanningUnits;
                     var regionList = this.state.regionListForExtrapolate;
@@ -538,7 +537,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         }
                     }
                     datasetJson.consumptionExtrapolation = consumptionExtrapolationList;
-                    datasetData = (CryptoJS.AES.encrypt(JSON.stringify(datasetJson), SECRET_KEY)).toString()
+                    var datasetData = encryptFCData(datasetJson);
                     myResult.programData = datasetData;
                     var putRequest = datasetTransaction.put(myResult);
                     this.setState({
@@ -725,8 +724,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         }
 
                         var program = (this.props.items.datasetList1.filter(x => x.programId == this.props.items.forecastProgramId && x.version == this.props.items.forecastProgramVersionId)[0]);
-                        var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(program.programData);
                         let originalConsumptionList = programData.actualConsumptionList;
                         for (var i = 0; i < ImportListPink.length; i++) {
                             let index = originalConsumptionList.findIndex(c => new Date(c.month).getTime() == new Date(ImportListPink[i].month).getTime() && c.region.id == ImportListPink[i].regionId && c.planningUnit.id == ImportListPink[i].planningUnitId)
@@ -758,7 +756,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                         });
                         
                         var programDataWithoutEncrypt = programData;
-                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        programData = encryptFCData(programData);
                         program.programData = programData;
                         programs.push(program);
                         var db1;
@@ -1137,7 +1135,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                 jExcelLoadedFunction(obj);
             },
             editable: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

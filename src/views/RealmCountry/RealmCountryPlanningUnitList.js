@@ -1,4 +1,5 @@
-import jexcel from "jspreadsheet";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from "react";
 import { Search } from "react-bootstrap-table2-toolkit";
 import { MultiSelect } from "react-multi-select-component";
@@ -663,9 +664,9 @@ export default class RealmCountryPlanningUnitList extends Component {
       },
       oneditionend: this.oneditionend,
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       onload: this.loaded,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {

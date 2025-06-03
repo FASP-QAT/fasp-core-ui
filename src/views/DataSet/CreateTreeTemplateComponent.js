@@ -9,6 +9,7 @@ import { Formik } from 'formik';
 import * as Yup from 'yup'
 import pdfIcon from '../../assets/img/pdf.png';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -54,7 +55,7 @@ import CryptoJS from 'crypto-js'
 import { calculateModelingData } from '../../views/DataSet/ModelingDataCalculation2';
 import DropdownService from '../../api/DropdownService';
 import { MultiSelect } from 'react-multi-select-component';
-import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree Template';
 const pickerLang = {
@@ -203,7 +204,7 @@ const validationSchemaNodeData = function (values) {
         noOfPersons:
             Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
                 function (value) {
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0$)\d{1,10}$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -213,7 +214,7 @@ const validationSchemaNodeData = function (values) {
         forecastingUnitPerPersonsFC:
             Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -223,7 +224,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyCon: Yup.string()
             .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -233,7 +234,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyDis: Yup.string()
             .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -269,7 +270,7 @@ const validationSchemaNodeData = function (values) {
                 }),
         repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
-                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+                var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
                     return false;
                 } else {
@@ -1054,8 +1055,7 @@ export default class CreateTreeTemplate extends Component {
         if (datasetId != 0 && datasetId != "" && datasetId != null) {
             var programForCreateTree = this.state.datasetListForCreateTree.filter(c => c.id == datasetId);
             if (programForCreateTree.length > 0) {
-                var databytes = CryptoJS.AES.decrypt(programForCreateTree[0].programData, SECRET_KEY);
-                var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                var programData = decryptFCData(programForCreateTree[0].programData);
                 regionListForCreateTree = programData.regionList;
                 regionListForCreateTree.map(c => {
                     regionMultiListForCreateTree.push({ label: getLabelText(c.label, this.state.lang), value: c.regionId })
@@ -1352,7 +1352,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -1972,8 +1972,7 @@ export default class CreateTreeTemplate extends Component {
                     var programId = this.state.datasetIdModalForCreateTree.split("_")[0];
                     var versionId = (this.state.datasetIdModalForCreateTree.split("_")[1]).split("v")[1];
                     var program = (filteredGetRequestList.filter(x => x.programId == programId)).filter(v => v.version == versionId)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1985,7 +1984,7 @@ export default class CreateTreeTemplate extends Component {
                     })
                     programData.planningUnitList = planningFullList;
                     let downloadedProgramData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -2379,7 +2378,7 @@ export default class CreateTreeTemplate extends Component {
             // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -3419,7 +3418,7 @@ export default class CreateTreeTemplate extends Component {
                     treeList[findTreeIndex] = tree;
                     tempProgram.treeList = treeList;
                     var programCopy = JSON.parse(JSON.stringify(tempProgram));
-                    var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram.programData), SECRET_KEY)).toString();
+                    var programData = encryptFCData(tempProgram.programData);
                     tempProgram.programData = programData;
                     this.saveTreeData(3, tempProgram, this.state.treeTemplate.treeTemplateId, programId, this.state.tempTreeId, programCopy);
                 } catch (error) {
@@ -3459,7 +3458,7 @@ export default class CreateTreeTemplate extends Component {
             db1 = e.target.result;
             var transaction = db1.transaction(['datasetData'], 'readwrite');
             var programTransaction = transaction.objectStore('datasetData');
-            var programData = (CryptoJS.AES.encrypt(JSON.stringify(tempProgram), SECRET_KEY)).toString();
+            var programData = encryptFCData(tempProgram);
             var id = tempProgram.programId + "_v" + version + "_uId_" + userId;
             var json = {
                 id: id,
@@ -5106,7 +5105,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: this.state.editable,
             contextMenu: function (obj, x, y, e) {
                 return false;
@@ -5274,7 +5273,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -5585,7 +5584,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -6132,7 +6131,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
         };
         var modelingPerEl = jexcel(document.getElementById("modelingJexcelPercent"), options);
         this.el = modelingPerEl;
@@ -9551,7 +9550,7 @@ export default class CreateTreeTemplate extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)

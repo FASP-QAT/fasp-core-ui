@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import {
@@ -16,7 +17,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions';
-import { decompressJson } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decompressJson, decryptFCData } from '../../CommonComponent/JavascriptCommonFunctions';
 import { LOGO } from '../../CommonComponent/Logo';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, ROUNDING_NUMBER, SECRET_KEY, TITLE_FONT } from '../../Constants.js';
@@ -112,9 +113,7 @@ class ProductValidation extends Component {
                 getRequest.onsuccess = function (event) {
                     var myResult = [];
                     myResult = getRequest.result;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(myResult.programData, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(myResult.programData);
                     this.setState({
                         datasetData: datasetJson,
                         localProgramId: datasetId,
@@ -600,7 +599,7 @@ class ProductValidation extends Component {
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 position: 'top',
                 filters: true,
-                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 editable: false,
                 contextMenu: function (obj, x, y, e) {
                     return [];
@@ -802,8 +801,7 @@ class ProductValidation extends Component {
                                     for (var mr = 0; mr < myResult.length; mr++) {
                                         if (myResult[mr].userId == userId) {
                                             var index = datasetList.findIndex(c => c.id == myResult[mr].programId);
-                                            var databytes = CryptoJS.AES.decrypt(myResult[mr].programData, SECRET_KEY);
-                                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                                            var programData = decryptFCData(myResult[mr].programData);
                                             if (index == -1) {
                                                 var programNameBytes = CryptoJS.AES.decrypt(myResult[mr].programName, SECRET_KEY);
                                                 var programNameLabel = programNameBytes.toString(CryptoJS.enc.Utf8);

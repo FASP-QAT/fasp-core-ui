@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -792,7 +793,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                 allowExport: false,
                                                 parseFormulas: true,
                                                 filters: filterOption,
-                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                 onchangepage: this.onchangepage,
                                                 oneditionend: this.oneditionend,
                                                 oncreateeditor: function (a, b, c, d, e) {
@@ -816,7 +817,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                             });
                                                         }
                                                         var rowData = obj.getRowData(y);
-                                                        if (rowData[4] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[5]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1) {
+                                                        if (rowData[27] == PLANNED_SHIPMENT_STATUS && (this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf") && moment(rowData[5]).format("YYYY-MM") >= moment(Date.now()).format("YYYY-MM") && this.props.items.isSuggested != 1) {
                                                             var expectedDeliveryDate = rowData[5];
                                                             var index = this.props.items.monthsArray.findIndex(c => moment(c.startDate).format("YYYY-MM") == moment(expectedDeliveryDate).format("YYYY-MM"));
                                                             var expectedTotalShipmentQty = this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty != "" ? (this.props.items.suggestedShipmentsTotalData[index].totalShipmentQty) : 0;
@@ -1170,7 +1171,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                                                                                 contextMenu: function (obj, x, y, e) {
                                                                                     return false;
                                                                                 },
-                                                                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                                                 onload: this.loadedShipmentDates,
                                                                                 updateTable: function (el, cell, x, y, source, value, id) {
                                                                                     var elInstance = el;
@@ -1913,7 +1914,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             allowExport: false,
             parseFormulas: true,
             onload: this.loadedBatchInfoShipment,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
             contextMenu: function (obj, x, y, e) {
@@ -2248,7 +2249,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0];
                     var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                     var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
-                    shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[28] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                    shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[2] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                         .map(c => {
                             var batchInfoList = c.batchInfoList;
                             batchInfoList.map(bi => {
@@ -3099,7 +3100,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
             this.props.updateState("batchQtyTotalForPopup", batchQtyTotalForPopup);
         }
         if (rowData[0] != "") {
-            if (rowData[0].length > 27) {
+            if (rowData[0].length >= 27) {
                 inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
             } else if (!BATCH_NO_REGEX.test(rowData[0])) {
                 inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
@@ -3161,7 +3162,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var rowData = elInstance.getRowData(y);
                 var value = rowData[0];
                 if (value != "") {
-                    if (value.length > 27) {
+                    if (value.length >= 27) {
                         inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
                         valid = false;
                     } else if (!BATCH_NO_REGEX.test(value)) {
@@ -3234,7 +3235,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 var puData = this.props.items.puData.filter(c => c.id == rowData[3])[0]
                 var shipmentListUnFiltered = puData.shipmentListUnFiltered;
                 var minCreatedDate = moment(rowData[5]).format("YYYY-MM-DD");
-                shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[28] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
+                shipmentListUnFiltered.filter(c => (c.shipmentId != 0 ? c.shipmentId != rowData[2] : c.index != rowData[28]) && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS)
                     .map(c => {
                         var batchInfoList = c.batchInfoList;
                         batchInfoList.map(bi => {
@@ -5033,7 +5034,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 allowManualInsertRow: false,
                 allowExport: false,
                 editable: tableEditable,
-                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 contextMenu: function (obj, x, y, e) {
                     return false;
                 },
@@ -5123,7 +5124,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     allowExport: false,
                     editable: false,
                     onload: this.loadedQtyCalculator1,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     },

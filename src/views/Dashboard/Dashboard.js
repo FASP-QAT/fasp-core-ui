@@ -49,11 +49,13 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             var puIds = ppu.filter(c => c.active.toString() == "true")
                                             puIds.map(pu => {
                                                 var item = topPuData[pu.planningUnit.id];
-                                                if (item.stockOut.toString() == "true") {
-                                                    stockedOutCount += 1;
+                                                if(item){
+                                                    if (item.stockOut.toString() == "true") {
+                                                        stockedOutCount += 1;
+                                                    }
+                                                    valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
+                                                    linkedShipmentsCount+=Number(item.linkedShipmentsCount);
                                                 }
-                                                valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
-                                                linkedShipmentsCount+=Number(item.linkedShipmentsCount);
                                             })
                                         }
                                         var dashboradTop = {

@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React from "react";
 import {
     Button,
@@ -103,7 +104,7 @@ export default class DatabaseTranslations extends React.Component {
                             allowDeleteRow: false,
                             onload: this.loaded,
                             filters: true,
-                            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                             contextMenu: function (obj, x, y, e) {
                                 return false;
                             }.bind(this),

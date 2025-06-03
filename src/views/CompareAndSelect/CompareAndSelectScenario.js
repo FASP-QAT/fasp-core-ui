@@ -3,6 +3,7 @@ import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
@@ -37,7 +38,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, formatter, hideFirstComponent, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { DatePicker } from 'antd';
 import "antd/dist/antd.css";
 const ref = React.createRef();
@@ -47,47 +48,76 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
-const filterDataByFiscalYear = (data, fiscalStartMonth, forecastEndDate) => {
-    // fiscalStartMonth is 6 because July is the 7th month, so zero-indexed it is 6
+const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     const result = {};
-    const yearWiseData = {};
-
-    data.forEach(item => {
-        let fiscalYearEnd = "";
-
-        const year = parseInt(moment(item[0]).format("YYYY"));
-        const forecastEndYear = parseInt(moment(forecastEndDate).format("YYYY"));
-        if (year <= forecastEndYear) {
-            const month = parseInt(moment(item[0]).format("MM")); // 0 = Jan, 11 = Dec
+    const getFiscalYear = (dateStr) => {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        if(fiscalStartMonth >= 7) {
             if (month >= fiscalStartMonth) {
-                fiscalYearEnd = year + 1;
+                return year + 1;
             } else {
-                fiscalYearEnd = year;
+                return year;
             }
-            const fiscalYearKey = `${fiscalYearEnd}`;
-            if (fiscalYearKey != "") {
-                if (yearWiseData[fiscalYearKey]) {
-                    yearWiseData[fiscalYearKey] += 1;
-                } else {
-                    yearWiseData[fiscalYearKey] = 1;
-                }
-                // Aggregate values based on the fiscal year
-                if (!result[fiscalYearKey]) {
-                    result[fiscalYearKey] = new Array(item.length).fill(0);
-                }
-
-                for (let i = 1; i < item.length; i++) {
-                    const value = parseFloat(item[i]) || 0; // Convert to float and handle empty strings
-                    result[fiscalYearKey][i] += value;
-                }
+        } else {
+            if (month >= fiscalStartMonth) {
+                return year;
+            } else {
+                return year-1;
             }
         }
-        // result[fiscalYearKey] += item.value;
-    });
-    for (const year in result) {
-        result[year].push(yearWiseData[year]);
+    };
+
+    const fiscalBuckets = {};
+    for (const row of data) {
+        const fiscalYear = getFiscalYear(row[0]);
+        if (!fiscalBuckets[fiscalYear]) {
+            fiscalBuckets[fiscalYear] = [];
+        }
+
+        fiscalBuckets[fiscalYear].push(row);
     }
-    return result;
+
+    for (const fy in fiscalBuckets) {
+        fiscalBuckets[fy].sort((a, b) => new Date(a[0]) - new Date(b[0]));
+    }
+
+    for (const [fy, entries] of Object.entries(fiscalBuckets)) {
+        let sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
+
+        for (const entry of entries) {
+            sum1 += parseFloat(entry[1]);
+            sum2 += parseFloat(entry[2]);
+            sum3 += parseFloat(entry[3]);
+            sum4 += parseFloat(entry[4]);
+        }
+
+        result[fy] = [
+            0,
+            sum1,
+            sum2,
+            sum3,
+            sum4,
+            entries.length
+        ];
+    }
+    var forecastStartDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+    var forecastEndDate = rangeValue.to.year + '-' + rangeValue.to.month + '-01';
+    const filtered = {};
+    for (const y in result) {
+        const yearNum = parseInt(y);
+        if (yearNum >= parseInt(new Date(forecastStartDate).getFullYear()) && yearNum <= parseInt(new Date(forecastEndDate).getFullYear())) {
+            filtered[y] = result[y];
+        }
+    }
+    for (let y = parseInt(new Date(forecastStartDate).getFullYear()); y <= parseInt(new Date(forecastEndDate).getFullYear()); y++) {
+        const yearStr = y.toString();
+        if (!(yearStr in filtered)) {
+            filtered[yearStr] = ['', '', '', '', '', '']; // or some default placeholder
+        }
+    }
+    return filtered;
 }
 
 
@@ -679,7 +709,7 @@ class CompareAndSelectScenario extends Component {
                 var displayBy = this.state.xAxisDisplayBy;
                 var fiscalStartMonth = (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12
                 var forecastStartMonth = parseInt(moment(this.state.forecastStartDate).format("MM"));
-                var originalData = this.state.xAxisDisplayBy > 2 && fiscalStartMonth != forecastStartMonth ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.forecastStopDate) : calculateSums(dataArr1, this.state.forecastStopDate);
+                var originalData = this.state.xAxisDisplayBy > 2 ? filterDataByFiscalYear(dataArr1, fiscalStartMonth, this.state.singleValue2) : calculateSums(dataArr1, this.state.forecastStopDate);
 
                 // Convert the object to an array
                 const transformedData = Object.keys(originalData).map((year, index) => ({
@@ -767,7 +797,7 @@ class CompareAndSelectScenario extends Component {
                 paginationOptions: JEXCEL_PAGINATION_OPTION,
                 position: 'top',
                 filters: true,
-                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                 onchangepage: this.onchangepage,
                 editable: false,
                 contextMenu: function (obj, x, y, e) {
@@ -853,7 +883,7 @@ class CompareAndSelectScenario extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: 'top',
                     filters: false,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return [];
                     }.bind(this),
@@ -892,7 +922,7 @@ class CompareAndSelectScenario extends Component {
                     allowExport: false,
                     position: 'top',
                     filters: false,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
@@ -1949,9 +1979,7 @@ class CompareAndSelectScenario extends Component {
                     localStorage.setItem("sesDatasetCompareVersionId", versionIdSes);
                     localStorage.setItem("sesDatasetVersionId", versionIdSes);
                     var datasetFiltered = this.state.datasetList.filter(c => c.id == datasetId)[0];
-                    var datasetDataBytes = CryptoJS.AES.decrypt(datasetFiltered.programJson, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(datasetFiltered.programJson);
                     var startDate = moment(datasetJson.currentVersion.forecastStartDate).format("YYYY-MM-DD");
                     var stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD");
                     var curDate = moment(startDate).format("YYYY-MM-DD");
@@ -2207,9 +2235,7 @@ class CompareAndSelectScenario extends Component {
             programRequest.onsuccess = function (event) {
                 var dataset = programRequest.result;
                 var programDataJson = programRequest.result.programData;
-                var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
-                var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                var datasetJson = JSON.parse(datasetData);
+                var datasetJson = decryptFCData(programDataJson);
                 var datasetForEncryption = datasetJson;
                 var planningUnitList = datasetJson.planningUnitList;
                 var planningUnitList1 = planningUnitList;
@@ -2218,7 +2244,7 @@ class CompareAndSelectScenario extends Component {
                 pu.selectedForecastMap[this.state.regionId] = { treeAndScenario: treeAndScenario, "consumptionExtrapolationId": consumptionExtrapolationId, "totalForecast": total, notes: this.state.forecastNotes };
                 planningUnitList1[index] = pu;
                 datasetForEncryption.planningUnitList = planningUnitList1;
-                var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                var encryptedDatasetJson = encryptFCData(datasetForEncryption);
                 dataset.programData = encryptedDatasetJson;
                 var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                 var datasetOs = datasetTransaction.objectStore('datasetData');
@@ -2310,7 +2336,7 @@ class CompareAndSelectScenario extends Component {
         let val;
         if (displayBy == 1) {
             val = this.state.singleValue2;
-        } else {
+        } else if (displayBy == 2) {
             val = {
                 from: {
                     year: this.state.singleValue2.from.year,
@@ -2319,6 +2345,17 @@ class CompareAndSelectScenario extends Component {
                 to: {
                     year: this.state.singleValue2.to.year,
                     month: 12,
+                }
+            }
+        } else {
+            val = {
+                from: {
+                    year: this.state.singleValue2.from.year,
+                    month: (Number(displayBy) + 4) % 12 == 0 ? 12 : (Number(displayBy) + 4) % 12,
+                },
+                to: {
+                    year: this.state.singleValue2.to.year,
+                    month: (Number(displayBy) + 3) % 12 == 0 ? 12 : (Number(displayBy) + 3) % 12,
                 }
             }
             // } else {
@@ -2744,7 +2781,7 @@ class CompareAndSelectScenario extends Component {
                                     <div className="pl-0">
                                         <div className="row">
                                             <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
+                                                <Label >{i18n.t('static.program.program')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2762,7 +2799,7 @@ class CompareAndSelectScenario extends Component {
                                                 </div>
                                             </FormGroup>
                                             <FormGroup className="col-md-4">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.region')}</Label>
+                                                <Label >{i18n.t('static.program.region')}</Label>
                                                 <div className="controls ">
                                                     <InputGroup>
                                                         <Input
@@ -2831,7 +2868,7 @@ class CompareAndSelectScenario extends Component {
                                                     {/* <span><b>Total Forecast Qty</b> : 1234</span> */}
                                                     <br></br>
                                                     <FormGroup className="col-md-12">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.program.notes')}</Label>
+                                                        <Label >{i18n.t('static.program.notes')}</Label>
                                                         <div className="controls">
                                                             <InputGroup>
                                                                 <Input
@@ -2902,7 +2939,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </FormGroup>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="planningUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
+                                                                <Label >{i18n.t('static.report.planningUnit')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -2921,7 +2958,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="forecastingUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.product.unit1')}</Label>
+                                                                <Label >{i18n.t('static.product.unit1')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -2941,7 +2978,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             <FormGroup className="col-md-4" id="equivalencyUnitDiv" style={{ display: "none" }}>
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
+                                                                <Label >{i18n.t('static.equivalancyUnit.equivalancyUnit')}</Label>
                                                                 <div className="controls">
                                                                     <InputGroup>
                                                                         <Input
@@ -2994,7 +3031,7 @@ class CompareAndSelectScenario extends Component {
                                                             </FormGroup>
                                                             {/* {this.state.xAxisDisplayBy == 1 && !this.state.showForecastPeriod &&
                                                                 <FormGroup className="col-md-3 compareAndSelectDatePicker">
-                                                                    <Label htmlFor="appendedInputButton">{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                                                    <Label >{i18n.t('static.compareAndSelect.startMonthForGraph')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                                                     <div className="controls edit">
                                                                         <Picker
                                                                             ref={this.pickAMonth3}
@@ -3010,7 +3047,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </FormGroup>
                                                             } */}
                                                             <FormGroup className="col-md-5">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
+                                                                <Label >{i18n.t('static.modelingValidation.displayBy')} : <i>({i18n.t('static.common.forecastPeriod')} = {makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)})</i></Label>
                                                                 <div className="controls ">
                                                                     <InputGroup>
                                                                         <Input
@@ -3041,7 +3078,7 @@ class CompareAndSelectScenario extends Component {
                                                                 </div>
                                                             </FormGroup>
                                                             {!this.state.showForecastPeriod && <FormGroup className="col-md-3 pickerRangeBox">
-                                                                <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}
+                                                                <Label >{i18n.t('static.report.dateRange')}
                                                                     <span className="stock-box-icon ModelingIcon fa fa-angle-down ml-1"></span>
                                                                 </Label>
                                                                 {(this.state.xAxisDisplayBy == 1 || this.state.xAxisDisplayBy == "") && (

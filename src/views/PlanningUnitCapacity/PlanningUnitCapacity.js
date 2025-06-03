@@ -10,6 +10,7 @@ import SupplierService from "../../api/SupplierService";
 import PlanningUnitService from "../../api/PlanningUnitService";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import moment from "moment";
@@ -329,7 +330,7 @@ class PlanningUnitCapacity extends Component {
                     }
                 }
             },
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {

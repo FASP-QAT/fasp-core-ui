@@ -20,9 +20,10 @@ import { LOGO } from '../../CommonComponent/Logo.js'
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, hideFirstComponent, isSiteOnline } from '../../CommonComponent/JavascriptCommonFunctions';
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js'
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { Prompt } from 'react-router';
@@ -930,9 +931,7 @@ class ForecastSummary extends Component {
                         for (var i = 0; i < filteredGetRequestList.length; i++) {
                             var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
                             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                            var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
-                            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                            var programJson1 = JSON.parse(programData);
+                            var programJson1 = decryptFCData(filteredGetRequestList[i].programData);
                             datasetList.push({
                                 programCode: filteredGetRequestList[i].programCode,
                                 programVersion: filteredGetRequestList[i].version,
@@ -1374,7 +1373,7 @@ class ForecastSummary extends Component {
                                                 colCount = colCount + 2;
                                             }
                                         },
-                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                         contextMenu: function (obj, x, y, e) {
                                             return false;
                                         }.bind(this),
@@ -1611,7 +1610,7 @@ class ForecastSummary extends Component {
                                         colCount = colCount + 2;
                                     }
                                 },
-                                license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                 contextMenu: function (obj, x, y, e) {
                                     return false;
                                 }.bind(this),
@@ -1888,8 +1887,7 @@ class ForecastSummary extends Component {
                     if (myResult[i].userId == userId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
+                        var programData = decryptFCData(myResult[i].programData);
                         programData.code = programData.programCode;
                         programData.id = programData.programId;
                         var f = 0
@@ -2253,9 +2251,8 @@ class ForecastSummary extends Component {
                     if (myResult[i].userId == userId && myResult[i].programId == programId) {
                         var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
+                        var programData = decryptFCData(myResult[i].programData);
+                        var version = programData.currentVersion
                         version.versionId = `${version.versionId} (Local)`
                         verList.push(version)
                     }
@@ -2439,9 +2436,7 @@ class ForecastSummary extends Component {
                 programRequest.onsuccess = function (event) {
                     var dataset = programRequest.result;
                     var programDataJson = programRequest.result.programData;
-                    var datasetDataBytes = CryptoJS.AES.decrypt(programDataJson, SECRET_KEY);
-                    var datasetData = datasetDataBytes.toString(CryptoJS.enc.Utf8);
-                    var datasetJson = JSON.parse(datasetData);
+                    var datasetJson = decryptFCData(programDataJson);
                     var datasetForEncryption = datasetJson;
                     var planningUnitList = datasetJson.planningUnitList;
                     var planningUnitList1 = planningUnitList;
@@ -2457,7 +2452,7 @@ class ForecastSummary extends Component {
                         }
                     }
                     datasetForEncryption.planningUnitList = planningUnitList1;
-                    var encryptedDatasetJson = (CryptoJS.AES.encrypt(JSON.stringify(datasetForEncryption), SECRET_KEY)).toString();
+                    var encryptedDatasetJson = encryptFCData(datasetForEncryption);
                     dataset.programData = encryptedDatasetJson;
                     var datasetTransaction = db1.transaction(['datasetData'], 'readwrite');
                     var datasetOs = datasetTransaction.objectStore('datasetData');

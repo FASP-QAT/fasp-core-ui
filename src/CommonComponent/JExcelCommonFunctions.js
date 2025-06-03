@@ -303,6 +303,8 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
  */
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0, colNo) {
     if (type == "text") {
+        console.log("Value Test@123",value);
+        value=value.toString().replaceAll('&nbsp;','').trim();
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "" || value == undefined || value == "undefined") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -755,4 +757,19 @@ export function jExcelLoadedFunctionForNotes(instance,number) {
     jexcel_pagination.appendChild(filter);
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
+}
+export function onOpenFilter(worksheets,columnNumber,options){
+    var type=worksheets.getConfig().columns[columnNumber].type;
+    if(type=='dropdown' || type=='autocomplete'){
+        setTimeout(() => {
+            const dropdown = document.querySelector('.jss_filters_options');
+            if (dropdown) {
+                const options = Array.from(dropdown.querySelectorAll('label')).slice(1);
+                const sorted = options.sort((a, b) =>
+                    a.textContent.localeCompare(b.textContent)
+                );
+                sorted.forEach(option => dropdown.appendChild(option));
+            }
+        }, 50);
+    }
 }

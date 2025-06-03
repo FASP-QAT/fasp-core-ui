@@ -15,6 +15,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, DECIMAL_NO_REGEX_8_DECIMALS, TITLE_FONT, DATE_FORMAT_CAP_WITHOUT_DATE_FOUR_DIGITS } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions.js";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -46,7 +47,7 @@ import AggregationDown from '../../assets/img/funnel.png';
 import AggregationAllowed from '../../assets/img/aggregateAllowed.png';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
-import { addDoubleQuoteToRowContent, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -142,7 +143,7 @@ const validationSchemaNodeData = function (values) {
         noOfPersons:
             Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
                 function (value) {
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0$)\d{1,10}$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -152,7 +153,7 @@ const validationSchemaNodeData = function (values) {
         forecastingUnitPerPersonsFC:
             Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -162,7 +163,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyCon: Yup.string()
             .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -172,7 +173,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyDis: Yup.string()
             .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -208,7 +209,7 @@ const validationSchemaNodeData = function (values) {
                 }),
         repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
-                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+                var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
                     return false;
                 } else {
@@ -1528,7 +1529,7 @@ export default class TreeTable extends Component {
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
             programData.treeList = treeData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             tempProgram.programData = programData;
             var db1;
             getDatabase();
@@ -3055,7 +3056,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onpaste: function (instance, data) {
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].x == 6) {
@@ -4007,7 +4008,7 @@ export default class TreeTable extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedTab2,
             onchange: this.onChangeTab2Data,
             onchangepage: this.onChangePageTab2,
@@ -4620,7 +4621,7 @@ export default class TreeTable extends Component {
             position: 'top',
             columnDrag: false,
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             onload: this.loadedTab3,
             onchange: this.onChangeTab3Data,
             onchangepage: this.onChangePageTab3,
@@ -4935,8 +4936,7 @@ export default class TreeTable extends Component {
                     var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
                     if (dataSetObj != null) {
                         var dataEnc = JSON.parse(JSON.stringify(dataSetObj));
-                        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(dataSetObj.programData);
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
@@ -5200,8 +5200,7 @@ export default class TreeTable extends Component {
                 var programDataListForPuCheck = [];
                 if (this.state.programId != null && this.state.programId != "") {
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
-                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(dataSetObj.programData);
                     programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
@@ -5214,8 +5213,7 @@ export default class TreeTable extends Component {
                 } else {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId) {
-                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            var programData = decryptFCData(myResult[i].programData);
                             programDataListForPuCheck.push({ "programData": programData, "id": myResult[i].id });
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {

@@ -1,5 +1,6 @@
 import { Formik } from "formik";
-import jexcel from "jspreadsheet";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from "react";
 import "react-select/dist/react-select.min.css";
 import {
@@ -962,7 +963,7 @@ class AddUserComponent extends Component {
       parseFormulas: true,
       onpaste: this.onPaste,
       onload: this.loaded,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       contextMenu: function (obj, x, y, e) {
         var items = [];
         if (y == null) {

@@ -1,4 +1,5 @@
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import React, { Component } from "react";
 import {
     Button,
@@ -259,7 +260,7 @@ class ProgramIntegration extends Component {
                                                         copyCompatibility: true,
                                                         onpaste: this.onPaste,
                                                         allowManualInsertRow: false,
-                                                        license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                                                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                                                         editable: true,
                                                         onload: this.loaded,
                                                         contextMenu: function (obj, x, y, e) {
@@ -859,8 +860,8 @@ class ProgramIntegration extends Component {
         var valid = true;
         var json = this.el.getJson(null, false);
         for (var y = 0; y < json.length; y++) {
-            var checkDuplicate=json.filter(c=>c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
-            if(checkDuplicate.length>1){
+            var checkDuplicate=json.filter(c=>c[0]==json[y][0] && c[1]==json[y][1] && c[2]==json[y][2] && c[3]==json[y][3] && c[4].toString()==json[y][4].toString());
+            if(checkDuplicate.length>1 && json[y][6] && json[y][4]){
                 this.setState({
                     message:'static.programIntegration.duplicateIntegration',
                 },()=>{

@@ -1,5 +1,6 @@
 import CryptoJS from 'crypto-js';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -322,8 +323,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[6] = "";
                             data[7] = "";
                             data[8] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod == 1 ? "*" : "/") + realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";;
-                            data[9] = `=ROUND(F${parseInt(0) + 1}*T${parseInt(0) + 1},8)`;
-                            data[10] = `=ROUND(G${parseInt(0) + 1}*T${parseInt(0) + 1},8)`;
+                            data[9] = `=ROUND(G${parseInt(0) + 1}*T${parseInt(0) + 1},8)`;
+                            data[10] = `=ROUND(H${parseInt(0) + 1}*T${parseInt(0) + 1},8)`;
                             data[11] = "";
                             data[12] = true;
                             if (this.props.inventoryPage != "inventoryDataEntry") {
@@ -398,7 +399,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             copyCompatibility: true,
                             parseFormulas: true,
                             filters: filterOption,
-                            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                             onpaste: this.onPaste,
                             oneditionend: this.oneditionend,
                             onchangepage: this.onchangepage,
@@ -626,7 +627,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             parseFormulas: true,
             editable: inventoryBatchEditable,
             onload: this.loadedBatchInfoInventory,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             updateTable: function (el, cell, x, y, source, value, id) {
             }.bind(this),
             contextMenu: function (obj, x, y, e) {
@@ -716,8 +717,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[6] = "";
         data[7] = "";
         data[8] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod == 1 ? "*" : "/") + realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";;
-        data[9] = `=ROUND(F${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`;
-        data[10] = `=ROUND(G${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`;
+        data[9] = `=ROUND(G${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`;
+        data[10] = `=ROUND(H${parseInt(json.length) + 1}*T${parseInt(json.length) + 1},8)`;
         data[11] = "";
         data[12] = true;
         if (this.props.inventoryPage != "inventoryDataEntry") {

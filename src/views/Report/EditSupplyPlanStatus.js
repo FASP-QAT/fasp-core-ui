@@ -9,6 +9,7 @@ import NumberFormat from 'react-number-format';
 import { Button, Card, CardBody, CardFooter, Col, Form, FormFeedback, FormGroup, Input, InputGroup, Label, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, Row, TabContent, Table, TabPane } from 'reactstrap';
 import * as Yup from 'yup';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import ProgramService from '../../api/ProgramService';
@@ -3585,7 +3586,7 @@ class EditSupplyPlanStatus extends Component {
                                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                                             {
                                                                 this.state.monthsOfStockArray.map(item1 => (
-                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : item1 == 0 ? "#BA0C2F" : item1 < this.state.minStockMoSQty ? "#f48521" : item1 > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                                    <td align="right" className='text-blackDModal' style={{ backgroundColor: item1 == null ? "#cfcdc9" : roundAMC(item1) == 0 ? "#BA0C2F" : roundAMC(item1) < this.state.minStockMoSQty ? "#f48521" : roundAMC(item1) > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                                 ))
                                                             }
                                                         </tr>}
@@ -3939,7 +3940,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable:false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
@@ -4234,7 +4235,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4610,7 +4611,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),

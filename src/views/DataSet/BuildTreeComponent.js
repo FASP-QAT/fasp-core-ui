@@ -24,6 +24,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import { NUMBER_NODE_ID, PERCENTAGE_NODE_ID, FU_NODE_ID, PU_NODE_ID, ROUNDING_NUMBER, INDEXED_DB_NAME, INDEXED_DB_VERSION, TREE_DIMENSION_ID, SECRET_KEY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, JEXCEL_DECIMAL_NO_REGEX_LONG, DATE_FORMAT_CAP_WITHOUT_DATE, JEXCEL_DECIMAL_MONTHLY_CHANGE_4_DECIMAL_POSITIVE, DATE_FORMAT_CAP, JEXCEL_DECIMAL_CATELOG_PRICE, JEXCEL_INTEGER_REGEX, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY } from '../../Constants.js'
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js'
@@ -63,7 +64,7 @@ import showguidanceModelingTransferSp from '../../../src/ShowGuidanceFiles/Build
 import showguidanceModelingTransferPr from '../../../src/ShowGuidanceFiles/BuildTreeModelingTransferPr.html'
 import PlanningUnitService from '../../api/PlanningUnitService';
 import { forEach } from 'mathjs';
-import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
+import { decryptFCData, encryptFCData, filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 // Localized entity name
 const entityname = 'Tree';
 const months = [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')]
@@ -159,7 +160,7 @@ const validationSchemaNodeData = function (values) {
         noOfPersons:
             Yup.string().test('noOfPersons', 'Please enter a valid 10 digit number.',
                 function (value) {
-                    var testNumber = (/^\d{0,10}?$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0$)\d{1,10}$/).test((document.getElementById("noOfPersons").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("noOfPersons").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -169,7 +170,7 @@ const validationSchemaNodeData = function (values) {
         forecastingUnitPerPersonsFC:
             Yup.string().test('forecastingUnitPerPersonsFC', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("forecastingUnitPerPersonsFC").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 4) && (document.getElementById("forecastingUnitPerPersonsFC").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -179,7 +180,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyCon: Yup.string()
             .test('usageFrequencyCon', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyCon").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 2 && (document.getElementById("usageFrequencyCon").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -189,7 +190,7 @@ const validationSchemaNodeData = function (values) {
         usageFrequencyDis: Yup.string()
             .test('usageFrequencyDis', i18n.t('static.tree.decimalValidation12&2'),
                 function (value) {
-                    var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
+                    var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("usageFrequencyDis").value).replaceAll(",", ""))
                     if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value == 'false' || document.getElementById("oneTimeUsage").value == false) && (document.getElementById("usageFrequencyDis").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -225,7 +226,7 @@ const validationSchemaNodeData = function (values) {
                 }),
         repeatCount: Yup.string().test('repeatCount', i18n.t('static.tree.decimalValidation12&2'),
             function (value) {
-                var testNumber = (/^\d{0,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
+                var testNumber = (/^(?!0(?:\.0{0,4})?$)\d{1,12}(\.\d{1,4})?$/).test((document.getElementById("repeatCount").value).replaceAll(",", ""));
                 if (document.getElementById("usageTypeIdFU").value == 1 && (document.getElementById("oneTimeUsage").value === "false" || document.getElementById("oneTimeUsage").value === false) && (document.getElementById("repeatCount").value == "" || testNumber == false)) {
                     return false;
                 } else {
@@ -1229,8 +1230,7 @@ export default class BuildTree extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     planningUnitList.forEach(p => {
                         indexVar = programData.planningUnitList.findIndex(c => c.planningUnit.id == p.planningUnit.id)
@@ -1245,7 +1245,7 @@ export default class BuildTree extends Component {
                     var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
                     programDataListForPuCheck[indexForPuCheck].programData = programData;
                     dataSetObj.programData = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1308,8 +1308,7 @@ export default class BuildTree extends Component {
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
                     var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                     var program = filteredGetRequestList.filter(x => x.id == this.state.dataSetObj.id)[0];
-                    var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(program.programData);
                     var planningFullList = programData.planningUnitList;
                     var tableJson = this.el.getJson(null, false);
                     var updatedMissingPUList = [];
@@ -1347,7 +1346,7 @@ export default class BuildTree extends Component {
                     var indexForPuCheck = programDataListForPuCheck.findIndex(c => c.id == dataSetObj.id);
                     programDataListForPuCheck[indexForPuCheck].programData = programData;
                     var datasetListJexcel = programData;
-                    programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                    programData = encryptFCData(programData);
                     program.programData = programData;
                     var transaction = db1.transaction(['datasetData'], 'readwrite');
                     var programTransaction = transaction.objectStore('datasetData');
@@ -1959,7 +1958,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -2522,7 +2521,7 @@ export default class BuildTree extends Component {
             // paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -3292,6 +3291,13 @@ export default class BuildTree extends Component {
             selectedScenario: scenarioId,
             selectedScenarioLabel: selectedText,
         }, () => {
+            if(!this.state.loading){
+                setTimeout(() => {
+                    this.setState({
+                        cursorItem: null
+                    })
+                }, 1000)
+            }
             try {
                 if (localStorage.getItem("openNodeId")) {
                     let tempData = {
@@ -3773,7 +3779,7 @@ export default class BuildTree extends Component {
             var findTreeIndex = treeData.findIndex(n => n.treeId == curTreeObj.treeId);
             treeData[findTreeIndex] = curTreeObj;
             programData.treeList = treeData;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             tempProgram.programData = programData;
             var db1;
             getDatabase();
@@ -4462,7 +4468,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -4612,7 +4618,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -4670,8 +4676,7 @@ export default class BuildTree extends Component {
         if (programId != "") {
             var dataSetObj = JSON.parse(JSON.stringify(this.state.datasetList.filter(c => c.id == programId)[0]));;
             var datasetEnc = dataSetObj;
-            var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = decryptFCData(dataSetObj.programData);
             programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
             dataSetObj.programData = programData;
             var treeList = programData.treeList;
@@ -5845,7 +5850,7 @@ export default class BuildTree extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items = [];
                 if (y == null) {
@@ -6785,8 +6790,7 @@ export default class BuildTree extends Component {
                     var dataSetObj = this.state.datasetList.filter(c => c.id == this.state.programId)[0];
                     if (dataSetObj != null) {
                         var dataEnc = JSON.parse(JSON.stringify(dataSetObj));
-                        var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                        var programData = decryptFCData(dataSetObj.programData);
                         dataEnc.programData = programData;
                         var minDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
                         var stopMinDate = { year: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("YYYY")), month: Number(moment(programData.currentVersion.forecastStartDate).startOf('month').format("M")) };
@@ -6804,7 +6808,13 @@ export default class BuildTree extends Component {
                             if (tree != null && tree.generateMom == 1) {
                                 this.calculateMOMData(0, 2, false);
                             } else {
-                                this.setState({ loading: false })
+                                this.setState({ loading: false }, () => {
+                                    setTimeout(() => {
+                                        this.setState({
+                                            cursorItem: null
+                                        })
+                                    }, 1000)
+                                })
                             }
                         });
                     } else {
@@ -6902,7 +6912,7 @@ export default class BuildTree extends Component {
                     })
                 }
                 for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId==this.state.selectedScenario && this.state.showConnections) {
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
                             fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -7276,8 +7286,7 @@ export default class BuildTree extends Component {
                 var programDataListForPuCheck = [];
                 if (this.state.programId != null && this.state.programId != "") {
                     var dataSetObj = myResult.filter(c => c.id == this.state.programId)[0];
-                    var databytes = CryptoJS.AES.decrypt(dataSetObj.programData, SECRET_KEY);
-                    var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                    var programData = decryptFCData(dataSetObj.programData);
                     programDataListForPuCheck.push({ "programData": programData, "id": dataSetObj.id });
                     realmCountryId = programData.realmCountry.realmCountryId;
                     var treeList = programData.treeList;
@@ -7290,8 +7299,7 @@ export default class BuildTree extends Component {
                 } else {
                     for (var i = 0; i < myResult.length; i++) {
                         if (myResult[i].userId == userId) {
-                            var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+                            var programData = decryptFCData(myResult[i].programData);
                             programDataListForPuCheck.push({ "programData": programData, "id": myResult[i].id });
                             var treeList = programData.treeList;
                             for (var k = 0; k < treeList.length; k++) {
@@ -8752,11 +8760,11 @@ export default class BuildTree extends Component {
             this.getModelingTypeList();
             this.getRegionList();
             this.procurementAgentList();
-            setTimeout(() => {
-                this.setState({
-                    cursorItem: null
-                })
-            }, 5000)
+            // setTimeout(() => {
+            //     this.setState({
+            //         cursorItem: null
+            //     })
+            // }, 5000)
         })
     }
     /**
@@ -9823,7 +9831,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && (da.scenarioId==this.state.selectedScenario) && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? tl.scenarioList.map(s=>sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: s.id, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == s.id)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" })) : "")) : ""))
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -10131,7 +10139,7 @@ export default class BuildTree extends Component {
             allowExport: false,
             position: 'top',
             filters: false,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this)
@@ -12891,11 +12899,11 @@ export default class BuildTree extends Component {
             }
             var sourceNodeUsageListCount = [];
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.scenarioId==this.state.selectedScenario && da.nodeId == itemConfig.payload.nodeId) ? tl.scenarioList.map(s=>sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: s.id, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == s.id)[0].label.label_en, nodeName: f.payload.label.label_en, })) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
-                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
+                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId==this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             } else if (itemConfig.payload.downwardAggregationList && itemConfig.payload.nodeType.id == 6) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId).length == itemConfig.payload.downwardAggregationList.length ? false : true;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.scenarioId==this.state.selectedScenario).length == itemConfig.payload.downwardAggregationList.length ? false : true;
             }
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
@@ -12949,7 +12957,7 @@ export default class BuildTree extends Component {
             var sourceNodeUsageListCount = [];
             var outerLink = false;
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.scenarioId==this.state.selectedScenario && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
             }
@@ -13120,7 +13128,7 @@ export default class BuildTree extends Component {
                     })
                 } else {
                     for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId==this.state.selectedScenario && this.state.showConnections) {
                             treeLevelItems.push(new ConnectorAnnotationConfig({
                                 annotationType: AnnotationType.Connector,
                                 fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),

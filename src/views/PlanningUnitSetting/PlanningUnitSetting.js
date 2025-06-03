@@ -1,6 +1,7 @@
 import CryptoJS from 'crypto-js';
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
@@ -39,7 +40,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import csvicon from '../../assets/img/csv.png';
-import { addDoubleQuoteToRowContent } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { addDoubleQuoteToRowContent, decryptFCData, encryptFCData } from '../../CommonComponent/JavascriptCommonFunctions.js';
 const ref = React.createRef();
 //Array of months
 const pickerLang = {
@@ -656,9 +657,7 @@ export default class PlanningUnitSetting extends Component {
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 var filteredGetRequestList = myResult.filter(c => c.userId == userId);
                 for (var i = 0; i < filteredGetRequestList.length; i++) {
-                    var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
-                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                    var programJson1 = JSON.parse(programData);
+                    var programJson1 = decryptFCData(filteredGetRequestList[i].programData);
                     datasetList.push({
                         programCode: filteredGetRequestList[i].programCode,
                         programVersion: filteredGetRequestList[i].version,
@@ -1263,7 +1262,7 @@ export default class PlanningUnitSetting extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: 'top',
             filters: true,
-            license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
             editable: (this.state.forecastProgramId != "" && (AuthenticationService.checkUserACL([this.state.forecastProgramId.toString()], 'ROLE_BF_EDIT_PLANNING_UNIT_SETTINGS')) ? true : false),
         };
         var languageEl = jexcel(document.getElementById("tableDiv"), options);
@@ -1420,8 +1419,7 @@ export default class PlanningUnitSetting extends Component {
             var planningUnitList = [];
             let indexVar = 0;
             var program = (this.state.datasetList1.filter(x => x.programId == this.state.forecastProgramId && x.version == this.state.forecastProgramVersionId)[0]);
-            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = decryptFCData(program.programData);
             let originalPlanningUnitList = programData.planningUnitList;
             let listOfDisablePuNode = [];
             let planningUnitIds = [];
@@ -1537,7 +1535,7 @@ export default class PlanningUnitSetting extends Component {
                             }
                         }
                         programData.planningUnitList = planningUnitList.concat(this.state.active != -1 ? originalPlanningUnitList.filter(c => this.state.active == 1 ? c.active.toString() == "false" : c.active.toString() == "true") : []);
-                        programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                        programData = encryptFCData(programData);
                         program.programData = programData;
                         programs.push(program);
                         var db1;
@@ -1729,7 +1727,7 @@ export default class PlanningUnitSetting extends Component {
                     }
                 }
                 programData.planningUnitList = planningUnitList.concat(this.state.active != -1 ? originalPlanningUnitList.filter(c => this.state.active == 1 ? c.active.toString() == "false" : c.active.toString() == "true") : []);
-                programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+                programData = encryptFCData(programData);
                 program.programData = programData;
                 programs.push(program);
                 var db1;
@@ -1796,8 +1794,7 @@ export default class PlanningUnitSetting extends Component {
         for (var i = 0; i < datasetList1.length; i++) {
             var programs = [];
             var program = datasetList1[i];
-            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = decryptFCData(program.programData);
             let actualConsumptionList = programData.actualConsumptionList;
             for (var j = 0; j < listOfDisablePuNode.length; j++) {
                 for (var k = 0; k < actualConsumptionList.length; k++) {
@@ -1807,7 +1804,7 @@ export default class PlanningUnitSetting extends Component {
                 }
             }
             programData.actualConsumptionList = actualConsumptionList;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             program.programData = programData;
             programs.push(program);
             var db1;
@@ -1860,8 +1857,7 @@ export default class PlanningUnitSetting extends Component {
         for (var i = 0; i < datasetList1.length; i++) {
             var programs = [];
             var program = datasetList1[i];
-            var databytes = CryptoJS.AES.decrypt(program.programData, SECRET_KEY);
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
+            var programData = decryptFCData(program.programData);
             let treeListForSelectedProgram = programData.treeList;
             for (var j = 0; j < listOfDisablePuNode.length; j++) {
                 for (var k = 0; k < treeListForSelectedProgram.length; k++) {
@@ -1895,7 +1891,7 @@ export default class PlanningUnitSetting extends Component {
                 }
             }
             programData.treeList = treeListForSelectedProgram;
-            programData = (CryptoJS.AES.encrypt(JSON.stringify(programData), SECRET_KEY)).toString();
+            programData = encryptFCData(programData);
             program.programData = programData;
             programs.push(program);
             var db1;

@@ -320,6 +320,25 @@ class Login extends Component {
                 <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
                 </div>
+                {/* <Row className='pb-lg-5'>
+                  <Col md="4">
+                    <div className="upper-logo logo-MarginTop">
+                      <img src={image1} className="img-fluid " />
+                    </div>
+                  </Col>
+                  <Col md="5" lg="5">
+                    <div style={{ marginBottom: '20px', marginTop:'-25px',fontSize:'14px' }}>
+                      {this.state.lang === 'en' ?
+                        <p style={{color:'#002f6c'}}>Due to an update made by Chrome on May 14th, large <strong>forecast programs</strong> (&gt;30 MB) can no longer be downloaded. If you are experience issues downloading your forecast program, please use Mozilla Firefox for the time being. We are looking to solve this issue. Thanks for your patience!</p>:
+                        this.state.lang === 'sp' ?
+                        <p style={{color:'#002f6c'}}>Debido a una actualización realizada por Chrome el 14 de mayo, los <strong>programas de pronóstico</strong> grandes (&gt;30 MB) ya no se pueden descargar. Si tienes problemas para descargar tu programa de pronóstico, por favor utiliza Mozilla Firefox por el momento. Estamos trabajando para resolver este problema. ¡Gracias por tu paciencia!</p>:
+                        this.state.lang === 'fr' ?
+                        <p style={{color:'#002f6c'}}>En raison d'une mise à jour effectuée par Chrome le 14 mai, les <strong>programmes de prévision</strong> volumineux (&gt;30 Mo) ne peuvent plus être téléchargés. Si vous rencontrez des problèmes pour télécharger votre programme de prévision, veuillez utiliser Mozilla Firefox pour le moment. Nous travaillons à résoudre ce problème. Merci pour votre patience!</p>:
+                        <p style={{color:'#002f6c'}}>Devido a uma atualização feita pelo Chrome em 14 de maio, os <strong>programas de previsão</strong> grandes (&gt;30 MB) não podem mais ser baixados. Se você estiver enfrentando problemas para baixar seu programa de previsão, por favor, use o Mozilla Firefox por enquanto. Estamos trabalhando para resolver esse problema. Obrigado pela sua paciência!</p>
+                      }
+                    </div>
+                  </Col>
+                </Row> */}
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>

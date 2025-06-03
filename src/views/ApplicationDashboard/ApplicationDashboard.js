@@ -12,11 +12,13 @@ import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
 import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import Skeleton from 'react-loading-skeleton'
 import '../../../node_modules/react-loading-skeleton/dist/skeleton.css'
 import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { encryptFCData, decryptFCData } from '../../CommonComponent/JavascriptCommonFunctions';
 import {
   Button,
   ButtonGroup,
@@ -450,7 +452,7 @@ class ApplicationDashboard extends Component {
           paginationOptions: JEXCEL_PAGINATION_OPTION,
           position: "top",
           filters: true,
-          license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+          license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
           contextMenu: function (obj, x, y, e) {
             return false;
           }.bind(this),
@@ -802,9 +804,10 @@ class ApplicationDashboard extends Component {
           for (var i = 0; i < filteredGetRequestList.length; i++) {
             var bytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programName, SECRET_KEY);
             var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-            var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
-            var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-            var programJson1 = JSON.parse(programData);
+            const programJson1 = decryptFCData(filteredGetRequestList[i].programData);
+            // var programDataBytes = CryptoJS.AES.decrypt(filteredGetRequestList[i].programData, SECRET_KEY);
+            // var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+            // var programJson1 = JSON.parse(programData);
             var pqd = programList.filter(c => c.programId == filteredGetRequestList[i].programId);
             datasetList.push({
               programCode: filteredGetRequestList[i].programCode,
@@ -1230,6 +1233,159 @@ class ApplicationDashboard extends Component {
     }.bind(this);
     openRequest.onsuccess = function (e) {
       db1 = e.target.result;
+
+      if (localStorage.getItem('sessionType') === 'Online') {
+        let topPIds = this.state.topProgramId.map(p => p.value.split("_")[0]);
+        if(topPIds.length > 0 && localStorage.getItem("topLocalProgram") == "true") {
+          for(var i = 0; i < topPIds.length; i++){
+            ProgramService.getProgramById(topPIds[i])
+              .then(response => {
+                if (response.status == 200) {
+                  var transaction = db1.transaction(['program'], 'readwrite');
+                  var programTransaction = transaction.objectStore('program');
+                  programTransaction.put(response.data);
+                } else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },
+                        () => {
+                            hideSecondComponent();
+                        })
+                }
+              }).catch(
+                  error => {
+                      if (error.message === "Network Error") {
+                          this.setState({
+                              message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                              loading: false
+                          }, () => {
+                              hideSecondComponent()
+                          });
+                      } else {
+                          switch (error.response ? error.response.status : "") {
+                              case 401:
+                                  this.props.history.push(`/login/static.message.sessionExpired`)
+                                  break;
+                              case 409:
+                                  this.setState({
+                                      message: i18n.t('static.common.accessDenied'),
+                                      loading: false,
+                                      color: "#BA0C2F",
+                                  });
+                                  break;
+                      case 403:
+                                  this.props.history.push(`/accessDenied`)
+                                  break;
+                              case 500:
+                              case 404:
+                              case 406:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              case 412:
+                                  this.setState({
+                                      message: error.response.data.messageCode,
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                              default:
+                                  this.setState({
+                                      message: 'static.unkownError',
+                                      loading: false
+                                  }, () => {
+                                      hideSecondComponent()
+                                  });
+                                  break;
+                          }
+                      }
+                  }
+              );
+          }
+  
+          ProgramService.getAllProgramPlanningUnitList(topPIds)
+            .then(response => {
+                if (response.status == 200) {
+                    var listArray = response.data;
+                    var programPlanningUnitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+                    var programPlanningUnitObjectStore = programPlanningUnitTransaction.objectStore('programPlanningUnit');
+                    for (var i = 0; i < listArray.length; i++) {
+                        programPlanningUnitObjectStore.put(listArray[i]);
+                    }
+                }
+                else {
+                    this.setState({
+                        message: response.data.messageCode,
+                        loading: false,
+                        color: '#BA0C2F'
+                    },() => {
+                        hideSecondComponent();
+                    })
+                }
+            }).catch(
+                error => {
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                            loading: false
+                        }, () => {
+                            hideSecondComponent()
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 401:
+                                this.props.history.push(`/login/static.message.sessionExpired`)
+                                break;
+                            case 409:
+                                this.setState({
+                                    message: i18n.t('static.common.accessDenied'),
+                                    loading: false,
+                                    color: "#BA0C2F",
+                                });
+                                break;
+                            case 403:
+                                this.props.history.push(`/accessDenied`)
+                                break;
+                            case 500:
+                            case 404:
+                            case 406:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            case 412:
+                                this.setState({
+                                    message: error.response.data.messageCode,
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                            default:
+                                this.setState({
+                                    message: 'static.unkownError',
+                                    loading: false
+                                }, () => {
+                                    hideSecondComponent()
+                                });
+                                break;
+                        }
+                    }
+                }
+            );
+        }
+      }
+      
       var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
       var program = transaction.objectStore('programQPLDetails');
       var getRequest = program.getAll();
@@ -1849,7 +2005,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 10,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1912,7 +2068,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1976,7 +2132,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
@@ -1999,7 +2155,7 @@ class ApplicationDashboard extends Component {
         data = [];
         data[0] = expiriesList[j].planningUnit.label.label_en + " | " + expiriesList[j].planningUnit.id
         data[1] = roundARU(expiriesList[j].expiringQty, 1)
-        data[2] = moment(expiriesList[j].expDate).format("DD-MMMM-YY")
+        data[2] = expiriesList[j].expDate;
         data[3] = roundARU(expiriesList[j].expiryAmt, 1)
         dataArray[count] = data;
         count++;
@@ -2029,7 +2185,8 @@ class ApplicationDashboard extends Component {
         },
         {
           title: i18n.t("static.supplyPlan.expiryDate"),
-          type: 'text',
+          type: 'calendar',
+          options: { format: 'DD-MMMM-YYYY' },
           editable: false,
           readOnly: true
         },
@@ -2053,7 +2210,7 @@ class ApplicationDashboard extends Component {
       allowExport: false,
       position: 'top',
       filters: true,
-      license: JEXCEL_PRO_KEY, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
       height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
