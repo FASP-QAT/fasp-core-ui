@@ -451,6 +451,9 @@ export function formatterMOS(value, withRoundN) {
 }
 
 export function encryptFCData(unencryptedData) {
+  if (typeof unencryptedData === "undefined") {
+    return [];
+  }
   const jsonString = JSON.stringify(unencryptedData);
   const chunkSize = 1024 * 1024; // 1 MB chunks
   const encryptedChunks = [];
