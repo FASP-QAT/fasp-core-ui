@@ -5872,7 +5872,7 @@ export default class BuildTree extends Component {
                                 data[8] = cleanUp
                                 data[9] = ''
                                 data[10] = ''
-                                data[11] = ''
+                                data[11] = 1
                                 data[12] = 0
                                 data[13] = {
                                     firstMonthOfTarget: "",
