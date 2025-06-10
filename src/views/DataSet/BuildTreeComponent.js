@@ -4411,7 +4411,7 @@ export default class BuildTree extends Component {
                 {
                     title: getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
                     type: 'numeric',
-                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? false : true,
+                    visible: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? true : false,
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
@@ -4420,8 +4420,8 @@ export default class BuildTree extends Component {
                     type: 'hidden',
                 },
                 {
-                    title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast') : '# of PUs',
-                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'numeric' : 'hidden',
+                    title: this.state.currentItemConfig.context.payload.nodeType.id == 4 || this.state.currentItemConfig.context.payload.nodeType.id == 5 ? '# of PUs' : getLabelText(this.state.currentItemConfig.context.payload.label, this.state.lang) + " " + i18n.t('static.consumption.forcast'),
+                    type: this.state.currentItemConfig.context.payload.nodeType.id == 5 || this.state.currentItemConfig.context.payload.nodeType.id == 4 ? 'hidden' : 'numeric',
                     mask: '#,##0.00', decimal: '.',
                     readOnly: true
                 },
@@ -4510,8 +4510,8 @@ export default class BuildTree extends Component {
         tr.children[7].title = i18n.t('static.momper.tooltip5');
         tr.children[8].classList.add('InfoTr');
         tr.children[8].title = i18n.t('static.momper.tooltip6');
-        tr.children[9].classList.add('InfoTr');
-        tr.children[9].title = i18n.t('static.momper.tooltip7');
+        tr.children[11].classList.add('InfoTr');
+        tr.children[11].title = i18n.t('static.momper.tooltip7');
     }
     /**
      * Builds jexcel table for modeling in number node or aggregation
@@ -5872,7 +5872,7 @@ export default class BuildTree extends Component {
                                 data[8] = cleanUp
                                 data[9] = ''
                                 data[10] = ''
-                                data[11] = ''
+                                data[11] = 1
                                 data[12] = 0
                                 data[13] = {
                                     firstMonthOfTarget: "",
@@ -10632,7 +10632,7 @@ export default class BuildTree extends Component {
                 pointHoverBackgroundColor: 'transparent',
                 pointHoverBorderColor: 'transparent',
                 pointHitRadius: 5,
-                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`K${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.currentItemConfig.context.payload.nodeType.id == 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
+                data: (this.state.momElPer).getJson(null, false).map((item, index) => (this.state.currentItemConfig.context.payload.nodeType.id > 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.currentItemConfig.context.payload.nodeType.id == 3 ? this.state.momElPer.getValue(`I${parseInt(index) + 1}`, true).toString().replaceAll("\,", "") : this.state.momElPer.getValue(`G${parseInt(index) + 1}`, true).toString().replaceAll("\,", ""))),
             }
             )
             bar1 = {
