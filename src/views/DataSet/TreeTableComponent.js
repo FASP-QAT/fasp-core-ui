@@ -3240,9 +3240,8 @@ export default class TreeTable extends Component {
                             curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.nodeUnit.unitId = json[i][4];
                             curItem.context.payload.nodeUnit.label = this.state.nodeUnitList.filter(c => c.id == json[i][4])[0];
-                            let tempMonth = new Date(json[i][5]);
                             if (curItem.context.payload.nodeType.id != 1 && curItem.context.payload.nodeType.id != 6) {
-                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
+                                (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = parseInt(moment(json[i][5]).format("YYYY")) + "-" + parseInt(moment(json[i][5]).format("MM")) + "-01";
                             }
                             if (json[i][11] == 3) {
                                 var value = json[i][6].toString().replaceAll(",", "").replaceAll("%", "");
@@ -3343,8 +3342,7 @@ export default class TreeTable extends Component {
                             // curItem.context.payload.label.label_en = json[i][3];
                             // curItem.context.payload.nodeUnit.id = json[i][4];
                             curItem.context.payload.label.label_en = json[i][3];
-                            let tempMonth = new Date(json[i][4]);
-                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01";
+                            (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].month = parseInt(moment(json[i][4]).format("YYYY")) + "-" + parseInt(moment(json[i][4]).format("MM")) + "-01";
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].dataValue = json[i][5];
                             (curItem.context.payload.nodeDataMap[this.state.selectedScenario])[0].calculatedDataValue = json[i][7];
                             if (json[i][36] == 4) {
