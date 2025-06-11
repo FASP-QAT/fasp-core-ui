@@ -12,7 +12,7 @@ import {
 import * as Yup from 'yup';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { API_URL } from '../../Constants';
-import DropdownService from '../../api/DropdownService';
+import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 // Initial values for form fields
@@ -58,13 +58,13 @@ export default class StepThree extends Component {
      * Reterives health area list from server
      */
     getHealthAreaList() {
-        DropdownService.getHealthAreaDropdownList(this.props.items.program.realm.realmId)
+        ProgramService.getHealthAreaListByRealmCountryId(this.props.items.program.realmCountry.realmCountryId)
             .then(response => {
                 if (response.status == 200) {
                     var json = response.data;
                     var haList = [];
                     for (var i = 0; i < json.length; i++) {
-                        haList[i] = { healthAreaCode: json[i].code, value: json[i].id, label: getLabelText(json[i].label, this.state.lang) }
+                        haList[i] = { healthAreaCode: json[i].healthAreaCode, value: json[i].healthAreaId, label: getLabelText(json[i].label, this.state.lang) }
                     }
                     var listArray = haList;
                     listArray.sort((a, b) => {
