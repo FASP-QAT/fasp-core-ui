@@ -7243,7 +7243,10 @@ export default class TreeTable extends Component {
             startY: y,
             head: [columns],
             body: data,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "hidden" },
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center', overflow: "linebreak" },
+            "columnStyles": {
+                9: { cellWidth: 400, halign: "left", valign: "top" } // "Notes" column
+            },
             horizontalPageBreak: true,
             horizontalPageBreakRepeat: 0,
         };
