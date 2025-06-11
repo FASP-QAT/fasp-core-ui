@@ -4936,7 +4936,7 @@ export default class CreateTreeTemplate extends Component {
                 if (Math.floor(j / monthsPerVisit) == 0) {
                     dataValue = (patients / monthsPerVisit) + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 } else {
-                    dataValue = dataArray[j - monthsPerVisit][14] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
+                    dataValue = dataArray[j - monthsPerVisit][16] + (j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth)
                 }
                 data[15] = j == 0 ? calculatedValueForCurMonth - patients : calculatedValueForCurMonth - calculatedValueForPrevMonth;
                 data[16] = dataValue;
