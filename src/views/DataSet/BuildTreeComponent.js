@@ -13039,7 +13039,7 @@ export default class BuildTree extends Component {
             && treeData.map((item, i) => {
                 return (
                     <option key={i} value={item.treeId}>
-                        {getLabelText(item.label, this.state.lang)}
+                        {getLabelText(item.label, this.state.lang)+(item.active ? "" : (" ("+i18n.t('static.dataentry.inactive')+")"))}
                     </option>
                 )
             }, this);
