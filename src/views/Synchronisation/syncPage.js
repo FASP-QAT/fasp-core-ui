@@ -4188,6 +4188,7 @@ export default class syncPage extends Component {
               if(programJson.batchInventoryList==undefined){
                 programJson.batchInventoryList=[];
               }
+              programJson.batchInventoryList = programJson.batchInventoryList.filter(c=>c.batchInventoryId>0 || (c.batchInventoryId==0 && c.batchList.length>0));
               delete programJson.dashboardData;
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
