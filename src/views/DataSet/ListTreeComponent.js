@@ -2792,7 +2792,7 @@ export default class ListTreeComponent extends Component {
                         programId: json[r].programId,
                         version: version,
                         programName: (CryptoJS.AES.encrypt(JSON.stringify((json[r].label)), SECRET_KEY)).toString(),
-                        programData: encryptedText.toString(),
+                        programData: encryptedText,
                         userId: userId,
                         programCode: json[r].programCode,
                     };
