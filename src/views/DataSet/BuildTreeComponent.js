@@ -13040,8 +13040,13 @@ export default class BuildTree extends Component {
                 )
             }, this);
         const { treeData } = this.state;
-        let treeList = treeData.length > 0
-            && treeData.map((item, i) => {
+        let sortedTreeData = treeData.length > 0
+            && treeData.sort((a, b) => {
+                if (a.active === b.active) return 0;
+                return a.active ? -1 : 1;
+            });
+        let treeList = sortedTreeData.length > 0
+            && sortedTreeData.map((item, i) => {
                 return (
                     <option key={i} value={item.treeId}>
                         {(item.active ? "" : ("["+i18n.t('static.dataentry.inactive')+"] ")) + getLabelText(item.label, this.state.lang)}
