@@ -328,7 +328,7 @@ class CompareAndSelectScenario extends Component {
             loading: false,
             singleValue2: rangeValue1
         }, () => {
-            this.buildJexcel();
+            this.buildJexcel(false);
         })
     }
 
@@ -509,11 +509,13 @@ class CompareAndSelectScenario extends Component {
     /**
      * Builds the jexcel table based on the tree scenario list.
      */
-    buildJexcel() {
+    buildJexcel(isLoader) {
         if (this.state.planningUnitId > 0 && this.state.regionId != "") {
-            this.setState({
-                loading: true
-            })
+            if(isLoader) {
+                this.setState({
+                    loading: true
+                })
+            }
             jexcel.destroy(document.getElementById("tableDiv"), true);
             jexcel.destroy(document.getElementById("calendarTable"), true);
             var columns1 = [];
@@ -1696,7 +1698,7 @@ class CompareAndSelectScenario extends Component {
                 treeScenarioList: treeScenarioList,
                 loading: true
             }, () => {
-                this.buildJexcel()
+                this.buildJexcel(true)
             })
         }
         if (x == 0) {
@@ -2148,7 +2150,7 @@ class CompareAndSelectScenario extends Component {
             // selectedTreeScenarioId: id,
             loading: false
         }, () => {
-            this.buildJexcel();
+            this.buildJexcel(true);
         })
     }
     /**
@@ -2179,7 +2181,7 @@ class CompareAndSelectScenario extends Component {
             // } else {
             //     document.getElementById("equivalencyUnitDiv").style.display = "none";
             // }
-            this.buildJexcel()
+            this.buildJexcel(false)
         })
     }
     /**
@@ -2901,7 +2903,7 @@ class CompareAndSelectScenario extends Component {
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
-                                                                        check htmlFor="inline-active1">
+                                                                        check htmlFor="viewById1">
                                                                         {i18n.t('static.report.planningUnit')}
                                                                     </Label>
                                                                 </FormGroup><br />
@@ -2917,7 +2919,7 @@ class CompareAndSelectScenario extends Component {
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
-                                                                        check htmlFor="inline-active1">
+                                                                        check htmlFor="viewById2">
                                                                         {i18n.t('static.dashboard.forecastingunit')}
                                                                     </Label>
                                                                 </FormGroup><br />
@@ -2933,7 +2935,7 @@ class CompareAndSelectScenario extends Component {
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
-                                                                        check htmlFor="inline-active1">
+                                                                        check htmlFor="viewById3">
                                                                         {i18n.t('static.equivalancyUnit.equivalancyUnit')}
                                                                     </Label>
                                                                 </FormGroup>
@@ -3009,7 +3011,7 @@ class CompareAndSelectScenario extends Component {
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        check htmlFor="showForecastPeriod" style={{ fontSize: '12px' }}>
                                                                         {i18n.t('static.compareAndSelect.showOnlyForecastPeriod')}
                                                                     </Label>
                                                                 </div>
@@ -3024,7 +3026,7 @@ class CompareAndSelectScenario extends Component {
                                                                     />
                                                                     <Label
                                                                         className="form-check-label"
-                                                                        check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                                        check htmlFor="showFits" style={{ fontSize: '12px' }}>
                                                                         {i18n.t('static.extrapolations.showFits')}
                                                                     </Label>
                                                                 </div>
