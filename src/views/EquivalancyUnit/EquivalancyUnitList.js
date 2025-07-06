@@ -863,7 +863,8 @@ class EquivalancyUnit extends Component {
      */
     filterDataset1 = function (instance, cell, c, r, source) {
         var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL').concat(AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_EDIT_EQIVALENCY_UNIT_OWN'));
-        var mylist = this.state.typeList1.filter(c=>programIds.includes(c.id) || c.id==-1);
+        console.log("Program Ids ",programIds,this.state.typeList1);
+        var mylist = this.state.typeList1.filter(c=>programIds.includes(c.id.toString()) || c.id==-1);
         if (!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_EQIVALENCY_UNIT_ALL')) {
             mylist = mylist.filter(c => c.id != -1);
         }
@@ -1252,6 +1253,7 @@ class EquivalancyUnit extends Component {
         let realmId = AuthenticationService.getRealmId();
         DropdownService.getAllProgramListByRealmId(realmId)
             .then(response => {
+                console.log("Response",response.data)
                 if (response.status == 200) {
                     var listArray = response.data;
                     listArray.sort((a, b) => {
@@ -1277,17 +1279,6 @@ class EquivalancyUnit extends Component {
                             tempProgramList[i] = paJson
                         }
                     }
-                    let tempProgramList1 = [];
-                    if (listArray.length > 0) {
-                        for (var i = 0; i < listArray.length; i++) {
-                            var paJson1 = {
-                                name: listArray[i].programCode,
-                                id: listArray[i].programId,
-                                active: listArray[i].active,
-                            }
-                            tempProgramList1[i] = paJson1
-                        }
-                    }
                     let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
                     let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
                     var roleList = decryptedUser.roleList;
@@ -1300,14 +1291,9 @@ class EquivalancyUnit extends Component {
                         id: -1,
                         active: true,
                     });
-                    tempProgramList1.unshift({
-                        name: i18n.t('static.common.all'),
-                        id: -1,
-                        active: true,
-                    });
                     this.setState({
                         typeList: tempProgramList,
-                        typeList1: tempProgramList1,
+                        typeList1: tempProgramList,
                         roleArray: roleArray
                     }, () => {
                         this.getEquivalancyUnitMappingData();
