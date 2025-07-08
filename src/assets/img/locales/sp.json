@@ -2726,6 +2726,7 @@
   "static.report.forecastErrorMonthlyFormulaNew11b": "el eje Y se muestra en la unidad de equivalencia",
   "static.tree.numberNodeValue": "Valor del nodo numérico",
   "static.extrapolation.MovingAverageTextThree": "Este método es más útil para estimaciomes a corto plazo y es sensible a las tendencias. No es apropiado para datos estacionales.",
+  "static.message.emailNotTriggered": "Usuario creado exitosamente pero el correo electrónico no se activó",
   "static.report.qtyBaseUnit": "Cantidad (unidades base)",
   "static.tree.Note": "Nota",
   "static.validated.minQplToleranceCutOff": "Introduzca el límite máximo de tolerancia de QPL",

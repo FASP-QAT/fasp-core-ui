@@ -2716,6 +2716,7 @@
   "static.report.forecastErrorMonthlyFormulaNew11a": "Se",
   "static.report.forecastErrorMonthlyFormulaNew11b": "O eixo Y está na unidade de equivalência",
   "static.extrapolation.MovingAverageTextThree": "Este método é mais útil para previsões de curto prazo e é sensível às tendências. Não é apropriado para dados sazonais",
+  "static.message.emailNotTriggered": "Usuário criado com sucesso, mas e-mail não disparado",
   "static.report.qtyBaseUnit": "Quantidade (unidades base)",
   "static.tree.Note": "Nota",
   "static.validated.minQplToleranceCutOff": "Por favor, insira o limite máximo de tolerância da lista de problemas QAT",

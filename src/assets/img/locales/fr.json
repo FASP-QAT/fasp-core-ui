@@ -2717,6 +2717,7 @@
   "static.report.forecastErrorMonthlyFormulaNew11a": "Si",
   "static.report.forecastErrorMonthlyFormulaNew11b": "L`axe Y est en unité d`équivalence",
   "static.extrapolation.MovingAverageTextThree": "Cette méthode est particulièrement utile pour les prévisions à court terme et est sensible aux tendances. Elle n'est pas appropriée pour les données saisonnières",
+  "static.message.emailNotTriggered": "Utilisateur créé avec succès mais e-mail non déclenché",
   "static.report.qtyBaseUnit": "Quantité (unités de base)",
   "static.tree.Note": "Note",
   "static.validated.minQplToleranceCutOff": "Veuillez saisir le seuil de tolérance qpl max.",
