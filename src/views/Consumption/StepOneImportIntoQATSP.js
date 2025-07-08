@@ -479,7 +479,7 @@ export default class StepOneImportMapPlanningUnits extends Component {
                     var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                     var programJson = JSON.parse(programData);
                     programs.push({
-                        programCode: filteredGetRequestList[i].programCode,
+                        programCode: programJson.programCode,
                         programVersion: filteredGetRequestList[i].version,
                         programId: filteredGetRequestList[i].programId,
                         id: filteredGetRequestList[i].id,
