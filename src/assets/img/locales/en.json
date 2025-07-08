@@ -2735,6 +2735,7 @@
   "static.report.forecastErrorMonthlyFormulaNew11b": "Y-axis is in Equivalency Unit",
   "static.tree.numberNodeValue": "Number Node Value",
   "static.extrapolation.MovingAverageTextThree": "This method is most useful for short-term forecasts and is sensitive to trends. It is not appropriate for seasonal data",
+  "static.message.emailNotTriggered": "User created successfully but email not triggered",
   "static.report.qtyBaseUnit": "Quantity (base units)",
   "static.tree.Note": "Note",
   "static.validated.minQplToleranceCutOff": "Please enter max qpl tolerance cutoff",
