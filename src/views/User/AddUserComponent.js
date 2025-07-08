@@ -1668,11 +1668,37 @@ class AddUserComponent extends Component {
                               this.props.history.push(`/accessDenied`);
                               break;
                             case 500:
+                              this.setState({
+                                message: i18n.t(
+                                  error.response.data.messageCode, { entityname }
+                                ),
+                                loading: false,
+                              }, () => {
+                                this.hideSecondComponent();
+                              });
+                              break;
                             case 404:
+                              this.setState({
+                                message: "static.unkownError",
+                                loading: false,
+                              }, () => {
+                                this.hideSecondComponent();
+                              });
+                              break;
                             case 406:
                               this.setState({
                                 message: i18n.t(
                                   "static.accesscontrol.duplicateAccessControl"
+                                ),
+                                loading: false,
+                              }, () => {
+                                this.hideSecondComponent();
+                              });
+                              break;
+                            case 206:
+                              this.setState({
+                                message: i18n.t(
+                                  error.response.data.messageCode
                                 ),
                                 loading: false,
                               }, () => {
