@@ -142,6 +142,17 @@ class StockStatus extends Component {
    * @param {Event} event - The on change event object.
    */
   programChange(event) {
+    if (localStorage.getItem("sessionType") != 'Online') {
+      var pId = event.target.value;
+      if (pId != "") {
+        var pLabel = document.getElementById("programId").selectedOptions[0].text.toString()
+        var p = [{
+          value: Number(pId),
+          label: pLabel
+        }]
+        event = p;
+      }
+    }
     this.setState({
       programId: event.map(ele => ele),
       planningUnitList: [],
@@ -1205,7 +1216,7 @@ class StockStatus extends Component {
       "reportingUnitId": this.state.viewById == 1 ? this.state.planningUnitIdExport.map(ele => ele.value).toString() : this.state.realmCountryPlanningUnitIdExport.map(ele => ele.value).toString(), // Will be used only if aggregate is false
       "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit
     }
-    if (this.state.versionId.toString().includes("Local")) {
+    if (this.state.programId.map(ele => ele.value).length == 1 && this.state.versionId.toString().includes("Local")) {
       let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
       var db1;
       getDatabase();
@@ -3402,8 +3413,7 @@ class StockStatus extends Component {
     this.setState({
       loading: true
     })
-
-    if (this.state.versionId.toString().includes("Local")) {
+    if (this.state.programId.map(ele => ele.value).length == 1 && this.state.versionId.toString().includes("Local")) {
       let programId = this.state.programId[0].value + "_v" + this.state.versionId.split(" ")[0] + "_uId_" + AuthenticationService.getLoggedInUserId();
       var db1;
       getDatabase();
@@ -4473,7 +4483,7 @@ class StockStatus extends Component {
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
                         <div className="controls">
-                          <MultiSelect
+                          {localStorage.getItem("sessionType") == 'Online' && <MultiSelect
                             name="programId"
                             id="programId"
                             bsSize="sm"
@@ -4482,7 +4492,27 @@ class StockStatus extends Component {
                             value={this.state.programId}
                             onChange={(e) => { this.programChange(e); }}
                             labelledBy={i18n.t('static.common.select')}
-                          />
+                          />}
+                          {localStorage.getItem("sessionType") != 'Online' && <InputGroup>
+                              <Input
+                                type="select"
+                                name="programId"
+                                id="programId"
+                                value={this.state.programId.length > 0 ? this.state.programId[0].value : ""}
+                                onChange={(e) => { this.programChange(e); }}
+                                bsSize="sm"
+                              >
+                                <option value="">{i18n.t('static.common.select')}</option>
+                                {programList.length > 0
+                                  && programList.map((item, i) => {
+                                    return (
+                                      <option key={i} value={item.value}>
+                                        {item.label}
+                                      </option>
+                                    )
+                                  }, this)}
+                              </Input>
+                            </InputGroup>}
                         </div>
                       </FormGroup>
                       {this.state.programId.length == 1 && <FormGroup className="col-md-3">
