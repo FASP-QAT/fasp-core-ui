@@ -84,13 +84,15 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     }
 
     for (const [fy, entries] of Object.entries(fiscalBuckets)) {
-        let sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
+        let sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0, sum5 = 0, sum6 = 0;
 
         for (const entry of entries) {
             sum1 += parseFloat(entry[1]);
             sum2 += parseFloat(entry[2]);
             sum3 += parseFloat(entry[3]);
             sum4 += parseFloat(entry[4]);
+            sum5 += parseFloat(entry[5]);
+            sum6 += parseFloat(entry[6]);
         }
 
         result[fy] = [
@@ -99,6 +101,8 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
             sum2,
             sum3,
             sum4,
+            sum5,
+            sum6,
             entries.length
         ];
     }
