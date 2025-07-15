@@ -971,6 +971,16 @@ class SupplyPlanFormulas extends Component {
           <ModalBody >
             <ListGroup style={{ height: "calc(100vh - 110px)", overflowY: 'scroll' }}>
               <ListGroupItem >
+                <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlanFormula.instructionHeader')}</ListGroupItemHeading>
+                <ListGroupItemText className="formulastext">
+                  <ul>
+                    <li>{i18n.t('static.supplyPlanFormula.instruction1')}</li>
+                    <li>{i18n.t('static.supplyPlanFormula.instruction2')}</li>
+                    <li>{i18n.t('static.supplyPlanFormula.instruction3')}</li>
+                  </ul>
+                </ListGroupItemText>
+              </ListGroupItem>
+              <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.supplyPlan.openingBalance')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img src={openingbalance} className="formula-img-mr img-fluid" />
