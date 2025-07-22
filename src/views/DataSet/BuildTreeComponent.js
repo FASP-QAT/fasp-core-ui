@@ -5924,6 +5924,9 @@ export default class BuildTree extends Component {
                                         })
                                     } else {
                                         obj.deleteRow(parseInt(y));
+                                        this.setState({
+                                            isChanged: true
+                                        })
                                     }
                                 }.bind(this)
                             });
