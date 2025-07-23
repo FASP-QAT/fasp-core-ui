@@ -311,17 +311,20 @@ class CompareAndSelectScenario extends Component {
         var rangeValue = this.state.singleValue2;
         let startDate = "";
         let stopDate = ""
+        let tempStopDate = ""
         if (!this.state.showForecastPeriod) {
             startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+            tempStopDate = ((rangeValue.to.month < 6 || rangeValue.to.month == 12)? rangeValue.to.year + 1 : rangeValue.to.year) + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         } else {
             startDate = this.state.forecastStartDate;
             stopDate = this.state.forecastStopDate
+            tempStopDate = stopDate
         }
         var curDate = moment(startDate).format("YYYY-MM-DD");
         var monthList = [];
         monthList.push(curDate);
-        for (var i = 1; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
+        for (var i = 1; moment(curDate).format("YYYY-MM") < moment(tempStopDate).format("YYYY-MM"); i++) {
             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
             monthList.push(curDate);
         }
