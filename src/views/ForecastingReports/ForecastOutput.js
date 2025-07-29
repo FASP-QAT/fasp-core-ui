@@ -1833,34 +1833,36 @@ class ForecastOutput extends Component {
             if (versionId.toString().includes('Local')) {
                 versionId = parseInt(versionId);
                 let selectedForecastProgram = this.state.downloadedProgramData.filter(c => c.programId == programId && c.currentVersion.versionId == versionId)[0]
-                let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
-                let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
-                var month = [
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                ]
-                let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
-                forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
-                let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
-                let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
-                let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
-                beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
-                this.setState({
-                    rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
-                    minDate: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) },
-                    maxDate: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) },
-                    forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
-                }, () => { })
+                if (selectedForecastProgram) {
+                    let d1 = new Date(selectedForecastProgram.currentVersion.forecastStartDate);
+                    let d2 = new Date(selectedForecastProgram.currentVersion.forecastStopDate);
+                    var month = [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                    ]
+                    let forecastStopDate = new Date((month[d1.getMonth()] + '-' + d1.getFullYear()));
+                    forecastStopDate.setMonth(forecastStopDate.getMonth() - 1);
+                    let forecastStartDateNew = selectedForecastProgram.currentVersion.forecastStartDate;
+                    let forecastStopDateNew = selectedForecastProgram.currentVersion.forecastStopDate;
+                    let beforeEndDateDisplay = new Date(selectedForecastProgram.forecastStartDate);
+                    beforeEndDateDisplay.setMonth(beforeEndDateDisplay.getMonth() - 1);
+                    this.setState({
+                        rangeValue: { from: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) }, to: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) } },
+                        minDate: { year: Number(moment(forecastStartDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStartDateNew).startOf('month').format("M")) },
+                        maxDate: { year: Number(moment(forecastStopDateNew).startOf('month').format("YYYY")), month: Number(moment(forecastStopDateNew).startOf('month').format("M")) },
+                        forecastPeriod: month[Number(moment(forecastStartDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStartDateNew).startOf('month').format("YYYY")) + ' ~ ' + month[Number(moment(forecastStopDateNew).startOf('month').format("M")) - 1] + ' ' + Number(moment(forecastStopDateNew).startOf('month').format("YYYY")),
+                    }, () => { })
+                }
             } else {
                 let currentProgramVersion = this.state.versions.filter(c => c.versionId == versionId)[0];
                 let d1 = new Date(currentProgramVersion.forecastStartDate);
