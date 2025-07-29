@@ -2403,7 +2403,7 @@ export default class BuildTree extends Component {
             levelNodes = this.state.curTreeObj.tree.flatList.filter(m => m.level == this.state.levelNo);
             levelNodes.sort((a, b) => a.parent - b.parent);
             var flatListUnsorted = levelNodes;
-            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.sortOrder)))];
+            var sortOrderArray = [...new Set(flatListUnsorted.map(ele => (ele.newSortOrder ? ele.newSortOrder : ele.sortOrder)))];
             var sortedArray = sortOrderArray.sort();
             levelNodes = [];
             for (var i = 0; i < sortedArray.length; i++) {
