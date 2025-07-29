@@ -3205,7 +3205,7 @@ export default class TreeTable extends Component {
                             title: "Open this node for editing",
                             onclick: function () {
                                 localStorage.setItem("openNodeId", rowData[12]);
-                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + this.state.selectedScenario, "_blank")
                             }.bind(this)
                         });
                     }
@@ -4390,7 +4390,7 @@ export default class TreeTable extends Component {
                             title: "Open this node for editing",
                             onclick: function () {
                                 localStorage.setItem("openNodeId", rowData[37]);
-                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + this.state.selectedScenario, "_blank")
                             }.bind(this)
                         });
                     }
@@ -4688,7 +4688,7 @@ export default class TreeTable extends Component {
                             title: "Open this node for editing",
                             onclick: function () {
                                 localStorage.setItem("openNodeId", rowData[12]);
-                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + "-1", "_blank")
+                                window.open("/#/dataSet/buildTree/tree/" + this.state.treeId + "/" + this.state.programId + "/" + this.state.selectedScenario, "_blank")
                             }.bind(this)
                         });
                     }

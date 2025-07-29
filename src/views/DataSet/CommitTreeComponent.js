@@ -128,7 +128,8 @@ export default class CommitTreeComponent extends React.Component {
             planningUnitsInstance: "",
             consumptionInstance: "",
             treeInstance: "",
-            selectedForecastInstance: ""
+            selectedForecastInstance: "",
+            isChanged: false
         }
         this.synchronize = this.synchronize.bind(this);
         this.updateState = this.updateState.bind(this);
@@ -738,6 +739,32 @@ export default class CommitTreeComponent extends React.Component {
                     programId: programId
                 })
                 let programData = myResult.filter(c => (c.id == programId));
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onerror = function (event) {
+                    this.setState({
+                        message: i18n.t('static.program.errortext'),
+                        color: '#BA0C2F'
+                    })
+                }.bind(this);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var programDataDetailsTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    var programDataDetailsOs = programDataDetailsTransaction.objectStore('datasetDetails');
+                    var programDetailsRequest = programDataDetailsOs.get(programId);
+                    programDetailsRequest.onerror = function (event) {
+                        this.setState({
+                            message: i18n.t('static.program.errortext'),
+                            color: '#BA0C2F'
+                        })
+                    }.bind(this);
+                    programDetailsRequest.onsuccess = function (e) {
+                        this.setState({
+                            isChanged: programDetailsRequest.result.changed
+                        })
+                    }.bind(this) 
+                }.bind(this);
                 this.setState({
                     programDataLocal: programData[0].datasetJson,
                     programCode: programData[0].datasetJson.programCode,
@@ -3458,7 +3485,7 @@ export default class CommitTreeComponent extends React.Component {
                                                         </FormGroup>
                                                         <div className="col-md-12">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0 && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
+                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0 && this.state.isChanged && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
                                                         </div>
                                                     </div>
                                                 </Form>
