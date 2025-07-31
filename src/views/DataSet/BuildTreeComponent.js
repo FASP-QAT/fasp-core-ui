@@ -2575,11 +2575,12 @@ export default class BuildTree extends Component {
             button.innerHTML = '\u2191';
             button.style.pointerEvents = 'auto';
             button.onclick = (event) => {
+                event.preventDefault(); 
                 event.stopPropagation();
                 var flatList = this.state.curTreeObj.tree.flatList;
                 var currNode = flatList.filter(f => f.id == rowData[3]);
                 var prevNode = flatList.filter(f => f.id == rowDataPrev[3]);
-                this.shiftNode(event, currNode, prevNode)
+                this.shiftNode(event, currNode, prevNode, row, col);
             };
             cell.appendChild(button);
         }
@@ -2590,11 +2591,12 @@ export default class BuildTree extends Component {
             button.innerHTML = '\u2193';
             button.style.pointerEvents = 'auto';
             button.onclick = (event) => {
+                event.preventDefault(); 
                 event.stopPropagation();
                 var flatList = this.state.curTreeObj.tree.flatList;
                 var currNode = flatList.filter(f => f.id == rowData[3]);
                 var nextNode = flatList.filter(f => f.id == rowDataNext[3]);
-                this.shiftNode(event, currNode, nextNode)
+                this.shiftNode(event, currNode, nextNode, row, col)
             };
             cell.appendChild(button);
         }
@@ -2605,7 +2607,7 @@ export default class BuildTree extends Component {
      * @param {*} currNode Object of Current Node
      * @param {*} prevNode Object of Previous Node
      */
-    shiftNode(event, currNode, prevNode) {
+    shiftNode(event, currNode, prevNode, y, x) {
         event.stopPropagation();
         let { curTreeObj } = this.state;
         var items = curTreeObj.tree.flatList;
@@ -2626,6 +2628,12 @@ export default class BuildTree extends Component {
             items
         }, () => {
             this.buildLevelReorderJexcel(true);
+            setTimeout(() => {
+                const targetRow = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                if (targetRow) {
+                    targetRow.scrollIntoView({ behavior: 'auto', block: 'center' });
+                }
+            }, 0);
         })
     }
     /**
@@ -7195,9 +7203,19 @@ export default class BuildTree extends Component {
             }
             let tempToggleList = tempToggleObject.map(item => item.id);
             var curTreeObj1 = curTreeObj.tree.flatList.map(item => {
+                let templateItem;
                 if (tempToggleList.includes(item.id))
-                    return { ...item, templateName: "contactTemplateMin", expanded: true }
-                return { ...item, templateName: "contactTemplate", expanded: false }
+                    templateItem = { ...item, templateName: "contactTemplateMin", expanded: true }
+                else
+                    templateItem = { ...item, templateName: "contactTemplate", expanded: false }
+
+                // Loop to fix incorrect sortorder values
+                templateItem = { ...item, sortOrder: item.sortOrder
+                                                        .split('.')
+                                                        .map(part => part === "010" ? "10" : part)
+                                                        .join('.') 
+                                };
+                return templateItem;
             })
             if (Array.from(new Set(tempToggleList)).length + 1 >= curTreeObj.tree.flatList.length) {
                 var parentNode = curTreeObj.tree.flatList.filter(item =>
