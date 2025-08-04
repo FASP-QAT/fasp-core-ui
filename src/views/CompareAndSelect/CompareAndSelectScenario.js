@@ -52,8 +52,8 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     const result = {};
     const getFiscalYear = (dateStr) => {
         const date = new Date(dateStr);
-        const year = date.getFullYear();
-        const month = date.getMonth() + 1;
+        const year = date.getUTCFullYear();
+        const month = date.getUTCMonth() + 1;
         if(fiscalStartMonth >= 7) {
             if (month >= fiscalStartMonth) {
                 return year + 1;
