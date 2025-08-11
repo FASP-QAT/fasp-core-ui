@@ -1058,6 +1058,8 @@ class EditUserComponent extends Component {
     var proList = [];
     var proListByCountryId = [];
     var proListByHealthAreaId = [];
+    var proListByProcurementAgent = [];
+    var proListByFundingSource = [];
     if (value != -1) {
       proListByCountryId = this.state.programListForFilter.filter(
         (c) => c.id == -1 || c.realmCountryId == value
@@ -1099,6 +1101,36 @@ class EditUserComponent extends Component {
     if (orgvalue != -1) {
       proList = proList.filter(c => c.id == -1 || c.organisation.id == orgvalue)
     }
+    var procurementAgentValue = this.state.addUserEL.getJson(null, false)[r][5];
+    if (procurementAgentValue != -1) {
+      var proListAll = proList;
+      for (var i = 1; i < proListAll.length; i++) {
+        if(proListAll[i].programType == 1) {
+          proListByProcurementAgent = [];
+          proListByProcurementAgent = proListAll[i].procurementAgentList.filter(
+            (c) => c.id == procurementAgentValue
+          );
+          if (proListByProcurementAgent.length == 0) {
+            proList = proList.filter(p => p.id != proListAll[i].id);
+          }
+        }
+      }
+    }
+    var fundingSourceValue = this.state.addUserEL.getJson(null, false)[r][6];
+    if (fundingSourceValue != -1) {
+      var proListAll = proList;
+      for (var i = 1; i < proListAll.length; i++) {
+        if(proListAll[i].programType == 1) {
+          proListByFundingSource = [];
+          proListByFundingSource = proListAll[i].fundingSourceList.filter(
+            (c) => c.id == fundingSourceValue
+          );
+          if (proListByFundingSource.length == 0) {
+            proList = proList.filter(p => p.id != proListAll[i].id);
+          }
+        }
+      }
+    }
     return proList;
   }.bind(this);
   /**
@@ -1137,7 +1169,10 @@ class EditUserComponent extends Component {
           id: parseInt(selProgram[i].id),
           realmCountryId: selProgram[i].realmCountry.id,
           healthAreaList: selProgram[i].healthAreaList,
-          organisation: selProgram[i].organisation
+          organisation: selProgram[i].organisation,
+          procurementAgentList: selProgram[i].procurementAgentList,
+          fundingSourceList: selProgram[i].fundingSourceList,
+          programType: selProgram[i].programTypeId
         };
         programList[i] = paJson;
       }
@@ -1270,8 +1305,8 @@ class EditUserComponent extends Component {
       data[3] = -1;
       data[4] = -1;
       data[5] = -1;
-      data[4] = -1;
-      data[5] = -1;
+      data[6] = -1;
+      data[7] = -1;
       papuDataArr[0] = data;
     }
     this.el = jexcel(document.getElementById("paputableDiv"), "");

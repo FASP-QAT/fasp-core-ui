@@ -903,7 +903,7 @@ export default class EditProgram extends Component {
             data = [];
             data[0] = userList[j].username;
             data[1] = userList[j].orgAndCountry;
-            data[2] = "";
+            data[2] = userList[j].roleList.map(a => getLabelText(a.label, this.state.lang)).toString().trim().replaceAll(',', ';');
             userListArr[count] = data;
             count++;
         }
