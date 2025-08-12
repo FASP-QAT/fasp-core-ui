@@ -139,7 +139,7 @@ class SupplyPlanFormulas extends Component {
     return (
       <div className="animated fadeIn">
         <Modal isOpen={this.state.modal} className={'modal-xl ' + this.props.className} >
-        <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
+          <ModalHeader toggle={this.toggle} className="ModalHead modal-info-Headher"><strong className="TextWhite" >{i18n.t('static.common.formulae')}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: "calc(100vh - 110px)", overflowY: 'scroll' }}>
               <ListGroupItem >
@@ -372,20 +372,20 @@ class SupplyPlanFormulas extends Component {
                   <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>: {i18n.t("static.supplyPlan.unmetDemandDef")}
 
                   <div className='formulaBox borderedBoxforformulae'>
-                      <i>
-                        <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
-                        <p>{i18n.t("static.showFormula.endingBalance2")}</p>
-                        <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> = {i18n.t("static.showFormula.endingBalance3.1")}</p>
-                        {/* <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p> */}
-                        {/* <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p> */}
+                    <i>
+                      <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
+                      <p>{i18n.t("static.showFormula.endingBalance2")}</p>
+                      <p><b>{i18n.t("static.supplyPlanFormula.endingBalanceFormula")}</b> = {i18n.t("static.showFormula.endingBalance3.1")}</p>
+                      {/* <p><b>{i18n.t("static.showFormula.endingBalance4")}</b> {i18n.t("static.showFormula.endingBalance5")}</p> */}
+                      {/* <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b> {i18n.t("static.showFormula.endingBalance6")}</p> */}
 
-                        <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>
-                          <ul type='disc'>
-                            <li>{i18n.t("static.supplyPlan.unmetDemandP1")}</li>
-                            <li>{i18n.t("static.supplyPlan.unmetDemandP2")}</li>
-                          </ul>
-                        </p>
-                      </i>
+                      <p><b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>
+                        <ul type='disc'>
+                          <li>{i18n.t("static.supplyPlan.unmetDemandP1")}</li>
+                          <li>{i18n.t("static.supplyPlan.unmetDemandP2")}</li>
+                        </ul>
+                      </p>
+                    </i>
                   </div>
                   <p><span className="formulastext-p">{i18n.t("static.supplyPlan.exampleActualConsumption") + " :"}</span><br></br>
                     {i18n.t("static.supplyPlanFormula.openingBalanceFormula") + " = 5,698,925"}<br></br>
@@ -614,7 +614,7 @@ class SupplyPlanFormulas extends Component {
                             <td>58</td>
                             <td>4.8</td>
                           </tr>
-                          <tr style={{fontWeight:'bold'}}>
+                          <tr style={{ fontWeight: 'bold' }}>
                             <td>9</td>
                             <td>3</td>
                             <td>2</td>
@@ -830,32 +830,32 @@ class SupplyPlanFormulas extends Component {
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.report.wapeFormula")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <p>{"1) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew1')}</p>
-                  <img className="formula-img-mr img-fluid" style={{width:'250px'}} src={forcasterrorWAPE} /><br></br>
+                  <img className="formula-img-mr img-fluid" style={{ width: '250px' }} src={forcasterrorWAPE} /><br></br>
                   <p>{i18n.t('static.report.forecastErrorMonthlyFormulaNew2')}</p>
                   <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew3')} <b>{i18n.t('static.report.timeWindow')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew3a')}</p>
                   <img className="formula-img-mr img-fluid" src={forcasterror} /><br></br>
                   <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew4a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew4b')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew4c')}</p>
-                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate4')} <i class="fa fa-exclamation-triangle" style={{color:'red'}} aria-hidden="true"></i> {i18n.t('static.report.forecastErrorMonthlyFormulaupdate41')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdate42')}</b></p>
-                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate5')} <span style={{color:'red'}}>{i18n.t('static.report.forecastErrorMonthlyFormulaupdateredtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormulaupdateindicates')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdatecalculated')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaupdatethreshold')}</p>
+                  <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate4')} <i class="fa fa-exclamation-triangle" style={{ color: 'red' }} aria-hidden="true"></i> {i18n.t('static.report.forecastErrorMonthlyFormulaupdate41')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdate42')}</b></p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormulaupdate5')} <span style={{ color: 'red' }}>{i18n.t('static.report.forecastErrorMonthlyFormulaupdateredtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormulaupdateindicates')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaupdatecalculated')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaupdatethreshold')}</p>
                   <p>{"6) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew6')}</p>
-                  <p><b>{""+i18n.t('static.dataEntryAndAdjustments.StockOutRate')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6a')}</p>
-                  <p><b>{""+i18n.t('static.dataentry.adjustedConsumption')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6b')}</p>
+                  <p><b>{"" + i18n.t('static.dataEntryAndAdjustments.StockOutRate')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6a')}</p>
+                  <p><b>{"" + i18n.t('static.dataentry.adjustedConsumption')}</b> = {i18n.t('static.report.forecastErrorMonthlyFormulaNew6b')}</p>
                   <p>{"7) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew7')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew7a')}</b> {i18n.t('static.report.forecastErrorMonthlyFormulaNew7b')}
-                  <ol>
+                    <ol>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew8")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew9")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew10")}</li>
-                  </ol>
+                    </ol>
                   </p>
                   <p>{"8) " + i18n.t('static.report.forecastErrorMonthlyFormulaNew11a')} <b>{i18n.t('static.report.forecastErrorMonthlyFormulaNew11b')}</b>
-                  <ol>
+                    <ol>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew12")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew13")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew14")}</li>
                       <li>{i18n.t("static.report.forecastErrorMonthlyFormulaNew10")}</li>
-                  </ol>
+                    </ol>
                   </p>
-                  </ListGroupItemText>
+                </ListGroupItemText>
               </ListGroupItem>
             </ListGroup>
           </ModalBody>
@@ -872,7 +872,7 @@ class SupplyPlanFormulas extends Component {
                   <p>{"2) " + i18n.t('static.report.forecastErrorMonthlyFormula8')}</p>
                   <p>{"3) " + i18n.t('static.report.forecastErrorMonthlyFormula6nomonth')}</p>
                   <p>{"4) " + i18n.t('static.report.forecastErrorMonthlyFormula7consumption')}</p>
-                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4row')} <span style={{color:'red'}}>{i18n.t('static.report.forecastErrorMonthlyFormula4redtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormula4indicatesthat')} <b>{i18n.t('static.report.forecastErrorMonthlyFormula4thresholdper')}</b> {i18n.t('static.report.forecastErrorMonthlyFormula4UpdatePlanningFe')}</p>
+                  <p>{"5) " + i18n.t('static.report.forecastErrorMonthlyFormula4row')} <span style={{ color: 'red' }}>{i18n.t('static.report.forecastErrorMonthlyFormula4redtext')}</span> {i18n.t('static.report.forecastErrorMonthlyFormula4indicatesthat')} <b>{i18n.t('static.report.forecastErrorMonthlyFormula4thresholdper')}</b> {i18n.t('static.report.forecastErrorMonthlyFormula4UpdatePlanningFe')}</p>
                   {/* <p>{i18n.t("static.report.wapeFormulaNote")}</p> */}
                 </ListGroupItemText>
               </ListGroupItem>
@@ -886,6 +886,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  {i18n.t("static.supplyPlanFormula.amcDef")}
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
                   <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -931,6 +932,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  {i18n.t("static.supplyPlanFormula.amcDef")}
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
                   <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -967,7 +969,7 @@ class SupplyPlanFormulas extends Component {
           </ModalBody>
         </Modal>
         <Modal isOpen={this.state.stockstatus} className={'modal-xl ' + this.props.className} >
-        <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
+          <ModalHeader toggle={this.toggleStockStatus} className="ModalHead modal-info-Headher"><strong className="TextWhite">{i18n.t("static.common.formulae")}</strong></ModalHeader>
           <ModalBody >
             <ListGroup style={{ height: "calc(100vh - 110px)", overflowY: 'scroll' }}>
               <ListGroupItem >
@@ -991,7 +993,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.openingBalanceEx3") + " = 10,653"}</p>
                 </ListGroupItemText>
               </ListGroupItem>
-              {/* <ListGroupItem >
+              <ListGroupItem>
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.dataentry.adjustedConsumption')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <img src={adjustedConsumption} className="formula-img-mr img-fluid" />
@@ -1007,7 +1009,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.dataentry.adjustedConsumption") + " = 15,000"}<br></br>
                   </p>
                 </ListGroupItemText>
-              </ListGroupItem> */}
+              </ListGroupItem>
 
               {/* <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText1')}</ListGroupItemHeading>
@@ -1100,7 +1102,7 @@ class SupplyPlanFormulas extends Component {
                   </p>
                 </ListGroupItemText>
               </ListGroupItem> */}
-              
+
               {/* <ListGroupItem>
                 <ListGroupItemHeading className="formulasheading">{i18n.t('static.formula.suggestedText50')}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
@@ -1191,23 +1193,23 @@ class SupplyPlanFormulas extends Component {
                 </ListGroupItemText>
               </ListGroupItem> */}
 
-              <ListGroupItem > 
+              <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.consensusConsumption")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
                   <p>
                     {i18n.t("static.supplyPlanFormula.consensusConsumptionTxt")}
                   </p>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx1") + " = 500"}<br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx2") + " = 550"}<br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx3") + " = 200"}<br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx4") + " = 300"}<br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx5") + " = 1,050"}<br></br>
-                  {i18n.t("static.supplyPlanFormula.consensusConsumptionEx6") + " = N/A"}<br></br>
-                  <br></br>
-                  <b>{i18n.t("static.supplyPlanFormula.consensusConsumption")}</b> = {i18n.t("static.supplyPlanFormula.consensusConsumptionFormula")} = <b>1,900</b><br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx1") + " = 500"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx2") + " = 550"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx3") + " = 200"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx4") + " = 300"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx5") + " = 1,050"}<br></br>
+                    {i18n.t("static.supplyPlanFormula.consensusConsumptionEx6") + " = N/A"}<br></br>
+                    <br></br>
+                    <b>{i18n.t("static.supplyPlanFormula.consensusConsumption")}</b> = {i18n.t("static.supplyPlanFormula.consensusConsumptionFormula")} = <b>1,900</b><br></br>
                   </p>
-                  
+
                 </ListGroupItemText>
               </ListGroupItem>
 
@@ -1226,13 +1228,14 @@ class SupplyPlanFormulas extends Component {
                     <ul type='disc'>
                       <li>{i18n.t("static.supplyPlanFormula.expiredStockNote")}</li>
                       <li>{i18n.t("static.supplyPlanFormula.expiredStockNoteP2")}</li>
-                    </ul>                    
+                    </ul>
                   </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>: {i18n.t("static.supplyPlan.unmetDemandDef")}
                   <div className='formulaBox borderedBoxforformulae'>
                     <i>
                       <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalancePI1")}</p>
@@ -1286,6 +1289,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  {i18n.t("static.supplyPlanFormula.amcDef")}
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
                   <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -1304,8 +1308,8 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t('static.supplyPlanFormula.amcEx12')}<br></br>
                     {i18n.t('static.supplyPlanFormula.amcEx13')}</p>
 
-                    <p><b>{i18n.t("static.tree.Note")}</b>: {i18n.t("static.supplyPlanFormula.amcNote2")}
-                    </p>
+                  <p><b>{i18n.t("static.tree.Note")}</b>: {i18n.t("static.supplyPlanFormula.amcNote2")}
+                  </p>
                 </ListGroupItemText>
               </ListGroupItem>
               <ListGroupItem >
@@ -1320,7 +1324,7 @@ class SupplyPlanFormulas extends Component {
                     {i18n.t("static.supplyPlanFormula.monthsOfStockEx3")}<br></br>
                     {i18n.t("static.supplyPlanFormula.monthsOfStockEx4")}<br></br>
                     <br></br>
-                    
+
                     {i18n.t("static.supplyPlanFormula.monthsOfStockMultiprogramPU")}<br></br>
                     {i18n.t("static.supplyPlanFormula.monthsOfStockMultiprogramPUFormulae")}<br></br>
                     <br></br>
@@ -1401,6 +1405,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlanFormula.amc")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  {i18n.t("static.supplyPlanFormula.amcDef")}
                   <img className="formula-img-mr img-fluid" src={amc} /><br></br>
                   <p>{i18n.t("static.supplyPlanFormula.amcNote")}</p>
                   <p><span className="formulastext-p">{i18n.t("static.common.example") + " :"}</span><br></br>
@@ -1436,6 +1441,7 @@ class SupplyPlanFormulas extends Component {
               <ListGroupItem >
                 <ListGroupItemHeading className="formulasheading">{i18n.t("static.supplyPlan.endingBalance") + " / " + i18n.t("static.supplyPlan.unmetDemandStr")}</ListGroupItemHeading>
                 <ListGroupItemText className="formulastext">
+                  <b>{i18n.t("static.supplyPlan.unmetDemandStr")}</b>: {i18n.t("static.supplyPlan.unmetDemandDef")}
                   <div className='formulaBox borderedBoxforformulae'>
                     <i>
                       <p><b>{i18n.t("static.supplyPlan.projectedInventory")}</b> {i18n.t("static.showFormula.endingBalance1")}</p>
