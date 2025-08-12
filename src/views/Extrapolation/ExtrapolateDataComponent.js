@@ -723,6 +723,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                     linearRegressionDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3 ? false : true,
                     tesDisabled: actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24 && localStorage.getItem("sessionType") === "Online" ? false : true,
                     arimaDisabled: ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
+                    dataChanged:true
                 })
             }, 0)
         })
