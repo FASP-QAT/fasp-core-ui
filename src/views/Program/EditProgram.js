@@ -6,6 +6,8 @@ import {
 } from 'reactstrap';
 import Select from 'react-select';
 import { Formik } from 'formik';
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import * as Yup from 'yup';
 import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
@@ -15,6 +17,10 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions.js";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 import DropdownService from "../../api/DropdownService";
 import { Capitalize, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
@@ -226,6 +232,7 @@ export default class EditProgram extends Component {
             procurementAgentList: [],
             programManagerList: [],
             regionList: [],
+            userList: [],
             message: '',
             loading: true,
             healthAreaCode: '',
@@ -244,6 +251,7 @@ export default class EditProgram extends Component {
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
         this.updateFieldDataProcurementAgent = this.updateFieldDataProcurementAgent.bind(this);
         this.updateFieldDataFundingSource = this.updateFieldDataFundingSource.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
     }
     /**
      * Updates the message state with the provided message.
@@ -606,6 +614,66 @@ export default class EditProgram extends Component {
                         })
                     }
                 })
+            ProgramService.getUserListForProgram(this.props.match.params.programId)
+                .then(response => {
+                    if (response.status == 200) {
+                        let userList = response.data;
+                        this.setState({
+                            userList: userList,
+                        }, () => {
+                             this.buildJexcel();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -808,6 +876,83 @@ export default class EditProgram extends Component {
             program.programNotes = event.target.value;
         }
         this.setState({ program }, () => { })
+    }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+    };
+    /**
+     * This function is used to build the table the access control
+     */
+    buildJexcel() {
+        var varEL = "";
+        let userList = this.state.userList;   
+        userList.sort((a, b) => {
+            var itemLabelA = a.userId;
+            var itemLabelB = b.userId;
+            return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        let userListArr = [];
+        var data = [];
+        var count = 0;
+        for (var j = 0; j < userList.length; j++) {
+            data = [];
+            data[0] = userList[j].username;
+            data[1] = userList[j].orgAndCountry;
+            data[2] = userList[j].roleList.map(a => getLabelText(a.label, this.state.lang)).toString().trim().replaceAll(',', ';');
+            userListArr[count] = data;
+            count++;
+        }
+        
+        this.el = jexcel(document.getElementById("userListTableDiv"), "");
+        jexcel.destroy(document.getElementById("userListTableDiv"), true);
+        var data = userListArr;
+        var options = {
+        data: data,
+        columnDrag: false,
+        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        columns: [
+            {
+            title: i18n.t("static.user.username"),
+            type: "text",
+            readOnly: true
+            },
+            {
+            title: i18n.t("static.user.orgAndCountry"),
+            type: "text",
+            readOnly: true
+            },
+            {
+            title: i18n.t("static.role.role"),
+            type: "text",
+            readOnly: true
+            }
+        ],
+        pagination: localStorage.getItem("sesRecordCount"),
+        filters: true,
+        search: true,
+        columnSorting: true,
+        editable: false,
+        wordWrap: true,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+        position: "top",
+        onload: this.loaded,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        copyCompatibility: true,
+        parseFormulas: true,
+        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false
+        };
+        this.el = jexcel(document.getElementById("userListTableDiv"), options);
+        varEL = this.el;
+        this.setState({
+        
+        });
     }
     /**
      * Renders the edit program screen.
@@ -1375,6 +1520,26 @@ export default class EditProgram extends Component {
                                             </CardFooter>
                                         </Form>
                                     )} />
+                        </Card>
+                    </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardBody>
+                                <div
+                                    className=""
+                                    style={{
+                                        display: "block",
+                                    }}
+                                    >
+                                    <div
+                                        style={{ width: '100%' }}
+                                        id="userListTableDiv"
+                                        className="RowheightForjexceladdRow consumptionDataEntryTable"
+                                    ></div>
+                                </div>
+                            </CardBody>
                         </Card>
                     </Col>
                 </Row>

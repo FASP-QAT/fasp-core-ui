@@ -131,6 +131,8 @@ class AddUserComponent extends Component {
     this.onPaste = this.onPaste.bind(this);
     this.filterOrganisation = this.filterOrganisation.bind(this);
     this.filterHealthArea = this.filterHealthArea.bind(this);
+    this.filterProcurementAgent = this.filterProcurementAgent.bind(this);
+    this.filterFundingSource = this.filterFundingSource.bind(this);
     this.filterProgram = this.filterProgram.bind(this);
   }
   /**
@@ -323,6 +325,38 @@ class AddUserComponent extends Component {
     }
   }
   /**
+   * This function is used to filter the procurement agent based on realm Id
+   */
+  filterProcurementAgent() {
+    let realmId = this.state.user.realm.realmId;
+    if (realmId != 0 && realmId != null) {
+      const selProcurementAgent = this.state.procurementAgents;
+      this.setState({
+        selProcurementAgent,
+      });
+    } else {
+      this.setState({
+        selProcurementAgent: this.state.procurementAgents,
+      });
+    }
+  }
+  /**
+   * This function is used to filter the funding source based on realm Id
+   */
+  filterFundingSource() {
+    let realmId = this.state.user.realm.realmId;
+    if (realmId != 0 && realmId != null) {
+      const selFundingSource = this.state.fundingSources;
+      this.setState({
+        selFundingSource,
+      });
+    } else {
+      this.setState({
+        selFundingSource: this.state.fundingSources,
+      });
+    }
+  }
+  /**
    * This function is used to get the list of realm country, health area, organisation and program for access control
    */
   getAccessControlData() {
@@ -384,168 +418,310 @@ class AddUserComponent extends Component {
                         healthAreas: listArray,
                         selHealthArea: listArray,
                       });
-                      DropdownService.getAllProgramListByRealmId(realmId)
-                        .then((response1) => {
-                          if (response1.status == "200") {
-                            var listArray = response1.data;
+                      DropdownService.getProcurementAgentDropdownList()
+                        .then((response) => {
+                          if (response.status == "200") {
+                            var listArray = response.data;
                             listArray.sort((a, b) => {
-                              var itemLabelA = a.code.toUpperCase();
-                              var itemLabelB = b.code.toUpperCase();
+                              var itemLabelA = getLabelText(
+                                a.label,
+                                this.state.lang
+                              ).toUpperCase();
+                              var itemLabelB = getLabelText(
+                                b.label,
+                                this.state.lang
+                              ).toUpperCase();
                               return itemLabelA > itemLabelB ? 1 : -1;
                             });
-                            this.setState(
-                              {
-                                programs: listArray,
-                                selProgram: listArray,
-                              },
-                              () => {
-                                this.filterOrganisation();
-                                this.filterHealthArea();
-                                this.filterProgram();
-                                this.buildJexcel();
-                              }
-                            );
-                          }
-                        })
-                        .catch((error) => {
-                          if (error.message === "Network Error") {
                             this.setState({
-                              message: API_URL.includes("uat")
-                                ? i18n.t("static.common.uatNetworkErrorMessage")
-                                : API_URL.includes("demo")
-                                  ? i18n.t(
-                                    "static.common.demoNetworkErrorMessage"
-                                  )
-                                  : i18n.t(
-                                    "static.common.prodNetworkErrorMessage"
-                                  ),
-                              loading: false,
-                            }, () => {
-                              this.hideSecondComponent();
+                              procurementAgents: listArray,
+                              selProcurementAgent: listArray,
                             });
-                          } else {
-                            switch (
-                            error.response ? error.response.status : ""
-                            ) {
-                              case 401:
-                                this.props.history.push(
-                                  `/login/static.message.sessionExpired`
-                                );
-                                break;
-                              case 409:
-                                this.setState({
-                                  message: i18n.t('static.common.accessDenied'),
-                                  loading: false,
-                                  color: "#BA0C2F",
-                                });
-                                break;
-                              case 403:
-                                this.props.history.push(`/accessDenied`);
-                                break;
-                              case 500:
-                              case 404:
-                              case 406:
-                                this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false,
-                                }, () => {
+                            DropdownService.getFundingSourceDropdownList()
+                              .then((response) => {
+                                if (response.status == "200") {
+                                  var listArray = response.data;
+                                  listArray.sort((a, b) => {
+                                    var itemLabelA = getLabelText(
+                                      a.label,
+                                      this.state.lang
+                                    ).toUpperCase();
+                                    var itemLabelB = getLabelText(
+                                      b.label,
+                                      this.state.lang
+                                    ).toUpperCase();
+                                    return itemLabelA > itemLabelB ? 1 : -1;
+                                  });
+                                  this.setState({
+                                    fundingSources: listArray,
+                                    selFundingSource: listArray,
+                                  });  
+                                  DropdownService.getAllProgramListByRealmId(realmId)
+                                    .then((response1) => {
+                                      if (response1.status == "200") {
+                                        var listArray = response1.data;
+                                        listArray.sort((a, b) => {
+                                          var itemLabelA = a.code.toUpperCase();
+                                          var itemLabelB = b.code.toUpperCase();
+                                          return itemLabelA > itemLabelB ? 1 : -1;
+                                        });
+                                        this.setState(
+                                          {
+                                            programs: listArray,
+                                            selProgram: listArray,
+                                          },
+                                            () => {
+                                              this.filterOrganisation();
+                                              this.filterHealthArea();
+                                              this.filterProcurementAgent();
+                                              this.filterFundingSource();
+                                              this.filterProgram();
+                                              this.buildJexcel();
+                                            });
+                                      } else {
+                                        this.setState(
+                                          {
+                                            message: response.data.messageCode,
+                                          },
+                                          () => {
+                                            this.hideSecondComponent();
+                                          }
+                                        );
+                                      }
+                                    })
+                                    .catch((error) => {
+                                      if (error.message === "Network Error") {
+                                        this.setState({
+                                          message: API_URL.includes("uat")
+                                            ? i18n.t("static.common.uatNetworkErrorMessage")
+                                            : API_URL.includes("demo")
+                                              ? i18n.t("static.common.demoNetworkErrorMessage")
+                                              : i18n.t("static.common.prodNetworkErrorMessage"),
+                                          loading: false,
+                                        });
+                                      } else {
+                                        switch (error.response ? error.response.status : "") {
+                                          case 401:
+                                            this.props.history.push(
+                                              `/login/static.message.sessionExpired`
+                                            );
+                                            break;
+                                          case 409:
+                                            this.setState({
+                                              message: i18n.t('static.common.accessDenied'),
+                                              loading: false,
+                                              color: "#BA0C2F",
+                                            });
+                                            break;
+                                          case 403:
+                                            this.props.history.push(`/accessDenied`);
+                                            break;
+                                          case 500:
+                                          case 404:
+                                          case 406:
+                                            this.setState({
+                                              message: error.response.data.messageCode,
+                                              loading: false,
+                                            });
+                                            break;
+                                          case 412:
+                                            this.setState({
+                                              message: error.response.data.messageCode,
+                                              loading: false,
+                                            });
+                                            break;
+                                          default:
+                                            this.setState({
+                                              message: "static.unkownError",
+                                              loading: false,
+                                            });
+                                            break;
+                                        }
+                                      }
+                                    });
+                                } else {
+                                  this.setState(
+                                    {
+                                      message: response.data.messageCode,
+                                    },
+                                    () => {
+                                      this.hideSecondComponent();
+                                    }
+                                  );
+                                }
+                              })
+                              .catch((error) => {
+                                if (error.message === "Network Error") {
+                                  this.setState({
+                                    message: API_URL.includes("uat")
+                                      ? i18n.t("static.common.uatNetworkErrorMessage")
+                                      : API_URL.includes("demo")
+                                        ? i18n.t("static.common.demoNetworkErrorMessage")
+                                        : i18n.t("static.common.prodNetworkErrorMessage"),
+                                    loading: false,
+                                  });
+                                } else {
+                                  switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                      this.props.history.push(`/login/static.message.sessionExpired`);
+                                      break;
+                                    case 409:
+                                      this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                      });
+                                      break;
+                                    case 403:
+                                      this.props.history.push(`/accessDenied`);
+                                      break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                      });
+                                      break;
+                                    case 412:
+                                      this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false,
+                                      });
+                                      break;
+                                    default:
+                                      this.setState({
+                                        message: "static.unkownError",
+                                        loading: false,
+                                      });
+                                      break;
+                                  }
+                                }
+                              })
+                            } else {
+                              this.setState(
+                                {
+                                  message: response.data.messageCode,
+                                },
+                                () => {
                                   this.hideSecondComponent();
-                                });
-                                break;
-                              case 412:
-                                this.setState({
-                                  message: error.response.data.messageCode,
-                                  loading: false,
-                                }, () => {
-                                  this.hideSecondComponent();
-                                });
-                                break;
-                              default:
-                                this.setState({
-                                  message: "static.unkownError",
-                                  loading: false,
-                                }, () => {
-                                  this.hideSecondComponent();
-                                });
-                                break;
+                                }
+                              );
                             }
+                        })
+                      .catch((error) => {
+                        if (error.message === "Network Error") {
+                          this.setState({
+                            message: API_URL.includes("uat")
+                              ? i18n.t("static.common.uatNetworkErrorMessage")
+                              : API_URL.includes("demo")
+                                ? i18n.t("static.common.demoNetworkErrorMessage")
+                                : i18n.t("static.common.prodNetworkErrorMessage"),
+                            loading: false,
+                          });
+                        } else {
+                          switch (error.response ? error.response.status : "") {
+                            case 401:
+                              this.props.history.push(`/login/static.message.sessionExpired`);
+                              break;
+                            case 409:
+                              this.setState({
+                                message: i18n.t('static.common.accessDenied'),
+                                loading: false,
+                                color: "#BA0C2F",
+                              });
+                              break;
+                            case 403:
+                              this.props.history.push(`/accessDenied`);
+                              break;
+                            case 500:
+                            case 404:
+                            case 406:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false,
+                              });
+                              break;
+                            case 412:
+                              this.setState({
+                                message: error.response.data.messageCode,
+                                loading: false,
+                              });
+                              break;
+                            default:
+                              this.setState({
+                                message: "static.unkownError",
+                                loading: false,
+                              });
+                              break;
                           }
-                        });
-                    } else {
-                      this.setState(
-                        {
-                          message: response.data.messageCode,
-                        },
-                        () => {
-                          this.hideSecondComponent();
                         }
-                      );
-                    }
-                  })
-                  .catch((error) => {
-                    if (error.message === "Network Error") {
-                      this.setState({
-                        message: API_URL.includes("uat")
-                          ? i18n.t("static.common.uatNetworkErrorMessage")
-                          : API_URL.includes("demo")
-                            ? i18n.t("static.common.demoNetworkErrorMessage")
-                            : i18n.t("static.common.prodNetworkErrorMessage"),
-                        loading: false,
-                      }, () => {
-                        this.hideSecondComponent();
-                      });
-                    } else {
-                      switch (error.response ? error.response.status : "") {
-                        case 401:
-                          this.props.history.push(
-                            `/login/static.message.sessionExpired`
-                          );
-                          break;
-                        case 409:
-                          this.setState({
-                            message: i18n.t('static.common.accessDenied'),
-                            loading: false,
-                            color: "#BA0C2F",
-                          });
-                          break;
-                        case 403:
-                          this.props.history.push(`/accessDenied`);
-                          break;
-                        case 500:
-                        case 404:
-                        case 406:
-                          this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false,
-                          }, () => {
-                            this.hideSecondComponent();
-                          });
-                          break;
-                        case 412:
-                          this.setState({
-                            message: error.response.data.messageCode,
-                            loading: false,
-                          }, () => {
-                            this.hideSecondComponent();
-                          });
-                          break;
-                        default:
-                          this.setState({
-                            message: "static.unkownError",
-                            loading: false,
-                          }, () => {
-                            this.hideSecondComponent();
-                          });
-                          break;
+                      })
+                      } else {
+                        this.setState({
+                          message: response.data.message,
+                        });
                       }
-                    }
-                  });
+                    })
+                    .catch((error) => {
+                      if (error.message === "Network Error") {
+                        this.setState({
+                          message: API_URL.includes("uat")
+                            ? i18n.t("static.common.uatNetworkErrorMessage")
+                            : API_URL.includes("demo")
+                              ? i18n.t("static.common.demoNetworkErrorMessage")
+                              : i18n.t("static.common.prodNetworkErrorMessage"),
+                          loading: false,
+                        });
+                      } else {
+                        switch (error.response ? error.response.status : "") {
+                          case 401:
+                            this.props.history.push(
+                              `/login/static.message.sessionExpired`
+                            );
+                            break;
+                          case 409:
+                            this.setState({
+                              message: i18n.t('static.common.accessDenied'),
+                              loading: false,
+                              color: "#BA0C2F",
+                            });
+                            break;
+                          case 403:
+                            this.props.history.push(`/accessDenied`);
+                            break;
+                          case 500:
+                          case 404:
+                          case 406:
+                            this.setState({
+                              message: error.response.data.messageCode,
+                              loading: false,
+                            });
+                            break;
+                          case 412:
+                            this.setState({
+                              message: error.response.data.messageCode,
+                              loading: false,
+                            });
+                            break;
+                          default:
+                            this.setState({
+                              message: "static.unkownError",
+                              loading: false,
+                            });
+                            break;
+                        }
+                      }
+                    });
               } else {
-                this.setState({
-                  message: response.data.message,
-                }, () => {
-                  this.hideSecondComponent();
-                });
+                this.setState(
+                  {
+                    message: response.data.messageCode,
+                  },
+                  () => {
+                    this.hideSecondComponent();
+                  }
+                );
               }
             })
             .catch((error) => {
@@ -557,15 +733,11 @@ class AddUserComponent extends Component {
                       ? i18n.t("static.common.demoNetworkErrorMessage")
                       : i18n.t("static.common.prodNetworkErrorMessage"),
                   loading: false,
-                }, () => {
-                  this.hideSecondComponent();
                 });
               } else {
                 switch (error.response ? error.response.status : "") {
                   case 401:
-                    this.props.history.push(
-                      `/login/static.message.sessionExpired`
-                    );
+                    this.props.history.push(`/login/static.message.sessionExpired`);
                     break;
                   case 409:
                     this.setState({
@@ -583,29 +755,23 @@ class AddUserComponent extends Component {
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
-                    }, () => {
-                      this.hideSecondComponent();
                     });
                     break;
                   case 412:
                     this.setState({
                       message: error.response.data.messageCode,
                       loading: false,
-                    }, () => {
-                      this.hideSecondComponent();
                     });
                     break;
                   default:
                     this.setState({
                       message: "static.unkownError",
                       loading: false,
-                    }, () => {
-                      this.hideSecondComponent();
                     });
                     break;
                 }
               }
-            });
+            })
         } else {
           this.setState(
             {
@@ -623,16 +789,22 @@ class AddUserComponent extends Component {
             message: API_URL.includes("uat")
               ? i18n.t("static.common.uatNetworkErrorMessage")
               : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                ? i18n.t(
+                  "static.common.demoNetworkErrorMessage"
+                )
+                : i18n.t(
+                  "static.common.prodNetworkErrorMessage"
+                ),
             loading: false,
-          }, () => {
-            this.hideSecondComponent();
           });
         } else {
-          switch (error.response ? error.response.status : "") {
+          switch (
+          error.response ? error.response.status : ""
+          ) {
             case 401:
-              this.props.history.push(`/login/static.message.sessionExpired`);
+              this.props.history.push(
+                `/login/static.message.sessionExpired`
+              );
               break;
             case 409:
               this.setState({
@@ -650,36 +822,31 @@ class AddUserComponent extends Component {
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              }, () => {
-                this.hideSecondComponent();
               });
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false,
-              }, () => {
-                this.hideSecondComponent();
               });
               break;
             default:
               this.setState({
                 message: "static.unkownError",
                 loading: false,
-              }, () => {
-                this.hideSecondComponent();
               });
               break;
           }
         }
       });
+    ;
   }
   /**
    * This function is called when something in the access control table is changed to add the validation and set values of other cell
    */
   changed = function (instance, cell, x, y, value) {
     if (x == 1) {
-      this.el.setValueFromCoords(5, y, "", true);
+      this.el.setValueFromCoords(7, y, "", true);
       var col = "B".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -691,7 +858,7 @@ class AddUserComponent extends Component {
       }
     }
     if (x == 2) {
-      this.el.setValueFromCoords(5, y, "", true);
+      this.el.setValueFromCoords(7, y, "", true);
       var col = "C".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -703,7 +870,7 @@ class AddUserComponent extends Component {
       }
     }
     if (x == 3) {
-      this.el.setValueFromCoords(5, y, "", true);
+      this.el.setValueFromCoords(7, y, "", true);
       var col = "D".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -715,6 +882,7 @@ class AddUserComponent extends Component {
       }
     }
     if (x == 4) {
+       this.el.setValueFromCoords(7, y, "", true);
       var col = "E".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
@@ -726,7 +894,31 @@ class AddUserComponent extends Component {
       }
     }
     if (x == 5) {
+       this.el.setValueFromCoords(7, y, "", true);
       var col = "F".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
+    if (x == 6) {
+      this.el.setValueFromCoords(7, y, "", true);
+      var col = "G".concat(parseInt(y) + 1);
+      if (value == "") {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setStyle(col, "background-color", "yellow");
+        this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+      } else {
+        this.el.setStyle(col, "background-color", "transparent");
+        this.el.setComments(col, "");
+      }
+    }
+    if (x == 7) {
+      var col = "H".concat(parseInt(y) + 1);
       if (value == "") {
         this.el.setStyle(col, "background-color", "transparent");
         this.el.setStyle(col, "background-color", "yellow");
@@ -741,11 +933,16 @@ class AddUserComponent extends Component {
    * This function is used to filter the program list based on user's selected realm country, health area and organisation
    */
   filterProgramByCountryId = function (instance, cell, c, r, source) {
+    var roleId = this.state.addUserEL.getJson(null, false)[r][1];
+    var role;
+    role = this.state.selRoleList.filter(r => r.value == roleId).length > 0 ? this.state.selRoleList.filter(r => r.value == roleId)[0].label : null;
     var value = this.state.addUserEL.getJson(null, false)[r][2];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][3];
     var proList = [];
     var proListByCountryId = [];
     var proListByHealthAreaId = [];
+    var proListByProcurementAgent = [];
+    var proListByFundingSource = [];
     if (value != -1) {
       proListByCountryId = this.state.programListForFilter.filter(
         (c) => c.id == -1 || c.realmCountryId == value
@@ -783,9 +980,46 @@ class AddUserComponent extends Component {
     } else {
       proList = this.state.programListForFilter;
     }
+    if(role) {
+      if(role.split(" ")[0] == "SP") {
+        proList = proList.filter(c => c.id == -1 || c.programType == 1)
+      } else if(role.split(" ")[0] == "FC") {
+        proList = proList.filter(c => c.id == -1 || c.programType == 2)
+      }
+    }
     var orgvalue = this.state.addUserEL.getJson(null, false)[r][4];
     if (orgvalue != -1) {
       proList = proList.filter(c => c.id == -1 || c.organisation.id == orgvalue)
+    }
+    var procurementAgentValue = this.state.addUserEL.getJson(null, false)[r][5];
+    if (procurementAgentValue != -1) {
+      var proListAll = proList;
+      for (var i = 1; i < proListAll.length; i++) {
+        if(proListAll[i].programType == 1) {
+          proListByProcurementAgent = [];
+          proListByProcurementAgent = proListAll[i].procurementAgentList.filter(
+            (c) => c.id == procurementAgentValue
+          );
+          if (proListByProcurementAgent.length == 0) {
+            proList = proList.filter(p => p.id != proListAll[i].id);
+          }
+        }
+      }
+    }
+    var fundingSourceValue = this.state.addUserEL.getJson(null, false)[r][6];
+    if (fundingSourceValue != -1) {
+      var proListAll = proList;
+      for (var i = 1; i < proListAll.length; i++) {
+        if(proListAll[i].programType == 1) {
+          proListByFundingSource = [];
+          proListByFundingSource = proListAll[i].fundingSourceList.filter(
+            (c) => c.id == fundingSourceValue
+          );
+          if (proListByFundingSource.length == 0) {
+            proList = proList.filter(p => p.id != proListAll[i].id);
+          }
+        }
+      }
     }
     return proList;
   }.bind(this);
@@ -797,12 +1031,16 @@ class AddUserComponent extends Component {
     const { selRealmCountry } = this.state;
     const { selOrganisation } = this.state;
     const { selHealthArea } = this.state;
+    const { selProcurementAgent } = this.state;
+    const { selFundingSource } = this.state;
     const { selRoleList } = this.state;
     let roleList = [];
     let programList = [];
     let countryList = [];
     let organisationList = [];
     let healthAreaList = [];
+    let procurementAgentList = [];
+    let fundingSourceList = [];
     if (selProgram.length > 0) {
       for (var i = 0; i < selProgram.length; i++) {
         var name =
@@ -819,7 +1057,10 @@ class AddUserComponent extends Component {
           id: parseInt(selProgram[i].id),
           realmCountryId: selProgram[i].realmCountry.id,
           healthAreaList: selProgram[i].healthAreaList,
-          organisation: selProgram[i].organisation
+          organisation: selProgram[i].organisation,
+          procurementAgentList: selProgram[i].procurementAgentList,
+          fundingSourceList: selProgram[i].fundingSourceList,
+          programType: selProgram[i].programTypeId
         };
         programList[i] = paJson;
       }
@@ -878,6 +1119,36 @@ class AddUserComponent extends Component {
       };
       healthAreaList.unshift(paJson);
     }
+    if (selProcurementAgent.length > 0) {
+      for (var i = 0; i < selProcurementAgent.length; i++) {
+        var paJson = {
+          name: getLabelText(selProcurementAgent[i].label, this.state.lang),
+          id: parseInt(selProcurementAgent[i].id),
+        };
+        procurementAgentList[i] = paJson;
+      }
+      var paJson = {
+        name: "All",
+        id: -1,
+        active: true,
+      };
+      procurementAgentList.unshift(paJson);
+    }
+    if (selFundingSource.length > 0) {
+      for (var i = 0; i < selFundingSource.length; i++) {
+        var paJson = {
+          name: getLabelText(selFundingSource[i].label, this.state.lang),
+          id: parseInt(selFundingSource[i].id),
+        };
+        fundingSourceList[i] = paJson;
+      }
+      var paJson = {
+        name: "All",
+        id: -1,
+        active: true,
+      };
+      fundingSourceList.unshift(paJson);
+    }
     if (selRoleList.length > 0) {
       for (var i = 0; i < selRoleList.length; i++) {
         if (selRoleList[i] != undefined) {
@@ -905,6 +1176,8 @@ class AddUserComponent extends Component {
       data[3] = -1;
       data[4] = -1;
       data[5] = -1;
+      data[6] = -1;
+      data[7] = -1;
       papuDataArr[0] = data;
     }
     jexcel.destroy(document.getElementById("paputableDiv"), true);
@@ -938,6 +1211,16 @@ class AddUserComponent extends Component {
           title: i18n.t("static.organisation.organisation"),
           type: "autocomplete",
           source: organisationList,
+        },
+        {
+          title: i18n.t("static.procurementagent.procurementagent"),
+          type: "autocomplete",
+          source: procurementAgentList,
+        },
+        {
+          title: i18n.t("static.fundingsource.fundingsource"),
+          type: "autocomplete",
+          source: fundingSourceList,
         },
         {
           title: i18n.t("static.dashboard.programheader"),
@@ -1010,6 +1293,8 @@ class AddUserComponent extends Component {
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
+                data[6] = "";
+                data[7] = "";
                 obj.insertRow(data, parseInt(y), 1);
               }.bind(this),
             });
@@ -1025,6 +1310,8 @@ class AddUserComponent extends Component {
                 data[3] = "";
                 data[4] = "";
                 data[5] = "";
+                data[6] = "";
+                data[7] = "";
                 obj.insertRow(data, parseInt(y));
               }.bind(this),
             });
@@ -1042,6 +1329,8 @@ class AddUserComponent extends Component {
                   data[3] = "";
                   data[4] = "";
                   data[5] = "";
+                  data[6] = "";
+                  data[7] = "";
                   obj.insertRow(data, parseInt(y));
                 } else {
                   obj.deleteRow(parseInt(y));
@@ -1078,6 +1367,8 @@ class AddUserComponent extends Component {
     tr.children[4].classList.add("AsteriskTheadtrTd");
     tr.children[5].classList.add("AsteriskTheadtrTd");
     tr.children[6].classList.add("AsteriskTheadtrTd");
+    tr.children[7].classList.add("AsteriskTheadtrTd");
+    tr.children[8].classList.add("AsteriskTheadtrTd");
   };
   /**
    * This function is called when user clicks on add row in access control table to add the access control
@@ -1090,6 +1381,8 @@ class AddUserComponent extends Component {
     data[3] = "";
     data[4] = "";
     data[5] = "";
+    data[6] = "";
+    data[7] = "";
     this.el.insertRow(data, 0, 1);
   }
   /**
@@ -1414,7 +1707,7 @@ class AddUserComponent extends Component {
       let tempArray = json;
       let seen = new Set();
       var hasDuplicate = false;
-      const columnIndexes = [1, 2, 3, 4, 5];
+      const columnIndexes = [1, 2, 3, 4, 5,6, 7];
       tempArray.forEach(v => {
         // Create a composite key by joining values from the selected columns
         const key = columnIndexes.map(index => v[Object.keys(v)[index]]).join('|');
@@ -1485,6 +1778,28 @@ class AddUserComponent extends Component {
           }
           var col = "F".concat(parseInt(y) + 1);
           var value = this.el.getValueFromCoords(5, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "G".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(6, y);
+          if (value == "") {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setStyle(col, "background-color", "yellow");
+            this.el.setComments(col, i18n.t("static.label.fieldRequired"));
+            valid = false;
+          } else {
+            this.el.setStyle(col, "background-color", "transparent");
+            this.el.setComments(col, "");
+          }
+          var col = "H".concat(parseInt(y) + 1);
+          var value = this.el.getValueFromCoords(7, y);
           if (value == "") {
             this.el.setStyle(col, "background-color", "transparent");
             this.el.setStyle(col, "background-color", "yellow");
@@ -1591,7 +1906,33 @@ class AddUserComponent extends Component {
                           label_fr: null,
                           label_pr: null,
                         },
-                        programId: parseInt(map1.get("5")),
+                        procurementAgentId: parseInt(map1.get("5")),
+                        procurementAgentName: {
+                          createdBy: null,
+                          createdDate: null,
+                          lastModifiedBy: null,
+                          lastModifiedDate: null,
+                          active: true,
+                          labelId: 0,
+                          label_en: null,
+                          label_sp: null,
+                          label_fr: null,
+                          label_pr: null,
+                        },
+                        fundingSourceId: parseInt(map1.get("6")),
+                        fundingSourceName: {
+                          createdBy: null,
+                          createdDate: null,
+                          lastModifiedBy: null,
+                          lastModifiedDate: null,
+                          active: true,
+                          labelId: 0,
+                          label_en: null,
+                          label_sp: null,
+                          label_fr: null,
+                          label_pr: null,
+                        },
+                        programId: parseInt(map1.get("7")),
                         programName: {
                           createdBy: null,
                           createdDate: null,
