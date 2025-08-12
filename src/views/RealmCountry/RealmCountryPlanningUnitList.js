@@ -35,6 +35,7 @@ import UnitService from "../../api/UnitService";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import { Prompt } from 'react-router';
 import { filterOptions, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
 // Localized entity name
 const entityname = i18n.t("static.dashboad.planningunitcountry");
@@ -96,7 +97,8 @@ export default class RealmCountryPlanningUnitList extends Component {
       offlinePrograms: [],
       programValues: [],
       programLabels: [],
-      popoverTooltip:false
+      popoverTooltip:false,
+      isChanged: false
     };
     this.filterData = this.filterData.bind(this);
     this.buildJexcel = this.buildJexcel.bind(this);
@@ -275,6 +277,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                   message: i18n.t('static.message.addUpdateSuccess', { entityname }),
                   color: "green",
                   loading: false,
+                  isChanged: false
                 },
                 () => {
                   hideSecondComponent();
@@ -440,6 +443,7 @@ export default class RealmCountryPlanningUnitList extends Component {
     if (x != 10) {
       this.el.setValueFromCoords(10, y, 1, true);
     }
+    this.setState({ isChanged: true });
   }.bind(this);
   /**
    * Function to build a jexcel table.
@@ -1234,6 +1238,10 @@ export default class RealmCountryPlanningUnitList extends Component {
     );
     return (
       <div className="animated">
+        <Prompt
+          when={this.state.isChanged == true}
+          message={i18n.t("static.dataentry.confirmmsg")}
+        />
         <AuthenticationServiceComponent history={this.props.history} />
         <h5 className={this.props.match.params.color} id="div1">
           {i18n.t(this.props.match.params.message, { entityname })}
@@ -1317,7 +1325,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                       <i className="fa fa-times"></i>{" "}
                       {i18n.t("static.common.cancel")}
                     </Button>
-                    <Button
+                    {this.state.isChanged && <Button
                       type="submit"
                       size="md"
                       color="success"
@@ -1326,7 +1334,7 @@ export default class RealmCountryPlanningUnitList extends Component {
                     >
                       <i className="fa fa-check"></i>
                       {i18n.t("static.common.submit")}
-                    </Button>
+                    </Button>}
                     <Button
                       color="info"
                       size="md"
