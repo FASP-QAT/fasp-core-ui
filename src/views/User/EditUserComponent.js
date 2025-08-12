@@ -1053,6 +1053,9 @@ class EditUserComponent extends Component {
    * This function is used to filter the program list based on user's selected realm country, health area and organisation
    */
   filterProgramByCountryId = function (instance, cell, c, r, source) {
+    var roleId = this.state.addUserEL.getJson(null, false)[r][1];
+    var role;
+    role = this.state.selRoleList.filter(r => r.value == roleId).length > 0 ? this.state.selRoleList.filter(r => r.value == roleId)[0].label : null;
     var value = this.state.addUserEL.getJson(null, false)[r][2];
     var healthAreavalue = this.state.addUserEL.getJson(null, false)[r][3];
     var proList = [];
@@ -1096,6 +1099,13 @@ class EditUserComponent extends Component {
       }
     } else {
       proList = this.state.programListForFilter;
+    }
+    if(role) {
+      if(role.split(" ")[0] == "SP") {
+        proList = proList.filter(c => c.id == -1 || c.programType == 1)
+      } else if(role.split(" ")[0] == "FC") {
+        proList = proList.filter(c => c.id == -1 || c.programType == 2)
+      }
     }
     var orgvalue = this.state.addUserEL.getJson(null, false)[r][4];
     if (orgvalue != -1) {
