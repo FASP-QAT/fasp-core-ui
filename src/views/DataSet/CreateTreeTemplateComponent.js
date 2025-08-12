@@ -2431,11 +2431,12 @@ export default class CreateTreeTemplate extends Component {
             button.innerHTML = '\u2191';
             button.style.pointerEvents = 'auto';
             button.onclick = (event) => {
+                event.preventDefault(); 
                 event.stopPropagation();
                 var flatList = this.state.treeTemplate.flatList;
                 var currNode = flatList.filter(f => f.id == rowData[3]);
                 var prevNode = flatList.filter(f => f.id == rowDataPrev[3]);
-                this.shiftNode(event, currNode, prevNode)
+                this.shiftNode(event, currNode, prevNode, row, col)
             };
             cell.appendChild(button);
         }
@@ -2446,11 +2447,12 @@ export default class CreateTreeTemplate extends Component {
             button.innerHTML = '\u2193';
             button.style.pointerEvents = 'auto';
             button.onclick = (event) => {
+                event.preventDefault(); 
                 event.stopPropagation();
                 var flatList = this.state.treeTemplate.flatList;
                 var currNode = flatList.filter(f => f.id == rowData[3]);
                 var nextNode = flatList.filter(f => f.id == rowDataNext[3]);
-                this.shiftNode(event, currNode, nextNode)
+                this.shiftNode(event, currNode, nextNode, row, col)
             };
             cell.appendChild(button);
         }
@@ -2461,7 +2463,7 @@ export default class CreateTreeTemplate extends Component {
      * @param {*} currNode Object of Current Node
      * @param {*} prevNode Object of Previous Node
      */
-    shiftNode(event, currNode, prevNode) {
+    shiftNode(event, currNode, prevNode, y, x) {
         event.stopPropagation();
         let { treeTemplate } = this.state;
         var items = treeTemplate.flatList;
@@ -2481,7 +2483,13 @@ export default class CreateTreeTemplate extends Component {
             isLevelChanged: true,
             items
         }, () => {
-            this.buildLevelReorderJexcel(true)
+            this.buildLevelReorderJexcel(true);
+            setTimeout(() => {
+                const targetRow = document.querySelector(`[data-x="${x}"][data-y="${y}"]`);
+                if (targetRow) {
+                    targetRow.scrollIntoView({ behavior: 'auto', block: 'center' });
+                }
+            }, 0);
         })
     }
     /**
