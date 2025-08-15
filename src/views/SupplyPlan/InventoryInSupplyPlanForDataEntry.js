@@ -209,6 +209,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
                             try {
                                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
                             } catch (err) {
                             }
                         }
@@ -304,6 +305,8 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[17] = 0;
                             data[18] = inventoryList[j].inventoryId;
                             data[19] = inventoryList[j].multiplier;
+                            // data[20] = inventoryList[j].addNewBatch;
+                            data[20] = true;
                             inventoryDataArr[j] = data;
                         }
                         var regionList = this.props.items.regionList;
@@ -338,6 +341,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[17] = 0;
                             data[18] = 0;
                             data[19] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
+                            data[20] = 0;
                             inventoryDataArr[0] = data;
                         }
                         this.setState({
@@ -384,6 +388,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     type: 'text',
                                     readOnly: true, visible: false, autoCasting: false
                                 },
+                                { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                 { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                             ],
                             pagination: paginationOption,
@@ -486,9 +491,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     batchDetailsClicked(obj, x, y, e, inventoryEditable) {
         var rowData = obj.getRowData(y);
         this.props.updateState("loading", true);
+        this.props.updateState("addNewBatch",rowData[20]);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             this.props.toggleLarge();
         }
+        if(rowData[20].toString()=="false"){
         var batchList = [];
         var date = moment(rowData[1]).startOf('month').format("YYYY-MM-DD");
         var inventoryQty = 0;
@@ -523,6 +530,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         })
         if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
             jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
         }
         var json = [];
         var inventoryQty = 0;
@@ -687,10 +695,155 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 return items;
             }.bind(this)
         };
-        var elVar = jexcel(document.getElementById("inventoryBatchInfoTable"), options);
+        var elVar = jexcel(document.getElementById("inventoryBaItchInfoTable"), options);
         this.el = elVar;
         this.setState({ inventoryBatchInfoTableEl: elVar });
         this.props.updateState("loading", false);
+    }else{
+        var date = moment(rowData[1]).startOf('month').format("YYYY-MM-DD");
+        var json = [];
+        if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
+            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+        }
+        var inventoryBatchEditable = inventoryEditable;
+        var lastEditableDate = "";
+        lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+        if (moment(rowData[1]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[15] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+            inventoryBatchEditable = false;
+        }
+        
+        if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
+        }
+        if (document.getElementById("inventoryBatchAddRow") != null) {
+            if (this.props.inventoryPage != "supplyPlanCompare") {
+                if (inventoryBatchEditable == false) {
+                    document.getElementById("inventoryBatchAddRow").style.display = "none";
+                } else {
+                    document.getElementById("inventoryBatchAddRow").style.display = "block";
+                }
+            }
+        }
+        
+        var batchInfo = rowData[14];
+        for (var sb = 0; sb < batchInfo.length; sb++) {
+            var data = [];
+            data[0] = batchInfo[sb].batch.batchNo; 
+            data[1] = moment(batchInfo[sb].batch.expiryDate).format("MMM-YY");
+            data[2] = Number(batchInfo[sb].adjustmentQty); 
+            data[3] = batchInfo[sb].inventoryTransBatchInfoId; 
+            data[4] = y; 
+            data[5] = batchInfo[sb].batch.autoGenerated;
+            json.push(data);
+        }
+        if(batchInfo.length==0){
+            var data = [];
+            data[0] = "" ;
+            data[1] = "";
+            data[2] = ""; 
+            data[3] = 0;
+            data[4] = y; 
+            data[5] = true; 
+            json.push(data);
+        }
+        var options = {
+            data: json,
+            columnDrag: false,
+            columns: [
+                {
+                    title: i18n.t('static.supplyPlan.batchId'),
+                    type: 'text',
+                    autoCasting: false
+                },
+                {
+                    title: i18n.t('static.supplyPlan.expiryDate'),
+                    type: 'calendar',
+                    options: {
+                        format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
+                        validRange: [moment(date).format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")]
+                    }
+                },
+                {
+                    title: i18n.t('static.supplyPlan.quantityCountryProduct'),
+                    type: 'numeric',
+                    textEditor: true,
+                    disabledMaskOnEdition: true,
+                    mask: '#,##',
+                },
+                {
+                    title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'),
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.supplyPlan.rowNumber'),
+                    type: 'hidden',
+                    readOnly: true
+                },
+                {
+                    title: i18n.t('static.supplyPlan.index'),
+                    type: 'hidden'
+                    , readOnly: true
+                },
+                { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
+            ],
+            pagination: false,
+            search: false,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            copyCompatibility: true,
+            allowInsertRow: true,
+            allowManualInsertRow: false,
+            allowExport: false,
+            onpaste: this.onPasteForAddBatchInfo,
+            onchange: this.batchInfoAddChangedInventory,
+            copyCompatibility: true,
+            parseFormulas: true,
+            editable: inventoryBatchEditable,
+            onload: this.loadedBatchInfoInventory,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            updateTable: function (el, cell, x, y, source, value, id) {
+            }.bind(this),
+            contextMenu: function (obj, x, y, e) {
+                var items = [];
+                var items = [];
+                if (y == null) {
+                } else {
+                    var adjustmentType = this.props.items.inventoryType;
+                    if (inventoryEditable) {
+                        items.push({
+                            title: i18n.t('static.supplyPlan.addNewBatchInfo'),
+                            onclick: function () {
+                                this.addBatchAddRowInJexcel();
+                            }.bind(this)
+                        });
+                    }
+                    if (inventoryEditable && obj.options.allowDeleteRow == true) {
+                        if (obj.getRowData(y)[5] == 0) {
+                            items.push({
+                                title: i18n.t("static.common.deleterow"),
+                                onclick: function () {
+                                    if (obj.getJson(null, false).length == 1) {
+                                    this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+                                    obj.deleteRow(parseInt(y));
+                                    }
+                                }.bind(this)
+                            });
+                        }
+                    }
+                }
+                return items;
+            }.bind(this)
+        };
+        var elVar = jexcel(document.getElementById("inventoryAddBatchInfoTable"), options);
+        this.el = elVar;
+        this.setState({ inventoryBatchInfoTableEl: elVar });
+        this.props.updateState("loading", false);
+    }
     }
     /**
      * This function is used when users click on the add row in the inventory/adjustment table
@@ -732,6 +885,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[17] = 0;
         data[18] = 0;
         data[19] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
+        data[20] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1352,6 +1506,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.toggleLarge("submit");
                 }
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
             }
             this.props.updateState("loading", false);
         } else {

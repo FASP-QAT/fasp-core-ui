@@ -12,9 +12,10 @@ import 'react-select/dist/react-select.min.css';
 import {
     Button, Card, CardBody, CardFooter,
     Form, FormGroup,
-    Label, Modal, ModalBody, ModalFooter, ModalHeader
+    Label, Modal, ModalBody, ModalFooter, ModalHeader, Input
 } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
 import { DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, SECRET_KEY } from '../../Constants.js';
@@ -22,7 +23,6 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import InventoryInSupplyPlanComponent from "../SupplyPlan/InventoryInSupplyPlanForDataEntry";
-import { filterOptions } from '../../CommonComponent/JavascriptCommonFunctions';
 const entityname = i18n.t('static.inventory.inventorydetils')
 /**
  * This component is used to allow the users to do the data entry for the inventory or adjustment records
@@ -58,7 +58,8 @@ export default class AddInventory extends Component {
             puData: [],
             inventoryListForSelectedPlanningUnits: [],
             inventoryListForSelectedPlanningUnitsUnfiltered: [],
-            planningUnitList: []
+            planningUnitList: [],
+            addNewBatch: false
         }
         this.options = props.options;
         this.formSubmit = this.formSubmit.bind(this);
@@ -862,8 +863,10 @@ export default class AddInventory extends Component {
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
                                                             filterOptions={filterOptions}
-                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                            overrideStrings={{
+                                                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                                selectSomeItems: i18n.t('static.common.select')
+                                                            }}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -929,15 +932,65 @@ export default class AddInventory extends Component {
                         <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                         <div className="">
                             <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
+                            <div id="inventoryAddBatchInfoTable" className="AddListbatchtrHeight"></div>
                         </div>
-                        <br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                        {!this.state.addNewBatch && <><br /><span>{i18n.t("static.dataEntry.missingBatchNote")}</span></>}
                     </ModalBody>
-                    <ModalFooter>
-                        <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }} className="mr-0">
-                            {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
-                            {this.refs.inventoryChild != undefined && <Button color="info" size="md" className="float-right mr-1" id="inventoryBatchAddRow" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                    <ModalFooter className="d-flex justify-content-between align-items-center">
+                        <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
+                            <FormGroup className='MarginTopCheckBox mb-0'>
+                                <div className="d-flex align-items-center">
+                                    <Input
+                                        className="form-check-input mr-6"
+                                        style={{ marginLeft: "-10px" }}
+                                        type="checkbox"
+                                        id="addNewBatch"
+                                        name="addNewBatch"
+                                        checked={this.state.addNewBatch}
+                                        onClick={(e) => { this.changeAddNewBatch(e); }}
+                                    />
+                                    <Label
+                                        className="form-check-label ml-2"
+                                        check htmlFor="addNewBatch" style={{ fontSize: '12px', marginTop: '3px' }}>
+                                        {i18n.t('static.supplyPlan.addNewBatch')}
+                                    </Label>
+                                </div>
+                            </FormGroup>
                         </div>
-                        <Button size="md" color="danger" className="submitBtn float-right mr-1" onClick={() => this.actionCanceled()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+
+                        <div className="d-flex">
+                            {this.state.inventoryBatchInfoChangedFlag == 1 && (
+                                <Button
+                                    type="submit"
+                                    size="md"
+                                    color="success"
+                                    className="mr-2"
+                                    onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()}
+                                >
+                                    <i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}
+                                </Button>
+                            )}
+                            {this.refs.inventoryChild != undefined && (
+                                <Button
+                                    color="info"
+                                    size="md"
+                                    className="mr-2"
+                                    id="inventoryBatchAddRow"
+                                    type="button"
+                                    onClick={this.refs.inventoryChild.addBatchRowInJexcel}
+                                >
+                                    <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}
+                                </Button>
+                            )}
+                            <Button
+                                size="md"
+                                color="danger"
+                                className="submitBtn"
+                                onClick={() => this.actionCanceled()}
+                            >
+                                <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+                            </Button>
+                        </div>
                     </ModalFooter>
                 </Modal>
             </div >

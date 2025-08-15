@@ -242,7 +242,8 @@ class EditSupplyPlanStatus extends Component {
             planningUnitDropdownList: [],
             temp_currentVersion_id: '',
             loadSummaryTable: false,
-            loadingForNotes: false
+            loadingForNotes: false,
+            addNewBatch: false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -678,7 +679,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
-            showBatchTable:0
+            showBatchTable: 0
         })
         if (supplyPlanType == 'Consumption') {
             var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -980,6 +981,7 @@ class EditSupplyPlanStatus extends Component {
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1284,18 +1286,18 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             })
                                         }).catch(error => {
-                                         });
+                                        });
                                     }).catch(error => {
-                                     });
-                                }).catch(error => { 
+                                    });
+                                }).catch(error => {
                                 });
                             }).catch(error => {
-                             });
+                            });
                         }).catch(error => {
-                         });
-                    }).catch(error => { 
+                        });
+                    }).catch(error => {
                     });
-                }).catch(error => { 
+                }).catch(error => {
                 });
             }.bind(this)
         }.bind(this)
@@ -1414,7 +1416,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
-            showBatchTable:0
+            showBatchTable: 0
         },
             () => {
                 var inputs = document.getElementsByClassName("submitBtn");
@@ -1467,6 +1469,7 @@ class EditSupplyPlanStatus extends Component {
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+        jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
         this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
         this.setState({
             inventoryBatchInfoChangedFlag: 0,
@@ -1883,7 +1886,7 @@ class EditSupplyPlanStatus extends Component {
                                     if (paColor3Array.length > 1) {
                                         colour = "#d9ead3";
                                     }
-                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData),1), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
+                                    orderedShipmentsTotalData.push({ qty: roundARU(Number(jsonList[0].approvedShipmentsTotalData) + Number(jsonList[0].submittedShipmentsTotalData) + Number(jsonList[0].approvedErpShipmentsTotalData) + Number(jsonList[0].submittedErpShipmentsTotalData), 1), month: m[n], shipmentDetail: sd3, colour: colour, textColor: contrast(colour), isEmergencyOrder: isEmergencyOrder3, isLocalProcurementAgent: isLocalProcurementAgent3, isErp: isErp3 });
                                 } else {
                                     orderedShipmentsTotalData.push("")
                                 }
@@ -2049,8 +2052,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : "");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
-                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment, 1) != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
+                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment, 1) != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -3659,9 +3662,11 @@ class EditSupplyPlanStatus extends Component {
                                         onChange={(e) => { this.handleProblemStatusChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
-                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
-                                        
+                                        overrideStrings={{
+                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')
+                                        }}
+
                                     />
                                 </div>
                             </FormGroup>
@@ -3707,8 +3712,10 @@ class EditSupplyPlanStatus extends Component {
                                         onChange={(e) => { this.handleProblemReviewedChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
-                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                        overrideStrings={{
+                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')
+                                        }}
                                     />
                                 </div>
                             </FormGroup>
@@ -3940,8 +3947,8 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-            editable:false
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+            editable: false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -3962,7 +3969,7 @@ class EditSupplyPlanStatus extends Component {
      */
     buildJExcel() {
         let problemList = this.state.problemList;
-        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu=>pu.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.id).includes(c.region.id))));
+        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu => pu.active).map(item => item.id).includes(c.planningUnit.id) && (c.region == null || (c.region != null && this.state.regionList.map(item => item.id).includes(c.region.id))));
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -4235,7 +4242,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4611,7 +4618,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
@@ -4814,7 +4821,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         name="programId"
                                                                         id="programId"
                                                                         bsSize="sm"
-                                                                        value={this.state.program.label.label_en +'~v'+ this.state.program.currentVersion.versionId}
+                                                                        value={this.state.program.label.label_en + '~v' + this.state.program.currentVersion.versionId}
                                                                         disabled />
                                                                 </InputGroup>
                                                             </div>
@@ -5014,14 +5021,14 @@ class EditSupplyPlanStatus extends Component {
                                                                     if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() != "" || item1.actualQty.toString() != 0)) {
                                                                         return (
                                                                             <>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty,1)} /></td>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty,1)} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty, 1)} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty, 1)} /></td>
                                                                             </>
                                                                         )
                                                                     } else if (item1.adjustmentsQty.toString() != '' && (item1.actualQty.toString() == "" || item1.actualQty.toString() == 0)) {
                                                                         return (
                                                                             <>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty,1)} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 2)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.adjustmentsQty, 1)} /></td>
                                                                                 <td align="center"></td>
                                                                             </>
                                                                         )
@@ -5029,7 +5036,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         return (
                                                                             <>
                                                                                 <td align="center"></td>
-                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty,1)} /></td>
+                                                                                <td align="center" className="hoverTd" onClick={() => this.adjustmentsDetailsClicked(`${item1.regionId}`, `${item1.month.month}`, `${item1.month.endDate}`, 1)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.actualQty, 1)} /></td>
                                                                             </>
                                                                         )
                                                                     } else {
@@ -5049,9 +5056,9 @@ class EditSupplyPlanStatus extends Component {
                                                         if (count < 7) {
                                                             return (
                                                                 <>
-                                                                    <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentsQty,1)} />
+                                                                    <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentsQty, 1)} />
                                                                     </td>
-                                                                    {(item.actualQty) > 0 ? <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.actualQty,1)} /></td> : <td style={{ textAlign: 'left' }}>{roundARU(item.actualQty,1)}</td>}
+                                                                    {(item.actualQty) > 0 ? <td style={{ textAlign: 'center' }}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.actualQty, 1)} /></td> : <td style={{ textAlign: 'left' }}>{roundARU(item.actualQty, 1)}</td>}
                                                                 </>
                                                             )
                                                         }
@@ -5067,7 +5074,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.projectedInventory,1)} /></td>
+                                                                <td colSpan="2"><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.projectedInventory, 1)} /></td>
                                                             )
                                                         }
                                                     })
@@ -5079,7 +5086,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.inventoryFilteredArray.filter(c => c.regionId == -1).map((item1, count) => {
                                                         if (count < 7) {
                                                             if (item1.autoAdjustments.toString() != '') {
-                                                                return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.autoAdjustments,1)} /></td>)
+                                                                return (<td colSpan="2" ><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item1.autoAdjustments, 1)} /></td>)
                                                             } else {
                                                                 return (<td colSpan="2"></td>)
                                                             }
@@ -5093,7 +5100,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable:1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable: 1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -5120,12 +5127,12 @@ class EditSupplyPlanStatus extends Component {
                                                             <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                             <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                             <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty,1)} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                             </Table><br />
-                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable:0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
                                         </>
                                     }
                                     {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
@@ -5135,9 +5142,29 @@ class EditSupplyPlanStatus extends Component {
                                     <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                                     <div className="">
                                         <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                        <div id="inventoryAddBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
                                     <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                        <FormGroup className='MarginTopCheckBox mb-0'>
+                                            <div className="d-flex align-items-center">
+                                                <Input
+                                                    className="form-check-input mr-6"
+                                                    style={{ marginLeft: "-10px" }}
+                                                    type="checkbox"
+                                                    id="addNewBatch"
+                                                    name="addNewBatch"
+                                                    disabled="true"
+                                                    checked={this.state.addNewBatch}
+                                                    onClick={(e) => { this.changeAddNewBatch(e); }}
+                                                />
+                                                <Label
+                                                    className="form-check-label ml-2"
+                                                    check htmlFor="addNewBatch" style={{ fontSize: '12px', marginTop: '3px' }}>
+                                                    {i18n.t('static.supplyPlan.addNewBatch')}
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
                                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <div className="pt-4"></div>
@@ -5288,7 +5315,7 @@ class EditSupplyPlanStatus extends Component {
                                                         <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
                                                         <td>{moment(item.expiryDate).format("MMM-YY")}</td>
                                                         <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.expiredQty,1)} /></td>
+                                                        <td className="hoverTd" onClick={() => this.showBatchLedgerClicked(item.batchNo, item.createdDate, item.expiryDate)}><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.expiredQty, 1)} /></td>
                                                     </tr>
                                                 )
                                                 )
@@ -5401,7 +5428,7 @@ class EditSupplyPlanStatus extends Component {
                                                     var json = elInstance.getJson();
                                                     var reviewedProblemList = [];
                                                     var isAllCheckForReviewed = true;
-                                                    var j=0;
+                                                    var j = 0;
                                                     for (var i = 0; i < json.length; i++) {
                                                         var map = new Map(Object.entries(json[i]));
                                                         if ((map.get("0") != "" && map.get("0") != 0) && (map.get("23") == 1 && (this.state.problemList[j].problemStatus.id != map.get("11") || this.state.problemList[j].reviewed.toString() != map.get("21").toString() || map.get("22").toString() != ""))) {
@@ -5415,8 +5442,8 @@ class EditSupplyPlanStatus extends Component {
                                                                 notes: map.get("22")
                                                             });
                                                         }
-                                                        if((map.get("0") != "" && map.get("0") != 0)){
-                                                            j+=1;
+                                                        if ((map.get("0") != "" && map.get("0") != 0)) {
+                                                            j += 1;
                                                         }
                                                         if (map.get("21") == false && map.get("13") != 4) {
                                                             isAllCheckForReviewed = false
@@ -5460,7 +5487,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 } else {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
-                                                                    } catch (err) { 
+                                                                    } catch (err) {
                                                                     }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",

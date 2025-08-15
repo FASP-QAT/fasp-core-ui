@@ -186,6 +186,7 @@ export default class SupplyPlanComponent extends React.Component {
             actualInventoryChanged: false,
             actualInventoryBatchTotalNotMatching: "",
             planningUnit: "",
+            addNewBatch: false
         }
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -1028,12 +1029,12 @@ export default class SupplyPlanComponent extends React.Component {
                 let batchInfoList = this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0);
                 let dataArray = [];
                 var total = 0;
-                var maxDecimals=0;
+                var maxDecimals = 0;
                 for (var j = 0; j < batchInfoList.length; j++) {
                     data = [];
                     var item = batchInfoList[j];
-                    if(parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length>maxDecimals){
-                        maxDecimals=parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length;
+                    if (parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                        maxDecimals = parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length;
                     }
                     data[0] = item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD");
                     data[1] = moment(item.createdDate).format(DATE_FORMAT_CAP);
@@ -1045,11 +1046,11 @@ export default class SupplyPlanComponent extends React.Component {
                     total += Number(item.qty);
                     dataArray.push(data);
                 }
-                if(parseFloat(Number(total).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length>maxDecimals){
-                    maxDecimals=parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length;
+                if (parseFloat(Number(total).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                    maxDecimals = parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length;
                 }
-                if(parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1]!=undefined && parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length>maxDecimals){
-                    maxDecimals=parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length;
+                if (parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                    maxDecimals = parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length;
                 }
                 try {
                     this.el = jexcel(document.getElementById("inventoryActualBatchInfoTable"), '');
@@ -1067,7 +1068,7 @@ export default class SupplyPlanComponent extends React.Component {
                             type: 'dropdown',
                             width: 200,
                             source: batchListForJexcel,
-                            readonly: editable?false:true
+                            readonly: editable ? false : true
                         },
                         {
                             title: i18n.t('static.report.createdDate'),
@@ -1093,7 +1094,7 @@ export default class SupplyPlanComponent extends React.Component {
                         },
                         {
                             title: i18n.t('static.supplyPlan.actualQuantity'),
-                            type: editable ? 'numeric' : 'hidden', mask: (maxDecimals!=0?`#,##.` + '0'.repeat(maxDecimals):`#,##`), decimal: '.'
+                            type: editable ? 'numeric' : 'hidden', mask: (maxDecimals != 0 ? `#,##.` + '0'.repeat(maxDecimals) : `#,##`), decimal: '.'
                         },
                         {
                             title: 'Is new',
@@ -1110,7 +1111,7 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?Number((Number(total) * Number(this.state.multiplier))).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):Number((Number(total) * Number(this.state.multiplier))).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? Number((Number(total) * Number(this.state.multiplier))).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number((Number(total) * Number(this.state.multiplier))).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
                             editable ? Number(total).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(roundARU(total, this.state.multiplier)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ],
                         [
@@ -1118,8 +1119,8 @@ export default class SupplyPlanComponent extends React.Component {
                             '',
                             '',
                             i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
-                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","):Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
-                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balanceWithoutRounding).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData==1?count-2:count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
                         ]
                     ],
                     oneditionend: function (instance, cell, x, y, value) {
@@ -1168,8 +1169,8 @@ export default class SupplyPlanComponent extends React.Component {
                                 '',
                                 '',
                                 i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
-                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData==1?Number(this.state.actualCount)-2:this.state.actualCount].balanceWithoutRounding).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData == 1 ? Number(this.state.actualCount) - 2 : this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData == 1 ? Number(this.state.actualCount) - 2 : this.state.actualCount].balanceWithoutRounding).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
                             ]])
                         }
                     }.bind(this),
@@ -1184,7 +1185,7 @@ export default class SupplyPlanComponent extends React.Component {
                     allowExport: false,
                     position: 'top',
                     filters: false,
-                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         var items = [];
                         if (y != null) {
@@ -1226,7 +1227,7 @@ export default class SupplyPlanComponent extends React.Component {
                 var actualInventoryEl = jexcel(document.getElementById("inventoryActualBatchInfoTable"), options);
                 this.el = actualInventoryEl;
                 this.setState({
-                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData:comingFromInventoryData, maxDecimals:maxDecimals
+                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData: comingFromInventoryData, maxDecimals: maxDecimals
                 })
             })
         }
@@ -2498,7 +2499,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={"hoverTd"} onClick={() => this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count,0)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={"hoverTd"} onClick={() => this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count, 0)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
@@ -2514,21 +2515,40 @@ export default class SupplyPlanComponent extends React.Component {
                                 <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                                 <div className="">
                                     <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                    <div id="inventoryAddBatchInfoTable" className="AddListbatchtrHeight"></div>
                                 </div>
                                 <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <span className='text-blackD'>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                    <FormGroup className='MarginTopCheckBox mb-0'>
+                                        <div className="d-flex align-items-center">
+                                            <Input
+                                                className="form-check-input mr-6"
+                                                style={{ marginLeft: "-10px" }}
+                                                type="checkbox"
+                                                id="addNewBatch"
+                                                name="addNewBatch"
+                                                checked={this.state.addNewBatch}
+                                                onClick={(e) => { this.changeAddNewBatch(e); }}
+                                            />
+                                            <Label
+                                                className="form-check-label ml-2"
+                                                check htmlFor="addNewBatch" style={{ fontSize: '12px', marginTop: '3px' }}>
+                                                {i18n.t('static.supplyPlan.addNewBatch')}
+                                            </Label>
+                                        </div>
+                                    </FormGroup>
                                     <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
-                                    <>
-                                        <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br />
-                                        <h6 style={{ "textAlign": "right" }} className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
-                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
-                                        {this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
-                                        {this.state.actualInventoryChanged && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                        {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
-                                    </>
+                                <>
+                                    <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br />
+                                    <h6 style={{ "textAlign": "right" }} className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
+                                    {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
+                                    {this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
+                                    {this.state.actualInventoryChanged && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                    {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                </>
                                 {this.state.ledgerForBatch.length > 0 &&
                                     <>
                                         <br></br>
@@ -2764,8 +2784,10 @@ export default class SupplyPlanComponent extends React.Component {
                                                             value={this.state.planningUnitIdsPlan}
                                                             onChange={(e) => { this.setPlanningUnitIdsPlan(e) }}
                                                             labelledBy={i18n.t('static.common.select')}
-                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                            overrideStrings={{
+                                                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                                selectSomeItems: i18n.t('static.common.select')
+                                                            }}
                                                         />
                                                     </div>
                                                 </FormGroup>
@@ -3992,12 +4014,12 @@ export default class SupplyPlanComponent extends React.Component {
                                             suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                         }
                                         if (suggestedOrd <= 0) {
-                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                            sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, this.state.multiplier), "suggestedOrderQtyRounded":Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, this.state.multiplier), "suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
-                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                     }
                                     suggestedShipmentsTotalData.push(sstd);
                                 } else {
@@ -4055,12 +4077,12 @@ export default class SupplyPlanComponent extends React.Component {
                                             suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                         }
                                         if (suggestedOrd <= 0) {
-                                            sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                            sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                         } else {
-                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, this.state.multiplier),"suggestedOrderQtyRounded":Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                            sstd = { "suggestedOrderQty": roundARU(suggestedOrd, this.state.multiplier), "suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                         }
                                     } else {
-                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                        sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                     }
                                     suggestedShipmentsTotalData.push(sstd);
                                 }
@@ -4171,7 +4193,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: roundARU(lastClosingBalance, this.state.multiplier) });
                                 consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                 shipmentsTotalData.push("");
-                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                                suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
                                 deliveredShipmentsTotalData.push("");
                                 shippedShipmentsTotalData.push("");
                                 orderedShipmentsTotalData.push("");
@@ -4284,12 +4306,12 @@ export default class SupplyPlanComponent extends React.Component {
             cont = true;
         }
         if (cont == true) {
-            if(supplyPlanType!='shipments'){
+            if (supplyPlanType != 'shipments') {
                 this.setState({
                     batchInfoInInventoryPopUp: [],
-                    actualInventoryChanged:false,
-                    actualInventoryBatchTotalNotMatching:"",
-                    ledgerForBatch:[]
+                    actualInventoryChanged: false,
+                    actualInventoryBatchTotalNotMatching: "",
+                    ledgerForBatch: []
                 })
             }
             this.setState({
@@ -4429,12 +4451,12 @@ export default class SupplyPlanComponent extends React.Component {
             for (var i = 0; i < inputs.length; i++) {
                 inputs[i].disabled = true;
             }
-            if(supplyPlanType!='shipments'){
+            if (supplyPlanType != 'shipments') {
                 this.setState({
                     batchInfoInInventoryPopUp: [],
-                    actualInventoryChanged:false,
-                    actualInventoryBatchTotalNotMatching:"",
-                    ledgerForBatch:[]
+                    actualInventoryChanged: false,
+                    actualInventoryBatchTotalNotMatching: "",
+                    ledgerForBatch: []
                 })
             }
             this.setState({
@@ -4690,6 +4712,7 @@ export default class SupplyPlanComponent extends React.Component {
             var elInstance = this.state.inventoryBatchInfoTableEl;
             if (elInstance != undefined && elInstance != "") {
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
             }
             var planningUnitId = document.getElementById("planningUnitId").value;
             var programJson = this.state.programJson;
@@ -5381,6 +5404,7 @@ export default class SupplyPlanComponent extends React.Component {
         if (cont == true) {
             document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
             jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
             this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
             this.setState({
                 inventoryBatchInfoChangedFlag: 0,
@@ -5853,12 +5877,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                         suggestedOrd = Number(Math.round(amc * Number(minStockMoSQty)) - Number(jsonList[0].closingBalance) + Number(jsonList[0].unmetDemand));
                                                     }
                                                     if (suggestedOrd <= 0) {
-                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": roundARU(suggestedOrd, multiplier),"suggestedOrderQtyRounded":Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                        sstd = { "suggestedOrderQty": roundARU(suggestedOrd, multiplier), "suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                     }
                                                 } else {
-                                                    sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                    sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                 }
                                                 suggestedShipmentsTotalData.push(sstd);
                                             } else {
@@ -5917,12 +5941,12 @@ export default class SupplyPlanComponent extends React.Component {
                                                         suggestedOrd = Number(Math.round(Number(minStockForMonth1)) - Number(cbForMonth1) + Number(unmetDemandForMonth1));
                                                     }
                                                     if (suggestedOrd <= 0) {
-                                                        sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                        sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                     } else {
-                                                        sstd = { "suggestedOrderQty": roundARU(suggestedOrd, multiplier),"suggestedOrderQtyRounded":Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
+                                                        sstd = { "suggestedOrderQty": roundARU(suggestedOrd, multiplier), "suggestedOrderQtyRounded": Math.round(Number(suggestedOrd)), "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) + Number(suggestedOrd) };
                                                     }
                                                 } else {
-                                                    sstd = { "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
+                                                    sstd = { "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": m[n].startDate, "isEmergencyOrder": isEmergencyOrder, "totalShipmentQty": Number(jsonList[0].onholdShipmentsTotalData) + Number(jsonList[0].plannedShipmentsTotalData) };
                                                 }
                                                 suggestedShipmentsTotalData.push(sstd);
                                             }
@@ -6033,7 +6057,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             openingBalanceArray.push({ isActual: lastIsActualClosingBalance, balance: roundARU(lastClosingBalance, multiplier) });
                                             consumptionTotalData.push({ consumptionQty: "", consumptionType: "", textColor: "" });
                                             shipmentsTotalData.push("");
-                                            suggestedShipmentsTotalData.push({ "suggestedOrderQty": "","suggestedOrderQtyRounded":"", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
+                                            suggestedShipmentsTotalData.push({ "suggestedOrderQty": "", "suggestedOrderQtyRounded": "", "month": moment(m[n].startDate).format("YYYY-MM-DD"), "isEmergencyOrder": 0 });
                                             deliveredShipmentsTotalData.push("");
                                             shippedShipmentsTotalData.push("");
                                             orderedShipmentsTotalData.push("");
@@ -6684,7 +6708,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                     }
                                                 }
                                             }
-                                            suggestedOrd=Math.round(Number(suggestedOrd));
+                                            suggestedOrd = Math.round(Number(suggestedOrd));
                                             if (suggestShipment) {
                                                 if (suggestedOrd <= 0) {
                                                 } else {
@@ -6832,7 +6856,7 @@ export default class SupplyPlanComponent extends React.Component {
                                             showPlanningUnitAndQtyList: showPlanningUnitAndQtyList
                                         })
                                         generalProgramJson.actionList = actionList;
-                                        generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                        generalProgramJson.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                         generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                                         programRequest.result.programData.planningUnitDataList = planningUnitDataList;
                                         programRequest.result.programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString();
