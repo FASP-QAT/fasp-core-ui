@@ -36,10 +36,21 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
         this.formulaChanged = this.formulaChanged.bind(this)
         this.onchangepage = this.onchangepage.bind(this)
+        this.changeAddNewBatch = this.changeAddNewBatch.bind(this);
         this.state = {
             inventoryEl: "",
-            inventoryBatchInfoTableEl: ""
+            inventoryBatchInfoTableEl: "",
+            inventoryJson: ""
         }
+    }
+
+    changeAddNewBatch(event) {
+        console.log("event.target.checked", event.target.checked);
+        this.props.updateState("addNewBatch", event.target.checked);
+        var inventoryJson = this.state.inventoryJson;
+        console.log("Inventory Json Test@123", inventoryJson);
+        this.state.inventoryEl.setValueFromCoords(19, inventoryJson.y, event.target.checked, true);
+        this.batchDetailsClicked(inventoryJson.obj, inventoryJson.x, inventoryJson.y, inventoryJson.e, inventoryJson.inventoryEditable, 0);
     }
     /**
      * This function is used to update the data when some records are pasted in the inventory/adjustment sheet
@@ -421,7 +432,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         items.push({
                                             title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                             onclick: function () {
-                                                this.batchDetailsClicked(obj, x, y, e, inventoryEditable)
+                                                this.setState({
+                                                    inventoryJson: {
+                                                        "obj": obj,
+                                                        "x": x,
+                                                        "y": y,
+                                                        "e": e,
+                                                        "inventoryEditable": inventoryEditable
+                                                    }
+                                                }, () => {
+                                                });
+                                                this.batchDetailsClicked(obj, x, y, e, inventoryEditable, 1);
                                             }.bind(this)
                                         });
                                     }
@@ -470,11 +491,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * @param {*} e This is mouse event handler
      * @param {*} inventoryEditable This is the value of the flag that indicates whether table should be editable or not
      */
-    batchDetailsClicked(obj, x, y, e, inventoryEditable) {
+    batchDetailsClicked(obj, x, y, e, inventoryEditable, toggle) {
         var rowData = obj.getRowData(y);
         this.props.updateState("loading", true);
         this.props.updateState("addNewBatch", rowData[19]);
-        if (this.props.inventoryPage == "inventoryDataEntry") {
+        if (this.props.inventoryPage == "inventoryDataEntry" && toggle) {
             this.props.toggleLarge();
         }
         if (rowData[19].toString() == "false") {

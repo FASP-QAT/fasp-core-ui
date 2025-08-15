@@ -2528,7 +2528,7 @@ export default class SupplyPlanComponent extends React.Component {
                                                 id="addNewBatch"
                                                 name="addNewBatch"
                                                 checked={this.state.addNewBatch}
-                                                onClick={(e) => { this.changeAddNewBatch(e); }}
+                                                onClick={(e) => { this.refs.inventoryChild.changeAddNewBatch(e); }}
                                             />
                                             <Label
                                                 className="form-check-label ml-2"

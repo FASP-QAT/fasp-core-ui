@@ -5156,7 +5156,6 @@ class EditSupplyPlanStatus extends Component {
                                                     name="addNewBatch"
                                                     disabled="true"
                                                     checked={this.state.addNewBatch}
-                                                    onClick={(e) => { this.changeAddNewBatch(e); }}
                                                 />
                                                 <Label
                                                     className="form-check-label ml-2"
