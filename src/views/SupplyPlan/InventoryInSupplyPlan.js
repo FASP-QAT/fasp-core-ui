@@ -8,7 +8,7 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { ADJUSTMENT_MODIFIED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
+import { ADJUSTMENT_MODIFIED, BATCH_NO_REGEX, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -24,6 +24,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.filterBatchInfoForExistingDataForInventory = this.filterBatchInfoForExistingDataForInventory.bind(this);
         this.loadedBatchInfoInventory = this.loadedBatchInfoInventory.bind(this);
         this.batchInfoChangedInventory = this.batchInfoChangedInventory.bind(this);
+        this.batchInfoAddChangedInventory = this.batchInfoAddChangedInventory.bind(this);
         this.checkValidationInventoryBatchInfo = this.checkValidationInventoryBatchInfo.bind(this);
         this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
@@ -45,12 +46,25 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
     }
 
     changeAddNewBatch(event) {
-        console.log("event.target.checked", event.target.checked);
-        this.props.updateState("addNewBatch", event.target.checked);
-        var inventoryJson = this.state.inventoryJson;
-        console.log("Inventory Json Test@123", inventoryJson);
-        this.state.inventoryEl.setValueFromCoords(19, inventoryJson.y, event.target.checked, true);
-        this.batchDetailsClicked(inventoryJson.obj, inventoryJson.x, inventoryJson.y, inventoryJson.e, inventoryJson.inventoryEditable, 0);
+        var cont = false;
+        if (this.props.items.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            console.log("event.target.checked", event.target.checked);
+            this.props.updateState("addNewBatch", event.target.checked);
+            this.props.updateState("inventoryBatchInfoChangedFlag", 0);
+            var inventoryJson = this.state.inventoryJson;
+            console.log("Inventory Json Test@123", inventoryJson);
+            this.state.inventoryEl.setValueFromCoords(19, inventoryJson.y, event.target.checked, true);
+            this.batchDetailsClicked(inventoryJson.obj, inventoryJson.x, inventoryJson.y, inventoryJson.e, inventoryJson.inventoryEditable, 0);
+        }
     }
     /**
      * This function is used to update the data when some records are pasted in the inventory/adjustment sheet
@@ -803,7 +817,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 allowInsertRow: true,
                 allowManualInsertRow: false,
                 allowExport: false,
-                onpaste: this.onPasteForAddBatchInfo,
                 onchange: this.batchInfoAddChangedInventory,
                 copyCompatibility: true,
                 parseFormulas: true,
@@ -1276,6 +1289,53 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
+    }
+    /**
+     * This function is called when something in the inventory/adjustment batch info table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
+    batchInfoAddChangedInventory = function (instance, cell, x, y, value) {
+        var elInstance = instance;
+        var rowData = elInstance.getRowData(y);
+        this.props.updateState("inventoryBatchError", "");
+        this.props.updateState("inventoryBatchInfoDuplicateError", "");
+        this.props.updateState("inventoryBatchInfoNoStockError", "");
+        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+        if (x == 0) {
+            this.props.updateState("inventoryBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
+        }
+        if (x == 1) {
+            this.props.updateState("inventoryBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
+            var valid = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
+            if (valid) {
+                var expectedDeliveryDate = (this.state.inventoryEl).getRowData(parseInt(rowData[4]))[0];
+                if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                    inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate"), elInstance);
+                } else {
+                    positiveValidation("B", y, elInstance);
+                }
+            }
+        }
+        if (x == 2) {
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+        }
+        if (rowData[0] != "") {
+            if (rowData[0].length >= 27) {
+                inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+            } else if (!BATCH_NO_REGEX.test(rowData[0])) {
+                inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+            } else {
+                positiveValidation("A", y, elInstance);
+            }
+        } else {
+            inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
+        }
     }
     /**
      * This function is called when something in the inventory/adjustment batch info table is changed to add the validations or fill some auto values for the cells
