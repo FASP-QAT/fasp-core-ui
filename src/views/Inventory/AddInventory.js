@@ -706,7 +706,6 @@ export default class AddInventory extends Component {
                                     }
                                 }
                             }
-                            console.log("Batch List Test@123",batchList);
                             var inventoryListUnFiltered = (programJson.inventoryList);
                             inventoryListForSelectedPlanningUnitsUnfiltered = inventoryListForSelectedPlanningUnitsUnfiltered.concat(inventoryListUnFiltered);
                             var inventoryList = (programJson.inventoryList).filter(c =>

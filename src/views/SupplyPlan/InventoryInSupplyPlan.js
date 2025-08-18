@@ -327,6 +327,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[17] = inventoryList[j].inventoryId;
                             data[18] = inventoryList[j].multiplier;
                             data[19] = inventoryList[j].addNewBatch;
+                            var adjustmentBatchQty = 0;
+                            inventoryList[j].batchInfoList.map(c => adjustmentBatchQty = Number(adjustmentBatchQty) + (c.adjustmentQty != null ? Number(c.adjustmentQty) : Number(0)));
+                            data[20] = adjustmentBatchQty;
                             inventoryDataArr[j] = data;
                         }
                         var regionList = this.props.items.regionList;
@@ -361,6 +364,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[17] = 0;
                             data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
                             data[19] = 0;
+                            data[20] = 0;
                             inventoryDataArr[0] = data;
                         }
                         this.setState({
@@ -741,6 +745,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
 
             if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
                 document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
+                var inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
                 if (inventoryQty > 0) {
                     document.getElementById("addNewBatchButton").style.display = 'block';
                 } else {
@@ -909,6 +914,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[17] = 0;
         data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
         data[19] = 0;
+        data[20] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -1328,6 +1334,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
         }
+        if (x == 20) {
+            if (rowData[19].toString() == "true" || rowData[19].toString() == 1) {
+                var adjustedQty = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
+                if (value > adjustedQty) {
+                    inValid("F", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                } else {
+                    positiveValidation("F", y, elInstance);
+                }
+            }
+        }
     }
     /**
      * This function is used to filter the batch list based on expiry date and created date
@@ -1684,6 +1700,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 var json = elInstance.getJson(null, false);
                 var batchInfoArray = [];
                 var rowNumber = 0;
+                var batchTotalQty = 0;
                 for (var i = 0; i < json.length; i++) {
                     var map = new Map(Object.entries(json[i]));
                     if (i == 0) {
@@ -1721,9 +1738,11 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         adjustmentQty: elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
                         actualQty: null
                     }
+                    batchTotalQty = Number(batchTotalQty) + elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", "");
                     batchInfoArray.push(batchInfoJson);
                 }
                 inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
+                inventoryInstance.setValueFromCoords(20, rowNumber, batchTotalQty, true);
                 inventoryInstance.setValueFromCoords(19, rowNumber, this.props.items.addNewBatch, true);
                 this.setState({
                     inventoryChangedFlag: 1,
@@ -1911,6 +1930,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         if (validation == false) {
                             valid = false;
                             elInstance.setValueFromCoords(16, y, 1, true);
+                        }
+                    }
+                    if (rowData[19].toString() == "true" || rowData[19].toString() == 1) {
+                        var adjustedQty = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
+                        if (rowData[20] > adjustedQty) {
+                            inValid("F", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("F", y, elInstance);
                         }
                     }
                 }
