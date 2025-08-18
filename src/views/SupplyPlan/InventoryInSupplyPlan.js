@@ -328,8 +328,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[16] = 0;
                             data[17] = inventoryList[j].inventoryId;
                             data[18] = inventoryList[j].multiplier;
-                            // data[19] = inventoryList[j].addNewBatch;
-                            data[19] = true;
+                            data[19] = inventoryList[j].addNewBatch;
                             inventoryDataArr[j] = data;
                         }
                         var regionList = this.props.items.regionList;
@@ -1959,6 +1958,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].notes = map.get("10");
                             inventoryDataList[parseInt(map.get("14"))].active = map.get("11");
+                            inventoryDataList[parseInt(map.get("14"))].addNewBatch = map.get("19");
                             if (map.get("13") != "") {
                                 inventoryDataList[parseInt(map.get("14"))].batchInfoList = map.get("13");
                             } else {
@@ -1988,6 +1988,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 adjustmentQty: (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                 actualQty: (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                 active: map.get("11"),
+                                addNewBatch: map.get("19"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),
                                     label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label

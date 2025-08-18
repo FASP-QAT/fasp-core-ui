@@ -332,7 +332,6 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             data[18] = inventoryList[j].inventoryId;
                             data[19] = inventoryList[j].multiplier;
                             data[20] = inventoryList[j].addNewBatch;
-                            // data[20] = true;
                             inventoryDataArr[j] = data;
                         }
                         var regionList = this.props.items.regionList;
@@ -1689,6 +1688,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         } else {
             this.props.updateState("loading", true);
             var validation = this.checkValidationAddInventoryBatchInfo();
+            console.log("Validation Test@123",validation);
             if (validation == true) {
                 var elInstance = this.state.inventoryBatchInfoTableEl;
                 var json = elInstance.getJson(null, false);
@@ -2029,6 +2029,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     inventoryDataList[parseInt(map.get("15"))].actualQty = (map.get("5") == 1) ? elInstance.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                                     inventoryDataList[parseInt(map.get("15"))].notes = map.get("11");
                                     inventoryDataList[parseInt(map.get("15"))].active = map.get("12");
+                                    inventoryDataList[parseInt(map.get("15"))].addNewBatch = map.get("20");
                                     if (map.get("14") != "") {
                                         inventoryDataList[parseInt(map.get("15"))].batchInfoList = map.get("14");
                                     } else {
@@ -2058,6 +2059,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                         adjustmentQty: (map.get("5") == 2) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                         actualQty: (map.get("5") == 1) ? elInstance.getValue(`H${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                         active: map.get("12"),
+                                        addNewBatch: map.get("20"),
                                         realmCountryPlanningUnit: {
                                             id: map.get("4"),
                                             label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("4"))[0].label
