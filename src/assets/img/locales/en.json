@@ -3625,5 +3625,5 @@
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
   "static.supplyPlan.addNewBatch":"Input New Batch and Expiry Information",
-  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than adjustment date"
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than Inventory Date"
 }

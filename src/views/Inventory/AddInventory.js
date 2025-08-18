@@ -706,6 +706,7 @@ export default class AddInventory extends Component {
                                     }
                                 }
                             }
+                            console.log("Batch List Test@123",batchList);
                             var inventoryListUnFiltered = (programJson.inventoryList);
                             inventoryListForSelectedPlanningUnitsUnfiltered = inventoryListForSelectedPlanningUnitsUnfiltered.concat(inventoryListUnFiltered);
                             var inventoryList = (programJson.inventoryList).filter(c =>
@@ -719,7 +720,6 @@ export default class AddInventory extends Component {
                             inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                             inventoryListForSelectedPlanningUnits = inventoryListForSelectedPlanningUnits.concat(inventoryList);
                             var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == puList[pu].value))[0];
-                            console.log("inventoryListUnFiltered Test@123",inventoryListUnFiltered)
                             puData.push({
                                 id: puList[pu].value,
                                 programJson: programJson,
