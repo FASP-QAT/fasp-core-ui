@@ -362,6 +362,7 @@ export default class ExtrapolateDataComponent extends React.Component {
     seasonalityCheckbox(event) {
         var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == this.state.planningUnitId && c.region.id == this.state.regionId);
         this.setState({
+            dataChanged: true,
             seasonality: event.target.checked ? 1 : 0,
             arimaId: this.state.arimaData.length > 0 && event.target.checked ? this.state.monthsDiff >= 13 : this.state.monthsDiff >= 2 ? this.state.arimaDisabled ? true : this.state.arimaId : false,
             arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
@@ -2251,9 +2252,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 if (consumptionExtrapolationTESM.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevel = consumptionExtrapolationTESM[0].jsonProperties.confidenceLevel;
                     seasonality = consumptionExtrapolationTESM[0].jsonProperties.seasonality;
-                    alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha;
-                    beta = consumptionExtrapolationTESM[0].jsonProperties.beta;
-                    gamma = consumptionExtrapolationTESM[0].jsonProperties.gamma;
+                    alpha = consumptionExtrapolationTESM[0].jsonProperties.alpha ? consumptionExtrapolationTESM[0].jsonProperties.alpha : alpha;
+                    beta = consumptionExtrapolationTESM[0].jsonProperties.beta ? consumptionExtrapolationTESM[0].jsonProperties.beta : beta;
+                    gamma = consumptionExtrapolationTESM[0].jsonProperties.gamma ? consumptionExtrapolationTESM[0].jsonProperties.gamma : gamma;
                     smoothingId = true;
                 }
                 var confidenceLevelArima = this.state.confidenceLevelIdArima;
@@ -2262,9 +2263,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var q = this.state.q;
                 if (consumptionExtrapolationArima.length > 0 && localStorage.getItem("sessionType") === "Online") {
                     confidenceLevelArima = consumptionExtrapolationArima[0].jsonProperties.confidenceLevel;
-                    p = consumptionExtrapolationArima[0].jsonProperties.p;
-                    d = consumptionExtrapolationArima[0].jsonProperties.d;
-                    q = consumptionExtrapolationArima[0].jsonProperties.q;
+                    p = consumptionExtrapolationArima[0].jsonProperties.p ? consumptionExtrapolationArima[0].jsonProperties.p : p;
+                    d = consumptionExtrapolationArima[0].jsonProperties.d ? consumptionExtrapolationArima[0].jsonProperties.d : d;
+                    q = consumptionExtrapolationArima[0].jsonProperties.q ? consumptionExtrapolationArima[0].jsonProperties.q : q;
                     seasonality = consumptionExtrapolationArima[0].jsonProperties.seasonality;
                     arimaId = true;
                 }
