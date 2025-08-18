@@ -693,6 +693,21 @@ export default class AddInventory extends Component {
                                     }
                                 }
                             }
+                            var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                            console.log("inventory List Test@123",inventoryList);
+                            for (var il = 0; il < inventoryList.length; il++) {
+                                var bdl = inventoryList[il].batchInfoList;
+                                for (var bd = 0; bd < bdl.length; bd++) {
+                                    var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (index == -1) {
+                                        var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == puList[pu].value && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        if (batchDetailsToPush.length > 0) {
+                                            batchList.push(batchDetailsToPush[0]);
+                                        }
+                                    }
+                                }
+                            }
+                            console.log("Batch Info List Test@123",batchInfoList);
                             var inventoryListUnFiltered = (programJson.inventoryList);
                             inventoryListForSelectedPlanningUnitsUnfiltered = inventoryListForSelectedPlanningUnitsUnfiltered.concat(inventoryListUnFiltered);
                             var inventoryList = (programJson.inventoryList).filter(c =>

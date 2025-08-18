@@ -1023,6 +1023,27 @@ export default class SupplyPlanComponent extends React.Component {
                         }
                     }
                 }
+                var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                for (var il = 0; il < inventoryList.length; il++) {
+                    var bdl = inventoryList[il].batchInfoList;
+                    for (var bd = 0; bd < bdl.length; bd++) {
+                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        if (index == -1) {
+                            var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                            if (batchDetailsToPush.length > 0) {
+                                batchDetailsToPush[0].qtyAvailable = 0;
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                                batchList.push(batchDetailsToPush[0]);
+                                if (moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM") > moment(this.state.monthsArray[count].startDate).format("YYYY-MM")) {
+                                    batchListForJexcel.push({
+                                        name: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("MMM-YY"),
+                                        id: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM-DD"),
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
                 this.setState({
                     actualBatchList: batchList
                 })
@@ -4661,6 +4682,19 @@ export default class SupplyPlanComponent extends React.Component {
                     }
                 }
             }
+            var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+            for (var il = 0; il < inventoryList.length; il++) {
+                var bdl = inventoryList[il].batchInfoList;
+                for (var bd = 0; bd < bdl.length; bd++) {
+                    var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    if (index == -1) {
+                        var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        if (batchDetailsToPush.length > 0) {
+                            batchList.push(batchDetailsToPush[0]);
+                        }
+                    }
+                }
+            }
             this.setState({
                 programJsonAfterConsumptionClicked: programJson,
                 consumptionListUnFiltered: consumptionListUnFiltered,
@@ -4745,6 +4779,19 @@ export default class SupplyPlanComponent extends React.Component {
                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                         if (batchDetailsToPush.length > 0) {
                             batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
+                            batchList.push(batchDetailsToPush[0]);
+                        }
+                    }
+                }
+            }
+            var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+            for (var il = 0; il < inventoryList.length; il++) {
+                var bdl = inventoryList[il].batchInfoList;
+                for (var bd = 0; bd < bdl.length; bd++) {
+                    var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                    if (index == -1) {
+                        var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        if (batchDetailsToPush.length > 0) {
                             batchList.push(batchDetailsToPush[0]);
                         }
                     }
