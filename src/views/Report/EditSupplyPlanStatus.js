@@ -242,7 +242,8 @@ class EditSupplyPlanStatus extends Component {
             planningUnitDropdownList: [],
             temp_currentVersion_id: '',
             loadSummaryTable: false,
-            loadingForNotes: false
+            loadingForNotes: false,
+            addNewBatch: false
         }
         this.leftClicked = this.leftClicked.bind(this);
         this.rightClicked = this.rightClicked.bind(this);
@@ -678,7 +679,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
-            showBatchTable:0
+            showBatchTable: 0
         })
         if (supplyPlanType == 'Consumption') {
             var monthCountConsumption = count != undefined ? this.state.monthCount + count - 2 : this.state.monthCount;
@@ -936,6 +937,19 @@ class EditSupplyPlanStatus extends Component {
                                 }
                             }
                         }
+                        var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                        for (var il = 0; il < inventoryList.length; il++) {
+                            var bdl = inventoryList[il].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
+                            }
+                        }
                         var consumptionListUnFiltered = (programJson.consumptionList);
                         var consumptionList = consumptionListUnFiltered.filter(con =>
                             con.planningUnit.id == planningUnitId
@@ -980,6 +994,7 @@ class EditSupplyPlanStatus extends Component {
         var elInstance = this.state.inventoryBatchInfoTableEl;
         if (elInstance != undefined && elInstance != "") {
             jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
         }
         var planningUnitId = document.getElementById("planningUnitId").value;
         var programId = document.getElementById("programId").value;
@@ -1044,6 +1059,19 @@ class EditSupplyPlanStatus extends Component {
                         var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var bdl = shipmentList[sl].batchInfoList;
+                            for (var bd = 0; bd < bdl.length; bd++) {
+                                var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                if (index == -1) {
+                                    var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (batchDetailsToPush.length > 0) {
+                                        batchList.push(batchDetailsToPush[0]);
+                                    }
+                                }
+                            }
+                        }
+                        var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                        for (var il = 0; il < inventoryList.length; il++) {
+                            var bdl = inventoryList[il].batchInfoList;
                             for (var bd = 0; bd < bdl.length; bd++) {
                                 var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                 if (index == -1) {
@@ -1284,18 +1312,18 @@ class EditSupplyPlanStatus extends Component {
                                                 }
                                             })
                                         }).catch(error => {
-                                         });
+                                        });
                                     }).catch(error => {
-                                     });
-                                }).catch(error => { 
+                                    });
+                                }).catch(error => {
                                 });
                             }).catch(error => {
-                             });
+                            });
                         }).catch(error => {
-                         });
-                    }).catch(error => { 
+                        });
+                    }).catch(error => {
                     });
-                }).catch(error => { 
+                }).catch(error => {
                 });
             }.bind(this)
         }.bind(this)
@@ -1414,7 +1442,7 @@ class EditSupplyPlanStatus extends Component {
             showInventory: 0,
             showConsumption: 0,
             batchInfoInInventoryPopUp: [],
-            showBatchTable:0
+            showBatchTable: 0
         },
             () => {
                 var inputs = document.getElementsByClassName("submitBtn");
@@ -1467,6 +1495,7 @@ class EditSupplyPlanStatus extends Component {
     actionCanceledInventory() {
         document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
         jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+        jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
         this.refs.inventoryChild.state.inventoryBatchInfoChangedFlag = 0;
         this.setState({
             inventoryBatchInfoChangedFlag: 0,
@@ -2049,8 +2078,8 @@ class EditSupplyPlanStatus extends Component {
                                     }
                                 })
                                 adjustmentTotalData.push(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : "");
-                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
-                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment,1)!=0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
+                                nationalAdjustmentTotalData.push(jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment, 1) != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : "");
+                                inventoryTotalData.push((adjustmentCount > 0 || (jsonList[0].regionCountForStock > 0 && roundARU(jsonList[0].nationalAdjustment, 1) != 0 && jsonList[0].nationalAdjustment != "" && jsonList[0].nationalAdjustment != null)) ? roundARU(Number(adjustmentCount > 0 ? roundARU(Number(adjustmentTotal), 1) : 0) + Number(jsonList[0].regionCountForStock > 0 ? roundARU(Number(jsonList[0].nationalAdjustment), 1) : 0), 1) : "");
                                 var consumptionTotalForRegion = 0;
                                 var totalAdjustmentsQtyForRegion = 0;
                                 var totalActualQtyForRegion = 0;
@@ -3659,9 +3688,11 @@ class EditSupplyPlanStatus extends Component {
                                         onChange={(e) => { this.handleProblemStatusChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
-                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
-                                        
+                                        overrideStrings={{
+                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')
+                                        }}
+
                                     />
                                 </div>
                             </FormGroup>
@@ -3707,8 +3738,10 @@ class EditSupplyPlanStatus extends Component {
                                         onChange={(e) => { this.handleProblemReviewedChange(e) }}
                                         labelledBy={i18n.t('static.common.select')}
                                         filterOptions={filterOptions}
-                                        overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                        overrideStrings={{
+                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                            selectSomeItems: i18n.t('static.common.select')
+                                        }}
                                     />
                                 </div>
                             </FormGroup>
@@ -3940,8 +3973,8 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-            editable:false
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+            editable: false
         };
         var problemTransEl = jexcel(document.getElementById("problemTransDiv"), options);
         this.el = problemTransEl;
@@ -3962,7 +3995,7 @@ class EditSupplyPlanStatus extends Component {
      */
     buildJExcel() {
         let problemList = this.state.problemList;
-        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu=>pu.active).map(item=>item.id).includes(c.planningUnit.id) && (c.region==null || (c.region!=null && this.state.regionList.map(item=>item.id).includes(c.region.id))));
+        problemList = problemList.filter(c => this.state.program.planningUnitList.filter(pu => pu.active).map(item => item.id).includes(c.planningUnit.id) && (c.region == null || (c.region != null && this.state.regionList.map(item => item.id).includes(c.region.id))));
         let problemArray = [];
         let count = 0;
         for (var j = 0; j < problemList.length; j++) {
@@ -4235,7 +4268,7 @@ class EditSupplyPlanStatus extends Component {
             position: 'top',
             filters: true,
             parseFormulas: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 var items1 = [];
                 if (y != null) {
@@ -4611,7 +4644,7 @@ class EditSupplyPlanStatus extends Component {
                     paginationOptions: JEXCEL_PAGINATION_OPTION,
                     position: "top",
                     filters: true,
-                    license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
                     contextMenu: function (obj, x, y, e) {
                         return false;
                     }.bind(this),
@@ -4814,7 +4847,7 @@ class EditSupplyPlanStatus extends Component {
                                                                         name="programId"
                                                                         id="programId"
                                                                         bsSize="sm"
-                                                                        value={this.state.program.label.label_en +'~v'+ this.state.program.currentVersion.versionId}
+                                                                        value={this.state.program.label.label_en + '~v' + this.state.program.currentVersion.versionId}
                                                                         disabled />
                                                                 </InputGroup>
                                                             </div>
@@ -5093,7 +5126,7 @@ class EditSupplyPlanStatus extends Component {
                                                     this.state.closingBalanceArray.map((item, count) => {
                                                         if (count < 7) {
                                                             return (
-                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable:1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                                <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable: 1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                             )
                                                         }
                                                     })
@@ -5125,7 +5158,7 @@ class EditSupplyPlanStatus extends Component {
                                                     ))}
                                                 </tbody>
                                             </Table><br />
-                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable:0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
+                                            <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
                                         </>
                                     }
                                     {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="supplyPlanCompare" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={0} />}
@@ -5135,9 +5168,28 @@ class EditSupplyPlanStatus extends Component {
                                     <h6 className="red" id="div3">{this.state.inventoryBatchInfoDuplicateError || this.state.inventoryBatchInfoNoStockError || this.state.inventoryBatchError}</h6>
                                     <div className="">
                                         <div id="inventoryBatchInfoTable" className="AddListbatchtrHeight"></div>
+                                        <div id="inventoryAddBatchInfoTable" className="AddListbatchtrHeight"></div>
                                     </div>
                                     <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                         <span>{i18n.t("static.dataEntry.missingBatchNote")}</span>
+                                        <FormGroup className='MarginTopCheckBox mb-0' id="addNewBatchButton">
+                                            <div className="d-flex align-items-center">
+                                                <Input
+                                                    className="form-check-input mr-6"
+                                                    style={{ marginLeft: "-10px" }}
+                                                    type="checkbox"
+                                                    id="addNewBatch"
+                                                    name="addNewBatch"
+                                                    disabled="true"
+                                                    checked={this.state.addNewBatch}
+                                                />
+                                                <Label
+                                                    className="form-check-label ml-2"
+                                                    check htmlFor="addNewBatch" style={{ fontSize: '12px', marginTop: '3px' }}>
+                                                    {i18n.t('static.supplyPlan.addNewBatch')}
+                                                </Label>
+                                            </div>
+                                        </FormGroup>
                                         <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                     </div>
                                     <div className="pt-4"></div>
@@ -5460,7 +5512,7 @@ class EditSupplyPlanStatus extends Component {
                                                                 } else {
                                                                     try {
                                                                         document.getElementById("submitButton").disabled = false;
-                                                                    } catch (err) { 
+                                                                    } catch (err) {
                                                                     }
                                                                     this.setState({
                                                                         submitMessage: "static.message.supplyplanversionapprovedsuccess",

@@ -3624,8 +3624,6 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.supplyPlanFormula.instructionHeader": "Program Selection",
-  "static.supplyPlanFormula.instruction1": "If creating a supply plan report for a single program, the user can select the supply plan version.",
-  "static.supplyPlanFormula.instruction2": "However, if more than one program is selected, local versions of the program will not be available. The version dropdown will not be available. QAT will automatically select the most recent version of the respective programs available on the server.",
-  "static.supplyPlanFormula.instruction3": "PLEASE NOTE: The merge program feature of the supply plan report is only available online."
+  "static.supplyPlan.addNewBatch":"Input New Batch and Expiry Information",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than Inventory Date"
 }
