@@ -8,10 +8,11 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { ADJUSTMENT_MODIFIED, BATCH_NO_REGEX, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
+import { ADJUSTMENT_MODIFIED, BATCH_NO_REGEX, BATCH_PREFIX, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 /**
  * This component is used to display the inventory/adjustment data in the form of table for supply plan, scenario planning, supply planning comparision and supply plan version and review screen
  */
@@ -26,6 +27,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.batchInfoChangedInventory = this.batchInfoChangedInventory.bind(this);
         this.batchInfoAddChangedInventory = this.batchInfoAddChangedInventory.bind(this);
         this.checkValidationInventoryBatchInfo = this.checkValidationInventoryBatchInfo.bind(this);
+        this.checkValidationAddInventoryBatchInfo = this.checkValidationAddInventoryBatchInfo.bind(this);
         this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
@@ -718,6 +720,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             this.setState({ inventoryBatchInfoTableEl: elVar });
             this.props.updateState("loading", false);
         } else {
+            var batchInfoListAll = this.props.items.programJson.batchInfoList;
+            this.setState({
+                batchInfoListAll: batchInfoListAll,
+            })
             var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
             var json = [];
             if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
@@ -748,7 +754,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             for (var sb = 0; sb < batchInfo.length; sb++) {
                 var data = [];
                 data[0] = batchInfo[sb].batch.batchNo;
-                data[1] = moment(batchInfo[sb].batch.expiryDate).format("MMM-YY");
+                data[1] = moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD");
                 data[2] = Number(batchInfo[sb].adjustmentQty);
                 data[3] = batchInfo[sb].inventoryTransBatchInfoId;
                 data[4] = y;
@@ -762,7 +768,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 data[2] = "";
                 data[3] = 0;
                 data[4] = y;
-                data[5] = true;
+                data[5] = false;
                 json.push(data);
             }
             var options = {
@@ -914,19 +920,32 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is used when users click on the add row in the inventory/adjustment batch table
      */
     addBatchRowInJexcel() {
-        var obj = this.state.inventoryBatchInfoTableEl;
-        var adjustmentType = this.props.items.inventoryType;
-        var rowData = obj.getRowData(0);
-        var data = [];
-        data[0] = "";
-        data[1] = "";
-        data[2] = adjustmentType;
-        data[3] = "";
-        data[4] = "";
-        data[5] = 0;
-        data[6] = rowData[6];
-        data[7] = rowData[7];
-        obj.insertRow(data);
+        if (this.props.items.addNewBatch.toString() == "false") {
+            var obj = this.state.inventoryBatchInfoTableEl;
+            var adjustmentType = this.props.items.inventoryType;
+            var rowData = obj.getRowData(0);
+            var data = [];
+            data[0] = "";
+            data[1] = "";
+            data[2] = adjustmentType;
+            data[3] = "";
+            data[4] = "";
+            data[5] = 0;
+            data[6] = rowData[6];
+            data[7] = rowData[7];
+            obj.insertRow(data);
+        } else {
+            var obj = this.state.inventoryBatchInfoTableEl;
+            var rowData = obj.getRowData(0);
+            var data = [];
+            data[0] = "";
+            data[1] = "";
+            data[2] = "";
+            data[3] = 0;
+            data[4] = rowData[4];
+            data[5] = false;
+            obj.insertRow(data);
+        }
     }
     /**
      * This function is used to filter the data source list based on active flag
@@ -1382,6 +1401,71 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         }
     }
     /**
+         * This function is called before saving the inventory/adjustment batch info to check validations for all the rows that are available in the table
+         * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+         */
+    checkValidationAddInventoryBatchInfo() {
+        var valid = true;
+        var elInstance = this.state.inventoryBatchInfoTableEl;
+        var json = elInstance.getJson(null, false);
+        var mapArray = [];
+        for (var y = 0; y < json.length; y++) {
+            var map = new Map(Object.entries(json[y]));
+            mapArray.push(map);
+            var checkDuplicateInMap = mapArray.filter(c =>
+                c.get("0") == map.get("0") &&
+                moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
+            )
+            if (checkDuplicateInMap.length > 1) {
+                var colArr = ['A'];
+                for (var c = 0; c < colArr.length; c++) {
+                    inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateBatchNumber'), elInstance);
+                }
+                valid = false;
+                this.props.updateState("inventoryBatchInfoDuplicateError", i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                this.props.hideThirdComponent()
+            } else {
+                var colArr = ['A'];
+                for (var c = 0; c < colArr.length; c++) {
+                    positiveValidation(colArr[c], y, elInstance);
+                }
+                var rowData = elInstance.getRowData(y);
+                var value = rowData[0];
+                if (value != "") {
+                    if (value.length >= 27) {
+                        inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+                        valid = false;
+                    } else if (!BATCH_NO_REGEX.test(value)) {
+                        inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("A", y, elInstance);
+                    }
+                } else {
+                    inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
+                    valid = false;
+                }
+                var validation = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
+                if (validation.toString() == "false") {
+                    valid = false;
+                } else {
+                    var expectedDeliveryDate = (this.state.inventoryEl).getRowData(parseInt(rowData[4]))[0];
+                    if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                        inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate"), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("B", y, elInstance);
+                    }
+                }
+                var validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+                if (validation.toString() == "false") {
+                    valid = false;
+                }
+            }
+        }
+        return valid;
+    }
+    /**
      * This function is called before saving the inventory/adjustment batch info to check validations for all the rows that are available in the table
      * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
      */
@@ -1471,54 +1555,134 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is called when submit button of the inventory/adjustment batch info is clicked and is used to save inventory/adjustment batch info if all the data is successfully validated.
      */
     saveInventoryBatchInfo() {
-        this.props.updateState("loading", true);
-        var validation = this.checkValidationInventoryBatchInfo();
-        if (validation == true) {
-            var elInstance = this.state.inventoryBatchInfoTableEl;
-            var json = elInstance.getJson(null, false);
-            var batchInfoArray = [];
-            var rowNumber = 0;
-            var totalAdjustments = 0;
-            var totalActualStock = 0;
-            var countForNonFefo = 0;
-            for (var i = 0; i < json.length; i++) {
-                var map = new Map(Object.entries(json[i]));
-                if (i == 0) {
-                    rowNumber = map.get("6");
+        if (this.props.items.addNewBatch.toString() == "false") {
+            this.props.updateState("loading", true);
+            var validation = this.checkValidationInventoryBatchInfo();
+            if (validation == true) {
+                var elInstance = this.state.inventoryBatchInfoTableEl;
+                var json = elInstance.getJson(null, false);
+                var batchInfoArray = [];
+                var rowNumber = 0;
+                var totalAdjustments = 0;
+                var totalActualStock = 0;
+                var countForNonFefo = 0;
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    if (i == 0) {
+                        rowNumber = map.get("6");
+                    }
+                    if (map.get("0") != -1) {
+                        countForNonFefo += 1;
+                        var batchInfoJson = {
+                            inventoryTransBatchInfoId: map.get("5"),
+                            batch: {
+                                batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
+                                batchNo: (elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[0],
+                                autoGenerated: 0,
+                                planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                expiryDate: moment((elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[1]).format("YYYY-MM-DD"),
+                                createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
+                            },
+                            adjustmentQty: (map.get("2") == 2) ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 1) && elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
+                            actualQty: (map.get("2") == 1) ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 2) && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != null && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != undefined && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "NaN" ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null
+                        }
+                        batchInfoArray.push(batchInfoJson);
+                    }
+                    totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
+                    totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
                 }
-                if (map.get("0") != -1) {
-                    countForNonFefo += 1;
+                var inventoryInstance = this.state.inventoryEl;
+                var allConfirm = true;
+                if (allConfirm == true) {
+                    if (map.get("2") == 1) {
+                        if (totalActualStock > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim()) {
+                            inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
+                        }
+                    } else {
+                        if ((inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
+                            inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
+                        }
+                    }
+                    inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
+                    inventoryInstance.setValueFromCoords(19, rowNumber, this.props.items.addNewBatch, true);
+                    this.setState({
+                        inventoryChangedFlag: 1,
+                        inventoryBatchInfoChangedFlag: 0,
+                        inventoryBatchInfoTableEl: ''
+                    })
+                    this.props.updateState("inventoryChangedFlag", 1);
+                    this.props.updateState("inventoryBatchInfoChangedFlag", 0);
+                    this.props.updateState("inventoryBatchInfoTableEl", "");
+                    this.setState({
+                        inventoryBatchInfoTableEl: ""
+                    })
+                    if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                        document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+                    }
+                    if (this.props.inventoryPage == "inventoryDataEntry") {
+                        this.props.toggleLarge("submit");
+                    }
+                    jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                    jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+                }
+                this.props.updateState("loading", false);
+            } else {
+                this.setState({
+                    inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
+                })
+                this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
+                this.props.updateState("loading", false);
+                this.props.hideThirdComponent();
+            }
+        } else {
+            this.props.updateState("loading", true);
+            var validation = this.checkValidationAddInventoryBatchInfo();
+            if (validation == true) {
+                var elInstance = this.state.inventoryBatchInfoTableEl;
+                var json = elInstance.getJson(null, false);
+                var batchInfoArray = [];
+                var rowNumber = 0;
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    if (i == 0) {
+                        rowNumber = map.get("4");
+                    }
+                    var inventoryInstance = this.state.inventoryEl;
+                    var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
+                    var batchNo = "";
+                    var autoGenerated = map.get("5");
+                    if (map.get("0") != "") {
+                        batchNo = map.get("0");
+                    } else {
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var planningUnitId = document.getElementById("planningUnitId").value;
+                        programId = paddingZero(programId, 0, 6);
+                        planningUnitId = paddingZero(planningUnitId, 0, 8);
+                        batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                        autoGenerated = true
+                    }
+                    var batchInfoList = this.state.batchInfoListAll.filter(c => c.batchNo == map.get("0") && moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM"));
+                    var batchId = 0;
+                    if (batchInfoList.length > 0) {
+                        batchId = batchInfoList[0].batchId;
+                    }
+                    var minCreatedDate = moment(rowData[0]).format("YYYY-MM-DD");
                     var batchInfoJson = {
-                        inventoryTransBatchInfoId: map.get("5"),
+                        inventoryTransBatchInfoId: map.get("3"),
                         batch: {
-                            batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
-                            batchNo: (elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[0],
-                            autoGenerated: 0,
-                            planningUnitId: parseInt(document.getElementById("planningUnitId").value),
-                            expiryDate: moment((elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[1]).format("YYYY-MM-DD"),
-                            createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
+                            batchNo: batchNo,
+                            expiryDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
+                            batchId: batchId,
+                            autoGenerated: autoGenerated,
+                            createdDate: moment(minCreatedDate).format("YYYY-MM-DD")
                         },
-                        adjustmentQty: (map.get("2") == 2) ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 1) && elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
-                        actualQty: (map.get("2") == 1) ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 2) && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != null && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != undefined && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "NaN" ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null
+                        adjustmentQty: elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
+                        actualQty: null
                     }
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
-                totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
-            }
-            var inventoryInstance = this.state.inventoryEl;
-            var allConfirm = true;
-            if (allConfirm == true) {
-                if (map.get("2") == 1) {
-                    if (totalActualStock > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim()) {
-                        inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
-                    }
-                } else {
-                    if ((inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
-                        inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
-                    }
-                }
                 inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
+                inventoryInstance.setValueFromCoords(19, rowNumber, this.props.items.addNewBatch, true);
                 this.setState({
                     inventoryChangedFlag: 1,
                     inventoryBatchInfoChangedFlag: 0,
@@ -1538,15 +1702,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
                 jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+                this.props.updateState("loading", false);
+            } else {
+                this.setState({
+                    inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
+                })
+                this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
+                this.props.updateState("loading", false);
+                this.props.hideThirdComponent();
             }
-            this.props.updateState("loading", false);
-        } else {
-            this.setState({
-                inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
-            })
-            this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
-            this.props.updateState("loading", false);
-            this.props.hideThirdComponent();
         }
     }
     /**
