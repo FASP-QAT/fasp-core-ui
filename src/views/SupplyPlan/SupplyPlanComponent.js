@@ -2540,7 +2540,7 @@ export default class SupplyPlanComponent extends React.Component {
                                 </div>
                                 <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
                                     <span className='text-blackD'>{i18n.t("static.dataEntry.missingBatchNote")}</span>
-                                    <FormGroup className='MarginTopCheckBox mb-0'>
+                                    <FormGroup className='MarginTopCheckBox mb-0' id="addNewBatchButton">
                                         <div className="d-flex align-items-center">
                                             <Input
                                                 className="form-check-input mr-6"

@@ -694,7 +694,6 @@ export default class AddInventory extends Component {
                                 }
                             }
                             var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
-                            console.log("inventory List Test@123",inventoryList);
                             for (var il = 0; il < inventoryList.length; il++) {
                                 var bdl = inventoryList[il].batchInfoList;
                                 for (var bd = 0; bd < bdl.length; bd++) {
@@ -707,7 +706,6 @@ export default class AddInventory extends Component {
                                     }
                                 }
                             }
-                            console.log("Batch Info List Test@123",batchInfoList);
                             var inventoryListUnFiltered = (programJson.inventoryList);
                             inventoryListForSelectedPlanningUnitsUnfiltered = inventoryListForSelectedPlanningUnitsUnfiltered.concat(inventoryListUnFiltered);
                             var inventoryList = (programJson.inventoryList).filter(c =>
@@ -720,12 +718,15 @@ export default class AddInventory extends Component {
                             }
                             inventoryList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM-DD") >= moment(startDate).format("YYYY-MM-DD") && moment(c.inventoryDate).format("YYYY-MM-DD") <= moment(stopDate).format("YYYY-MM-DD"))
                             inventoryListForSelectedPlanningUnits = inventoryListForSelectedPlanningUnits.concat(inventoryList);
+                            var programPlanningUnit = ((this.state.planningUnitListAll).filter(p => p.planningUnit.id == puList[pu].value))[0];
+                            console.log("inventoryListUnFiltered Test@123",inventoryListUnFiltered)
                             puData.push({
                                 id: puList[pu].value,
                                 programJson: programJson,
                                 inventoryListUnFiltered: inventoryListUnFiltered,
                                 inventoryList: inventoryList,
                                 batchInfoList: batchList,
+                                shelfLife: programPlanningUnit.shelfLife,
                             })
                         }
                         this.setState({
@@ -953,7 +954,7 @@ export default class AddInventory extends Component {
                     </ModalBody>
                     <ModalFooter className="d-flex justify-content-between align-items-center">
                         <div id="showInventoryBatchInfoButtonsDiv" style={{ display: 'none' }}>
-                            <FormGroup className='MarginTopCheckBox mb-0'>
+                            <FormGroup className='MarginTopCheckBox mb-0' id="addNewBatchButton">
                                 <div className="d-flex align-items-center">
                                     <Input
                                         className="form-check-input mr-6"
