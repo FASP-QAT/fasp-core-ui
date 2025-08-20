@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import {
     Row, Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form
+    CardFooter, Button, Col, FormFeedback, Form,
+    CardHeader
 } from 'reactstrap';
 import Select from 'react-select';
 import { Formik } from 'formik';
@@ -896,6 +897,13 @@ export default class EditProgram extends Component {
             var itemLabelB = b.userId;
             return itemLabelA > itemLabelB ? 1 : -1;
         });
+        userList.sort((a, b) => {
+            const orgCompare = a.orgAndCountry.localeCompare(b.orgAndCountry, undefined, { sensitivity: 'base' });
+            if (orgCompare !== 0) {
+                return orgCompare;
+            }
+            return a.username.localeCompare(b.username, undefined, { sensitivity: 'base' });
+        });
         let userListArr = [];
         var data = [];
         var count = 0;
@@ -1526,7 +1534,11 @@ export default class EditProgram extends Component {
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
                     <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
                         <Card>
+                            <CardHeader>
+                                <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
+                            </CardHeader>
                             <CardBody>
+                                <h7>{i18n.t('static.editProgram.userListSubHeader')}</h7>
                                 <div
                                     className=""
                                     style={{
@@ -1540,6 +1552,9 @@ export default class EditProgram extends Component {
                                     ></div>
                                 </div>
                             </CardBody>
+                            <CardHeader>
+                                <b>{this.state.userList.length}</b> {i18n.t('static.dashboard.users').toLowerCase()}
+                            </CardHeader>
                         </Card>
                     </Col>
                 </Row>
