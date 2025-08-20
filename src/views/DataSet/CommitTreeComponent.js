@@ -72,6 +72,7 @@ export default class CommitTreeComponent extends React.Component {
             programList: [],
             showValidation: false,
             versionTypeId: -1,
+            lastVersionType: -1,
             programDataLocal: '',
             programDataServer: '',
             programDataDownloaded: '',
@@ -655,6 +656,7 @@ export default class CommitTreeComponent extends React.Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var datasetJson = decryptFCData(myResult[i].programData);
+                        var lastVersionType = datasetJson.currentVersion.versionType.id
                         var programJson = {
                             name: datasetJson.programCode,
                             id: myResult[i].id,
@@ -685,7 +687,8 @@ export default class CommitTreeComponent extends React.Component {
                 this.setState({
                     programList: programList,
                     loading: false,
-                    programId: programId
+                    programId: programId,
+                    lastVersionType: lastVersionType
                 }, () => {
                     if (programId != "") {
                         this.setProgramId(event);
@@ -3486,7 +3489,7 @@ export default class CommitTreeComponent extends React.Component {
                                                         </FormGroup>
                                                         <div className="col-md-12">
                                                             <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-refresh"></i> {i18n.t('static.common.cancel')}</Button>
-                                                            {this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0 && (this.state.isChanged || this.state.versionTypeId == 2) && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
+                                                            {!!(this.state.programId != -1 && this.state.programId != "" && this.state.programId != undefined && this.state.conflictsCountVersionSettings == 0 && this.state.conflictsCountPlanningUnits == 0 && this.state.conflictsCountConsumption == 0 && this.state.conflictsCountTree == 0 && this.state.conflictsCountSelectedForecast == 0 && (this.state.isChanged || (this.state.versionTypeId == 2 ? (this.state.lastVersionType == 2 ? this.state.isChanged : true) : this.state.isChanged ))) && <Button type="submit" color="success" className="mr-1 float-right" size="md" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')}</Button>}
                                                         </div>
                                                     </div>
                                                 </Form>
