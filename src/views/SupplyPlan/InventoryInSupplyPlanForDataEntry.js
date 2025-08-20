@@ -417,6 +417,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 },
                                 { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                 { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                                { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                             ],
                             pagination: paginationOption,
                             paginationOptions: paginationArray,
@@ -870,14 +871,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             });
                         }
                         if (inventoryEditable && obj.options.allowDeleteRow == true) {
-                            if (obj.getRowData(y)[5] == 0) {
+                            if (obj.getRowData(y)[3] == 0) {
                                 items.push({
                                     title: i18n.t("static.common.deleterow"),
                                     onclick: function () {
-                                        if (obj.getJson(null, false).length == 1) {
-                                            this.props.updateState("inventoryBatchInfoChangedFlag", 1);
-                                            obj.deleteRow(parseInt(y));
-                                        }
+                                        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+                                        obj.deleteRow(parseInt(y));
                                     }.bind(this)
                                 });
                             }
@@ -1450,7 +1449,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             }
         }
         if (x == 2) {
-            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 0, 1);
         }
         if (rowData[0] != "") {
             if (rowData[0].length >= 27) {
@@ -1566,7 +1565,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         positiveValidation("B", y, elInstance);
                     }
                 }
-                var validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 1);
+                var validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 0, 1);
                 if (validation.toString() == "false") {
                     valid = false;
                 }
@@ -1789,7 +1788,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         adjustmentQty: elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
                         actualQty: null
                     }
-                    batchTotalQty = Number(batchTotalQty) + elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", "");
+                    batchTotalQty = Number(batchTotalQty) + Number(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
                     batchInfoArray.push(batchInfoJson);
                 }
                 inventoryInstance.setValueFromCoords(14, rowNumber, batchInfoArray, true);
