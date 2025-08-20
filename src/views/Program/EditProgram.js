@@ -1552,9 +1552,9 @@ export default class EditProgram extends Component {
                                     ></div>
                                 </div>
                             </CardBody>
-                            <CardHeader>
+                            <CardFooter>
                                 <b>{this.state.userList.length}</b> {i18n.t('static.dashboard.users').toLowerCase()}
-                            </CardHeader>
+                            </CardFooter>
                         </Card>
                     </Col>
                 </Row>
