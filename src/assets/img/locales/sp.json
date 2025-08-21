@@ -3623,5 +3623,7 @@
   "static.currency.conversionrateusd": "Tasa de cambio a USD",
   "static.logout.confirmLogout": "¿Desea cerrar la sesión?",
   "static.common.node": "Nodo",
-  "static.pipeline.pipelineConvertorLinux": "Linux"
+  "static.pipeline.pipelineConvertorLinux": "Linux",
+  "static.supplyPlan.addNewBatch":"Ingresar nuevo lote e información de vencimiento",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La fecha de vencimiento debe ser mayor que la fecha de inventario"
 }

@@ -3623,5 +3623,7 @@
   "static.currency.conversionrateusd": "Taux de conversion à 1 USD",
   "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
   "static.common.node": "Nœud",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.supplyPlan.addNewBatch":"Saisir les nouvelles informations de lot et d'expiration",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La date d'expiration doit être supérieure à la date d'inventaire"
 }
