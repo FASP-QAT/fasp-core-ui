@@ -3337,7 +3337,7 @@
   "static.forecastingunit.forecastingunittext": "Enter Forecasting Unit",
   "static.planningUnit.plannignUnitMeasure": "Enter Planning Unit UoM (Unit of Measure)",
   "static.dataEntryAndAdjustments.ClickSubmit": "Click \"Submit\" to save any entered data",
-  "static.stockStatus.doYouWantToAggregate": "Do you want to aggregate selected programs",
+  "static.stockStatus.doYouWantToAggregate": "Do you want to aggregate selected products and/or programs?",
   "static.ticket.header": "QAT Helpdesk",
   "static.user.confirmNewPasswordLabel": "Confirm new password",
   "static.realm.realm": "Realm",
