@@ -3613,21 +3613,10 @@
   "static.logout.confirmLogout": "¿Desea cerrar la sesión?",
   "static.common.node": "Nodo",
   "static.pipeline.pipelineConvertorLinux": "Linux",
-  "static.supplyPlan.importIntoSP": "Importar al plan de suministro",
   "static.importIntoSP.forecastBlank": "El pronóstico está en blanco",
-  "static.importFromQATSupplyPlan.supplyPlanProgram": "Programa del Plan de Abastecimiento",
-  "static.importIntoSP.dataExists": "Los datos ya existen en el programa del plan de suministro.",
-  "static.importIntoSP.dataExistsGray": "Los datos existen en el programa del plan de suministro y ya pasaron {{month}} meses, por lo que no se puede importar.",
   "static.errorPage.validUserComment": "Introduzca la descripción",
-  "static.priority": "Prioridad",
-  "static.priority.highest": "Mas alto",
   "static.priority.highestDesc": "QAT está inactivo o el usuario no puede iniciar sesión.",
-  "static.priority.high": "Alto",
-  "static.priority.highDesc": "El problema implica importantes inconvenientes para los usuarios, como no poder completar su previsión o plan de suministro. (Afecta una función crítica para el negocio y no existen soluciones alternativas).",
-  "static.priority.mediumDesc": "El usuario puede esperar una resolución sin causar una interrupción sustancial (afecta una función crítica para el negocio, pero existe una solución alternativa).",
-  "static.priority.low": "Bajo",
-  "static.priority.lowDesc": "El problema es notable pero no crítico para las operaciones diarias y sería bueno solucionarlo eventualmente. (Afecta a una función no crítica para el negocio).",
   "static.module": "Módulo",
-  "static.program.noOfProgramsUsingPU": "# Programas que usan PU",
-  "static.program.noOfProgramsUsingFU": "# Programas que usan FU"
+  "static.supplyPlan.addNewBatch":"Ingresar nuevo lote e información de vencimiento",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La fecha de vencimiento debe ser mayor que la fecha de inventario"
 }

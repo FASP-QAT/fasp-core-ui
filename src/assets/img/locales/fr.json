@@ -3599,10 +3599,9 @@
   "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
   "static.common.node": "Nœud",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.supplyPlan.importIntoSP": "Importer dans le plan d`approvisionnement",
   "static.importIntoSP.forecastBlank": "La prévision est vide",
-  "static.importIntoSP.dataExists": "Les données existent déjà dans le programme du plan d`approvisionnement",
-  "static.importIntoSP.dataExistsGray": "Les données existent dans le programme du plan d`approvisionnement et sont passées {{month}} mois, il ne peut donc pas être importé.",
   "static.errorPage.validUserComment": "Entrez la description",
-  "static.module": "Module"
+  "static.module": "Module",
+  "static.supplyPlan.addNewBatch":"Saisir les nouvelles informations de lot et d'expiration",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La date d'expiration doit être supérieure à la date d'inventaire"
 }
