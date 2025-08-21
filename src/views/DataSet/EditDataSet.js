@@ -11,6 +11,7 @@ import {
     Card, CardBody,
     CardHeader,
     CardFooter,
+    CardHeader,
     Col,
     Form,
     FormFeedback,
@@ -702,21 +703,34 @@ export default class EditProgram extends Component {
         var itemLabelB = b.userId;
         return itemLabelA > itemLabelB ? 1 : -1;
     });
-    userList.sort((a, b) => {
+    const flattenedUserList = userList.flatMap(user =>
+        user.roleList.map(role => ({
+            username: user.username,
+            orgAndCountry: user.orgAndCountry,
+            role: getLabelText(role.label, this.state.lang)
+        }))
+    );
+    flattenedUserList.sort((a, b) => {
         const orgCompare = a.orgAndCountry.localeCompare(b.orgAndCountry, undefined, { sensitivity: 'base' });
         if (orgCompare !== 0) {
             return orgCompare;
         }
-        return a.username.localeCompare(b.username, undefined, { sensitivity: 'base' });
+
+        const userCompare = a.username.localeCompare(b.username, undefined, { sensitivity: 'base' });
+        if (userCompare !== 0) {
+            return userCompare;
+        }
+
+        return a.role.localeCompare(b.role, undefined, { sensitivity: 'base' });
     });
     let userListArr = [];
     var data = [];
     var count = 0;
-    for (var j = 0; j < userList.length; j++) {
+    for (var j = 0; j < flattenedUserList.length; j++) {
         data = [];
-        data[0] = userList[j].username;
-        data[1] = userList[j].orgAndCountry;
-        data[2] = userList[j].roleList.map(a => getLabelText(a.label, this.state.lang)).toString().trim().replaceAll(',', ';');
+        data[0] = flattenedUserList[j].username;
+        data[1] = flattenedUserList[j].orgAndCountry;
+        data[2] = flattenedUserList[j].role;
         userListArr[count] = data;
         count++;
     }
