@@ -32,6 +32,7 @@ import i18n from "../../i18n";
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { Capitalize, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
+import InitialTicketPageComponent from '../Ticket/InitialTicketPageComponent.js';
 // Localized entity name
 const entityname = i18n.t('static.program.programMaster');
 // Initial values for form fields
@@ -1111,7 +1112,10 @@ export default class EditProgram extends Component {
                                 <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
                             </CardHeader>
                             <CardBody>
-                                <h7>{i18n.t('static.editProgram.userListSubHeader')}</h7>
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <h7>{i18n.t('static.editProgram.userListSubHeader')}</h7>
+                                    <InitialTicketPageComponent isIcon={false}/>
+                                </div>
                                 <div
                                     className=""
                                     style={{

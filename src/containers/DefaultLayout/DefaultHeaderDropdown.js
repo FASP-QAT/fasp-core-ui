@@ -306,7 +306,7 @@ class DefaultHeaderDropdown extends Component {
   dropMssgs() {
     const itemsCount = 7;
     return (
-      <InitialTicketPageComponent />
+      <InitialTicketPageComponent isIcon={true}/>
     );
   }
   /**

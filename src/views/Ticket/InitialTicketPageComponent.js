@@ -953,8 +953,8 @@ export default class InitialTicketPageComponent extends Component {
   render() {
     const checkOnline = localStorage.getItem('sessionType');
     return (
-      <Dropdown nav  >
-        {checkOnline==='Online' && <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />}
+      <Dropdown nav={this.props.isIcon} >
+        {checkOnline==='Online' && (!this.props.isIcon ? <h7 onClick={this.togglehelp} style={{color:'#205493'}}>{i18n.t('static.ticket.help')}</h7> : <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.help')} onClick={this.togglehelp} style={{ width: '31px', height: '31px' }} />)}
         <Modal isOpen={this.state.help} toggle={this.togglehelp} className={this.props.className} size='lg' backdrop="static">
           <AuthenticationServiceComponent history={this.props.history} />
                     <ModalHeader toggle={this.togglehelp} className="ModalHead modal-info-Headher"><strong>{i18n.t('static.ticket.help')}</strong></ModalHeader>
