@@ -3627,5 +3627,5 @@
   "static.supplyPlan.addNewBatch":"Input New Batch and Expiry Information",
   "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than Inventory Date",
   "static.editProgram.userListHeader": "Users who have access to",
-  "static.editProgram.userListSubHeader": "By default, the users are given access based on the selected Procurement Agent(s) and Funder(s) in the Program Info screen above. Additional users may be added manually as requested by a Program Admin. If you have concerns or requests regarding user access, please submit a ticket via the QAT Help Desk."
+  "static.editProgram.userListSubHeader": "By default, the users are given access based on the selected Procurement Agent(s) and Funder(s) in the Program Info screen above. Additional users may be added manually as requested by a Program Admin. If you have concerns or requests regarding user access, please submit a ticket via the "
 }
