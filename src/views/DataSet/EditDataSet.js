@@ -1112,10 +1112,10 @@ export default class EditProgram extends Component {
                                 <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
                             </CardHeader>
                             <CardBody>
-                                <div style={{ display: "flex", alignItems: "center" }}>
-                                    <h7>{i18n.t('static.editProgram.userListSubHeader')}</h7>
-                                    <InitialTicketPageComponent isIcon={false}/>
-                                </div>
+                                <h7>
+                                    {i18n.t('static.editProgram.userListSubHeader')}
+                                    <InitialTicketPageComponent isIcon={false} />
+                                </h7>
                                 <div
                                     className=""
                                     style={{
