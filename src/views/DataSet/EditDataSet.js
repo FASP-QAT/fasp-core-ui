@@ -705,10 +705,16 @@ export default class EditProgram extends Component {
         return itemLabelA > itemLabelB ? 1 : -1;
     });
     const flattenedUserList = userList.flatMap(user =>
-        user.roleList.map(role => ({
+        user.aclList.map(role => ({
             username: user.username,
             orgAndCountry: user.orgAndCountry,
-            role: getLabelText(role.label, this.state.lang)
+            role: getLabelText(role.roleDesc, this.state.lang),
+            country: role.countryName ? getLabelText(role.countryName, this.state.lang) : "All",
+            technicalArea: role.healthAreaName ? getLabelText(role.healthAreaName, this.state.lang) : "All",
+            organisation: role.organisationName ? getLabelText(role.organisationName, this.state.lang) : "All",
+            procurementAgent: role.procurementAgentName ? getLabelText(role.procurementAgentName, this.state.lang) : "All",
+            fundingSource: role.fundingSourceName ? getLabelText(role.fundingSourceName, this.state.lang) : "All",
+            program: role.programName ? getLabelText(role.programName, this.state.lang) : "All"
         }))
     );
     flattenedUserList.sort((a, b) => {
@@ -732,6 +738,12 @@ export default class EditProgram extends Component {
         data[0] = flattenedUserList[j].username;
         data[1] = flattenedUserList[j].orgAndCountry;
         data[2] = flattenedUserList[j].role;
+        data[3] = flattenedUserList[j].country;
+        data[4] = flattenedUserList[j].technicalArea;
+        data[5] = flattenedUserList[j].organisation;
+        data[6] = flattenedUserList[j].procurementAgent;
+        data[7] = flattenedUserList[j].fundingSource;
+        data[8] = flattenedUserList[j].program;
         userListArr[count] = data;
         count++;
     }
@@ -745,19 +757,49 @@ export default class EditProgram extends Component {
       colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
       columns: [
         {
-          title: i18n.t("static.user.username"),
-          type: "text",
-          readOnly: true
+            title: i18n.t("static.user.username"),
+            type: "text",
+            readOnly: true
         },
         {
-          title: i18n.t("static.user.orgAndCountry"),
-          type: "text",
-          readOnly: true
+            title: i18n.t("static.user.orgAndCountry"),
+            type: "text",
+            readOnly: true
         },
         {
-          title: i18n.t("static.role.role"),
-          type: "text",
-          readOnly: true
+            title: i18n.t("static.role.role"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.program.realmcountry"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.dashboard.healthareaheader"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.organisation.organisation"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.procurementagent.procurementagent"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.fundingsource.fundingsource"),
+            type: "text",
+            readOnly: true
+        },
+        {
+            title: i18n.t("static.dashboard.programheader"),
+            type: "text",
+            readOnly: true
         }
       ],
       pagination: localStorage.getItem("sesRecordCount"),
@@ -1107,7 +1149,7 @@ export default class EditProgram extends Component {
                     </Col>
                 </Row>
                 <Row style={{ display: this.state.loading ? "none" : "block" }}>
-                    <Col sm={12} md={8} style={{ flexBasis: 'auto' }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
                         <Card>
                             <CardHeader>
                                 <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
