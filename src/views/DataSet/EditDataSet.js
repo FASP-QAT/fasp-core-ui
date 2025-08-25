@@ -709,12 +709,12 @@ export default class EditProgram extends Component {
             username: user.username,
             orgAndCountry: user.orgAndCountry,
             role: getLabelText(role.roleDesc, this.state.lang),
-            country: role.countryName ? getLabelText(role.countryName, this.state.lang) : "All",
-            technicalArea: role.healthAreaName ? getLabelText(role.healthAreaName, this.state.lang) : "All",
-            organisation: role.organisationName ? getLabelText(role.organisationName, this.state.lang) : "All",
-            procurementAgent: role.procurementAgentName ? getLabelText(role.procurementAgentName, this.state.lang) : "All",
-            fundingSource: role.fundingSourceName ? getLabelText(role.fundingSourceName, this.state.lang) : "All",
-            program: role.programName ? getLabelText(role.programName, this.state.lang) : "All"
+            country: role.countryName ? getLabelText(role.countryName, this.state.lang) : i18n.t('static.common.all'),
+            technicalArea: role.healthAreaName ? getLabelText(role.healthAreaName, this.state.lang) : i18n.t('static.common.all'),
+            organisation: role.organisationName ? getLabelText(role.organisationName, this.state.lang) : i18n.t('static.common.all'),
+            procurementAgent: role.procurementAgentName ? getLabelText(role.procurementAgentName, this.state.lang) : i18n.t('static.common.all'),
+            fundingSource: role.fundingSourceName ? getLabelText(role.fundingSourceName, this.state.lang) : i18n.t('static.common.all'),
+            program: role.programName ? getLabelText(role.programName, this.state.lang) : i18n.t('static.common.all')
         }))
     );
     flattenedUserList.sort((a, b) => {
