@@ -620,7 +620,6 @@ class ListUserComponent extends Component {
      */
     buildJExcel2() {
         let userAclList = this.state.userAclList;
-        console.log("Hello",userAclList)
         let userArray = [];
         let count = 0;
         for (var j = 0; j < userAclList.length; j++) {

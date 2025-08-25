@@ -704,7 +704,7 @@ export default class EditProgram extends Component {
         var itemLabelB = b.userId;
         return itemLabelA > itemLabelB ? 1 : -1;
     });
-    const flattenedUserList = userList.flatMap(user =>
+    const flattenedUserListWithDuplicates = userList.flatMap(user =>
         user.aclList.map(role => ({
             username: user.username,
             orgAndCountry: user.orgAndCountry,
@@ -717,7 +717,7 @@ export default class EditProgram extends Component {
             program: role.programName ? getLabelText(role.programName, this.state.lang) : i18n.t('static.common.all')
         }))
     );
-    flattenedUserList.sort((a, b) => {
+    flattenedUserListWithDuplicates.sort((a, b) => {
         const orgCompare = a.orgAndCountry.localeCompare(b.orgAndCountry, undefined, { sensitivity: 'base' });
         if (orgCompare !== 0) {
             return orgCompare;
@@ -730,6 +730,9 @@ export default class EditProgram extends Component {
 
         return a.role.localeCompare(b.role, undefined, { sensitivity: 'base' });
     });
+    const flattenedUserList = Array.from(
+        new Set(flattenedUserListWithDuplicates.map(obj => JSON.stringify(obj)))
+    ).map(str => JSON.parse(str));
     let userListArr = [];
     var data = [];
     var count = 0;
