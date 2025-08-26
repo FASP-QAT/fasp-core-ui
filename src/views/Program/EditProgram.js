@@ -893,6 +893,14 @@ export default class EditProgram extends Component {
      */
     loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
+        let firstNestedHeader = document.querySelector(".jss_nested td:first-child").nextSibling;
+        if (firstNestedHeader) {
+            firstNestedHeader.style.border = "none";
+        }
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild.nextSibling;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.roleAcl');
     };
     /**
      * This function is used to build the table the access control
@@ -1005,6 +1013,12 @@ export default class EditProgram extends Component {
                 type: "text",
                 readOnly: true
             }
+        ],
+        nestedHeaders: [
+            [
+                { title: '', colspan: 2 },
+                { title: i18n.t("static.program.nestedHeader"), colspan: 7 }
+            ]
         ],
         pagination: localStorage.getItem("sesRecordCount"),
         filters: true,
