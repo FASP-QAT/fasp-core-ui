@@ -2374,6 +2374,7 @@
   "static.supplyPlanFormula.minMonthOfStockEx4": "Min= MAX (MIN MONTH OF STOCK,Min MoS Guardrail)",
   "static.supplyPlanFormula.minMonthOfStockEx5": "Min = MAX (4,3)",
   "static.supplyPlanFormula.minMonthOfStockEx2": "REORDER FREQUENCY = 3",
+  "static.supplyPlan.addNewBatch": "Input New Batch and Expiry Information",
   "static.dashboard.consumption": "Consumption (Forecast vs. Actual)",
   "static.supplyPlanFormula.minMonthOfStockEx3": "Min MoS Guardrail = 3(Based on realm)",
   "static.supplyPlan.userEnteredBatches": "User-Entered Batches",
@@ -3160,6 +3161,7 @@
   "static.dataset.manageProgramInfo": "Update Program Info",
   "static.equivalancyUnit.equivalancyUnitManage": "Manage Equivalency Unit",
   "static.extrpolation.graphTitlePart1": "Forecast for ",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than Inventory Date",
   "static.tree.monthlyEndNoSeasonality": "(No seasonality)",
   "static.whatIf.supplyPlanSaved": "Supply plan saved successfully.",
   "static.message.addBranchTemplate": "Branch Template Added Successfully",
@@ -3624,8 +3626,6 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.supplyPlan.addNewBatch":"Input New Batch and Expiry Information",
-  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "Expiry date must be greater than Inventory Date",
   "static.editProgram.userListHeader": "Users who have access to",
   "static.editProgram.userListSubHeader": "By default, the users are given access based on the selected Procurement Agent(s) and Funder(s) in the Program Info screen above. Additional users may be added manually as requested by a Program Admin. If you have concerns or requests regarding user access, please submit a ticket via the "
 }

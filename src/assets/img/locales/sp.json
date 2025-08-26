@@ -2366,6 +2366,7 @@
   "static.supplyPlanFormula.minMonthOfStockEx4": "Min = Mayor entre (MESES DE STOCK MIN, Límite inferior de MOS)",
   "static.supplyPlanFormula.minMonthOfStockEx5": "Min = Mayor entre '(4,3)",
   "static.supplyPlanFormula.minMonthOfStockEx2": "FRECUENCIA DE REORDEN = 3",
+  "static.supplyPlan.addNewBatch": "Ingrese la información del nuevo lote y la fecha de vencimiento.",
   "static.dashboard.consumption": "Consumo: estimado vs. real",
   "static.supplyPlanFormula.minMonthOfStockEx3": "Límite inferior de MOS = 3 (según el dominio)",
   "static.supplyPlan.userEnteredBatches": "Lotes ingresados ​​por el usuario",
@@ -3150,6 +3151,7 @@
   "static.dataset.manageProgramInfo": "Actualizar información del programa",
   "static.equivalancyUnit.equivalancyUnitManage": "Administrar unidad de equivalencia",
   "static.extrpolation.graphTitlePart1": "Estimación para ",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La fecha de vencimiento debe ser posterior a la fecha de inventario.",
   "static.tree.monthlyEndNoSeasonality": "(Sin estacionalidad)",
   "static.whatIf.supplyPlanSaved": "Plan de suministro guardado correctamente",
   "static.message.addBranchTemplate": "Plantilla de ramal añadida con éxito",
@@ -3327,7 +3329,7 @@
   "static.forecastingunit.forecastingunittext": "Ingresar el Producto base",
   "static.planningUnit.plannignUnitMeasure": "Ingrese la unidad de medida del producto",
   "static.dataEntryAndAdjustments.ClickSubmit": "Haga clic en \"Enviar\" para guardar los datos ingresados",
-  "static.stockStatus.doYouWantToAggregate": "¿Quieres agregar los programas seleccionados?",
+  "static.stockStatus.doYouWantToAggregate": "¿Quieres agregar productos y/o programas seleccionados?",
   "static.ticket.header": "Servicio de asistencia técnica QAT",
   "static.user.confirmNewPasswordLabel": "Confirmar la nueva contraseña",
   "static.realm.realm": "Dominio",
@@ -3616,7 +3618,5 @@
   "static.importIntoSP.forecastBlank": "El pronóstico está en blanco",
   "static.errorPage.validUserComment": "Introduzca la descripción",
   "static.priority.highestDesc": "QAT está inactivo o el usuario no puede iniciar sesión.",
-  "static.module": "Módulo",
-  "static.supplyPlan.addNewBatch":"Ingresar nuevo lote e información de vencimiento",
-  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La fecha de vencimiento debe ser mayor que la fecha de inventario"
+  "static.module": "Módulo"
 }
