@@ -644,32 +644,45 @@ export default class ConsumptionDetails extends React.Component {
                             var batchInfoList = programJson.batchInfoList;
                             var batchList = [];
                             var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.shipmentStatus.id == DELIVERED_SHIPMENT_STATUS);
-                            var consumptionBatchList=programJson.consumptionList.filter(c=>c.planningUnit.id==puList[pu].value).flatMap(consumption => consumption.batchInfoList);
-                            var inventoryBatchList=programJson.inventoryList.filter(c=>c.planningUnit.id==puList[pu].value).flatMap(inventory => inventory.batchInfoList);
-                            var shipmentBatchList=shipmentList.flatMap(shipment => shipment.batchInfoList);
+                            var consumptionBatchList = programJson.consumptionList.filter(c => c.planningUnit.id == puList[pu].value).flatMap(consumption => consumption.batchInfoList);
+                            var inventoryBatchList = programJson.inventoryList.filter(c => c.planningUnit.id == puList[pu].value).flatMap(inventory => inventory.batchInfoList);
+                            var shipmentBatchList = shipmentList.flatMap(shipment => shipment.batchInfoList);
                             for (var sl = 0; sl < shipmentList.length; sl++) {
                                 var bdl = shipmentList[sl].batchInfoList;
                                 for (var bd = 0; bd < bdl.length; bd++) {
                                     var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                     if (index == -1) {
-                                        var shipmentBatchListFiltered=shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var consumptionBatchListFiltered=consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var inventoryBatchListFiltered=inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
-                                        var shipmentTotal=0;
-                                        var consumptionTotal=0;
-                                        var inventoryTotal=0;
-                                        shipmentBatchListFiltered.map(item=>{
-                                            shipmentTotal+=Number(item.shipmentQty);
+                                        var shipmentBatchListFiltered = shipmentBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var consumptionBatchListFiltered = consumptionBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var inventoryBatchListFiltered = inventoryBatchList.filter(c => c.batch.batchNo == bdl[bd].batch.batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        var shipmentTotal = 0;
+                                        var consumptionTotal = 0;
+                                        var inventoryTotal = 0;
+                                        shipmentBatchListFiltered.map(item => {
+                                            shipmentTotal += Number(item.shipmentQty);
                                         })
-                                        consumptionBatchListFiltered.map(item=>{
-                                            consumptionTotal+=Number(item.consumptionQty);
+                                        consumptionBatchListFiltered.map(item => {
+                                            consumptionTotal += Number(item.consumptionQty);
                                         })
-                                        inventoryBatchListFiltered.map(item=>{
-                                            inventoryTotal+=Number(item.adjustmentQty)
+                                        inventoryBatchListFiltered.map(item => {
+                                            inventoryTotal += Number(item.adjustmentQty)
                                         })
                                         var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == puList[pu].value && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
                                         if (batchDetailsToPush.length > 0) {
-                                            batchDetailsToPush[0].qtyAvailable=Number(shipmentTotal)+Number(inventoryTotal)-Number(consumptionTotal);
+                                            batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
+                                            batchList.push(batchDetailsToPush[0]);
+                                        }
+                                    }
+                                }
+                            }
+                            var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == puList[pu].value && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                            for (var il = 0; il < inventoryList.length; il++) {
+                                var bdl = inventoryList[il].batchInfoList;
+                                for (var bd = 0; bd < bdl.length; bd++) {
+                                    var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                    if (index == -1) {
+                                        var batchDetailsToPush = batchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == puList[pu].value && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                                        if (batchDetailsToPush.length > 0) {
                                             batchList.push(batchDetailsToPush[0]);
                                         }
                                     }
@@ -883,8 +896,10 @@ export default class ConsumptionDetails extends React.Component {
                                                             onChange={(e) => { this.formSubmit(e, this.state.rangeValue); }}
                                                             labelledBy={i18n.t('static.common.select')}
                                                             filterOptions={filterOptions}
-                                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')}}
+                                                            overrideStrings={{
+                                                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                                selectSomeItems: i18n.t('static.common.select')
+                                                            }}
                                                         />
                                                     </div>
                                                 </FormGroup>

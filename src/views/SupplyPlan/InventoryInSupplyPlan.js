@@ -8,10 +8,11 @@ import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { ADJUSTMENT_MODIFIED, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
+import { ADJUSTMENT_MODIFIED, BATCH_NO_REGEX, BATCH_PREFIX, DATE_FORMAT_CAP, INDEXED_DB_NAME, INDEXED_DB_VERSION, INVENTORY_DATA_SOURCE_TYPE, INVENTORY_MODIFIED, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_NEGATIVE_INTEGER_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, SECRET_KEY } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
+import { generateRandomAplhaNumericCode, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 /**
  * This component is used to display the inventory/adjustment data in the form of table for supply plan, scenario planning, supply planning comparision and supply plan version and review screen
  */
@@ -24,7 +25,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.filterBatchInfoForExistingDataForInventory = this.filterBatchInfoForExistingDataForInventory.bind(this);
         this.loadedBatchInfoInventory = this.loadedBatchInfoInventory.bind(this);
         this.batchInfoChangedInventory = this.batchInfoChangedInventory.bind(this);
+        this.batchInfoAddChangedInventory = this.batchInfoAddChangedInventory.bind(this);
         this.checkValidationInventoryBatchInfo = this.checkValidationInventoryBatchInfo.bind(this);
+        this.checkValidationAddInventoryBatchInfo = this.checkValidationAddInventoryBatchInfo.bind(this);
         this.saveInventoryBatchInfo = this.saveInventoryBatchInfo.bind(this);
         this.checkValidationInventory = this.checkValidationInventory.bind(this);
         this.saveInventory = this.saveInventory.bind(this);
@@ -35,10 +38,32 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         this.oneditionend = this.oneditionend.bind(this);
         this.batchDetailsClicked = this.batchDetailsClicked.bind(this);
         this.formulaChanged = this.formulaChanged.bind(this)
-        this.onchangepage=this.onchangepage.bind(this)
+        this.onchangepage = this.onchangepage.bind(this)
+        this.changeAddNewBatch = this.changeAddNewBatch.bind(this);
         this.state = {
             inventoryEl: "",
-            inventoryBatchInfoTableEl: ""
+            inventoryBatchInfoTableEl: "",
+            inventoryJson: ""
+        }
+    }
+
+    changeAddNewBatch(event) {
+        var cont = false;
+        if (this.props.items.inventoryBatchInfoChangedFlag == 1) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.props.updateState("addNewBatch", event.target.checked);
+            this.props.updateState("inventoryBatchInfoChangedFlag", 0);
+            var inventoryJson = this.state.inventoryJson;
+            this.state.inventoryEl.setValueFromCoords(19, inventoryJson.y, event.target.checked, true);
+            this.batchDetailsClicked(inventoryJson.obj, inventoryJson.x, inventoryJson.y, inventoryJson.e, inventoryJson.inventoryEditable, 0);
         }
     }
     /**
@@ -65,10 +90,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
             if (data[i].x == 0 && data[i].value != "") {
-                var minDate=this.props.items.generalProgramJson.cutOffDate!=undefined && this.props.items.generalProgramJson.cutOffDate!=null && this.props.items.generalProgramJson.cutOffDate!=""?moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD"):moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD");
-                if(moment(data[i].value).format("YYYY-MM")>=moment(minDate).format("YYYY-MM")){
+                var minDate = this.props.items.generalProgramJson.cutOffDate != undefined && this.props.items.generalProgramJson.cutOffDate != null && this.props.items.generalProgramJson.cutOffDate != "" ? moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD") : moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD");
+                if (moment(data[i].value).format("YYYY-MM") >= moment(minDate).format("YYYY-MM")) {
                     (instance).setValueFromCoords(0, data[i].y, moment(data[i].value).format("YYYY-MM-DD"), true);
-                }else{
+                } else {
                     (instance).setValueFromCoords(0, data[i].y, "", true);
                 }
             }
@@ -155,307 +180,326 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var realmOS = realmTransaction.objectStore('realm');
             var realmRequest = realmOS.get(realmId);
             realmRequest.onsuccess = function (event) {
-            var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
-            var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
-            var rcpuRequest = rcpuOs.getAll();
-            rcpuRequest.onerror = function (event) {
-                this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
-                this.props.updateState("color", "#BA0C2F");
-                this.props.hideFirstComponent();
-            }.bind(this);
-            rcpuRequest.onsuccess = function (event) {
-                var rcpuResult = [];
-                rcpuResult = rcpuRequest.result;
-                for (var k = 0; k < rcpuResult.length; k++) {
-                    if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
-                        var rcpuJson = {
-                            name: getLabelText(rcpuResult[k].label, this.props.items.lang),
-                            id: rcpuResult[k].realmCountryPlanningUnitId,
-                            multiplier: rcpuResult[k].multiplier,
-                            active: rcpuResult[k].active,
-                            conversionNumber:rcpuResult[k].conversionNumber,
-                            conversionMethod:rcpuResult[k].conversionMethod,
-                        }
-                        realmCountryPlanningUnitList.push(rcpuJson);
-                    }
-                }
-                var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
-                var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
-                var dataSourceRequest = dataSourceOs.getAll();
-                dataSourceRequest.onerror = function (event) {
+                var rcpuTransaction = db1.transaction(['realmCountryPlanningUnit'], 'readwrite');
+                var rcpuOs = rcpuTransaction.objectStore('realmCountryPlanningUnit');
+                var rcpuRequest = rcpuOs.getAll();
+                rcpuRequest.onerror = function (event) {
                     this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
                     this.props.updateState("color", "#BA0C2F");
                     this.props.hideFirstComponent();
                 }.bind(this);
-                dataSourceRequest.onsuccess = function (event) {
-                    var dataSourceResult = [];
-                    dataSourceResult = dataSourceRequest.result;
-                    for (var k = 0; k < dataSourceResult.length; k++) {
-                        if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
-                            if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
-                                var dataSourceJson = {
-                                    name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
-                                    id: dataSourceResult[k].dataSourceId,
-                                    active: dataSourceResult[k].active,
-                                    label: dataSourceResult[k].label
+                rcpuRequest.onsuccess = function (event) {
+                    var rcpuResult = [];
+                    rcpuResult = rcpuRequest.result;
+                    for (var k = 0; k < rcpuResult.length; k++) {
+                        if (rcpuResult[k].realmCountry.id == generalProgramJson.realmCountry.realmCountryId && rcpuResult[k].planningUnit.id == document.getElementById("planningUnitId").value && rcpuResult[k].realmCountryPlanningUnitId != 0) {
+                            var rcpuJson = {
+                                name: getLabelText(rcpuResult[k].label, this.props.items.lang),
+                                id: rcpuResult[k].realmCountryPlanningUnitId,
+                                multiplier: rcpuResult[k].multiplier,
+                                active: rcpuResult[k].active,
+                                conversionNumber: rcpuResult[k].conversionNumber,
+                                conversionMethod: rcpuResult[k].conversionMethod,
+                            }
+                            realmCountryPlanningUnitList.push(rcpuJson);
+                        }
+                    }
+                    var dataSourceTransaction = db1.transaction(['dataSource'], 'readwrite');
+                    var dataSourceOs = dataSourceTransaction.objectStore('dataSource');
+                    var dataSourceRequest = dataSourceOs.getAll();
+                    dataSourceRequest.onerror = function (event) {
+                        this.props.updateState("supplyPlanError", i18n.t('static.program.errortext'));
+                        this.props.updateState("color", "#BA0C2F");
+                        this.props.hideFirstComponent();
+                    }.bind(this);
+                    dataSourceRequest.onsuccess = function (event) {
+                        var dataSourceResult = [];
+                        dataSourceResult = dataSourceRequest.result;
+                        for (var k = 0; k < dataSourceResult.length; k++) {
+                            if (dataSourceResult[k].program == null || dataSourceResult[k].program.id == generalProgramJson.programId || dataSourceResult[k].program.id == 0) {
+                                if (dataSourceResult[k].realm.id == generalProgramJson.realmCountry.realm.realmId && dataSourceResult[k].dataSourceType.id == INVENTORY_DATA_SOURCE_TYPE) {
+                                    var dataSourceJson = {
+                                        name: getLabelText(dataSourceResult[k].label, this.props.items.lang),
+                                        id: dataSourceResult[k].dataSourceId,
+                                        active: dataSourceResult[k].active,
+                                        label: dataSourceResult[k].label
+                                    }
+                                    dataSourceList.push(dataSourceJson);
                                 }
-                                dataSourceList.push(dataSourceJson);
                             }
                         }
-                    }
-                    if (this.state.inventoryEl != "" && this.state.inventoryEl != undefined) {
-                        jexcel.destroy(document.getElementById("adjustmentsTable"), true);
-                    }
-                    if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
-                        jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
-                    }
-                    if (this.props.useLocalData == 0) {
-                        dataSourceList = this.props.items.dataSourceList;
-                    }
-                    if (this.props.useLocalData == 0) {
-                        realmCountryPlanningUnitList = this.props.items.realmCountryPlanningUnitList;
-                    }
-                    this.setState({
-                        realmCountryPlanningUnitList: realmCountryPlanningUnitList,
-                        dataSourceList: dataSourceList,
-                        realm:realmRequest.result
-                    }, () => {
-                        this.props.updateState("dataSourceList", dataSourceList);
-                        this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
-                        this.props.updateState("realm", realmRequest.result);
-                    })
-                    var data = [];
-                    var inventoryDataArr = [];
-                    var adjustmentType = this.props.items.inventoryType;
-                    var adjustmentColumnType = "text";
-                    var adjustmentVisible = false;
-                    if (adjustmentType == 2) {
-                        adjustmentColumnType = "numeric"
-                        adjustmentVisible = true;
-                    }
-                    var actualVisible = false;
-                    var actualColumnType = "hidden";
-                    if (adjustmentType == 1) {
-                        actualColumnType = "numeric";
-                        actualVisible = true;
-                    }
-                    var inventoryEditable = true;
-                    if (this.props.inventoryPage == "supplyPlanCompare") {
-                        inventoryEditable = false;
-                    }
-                    // var roleList = AuthenticationService.getLoggedInUserRole();
-                    var programId = (document.getElementById("programId").value).split("_")[0];
-                    if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
-                        inventoryEditable = false;
-                    }
-                    if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
-                        document.getElementById("addInventoryRowSupplyPlan").style.display = "none";
-                    } else if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
-                        document.getElementById("addInventoryRowSupplyPlan").style.display = "block";
-                    }
-                    var paginationOption = false;
-                    var searchOption = false;
-                    var paginationArray = [];
-                    var filterOption = false;
-                    if (this.props.inventoryPage == "inventoryDataEntry") {
-                        paginationOption = localStorage.getItem("sesRecordCount");
-                        searchOption = true;
-                        paginationArray = JEXCEL_PAGINATION_OPTION;
-                        filterOption = true;
-                    }
-                    var readonlyRegionAndMonth = true;
-                    if (this.props.inventoryPage == "inventoryDataEntry") {
-                        readonlyRegionAndMonth = false;
-                    }
-                    inventoryList = inventoryList.sort(function (a, b) { return ((new Date(a.inventoryDate) - new Date(b.inventoryDate)) || (a.region.id - b.region.id) || (a.realmCountryPlanningUnit.id - b.realmCountryPlanningUnit.id)) })
-                    for (var j = 0; j < inventoryList.length; j++) {
-                        var rcpuForTable=realmCountryPlanningUnitList.filter(c=>c.id==inventoryList[j].realmCountryPlanningUnit.id);
-                        data = [];
-                        data[0] = inventoryList[j].inventoryDate; 
-                        data[1] = inventoryList[j].region.id; 
-                        data[2] = inventoryList[j].dataSource.id; 
-                        data[3] = inventoryList[j].realmCountryPlanningUnit.id; 
-                        data[4] = adjustmentType; 
-                        data[5] = Math.round(inventoryList[j].adjustmentQty); 
-                        data[6] = Math.round(inventoryList[j].actualQty); 
-                        data[7] = (rcpuForTable[0].conversionMethod==1?"*":"/")+rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
-                        data[8] = `=ROUND(F${parseInt(j) + 1}*S${parseInt(j) + 1},8)`; 
-                        data[9] = `=ROUND(G${parseInt(j) + 1}*S${parseInt(j) + 1},8)`; 
-                        if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
-                            data[10] = "";
-                        } else {
-                            data[10] = inventoryList[j].notes;
+                        if (this.state.inventoryEl != "" && this.state.inventoryEl != undefined) {
+                            jexcel.destroy(document.getElementById("adjustmentsTable"), true);
                         }
-                        data[11] = inventoryList[j].active;
-                        data[12] = inventoryList[j].inventoryDate;
-                        data[13] = inventoryList[j].batchInfoList;
-                        var index;
-                        if (inventoryList[j].inventoryId != 0) {
-                            index = inventoryListUnFiltered.findIndex(c => c.inventoryId == inventoryList[j].inventoryId);
-                        } else {
-                            index = inventoryList[j].index;
+                        if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
+                            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                            jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
                         }
-                        data[14] = index;
-                        data[15] = 0;
-                        data[16] = 0;
-                        data[17] = inventoryList[j].inventoryId;
-                        data[18] = inventoryList[j].multiplier; 
-                        inventoryDataArr[j] = data;
-                    }
-                    var regionList = this.props.items.regionList;
-                    if (inventoryList.length == 0 && inventoryEditable) {
-                        data = [];
-                        if (this.props.inventoryPage != "inventoryDataEntry") {
-                            data[0] = moment(this.props.items.inventoryEndDate).endOf('month').format("YYYY-MM-DD"); 
-                            data[1] = this.props.items.inventoryRegion; 
-                        } else {
-                            data[0] = "";
-                            data[1] = regionList.length == 1 ? regionList[0].id : "";
+                        if (this.props.useLocalData == 0) {
+                            dataSourceList = this.props.items.dataSourceList;
                         }
-                        data[2] = ""; 
-                        data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
-                        data[4] = adjustmentType; 
-                        data[5] = ""; 
-                        data[6] = ""; 
-                        data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-                        data[8] = `=ROUND(F${parseInt(0) + 1}*S${parseInt(0) + 1},8)`; 
-                        data[9] = `=ROUND(G${parseInt(0) + 1}*S${parseInt(0) + 1},8)`; 
-                        data[10] = "";
-                        data[11] = true;
-                        if (this.props.inventoryPage != "inventoryDataEntry") {
-                            data[12] = this.props.items.inventoryEndDate;
-                        } else {
-                            data[12] = "";
+                        if (this.props.useLocalData == 0) {
+                            realmCountryPlanningUnitList = this.props.items.realmCountryPlanningUnitList;
                         }
-                        data[13] = "";
-                        data[14] = -1;
-                        data[15] = 1;
-                        data[16] = 0;
-                        data[17] = 0;
-                        data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; 
-                        inventoryDataArr[0] = data;
-                    }
-                    this.setState({
-                        inventoryAllJson: inventoryDataArr
-                    })
-                    var options = {
-                        data: inventoryDataArr,
-                        columnDrag: false,
-                        columns: [
-                            { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.props.items.generalProgramJson.cutOffDate!=undefined && this.props.items.generalProgramJson.cutOffDate!=null && this.props.items.generalProgramJson.cutOffDate!=""?moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD"):moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
-                            { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
-                            { title: i18n.t('static.inventory.dataSource'), type: 'autocomplete', source: dataSourceList, width: 180, filter: this.filterDataSource },
-                            { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
-                            { title: i18n.t('static.supplyPlan.inventoryType'), type: 'autocomplete', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
-                            { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120, autoCasting: false },
-                            { title: actualVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120, autoCasting: false },
-                            { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 100, readOnly: true },
-                            { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'[-]#,##.000':'[-]#,##', decimal: '.', width: 120, readOnly: true, autoCasting: false },
-                            { title: actualVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: actualColumnType, visible: actualVisible, mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.', width: 120, readOnly: true, autoCasting: false },
-                            { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
-                            { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
-                            {
-                                type: 'text', visible: false,
-                                readOnly: true, autoCasting: false
-                            },
-                            {
-                                type: 'text',
-                                readOnly: true, visible: false, autoCasting: false
-                            },
-                            {
-                                type: 'text',
-                                readOnly: true, visible: false, autoCasting: false
-                            },
-                            {
-                                type: 'text',
-                                readOnly: true, visible: false, autoCasting: false
-                            },
-                            {
-                                type: 'text',
-                                readOnly: true, visible: false, autoCasting: false
-                            },
-                            {
-                                type: 'text',
-                                readOnly: true, visible: false, autoCasting: false
-                            },
-                            { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
-                        ],
-                        pagination: paginationOption,
-                        paginationOptions: paginationArray,
-                        search: searchOption,
-                        columnSorting: true,
-                        wordWrap: true,
-                        allowInsertColumn: false,
-                        allowManualInsertColumn: false,
-                        allowDeleteRow: true,
-                        allowManualInsertRow: false,
-                        allowExport: false,
-                        copyCompatibility: true,
-                        parseFormulas: true,
-                        filters: filterOption,
-                        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-                        onpaste: this.onPaste,
-                        oneditionend: this.oneditionend,
-                        onchangepage: this.onchangepage,
-                        onload: this.loadedInventory,
-                        editable: inventoryEditable,
-                        onformulachain: this.formulaChanged,
-                        onchange: this.inventoryChanged,
-                        updateTable: function (el, cell, x, y, source, value, id) {
-                        }.bind(this),
-                        onsearch: function (el) {
-                        },
-                        onfilter: function (el) {
-                        },
-                        contextMenu: function (obj, x, y, e) {
-                            var items = [];
-                            if (y == null) {
+                        this.setState({
+                            realmCountryPlanningUnitList: realmCountryPlanningUnitList,
+                            dataSourceList: dataSourceList,
+                            realm: realmRequest.result
+                        }, () => {
+                            this.props.updateState("dataSourceList", dataSourceList);
+                            this.props.updateState("realmCountryPlanningUnitList", realmCountryPlanningUnitList);
+                            this.props.updateState("realm", realmRequest.result);
+                        })
+                        var data = [];
+                        var inventoryDataArr = [];
+                        var adjustmentType = this.props.items.inventoryType;
+                        var adjustmentColumnType = "text";
+                        var adjustmentVisible = false;
+                        if (adjustmentType == 2) {
+                            adjustmentColumnType = "numeric"
+                            adjustmentVisible = true;
+                        }
+                        var actualVisible = false;
+                        var actualColumnType = "hidden";
+                        if (adjustmentType == 1) {
+                            actualColumnType = "numeric";
+                            actualVisible = true;
+                        }
+                        var inventoryEditable = true;
+                        if (this.props.inventoryPage == "supplyPlanCompare") {
+                            inventoryEditable = false;
+                        }
+                        // var roleList = AuthenticationService.getLoggedInUserRole();
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        if (AuthenticationService.checkUserACLBasedOnRoleId([programId.toString()], 'ROLE_GUEST_USER') || this.props.items.programQPLDetails.filter(c => c.id == this.props.items.programId)[0].readonly) {
+                            inventoryEditable = false;
+                        }
+                        if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == false) {
+                            document.getElementById("addInventoryRowSupplyPlan").style.display = "none";
+                        } else if (document.getElementById("addInventoryRowSupplyPlan") != null && this.props.inventoryPage != "supplyPlanCompare" && this.props.inventoryPage != "inventoryDataEntry" && inventoryEditable == true) {
+                            document.getElementById("addInventoryRowSupplyPlan").style.display = "block";
+                        }
+                        var paginationOption = false;
+                        var searchOption = false;
+                        var paginationArray = [];
+                        var filterOption = false;
+                        if (this.props.inventoryPage == "inventoryDataEntry") {
+                            paginationOption = localStorage.getItem("sesRecordCount");
+                            searchOption = true;
+                            paginationArray = JEXCEL_PAGINATION_OPTION;
+                            filterOption = true;
+                        }
+                        var readonlyRegionAndMonth = true;
+                        if (this.props.inventoryPage == "inventoryDataEntry") {
+                            readonlyRegionAndMonth = false;
+                        }
+                        inventoryList = inventoryList.sort(function (a, b) { return ((new Date(a.inventoryDate) - new Date(b.inventoryDate)) || (a.region.id - b.region.id) || (a.realmCountryPlanningUnit.id - b.realmCountryPlanningUnit.id)) })
+                        for (var j = 0; j < inventoryList.length; j++) {
+                            var rcpuForTable = realmCountryPlanningUnitList.filter(c => c.id == inventoryList[j].realmCountryPlanningUnit.id);
+                            data = [];
+                            data[0] = inventoryList[j].inventoryDate;
+                            data[1] = inventoryList[j].region.id;
+                            data[2] = inventoryList[j].dataSource.id;
+                            data[3] = inventoryList[j].realmCountryPlanningUnit.id;
+                            data[4] = adjustmentType;
+                            data[5] = Math.round(inventoryList[j].adjustmentQty);
+                            data[6] = Math.round(inventoryList[j].actualQty);
+                            data[7] = (rcpuForTable[0].conversionMethod == 1 ? "*" : "/") + rcpuForTable[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+                            data[8] = `=ROUND(F${parseInt(j) + 1}*S${parseInt(j) + 1},8)`;
+                            data[9] = `=ROUND(G${parseInt(j) + 1}*S${parseInt(j) + 1},8)`;
+                            if (inventoryList[j].notes === null || ((inventoryList[j].notes) == "NULL")) {
+                                data[10] = "";
                             } else {
-                                var rowData = obj.getRowData(y)
-                                if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && this.props.items.inventoryType==2) {
-                                    items.push({
-                                        title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
-                                        onclick: function () {
-                                            this.batchDetailsClicked(obj, x, y, e, inventoryEditable)
-                                        }.bind(this)
-                                    });
-                                }
-                                if (obj.options.allowInsertRow == true) {
-                                    var json = obj.getJson(null, false);
-                                    if (inventoryEditable) {
+                                data[10] = inventoryList[j].notes;
+                            }
+                            data[11] = inventoryList[j].active;
+                            data[12] = inventoryList[j].inventoryDate;
+                            data[13] = inventoryList[j].batchInfoList;
+                            var index;
+                            if (inventoryList[j].inventoryId != 0) {
+                                index = inventoryListUnFiltered.findIndex(c => c.inventoryId == inventoryList[j].inventoryId);
+                            } else {
+                                index = inventoryList[j].index;
+                            }
+                            data[14] = index;
+                            data[15] = 0;
+                            data[16] = 0;
+                            data[17] = inventoryList[j].inventoryId;
+                            data[18] = inventoryList[j].multiplier;
+                            data[19] = inventoryList[j].addNewBatch;
+                            var adjustmentBatchQty = 0;
+                            inventoryList[j].batchInfoList.map(c => adjustmentBatchQty = Number(adjustmentBatchQty) + (c.adjustmentQty != null ? Number(c.adjustmentQty) : Number(0)));
+                            data[20] = adjustmentBatchQty;
+                            inventoryDataArr[j] = data;
+                        }
+                        var regionList = this.props.items.regionList;
+                        if (inventoryList.length == 0 && inventoryEditable) {
+                            data = [];
+                            if (this.props.inventoryPage != "inventoryDataEntry") {
+                                data[0] = moment(this.props.items.inventoryEndDate).endOf('month').format("YYYY-MM-DD");
+                                data[1] = this.props.items.inventoryRegion;
+                            } else {
+                                data[0] = "";
+                                data[1] = regionList.length == 1 ? regionList[0].id : "";
+                            }
+                            data[2] = "";
+                            data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
+                            data[4] = adjustmentType;
+                            data[5] = "";
+                            data[6] = "";
+                            data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod == 1 ? "*" : "/") + realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";;
+                            data[8] = `=ROUND(F${parseInt(0) + 1}*S${parseInt(0) + 1},8)`;
+                            data[9] = `=ROUND(G${parseInt(0) + 1}*S${parseInt(0) + 1},8)`;
+                            data[10] = "";
+                            data[11] = true;
+                            if (this.props.inventoryPage != "inventoryDataEntry") {
+                                data[12] = this.props.items.inventoryEndDate;
+                            } else {
+                                data[12] = "";
+                            }
+                            data[13] = "";
+                            data[14] = -1;
+                            data[15] = 1;
+                            data[16] = 0;
+                            data[17] = 0;
+                            data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
+                            data[19] = 0;
+                            data[20] = 0;
+                            inventoryDataArr[0] = data;
+                        }
+                        this.setState({
+                            inventoryAllJson: inventoryDataArr
+                        })
+                        var options = {
+                            data: inventoryDataArr,
+                            columnDrag: false,
+                            columns: [
+                                { title: i18n.t('static.inventory.inventoryDate'), type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker', validRange: [this.props.items.generalProgramJson.cutOffDate != undefined && this.props.items.generalProgramJson.cutOffDate != null && this.props.items.generalProgramJson.cutOffDate != "" ? moment(this.props.items.generalProgramJson.cutOffDate).startOf('month').format("YYYY-MM-DD") : moment(MIN_DATE_RESTRICTION_IN_DATA_ENTRY).startOf('month').format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")] }, width: 80, readOnly: readonlyRegionAndMonth },
+                                { title: i18n.t('static.region.region'), type: 'autocomplete', readOnly: readonlyRegionAndMonth, source: this.props.items.regionList, width: 100 },
+                                { title: i18n.t('static.inventory.dataSource'), type: 'autocomplete', source: dataSourceList, width: 180, filter: this.filterDataSource },
+                                { title: i18n.t('static.supplyPlan.alternatePlanningUnit'), type: 'autocomplete', source: realmCountryPlanningUnitList, filter: this.filterRealmCountryPlanningUnit, width: 180 },
+                                { title: i18n.t('static.supplyPlan.inventoryType'), type: 'autocomplete', source: [{ id: 1, name: i18n.t('static.inventory.inventory') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true, width: 100 },
+                                { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 120, autoCasting: false },
+                                { title: actualVisible ? i18n.t('static.supplyPlan.quantityCountryProduct') : "", type: actualColumnType, visible: actualVisible, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, decimal: '.', width: 120, autoCasting: false },
+                                { title: i18n.t('static.unit.multiplierFromARUTOPU'), type: 'text', width: 100, readOnly: true },
+                                { title: adjustmentVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: adjustmentColumnType, visible: adjustmentVisible, mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '[-]#,##.000' : '[-]#,##', decimal: '.', width: 120, readOnly: true, autoCasting: false },
+                                { title: actualVisible ? i18n.t('static.supplyPlan.quantityQATProduct') : "", type: actualColumnType, visible: actualVisible, mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.', width: 120, readOnly: true, autoCasting: false },
+                                { title: i18n.t('static.program.notes'), type: 'text', width: 400 },
+                                { title: i18n.t('static.inventory.active'), type: 'checkbox', width: 100, readOnly: !inventoryEditable },
+                                {
+                                    type: 'text', visible: false,
+                                    readOnly: true, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                {
+                                    type: 'text',
+                                    readOnly: true, visible: false, autoCasting: false
+                                },
+                                { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                                { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                                { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
+                            ],
+                            pagination: paginationOption,
+                            paginationOptions: paginationArray,
+                            search: searchOption,
+                            columnSorting: true,
+                            wordWrap: true,
+                            allowInsertColumn: false,
+                            allowManualInsertColumn: false,
+                            allowDeleteRow: true,
+                            allowManualInsertRow: false,
+                            allowExport: false,
+                            copyCompatibility: true,
+                            parseFormulas: true,
+                            filters: filterOption,
+                            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+                            onpaste: this.onPaste,
+                            oneditionend: this.oneditionend,
+                            onchangepage: this.onchangepage,
+                            onload: this.loadedInventory,
+                            editable: inventoryEditable,
+                            onformulachain: this.formulaChanged,
+                            onchange: this.inventoryChanged,
+                            updateTable: function (el, cell, x, y, source, value, id) {
+                            }.bind(this),
+                            onsearch: function (el) {
+                            },
+                            onfilter: function (el) {
+                            },
+                            contextMenu: function (obj, x, y, e) {
+                                var items = [];
+                                if (y == null) {
+                                } else {
+                                    var rowData = obj.getRowData(y)
+                                    if (rowData[4] != "" && rowData[0] != "" && rowData[1] != "" && rowData[3] != "" && this.props.items.inventoryType == 2) {
                                         items.push({
-                                            title: this.props.items.inventoryType == 1 ? i18n.t('static.supplyPlan.addNewInventory') : i18n.t('static.supplyPlan.addNewAdjustments'),
+                                            title: i18n.t('static.supplyPlan.addOrListBatchInfo'),
                                             onclick: function () {
-                                                this.addRowInJexcel();
+                                                this.setState({
+                                                    inventoryJson: {
+                                                        "obj": obj,
+                                                        "x": x,
+                                                        "y": y,
+                                                        "e": e,
+                                                        "inventoryEditable": inventoryEditable
+                                                    }
+                                                }, () => {
+                                                });
+                                                this.batchDetailsClicked(obj, x, y, e, inventoryEditable, 1);
                                             }.bind(this)
                                         });
                                     }
-                                    if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
-                                        if (obj.getRowData(y)[14] == -1) {
+                                    if (obj.options.allowInsertRow == true) {
+                                        var json = obj.getJson(null, false);
+                                        if (inventoryEditable) {
                                             items.push({
-                                                title: i18n.t("static.common.deleterow"),
+                                                title: this.props.items.inventoryType == 1 ? i18n.t('static.supplyPlan.addNewInventory') : i18n.t('static.supplyPlan.addNewAdjustments'),
                                                 onclick: function () {
-                                                    this.props.updateState("inventoryChangedFlag", 1);
-                                                    obj.deleteRow(parseInt(y));
+                                                    this.addRowInJexcel();
                                                 }.bind(this)
                                             });
                                         }
+                                        if (inventoryEditable && obj.options.allowDeleteRow == true && obj.getJson(null, false).length > 1) {
+                                            if (obj.getRowData(y)[14] == -1) {
+                                                items.push({
+                                                    title: i18n.t("static.common.deleterow"),
+                                                    onclick: function () {
+                                                        this.props.updateState("inventoryChangedFlag", 1);
+                                                        obj.deleteRow(parseInt(y));
+                                                    }.bind(this)
+                                                });
+                                            }
+                                        }
                                     }
                                 }
-                            }
-                            return items;
-                        }.bind(this)
-                    }
-                    myVar = jexcel(document.getElementById("adjustmentsTable"), options);
-                    this.el = myVar;
-                    this.setState({
-                        inventoryEl: myVar
-                    })
-                    this.props.updateState("loading", false);
+                                return items;
+                            }.bind(this)
+                        }
+                        myVar = jexcel(document.getElementById("adjustmentsTable"), options);
+                        this.el = myVar;
+                        this.setState({
+                            inventoryEl: myVar
+                        })
+                        this.props.updateState("loading", false);
+                    }.bind(this)
                 }.bind(this)
-            }.bind(this)
+            }.bind(this);
         }.bind(this);
-    }.bind(this);
     }
     /**
      * This function is used when user clicks on the show batch details for a particular inventory/adjustment record
@@ -465,215 +509,370 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * @param {*} e This is mouse event handler
      * @param {*} inventoryEditable This is the value of the flag that indicates whether table should be editable or not
      */
-    batchDetailsClicked(obj, x, y, e, inventoryEditable) {
+    batchDetailsClicked(obj, x, y, e, inventoryEditable, toggle) {
         var rowData = obj.getRowData(y);
         this.props.updateState("loading", true);
-        if (this.props.inventoryPage == "inventoryDataEntry") {
+        this.props.updateState("addNewBatch", rowData[19]);
+        if (this.props.inventoryPage == "inventoryDataEntry" && toggle) {
             this.props.toggleLarge();
         }
-        var batchList = [];
-        var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
-        var inventoryQty = 0;
-        if (adjustmentType == 1) {
-            inventoryQty = obj.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()
-        } else {
-            inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
-        }
-        var batchInfoList = (this.props.items.batchInfoList).filter(c => c.autoGenerated.toString() == "false");
-        batchList.push({
-            name: inventoryQty>0?i18n.t('static.supplyPlan.positiveAdjustmentFEFO'):i18n.t('static.supplyPlan.negativeAdjustmentFEFO'),
-            id: -1
-        })
-        batchList.push({
-            name: i18n.t('static.common.select'),
-            id: 0
-        })
-        var planningUnitId = document.getElementById("planningUnitId").value;
-        for (var k = 0; k < batchInfoList.length; k++) {
-            if (batchInfoList[k].planningUnitId == planningUnitId) {
-                var batchJson = {
-                    name: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("MMM-YY"),
-                    id: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
-                    createdDate: batchInfoList[k].createdDate,
-                    expiryDate: batchInfoList[k].expiryDate,
-                    batchId: batchInfoList[k].batchId
-                }
-                batchList.push(batchJson);
-            }
-        }
-        this.setState({
-            batchInfoList: batchList
-        })
-        if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
-            jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
-        }
-        var json = [];
-        var inventoryQty = 0;
-        var adjustmentType = this.props.items.inventoryType;
-        var adjustmentColumnType = "hidden";
-        if (adjustmentType == 2) {
-            adjustmentColumnType = "numeric"
-        }
-        var actualColumnType = "hidden";
-        if (adjustmentType == 1) {
-            actualColumnType = "numeric";
-        }
-        var batchInfo = rowData[13];
-        var inventoryQty = 0;
-        if (adjustmentType == 1) {
-            inventoryQty = obj.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()
-        } else {
-            inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
-        }
-        var inventoryBatchInfoQty = 0;
-        var inventoryBatchEditable = inventoryEditable;
-        var lastEditableDate = "";
-        lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
-        if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
-            inventoryBatchEditable = false;
-        }
-        if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
-            document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
-        }
-        if (document.getElementById("inventoryBatchAddRow") != null) {
-            if (this.props.inventoryPage != "supplyPlanCompare") {
-                if (inventoryBatchEditable == false) {
-                    document.getElementById("inventoryBatchAddRow").style.display = "none";
-                } else {
-                    document.getElementById("inventoryBatchAddRow").style.display = "block";
-                }
-            }
-        }
-        for (var sb = 0; sb < batchInfo.length; sb++) {
-            var data = [];
-            data[0] = batchInfo[sb].batch.batchNo + "~" + moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD"); 
-            data[1] = moment(batchInfo[sb].batch.expiryDate).format("MMM-YY");
-            data[2] = adjustmentType; 
-            data[3] = Number(batchInfo[sb].adjustmentQty); 
-            data[4] = Number(batchInfo[sb].actualQty); 
-            data[5] = batchInfo[sb].inventoryTransBatchInfoId; 
-            data[6] = y; 
-            data[7] = date;
+        if (rowData[19].toString() == "false" || rowData[19].toString() == 0) {
+            var batchList = [];
+            var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+            var inventoryQty = 0;
             if (adjustmentType == 1) {
-                inventoryBatchInfoQty += Number(batchInfo[sb].actualQty);
+                inventoryQty = obj.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()
             } else {
-                inventoryBatchInfoQty += Number(batchInfo[sb].adjustmentQty);
+                inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
             }
-            json.push(data);
-        }
-        if ((adjustmentType == 1 && Number(inventoryQty) > inventoryBatchInfoQty) ||
-            (adjustmentType == 2 && Number(inventoryQty) > 0 ? Number(inventoryBatchInfoQty) < Number(inventoryQty) : Number(inventoryBatchInfoQty) > Number(inventoryQty)) || Number(inventoryBatchInfoQty) == 0) {
-            var qty = Number(inventoryQty) - Number(inventoryBatchInfoQty);
-            var data = [];
-            data[0] = -1; 
-            data[1] = "";
-            data[2] = adjustmentType; 
-            if (adjustmentType == 1) {
-                data[3] = ""; 
-                data[4] = qty; 
-            } else {
-                data[3] = qty; 
-                data[4] = ""; 
-            }
-            data[5] = 0; 
-            data[6] = y; 
-            data[7] = date;
-            json.push(data);
-        }
-        var options = {
-            data: json,
-            columnDrag: false,
-            columns: [
-                { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
-                { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
-                { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
-                { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
-                { title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', width: 0 },
-                { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
-                { type: 'hidden' }
-            ],
-            pagination: false,
-            search: false,
-            columnSorting: true,
-            wordWrap: true,
-            allowInsertColumn: false,
-            allowManualInsertColumn: false,
-            allowDeleteRow: true,
-            copyCompatibility: true,
-            allowInsertRow: true,
-            allowManualInsertRow: false,
-            allowExport: false,
-            onpaste: this.onPasteForBatchInfo,
-            onchange: this.batchInfoChangedInventory,
-            copyCompatibility: true,
-            parseFormulas: true,
-            editable: inventoryBatchEditable,
-            onload: this.loadedBatchInfoInventory,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-            updateTable: function (el, cell, x, y, source, value, id) {
-            }.bind(this),
-            contextMenu: function (obj, x, y, e) {
-                var items = [];
-                var items = [];
-                if (y == null) {
-                } else {
-                    var adjustmentType = this.props.items.inventoryType;
-                    if (inventoryEditable) {
-                        items.push({
-                            title: i18n.t('static.supplyPlan.addNewBatchInfo'),
-                            onclick: function () {
-                                this.addBatchRowInJexcel();
-                            }.bind(this)
-                        });
+            var batchInfoList = (this.props.items.batchInfoList).filter(c => c.autoGenerated.toString() == "false");
+            batchList.push({
+                name: inventoryQty > 0 ? i18n.t('static.supplyPlan.positiveAdjustmentFEFO') : i18n.t('static.supplyPlan.negativeAdjustmentFEFO'),
+                id: -1
+            })
+            batchList.push({
+                name: i18n.t('static.common.select'),
+                id: 0
+            })
+            var planningUnitId = document.getElementById("planningUnitId").value;
+            for (var k = 0; k < batchInfoList.length; k++) {
+                if (batchInfoList[k].planningUnitId == planningUnitId) {
+                    var batchJson = {
+                        name: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("MMM-YY"),
+                        id: batchInfoList[k].batchNo + "~" + moment(batchInfoList[k].expiryDate).format("YYYY-MM-DD"),
+                        createdDate: batchInfoList[k].createdDate,
+                        expiryDate: batchInfoList[k].expiryDate,
+                        batchId: batchInfoList[k].batchId
                     }
-                    if (inventoryEditable && obj.options.allowDeleteRow == true) {
-                        if (obj.getRowData(y)[5] == 0) {
+                    batchList.push(batchJson);
+                }
+            }
+            this.setState({
+                batchInfoList: batchList
+            })
+            if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+            }
+            var json = [];
+            var inventoryQty = 0;
+            var adjustmentType = this.props.items.inventoryType;
+            var adjustmentColumnType = "hidden";
+            if (adjustmentType == 2) {
+                adjustmentColumnType = "numeric"
+            }
+            var actualColumnType = "hidden";
+            if (adjustmentType == 1) {
+                actualColumnType = "numeric";
+            }
+            var batchInfo = rowData[13];
+            var inventoryQty = 0;
+            if (adjustmentType == 1) {
+                inventoryQty = obj.getValue(`G${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()
+            } else {
+                inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
+            }
+            var inventoryBatchInfoQty = 0;
+            var inventoryBatchEditable = inventoryEditable;
+            var lastEditableDate = "";
+            lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                inventoryBatchEditable = false;
+            }
+            if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
+                if (inventoryQty > 0) {
+                    document.getElementById("addNewBatchButton").style.display = 'block';
+                } else {
+                    document.getElementById("addNewBatchButton").style.display = 'none';
+                }
+            }
+            if (document.getElementById("inventoryBatchAddRow") != null) {
+                if (this.props.inventoryPage != "supplyPlanCompare") {
+                    if (inventoryBatchEditable == false) {
+                        document.getElementById("inventoryBatchAddRow").style.display = "none";
+                    } else {
+                        document.getElementById("inventoryBatchAddRow").style.display = "block";
+                    }
+                }
+            }
+            for (var sb = 0; sb < batchInfo.length; sb++) {
+                var data = [];
+                data[0] = batchInfo[sb].batch.batchNo + "~" + moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD");
+                data[1] = moment(batchInfo[sb].batch.expiryDate).format("MMM-YY");
+                data[2] = adjustmentType;
+                data[3] = Number(batchInfo[sb].adjustmentQty);
+                data[4] = Number(batchInfo[sb].actualQty);
+                data[5] = batchInfo[sb].inventoryTransBatchInfoId;
+                data[6] = y;
+                data[7] = date;
+                if (adjustmentType == 1) {
+                    inventoryBatchInfoQty += Number(batchInfo[sb].actualQty);
+                } else {
+                    inventoryBatchInfoQty += Number(batchInfo[sb].adjustmentQty);
+                }
+                json.push(data);
+            }
+            if ((adjustmentType == 1 && Number(inventoryQty) > inventoryBatchInfoQty) ||
+                (adjustmentType == 2 && Number(inventoryQty) > 0 ? Number(inventoryBatchInfoQty) < Number(inventoryQty) : Number(inventoryBatchInfoQty) > Number(inventoryQty)) || Number(inventoryBatchInfoQty) == 0) {
+                var qty = Number(inventoryQty) - Number(inventoryBatchInfoQty);
+                var data = [];
+                data[0] = -1;
+                data[1] = "";
+                data[2] = adjustmentType;
+                if (adjustmentType == 1) {
+                    data[3] = "";
+                    data[4] = qty;
+                } else {
+                    data[3] = qty;
+                    data[4] = "";
+                }
+                data[5] = 0;
+                data[6] = y;
+                data[7] = date;
+                json.push(data);
+            }
+            var options = {
+                data: json,
+                columnDrag: false,
+                columns: [
+                    { title: i18n.t('static.supplyPlan.batchId'), type: 'autocomplete', source: batchList, filter: this.filterBatchInfoForExistingDataForInventory, width: 100 },
+                    { title: i18n.t('static.supplyPlan.expiryDate'), type: 'text', readOnly: true, width: 150 },
+                    { title: i18n.t('static.supplyPlan.adjustmentType'), type: 'hidden', source: [{ id: 1, name: i18n.t('static.consumption.actual') }, { id: 2, name: i18n.t('static.inventoryType.adjustment') }], readOnly: true },
+                    { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: adjustmentColumnType, mask: '[-]#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
+                    { title: i18n.t('static.supplyPlan.quantityCountryProduct'), type: actualColumnType, mask: '#,##', textEditor: true, disabledMaskOnEdition: true, width: 80 },
+                    { title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'), type: 'hidden', width: 0 },
+                    { title: i18n.t('static.supplyPlan.rowNumber'), type: 'hidden', width: 0 },
+                    { type: 'hidden' }
+                ],
+                pagination: false,
+                search: false,
+                columnSorting: true,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: true,
+                copyCompatibility: true,
+                allowInsertRow: true,
+                allowManualInsertRow: false,
+                allowExport: false,
+                onpaste: this.onPasteForBatchInfo,
+                onchange: this.batchInfoChangedInventory,
+                copyCompatibility: true,
+                parseFormulas: true,
+                editable: inventoryBatchEditable,
+                onload: this.loadedBatchInfoInventory,
+                license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+                updateTable: function (el, cell, x, y, source, value, id) {
+                }.bind(this),
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    var items = [];
+                    if (y == null) {
+                    } else {
+                        var adjustmentType = this.props.items.inventoryType;
+                        if (inventoryEditable) {
                             items.push({
-                                title: i18n.t("static.common.deleterow"),
+                                title: i18n.t('static.supplyPlan.addNewBatchInfo'),
                                 onclick: function () {
-                                    if (obj.getJson(null, false).length == 1) {
-                                        var adjustmentType = this.props.items.inventoryType;
-                                        var rowData = obj.getRowData(0);
-                                        var inventoryQty = 0;
-                                        if (adjustmentType == 1) {
-                                            inventoryQty = (this.state.inventoryEl).getValue(`G${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim()
-                                        } else {
-                                            inventoryQty = (this.state.inventoryEl).getValue(`F${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim();
-                                        }
-                                        var rd = obj.getRowData(0);
-                                        var data = [];
-                                        var adjustmentType = this.props.items.inventoryType;
-                                        var data = [];
-                                        data[0] = -1;
-                                        data[1] = "";
-                                        data[2] = adjustmentType;
-                                        if (adjustmentType == 1) {
-                                            data[3] = ""; 
-                                            data[4] = inventoryQty; 
-                                        } else {
-                                            data[3] = inventoryQty; 
-                                            data[4] = ""; 
-                                        }
-                                        data[5] = 0;
-                                        data[6] = rowData[6];
-                                        data[7] = rowData[7];
-                                        obj.insertRow(data);
-                                    }
-                                    this.props.updateState("inventoryBatchInfoChangedFlag", 1);
-                                    obj.deleteRow(parseInt(y));
+                                    this.addBatchRowInJexcel();
                                 }.bind(this)
                             });
                         }
+                        if (inventoryEditable && obj.options.allowDeleteRow == true) {
+                            if (obj.getRowData(y)[5] == 0) {
+                                items.push({
+                                    title: i18n.t("static.common.deleterow"),
+                                    onclick: function () {
+                                        if (obj.getJson(null, false).length == 1) {
+                                            var adjustmentType = this.props.items.inventoryType;
+                                            var rowData = obj.getRowData(0);
+                                            var inventoryQty = 0;
+                                            if (adjustmentType == 1) {
+                                                inventoryQty = (this.state.inventoryEl).getValue(`G${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim()
+                                            } else {
+                                                inventoryQty = (this.state.inventoryEl).getValue(`F${parseInt(rowData[6]) + 1}`, true).toString().replaceAll("\,", "").trim();
+                                            }
+                                            var rd = obj.getRowData(0);
+                                            var data = [];
+                                            var adjustmentType = this.props.items.inventoryType;
+                                            var data = [];
+                                            data[0] = -1;
+                                            data[1] = "";
+                                            data[2] = adjustmentType;
+                                            if (adjustmentType == 1) {
+                                                data[3] = "";
+                                                data[4] = inventoryQty;
+                                            } else {
+                                                data[3] = inventoryQty;
+                                                data[4] = "";
+                                            }
+                                            data[5] = 0;
+                                            data[6] = rowData[6];
+                                            data[7] = rowData[7];
+                                            obj.insertRow(data);
+                                        }
+                                        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+                                        obj.deleteRow(parseInt(y));
+                                    }.bind(this)
+                                });
+                            }
+                        }
+                    }
+                    return items;
+                }.bind(this)
+            };
+            var elVar = jexcel(document.getElementById("inventoryBatchInfoTable"), options);
+            this.el = elVar;
+            this.setState({ inventoryBatchInfoTableEl: elVar });
+            this.props.updateState("loading", false);
+        } else {
+            var batchInfoListAll = this.props.items.programJson.batchInfoList;
+            this.setState({
+                batchInfoListAll: batchInfoListAll,
+            })
+            var date = moment(rowData[0]).startOf('month').format("YYYY-MM-DD");
+            var json = [];
+            if (this.state.inventoryBatchInfoTableEl != "" && this.state.inventoryBatchInfoTableEl != undefined) {
+                jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+            }
+            var inventoryBatchEditable = inventoryEditable;
+            var lastEditableDate = "";
+            lastEditableDate = moment(Date.now()).subtract(this.state.realm.inventoryMonthsInPast + 1, 'months').format("YYYY-MM-DD");
+            if (moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && rowData[14] != -1 && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
+                inventoryBatchEditable = false;
+            }
+
+            if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'block';
+                var inventoryQty = obj.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim();
+                if (inventoryQty > 0) {
+                    document.getElementById("addNewBatchButton").style.display = 'block';
+                } else {
+                    document.getElementById("addNewBatchButton").style.display = 'none';
+                }
+            }
+            if (document.getElementById("inventoryBatchAddRow") != null) {
+                if (this.props.inventoryPage != "supplyPlanCompare") {
+                    if (inventoryBatchEditable == false) {
+                        document.getElementById("inventoryBatchAddRow").style.display = "none";
+                    } else {
+                        document.getElementById("inventoryBatchAddRow").style.display = "block";
                     }
                 }
-                return items;
-            }.bind(this)
-        };
-        var elVar = jexcel(document.getElementById("inventoryBatchInfoTable"), options);
-        this.el = elVar;
-        this.setState({ inventoryBatchInfoTableEl: elVar });
-        this.props.updateState("loading", false);
+            }
+
+            var batchInfo = rowData[13];
+            for (var sb = 0; sb < batchInfo.length; sb++) {
+                var data = [];
+                data[0] = batchInfo[sb].batch.batchNo;
+                data[1] = moment(batchInfo[sb].batch.expiryDate).format("YYYY-MM-DD");
+                data[2] = Number(batchInfo[sb].adjustmentQty);
+                data[3] = batchInfo[sb].inventoryTransBatchInfoId;
+                data[4] = y;
+                data[5] = batchInfo[sb].batch.autoGenerated;
+                json.push(data);
+            }
+            if (batchInfo.length == 0) {
+                var data = [];
+                data[0] = "";
+                data[1] = "";
+                data[2] = "";
+                data[3] = 0;
+                data[4] = y;
+                data[5] = false;
+                json.push(data);
+            }
+            var options = {
+                data: json,
+                columnDrag: false,
+                columns: [
+                    {
+                        title: i18n.t('static.supplyPlan.batchId'),
+                        type: 'text',
+                        autoCasting: false
+                    },
+                    {
+                        title: i18n.t('static.supplyPlan.expiryDate'),
+                        type: 'calendar',
+                        options: {
+                            format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker',
+                            validRange: [moment(date).format("YYYY-MM-DD"), moment(Date.now()).add(MAX_DATE_RESTRICTION_IN_DATA_ENTRY, 'years').endOf('month').format("YYYY-MM-DD")]
+                        }
+                    },
+                    {
+                        title: i18n.t('static.supplyPlan.quantityCountryProduct'),
+                        type: 'numeric',
+                        textEditor: true,
+                        disabledMaskOnEdition: true,
+                        mask: '#,##',
+                    },
+                    {
+                        title: i18n.t('static.supplyPlan.inventoryTransBatchInfoId'),
+                        type: 'hidden',
+                        readOnly: true
+                    },
+                    {
+                        title: i18n.t('static.supplyPlan.rowNumber'),
+                        type: 'hidden',
+                        readOnly: true
+                    },
+                    { type: 'checkbox', title: i18n.t('static.report.autogenerated'), readOnly: true },
+                ],
+                pagination: false,
+                search: false,
+                columnSorting: true,
+                wordWrap: true,
+                allowInsertColumn: false,
+                allowManualInsertColumn: false,
+                allowDeleteRow: true,
+                copyCompatibility: true,
+                allowInsertRow: true,
+                allowManualInsertRow: false,
+                allowExport: false,
+                onchange: this.batchInfoAddChangedInventory,
+                copyCompatibility: true,
+                parseFormulas: true,
+                editable: inventoryBatchEditable,
+                onload: this.loadedBatchInfoInventory,
+                license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+                updateTable: function (el, cell, x, y, source, value, id) {
+                }.bind(this),
+                contextMenu: function (obj, x, y, e) {
+                    var items = [];
+                    var items = [];
+                    if (y == null) {
+                    } else {
+                        var adjustmentType = this.props.items.inventoryType;
+                        if (inventoryEditable) {
+                            items.push({
+                                title: i18n.t('static.supplyPlan.addNewBatchInfo'),
+                                onclick: function () {
+                                    this.addBatchRowInJexcel();
+                                }.bind(this)
+                            });
+                        }
+                        if (inventoryEditable && obj.options.allowDeleteRow == true) {
+                            if (obj.getRowData(y)[3] == 0) {
+                                items.push({
+                                    title: i18n.t("static.common.deleterow"),
+                                    onclick: function () {
+                                        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+                                        obj.deleteRow(parseInt(y));
+                                    }.bind(this)
+                                });
+                            }
+                        }
+                    }
+                    return items;
+                }.bind(this)
+            };
+            var elVar = jexcel(document.getElementById("inventoryAddBatchInfoTable"), options);
+            this.el = elVar;
+            this.setState({ inventoryBatchInfoTableEl: elVar });
+            this.props.updateState("loading", false);
+        }
     }
     /**
      * This function is used when users click on the add row in the inventory/adjustment table
@@ -686,19 +885,19 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         var realmCountryPlanningUnitList = this.state.realmCountryPlanningUnitList;
         var data = [];
         if (this.props.inventoryPage != "inventoryDataEntry") {
-            data[0] = moment(this.props.items.inventoryEndDate).format("YYYY-MM-DD"); 
-            data[1] = this.props.items.inventoryRegion; 
+            data[0] = moment(this.props.items.inventoryEndDate).format("YYYY-MM-DD");
+            data[1] = this.props.items.inventoryRegion;
         } else {
             data[0] = "";
             data[1] = regionList.length == 1 ? regionList[0].id : "";
         }
-        data[2] = ""; 
-        data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : ""; 
-        data[4] = map.get("4"); 
-        data[5] = ""; 
-        data[6] = ""; 
-        data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod==1?"*":"/")+realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";; 
-        data[8] = `=ROUND(F${parseInt(json.length) + 1}*S${parseInt(json.length) + 1},8)`; 
+        data[2] = "";
+        data[3] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].id : "";
+        data[4] = map.get("4");
+        data[5] = "";
+        data[6] = "";
+        data[7] = realmCountryPlanningUnitList.length == 1 ? (realmCountryPlanningUnitList[0].conversionMethod == 1 ? "*" : "/") + realmCountryPlanningUnitList[0].conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : "";;
+        data[8] = `=ROUND(F${parseInt(json.length) + 1}*S${parseInt(json.length) + 1},8)`;
         data[9] = `=ROUND(G${parseInt(json.length) + 1}*S${parseInt(json.length) + 1},8)`;
         data[10] = "";
         data[11] = true;
@@ -712,7 +911,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         data[15] = 1;
         data[16] = 0;
         data[17] = 0;
-        data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : ""; 
+        data[18] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
+        data[19] = 0;
+        data[20] = 0;
         obj.insertRow(data);
         if (this.props.inventoryPage == "inventoryDataEntry") {
             var showOption = (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
@@ -726,19 +927,32 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is used when users click on the add row in the inventory/adjustment batch table
      */
     addBatchRowInJexcel() {
-        var obj = this.state.inventoryBatchInfoTableEl;
-        var adjustmentType = this.props.items.inventoryType;
-        var rowData = obj.getRowData(0);
-        var data = [];
-        data[0] = "";
-        data[1] = "";
-        data[2] = adjustmentType;
-        data[3] = "";
-        data[4] = "";
-        data[5] = 0;
-        data[6] = rowData[6];
-        data[7] = rowData[7];
-        obj.insertRow(data);
+        if (this.props.items.addNewBatch.toString() == "false") {
+            var obj = this.state.inventoryBatchInfoTableEl;
+            var adjustmentType = this.props.items.inventoryType;
+            var rowData = obj.getRowData(0);
+            var data = [];
+            data[0] = "";
+            data[1] = "";
+            data[2] = adjustmentType;
+            data[3] = "";
+            data[4] = "";
+            data[5] = 0;
+            data[6] = rowData[6];
+            data[7] = rowData[7];
+            obj.insertRow(data);
+        } else {
+            var obj = this.state.inventoryBatchInfoTableEl;
+            var rowData = obj.getRowData(0);
+            var data = [];
+            data[0] = "";
+            data[1] = "";
+            data[2] = "";
+            data[3] = 0;
+            data[4] = rowData[4];
+            data[5] = false;
+            obj.insertRow(data);
+        }
     }
     /**
      * This function is used to filter the data source list based on active flag
@@ -806,10 +1020,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[17] > 0) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
-                    cell.classList.add('readonly');
-                }
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(z) + 1))
+                        cell.classList.add('readonly');
+                    }
                 }
                 if (rowData[11] == false) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -861,10 +1075,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[17] > 0) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
-                    cell.classList.add('readonly');
-                }
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(i) + 1))
+                        cell.classList.add('readonly');
+                    }
                 }
                 if (rowData[11] == false) {
                     for (var c = 0; c < colArr.length; c++) {
@@ -925,10 +1139,10 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var colArr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q']
             if (rowData[14] != -1 && rowData[14] !== "" && rowData[14] != undefined && moment(rowData[0]).format("YYYY-MM") < moment(lastEditableDate).format("YYYY-MM-DD") && !AuthenticationService.checkUserACL([(document.getElementById("programId").value).toString().split("_")[0].toString()], "ROLE_BF_READONLY_ACCESS_REALM_ADMIN")) {
                 if (rowData[17] > 0) {
-                for (var c = 0; c < colArr.length; c++) {
-                    var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
-                    cell.classList.add('readonly');
-                }
+                    for (var c = 0; c < colArr.length; c++) {
+                        var cell = elInstance.getCell((colArr[c]).concat(parseInt(y) + 1))
+                        cell.classList.add('readonly');
+                    }
                 }
             } else {
                 if (rowData[11] == false) {
@@ -962,6 +1176,36 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         positiveValidation("A", y, elInstance);
                     }
                 }
+                if (rowData[19].toString() == "true" || rowData[19].toString() == "1") {
+                    if (rowData[13] != "") {
+                        var batchDetails = rowData[13].filter(c => moment(c.batch.expiryDate).format("YYYY-MM") <= moment(rowData[0]).format("YYYY-MM"));
+                        if (batchDetails.length > 0) {
+                            inValid("A", y, i18n.t('static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("A", y, elInstance);
+                        }
+                    }
+                    if (rowData[13] != "") {
+                        var batchDetails = rowData[13];
+                        for (var b = 0; b < batchDetails.length; b++) {
+                            var bd = batchDetails[b];
+                            var minCreatedDate = moment(rowData[0]).format("YYYY-MM-DD");
+                            if (bd.batch.autoGenerated.toString() == "true") {
+                                var expDate = moment(minCreatedDate).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                batchDetails[b].batch.expiryDate = expDate;
+                                var batchInfoList = this.props.items.programJson.batchInfoList.filter(c => c.batchNo == batchDetails[b].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expDate).startOf('month').format("YYYY-MM"));
+                                var batchId = 0;
+                                if (batchInfoList.length > 0) {
+                                    batchId = batchInfoList[0].batchId;
+                                }
+                                batchDetails[b].batch.batchId = batchId;
+                            }
+                            batchDetails[b].batch.createdDate = moment(minCreatedDate).format("YYYY-MM-DD");
+                        }
+                        elInstance.setValueFromCoords(13, y, batchDetails, true);
+                    }
+                }
             }
         }
         if (x == 1) {
@@ -982,7 +1226,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
             var valid = checkValidtion("text", "D", y, rowData[3], elInstance);
             if (valid == true) {
                 var rcpuForTable = (this.state.realmCountryPlanningUnitList.filter(c => c.id == rowData[3].toString().split(";")[0])[0]);
-                elInstance.setValueFromCoords(7, y, (rcpuForTable.conversionMethod==1?"*":"/")+rcpuForTable.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
+                elInstance.setValueFromCoords(7, y, (rcpuForTable.conversionMethod == 1 ? "*" : "/") + rcpuForTable.conversionNumber.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","), true);
                 elInstance.setValueFromCoords(18, y, rcpuForTable.multiplier, true);
             }
             if (valid == false) {
@@ -999,16 +1243,26 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         inValid("F", y, i18n.t('static.common.max15digittext'), elInstance);
                     } else {
                         positiveValidation("F", y, elInstance);
-                        var batchDetails = rowData[13];
-                        var adjustmentBatchQty = 0;
-                        for (var b = 0; b < batchDetails.length; b++) {
-                            adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
-                        }
-                        if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())!="" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
-                            inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
-                            valid = false;
+                        if (rowData[19].toString() == "false" || rowData[19].toString() == "0") {
+                            var batchDetails = rowData[13];
+                            var adjustmentBatchQty = 0;
+                            for (var b = 0; b < batchDetails.length; b++) {
+                                adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
+                            }
+                            if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != "" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                                inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
+                                valid = false;
+                            } else {
+                                positiveValidation("F", y, elInstance)
+                            }
                         } else {
-                            positiveValidation("F", y, elInstance)
+                            var batchDetails = rowData[13];
+                            if (batchDetails.length == 1) {
+                                if (batchDetails[0].batch.autoGenerated.toString() == "true") {
+                                    batchDetails[0].adjustmentQty = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
+                                    elInstance.setValueFromCoords(13, y, batchDetails, true);
+                                }
+                            }
                         }
                     }
                 }
@@ -1038,7 +1292,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 for (var b = 0; b < batchDetails.length; b++) {
                     adjustmentBatchQty += Number(batchDetails[b].adjustmentQty);
                 }
-                if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim())!="" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
+                if (batchDetails.length > 0 && Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) != "" && (Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) > 0 ? Number(adjustmentBatchQty) > Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()) : Number(adjustmentBatchQty) < Number(elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim()))) {
                     inValid("F", y, i18n.t('static.consumption.missingBatch'), elInstance);
                     valid = false;
                 } else {
@@ -1079,6 +1333,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 }
             }
         }
+        if (x == 20) {
+            if (rowData[19].toString() == "true" || rowData[19].toString() == 1) {
+                var adjustedQty = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
+                if (value > adjustedQty) {
+                    inValid("F", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                } else {
+                    positiveValidation("F", y, elInstance);
+                }
+            }
+        }
     }
     /**
      * This function is used to filter the batch list based on expiry date and created date
@@ -1101,6 +1365,53 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
         tr.children[1].classList.add('AsteriskTheadtrTd');
         tr.children[4].classList.add('AsteriskTheadtrTd');
         tr.children[5].classList.add('AsteriskTheadtrTd');
+    }
+    /**
+     * This function is called when something in the inventory/adjustment batch info table is changed to add the validations or fill some auto values for the cells
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     * @param {*} x This is the value of the column number that is being updated
+     * @param {*} y This is the value of the row number that is being updated
+     * @param {*} value This is the updated value
+     */
+    batchInfoAddChangedInventory = function (instance, cell, x, y, value) {
+        var elInstance = instance;
+        var rowData = elInstance.getRowData(y);
+        this.props.updateState("inventoryBatchError", "");
+        this.props.updateState("inventoryBatchInfoDuplicateError", "");
+        this.props.updateState("inventoryBatchInfoNoStockError", "");
+        this.props.updateState("inventoryBatchInfoChangedFlag", 1);
+        if (x == 0) {
+            this.props.updateState("inventoryBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
+        }
+        if (x == 1) {
+            this.props.updateState("inventoryBatchInfoDuplicateError", "");
+            positiveValidation("A", y, elInstance);
+            var valid = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
+            if (valid) {
+                var expectedDeliveryDate = (this.state.inventoryEl).getRowData(parseInt(rowData[4]))[0];
+                if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                    inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate"), elInstance);
+                } else {
+                    positiveValidation("B", y, elInstance);
+                }
+            }
+        }
+        if (x == 2) {
+            checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 0, 1);
+        }
+        if (rowData[0] != "") {
+            if (rowData[0].length >= 27) {
+                inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+            } else if (!BATCH_NO_REGEX.test(rowData[0])) {
+                inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+            } else {
+                positiveValidation("A", y, elInstance);
+            }
+        } else {
+            inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
+        }
     }
     /**
      * This function is called when something in the inventory/adjustment batch info table is changed to add the validations or fill some auto values for the cells
@@ -1145,6 +1456,71 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                 checkValidtion("number", "E", y, elInstance.getValue(`E${parseInt(y) + 1}`, true).toString().replaceAll("\,", "").trim(), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 1, 0);
             }
         }
+    }
+    /**
+         * This function is called before saving the inventory/adjustment batch info to check validations for all the rows that are available in the table
+         * @returns This functions return true or false. It returns true if all the data is sucessfully validated. It returns false if some validation fails.
+         */
+    checkValidationAddInventoryBatchInfo() {
+        var valid = true;
+        var elInstance = this.state.inventoryBatchInfoTableEl;
+        var json = elInstance.getJson(null, false);
+        var mapArray = [];
+        for (var y = 0; y < json.length; y++) {
+            var map = new Map(Object.entries(json[y]));
+            mapArray.push(map);
+            var checkDuplicateInMap = mapArray.filter(c =>
+                c.get("0") == map.get("0") &&
+                moment(c.get("1")).startOf('month').format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM")
+            )
+            if (checkDuplicateInMap.length > 1) {
+                var colArr = ['A'];
+                for (var c = 0; c < colArr.length; c++) {
+                    inValid(colArr[c], y, i18n.t('static.supplyPlan.duplicateBatchNumber'), elInstance);
+                }
+                valid = false;
+                this.props.updateState("inventoryBatchInfoDuplicateError", i18n.t('static.supplyPlan.duplicateBatchNumber'));
+                this.props.hideThirdComponent()
+            } else {
+                var colArr = ['A'];
+                for (var c = 0; c < colArr.length; c++) {
+                    positiveValidation(colArr[c], y, elInstance);
+                }
+                var rowData = elInstance.getRowData(y);
+                var value = rowData[0];
+                if (value != "") {
+                    if (value.length >= 27) {
+                        inValid("A", y, i18n.t('static.common.max26digittext'), elInstance);
+                        valid = false;
+                    } else if (!BATCH_NO_REGEX.test(value)) {
+                        inValid("A", y, i18n.t('static.message.alphabetnumerallowed'), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("A", y, elInstance);
+                    }
+                } else {
+                    inValid("A", y, i18n.t('static.label.fieldRequired'), elInstance);
+                    valid = false;
+                }
+                var validation = checkValidtion("dateWithInvalidDataEntry", "B", y, rowData[1], elInstance, "", "", "", 1);
+                if (validation.toString() == "false") {
+                    valid = false;
+                } else {
+                    var expectedDeliveryDate = (this.state.inventoryEl).getRowData(parseInt(rowData[4]))[0];
+                    if (moment(rowData[1]).format("YYYY-MM") <= moment(expectedDeliveryDate).format("YYYY-MM")) {
+                        inValid("B", y, i18n.t("static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate"), elInstance);
+                        valid = false;
+                    } else {
+                        positiveValidation("B", y, elInstance);
+                    }
+                }
+                var validation = checkValidtion("number", "C", y, elInstance.getValue(`C${parseInt(y) + 1}`, true), elInstance, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, 0, 1);
+                if (validation.toString() == "false") {
+                    valid = false;
+                }
+            }
+        }
+        return valid;
     }
     /**
      * This function is called before saving the inventory/adjustment batch info to check validations for all the rows that are available in the table
@@ -1236,54 +1612,137 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is called when submit button of the inventory/adjustment batch info is clicked and is used to save inventory/adjustment batch info if all the data is successfully validated.
      */
     saveInventoryBatchInfo() {
-        this.props.updateState("loading", true);
-        var validation = this.checkValidationInventoryBatchInfo();
-        if (validation == true) {
-            var elInstance = this.state.inventoryBatchInfoTableEl;
-            var json = elInstance.getJson(null, false);
-            var batchInfoArray = [];
-            var rowNumber = 0;
-            var totalAdjustments = 0;
-            var totalActualStock = 0;
-            var countForNonFefo = 0;
-            for (var i = 0; i < json.length; i++) {
-                var map = new Map(Object.entries(json[i]));
-                if (i == 0) {
-                    rowNumber = map.get("6");
-                }
-                if (map.get("0") != -1) {
-                    countForNonFefo += 1;
-                    var batchInfoJson = {
-                        inventoryTransBatchInfoId: map.get("5"),
-                        batch: {
-                            batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
-                            batchNo: (elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[0],
-                            autoGenerated: 0,
-                            planningUnitId: parseInt(document.getElementById("planningUnitId").value),
-                            expiryDate: moment((elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[1]).format("YYYY-MM-DD"),
-                            createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
-                        },
-                        adjustmentQty: (map.get("2") == 2) ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 1) && elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
-                        actualQty: (map.get("2") == 1) ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 2) && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != null && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != undefined && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "NaN" ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null
+        if (this.props.items.addNewBatch.toString() == "false") {
+            this.props.updateState("loading", true);
+            var validation = this.checkValidationInventoryBatchInfo();
+            if (validation == true) {
+                var elInstance = this.state.inventoryBatchInfoTableEl;
+                var json = elInstance.getJson(null, false);
+                var batchInfoArray = [];
+                var rowNumber = 0;
+                var totalAdjustments = 0;
+                var totalActualStock = 0;
+                var countForNonFefo = 0;
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    if (i == 0) {
+                        rowNumber = map.get("6");
                     }
+                    if (map.get("0") != -1) {
+                        countForNonFefo += 1;
+                        var batchInfoJson = {
+                            inventoryTransBatchInfoId: map.get("5"),
+                            batch: {
+                                batchId: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].batchId,
+                                batchNo: (elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[0],
+                                autoGenerated: 0,
+                                planningUnitId: parseInt(document.getElementById("planningUnitId").value),
+                                expiryDate: moment((elInstance.getValue(`A${parseInt(i) + 1}`, false)).split("~")[1]).format("YYYY-MM-DD"),
+                                createdDate: this.state.batchInfoList.filter(c => c.name == (elInstance.getCell(`A${parseInt(i) + 1}`).innerText))[0].createdDate
+                            },
+                            adjustmentQty: (map.get("2") == 2) ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 1) && elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
+                            actualQty: (map.get("2") == 1) ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : (map.get("2") == 2) && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != null && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "" && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != undefined && elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != "NaN" ? elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null
+                        }
+                        batchInfoArray.push(batchInfoJson);
+                    }
+                    totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
+                    totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
+                }
+                var inventoryInstance = this.state.inventoryEl;
+                var allConfirm = true;
+                if (allConfirm == true) {
+                    if (map.get("2") == 1) {
+                        if (totalActualStock > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim()) {
+                            inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
+                        }
+                    } else {
+                        if ((inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
+                            inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
+                        }
+                    }
+                    inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
+                    inventoryInstance.setValueFromCoords(19, rowNumber, this.props.items.addNewBatch, true);
+                    this.setState({
+                        inventoryChangedFlag: 1,
+                        inventoryBatchInfoChangedFlag: 0,
+                        inventoryBatchInfoTableEl: ''
+                    })
+                    this.props.updateState("inventoryChangedFlag", 1);
+                    this.props.updateState("inventoryBatchInfoChangedFlag", 0);
+                    this.props.updateState("inventoryBatchInfoTableEl", "");
+                    this.setState({
+                        inventoryBatchInfoTableEl: ""
+                    })
+                    if (document.getElementById("showInventoryBatchInfoButtonsDiv") != null) {
+                        document.getElementById("showInventoryBatchInfoButtonsDiv").style.display = 'none';
+                    }
+                    if (this.props.inventoryPage == "inventoryDataEntry") {
+                        this.props.toggleLarge("submit");
+                    }
+                    jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                    jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+                }
+                this.props.updateState("loading", false);
+            } else {
+                this.setState({
+                    inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
+                })
+                this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
+                this.props.updateState("loading", false);
+                this.props.hideThirdComponent();
+            }
+        } else {
+            this.props.updateState("loading", true);
+            var validation = this.checkValidationAddInventoryBatchInfo();
+            if (validation == true) {
+                var elInstance = this.state.inventoryBatchInfoTableEl;
+                var json = elInstance.getJson(null, false);
+                var batchInfoArray = [];
+                var rowNumber = 0;
+                var batchTotalQty = 0;
+                for (var i = 0; i < json.length; i++) {
+                    var map = new Map(Object.entries(json[i]));
+                    if (i == 0) {
+                        rowNumber = map.get("4");
+                    }
+                    var inventoryInstance = this.state.inventoryEl;
+                    var rowData = inventoryInstance.getRowData(parseInt(rowNumber));
+                    var batchNo = "";
+                    var autoGenerated = map.get("5");
+                    if (map.get("0") != "") {
+                        batchNo = map.get("0");
+                    } else {
+                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var planningUnitId = document.getElementById("planningUnitId").value;
+                        programId = paddingZero(programId, 0, 6);
+                        planningUnitId = paddingZero(planningUnitId, 0, 8);
+                        batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                        autoGenerated = true
+                    }
+                    var batchInfoList = this.state.batchInfoListAll.filter(c => c.batchNo == map.get("0") && moment(c.expiryDate).format("YYYY-MM") == moment(map.get("1")).startOf('month').format("YYYY-MM"));
+                    var batchId = 0;
+                    if (batchInfoList.length > 0) {
+                        batchId = batchInfoList[0].batchId;
+                    }
+                    var minCreatedDate = moment(rowData[0]).format("YYYY-MM-DD");
+                    var batchInfoJson = {
+                        inventoryTransBatchInfoId: map.get("3"),
+                        batch: {
+                            batchNo: batchNo,
+                            expiryDate: moment(map.get("1")).startOf('month').format("YYYY-MM-DD"),
+                            batchId: batchId,
+                            autoGenerated: autoGenerated,
+                            createdDate: moment(minCreatedDate).format("YYYY-MM-DD")
+                        },
+                        adjustmentQty: elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""),
+                        actualQty: null
+                    }
+                    batchTotalQty = Number(batchTotalQty) + Number(elInstance.getValue(`C${parseInt(i) + 1}`, true).toString().replaceAll("\,", ""));
                     batchInfoArray.push(batchInfoJson);
                 }
-                totalAdjustments += Number(elInstance.getValue(`D${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
-                totalActualStock += Number(elInstance.getValue(`E${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim());
-            }
-            var inventoryInstance = this.state.inventoryEl;
-            var allConfirm = true;
-            if (allConfirm == true) {
-                if (map.get("2") == 1) {
-                    if (totalActualStock > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim()) {
-                        inventoryInstance.setValueFromCoords(6, rowNumber, totalActualStock, true);
-                    }
-                } else {
-                    if ((inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() > 0 ? totalAdjustments > inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim() : totalAdjustments < inventoryInstance.getValue(`G${parseInt(rowNumber) + 1}`, true).toString().replaceAll("\,", "").trim())) {
-                        inventoryInstance.setValueFromCoords(5, rowNumber, totalAdjustments, true);
-                    }
-                }
                 inventoryInstance.setValueFromCoords(13, rowNumber, batchInfoArray, true);
+                inventoryInstance.setValueFromCoords(20, rowNumber, batchTotalQty, true);
+                inventoryInstance.setValueFromCoords(19, rowNumber, this.props.items.addNewBatch, true);
                 this.setState({
                     inventoryChangedFlag: 1,
                     inventoryBatchInfoChangedFlag: 0,
@@ -1302,15 +1761,16 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     this.props.toggleLarge("submit");
                 }
                 jexcel.destroy(document.getElementById("inventoryBatchInfoTable"), true);
+                jexcel.destroy(document.getElementById("inventoryAddBatchInfoTable"), true);
+                this.props.updateState("loading", false);
+            } else {
+                this.setState({
+                    inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
+                })
+                this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
+                this.props.updateState("loading", false);
+                this.props.hideThirdComponent();
             }
-            this.props.updateState("loading", false);
-        } else {
-            this.setState({
-                inventoryBatchError: i18n.t('static.supplyPlan.validationFailed')
-            })
-            this.props.updateState("inventoryBatchError", i18n.t('static.supplyPlan.validationFailed'));
-            this.props.updateState("loading", false);
-            this.props.hideThirdComponent();
         }
     }
     /**
@@ -1401,6 +1861,17 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 positiveValidation("A", y, elInstance);
                             }
                         }
+                        if (rowData[19].toString() == "true" || rowData[19].toString() == "1") {
+                            if (rowData[13] != "") {
+                                var batchDetails = rowData[13].filter(c => moment(c.batch.expiryDate).format("YYYY-MM") <= moment(rowData[0]).format("YYYY-MM"));
+                                if (batchDetails.length > 0) {
+                                    inValid("A", y, i18n.t('static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate'), elInstance);
+                                    valid = false;
+                                } else {
+                                    positiveValidation("B", y, elInstance);
+                                }
+                            }
+                        }
                     }
                     var validation = checkValidtion("text", "B", y, rowData[1], elInstance);
                     if (validation == false) {
@@ -1458,6 +1929,15 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         if (validation == false) {
                             valid = false;
                             elInstance.setValueFromCoords(16, y, 1, true);
+                        }
+                    }
+                    if (rowData[19].toString() == "true" || rowData[19].toString() == 1) {
+                        var adjustedQty = elInstance.getValue(`F${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")
+                        if (rowData[20] > adjustedQty) {
+                            inValid("F", y, i18n.t('static.supplyPlan.batchNumberMissing'), elInstance);
+                            valid = false;
+                        } else {
+                            positiveValidation("F", y, elInstance);
                         }
                     }
                 }
@@ -1537,6 +2017,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                     var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     var curUser = AuthenticationService.getLoggedInUserId();
                     var username = AuthenticationService.getLoggedInUsername();
+                    var batchInfoList = (programJson.batchInfoList);
                     for (var i = 0; i < json.length; i++) {
                         var map = new Map(Object.entries(json[i]));
                         if (map.get("15") == 1) {
@@ -1547,6 +2028,12 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             }
                         }
                         if (parseInt(map.get("14")) != -1) {
+                            var inventorybatchInfoList;
+                            if (map.get("13") != "") {
+                                inventorybatchInfoList = map.get("13");
+                            } else {
+                                inventorybatchInfoList = [];
+                            }
                             inventoryDataList[parseInt(map.get("14"))].inventoryDate = moment(map.get("0")).endOf('month').format("YYYY-MM-DD");
                             inventoryDataList[parseInt(map.get("14"))].region.id = map.get("1");
                             inventoryDataList[parseInt(map.get("14"))].region.label = (this.props.items.regionList).filter(c => c.id == map.get("1"))[0].label
@@ -1559,8 +2046,40 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                             inventoryDataList[parseInt(map.get("14"))].actualQty = (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
                             inventoryDataList[parseInt(map.get("14"))].notes = map.get("10");
                             inventoryDataList[parseInt(map.get("14"))].active = map.get("11");
+                            inventoryDataList[parseInt(map.get("14"))].addNewBatch = map.get("19");
+                            if (map.get("19").toString() == "true") {
+                                var adjustmentBatchQty = 0;
+                                inventorybatchInfoList.map(c => adjustmentBatchQty = Number(adjustmentBatchQty) + (c.adjustmentQty != null ? Number(c.adjustmentQty) : Number(0)));
+                                var adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                                if (adjustmentBatchQty < adjustmentQty) {
+                                    var expiryDate = moment(map.get("0")).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                    var remainingBatchQty = Number(adjustmentQty) - Number(adjustmentBatchQty);
+                                    var indexBatchNo = inventorybatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
+                                    if (indexBatchNo != -1) {
+                                        inventorybatchInfoList[indexBatchNo].adjustmentQty = Number(inventorybatchInfoList[indexBatchNo].adjustmentQty) + Number(remainingBatchQty);
+                                    } else {
+                                        var programId = (document.getElementById("programId").value).split("_")[0];
+                                        var planningUnitId1 = planningUnitId;
+                                        programId = paddingZero(programId, 0, 6);
+                                        planningUnitId1 = paddingZero(planningUnitId1, 0, 8);
+                                        var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                        var json1 = {
+                                            inventoryTransBatchInfoId: 0,
+                                            batch: {
+                                                batchNo: batchNo,
+                                                expiryDate: expiryDate,
+                                                batchId: 0,
+                                                autoGenerated: true,
+                                                createdDate: moment(map.get("0")).format("YYYY-MM-DD")
+                                            },
+                                            adjustmentQty: remainingBatchQty,
+                                        }
+                                        inventorybatchInfoList.push(json1);
+                                    }
+                                }
+                            }
                             if (map.get("13") != "") {
-                                inventoryDataList[parseInt(map.get("14"))].batchInfoList = map.get("13");
+                                inventoryDataList[parseInt(map.get("14"))].batchInfoList = inventorybatchInfoList;
                             } else {
                                 inventoryDataList[parseInt(map.get("14"))].batchInfoList = [];
                             }
@@ -1569,10 +2088,66 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 inventoryDataList[parseInt(map.get("14"))].lastModifiedBy.username = username;
                                 inventoryDataList[parseInt(map.get("14"))].lastModifiedDate = curDate;
                             }
+                            if (map.get("19").toString() == "true") {
+                                for (var bi = 0; bi < inventorybatchInfoList.length; bi++) {
+                                    var index = -1;
+                                    if (inventorybatchInfoList[bi].batch.batchId != 0) {
+                                        index = batchInfoList.findIndex(c => c.batchId == inventorybatchInfoList[bi].batch.batchId);
+                                    } else {
+                                        index = batchInfoList.findIndex(c => c.batchNo == inventorybatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(inventorybatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                    }
+                                    if (index == -1) {
+                                        var batchDetails = {
+                                            batchId: inventorybatchInfoList[bi].batch.batchId,
+                                            batchNo: inventorybatchInfoList[bi].batch.batchNo,
+                                            planningUnitId: planningUnitId,
+                                            expiryDate: inventorybatchInfoList[bi].batch.expiryDate,
+                                            createdDate: inventorybatchInfoList[bi].batch.createdDate,
+                                            autoGenerated: inventorybatchInfoList[bi].batch.autoGenerated
+                                        }
+                                        batchInfoList.push(batchDetails);
+                                    } else {
+                                        batchInfoList[index].expiryDate = inventorybatchInfoList[bi].batch.expiryDate;
+                                        batchInfoList[index].createdDate = inventorybatchInfoList[bi].batch.createdDate;
+                                        batchInfoList[index].autoGenerated = inventorybatchInfoList[bi].batch.autoGenerated;
+                                    }
+                                }
+                            }
                         } else {
-                            var batchInfoList = [];
+                            var inventorybatchInfoList = [];
                             if (map.get("13") != "") {
-                                batchInfoList = map.get("13");
+                                inventorybatchInfoList = map.get("13");
+                            }
+                            if (map.get("19").toString() == "true") {
+                                var adjustmentBatchQty = 0;
+                                inventorybatchInfoList.map(c => adjustmentBatchQty = Number(adjustmentBatchQty) + (c.adjustmentQty != null ? Number(c.adjustmentQty) : Number(0)));
+                                var adjustmentQty = (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() != 0 ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null;
+                                if (adjustmentBatchQty < adjustmentQty) {
+                                    var expiryDate = moment(map.get("0")).add(this.props.items.shelfLife, 'months').startOf('month').format("YYYY-MM-DD");
+                                    var remainingBatchQty = Number(adjustmentQty) - Number(adjustmentBatchQty);
+                                    var indexBatchNo = inventorybatchInfoList.findIndex(c => c.batch.autoGenerated.toString() == "true");
+                                    if (indexBatchNo != -1) {
+                                        inventorybatchInfoList[indexBatchNo].adjustmentQty = Number(inventorybatchInfoList[indexBatchNo].adjustmentQty) + Number(remainingBatchQty);
+                                    } else {
+                                        var programId = (document.getElementById("programId").value).split("_")[0];
+                                        var planningUnitId1 = planningUnitId;
+                                        programId = paddingZero(programId, 0, 6);
+                                        planningUnitId1 = paddingZero(planningUnitId1, 0, 8);
+                                        var batchNo = (BATCH_PREFIX).concat(programId).concat(planningUnitId1).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                        var json1 = {
+                                            inventoryTransBatchInfoId: 0,
+                                            batch: {
+                                                batchNo: batchNo,
+                                                expiryDate: expiryDate,
+                                                batchId: 0,
+                                                autoGenerated: true,
+                                                createdDate: moment(map.get("0")).format("YYYY-MM-DD")
+                                            },
+                                            adjustmentQty: remainingBatchQty,
+                                        }
+                                        inventorybatchInfoList.push(json1);
+                                    }
+                                }
                             }
                             var inventoryJson = {
                                 inventoryId: 0,
@@ -1588,6 +2163,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 adjustmentQty: (map.get("4") == 2) ? elInstance.getValue(`F${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                 actualQty: (map.get("4") == 1) ? elInstance.getValue(`G${parseInt(i) + 1}`, true).toString().replaceAll("\,", "").trim() : null,
                                 active: map.get("11"),
+                                addNewBatch: map.get("19"),
                                 realmCountryPlanningUnit: {
                                     id: map.get("3"),
                                     label: (this.state.realmCountryPlanningUnitList).filter(c => c.id == map.get("3"))[0].label
@@ -1598,7 +2174,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                     label: (this.props.items.planningUnitListAll.filter(c => c.planningUnit.id == planningUnitId)[0]).planningUnit.label
                                 },
                                 notes: map.get("10"),
-                                batchInfoList: batchInfoList,
+                                batchInfoList: inventorybatchInfoList,
                                 index: inventoryDataList.length,
                                 createdBy: {
                                     userId: curUser,
@@ -1612,6 +2188,37 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                                 lastModifiedDate: curDate
                             }
                             inventoryDataList.push(inventoryJson);
+                            var inventorybatchInfoList;
+                            if (map.get("13") != "") {
+                                inventorybatchInfoList = map.get("13");
+                            } else {
+                                inventorybatchInfoList = [];
+                            }
+                            if (map.get("19").toString() == "true") {
+                                for (var bi = 0; bi < inventorybatchInfoList.length; bi++) {
+                                    var index = -1;
+                                    if (inventorybatchInfoList[bi].batch.batchId != 0) {
+                                        index = batchInfoList.findIndex(c => c.batchId == inventorybatchInfoList[bi].batch.batchId);
+                                    } else {
+                                        index = batchInfoList.findIndex(c => c.batchNo == inventorybatchInfoList[bi].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(inventorybatchInfoList[bi].batch.expiryDate).format("YYYY-MM") && c.planningUnitId == document.getElementById("planningUnitId").value);
+                                    }
+                                    if (index == -1) {
+                                        var batchDetails = {
+                                            batchId: inventorybatchInfoList[bi].batch.batchId,
+                                            batchNo: inventorybatchInfoList[bi].batch.batchNo,
+                                            planningUnitId: planningUnitId,
+                                            expiryDate: inventorybatchInfoList[bi].batch.expiryDate,
+                                            createdDate: inventorybatchInfoList[bi].batch.createdDate,
+                                            autoGenerated: inventorybatchInfoList[bi].batch.autoGenerated
+                                        }
+                                        batchInfoList.push(batchDetails);
+                                    } else {
+                                        batchInfoList[index].expiryDate = inventorybatchInfoList[bi].batch.expiryDate;
+                                        batchInfoList[index].createdDate = inventorybatchInfoList[bi].batch.createdDate;
+                                        batchInfoList[index].autoGenerated = inventorybatchInfoList[bi].batch.autoGenerated;
+                                    }
+                                }
+                            }
                         }
                     }
                     actionList.push({
@@ -1620,8 +2227,9 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
                         date: moment(minDate).startOf('month').format("YYYY-MM-DD")
                     })
                     programJson.inventoryList = inventoryDataList;
+                    programJson.batchInfoList = batchInfoList;
                     generalProgramJson.actionList = actionList;
-                    generalProgramJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    generalProgramJson.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                     if (planningUnitDataIndex != -1) {
                         planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJson), SECRET_KEY)).toString();
                     } else {
