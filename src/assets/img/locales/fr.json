@@ -2374,6 +2374,7 @@
   "static.supplyPlanFormula.minMonthOfStockEx4": "Min = MAX (MOIS MIN DE STOCK, Garde-corps Min MoS)",
   "static.supplyPlanFormula.minMonthOfStockEx5": "Min = MAX (4,3)",
   "static.supplyPlanFormula.minMonthOfStockEx2": "FRÉQUENCE DE COMMANDE = 3",
+  "static.supplyPlan.addNewBatch": "Saisir les informations relatives au nouveau lot et à la date d`expiration",
   "static.dashboard.consumption": "Consommation (prévue contre réelle)",
   "static.supplyPlanFormula.minMonthOfStockEx3": "Garde-corps Min MoS = 3 (basé sur le royaume)",
   "static.supplyPlan.userEnteredBatches": "Lots saisis par l`utilisateur",
@@ -3160,6 +3161,7 @@
   "static.dataset.manageProgramInfo": "Mettre à jour les informations sur le programme",
   "static.equivalancyUnit.equivalancyUnitManage": "Gestion de l'Unité d'Equivalence",
   "static.extrpolation.graphTitlePart1": "Prévisions pour ",
+  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La date d`expiration doit être supérieure à la date d`inventaire.",
   "static.tree.monthlyEndNoSeasonality": "(Pas de saisonnalité)",
   "static.whatIf.supplyPlanSaved": "Plan d`approvisionnement enregistré avec succès.",
   "static.message.addBranchTemplate": "Modèle de branche ajouté avec succès",
@@ -3337,7 +3339,7 @@
   "static.forecastingunit.forecastingunittext": "Entrez l`unité de prévision",
   "static.planningUnit.plannignUnitMeasure": "Saisissez l`unité de planification UoM (unité de mesure)",
   "static.dataEntryAndAdjustments.ClickSubmit": "Cliquer sur Soumettre pour enregistrer les données saisies",
-  "static.stockStatus.doYouWantToAggregate": "Voulez-vous regrouper les programmes sélectionnés",
+  "static.stockStatus.doYouWantToAggregate": "Souhaitez-vous regrouper des produits et/ou programmes sélectionnés ?",
   "static.ticket.header": "Service d`assistance technique QAT",
   "static.user.confirmNewPasswordLabel": "Confirmer le nouveau mot de passe",
   "static.realm.realm": "Domaine",
@@ -3623,7 +3625,5 @@
   "static.currency.conversionrateusd": "Taux de conversion à 1 USD",
   "static.logout.confirmLogout": "Voulez vous vraiment vous déconnecter?",
   "static.common.node": "Nœud",
-  "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.supplyPlan.addNewBatch":"Saisir les nouvelles informations de lot et d'expiration",
-  "static.shipmentDataEntry.expiryDateMustBeGreaterThanAdjustmentDate": "La date d'expiration doit être supérieure à la date d'inventaire"
+  "static.pipeline.pipelineConvertorLinux": "Linux."
 }
