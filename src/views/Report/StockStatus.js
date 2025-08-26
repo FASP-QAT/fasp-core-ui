@@ -1293,7 +1293,6 @@ class StockStatus extends Component {
               var ppuResult = ppuRequest.result;
               var planningUnitArray = [...new Set(this.state.planningUnitIdExport).map(c => Number(c.value))];
               var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(c.planningUnit.id));
-              console.log("PPu Test@123", ppu)
               let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
               let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
               for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {

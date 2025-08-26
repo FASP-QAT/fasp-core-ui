@@ -461,7 +461,8 @@ class CompareVersion extends Component {
                                 region: {
                                     id: regionList[r].regionId,
                                     label: regionList[r].label
-                                }
+                                },
+                                active: planningUnitList[pu].active
                             })
                         }
                     }
@@ -471,7 +472,7 @@ class CompareVersion extends Component {
                             forecastStopDate: datasetJson.currentVersion.forecastStopDate,
                             notes: datasetJson.currentVersion.notes,
                         },
-                        planningUnitList: list,
+                        planningUnitList: list.filter(x => x.active.toString() == "true"),
                         regionList: datasetJson.regionList,
                         programCode: datasetJson.programCode,
                         label: datasetJson.label
@@ -495,7 +496,7 @@ class CompareVersion extends Component {
             }
             ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
-                    var responseData = response.data;
+                    var responseData = response.data.filter(x => x.planningUnit.active.toString() == "true");
                     var json = {
                         currentVersion: {
                             forecastStartDate: versonListFilter.forecastStartDate,
@@ -649,7 +650,8 @@ class CompareVersion extends Component {
                                 region: {
                                     id: regionList[r].regionId,
                                     label: regionList[r].label
-                                }
+                                },
+                                active: planningUnitList[pu].active
                             })
                         }
                     }
@@ -659,7 +661,7 @@ class CompareVersion extends Component {
                             forecastStopDate: datasetJson.currentVersion.forecastStopDate,
                             notes: datasetJson.currentVersion.notes,
                         },
-                        planningUnitList: list,
+                        planningUnitList: list.filter(x => x.active.toString() == "true"),
                         regionList: datasetJson.regionList,
                         programCode: datasetJson.programCode,
                         label: datasetJson.label
@@ -683,6 +685,7 @@ class CompareVersion extends Component {
             ReportService.forecastSummary(inputJson).then(response => {
                 if (response.status == 200) {
                     var responseData = response.data;
+                    var responseData = response.data.filter(x => x.planningUnit.active.toString() == "true");
                     var json = {
                         currentVersion: {
                             forecastStartDate: versonListFilter.forecastStartDate,

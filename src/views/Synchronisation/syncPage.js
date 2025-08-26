@@ -70,6 +70,7 @@ export default class syncPage extends Component {
       conflictsCount: 0,
       loading: true,
       versionType: 1,
+      lastVersionType: 1,
       openCount: 0,
       progressPer: 0,
       notes: '',
@@ -1620,6 +1621,7 @@ export default class syncPage extends Component {
                     var generalDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                     var generalData = generalDataBytes.toString(CryptoJS.enc.Utf8);
                     var generalJson = JSON.parse(generalData);
+                    var lastVersionType = generalJson.currentVersion.versionType.id;
                     var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                     var consumptionList = [];
                     var inventoryList = [];
@@ -1645,6 +1647,7 @@ export default class syncPage extends Component {
                       programJson.batchInfoList = batchInfoList;
                       programJson.supplyPlan = supplyPlan;
                       this.setState({
+                        lastVersionType: lastVersionType,
                         programRequestResult: programRequest.result,
                         programRequestProgramJson: programJson,
                         planningUnitDataList: planningUnitDataList,
@@ -3891,7 +3894,7 @@ export default class syncPage extends Component {
                                 </FormGroup>
                                 <FormGroup className="tab-ml-1 mt-4">
                                   <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
-                                  {(((this.state.isChanged.toString() == "true" || this.state.programModified==1) && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.openCount == 0 || AuthenticationService.checkUserACL([this.state.programId.programId.toString()],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
+                                  {(((this.state.isChanged.toString() == "true" || this.state.programModified==1) && this.state.versionType == 1) || (this.state.versionType == 2 && (this.state.lastVersionType == 2 ? (this.state.isChanged.toString() == "true" || this.state.programModified==1) : true) && (this.state.openCount == 0 || AuthenticationService.checkUserACL([this.state.programId.programId.toString()],"ROLE_BF_READONLY_ACCESS_REALM_ADMIN")))) && this.state.conflictsCount == 0 && <Button type="submit" size="md" color="success" className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.button.commit')} </Button>}
                                   &nbsp;
                                 </FormGroup>
                               </div>
