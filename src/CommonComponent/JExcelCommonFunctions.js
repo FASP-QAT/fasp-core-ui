@@ -303,7 +303,6 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
  */
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0, colNo) {
     if (type == "text") {
-        console.log("Value Test@123",value);
         value=value.toString().replaceAll('&nbsp;','').trim();
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "" || value == undefined || value == "undefined") {
