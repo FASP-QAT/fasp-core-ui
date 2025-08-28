@@ -2411,15 +2411,21 @@ export default class syncPage extends Component {
                                                 var shipmentQtyOtherProgram = 0;
                                                 oldProgramDataShipmentLinkedFiltered.map(item => {
                                                   var sl = oldProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
-                                                  shipmentQtyLocal += sl[0].shipmentQty;
+                                                  if(sl.length>0){
+                                                    shipmentQtyLocal += sl[0].shipmentQty;
+                                                  }
                                                 })
                                                 downloadedProgramDataShipmentLinkedFiltered.map(item => {
                                                   var sl = downloadedProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId);
+                                                  if(sl.length>0){
                                                   shipmentQtyDownloaded += sl[0].shipmentQty;
+                                                  }
                                                 })
                                                 latestProgramDataShipmentLinkedFiltered.map(item => {
                                                   var sl = latestProgramData.shipmentList.filter(c => item.childShipmentId > 0 ? c.shipmentId == item.childShipmentId : c.tempShipmentId == item.tempChildShipmentId)
+                                                  if(sl.length>0){
                                                   shipmentQtyServer += sl[0].shipmentQty;
+                                                  }
                                                 })
                                                 listFromAPIFiltered.map(item => {
                                                   shipmentQtyOtherProgram += item.shipmentQty
