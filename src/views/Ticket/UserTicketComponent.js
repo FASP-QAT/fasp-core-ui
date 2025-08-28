@@ -13,7 +13,6 @@ import RealmService from '../../api/RealmService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.ticket.addUpdateUser"))
 let summaryText_2 = "Add / Update User"
 /**
  * This const is used to define the validation schema for user ticket component
@@ -71,7 +70,7 @@ export default class UserTicketComponent extends Component {
         super(props);
         this.state = {
             user: {
-                summary: summaryText_1,
+                summary: i18n.t('static.ticket.addUpdateUser'),
                 realm: "",
                 name: "",
                 emailId: "",
@@ -470,7 +469,7 @@ export default class UserTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: i18n.t('static.ticket.addUpdateUser'),
                             realm: this.props.items.userRealmId,
                             name: "",
                             emailId: "",

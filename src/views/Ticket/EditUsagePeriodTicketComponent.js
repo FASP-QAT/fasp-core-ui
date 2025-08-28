@@ -8,10 +8,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import UsagePeriodService from "../../api/UsagePeriodService";
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.usagePeriod.usagePeriod"))
 let summaryText_2 = "Edit Usage Period"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.usagePeriod.usagePeriod")),
     usagePeriodName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             usagePeriod: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.usagePeriod.usagePeriod")),
                 usagePeriodName: "",
                 notes: "",
                 priority: 3

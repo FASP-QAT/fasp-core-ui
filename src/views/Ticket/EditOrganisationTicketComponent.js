@@ -9,10 +9,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import OrganisationService from '../../api/OrganisationService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Edit Organisation"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.organisation.organisation")),
     organizationName: '',
     notes: '',
     priority: 3
@@ -41,7 +40,7 @@ export default class EditOrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.organisation.organisation")),
                 organizationName: "",
                 notes: "",
                 priority: 3

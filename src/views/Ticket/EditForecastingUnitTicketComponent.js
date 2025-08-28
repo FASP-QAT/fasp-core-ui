@@ -11,10 +11,9 @@ import ForecastingUnitService from '../../api/ForecastingUnitService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Edit Forecasting Unit"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.forecastingunit.forecastingunit")),
     forecastingUnitName: "",
     notes: "",
     priority: 3
@@ -43,7 +42,7 @@ export default class EditForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.forecastingunit.forecastingunit")),
                 forecastingUnitName: "",
                 notes: '',
                 priority: 3

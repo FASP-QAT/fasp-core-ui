@@ -8,10 +8,9 @@ import DataSourceService from '../../api/DataSourceService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.datasource.datasource"))
 let summaryText_2 = "Edit Data Source"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.datasource.datasource")),
     dataSourceName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditDataSourceTicketComponent extends Component {
         super(props);
         this.state = {
             dataSource: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.datasource.datasource")),
                 dataSourceName: "",
                 notes: "",
                 priority: 3

@@ -9,10 +9,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Edit Program"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.program.programMaster")),
     realmId: '',
     notes: "",
     priority: 3
@@ -41,7 +40,7 @@ export default class EditProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.program.programMaster")),
                 programName: '',
                 notes: "",
                 priority: 3

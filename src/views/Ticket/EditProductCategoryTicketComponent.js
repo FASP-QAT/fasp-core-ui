@@ -9,10 +9,9 @@ import PoroductCategoryService from '../../api/PoroductCategoryService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory"))
 let summaryText_2 = "Edit Planning Unit Category"
 let initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory")),
     realmName: "",
     planningUnitCategoryName: "",
     notes: "",
@@ -44,7 +43,7 @@ export default class EditProductCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnitCategory: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory")),
                 realmName: "",
                 planningUnitCategoryName: "",
                 notes: "",
@@ -309,7 +308,7 @@ export default class EditProductCategoryTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.edit") + " " + i18n.t("static.product.productcategory")),
                             realmName: this.props.items.userRealmId,
                             planningUnitCategoryName: "",
                             notes: "",

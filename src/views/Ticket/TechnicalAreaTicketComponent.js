@@ -14,7 +14,6 @@ import RealmCountryService from '../../api/RealmCountryService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Add Technical Area"
 /**
  * This const is used to define the validation schema for technical area ticket component
@@ -47,7 +46,7 @@ export default class TechnicalAreaTicketComponent extends Component {
         super(props);
         this.state = {
             technicalArea: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea")),
                 realmName: "",
                 countryName: [],
                 technicalAreaName: "",
@@ -519,7 +518,7 @@ export default class TechnicalAreaTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.healtharea.healtharea")),
                             realmName: this.state.realmId,
                             countryName: this.state.countryId,
                             technicalAreaName: this.state.technicalArea.technicalAreaName,

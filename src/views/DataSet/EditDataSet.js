@@ -1174,7 +1174,7 @@ export default class EditProgram extends Component {
                             <CardBody>
                                 <h7>
                                     {i18n.t('static.editProgram.userListSubHeader')}
-                                    <InitialTicketPageComponent isIcon={false} />
+                                    <InitialTicketPageComponent isIcon={false} />{"."}
                                 </h7>
                                 <div
                                     className=""
