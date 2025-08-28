@@ -3628,6 +3628,6 @@
   "static.pipeline.pipelineConvertorLinux": "Linux.",
   "static.editProgram.userListHeader": "Users who have access to",
   "static.editProgram.userListSubHeader": "By default, the users are given access based on the selected Procurement Agent(s) and Funder(s) in the Program Info screen above. Additional users may be added manually as requested by a Program Admin. If you have concerns or requests regarding user access, please submit a ticket via the ",
-  "static.tooltip.roleAcl": "Please see Annex 3, User Role Matrix for more information.",
+  "static.tooltip.roleAcl": "Please see User Manual Annex 3, User Role Matrix for more information.",
   "static.program.nestedHeader": "Access control based on the following:"
 }
