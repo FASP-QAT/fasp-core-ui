@@ -9,10 +9,9 @@ import BudgetService from '../../api/BudgetService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent.js';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Edit Budget"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.budget")),
     budgetName: "",
     notes: "",
     priority: 3
@@ -41,7 +40,7 @@ export default class EditBudgetTicketComponent extends Component {
         super(props);
         this.state = {
             budget: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.budget")),
                 budgetName: "",
                 notes: "",
                 priority: 3

@@ -9,10 +9,9 @@ import HealthAreaService from '../../api/HealthAreaService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.healtharea.healtharea"))
 let summaryText_2 = "Edit Technical Area"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.healtharea.healtharea")),
     technicalAreaName: "",
     notes: "",
     priority: 3
@@ -41,7 +40,7 @@ export default class EditTechnicalAreaTicketComponent extends Component {
         super(props);
         this.state = {
             technicalArea: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.healtharea.healtharea")),
                 technicalAreaName: "",
                 notes: "",
                 priority: 3

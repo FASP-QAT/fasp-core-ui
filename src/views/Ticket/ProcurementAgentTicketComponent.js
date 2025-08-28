@@ -9,7 +9,6 @@ import ProcurementAgentService from '../../api/ProcurementAgentService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent"))
 let summaryText_2 = "Add Procurement Agent"
 /**
  * This const is used to define the validation schema for procurement agent ticket component
@@ -42,7 +41,7 @@ export default class ProcurementAgentTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgent: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent")),
                 realmName: "",
                 procurementAgentName: "",
                 procurementAgentCode: "",
@@ -373,7 +372,7 @@ export default class ProcurementAgentTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.procurementagent.procurementagent")),
                             realmName: this.props.items.userRealmId,
                             procurementAgentName: this.state.procurementAgent.procurementAgentName,
                             procurementAgentCode: this.state.procurementAgent.procurementAgentCode,

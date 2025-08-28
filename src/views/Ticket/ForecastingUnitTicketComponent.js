@@ -11,7 +11,6 @@ import TracerCategoryService from '../../api/TracerCategoryService';
 import UnitService from '../../api/UnitService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit"))
 let summaryText_2 = "Add Forecasting Unit"
 const initialValues = {
     summary: "",
@@ -58,7 +57,7 @@ export default class ForecastingUnitTicketComponent extends Component {
         super(props);
         this.state = {
             forecastingUnit: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit")),
                 realm: "",
                 tracerCategory: "",
                 productCategory: "",
@@ -476,7 +475,7 @@ export default class ForecastingUnitTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.forecastingunit.forecastingunit")),
                             realm: this.props.items.userRealmId,
                             tracerCategory: "",
                             productCategory: "",

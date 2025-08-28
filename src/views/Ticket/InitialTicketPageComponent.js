@@ -153,7 +153,7 @@ export default class InitialTicketPageComponent extends Component {
     if (localStorage.getItem("sessionType") === 'Online') {
       this.setState({
         help: !this.state.help,
-        initialPage: 1,
+        initialPage: !this.props.isIcon ? 0 : 1,
         showOnlyMaster: 0,
         showOnlyProgramMaster: 0,
         showOnlyRealmMaster: 0,
@@ -162,7 +162,7 @@ export default class InitialTicketPageComponent extends Component {
         showBugReport: 0,
         showPlanningUnitData: 0,
         showForecastingUnitData: 0,
-        showUserData: 0,
+        showUserData: !this.props.isIcon ? 1 : 0,
         showCountryData: 0,
         showCurrencyData: 0,
         showUnitData: 0,

@@ -12,7 +12,6 @@ import classNames from 'classnames';
 import Select from 'react-select';
 import 'react-select/dist/react-select.min.css';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Add Planning Unit"
 const initialValues = {
     summary: "",
@@ -54,7 +53,7 @@ export default class PlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit")),
                 planningUnitDesc: '',
                 forecastingUnitDesc: '',
                 unit: '',
@@ -291,7 +290,7 @@ export default class PlanningUnitTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.planningunit.planningunit")),
                             planningUnitDesc: "",
                             forecastingUnitDesc: "",
                             unit: "",
