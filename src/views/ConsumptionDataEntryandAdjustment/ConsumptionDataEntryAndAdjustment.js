@@ -250,6 +250,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         var consumptionList = isInterpolate == 1 ? this.state.tempConsumptionList : this.state.consumptionList;
         var consumptionUnit = {};
         var consumptionNotes = "";
+        if(!isInterpolate){
         if (consumptionUnitId > 0) {
           consumptionUnit = this.state.planningUnitList.filter(c => c.planningUnit.id == consumptionUnitId)[0];
           consumptionNotes = consumptionUnit.consumptionNotes != null ? consumptionUnit.consumptionNotes : "";
@@ -280,10 +281,12 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             selectedForecastMap: {},
           }
         }
+      }else{
+        consumptionUnit=this.state.tempConsumptionUnitObject;
+      }
         if (!isInterpolate) {
-          document.getElementById("consumptionNotes").value = consumptionNotes;
+          this.setState({ consumptionNotesForValidation: consumptionNotes })
         }
-        this.setState({ consumptionNotesForValidation: consumptionNotes })
         var multiplier = 1;
         var changedConsumptionDataDesc = "";
         if (consumptionUnitId != 0) {
@@ -1303,7 +1306,7 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
         } else {
         }
         if (cont == true) {
-          document.getElementById("consumptionNotes").value = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
+          var consumptionNotes = notes + (notes != "" ? "\r\n" : "") + "Interpolated data for: " + interpolatedRegions.map(item => (
             "\r\n" + getLabelText(regionList.filter(c => c.regionId == item)[0].label, this.state.lang) + ": " + interpolatedRegionsAndMonths.filter(c => c.region.regionId == item).map(item1 => moment(item1.month).format(DATE_FORMAT_CAP_WITHOUT_DATE))
           ));
           this.setState({
@@ -1311,7 +1314,8 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
             consumptionChanged: true,
             loading: false,
             message: "",
-            messageColor: ""
+            messageColor: "",
+            consumptionNotesForValidation: consumptionNotes
           })
           this.buildDataJexcel(this.state.selectedConsumptionUnitId, 1);
         }
@@ -3553,9 +3557,10 @@ export default class ConsumptionDataEntryandAdjustment extends React.Component {
                                         valid={!errors.consumptionNotes}
                                         invalid={!!errors.consumptionNotes}
                                         disabled={this.state.isDisabled}
+                                        value={this.state.consumptionNotesForValidation}
                                         bsSize="sm"
                                         readOnly={AuthenticationService.checkUserACL([this.state.datasetId.toString()], 'ROLE_BF_CONSUMPTION_DATA_ENTRY_ADJUSTMENT') ? false : true}
-                                        onChange={(e) => { handleChange(e); this.setState({ consumptionChanged: true }) }}
+                                        onChange={(e) => { handleChange(e); this.setState({ consumptionChanged: true,consumptionNotesForValidation: e.target.value }) }}
                                         onBlur={handleBlur}
                                       >
                                       </Input>
