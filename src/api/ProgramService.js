@@ -183,5 +183,8 @@ class ProgramService {
         return axios.post(`${API_URL}/api/programPlanningUnit/all`, programIds, {}
         );
     }
+    getUserListForProgram(programId) {
+        return axios.get(`${API_URL}/api/program/userList/${programId}`, {});
+    }
 }
 export default new ProgramService()

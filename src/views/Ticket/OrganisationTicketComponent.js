@@ -14,7 +14,6 @@ import OrganisationTypeService from "../../api/OrganisationTypeService.js";
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent.js';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation"))
 let summaryText_2 = "Add Organisation"
 const initialValues = {
     summary: "",
@@ -59,7 +58,7 @@ export default class OrganisationTicketComponent extends Component {
         super(props);
         this.state = {
             organisation: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation")),
                 realmId: "",
                 realmCountryId: [],
                 organisationCode: "",
@@ -574,7 +573,7 @@ export default class OrganisationTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.organisation.organisation")),
                             realmId: this.state.realm,
                             realmCountryId: this.state.countryId,
                             organisationCode: this.state.organisation.organisationCode,

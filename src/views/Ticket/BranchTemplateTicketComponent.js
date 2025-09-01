@@ -8,7 +8,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dataset.BranchTreeTemplate"))
 let summaryText_2 = "Add Branch Template"
 /**
  * This const is used to define the validation schema for branch template
@@ -37,7 +36,7 @@ export default class BranchTemplateTicketComponent extends Component {
         super(props);
         this.state = {
             branchTemplate: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.dataset.BranchTreeTemplate")),
                 realmName: "",
                 templateName: "",
                 details: "",
@@ -235,7 +234,7 @@ export default class BranchTemplateTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.dataset.BranchTreeTemplate")),
                             realmName: this.state.realmId,
                             templateName: this.state.branchTemplate.templateName,
                             details: this.state.branchTemplate.details,

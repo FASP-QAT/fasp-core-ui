@@ -8,7 +8,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.product.productcategory"))
 let summaryText_2 = "Add Planning Unit Category"
 /**
  * This const is used to define the validation schema for product category ticket component
@@ -34,7 +33,7 @@ export default class ProductCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             productCategory: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.product.productcategory")),
                 realmName: "",
                 productCategoryName: "",
                 notes: "",
@@ -219,7 +218,7 @@ export default class ProductCategoryTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.product.productcategory")),
                             realmName: this.props.items.userRealmId,
                             productCategoryName: "",
                             notes: "",

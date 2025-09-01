@@ -15,7 +15,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import ProgramService from '../../api/ProgramService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent.js';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget"))
 let summaryText_2 = "Add Budget"
 /**
  * This const is used to define the validation schema for budget ticket component
@@ -56,7 +55,7 @@ export default class BudgetTicketComponent extends Component {
         super(props);
         this.state = {
             budget: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget")),
                 programName: "",
                 fundingSourceName: "",
                 budgetName: "",
@@ -455,7 +454,7 @@ export default class BudgetTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.dashboard.budget")),
                             programName: "",
                             fundingSourceName: "",
                             budgetName: "",

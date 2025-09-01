@@ -10,7 +10,6 @@ import ProgramService from '../../api/ProgramService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-const summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource"))
 const summaryText_2 = "Add Data Source"
 const initialValues = {
     summary: "",
@@ -50,7 +49,7 @@ export default class DataSourceTicketComponent extends Component {
         super(props);
         this.state = {
             dataSource: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource")),
                 realmName: "",
                 programName: "",
                 dataSourceType: "",
@@ -400,7 +399,7 @@ export default class DataSourceTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.datasource.datasource")),
                             realmName: this.props.items.userRealmId,
                             programName: "",
                             dataSourceType: "",

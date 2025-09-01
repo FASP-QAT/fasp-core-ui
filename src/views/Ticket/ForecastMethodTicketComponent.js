@@ -9,7 +9,6 @@ import ForecastMethodService from "../../api/ForecastMethodService";
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.forecastMethod.forecastMethod"))
 let summaryText_2 = "Add Forecast Method"
 const initialValues = {
     summary: "",
@@ -43,7 +42,7 @@ export default class OrganisationTypeTicketComponent extends Component {
         super(props);
         this.state = {
             forecastMethod: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.forecastMethod.forecastMethod")),
                 forecastMethod: "",
                 forecastMethodTypeName: '',
                 notes: '',
@@ -242,7 +241,7 @@ export default class OrganisationTypeTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.forecastMethod.forecastMethod")),
                             forecastMethod: '',
                             forecastMethodTypeId: '',
                             notes: '',

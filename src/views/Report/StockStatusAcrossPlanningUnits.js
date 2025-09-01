@@ -758,7 +758,7 @@ class StockStatusAcrossPlanningUnits extends Component {
                 {
                     title: i18n.t('static.report.maxMosOrQty'),
                     type: 'numeric',
-                    mask: '#,##.000', decimal: '.',
+                    mask: '#,##',
                 },
                 {
                     title: i18n.t('static.report.amc'),

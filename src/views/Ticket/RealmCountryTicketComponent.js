@@ -13,7 +13,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry"))
 let summaryText_2 = "Add Realm Country"
 /**
  * This const is used to define the validation schema for realm country ticket component
@@ -41,7 +40,7 @@ export default class RealmCountryTicketComponent extends Component {
         super(props);
         this.state = {
             realmCountry: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry")),
                 realmId: "",
                 countryId: "",
                 currencyId: "",
@@ -415,7 +414,7 @@ export default class RealmCountryTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.ticket.realmcountry")),
                             realmId: this.props.items.userRealmId,
                             countryId: "",
                             currencyId: "",
