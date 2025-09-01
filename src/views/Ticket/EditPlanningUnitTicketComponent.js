@@ -11,10 +11,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import PlanningUnitService from '../../api/PlanningUnitService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit"))
 let summaryText_2 = "Edit Planning Unit"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit")),
     planningUnitName: "",
     notes: "",
     priority: 3
@@ -43,7 +42,7 @@ export default class EditPlanningUnitTicketComponent extends Component {
         super(props);
         this.state = {
             planningUnit: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.planningunit.planningunit")),
                 planningUnitName: '',
                 notes: '',
                 priority: 3

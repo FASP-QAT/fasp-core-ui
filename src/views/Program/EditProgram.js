@@ -2,10 +2,13 @@ import React, { Component } from "react";
 import {
     Row, Card, CardBody,
     Label, Input, FormGroup,
-    CardFooter, Button, Col, FormFeedback, Form
+    CardFooter, Button, Col, FormFeedback, Form,
+    CardHeader
 } from 'reactstrap';
 import Select from 'react-select';
 import { Formik } from 'formik';
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import * as Yup from 'yup';
 import 'react-select/dist/react-select.min.css';
 import ProgramService from "../../api/ProgramService";
@@ -15,9 +18,14 @@ import getLabelText from '../../CommonComponent/getLabelText'
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import classNames from 'classnames';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions.js";
+import { JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from "../../Constants";
 import { API_URL, MAX_PROGRAM_CODE_LENGTH } from "../../Constants";
 import DropdownService from "../../api/DropdownService";
 import { Capitalize, hideSecondComponent } from "../../CommonComponent/JavascriptCommonFunctions";
+import InitialTicketPageComponent from "../Ticket/InitialTicketPageComponent.js";
 // Localized entity name
 const entityname = i18n.t('static.program.programMaster');
 // Initial values for form fields
@@ -226,6 +234,7 @@ export default class EditProgram extends Component {
             procurementAgentList: [],
             programManagerList: [],
             regionList: [],
+            userList: [],
             message: '',
             loading: true,
             healthAreaCode: '',
@@ -244,6 +253,11 @@ export default class EditProgram extends Component {
         this.updateFieldDataHealthArea = this.updateFieldDataHealthArea.bind(this);
         this.updateFieldDataProcurementAgent = this.updateFieldDataProcurementAgent.bind(this);
         this.updateFieldDataFundingSource = this.updateFieldDataFundingSource.bind(this);
+        this.buildJexcel = this.buildJexcel.bind(this);
+        this.toggleHelp = this.toggleHelp.bind(this);
+    }
+    toggleHelp() {
+        return null
     }
     /**
      * Updates the message state with the provided message.
@@ -263,6 +277,9 @@ export default class EditProgram extends Component {
      * Fetches program manager, region, organisation and health area list and program details on component mount.
      */
     componentDidMount() {
+        console.log(
+            "Hello", this.props
+        )
         ProgramService.getProgramById(this.props.match.params.programId).then(response => {
             var proObj = response.data;
             var programCode = response.data.programCode;
@@ -606,6 +623,66 @@ export default class EditProgram extends Component {
                         })
                     }
                 })
+            ProgramService.getUserListForProgram(this.props.match.params.programId)
+                .then(response => {
+                    if (response.status == 200) {
+                        let userList = response.data;
+                        this.setState({
+                            userList: userList,
+                        }, () => {
+                             this.buildJexcel();
+                        })
+                    } else {
+                        this.setState({
+                            message: response.data.messageCode
+                        })
+                    }
+                }).catch(
+                    error => {
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+				                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: error.response.data.messageCode,
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
+                        }
+                    }
+                );
         }).catch(
             error => {
                 if (error.message === "Network Error") {
@@ -808,6 +885,162 @@ export default class EditProgram extends Component {
             program.programNotes = event.target.value;
         }
         this.setState({ program }, () => { })
+    }
+    /**
+     * This function is used to format the table like add asterisk or info to the table headers
+     * @param {*} instance This is the DOM Element where sheet is created
+     * @param {*} cell This is the object of the DOM element
+     */
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+        let firstNestedHeader = document.querySelector(".jss_nested td:first-child").nextSibling;
+        if (firstNestedHeader) {
+            firstNestedHeader.style.border = "none";
+        }
+        var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+        var tr = asterisk.firstChild.nextSibling;
+        tr.children[3].classList.add('InfoTr');
+        tr.children[3].title = i18n.t('static.tooltip.roleAcl');
+    };
+    /**
+     * This function is used to build the table the access control
+     */
+    buildJexcel() {
+        var varEL = "";
+        let userList = this.state.userList;   
+        userList.sort((a, b) => {
+            var itemLabelA = a.userId;
+            var itemLabelB = b.userId;
+            return itemLabelA > itemLabelB ? 1 : -1;
+        });
+        const flattenedUserListWithDuplicates = userList.flatMap(user =>
+            user.aclList.map(role => ({
+                username: user.username,
+                orgAndCountry: user.orgAndCountry,
+                role: getLabelText(role.roleDesc, this.state.lang),
+                country: role.countryName ? getLabelText(role.countryName, this.state.lang) : i18n.t('static.common.all'),
+                technicalArea: role.healthAreaName ? getLabelText(role.healthAreaName, this.state.lang) : i18n.t('static.common.all'),
+                organisation: role.organisationName ? getLabelText(role.organisationName, this.state.lang) : i18n.t('static.common.all'),
+                procurementAgent: role.procurementAgentName ? getLabelText(role.procurementAgentName, this.state.lang) : i18n.t('static.common.all'),
+                fundingSource: role.fundingSourceName ? getLabelText(role.fundingSourceName, this.state.lang) : i18n.t('static.common.all'),
+                program: role.programName ? getLabelText(role.programName, this.state.lang) : i18n.t('static.common.all')
+            }))
+        );
+        flattenedUserListWithDuplicates.sort((a, b) => {
+            const orgCompare = a.orgAndCountry.localeCompare(b.orgAndCountry, undefined, { sensitivity: 'base' });
+            if (orgCompare !== 0) {
+                return orgCompare;
+            }
+
+            const userCompare = a.username.localeCompare(b.username, undefined, { sensitivity: 'base' });
+            if (userCompare !== 0) {
+                return userCompare;
+            }
+
+            return a.role.localeCompare(b.role, undefined, { sensitivity: 'base' });
+        });
+        const flattenedUserList = Array.from(
+            new Set(flattenedUserListWithDuplicates.map(obj => JSON.stringify(obj)))
+        ).map(str => JSON.parse(str));
+        let userListArr = [];
+        var data = [];
+        var count = 0;
+        for (var j = 0; j < flattenedUserList.length; j++) {
+            data = [];
+            data[0] = flattenedUserList[j].username;
+            data[1] = flattenedUserList[j].orgAndCountry;
+            data[2] = flattenedUserList[j].role;
+            data[3] = flattenedUserList[j].country;
+            data[4] = flattenedUserList[j].technicalArea;
+            data[5] = flattenedUserList[j].organisation;
+            data[6] = flattenedUserList[j].procurementAgent;
+            data[7] = flattenedUserList[j].fundingSource;
+            data[8] = flattenedUserList[j].program;
+            userListArr[count] = data;
+            count++;
+        }
+        
+        this.el = jexcel(document.getElementById("userListTableDiv"), "");
+        jexcel.destroy(document.getElementById("userListTableDiv"), true);
+        var data = userListArr;
+        var options = {
+        data: data,
+        columnDrag: false,
+        colWidths: [100, 100, 100, 100, 100, 100, 100, 100, 100, 100],
+        columns: [
+            {
+                title: i18n.t("static.user.username"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.user.orgAndCountry"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.role.role"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.program.realmcountry"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.dashboard.healthareaheader"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.organisation.organisation"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.procurementagent.procurementagent"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.fundingsource.fundingsource"),
+                type: "text",
+                readOnly: true
+            },
+            {
+                title: i18n.t("static.dashboard.programheader"),
+                type: "text",
+                readOnly: true
+            }
+        ],
+        nestedHeaders: [
+            [
+                { title: '', colspan: 2 },
+                { title: i18n.t("static.program.nestedHeader"), colspan: 7 }
+            ]
+        ],
+        pagination: localStorage.getItem("sesRecordCount"),
+        filters: true,
+        search: true,
+        columnSorting: true,
+        editable: false,
+        wordWrap: true,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+        position: "top",
+        onload: this.loaded,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        copyCompatibility: true,
+        parseFormulas: true,
+        license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false
+        };
+        this.el = jexcel(document.getElementById("userListTableDiv"), options);
+        varEL = this.el;
+        this.setState({
+        
+        });
     }
     /**
      * Renders the edit program screen.
@@ -1375,6 +1608,36 @@ export default class EditProgram extends Component {
                                             </CardFooter>
                                         </Form>
                                     )} />
+                        </Card>
+                    </Col>
+                </Row>
+                <Row style={{ display: this.state.loading ? "none" : "block" }}>
+                    <Col sm={12} md={12} style={{ flexBasis: 'auto' }}>
+                        <Card>
+                            <CardHeader>
+                                <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
+                            </CardHeader>
+                            <CardBody>
+                                <h7>
+                                    {i18n.t('static.editProgram.userListSubHeader')}
+                                    <InitialTicketPageComponent isIcon={false} />{"."}
+                                </h7>
+                                <div
+                                    className=""
+                                    style={{
+                                        display: "block",
+                                    }}
+                                    >
+                                    <div
+                                        style={{ width: '100%' }}
+                                        id="userListTableDiv"
+                                        className="RowheightForjexceladdRow consumptionDataEntryTable"
+                                    ></div>
+                                </div>
+                            </CardBody>
+                            <CardFooter>
+                                <b>{this.state.userList.length}</b> {i18n.t('static.dashboard.user').toLowerCase()}
+                            </CardFooter>
                         </Card>
                     </Col>
                 </Row>

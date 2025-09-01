@@ -8,10 +8,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Edit Realm"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.realm.realm")),
     realmName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditRealmTicketComponent extends Component {
         super(props);
         this.state = {
             realm: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.realm.realm")),
                 realmName: "",
                 notes: "",
                 priority: 3

@@ -8,10 +8,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import DatasetService from '../../api/DatasetService';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.dataset.BranchTreeTemplate"))
 let summaryText_2 = "Edit Branch Template"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dataset.BranchTreeTemplate")),
     templateName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditBranchTemplateTicketComponent extends Component {
         super(props);
         this.state = {
             branchTemplate: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dataset.BranchTreeTemplate")),
                 templateName: "",
                 notes: "",
                 priority: 3

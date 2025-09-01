@@ -6,7 +6,6 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm"))
 let summaryText_2 = "Add Realm"
 /**
  * This const is used to define the validation schema for realm ticket component
@@ -70,7 +69,7 @@ export default class RealmTicketComponent extends Component {
         super(props);
         this.state = {
             realm: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm")),
                 realmName: "",
                 realmCode: "",
                 minMosMinGaurdrail: "",
@@ -195,7 +194,7 @@ export default class RealmTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.realm.realm")),
                             realmName: this.state.realm.realmName,
                             realmCode: this.state.realm.realmCode,
                             minMosMinGaurdrail: this.state.realm.minMosMinGaurdrail,

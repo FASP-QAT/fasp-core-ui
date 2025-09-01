@@ -8,10 +8,9 @@ import FundingSourceService from '../../api/FundingSourceService';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource"))
 let summaryText_2 = "Edit Funding Source"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource")),
     fundingSourceName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditFundingSourceTicketComponent extends Component {
         super(props);
         this.state = {
             fundingSource: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.fundingsource.fundingsource")),
                 fundingSourceName: "",
                 notes: "",
                 priority: 3

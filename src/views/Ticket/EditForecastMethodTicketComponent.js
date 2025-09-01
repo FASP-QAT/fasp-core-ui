@@ -8,10 +8,9 @@ import ForecastMethodService from "../../api/ForecastMethodService";
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.forecastMethod.forecastMethod"))
 let summaryText_2 = "Edit Forecast Method"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.forecastMethod.forecastMethod")),
     forecastMethodName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             forecastMethod: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.forecastMethod.forecastMethod")),
                 forecastMethodName: "",
                 notes: "",
                 priority: 3

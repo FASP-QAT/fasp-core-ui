@@ -8,10 +8,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import ProcurementAgentService from '../../api/ProcurementAgentService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.procurementagenttype"))
 let summaryText_2 = "Edit Procurement Agent Type"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.procurementagenttype")),
     procurementAgentTypeName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditProcurementAgentTypeTicketComponent extends Component {
         super(props);
         this.state = {
             procurementAgentType: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.dashboard.procurementagenttype")),
                 procurementAgentTypeName: "",
                 notes: "",
                 priority: 3
