@@ -9,7 +9,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import UserService from '../../api/UserService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.organisationType.organisationType"))
 let summaryText_2 = "Add Organisation Type"
 const initialValues = {
     summary: "",
@@ -43,7 +42,7 @@ export default class OrganisationTypeTicketComponent extends Component {
         super(props);
         this.state = {
             organisationType: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.organisationType.organisationType")),
                 realmId: "",
                 organisationTypeName: "",
                 priority: 3
@@ -231,7 +230,7 @@ export default class OrganisationTypeTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.organisationType.organisationType")),
                             realmId: this.props.items.userRealmId,
                             organisationTypeName: '',
                             notes: '',

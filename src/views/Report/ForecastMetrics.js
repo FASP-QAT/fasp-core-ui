@@ -1093,8 +1093,8 @@ class ForecastMetrics extends Component {
                             bsSize="sm"
                             onChange={this.filterData}
                           >
-                            <option value="5">6 {i18n.t('static.dashboard.months')}</option>
                             <option value="2">3 {i18n.t('static.dashboard.months')}</option>
+                            <option value="5">6 {i18n.t('static.dashboard.months')}</option>
                             <option value="8">9 {i18n.t('static.dashboard.months')}</option>
                             <option value="11">12 {i18n.t('static.dashboard.months')}</option>
                           </Input>

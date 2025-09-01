@@ -8,10 +8,9 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import TracerCategoryService from '../../api/TracerCategoryService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.edit") + " " + i18n.t("static.tracercategory.tracercategory"))
 let summaryText_2 = "Edit Tracer Category"
 const initialValues = {
-    summary: summaryText_1,
+    summary: (i18n.t("static.common.edit") + " " + i18n.t("static.tracercategory.tracercategory")),
     tracerCategoryName: "",
     notes: "",
     priority: 3
@@ -40,7 +39,7 @@ export default class EditTracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             tracerCategory: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.edit") + " " + i18n.t("static.tracercategory.tracercategory")),
                 tracerCategoryName: "",
                 notes: "",
                 priority: 3

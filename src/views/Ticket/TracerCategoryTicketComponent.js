@@ -8,7 +8,6 @@ import JiraTikcetService from '../../api/JiraTikcetService';
 import RealmService from '../../api/RealmService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.tracercategory.tracercategory"))
 let summaryText_2 = "Add Tracer Category"
 /**
  * This const is used to define the validation schema for tracer category ticket component
@@ -35,7 +34,7 @@ export default class TracerCategoryTicketComponent extends Component {
         super(props);
         this.state = {
             tracerCategory: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.tracercategory.tracercategory")),
                 realmName: "",
                 tracerCategoryName: "",
                 notes: "",
@@ -220,7 +219,7 @@ export default class TracerCategoryTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.tracercategory.tracercategory")),
                             realmName: this.props.items.userRealmId,
                             tracerCategoryName: "",
                             notes: "",

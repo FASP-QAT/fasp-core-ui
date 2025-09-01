@@ -7,7 +7,6 @@ import { API_URL, SPACE_REGEX } from '../../Constants';
 import JiraTikcetService from '../../api/JiraTikcetService';
 import i18n from '../../i18n';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.usagePeriod.usagePeriod"))
 let summaryText_2 = "Add Usage Period"
 /**
  * This const is used to define the validation schema for usage period ticket component
@@ -35,7 +34,7 @@ export default class OrganisationTypeTicketComponent extends Component {
         super(props);
         this.state = {
             usagePeriod: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.usagePeriod.usagePeriod")),
                 usagePeriodName: "",
                 conversionFactor: '',
                 notes: '',
@@ -143,7 +142,7 @@ export default class OrganisationTypeTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.usagePeriod.usagePeriod")),
                             usagePeriodName: '',
                             conversionFactor: '',
                             notes: '',

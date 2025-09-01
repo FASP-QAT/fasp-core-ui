@@ -16,7 +16,6 @@ import DropdownService from '../../api/DropdownService';
 import classNames from 'classnames';
 import { API_URL, SPACE_REGEX } from '../../Constants';
 import TicketPriorityComponent from './TicketPriorityComponent';
-let summaryText_1 = (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster"))
 let summaryText_2 = "Add Program"
 /**
  * This const is used to define the validation schema for program ticket component
@@ -100,7 +99,7 @@ export default class ProgramTicketComponent extends Component {
         super(props);
         this.state = {
             program: {
-                summary: summaryText_1,
+                summary: (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster")),
                 programName: '',
                 programCode: '',
                 realmId: '',
@@ -831,7 +830,7 @@ export default class ProgramTicketComponent extends Component {
                     <Formik
                         enableReinitialize={true}
                         initialValues={{
-                            summary: summaryText_1,
+                            summary: (i18n.t("static.common.add") + " " + i18n.t("static.program.programMaster")),
                             programName: '',
                             programCode: '',
                             realmId: this.props.items.userRealmId,
