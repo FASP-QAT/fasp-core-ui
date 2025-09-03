@@ -710,14 +710,17 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                     var nodeDataMapForScenario = (nodeDataMap[scenarioList[ndm].id])[0];
                                     if (aggregateDownwardNodeList[fl].payload.downwardAggregationList && aggregateDownwardNodeList[fl].payload.downwardAggregationList.length > 0 && aggregateDownwardNodeList[fl].payload.downwardAggregationList[0].nodeId ) {
                                         aggregateDownwardNodeList[fl].payload.downwardAggregationList.map((x,index) => {
-                                            var aggDownNode = datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString());
-                                            if(aggDownNode.length > 0 && (aggDownNode[0].payload.nodeType.id == 2 || aggDownNode[0].payload.nodeType.id == 3) && aggDownNode[0].payload.downwardAggregationAllowed)
-                                                childNodeFlatList.push(aggDownNode[0]);
-                                            else
-                                                invalidChild.push(index)
+                                            if(x.targetScenarioId == scenarioList[ndm].id) {
+                                                var aggDownNode = datasetJson.treeList.filter(c => c.treeId.toString() == x.treeId.toString())[0].tree.flatList.filter(t => t.id.toString() == x.nodeId.toString());
+                                                if(aggDownNode.length > 0 && (aggDownNode[0].payload.nodeType.id == 2 || aggDownNode[0].payload.nodeType.id == 3) && aggDownNode[0].payload.downwardAggregationAllowed)
+                                                    childNodeFlatList.push(aggDownNode[0]);
+                                                else
+                                                    invalidChild.push(index)
+                                            }
                                         })
                                         aggregateDownwardNodeList[fl].payload.downwardAggregationList = aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter((x, index) => !invalidChild.includes(index))
                                     }
+                                    childNodeFlatList = [...new Set(childNodeFlatList)];
                                     // var treeListAD = datasetJson.treeList.map.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId))
                                     // var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
                                     var monthList = [];
@@ -740,7 +743,8 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var aggregatedSeasonality = 0;
                                         var aggregatedManualChange = 0;
                                         for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
-                                            var childScenario = (childNodeFlatList[cnfl].payload.nodeDataMap[aggregateDownwardNodeList[fl].payload.downwardAggregationList[cnfl].scenarioId]);
+                                            aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter(x => x.targetScenarioId == scenarioList[ndm].id).map(item => {
+                                            var childScenario = (childNodeFlatList[cnfl].payload.nodeDataMap[item.scenarioId]);
                                             if (childScenario != undefined && childScenario.length > 0) {
                                                 var childNodeMomData = childScenario[0].nodeDataMomList;
                                                 var nodeDataListFilteredFilter = (childNodeMomData.filter(c => moment(c.month).format("YYYY-MM") == moment(curDate).format("YYYY-MM")));
@@ -754,6 +758,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                                     aggregatedManualChange += Number(nodeDataListFiltered.manualChange);
                                                 }
                                             }
+                                            })
                                         }
                                         nodeDataList.push(
                                             {
