@@ -1140,12 +1140,11 @@ export default class SyncMasterData extends Component {
                                                                                                                                                     flat.payload.downwardAggregationList =
                                                                                                                                                         flat.payload.downwardAggregationList?.map(obj => ({
                                                                                                                                                         ...obj,
-                                                                                                                                                        targetScenarioId: obj.targetScenarioId ?? flat.payload.scenarioId
+                                                                                                                                                        targetScenarioId: obj.targetScenarioId ?? obj.scenarioId
                                                                                                                                                         })) ?? [];
                                                                                                                                                     }
                                                                                                                                                 });
                                                                                                                                             });
-                                                                                                                                            console.log("Hello ",(programData))
                                                                                                                                             var datasetPlanningUnitList = programData.planningUnitList;
                                                                                                                                             datasetPlanningUnitList.map(item => {
                                                                                                                                                 var planningUnitObj = response.planningUnitList.filter(c => c.planningUnitId == item.planningUnit.id);
