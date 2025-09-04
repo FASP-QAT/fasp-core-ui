@@ -1135,13 +1135,21 @@ export default class SyncMasterData extends Component {
                                                                                                                                         if (datasetList[dl].userId == userId) {
                                                                                                                                             const programData = decryptFCData(datasetList[dl].programData);
                                                                                                                                             programData.treeList.forEach(treeItem => {
+                                                                                                                                                const scenarioIds = treeItem.scenarioList?.map(s => s.id) ?? [];
                                                                                                                                                 treeItem.tree?.flatList?.forEach(flat => {
                                                                                                                                                     if (flat.payload?.nodeType?.id === 6) {
-                                                                                                                                                    flat.payload.downwardAggregationList =
-                                                                                                                                                        flat.payload.downwardAggregationList?.map(obj => ({
-                                                                                                                                                        ...obj,
-                                                                                                                                                        targetScenarioId: obj.targetScenarioId ?? obj.scenarioId
-                                                                                                                                                        })) ?? [];
+                                                                                                                                                    const hasTarget = flat.payload.downwardAggregationList?.some(
+                                                                                                                                                        obj => obj.targetScenarioId != null
+                                                                                                                                                    );
+                                                                                                                                                    if (!hasTarget) {
+                                                                                                                                                        flat.payload.downwardAggregationList =
+                                                                                                                                                        flat.payload.downwardAggregationList?.flatMap(obj =>
+                                                                                                                                                            scenarioIds.map(scenarioId => ({
+                                                                                                                                                            ...obj,
+                                                                                                                                                            targetScenarioId: scenarioId
+                                                                                                                                                            }))
+                                                                                                                                                        ) ?? [];
+                                                                                                                                                    }
                                                                                                                                                     }
                                                                                                                                                 });
                                                                                                                                             });

@@ -6925,7 +6925,7 @@ export default class BuildTree extends Component {
                     })
                 }
                 for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].targetScenarioId == this.state.selectedScenario && this.state.showConnections) {
+                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId == this.state.selectedScenario && this.state.showConnections) {
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
                             fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -13159,7 +13159,7 @@ export default class BuildTree extends Component {
                     })
                 } else {
                     for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].targetScenarioId == this.state.selectedScenario && this.state.showConnections) {
+                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId == this.state.selectedScenario && this.state.showConnections) {
                             treeLevelItems.push(new ConnectorAnnotationConfig({
                                 annotationType: AnnotationType.Connector,
                                 fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
