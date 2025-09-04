@@ -720,7 +720,10 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         })
                                         aggregateDownwardNodeList[fl].payload.downwardAggregationList = aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter((x, index) => !invalidChild.includes(index))
                                     }
-                                    childNodeFlatList = [...new Set(childNodeFlatList)];
+                                    childNodeFlatList = childNodeFlatList.filter(
+                                        (item, index, self) =>
+                                            index === self.findIndex(t => JSON.stringify(t) === JSON.stringify(item))
+                                    );
                                     // var treeListAD = datasetJson.treeList.map.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId))
                                     // var childNodeFlatList = flatListUnsorted.filter(c => aggregateDownwardNodeList[fl].payload.downwardAggregationList.map(x => x.nodeId.toString()).includes(c.id.toString()));
                                     var monthList = [];
@@ -743,7 +746,7 @@ export function calculateModelingData(dataset, props, page, nodeId, scenarioId, 
                                         var aggregatedSeasonality = 0;
                                         var aggregatedManualChange = 0;
                                         for (var cnfl = 0; cnfl < childNodeFlatList.length; cnfl++) {
-                                            aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter(x => x.targetScenarioId == scenarioList[ndm].id).map(item => {
+                                            aggregateDownwardNodeList[fl].payload.downwardAggregationList.filter(x => x.targetScenarioId == scenarioList[ndm].id && x.nodeId == childNodeFlatList[cnfl].payload.nodeId).map(item => {
                                             var childScenario = (childNodeFlatList[cnfl].payload.nodeDataMap[item.scenarioId]);
                                             if (childScenario != undefined && childScenario.length > 0) {
                                                 var childNodeMomData = childScenario[0].nodeDataMomList;
