@@ -634,6 +634,7 @@ class ListUserComponent extends Component {
             data[7] = (userAclList[j].procurementAgentName == "" || userAclList[j].procurementAgentName == null ? "All" : userAclList[j].procurementAgentName.label_en).toString();
             data[8] = (userAclList[j].fundingSourceName == "" || userAclList[j].fundingSourceName == null ? "All" : userAclList[j].fundingSourceName.label_en).toString();
             data[9] = (userAclList[j].programName == "" || userAclList[j].programName == null ? "All" : userAclList[j].programName.label_en).toString();
+            data[10] = userAclList[j].active;
             userArray[count] = data;
             count++;
         }
@@ -685,6 +686,14 @@ class ListUserComponent extends Component {
                 {
                     title: i18n.t('static.dashboard.programheader'),
                     type: 'text',
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.common.status'),
+                    source: [
+                        { id: 1, name: i18n.t('static.common.active') },
+                        { id: 0, name: i18n.t('static.dataentry.inactive') }
+                    ]
                 },
             ],
             editable: false,

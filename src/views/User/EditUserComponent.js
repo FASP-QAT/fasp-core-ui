@@ -1939,7 +1939,7 @@ class EditUserComponent extends Component {
           {i18n.t(this.state.message, { entityname })}
         </h5>
         <Row>
-          <Col sm={12} md={6} style={{ flexBasis: "auto" }}>
+          <Col sm={12} md={8} style={{ flexBasis: "auto" }}>
             <Card>
               <Formik
                 enableReinitialize={true}
@@ -2485,7 +2485,10 @@ class EditUserComponent extends Component {
    * This function is called when reset button is clicked to reset the user details
    */
   resetClicked() {
-    UserService.getUserByUserId(this.props.match.params.userId)
+    this.setState({
+      loading: true
+    }, () => {
+      UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
         this.setState(
           {
@@ -2545,6 +2548,7 @@ class EditUserComponent extends Component {
           }
         }
       });
+    });
   }
 }
 export default EditUserComponent;
