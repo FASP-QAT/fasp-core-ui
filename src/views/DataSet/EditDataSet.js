@@ -769,47 +769,38 @@ export default class EditProgram extends Component {
         {
             title: i18n.t("static.user.username"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.user.orgAndCountry"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.role.role"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.program.realmcountry"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.dashboard.healthareaheader"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.organisation.organisation"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.procurementagent.procurementagent"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.fundingsource.fundingsource"),
             type: "text",
-            readOnly: true
         },
         {
             title: i18n.t("static.dashboard.programheader"),
             type: "text",
-            readOnly: true
         }
       ],
       nestedHeaders: [
@@ -832,7 +823,18 @@ export default class EditProgram extends Component {
       allowDeleteRow: false,
       copyCompatibility: true,
       parseFormulas: true,
-      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+      onfilter: (el, term, rowNumbers) => {
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: "smooth",
+                });
+            }, 0);
+      },
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this)
     };
     this.el = jexcel(document.getElementById("userListTableDiv"), options);
     varEL = this.el;
@@ -1171,10 +1173,12 @@ export default class EditProgram extends Component {
                                 <b>{i18n.t('static.editProgram.userListHeader') + " " + getLabelText(this.state.program.label, this.state.lang) + " (" + this.state.realmCountryCode + "-" + this.state.healthAreaCode + "-" + this.state.organisationCode + (this.state.uniqueCode != undefined && this.state.uniqueCode.toString().length > 0 ? ("-" + this.state.uniqueCode) : "") + "):"}</b>
                             </CardHeader>
                             <CardBody>
-                                <h7>
-                                    {i18n.t('static.editProgram.userListSubHeader')}
-                                    <InitialTicketPageComponent isIcon={false} />{"."}
-                                </h7>
+                                <div class="label-text text-mutedDashboard">
+                                    <h7>
+                                        {i18n.t('static.editProgram.userListSubHeader')}
+                                        <InitialTicketPageComponent isIcon={false} />{"."}
+                                    </h7>
+                                </div>
                                 <div
                                     className=""
                                     style={{

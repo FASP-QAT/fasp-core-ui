@@ -1100,7 +1100,7 @@ export default class InitialTicketPageComponent extends Component {
       </Modal>
     );
     if (!this.props.isIcon) {
-      return <span onClick={this.togglehelp} style={{ color: "#205493", cursor: "pointer" }}>{i18n.t('static.ticket.help')} {content}</span>;
+      return <span onClick={this.togglehelp} style={{ color: "#205493", cursor: "pointer" }}>{i18n.t('static.ticket.help')}{content}</span>;
     }
     return (
       <Dropdown nav >
