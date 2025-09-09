@@ -700,6 +700,10 @@ export default class EditProgram extends Component {
         var tr = asterisk.firstChild.nextSibling;
         tr.children[3].classList.add('InfoTr');
         tr.children[3].title = i18n.t('static.tooltip.roleAcl');
+        tr.children[7].classList.add('InfoTr');
+        tr.children[7].title = i18n.t('static.tooltip.procurementAgentAcl');
+        tr.children[8].classList.add('InfoTr');
+        tr.children[8].title = i18n.t('static.tooltip.fundingSourceAcl');
     };
     /**
      * This function is used to build the table the access control
