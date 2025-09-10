@@ -1448,6 +1448,7 @@ class ApplicationDashboard extends Component {
           var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
           DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
             localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+            console.log("Hello ",response.data);
             this.setState({
               dashboardTopList: (response.data).sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();
