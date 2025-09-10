@@ -1235,7 +1235,7 @@ class ApplicationDashboard extends Component {
       db1 = e.target.result;
 
       if (localStorage.getItem('sessionType') === 'Online') {
-        let topPIds = this.state.topProgramId.map(p => p.value.split("_")[0]);
+        let topPIds = this.state.topProgramId.map(p => p.value.toString().split("_")[0]);
         if(topPIds.length > 0 && localStorage.getItem("topLocalProgram") == "true") {
           for(var i = 0; i < topPIds.length; i++){
             ProgramService.getProgramById(topPIds[i])
@@ -1383,6 +1383,21 @@ class ApplicationDashboard extends Component {
                     }
                 }
             );
+        } else {
+          DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+            this.setState({
+              dashboardTopList: (response.data).sort((a, b) => {
+                var itemLabelA = a.program.code.toUpperCase();
+                var itemLabelB = b.program.code.toUpperCase();
+                return itemLabelA > itemLabelB ? 1 : -1;
+              }),
+              topSubmitLoader: false
+            })
+          }).catch(e => {
+            this.setState({
+              topSubmitLoader: false
+            })
+          })
         }
       }
       
@@ -1487,7 +1502,7 @@ class ApplicationDashboard extends Component {
             }
           }
           this.setState({ shipmentStatusList: shipmentStatusList })
-        }
+        }.bind(this)
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
