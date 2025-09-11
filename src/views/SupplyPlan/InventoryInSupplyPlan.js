@@ -927,7 +927,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is used when users click on the add row in the inventory/adjustment batch table
      */
     addBatchRowInJexcel() {
-        if (this.props.items.addNewBatch.toString() == "false") {
+        if (this.props.items.addNewBatch.toString() == "false" || this.props.items.addNewBatch == 0) {
             var obj = this.state.inventoryBatchInfoTableEl;
             var adjustmentType = this.props.items.inventoryType;
             var rowData = obj.getRowData(0);
@@ -1612,7 +1612,7 @@ export default class InventoryInSupplyPlanComponent extends React.Component {
      * This function is called when submit button of the inventory/adjustment batch info is clicked and is used to save inventory/adjustment batch info if all the data is successfully validated.
      */
     saveInventoryBatchInfo() {
-        if (this.props.items.addNewBatch.toString() == "false") {
+        if (this.props.items.addNewBatch.toString() == "false" || this.props.items.addNewBatch == 0) {
             this.props.updateState("loading", true);
             var validation = this.checkValidationInventoryBatchInfo();
             if (validation == true) {
