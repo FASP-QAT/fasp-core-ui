@@ -8827,6 +8827,11 @@ export default class BuildTree extends Component {
                     }
                     var tArr = [];
                     for (var i = 0; i < items.length; i++) {
+                        if(items[i].payload.downwardAggregationList && items[i].payload.downwardAggregationList.length > 0) {
+                            let filteredDownwardAggregationList = items[i].payload.downwardAggregationList.filter(c => c.targetScenarioId == this.state.selectedScenario); 
+                            let newDownwardAggregationList = filteredDownwardAggregationList.map(c => (c.scenarioId == this.state.selectedScenario ? { ...c, targetScenarioId: scenarioId.toString(), scenarioId: scenarioId.toString() } : { ...c, targetScenarioId: scenarioId.toString() }));
+                            items[i].payload.downwardAggregationList = [...items[i].payload.downwardAggregationList, ...newDownwardAggregationList];
+                        }
                         for (let j = 0; j < scenarioList.length; j++) {
                             if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                                 temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
