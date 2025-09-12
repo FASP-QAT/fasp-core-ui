@@ -315,6 +315,25 @@ export default class ImportDataset extends Component {
                                 var programDataBytes = json.programData;
                                 var programData = programDataBytes;
                                 var programJson = (programData);
+                                programJson.treeList.forEach(treeItem => {
+                                    const scenarioIds = treeItem.scenarioList?.map(s => s.id) ?? [];
+                                    treeItem.tree?.flatList?.forEach(flat => {
+                                        if (flat.payload?.nodeType?.id === 6) {
+                                        const hasTarget = flat.payload.downwardAggregationList?.some(
+                                            obj => obj.targetScenarioId != null
+                                        );
+                                        if (!hasTarget) {
+                                            flat.payload.downwardAggregationList =
+                                            flat.payload.downwardAggregationList?.flatMap(obj =>
+                                                scenarioIds.map(scenarioId => ({
+                                                ...obj,
+                                                targetScenarioId: scenarioId
+                                                }))
+                                            ) ?? [];
+                                        }
+                                        }
+                                    });
+                                });
                                 json.programData = encryptFCData(programJson);
                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                 var programn = transactionn.objectStore('datasetData');
@@ -463,6 +482,25 @@ export default class ImportDataset extends Component {
                                                 var programDataBytes = json.programData;
                                                 var programData = programDataBytes;
                                                 var programJson = (programData);
+                                                programJson.treeList.forEach(treeItem => {
+                                                    const scenarioIds = treeItem.scenarioList?.map(s => s.id) ?? [];
+                                                    treeItem.tree?.flatList?.forEach(flat => {
+                                                        if (flat.payload?.nodeType?.id === 6) {
+                                                        const hasTarget = flat.payload.downwardAggregationList?.some(
+                                                            obj => obj.targetScenarioId != null
+                                                        );
+                                                        if (!hasTarget) {
+                                                            flat.payload.downwardAggregationList =
+                                                            flat.payload.downwardAggregationList?.flatMap(obj =>
+                                                                scenarioIds.map(scenarioId => ({
+                                                                ...obj,
+                                                                targetScenarioId: scenarioId
+                                                                }))
+                                                            ) ?? [];
+                                                        }
+                                                        }
+                                                    });
+                                                });
                                                 json.programData = encryptFCData(programJson);
                                                 var transactionn = db1.transaction(['datasetData'], 'readwrite');
                                                 var programn = transactionn.objectStore('datasetData');
