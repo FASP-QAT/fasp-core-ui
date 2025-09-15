@@ -90,7 +90,7 @@ export default class ConsumptionDetails extends React.Component {
         let workbook = new Workbook();
         let worksheet = workbook.addWorksheet(i18n.t('static.supplyplan.consumptionDataEntry'));
         worksheet.columns = [
-            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },//D
+            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },//D
             { header: i18n.t('static.pipeline.consumptionDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.consumption.consumptionType'), key: 'name', width: 40 },
