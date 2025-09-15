@@ -311,20 +311,17 @@ class CompareAndSelectScenario extends Component {
         var rangeValue = this.state.singleValue2;
         let startDate = "";
         let stopDate = ""
-        let tempStopDate = ""
         if (!this.state.showForecastPeriod) {
             startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
             stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-            tempStopDate = ((rangeValue.to.month < 6 || rangeValue.to.month == 12)? rangeValue.to.year + 1 : rangeValue.to.year) + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
         } else {
             startDate = this.state.forecastStartDate;
             stopDate = this.state.forecastStopDate
-            tempStopDate = stopDate
         }
         var curDate = moment(startDate).format("YYYY-MM-DD");
         var monthList = [];
         monthList.push(curDate);
-        for (var i = 1; moment(curDate).format("YYYY-MM") < moment(tempStopDate).format("YYYY-MM"); i++) {
+        for (var i = 1; moment(curDate).format("YYYY-MM") < moment(stopDate).format("YYYY-MM"); i++) {
             curDate = moment(startDate).add(i, 'months').format("YYYY-MM-DD");
             monthList.push(curDate);
         }
@@ -532,18 +529,18 @@ class CompareAndSelectScenario extends Component {
             calendarTableCol.push({ title: this.state.xAxisDisplayBy == 1 ? i18n.t('static.inventoryDate.inventoryReport') : this.state.xAxisDisplayBy == 2 ? i18n.t('static.modelingValidation.calendarYear') : i18n.t('static.modelingValidation.fiscalYear'), type: 'text' });
             calendarTableCol.push({ title: "", type: 'hidden' });
             columns1.push({ title: i18n.t('static.inventoryDate.inventoryReport'), width: 100, type: 'calendar', options: { format: JEXCEL_MONTH_PICKER_FORMAT, type: 'year-month-picker' } });
-            columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.0000',decimal: '.'});
+            columns1.push({ title: i18n.t('static.compareAndSelect.actuals'), width: 100, type: 'numeric', mask: '#,##.00' });
             var treeScenarioList = this.state.treeScenarioList;
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
-                    columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
+                    columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                     if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                     }
                 } else {
-                    columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
+                    columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                     if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.0000', decimal: "." });
+                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                     }
                 }
             }
