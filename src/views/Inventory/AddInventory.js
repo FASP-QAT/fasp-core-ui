@@ -82,7 +82,7 @@ export default class AddInventory extends Component {
         let workbook = new Workbook();
         let worksheet = (this.state.inventoryDataType.value == 1 ? workbook.addWorksheet(i18n.t('static.supplyplan.inventoryDataEntry')) : workbook.addWorksheet(i18n.t('static.supplyplan.adjustmentDataEntryTemplate')));
         worksheet.columns = [
-            { header: i18n.t('static.dataEntry.planningUnitId'), key: 'name', width: 25 },
+            { header: i18n.t('static.supplyPlan.qatProduct'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.inventoryDate'), key: 'string', width: 25, style: { numFmt: 'YYYY-MM-DD' } },
             { header: i18n.t('static.region.region'), key: 'name', width: 25 },
             { header: i18n.t('static.inventory.dataSource'), key: 'name', width: 40 },
