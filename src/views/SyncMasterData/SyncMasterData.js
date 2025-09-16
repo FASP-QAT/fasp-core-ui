@@ -1134,6 +1134,25 @@ export default class SyncMasterData extends Component {
                                                                                                                                     for (var dl = 0; dl < datasetList.length; dl++) {
                                                                                                                                         if (datasetList[dl].userId == userId) {
                                                                                                                                             const programData = decryptFCData(datasetList[dl].programData);
+                                                                                                                                            programData.treeList.forEach(treeItem => {
+                                                                                                                                                const scenarioIds = treeItem.scenarioList?.map(s => s.id) ?? [];
+                                                                                                                                                treeItem.tree?.flatList?.forEach(flat => {
+                                                                                                                                                    if (flat.payload?.nodeType?.id === 6) {
+                                                                                                                                                    const hasTarget = flat.payload.downwardAggregationList?.some(
+                                                                                                                                                        obj => obj.targetScenarioId != null
+                                                                                                                                                    );
+                                                                                                                                                    if (!hasTarget) {
+                                                                                                                                                        flat.payload.downwardAggregationList =
+                                                                                                                                                        flat.payload.downwardAggregationList?.flatMap(obj =>
+                                                                                                                                                            scenarioIds.map(scenarioId => ({
+                                                                                                                                                            ...obj,
+                                                                                                                                                            targetScenarioId: scenarioId
+                                                                                                                                                            }))
+                                                                                                                                                        ) ?? [];
+                                                                                                                                                    }
+                                                                                                                                                    }
+                                                                                                                                                });
+                                                                                                                                            });
                                                                                                                                             var datasetPlanningUnitList = programData.planningUnitList;
                                                                                                                                             datasetPlanningUnitList.map(item => {
                                                                                                                                                 var planningUnitObj = response.planningUnitList.filter(c => c.planningUnitId == item.planningUnit.id);

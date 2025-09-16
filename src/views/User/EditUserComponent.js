@@ -1939,7 +1939,7 @@ class EditUserComponent extends Component {
           {i18n.t(this.state.message, { entityname })}
         </h5>
         <Row>
-          <Col sm={12} md={8} style={{ flexBasis: "auto" }}>
+          <Col sm={12} md={12} style={{ flexBasis: "auto" }}>
             <Card>
               <Formik
                 enableReinitialize={true}
