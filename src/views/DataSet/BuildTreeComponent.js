@@ -4883,12 +4883,16 @@ export default class BuildTree extends Component {
         })
         let { currentItemConfig } = this.state;
         let tempList = [];
+        let existingList = currentItemConfig.context.payload.downwardAggregationList ? currentItemConfig.context.payload.downwardAggregationList.filter(
+            item => item.targetScenarioId != this.state.selectedScenario
+        ) : []
         daList.map(x => tempList.push({
             treeId: x.value.split("~")[0],
             scenarioId: x.value.split("~")[1],
-            nodeId: x.value.split("~")[2]
+            nodeId: x.value.split("~")[2],
+            targetScenarioId: this.state.selectedScenario
         }))
-        currentItemConfig.context.payload.downwardAggregationList = tempList;
+        currentItemConfig.context.payload.downwardAggregationList = [...existingList, ...tempList];
         if (tempList.length == 0) {
             this.setState({
                 multiselectError: true
@@ -6921,7 +6925,7 @@ export default class BuildTree extends Component {
                     })
                 }
                 for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                    if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && newItems[i].payload.downwardAggregationList[j].scenarioId == this.state.selectedScenario && this.state.showConnections) {
                         treeLevelItems.push(new ConnectorAnnotationConfig({
                             annotationType: AnnotationType.Connector,
                             fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -6958,6 +6962,10 @@ export default class BuildTree extends Component {
                 }
             }
         }
+        treeLevelItems = treeLevelItems.filter(
+            (item, index, self) =>
+                index === self.findIndex(t => JSON.stringify(t) === JSON.stringify(item))
+        );
         var sampleChart = new OrgDiagramPdfkit({
             ...this.state,
             pageFitMode: PageFitMode.Enabled,
@@ -7577,9 +7585,6 @@ export default class BuildTree extends Component {
                 child.level = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].level + 1;
                 if (child.payload.nodeType.id == 6 && this.state.copyModalTree != this.state.treeId) {
                     child.payload.downwardAggregationList = [];
-                }
-                if (child.payload.downwardAggregationAllowed) {
-                    child.payload.downwardAggregationAllowed = false;
                 }
                 var parentSortOrder = this.state.copyModalParentNodeList.filter(x => x.id == this.state.copyModalParentNode)[0].sortOrder;
                 var childList1 = this.state.copyModalTree != this.state.treeId ? updatedFlatList.filter(c => c.parent == this.state.copyModalParentNode) : items.filter(c => c.parent == this.state.copyModalParentNode);
@@ -8822,6 +8827,11 @@ export default class BuildTree extends Component {
                     }
                     var tArr = [];
                     for (var i = 0; i < items.length; i++) {
+                        if(items[i].payload.downwardAggregationList && items[i].payload.downwardAggregationList.length > 0) {
+                            let filteredDownwardAggregationList = items[i].payload.downwardAggregationList.filter(c => c.targetScenarioId == this.state.selectedScenario); 
+                            let newDownwardAggregationList = filteredDownwardAggregationList.map(c => ((c.treeId == this.state.treeId && c.scenarioId == this.state.selectedScenario) ? { ...c, targetScenarioId: scenarioId.toString(), scenarioId: scenarioId.toString() } : { ...c, targetScenarioId: scenarioId.toString() }));
+                            items[i].payload.downwardAggregationList = [...items[i].payload.downwardAggregationList, ...newDownwardAggregationList];
+                        }
                         for (let j = 0; j < scenarioList.length; j++) {
                             if (items[i].payload.nodeDataMap.hasOwnProperty(scenarioList[j].id)) {
                                 temNodeDataMap.push(items[i].payload.nodeDataMap[scenarioList[j].id][0]);
@@ -8830,7 +8840,7 @@ export default class BuildTree extends Component {
                         }
                         var tempArray = [];
                         var nodeDataMap = {};
-                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[minScenarioId])[0])));
+                        tempArray.push(JSON.parse(JSON.stringify((items[i].payload.nodeDataMap[this.state.selectedScenario])[0])));
                         nodeDataMap = items[i].payload.nodeDataMap;
                         nodeDataMap[scenarioId] = tempArray;
                         nodeDataMap[scenarioId][0].nodeDataId = "";
@@ -8885,6 +8895,7 @@ export default class BuildTree extends Component {
                     this.callAfterScenarioChange(scenarioId);
                 }
                 this.saveTreeData(false, false);
+                this.componentDidMount();
             });
         } else {
             alert(i18n.t('static.tree.duplicateScenarioName'));
@@ -9850,7 +9861,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
+            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && da.scenarioId == this.state.selectedScenario && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.targetScenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -10979,7 +10990,7 @@ export default class BuildTree extends Component {
                                                         name="downwardAggregationList"
                                                         id="downwardAggregationList"
                                                         options={this.state.downwardAggregationList.length > 0 ? this.state.downwardAggregationList : []}
-                                                        value={this.state.currentItemConfig.context.payload.downwardAggregationList ? this.state.currentItemConfig.context.payload.downwardAggregationList.map(x => ({ value: x.treeId + "~" + x.scenarioId + "~" + x.nodeId, label: this.state.downwardAggregationList.filter(t => t.value == (x.treeId + "~" + x.scenarioId + "~" + x.nodeId))[0].label })) : []}
+                                                        value={this.state.currentItemConfig.context.payload.downwardAggregationList ? this.state.currentItemConfig.context.payload.downwardAggregationList.filter(x => x.targetScenarioId == this.state.selectedScenario).map(x => ({ value: x.treeId + "~" + x.scenarioId + "~" + x.nodeId, label: this.state.downwardAggregationList.filter(t => t.value == (x.treeId + "~" + x.scenarioId + "~" + x.nodeId))[0].label })) : []}
                                                         onChange={(e) => { this.downwardAggregationListChange(e) }}
                                                         labelledBy={i18n.t('static.common.select')}
                                                     />
@@ -10996,7 +11007,7 @@ export default class BuildTree extends Component {
                                                 {this.state.currentItemConfig.context.payload.downwardAggregationAllowed && <div className="col-md-6">
                                                     {this.state.sourceNodeUsageList.length > 0 && <><b>{i18n.t('static.tree.aggregatedBy')} </b> ({i18n.t('static.common.treeName')} &gt; {i18n.t('static.tree.scenarioName')} &gt; … {i18n.t('static.tree.parentName')} &gt; {i18n.t('static.tree.nodeName')})</>}
                                                     {this.state.sourceNodeUsageList.length == 0 && <b className='red'>{i18n.t('static.tree.notUsed')}</b>}<br></br>
-                                                    {this.state.sourceNodeUsageList.map(sn => (<><u><a href={"/#/dataSet/buildTree/tree/" + sn.treeId + "/" + this.state.programId + "/" + "-1"} target="_blank">
+                                                    {this.state.sourceNodeUsageList.map(sn => (<><u><a href={"/#/dataSet/buildTree/tree/" + sn.treeId + "/" + this.state.programId + "/" + sn.scenarioId} target="_blank">
                                                         {sn.treeName + (sn.isScenarioVisible.length > 1 ? (" > " + sn.scenarioName) : "") + " > ... " + sn.parentName + " > " + sn.nodeName}
                                                     </a></u><br></br></>))}
                                                 </div>}
@@ -12917,11 +12928,11 @@ export default class BuildTree extends Component {
             }
             var sourceNodeUsageListCount = [];
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId && da.scenarioId == this.state.selectedScenario) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.targetScenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
-                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
+                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             } else if (itemConfig.payload.downwardAggregationList && itemConfig.payload.nodeType.id == 6) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId).length == itemConfig.payload.downwardAggregationList.length ? false : true;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
             }
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
@@ -12956,7 +12967,7 @@ export default class BuildTree extends Component {
                                                         (itemConfig.payload.nodeType.id == 1 ?
                                                             <i><img src={AggregationNode} className="AggregationNodeSize" /></i> :
                                                             (itemConfig.payload.nodeType.id == 6 ?
-                                                                <><span style={{ color: '#002f6c' }} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                                                <><span style={{ color: '#002f6c' }} className={itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.length == 0 ? "red" : "" : "red"}>{itemConfig.payload.downwardAggregationList ? itemConfig.payload.downwardAggregationList.filter(item => item.targetScenarioId == this.state.selectedScenario).length : 0}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
                                     {(itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) && itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
                                     {(itemConfig.payload.nodeType.id == 2 || itemConfig.payload.nodeType.id == 3) && itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 </div>
@@ -12975,12 +12986,12 @@ export default class BuildTree extends Component {
             var sourceNodeUsageListCount = [];
             var outerLink = false;
             if (this.state.dataSetObj.programData.treeList)
-                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.scenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
+                this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == itemConfig.payload.nodeId && da.scenarioId == this.state.selectedScenario) ? sourceNodeUsageListCount.push({ treeId: tl.treeId, scenarioId: da.targetScenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, }) : "")) : ""));
             if (itemConfig.payload.downwardAggregationAllowed) {
-                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId).length == sourceNodeUsageListCount.length ? false : true
+                outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             }
             if (itemConfig.payload.downwardAggregationList) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId).length == itemConfig.payload.downwardAggregationList.length ? false : true;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
             }
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{ height: "88px", width: "200px", zIndex: "1" }}>
@@ -13011,7 +13022,7 @@ export default class BuildTree extends Component {
                                                     (itemConfig.payload.nodeType.id == 1 ?
                                                         <i><img src={AggregationNode} className="AggregationNodeSize" /></i> :
                                                         (itemConfig.payload.nodeType.id == 6 ?
-                                                            <><span style={{ color: '#002f6c' }}>{itemConfig.payload.downwardAggregationList.length}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
+                                                            <><span style={{ color: '#002f6c' }}>{itemConfig.payload.downwardAggregationList.filter(item => item.targetScenarioId == this.state.selectedScenario).length}</span><i><img src={AggregationDown} className="AggregationDownwardNodeSize" /></i></> : "")))))}</b>
                                 {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length > 0 ? <i><img src={AggregationAllowed} className="AggregationDownwardNodeSize" /></i> : ""}
                                 {itemConfig.payload.downwardAggregationAllowed && sourceNodeUsageListCount.length == 0 ? <i><img src={AggregationAllowedRed} className="AggregationDownwardNodeSize" /></i> : ""}
                             </div>
@@ -13087,7 +13098,7 @@ export default class BuildTree extends Component {
                 return ({ value: item.regionId, label: getLabelText(item.label, this.state.lang) })
             }, this);
         let treeLevel = this.state.items.length;
-        const treeLevelItems = []
+        var treeLevelItems = []
         var treeLevels = this.state.curTreeObj.forecastMethod.id != "" && this.state.curTreeObj.levelList != undefined ? this.state.curTreeObj.levelList : [];
         for (var i = 0; i <= treeLevel; i++) {
             var treeLevelFiltered = treeLevels.filter(c => c.levelNo == i);
@@ -13151,7 +13162,7 @@ export default class BuildTree extends Component {
                     })
                 } else {
                     for (var j = 0; j < newItems[i].payload.downwardAggregationList.length; j++) {
-                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && this.state.showConnections) {
+                        if (newItems[i].payload.downwardAggregationList[j].treeId == this.state.treeId && (newItems[i].payload.downwardAggregationList[j].targetScenarioId == this.state.selectedScenario && newItems[i].payload.downwardAggregationList[j].scenarioId == this.state.selectedScenario) && this.state.showConnections) {
                             treeLevelItems.push(new ConnectorAnnotationConfig({
                                 annotationType: AnnotationType.Connector,
                                 fromItem: parseInt(newItems[i].payload.downwardAggregationList[j].nodeId),
@@ -13189,6 +13200,10 @@ export default class BuildTree extends Component {
                 }
             }
         }
+        treeLevelItems = treeLevelItems.filter(
+            (item, index, self) =>
+                index === self.findIndex(t => JSON.stringify(t) === JSON.stringify(item))
+        );
         const config = {
             ...this.state,
             items: newItems,

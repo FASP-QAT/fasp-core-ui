@@ -1738,6 +1738,7 @@ export default class ListTreeComponent extends Component {
                             sortOrder: "00",
                             newTree: true,
                             payload: {
+                                nodeId: 1,
                                 label: {
                                     label_en: ''
                                 },
