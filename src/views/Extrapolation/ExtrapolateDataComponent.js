@@ -3458,7 +3458,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var monthsForMovingAverage = e.target.value;
         this.setState({
             monthsForMovingAverage: monthsForMovingAverage,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3470,7 +3471,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var alpha = e.target.value;
         this.setState({
             alpha: alpha,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3482,7 +3484,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var beta = e.target.value;
         this.setState({
             beta: beta,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3494,7 +3497,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var gamma = e.target.value;
         this.setState({
             gamma: gamma,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3506,7 +3510,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var confidenceLevelId = e.target.value;
         this.setState({
             confidenceLevelId: confidenceLevelId,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3518,7 +3523,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var confidenceLevelIdLinearRegression = e.target.value;
         this.setState({
             confidenceLevelIdLinearRegression: confidenceLevelIdLinearRegression,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3530,7 +3536,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var confidenceLevelIdArima = e.target.value;
         this.setState({
             confidenceLevelIdArima: confidenceLevelIdArima,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3542,7 +3549,8 @@ export default class ExtrapolateDataComponent extends React.Component {
         var seasonals = e.target.value;
         this.setState({
             noOfMonthsForASeason: seasonals,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3553,7 +3561,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     setPId(e) {
         this.setState({
             p: e.target.value,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3564,7 +3573,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     setDId(e) {
         this.setState({
             d: e.target.value,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3575,7 +3585,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     setQId(e) {
         this.setState({
             q: e.target.value,
-            dataChanged: true
+            dataChanged: true,
+            extrapolateClicked: false
         }, () => {
         })
     }
@@ -3589,6 +3600,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             movingAvgId: movingAvgId,
             show: false,
             dataChanged: !movingAvgId?this.state.dataChanged:true,
+            extrapolateClicked: !movingAvgId?true:false,
             methodChanged:!movingAvgId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3603,6 +3615,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             semiAvgId: semiAvgId,
             dataChanged: !semiAvgId?this.state.dataChanged:true,
+            extrapolateClicked: !semiAvgId?true:false,
             methodChanged:!semiAvgId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3617,6 +3630,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             linearRegressionId: linearRegressionId,
             dataChanged: !linearRegressionId?this.state.dataChanged:true,
+            extrapolateClicked: !linearRegressionId?true:false,
             methodChanged:!linearRegressionId?true:false
         }, () => {
             this.buildActualJxl()
@@ -3631,6 +3645,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             smoothingId: smoothingId,
             dataChanged: !smoothingId?this.state.dataChanged:true,
+            extrapolateClicked: !smoothingId?true:false,
             offlineTES: false,
             methodChanged:!smoothingId?true:false
         }, () => {
@@ -3646,6 +3661,7 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             arimaId: arimaId,
             dataChanged: !arimaId?this.state.dataChanged:true,
+            extrapolateClicked: !arimaId?true:false,
             offlineArima: false,
             methodChanged:!arimaId?true:false
         }, () => {
