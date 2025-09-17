@@ -937,7 +937,7 @@ class StockAdjustmentComponent extends Component {
      * @param {Object} event - The event object containing the version ID value.
      */
     setVersionId(event) {
-        if (this.state.versionId != '' || this.state.versionId != undefined) {
+        if ((this.state.versionId != '' || this.state.versionId != undefined) && event.target.value != 0) {
             this.setState({
                 versionId: event.target.value
             }, () => {
