@@ -118,6 +118,7 @@ class VersionSettingsComponent extends Component {
      * Function for rebuilding tree
      */
     calculateModeling(){
+        console.log("Hello in calculateModeling")
         var programList = this.state.programsForWhichDateIsChanged;
         programList.forEach(program => {
         var db1;
@@ -144,7 +145,11 @@ class VersionSettingsComponent extends Component {
     })
     }
     saveTreeData(datasetObj) {
-        var programData = encryptFCData(datasetObj.programData);
+        var programData;
+        if(Array.isArray(datasetObj.programData)){
+            datasetObj.programData = decryptFCData(datasetObj.programData);
+        }
+        programData = encryptFCData(datasetObj.programData);
         datasetObj.programData = programData;
         var db1;
         getDatabase();
@@ -599,6 +604,7 @@ class VersionSettingsComponent extends Component {
                         programData.currentVersion.forecastThresholdHighPerc = this.el.getValue(`P${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
                         programData.currentVersion.forecastThresholdLowPerc = this.el.getValue(`Q${parseInt(i) + 1}`, true).toString().replaceAll("%", "");
                         programData = encryptFCData(programData);
+                        console.log("hello in formsubmit")
                         program.programData = programData;
                         programs.push(program);
                         count++;
