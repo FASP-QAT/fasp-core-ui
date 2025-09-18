@@ -1513,6 +1513,7 @@ class AddprogramPlanningUnit extends Component {
         tr.children[9].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[10].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[14].classList.add('InfoTrAsteriskTheadtrTdImage');
+        tr.children[11].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[12].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[13].classList.add('InfoTrAsteriskTheadtrTdImage');
         tr.children[15].classList.add('InfoTr');
