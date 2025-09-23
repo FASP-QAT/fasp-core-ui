@@ -214,19 +214,19 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 "forecastErrorList": [],
                                 "forecastConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
                                 },
                                 "actualConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
                                 },
                                 "inventoryQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
                                 },
                                 "shipmentQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
                                 },
                                 "expiryTotal": expiryTotal,
                                 "shipmentTotal": shipmentTotal
