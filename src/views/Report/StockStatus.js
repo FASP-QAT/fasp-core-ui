@@ -2059,7 +2059,7 @@ class StockStatus extends Component {
                 planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
                 programId: sortedProgramList[outputIndex],
                 PlanningUnitIdDataForExport: planningUnitItemFilter,
-                reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.id == sortedPlanningUnitList[outputIndex])[0]
+                reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.planningUnit.id == sortedPlanningUnitList[outputIndex])[0]
               }
               PlanningUnitDataForExport.push(planningUnitexport)
               PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]
@@ -2627,7 +2627,7 @@ class StockStatus extends Component {
               planBasedOn: this.state.isAggregate.toString() == "false" ? planningUnitItemFilter.planBasedOn : "",
               programId: sortedProgramList[outputIndex],
               PlanningUnitIdDataForExport: planningUnitItemFilter,
-              reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.id == sortedPlanningUnitList[outputIndex])[0]
+              reportBy: this.state.viewById == 1 ? planningUnit : this.state.realmCountryPlanningUnitListAll.filter(c => c.planningUnit.id == sortedPlanningUnitList[outputIndex])[0]
             }
             PlanningUnitDataForExport.push(planningUnitexport)
             PlanningUnitIdForExport = sortedPlanningUnitList[outputIndex]

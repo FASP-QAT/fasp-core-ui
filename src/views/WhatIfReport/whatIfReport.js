@@ -4,7 +4,7 @@ import { Formik } from 'formik';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from 'jspreadsheet';
-import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
+import { checkValidtion, inValid, jExcelLoadedFunctionOnlyHideRow, onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
 import { Bar } from 'react-chartjs-2';
@@ -37,7 +37,7 @@ import { contrast, filterOptions, roundAMC, roundARU } from "../../CommonCompone
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, INTERPOLATE_DATA_SOURCE_ID, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, CANCELLED_SHIPMENT_STATUS, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DECIMAL_NO_REGEX_8_DECIMALS, DELIVERED_SHIPMENT_STATUS, FORECASTED_CONSUMPTION_MODIFIED, INDEXED_DB_NAME, INDEXED_DB_VERSION, INTEGER_NO_REGEX, INTERPOLATE_DATA_SOURCE_ID, JEXCEL_PRO_KEY, MONTHS_IN_PAST_FOR_SUPPLY_PLAN, NO_OF_MONTHS_ON_LEFT_CLICKED, NO_OF_MONTHS_ON_LEFT_CLICKED_REGION, NO_OF_MONTHS_ON_RIGHT_CLICKED, NO_OF_MONTHS_ON_RIGHT_CLICKED_REGION, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, QAT_SUGGESTED_DATA_SOURCE_ID, SECRET_KEY, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, TOTAL_MONTHS_TO_DISPLAY_IN_SUPPLY_PLAN, USD_CURRENCY_ID } from '../../Constants.js';
 import csvicon from '../../assets/img/csv.png';
 import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
@@ -337,6 +337,10 @@ export default class WhatIfReportComponent extends React.Component {
         this.scenarioCheckedChanged = this.scenarioCheckedChanged.bind(this);
         this.saveScenario = this.saveScenario.bind(this);
         this.setFundingSource = this.setFundingSource.bind(this)
+        this.addActualInventory = this.addActualInventory.bind(this);
+        this.actionCanceledActualInventory = this.actionCanceledActualInventory.bind(this);
+        this.saveActualInventory = this.saveActualInventory.bind(this)
+        this.hideSixthCompoenent = this.hideSixthCompoenent.bind(this);
     }
     /**
      * Toggles the visibility of guidance in the component state.
@@ -511,6 +515,15 @@ export default class WhatIfReportComponent extends React.Component {
         document.getElementById('div5').style.display = 'block';
         this.state.timeout = setTimeout(function () {
             document.getElementById('div5').style.display = 'none';
+        }, 30000);
+    }
+    /**
+     * This function is used to hide the messages that are there in div6 after 30 seconds
+     */
+    hideSixthCompoenent() {
+        document.getElementById('div6').style.display = 'block';
+        this.state.timeout = setTimeout(function () {
+            document.getElementById('div6').style.display = 'none';
         }, 30000);
     }
     /**
@@ -3668,6 +3681,530 @@ export default class WhatIfReportComponent extends React.Component {
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.whatIf') + ".pdf")
     }
+    toggleInventoryActualBatchInfo(batchInfoList, isActual, count, comingFromInventoryData) {
+        var cont = false;
+        if (this.state.actualInventoryChanged) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            this.setState({
+                batchInfoInInventoryPopUp: batchInfoList,
+                actualInventoryChanged: false,
+                actualInventoryEditable: isActual,
+                actualInventoryBatchTotalNotMatching: "",
+                ledgerForBatch: []
+            }, () => {
+                var batchListForJexcel = [];
+                var editable = isActual;
+                var programJson = this.state.programJson;
+                var planningUnitId = document.getElementById("planningUnitId").value;
+                var batchInfoListForProgram = programJson.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") <= moment(this.state.monthsArray[count].startDate).format("YYYY-MM")).flatMap(b => b.batchDetails);
+                var fullBatchInfoList = programJson.batchInfoList;
+                var batchList = [];
+                var shipmentList = programJson.shipmentList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+                var consumptionBatchList = programJson.consumptionList.filter(c => c.planningUnit.id == planningUnitId).flatMap(consumption => consumption.batchInfoList);
+                var inventoryBatchList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId).flatMap(inventory => inventory.batchInfoList);
+                var shipmentBatchList = shipmentList.flatMap(shipment => shipment.batchInfoList);
+                batchListForJexcel.push({
+                    name: i18n.t("static.supplyPlan.qatAutocalculations"),
+                    id: -1,
+                    createdDate: "",
+                    expiryDate: "",
+                    autoGenerated: ''
+                })
+                batchList.push({
+                    name: i18n.t("static.supplyPlan.qatAutocalculations"),
+                    id: -1,
+                    checkQtyValidation: false,
+                    createdDate: "",
+                    expiryDate: "",
+                    autoGenerated: ''
+                })
+                for (var bd = 0; bd < batchInfoListForProgram.length; bd++) {
+                    var index = batchList.findIndex(c => c.batchNo == batchInfoListForProgram[bd].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfoListForProgram[bd].expiryDate).format("YYYY-MM"));
+                    if (index == -1) {
+                        var shipmentBatchListFiltered = shipmentBatchList.filter(c => c.batch.batchNo == batchInfoListForProgram[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(batchInfoListForProgram[bd].expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered = consumptionBatchList.filter(c => c.batch.batchNo == batchInfoListForProgram[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(batchInfoListForProgram[bd].expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered = inventoryBatchList.filter(c => c.batch.batchNo == batchInfoListForProgram[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(batchInfoListForProgram[bd].expiryDate).format("YYYY-MM"));
+                        var shipmentTotal = 0;
+                        var consumptionTotal = 0;
+                        var inventoryTotal = 0;
+                        shipmentBatchListFiltered.map(item => {
+                            shipmentTotal += Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item => {
+                            consumptionTotal += Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item => {
+                            inventoryTotal += Number(item.adjustmentQty)
+                        })
+                        var batchDetailsToPush = batchInfoListForProgram.filter(c => c.batchNo == batchInfoListForProgram[bd].batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(batchInfoListForProgram[bd].expiryDate).format("YYYY-MM"));
+                        if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
+                            if (shipmentBatchListFiltered.length > 0 || consumptionBatchListFiltered.length > 0 || inventoryBatchListFiltered.length > 0) {
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                            } else {
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                            }
+                            batchList.push(batchDetailsToPush[0]);
+                            if (moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM") > moment(this.state.monthsArray[count].startDate).format("YYYY-MM")) {
+                                batchListForJexcel.push({
+                                    name: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("MMM-YY"),
+                                    id: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM-DD"),
+                                })
+                            }
+                        }
+                    }
+                }
+                for (var bd = 0; bd < shipmentBatchList.length; bd++) {
+                    var index = batchList.findIndex(c => c.batchNo == shipmentBatchList[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchList[bd].batch.expiryDate).format("YYYY-MM"));
+                    if (index == -1) {
+                        var shipmentBatchListFiltered = shipmentBatchList.filter(c => c.batch.batchNo == shipmentBatchList[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(shipmentBatchList[bd].expiryDate).format("YYYY-MM"));
+                        var consumptionBatchListFiltered = consumptionBatchList.filter(c => c.batch.batchNo == shipmentBatchList[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(shipmentBatchList[bd].expiryDate).format("YYYY-MM"));
+                        var inventoryBatchListFiltered = inventoryBatchList.filter(c => c.batch.batchNo == shipmentBatchList[bd].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(shipmentBatchList[bd].expiryDate).format("YYYY-MM"));
+                        var shipmentTotal = 0;
+                        var consumptionTotal = 0;
+                        var inventoryTotal = 0;
+                        shipmentBatchListFiltered.map(item => {
+                            shipmentTotal += Number(item.shipmentQty);
+                        })
+                        consumptionBatchListFiltered.map(item => {
+                            consumptionTotal += Number(item.consumptionQty);
+                        })
+                        inventoryBatchListFiltered.map(item => {
+                            inventoryTotal += Number(item.adjustmentQty)
+                        })
+                        var batchDetailsToPush = shipmentBatchList.filter(c => c.batchNo == shipmentBatchList[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(shipmentBatchList[bd].batch.expiryDate).format("YYYY-MM"));
+                        if (batchDetailsToPush.length > 0) {
+                            batchDetailsToPush[0].qtyAvailable = Number(shipmentTotal) + Number(inventoryTotal) - Number(consumptionTotal);
+                            if (shipmentBatchListFiltered.length > 0 || consumptionBatchListFiltered.length > 0 || inventoryBatchListFiltered.length > 0) {
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                            } else {
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                            }
+                            batchList.push(batchDetailsToPush[0]);
+                            if (moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM") > moment(this.state.monthsArray[count].startDate).format("YYYY-MM")) {
+                                batchListForJexcel.push({
+                                    name: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("MMM-YY"),
+                                    id: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM-DD"),
+                                })
+                            }
+                        }
+                    }
+                }
+                var inventoryList = programJson.inventoryList.filter(c => c.planningUnit.id == planningUnitId && c.active.toString() == "true" && c.addNewBatch && c.addNewBatch.toString() == "true");
+                for (var il = 0; il < inventoryList.length; il++) {
+                    var bdl = inventoryList[il].batchInfoList;
+                    for (var bd = 0; bd < bdl.length; bd++) {
+                        var index = batchList.findIndex(c => c.batchNo == bdl[bd].batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                        if (index == -1) {
+                            var batchDetailsToPush = fullBatchInfoList.filter(c => c.batchNo == bdl[bd].batch.batchNo && c.planningUnitId == planningUnitId && moment(c.expiryDate).format("YYYY-MM") == moment(bdl[bd].batch.expiryDate).format("YYYY-MM"));
+                            if (batchDetailsToPush.length > 0) {
+                                batchDetailsToPush[0].qtyAvailable = 0;
+                                batchDetailsToPush[0].checkQtyValidation = false;
+                                batchList.push(batchDetailsToPush[0]);
+                                if (moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM") > moment(this.state.monthsArray[count].startDate).format("YYYY-MM")) {
+                                    batchListForJexcel.push({
+                                        name: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("MMM-YY"),
+                                        id: batchDetailsToPush[0].batchNo + "~" + moment(batchDetailsToPush[0].expiryDate).format("YYYY-MM-DD"),
+                                    })
+                                }
+                            }
+                        }
+                    }
+                }
+                this.setState({
+                    actualBatchList: batchList
+                })
+                let batchInfoList = this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0);
+                let dataArray = [];
+                var total = 0;
+                var maxDecimals = 0;
+                for (var j = 0; j < batchInfoList.length; j++) {
+                    data = [];
+                    var item = batchInfoList[j];
+                    if (parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                        maxDecimals = parseFloat(Number(item.qty).toFixed(8)).toString().split(".")[1].length;
+                    }
+                    data[0] = item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD");
+                    data[1] = moment(item.createdDate).format(DATE_FORMAT_CAP);
+                    data[2] = moment(item.expiryDate).format("MMM-YY");
+                    data[3] = (item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")
+                    data[4] = Number((Number(item.qty) * Number(1))).toFixed(8);
+                    data[5] = Number(item.qty).toFixed(8);
+                    data[6] = 0;
+                    total += Number(item.qty);
+                    dataArray.push(data);
+                }
+                if (parseFloat(Number(total).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                    maxDecimals = parseFloat(Number(total).toFixed(8)).toString().split(".")[1].length;
+                }
+                if (parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1] != undefined && parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length > maxDecimals) {
+                    maxDecimals = parseFloat(Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(8)).toString().split(".")[1].length;
+                }
+                try {
+                    this.el = jexcel(document.getElementById("inventoryActualBatchInfoTable"), '');
+                    jexcel.destroy(document.getElementById("inventoryActualBatchInfoTable"), true);
+                } catch (err) { }
+                var data = dataArray;
+                var options = {
+                    data: data,
+                    columnDrag: false,
+                    colWidths: [0, 150, 150, 150, 100, 100, 100],
+                    colHeaderClasses: ["Reqasterisk"],
+                    columns: [
+                        {
+                            title: i18n.t("static.supplyPlan.batchId"),
+                            type: 'dropdown',
+                            width: 200,
+                            source: batchListForJexcel,
+                            readonly: editable ? false : true
+                        },
+                        {
+                            title: i18n.t('static.report.createdDate'),
+                            type: 'text',
+                            readonly: true
+                        },
+                        {
+                            title: i18n.t('static.inventory.expireDate'),
+                            type: 'text',
+                            readonly: true
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.qatGenerated'),
+                            type: 'text',
+                            readonly: true
+                        },
+                        {
+                            title: i18n.t("static.supplyPlan.projectedQuantity"),
+                            type: editable ? 'hidden' : 'numeric',
+                            mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
+                            decimal: '.',
+                            readonly: true
+                        },
+                        {
+                            title: i18n.t('static.supplyPlan.actualQuantity'),
+                            type: editable ? 'numeric' : 'hidden', mask: (maxDecimals != 0 ? `#,##.` + '0'.repeat(maxDecimals) : `#,##`), decimal: '.'
+                        },
+                        {
+                            title: 'Is new',
+                            type: 'hidden'
+                        }
+                    ],
+                    editable: editable,
+                    onload: function (instance, cell, x, y, value) {
+                        jExcelLoadedFunctionOnlyHideRow(instance);
+                    },
+                    footers: [
+                        [
+                            '',
+                            '',
+                            '',
+                            i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? Number((Number(total) * Number(1))).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number((Number(total) * Number(1))).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(total).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(roundARU(total, 1)).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                        ],
+                        [
+                            '',
+                            '',
+                            '',
+                            i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[count].startDate).format("MMM YYYY") + ")",
+                            (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(3).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(0).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","),
+                            editable ? Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balanceWithoutRounding).toFixed(maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",") : Number(this.state.closingBalanceArray[comingFromInventoryData == 1 ? count - 2 : count].balance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")
+                        ]
+                    ],
+                    oneditionend: function (instance, cell, x, y, value) {
+                        var rowData = instance.getRowData(y);
+                        if (x == 5) {
+                            instance.setValueFromCoords(5, y, Number(rowData[5]).toFixed(this.state.maxDecimals), true);
+                        }
+                    }.bind(this),
+                    onchange: function (instance, cell, x, y, value) {
+                        this.setState({
+                            actualInventoryChanged: true
+                        })
+                        if (x == 0) {
+                            var valid = checkValidtion("text", "A", y, value, this.state.actualInventoryEl);
+                            if (valid) {
+                                if (value != -1) {
+                                    var batchDetails = this.state.actualBatchList.filter(item => (item.batchNo + "~" + moment(item.expiryDate).format("YYYY-MM-DD")) == value)[0];
+                                    instance.setValueFromCoords(1, y, moment(batchDetails.createdDate).format(DATE_FORMAT_CAP), true);
+                                    instance.setValueFromCoords(2, y, moment(batchDetails.expiryDate).format("MMM-YY"), true);
+                                    instance.setValueFromCoords(3, y, (batchDetails.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no"), true);
+                                } else {
+                                    instance.setValueFromCoords(1, y, "", true);
+                                    instance.setValueFromCoords(2, y, "", true);
+                                    instance.setValueFromCoords(3, y, "", true);
+                                }
+                                // instance.setValueFromCoords(4,y,(batchDetails.qty!=undefined && batchDetails.qty!=null?batchDetails.qty:0),true);
+                            }
+                        }
+                        if (x == 5) {
+                            var totalProjected = 0;
+                            var totalActual = 0;
+                            this.state.actualInventoryEl.getJson(null, false).map(item => {
+                                totalActual += Number(item[5].toString().replaceAll(",", ""))
+                            })
+                            checkValidtion("number", "F", y, this.state.actualInventoryEl.getValue(`F${parseInt(y) + 1}`, true), this.state.actualInventoryEl, DECIMAL_NO_REGEX_8_DECIMALS, 1, 1);
+                            instance.setFooter([[
+                                '',
+                                '',
+                                '',
+                                i18n.t('static.supplyPlan.batchTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
+                                this.formatter(Number((Number(totalProjected) * Number(1))).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(totalActual).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                            ],
+                            [
+                                '',
+                                '',
+                                '',
+                                i18n.t('static.supplyPlan.inventoryTotal') + " (" + moment(this.state.monthsArray[this.state.actualCount].startDate).format("MMM YYYY") + ")",
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData == 1 ? Number(this.state.actualCount) - 2 : this.state.actualCount].closingBalance).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")),
+                                this.formatter(Number(this.state.closingBalanceArray[this.state.comingFromInventoryData == 1 ? Number(this.state.actualCount) - 2 : this.state.actualCount].balanceWithoutRounding).toFixed(this.state.maxDecimals).toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ","))
+                            ]])
+                        }
+                    }.bind(this),
+                    pagination: false,
+                    search: false,
+                    columnSorting: false,
+                    wordWrap: true,
+                    allowInsertColumn: false,
+                    allowManualInsertColumn: false,
+                    allowDeleteRow: true,
+                    copyCompatibility: true,
+                    allowExport: false,
+                    position: 'top',
+                    filters: false,
+                    license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+                    contextMenu: function (obj, x, y, e) {
+                        var items = [];
+                        if (y != null) {
+                            if (editable) {
+                                items.push({
+                                    title: i18n.t('static.common.addRow'),
+                                    onclick: function () {
+                                        this.addActualInventory();
+                                    }.bind(this)
+                                });
+                                items.push({
+                                    title: i18n.t("static.common.deleterow"),
+                                    onclick: function () {
+                                        this.setState({
+                                            actualInventoryChanged: true
+                                        })
+                                        obj.deleteRow(parseInt(y));
+                                    }.bind(this)
+                                });
+                            }
+                            if (obj.getRowData(y)[0] != -1) {
+                                items.push({
+                                    title: i18n.t('static.supplyPlan.batchLedger'),
+                                    onclick: function () {
+                                        this.setState({
+                                            ledgerForBatch: []
+                                        })
+                                        this.showBatchLedgerClicked(obj.getRowData(y)[0].toString().split("~")[0], moment(obj.getRowData(y)[1]).format("YYYY-MM-DD"), moment(obj.getRowData(y)[0].toString().split("~")[1]).format("YYYY-MM-DD"));
+                                    }.bind(this)
+                                })
+                            }
+                        }
+                        return items;
+                    }.bind(this),
+                    onbeforepaste: function (obj, data, x, y) {
+                        return false;
+                    },
+                };
+                var actualInventoryEl = jexcel(document.getElementById("inventoryActualBatchInfoTable"), options);
+                this.el = actualInventoryEl;
+                this.setState({
+                    actualInventoryEl: actualInventoryEl, loading: false, actualInventoryBatchTotal: Number(total).toFixed(8), actualInventoryDate: this.state.monthsArray[count].startDate, actualCount: count, comingFromInventoryData: comingFromInventoryData, maxDecimals: maxDecimals
+                })
+            })
+        }
+    }
+    /**
+     * This function is used when users click on the add row in the actual inventory
+     */
+    addActualInventory() {
+        var data = [];
+        var obj = this.state.actualInventoryEl;
+        data[0] = "";
+        data[1] = "";
+        data[2] = "";
+        data[3] = "";
+        data[4] = "";
+        data[5] = "";
+        data[6] = 1;
+        obj.insertRow(data);
+    }
+    /**
+     * This function is used when users click save for actual inventory
+     */
+    saveActualInventory() {
+        var validation = this.checkValidtionForActualInventory();
+        if (validation) {
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onerror = function (event) {
+            }.bind(this);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['programData'], 'readwrite');
+                var programTransaction = transaction.objectStore('programData');
+                var programId = (document.getElementById("programId").value);
+                var programRequest = programTransaction.get(programId);
+                programRequest.onerror = function (event) {
+                }.bind(this);
+                programRequest.onsuccess = function (event) {
+                    var programDataJson = programRequest.result.programData;
+                    var generalProgramDataBytes = CryptoJS.AES.decrypt(programDataJson.generalData, SECRET_KEY);
+                    var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                    var generalProgramJson = JSON.parse(generalProgramData);
+                    var batchInventortList = generalProgramJson.batchInventoryList;
+                    if (batchInventortList == undefined) {
+                        batchInventortList = [];
+                    }
+                    var actionList = generalProgramJson.actionList;
+                    if (actionList == undefined) {
+                        actionList = []
+                    }
+                    var planningUnitId = document.getElementById("planningUnitId").value;
+                    var indexData = batchInventortList.filter(c => (c.planningUnit.id == planningUnitId && moment(c.inventoryDate).format("YYYY-MM") == moment(this.state.actualInventoryDate).format("YYYY-MM")));
+                    var batchInventortListFilter = batchInventortList.filter(c => (c.planningUnit.id != planningUnitId) || (c.planningUnit.id == planningUnitId && moment(c.inventoryDate).format("YYYY-MM") != moment(this.state.actualInventoryDate).format("YYYY-MM")));
+                    var curDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                    var curUser = AuthenticationService.getLoggedInUserId();
+                    var batchDetailsList = [];
+                    var json = this.state.actualInventoryEl.getJson(null, false).filter(c => c[0] != -1);
+                    for (var j = 0; j < json.length; j++) {
+                        var batchDetails = this.state.actualBatchList.filter(c => (c.batchNo == (json[j][0]).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((json[j][0]).split("~")[1]).format("YYYY-MM")));
+                        if (batchDetails.length > 0) {
+                            batchDetailsList.push({
+                                batchInventoryTransId: 0,
+                                batch: batchDetails[0],
+                                qty: Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",", ""))
+                            })
+                        }
+                    }
+                    batchInventortListFilter.push({
+                        batchInventoryId: indexData.length > 0 ? indexData[0].batchInventoryId : 0,
+                        planningUnit: {
+                            id: planningUnitId
+                        },
+                        inventoryDate: moment(this.state.actualInventoryDate).format("YYYY-MM-DD"),
+                        versionId: generalProgramJson.currentVersion.versionId,
+                        createdBy: {
+                            userId: curUser
+                        },
+                        createdDate: curDate,
+                        lastModifiedBy: {
+                            userId: curUser
+                        },
+                        lastModifiedDate: curDate,
+                        batchList: batchDetailsList
+                    })
+                    generalProgramJson.batchInventoryList = batchInventortListFilter;
+                    programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                    programRequest.result.programData = programDataJson;
+                    var putRequest = programTransaction.put(programRequest.result);
+                    putRequest.onerror = function (event) {
+                    }.bind(this);
+                    putRequest.onsuccess = function (event) {
+                        var programId = (document.getElementById("programId").value)
+                        var planningUnitId = (document.getElementById("planningUnitId").value)
+                        this.setState({
+                            actualInventoryChanged: false
+                        })
+                        var objectStore = "";
+                        objectStore = 'programData';
+                        calculateSupplyPlan(programId, planningUnitId, objectStore, "actualInventory", this, [], moment(this.state.actualInventoryDate).startOf('month').format("YYYY-MM-DD"));
+                    }.bind(this)
+                }.bind(this)
+            }.bind(this)
+        }
+    }
+    checkValidtionForActualInventory() {
+        var json = this.state.actualInventoryEl.getJson(null, false);
+        var valid = true;
+        var tempJson = [];
+        var total = 0;
+        for (var j = 0; j < json.length; j++) {
+            var validation = checkValidtion("text", "A", j, json[j][0], this.state.actualInventoryEl);;
+            if (validation == false) {
+                valid = false;
+            }
+            var tmpIndex = tempJson.findIndex(c => c[0] == json[j][0]);
+            if (tmpIndex >= 0) {
+                valid = false;
+                inValid("A", j, i18n.t('static.supplyPlan.duplicateBatchNumber'), this.state.actualInventoryEl);
+                inValid("A", tmpIndex, i18n.t('static.supplyPlan.duplicateBatchNumber'), this.state.actualInventoryEl);
+            }
+            tempJson.push(json[j]);
+            total += Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",", ""));
+            validation = checkValidtion("number", "F", j, this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true), this.state.actualInventoryEl, DECIMAL_NO_REGEX_8_DECIMALS, 1, 1);
+            if (validation == false) {
+                valid = false;
+            }
+            var batchDetails = this.state.actualBatchList.filter(c => (c.batchNo == (json[j][0]).split("~")[0] && moment(c.expiryDate).format("YYYY-MM") == moment((json[j][0]).split("~")[1]).format("YYYY-MM")));
+            if (batchDetails.length > 0) {
+                if (batchDetails[0].checkQtyValidation && batchDetails[0].qtyAvailable < Number(this.state.actualInventoryEl.getValue(`F${parseInt(j) + 1}`, true).toString().replaceAll(",", ""))) {
+                    inValid("F", j, i18n.t('static.supplyPlan.qtyNotAvailable'), this.state.actualInventoryEl);
+                    valid = false;
+                }
+            }
+        }
+        if (json.length > 1 && json.filter(c => c[0] == -1).length > 0) {
+            valid = false;
+            alert(i18n.t('static.supplyPlan.combinationNotAllowed'));
+        }
+        if (total != this.state.actualInventoryBatchTotal) {
+            valid = false;
+            this.setState({
+                actualInventoryBatchTotalNotMatching: i18n.t("static.supplyPlan.batchQtyNotAvailable")
+            }, () => {
+                this.hideSixthCompoenent()
+            })
+        } else {
+            this.setState({
+                actualInventoryBatchTotalNotMatching: ""
+            })
+        }
+        return valid;
+    }
+    actionCanceledBatchLedger() {
+        this.setState({
+            ledgerForBatch: []
+        })
+    }
+    actionCanceledActualInventory() {
+        var cont = false;
+        if (this.state.actualInventoryChanged) {
+            var cf = window.confirm(i18n.t("static.dataentry.confirmmsg"));
+            if (cf == true) {
+                cont = true;
+            } else {
+            }
+        } else {
+            cont = true;
+        }
+        if (cont == true) {
+            try {
+                jexcel.destroy(document.getElementById("inventoryActualBatchInfoTable"), true);
+            } catch (err) { }
+            this.setState({
+                actualInventoryChanged: false,
+                actualInventoryEl: "",
+                ledgerForBatch: [],
+                actualInventoryBatchTotalNotMatching: ""
+            })
+        }
+    }
     /**
      * This function is used to get list of programs that user has downloaded
      */
@@ -4552,7 +5089,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 minStockMoS.push(jsonList[0].minStockMoS)
                                                 maxStockMoS.push(jsonList[0].maxStockMoS)
                                                 unmetDemand.push(jsonList[0].unmetDemand == 0 ? "" : roundARU(jsonList[0].unmetDemand, 1));
-                                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: roundARU(jsonList[0].closingBalance, 1), batchInfoList: jsonList[0].batchDetails })
+                                                closingBalanceArray.push({ isActual: jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0, balance: roundARU(jsonList[0].closingBalance, 1), balanceWithoutRounding: Number(Number(jsonList[0].closingBalance) * Number(1)).toFixed(8), batchInfoList: jsonList[0].batchDetails })
                                                 lastClosingBalance = jsonList[0].closingBalance;
                                                 lastBatchDetails = jsonList[0].batchDetails;
                                                 lastIsActualClosingBalance = jsonList[0].regionCountForStock == jsonList[0].regionCount ? 1 : 0;
@@ -4801,7 +5338,7 @@ export default class WhatIfReportComponent extends React.Component {
                                                 minStockMoS.push(minStockMoSQty);
                                                 maxStockMoS.push(maxStockMoSQty)
                                                 unmetDemand.push("");
-                                                closingBalanceArray.push({ isActual: 0, balance: roundARU(lastClosingBalance, 1), batchInfoList: lastBatchDetails });
+                                                closingBalanceArray.push({ isActual: 0, balance: roundARU(lastClosingBalance, 1), balanceWithoutRounding: Number(Number(lastClosingBalance) * Number(1)).toFixed(8), batchInfoList: lastBatchDetails });
                                                 for (var i = 0; i < this.state.regionListFiltered.length; i++) {
                                                     consumptionArrayForRegion.push({ "regionId": regionListFiltered[i].id, "qty": "", "actualFlag": "", "month": m[n] })
                                                     inventoryArrayForRegion.push({ "regionId": regionListFiltered[i].id, "adjustmentsQty": "", "actualQty": "", "finalInventory": lastClosingBalance, "autoAdjustments": "", "projectedInventory": lastClosingBalance, "month": m[n] });
@@ -7064,41 +7601,15 @@ export default class WhatIfReportComponent extends React.Component {
                                                 this.state.closingBalanceArray.map((item, count) => {
                                                     if (count < 7) {
                                                         return (
-                                                            <td colSpan="2" className={"hoverTd"} onClick={() => this.setState({ batchInfoInInventoryPopUp: item.batchInfoList, showBatchTable: 1 })}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
+                                                            <td colSpan="2" className={"hoverTd"} onClick={() => this.toggleInventoryActualBatchInfo(item.batchInfoList, item.isActual, count, 0)}><NumberFormat displayType={'text'} thousandSeparator={true} value={item.balance} /></td>
                                                         )
                                                     }
                                                 })
                                             }
                                         </tr>
                                     </tbody>
-                                </Table>
-                                {this.state.showBatchTable == 1 &&
-                                    <>
-                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
-                                            <thead>
-                                                <tr>
-                                                    <th>{i18n.t("static.supplyPlan.batchId")}</th>
-                                                    <th>{i18n.t('static.report.createdDate')}</th>
-                                                    <th>{i18n.t('static.inventory.expireDate')}</th>
-                                                    <th>{i18n.t('static.supplyPlan.qatGenerated')}</th>
-                                                    <th>{i18n.t("static.report.qty")}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {this.state.batchInfoInInventoryPopUp.filter(c => c.qty > 0).map(item => (
-                                                    <tr>
-                                                        <td className="hoverTd" onClick={() => this.showShipmentWithBatch(item.batchNo, item.expiryDate)}>{item.batchNo}</td>
-                                                        <td>{moment(item.createdDate).format(DATE_FORMAT_CAP)}</td>
-                                                        <td>{moment(item.expiryDate).format("MMM-YY")}</td>
-                                                        <td>{(item.autoGenerated) ? i18n.t("static.program.yes") : i18n.t("static.program.no")}</td>
-                                                        <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </Table><br />
-                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.setState({ batchInfoInInventoryPopUp: [], showBatchTable: 0 })}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button><br />
-                                    </>
-                                }
+                                </Table><br />
+                                <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote1')}</span>
                                 {this.state.showInventory == 1 && <InventoryInSupplyPlanComponent ref="inventoryChild" items={this.state} toggleLarge={this.toggleLarge} formSubmit={this.formSubmit} updateState={this.updateState} inventoryPage="whatIf" hideSecondComponent={this.hideSecondComponent} hideFirstComponent={this.hideFirstComponent} hideThirdComponent={this.hideThirdComponent} adjustmentsDetailsClicked={this.adjustmentsDetailsClicked} useLocalData={1} />}
                                 <div className=" mt-3">
                                     <div id="adjustmentsTable" className=" " />
@@ -7132,6 +7643,62 @@ export default class WhatIfReportComponent extends React.Component {
                                     {this.state.inventoryBatchInfoChangedFlag == 1 && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.refs.inventoryChild.saveInventoryBatchInfo()} ><i className="fa fa-check"></i>{i18n.t('static.supplyPlan.saveBatchInfo')}</Button>}
                                     {this.refs.inventoryChild != undefined && <Button id="inventoryBatchAddRow" color="info" size="md" className="float-right mr-1" type="button" onClick={this.refs.inventoryChild.addBatchRowInJexcel}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 </div>
+                                <>
+                                    <div id="inventoryActualBatchInfoTable" className="AddListbatchtrHeight bachTotaltDM"></div><br />
+                                    <h6 style={{ "textAlign": "right" }} className="red" id="div6">{this.state.actualInventoryBatchTotalNotMatching}</h6>
+                                    {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <span className='text-blackD'>{i18n.t('static.supplyPlan.actualInventoryNote2')}</span>}
+                                    {this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledActualInventory()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>}
+                                    {this.state.actualInventoryChanged && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button type="submit" size="md" color="success" className="float-right mr-1" onClick={() => this.saveActualInventory()} ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
+                                    {this.state.actualInventoryEditable == 1 && this.state.actualInventoryEl != "" && this.state.actualInventoryEl != undefined && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={this.addActualInventory}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
+                                </>
+                                {this.state.ledgerForBatch.length > 0 &&
+                                    <>
+                                        <br></br>
+                                        <br></br>
+                                        <br></br>
+                                        <>{i18n.t("static.inventory.batchNumber") + " : "}<span className='hoverTd' onClick={() => this.showShipmentWithBatch(this.state.ledgerForBatch[0].batchNo, moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM-DD"))}>{this.state.ledgerForBatch[0].batchNo}</span></>
+                                        <br></br>
+                                        {i18n.t("static.batchLedger.note")}
+                                        <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
+                                            <thead>
+                                                <tr>
+                                                    <th style={{ width: "60px" }} rowSpan="2" align="center">{i18n.t("static.common.month")}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.openingBalance")}</th>
+                                                    <th colSpan="3" align="center">{i18n.t("static.supplyPlan.userEnteredBatches")}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.supplyPlan.autoAllocated") + " (+/-)"}</th>
+                                                    <th rowSpan="2" align="center">{i18n.t("static.report.closingbalance")}</th>
+                                                </tr>
+                                                <tr>
+                                                    <th align="center">{i18n.t("static.supplyPlan.consumption") + " (-)"}</th>
+                                                    <th align="center">{i18n.t("static.inventoryType.adjustment") + " (+/-)"}</th>
+                                                    <th align="center">{i18n.t("static.shipment.shipment") + " (+)"}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {
+                                                    ((moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("YYYY-MM") == moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].transDate).format("YYYY-MM")) ? this.state.ledgerForBatch.slice(0, -1) : this.state.ledgerForBatch).map(item => (
+                                                        <tr>
+                                                            <td>{moment(item.transDate).format(DATE_FORMAT_CAP_WITHOUT_DATE)}</td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.openingBalance != "" ? roundARU(item.openingBalance, 1) : item.openingBalance} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.consumptionQty != "" ? roundARU(item.consumptionQty, 1) : item.consumptionQty} /></td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={item.adjustmentQty != "" ? roundARU(item.adjustmentQty, 1) : item.adjustmentQty} /></td>
+                                                            <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.shipmentQty, 1)} />}</td>
+                                                            <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(0 - Number(item.unallocatedQty), 1)} /></td>
+                                                            {((item.stockQty != null && Number(item.stockQty) > 0) || (item.actualInventoryBatch)) ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.qty, 1)} /></td>}
+                                                        </tr>
+                                                    ))
+                                                }
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td align="right" colSpan="6"><b>{i18n.t("static.supplyPlan.expiry") + " (" + moment(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiryDate).format("MMM-YY") + ")"}</b></td>
+                                                    <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(this.state.ledgerForBatch[this.state.ledgerForBatch.length - 1].expiredQty, 1)} /></b></td>
+                                                </tr>
+                                            </tfoot>
+                                        </Table><br />
+                                        <Button size="md" color="danger" className="float-right mr-1" onClick={() => this.actionCanceledBatchLedger()}> <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
+                                    </>
+                                }
                                 <div className="pt-4"></div>
                             </ModalBody>
                             <ModalFooter>

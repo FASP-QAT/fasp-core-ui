@@ -74,6 +74,11 @@ const validationSchema = function (values) {
     //   .required(i18n.t("static.user.validrole")),
     languageId: Yup.string().required(i18n.t("static.user.validlanguage")),
     emailId: Yup.string()
+      .test(
+        "no-nbsp",
+        i18n.t("static.user.invalidemail"),
+        (value) => !value || !/\u00A0/.test(value)
+      )
       .email(i18n.t("static.user.invalidemail"))
       .required(i18n.t("static.user.validemail")),
     orgAndCountry: Yup.string()
