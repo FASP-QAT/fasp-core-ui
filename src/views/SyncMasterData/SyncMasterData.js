@@ -547,6 +547,7 @@ export default class SyncMasterData extends Component {
                                                         if(linkedShipmentsList[linkedShipmentsListIndex].shipmentLinkingId==0){
                                                         shipmentDataList[shipmentIndex].active = false;
                                                         }else{
+                                                            shipmentDataList[shipmentIndex].active = false;
                                                             shipmentDataList[shipmentIndex].erpFlag = false;
                                                         }
                                                         shipmentBudgetList=shipmentBudgetList.filter(c=>(shipmentDataList[shipmentIndex].shipmentId>0?(c.shipmentId!=shipmentDataList[shipmentIndex].shipmentId):(c.tempShipmentId!=shipmentDataList[shipmentIndex].tempShipmentId)));
