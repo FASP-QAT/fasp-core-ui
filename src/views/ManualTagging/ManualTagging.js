@@ -1839,7 +1839,7 @@ export default class ManualTagging extends Component {
                                             shipmentList[shipmentIndex].active = false;
                                             shipmentBudgetList = shipmentBudgetList.filter(c => (shipmentList[shipmentIndex].shipmentId > 0) ? (c.shipmentId != shipmentList[shipmentIndex].shipmentId) : (c.tempShipmentId != shipmentList[shipmentIndex].tempShipmentId))
                                             var minDate = shipmentList[shipmentIndex].receivedDate != "" && shipmentList[shipmentIndex].receivedDate != null && shipmentList[shipmentIndex].receivedDate != undefined && shipmentList[shipmentIndex].receivedDate != "Invalid date" ? shipmentList[shipmentIndex].receivedDate : shipmentList[shipmentIndex].expectedDeliveryDate;
-                                            for (var i = 1; i < this.state.finalShipmentId.length; i++) {
+                                            for (var i = 0; i < this.state.finalShipmentId.length; i++) {
                                                 var shipmentId1 = this.state.active1 ? this.state.finalShipmentId[i].shipmentId : this.state.finalShipmentId[i].shipmentId;
                                                 var index1 = this.state.active1 ? this.state.finalShipmentId[i].tempShipmentId : this.state.finalShipmentId[i].tempShipmentId;
                                                 var shipmentIndex1 = shipmentList.findIndex(c => shipmentId1 > 0 ? (c.shipmentId == shipmentId1) : (c.tempShipmentId == index1));
