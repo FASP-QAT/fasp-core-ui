@@ -155,7 +155,8 @@ export default class PlanningUnitSetting extends Component {
             for (var i = (json.length - 1); i >= 0; i--) {
                 var map = new Map(Object.entries(json[i]));
                 var planningUnitValue = map.get("1");
-                if (planningUnitValue == value && y != i && i > y) {
+                var active = map.get("17");
+                if (planningUnitValue == value && y != i && i > y && active) {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
