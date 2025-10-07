@@ -737,6 +737,13 @@ class Budgets extends Component {
                     value: item.id,
                 };
             }, this);
+        let fundingSourceTypeListDD = fundingSourceTypes.length > 0 &&
+            fundingSourceTypes.map((item, i) => {
+                return {
+                    label: item.code,
+                    value: item.id,
+                };
+            }, this);
 
         let data1 = []
         let data2 = []
@@ -934,12 +941,11 @@ class Budgets extends Component {
                                             filterOptions={filterOptions}
                                             value={this.state.fundingSourceTypeValues}
                                             onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
-                                            options={fundingSourceTypes.length > 0
-                                                && fundingSourceTypes.map((item, i) => {
-                                                    return (
-                                                        { label: item.code, value: item.id }
-                                                    )
-                                                }, this)}
+                                            options={
+                                                fundingSourceTypeListDD && fundingSourceTypeListDD.length > 0
+                                                    ? fundingSourceTypeListDD
+                                                    : []
+                                            }
                                             disabled={this.state.loading}
                                         />
                                     </div>
