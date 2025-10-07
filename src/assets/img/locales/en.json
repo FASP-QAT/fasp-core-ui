@@ -1183,7 +1183,7 @@
   "static.loadDelDataset.deleteVersion": "Delete the version",
   "static.supplyPlan.doNotConsideAsEmergencyOrder": "Not an emergency order",
   "static.dashboard.datasourcetype": "Data source types",
-  "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \" :)",
+  "static.label.someSpecialCaseNotAllowed": "Enter valid data. Some special characters are not allowed i.e.(' \")",
   "static.label.labelFail": "An error occurred",
   "static.ForecastSummary.FullSupplyPlan": "This is not a full supply plan, but a high-level procurement surplus/gap analysis. We recommend importing your forecast into the supply planning module for granular supply planning.",
   "static.commit.server": "Server",

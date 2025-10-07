@@ -1173,7 +1173,7 @@
   "static.loadDelDataset.deleteVersion": "Supprimer la version",
   "static.supplyPlan.doNotConsideAsEmergencyOrder": "Pas une commande d`urgence",
   "static.dashboard.datasourcetype": "Sources de données",
-  "static.label.someSpecialCaseNotAllowed": "Saisissez des données valides. Certains caractères spéciaux ne sont pas autorisés, par exemple (' \" :)",
+  "static.label.someSpecialCaseNotAllowed": "Saisissez des données valides. Certains caractères spéciaux ne sont pas autorisés, par exemple (' \")",
   "static.label.labelFail": "Une erreur s`est produite",
   "static.ForecastSummary.FullSupplyPlan": "Il ne sagit pas d'un plan d'approvisionnement complet, mais d'une analyse de haut niveau des gaps d'approvisionnement. Nous vous recommandons d'importer vos prévisions dans le module de planification des approvisionnements pour une planification granulaire de l'approvisionnement.",
   "static.commit.server": "Serveur",

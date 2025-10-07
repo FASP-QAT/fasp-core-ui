@@ -1173,7 +1173,7 @@
   "static.loadDelDataset.deleteVersion": "Excluir a versão",
   "static.supplyPlan.doNotConsideAsEmergencyOrder": "Não é um embarque de emergência",
   "static.dashboard.datasourcetype": "Tipos de fonte de dados",
-  "static.label.someSpecialCaseNotAllowed": "Insira dados válidos. Alguns caracteres especiais não são permitidos, por exemplo (' \" :)",
+  "static.label.someSpecialCaseNotAllowed": "Insira dados válidos. Alguns caracteres especiais não são permitidos, por exemplo (' \")",
   "static.label.labelFail": "Ocorreu um erro",
   "static.ForecastSummary.FullSupplyPlan": "Este não é um plano de suprimento completo, mas uma análise de alto nível dos excedente/gap de compras. Recomendamos importar sua previsão para o módulo de planeamento do suprimento para um planeamento granular.",
   "static.commit.server": "Servidor",
