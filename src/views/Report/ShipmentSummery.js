@@ -1118,12 +1118,14 @@ class ShipmentSummery extends Component {
             var budgetList = response.data;
             var bList = [];
             for (var i = 0; i < budgetList.length; i++) {
+              if(this.state.filteredBudgetList.some(c=>c.budgetId==budgetList[i].id)){
               var budgetJson = {
                 budgetId: budgetList[i].id,
                 label: budgetList[i].label,
                 budgetCode: budgetList[i].code,
               };
-              bList[i] = budgetJson;
+              bList.push(budgetJson);
+            }
             }
             this.setState(
               {
