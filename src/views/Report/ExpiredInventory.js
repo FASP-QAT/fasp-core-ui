@@ -778,6 +778,7 @@ export default class ExpiredInventory extends Component {
                 allBatchLedger.push(batchInfo);
             }));
         var ledgerForBatch = allBatchLedger.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+        console.log("ledgerForBatch Test@123",ledgerForBatch);
         this.setState({
             ledgerForBatch: ledgerForBatch,
             loading: false
@@ -1366,7 +1367,7 @@ export default class ExpiredInventory extends Component {
                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={roundARU(item.adjustmentQty)} /></td>
                                                 <td>{item.shipmentQty == 0 ? null : <NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.shipmentQty,1) : roundARU(item.shipmentQtyWps,1)} />}</td>
                                                 <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU((0 - Number(item.unallocatedQty)),1) : roundARU((0 - Number(item.unallocatedQtyWps)),1)} /></td>
-                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty,1) : roundARU(item.qtyWps,1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty) : roundARU(item.qtyWps)} /></td>}
+                                                {item.stockQty != null && Number(item.stockQty) > 0 ? <td><b><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty,1) : roundARU(item.qtyWps,1)} /></b></td> : <td><NumberFormat displayType={'text'} thousandSeparator={true} value={document.getElementById("includePlanningShipments").value.toString() == 'true' ? roundARU(item.qty,1) : roundARU(item.qtyWps,1)} /></td>}
                                             </tr>
                                         ))
                                     }
