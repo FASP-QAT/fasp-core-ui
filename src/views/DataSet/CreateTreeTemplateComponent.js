@@ -5177,7 +5177,11 @@ export default class CreateTreeTemplate extends Component {
         for (var j = 0; j < momList.length; j++) {
             data = [];
             data[0] = momList[j].month
-            data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}))`
+            if(this.state.currentItemConfig.context.payload.nodeType.id == 6){
+                data[1] = parseFloat(momList[j].calculatedValue).toFixed(2);
+            }else{
+                data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}))`
+            }
             data[2] = parseFloat(momList[j].difference).toFixed(2)
             data[3] = `=(IF(B${parseInt(j) + 1}+C${parseInt(j) + 1}<0,0,(B${parseInt(j) + 1}+C${parseInt(j) + 1})))`;
             data[4] = parseFloat(momList[j].seasonalityPerc).toFixed(2)
@@ -9853,7 +9857,7 @@ export default class CreateTreeTemplate extends Component {
                     pointHoverBorderColor: 'transparent',
                     pointHitRadius: 5,
                     showInLegend: false,
-                    data: this.state.momList.map((item, index) => (item.endValue > 0 ? item.endValue : null))
+                    data: (this.state.currentItemConfig.context.payload.nodeType.id == 6) ? (this.state.momList.map((item, index) => (item.calculatedValue > 0 ? item.calculatedValue : null))):this.state.momList.map((item, index) => (item.endValue > 0 ? item.endValue : null))
                 }
             )
             bar = {
