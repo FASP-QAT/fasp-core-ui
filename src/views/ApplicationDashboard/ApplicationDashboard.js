@@ -2372,7 +2372,7 @@ class ApplicationDashboard extends Component {
       "url": "/program/downloadProgram/",
     }]
     if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM')) {
-      slidesUserContent.add({
+      slidesUserContent.push({
         "name": i18n.t("static.dashboard.downloadedSP"),
         "count": formatter(this.state.programList.filter(c => c.local).length),
         "url": "/program/downloadProgram/",
@@ -2403,7 +2403,7 @@ class ApplicationDashboard extends Component {
       "url": "/shipment/manualTagging",
     }]
     if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM')) {
-      slidesErpContent.add({
+      slidesErpContent.push({
         "name": i18n.t("static.dashboard.erpLinkingDownloaded"),
         "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a, b) => a + b, 0)),
         "url": "/shipment/manualTagging",
