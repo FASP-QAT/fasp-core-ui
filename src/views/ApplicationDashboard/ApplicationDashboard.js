@@ -121,7 +121,7 @@ class ApplicationDashboard extends Component {
       topTechnicalAreaId: [],
       bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('bottomProgramId') : localStorage.getItem("bottomLocalProgram") == "false" ? "" : localStorage.getItem('bottomProgramId') : "",
       displayBy: 1,
-      onlyDownloadedTopProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true,
+      onlyDownloadedTopProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true : false,
       onlyDownloadedBottomProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true,
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
@@ -1793,7 +1793,7 @@ class ApplicationDashboard extends Component {
     if (this.animating) return;
     const nextIndex = this.state.activeIndexUser === 1 ? 0 :
       this.state.activeIndexUser + 1;
-    this.setState({ activeIndexUser: nextIndex });
+    this.setState({ activeIndexUser: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? nextIndex : 0 });
   }
   /**
    * Move to the previous item in the carousel.
@@ -1820,7 +1820,7 @@ class ApplicationDashboard extends Component {
     if (this.animating) return;
     const nextIndex = this.state.activeIndexErp === 1 ? 0 :
       this.state.activeIndexErp + 1;
-    this.setState({ activeIndexErp: nextIndex });
+    this.setState({ activeIndexErp: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? nextIndex : 0 });
   }
   /**
    * Move to the previous item in the carousel.
@@ -2370,12 +2370,14 @@ class ApplicationDashboard extends Component {
       "name": i18n.t("static.dashboard.accessSP"),
       "count": formatter(this.state.programList.filter(c => !c.local).length),
       "url": "/program/downloadProgram/",
-    },
-    {
-      "name": i18n.t("static.dashboard.downloadedSP"),
-      "count": formatter(this.state.programList.filter(c => c.local).length),
-      "url": "/program/downloadProgram/",
     }]
+    if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM')) {
+      slidesUserContent.push({
+        "name": i18n.t("static.dashboard.downloadedSP"),
+        "count": formatter(this.state.programList.filter(c => c.local).length),
+        "url": "/program/downloadProgram/",
+      })
+    }
     const slidesUser = slidesUserContent.map((item) => {
       return (
         <CarouselItem
@@ -2399,12 +2401,14 @@ class ApplicationDashboard extends Component {
       "name": i18n.t("static.dashboard.erpLinkingRealm"),
       "count": formatter(this.state.dashboard.LINKED_ERP_SHIPMENTS_COUNT),
       "url": "/shipment/manualTagging",
-    },
-    {
-      "name": i18n.t("static.dashboard.erpLinkingDownloaded"),
-      "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a, b) => a + b, 0)),
-      "url": "/shipment/manualTagging",
     }]
+    if(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM')) {
+      slidesErpContent.push({
+        "name": i18n.t("static.dashboard.erpLinkingDownloaded"),
+        "count": formatter(this.state.dashboardTopList.map(x => x.linkedShipmentsCount).reduce((a, b) => a + b, 0)),
+        "url": "/shipment/manualTagging",
+      })
+    }
     const slidesErp = slidesErpContent.map((item) => {
       return (
         <CarouselItem
@@ -3435,7 +3439,7 @@ class ApplicationDashboard extends Component {
                       <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.dashboard.programheader")}
                         <FormGroup className='MarginTopCheckBox'>
                           <div className="pl-lg-4">
-                            <Input
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Input
                               className="form-check-input"
                               type="checkbox"
                               id="onlyDownloadedTopProgram"
@@ -3443,12 +3447,17 @@ class ApplicationDashboard extends Component {
                               disabled={!(localStorage.getItem('sessionType') === 'Online')}
                               checked={this.state.onlyDownloadedTopProgram}
                               onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
-                            />
-                            <Label
+                            />}
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
                               className="form-check-label"
                               check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
                               {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                            </Label>
+                            </Label>}
+                            {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
+                              className="form-check-label"
+                              check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
+                              {""}
+                            </Label>}
                           </div>
                         </FormGroup>
                       </Label>
