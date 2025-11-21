@@ -4088,6 +4088,7 @@ export default class BuildTree extends Component {
                 let { treeData } = this.state;
                 let { dataSetObj } = this.state;
                 var dataSetObjCopy = JSON.parse(JSON.stringify(dataSetObj));
+                (dataSetObjCopy.programData.treeList.filter(t => t.treeId == this.state.treeId)[0].tree.flatList.filter(f => f.id == currentItemConfig.context.id)[0].payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
                 var items = this.state.items;
                 (currentItemConfig.context.payload.nodeDataMap[this.state.selectedScenario])[0].nodeDataOverrideList = overrideListArray;
                 this.setState({ currentItemConfig }, () => {

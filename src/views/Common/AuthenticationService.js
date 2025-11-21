@@ -290,7 +290,6 @@ class AuthenticationService {
      * @returns {boolean} True user has access to program and business funtion, otherwise false.
      */
     checkUserACL(programIds, businessFunctionId) {
-        console.log("checkUserACL====>", programIds, "=====", businessFunctionId)
         if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
             let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
             try {
@@ -306,7 +305,6 @@ class AuthenticationService {
                         }
                     }
                 })
-                console.log("hasaccess=>", hasAccess)
                 return hasAccess;
             } catch (err) {
                 localStorage.setItem('curUser', '')
