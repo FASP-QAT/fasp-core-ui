@@ -122,7 +122,7 @@ class ApplicationDashboard extends Component {
       bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('bottomProgramId') : localStorage.getItem("bottomLocalProgram") == "false" ? "" : localStorage.getItem('bottomProgramId') : "",
       displayBy: 1,
       onlyDownloadedTopProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true : false,
-      onlyDownloadedBottomProgram: localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true,
+      onlyDownloadedBottomProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true : false,
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -3726,7 +3726,7 @@ class ApplicationDashboard extends Component {
                         <div style={{ gap: '20px', display: 'flex' }}>
                           <FormGroup className='MarginTopCheckBox'>
                             <div className="pl-lg-4">
-                              <Input
+                              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Input
                                 className="form-check-input"
                                 type="checkbox"
                                 id="onlyDownloadedBottomProgram"
@@ -3734,12 +3734,17 @@ class ApplicationDashboard extends Component {
                                 checked={this.state.onlyDownloadedBottomProgram}
                                 disabled={!(localStorage.getItem('sessionType') === 'Online')}
                                 onClick={(e) => { this.changeOnlyDownloadedBottomProgram(e); }}
-                              />
-                              <Label
+                              />}
+                              {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
                                 className="form-check-label"
                                 check htmlFor="onlyDownloadedBottomProgram" style={{ fontSize: '12px', marginTop: '3px' }}>
                                 {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                              </Label>
+                              </Label>}
+                              {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
+                                className="form-check-label"
+                                check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
+                                {""}
+                              </Label>}
                             </div>
                           </FormGroup>
                         </div>
