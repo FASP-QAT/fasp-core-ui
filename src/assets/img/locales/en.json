@@ -2466,7 +2466,7 @@
   "static.mt.tab3DetailPurpose": "Use this screen to link ERP orders to QAT for the first time. Users will see a list of ERP orders, and when a user clicks on a single ERP order, they can then choose which QAT shipment that ERP order should be linked with.  For any orders that are in the ERP that are not already in QAT, you can create a new QAT shipment in this screen.",
   "static.qpl.noMonths": "No months",
   "static.common.productFreight": "Planning Unit + Freight Cost",
-  "static.dashboard.shipmentsHeaderTooltip": "Based on chose report period for selected program",
+  "static.dashboard.shipmentsHeaderTooltip": "Based on chosen report period for selected program",
   "static.common.positiveIntegerWithLength": "Max 10 digit positive number and 2 digits after decimal are allowed.",
   "static.tree.moveCopyNote": "Note: The entire branch (including all child nodes) will be moved/copied",
   "static.monthlyForecast.ReportPeriod": "Report Period",
