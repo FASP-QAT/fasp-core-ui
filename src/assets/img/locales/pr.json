@@ -2450,7 +2450,7 @@
   "static.mt.tab3DetailPurpose": "Use esta tela para vincular pedidos ERP ao QAT pela primeira vez. Os usuários verão uma lista de pedidos ERP e, quando um usuário clicar em um único pedido ERP, eles podem escolher a qual embarque QAT esse pedido ERP deve ser vinculado. Para qualquer pedido que esteja no ERP que ainda não esteja no QAT, você pode criar um novo embaruqe QAT nesta tela.",
   "static.qpl.noMonths": "Sem meses",
   "static.common.productFreight": "Unidade de planeamento + custo de frete",
-  "static.dashboard.shipmentsHeaderTooltip": "Com base no período de relatório escolhido para o programa selecionado",
+  "static.dashboard.shipmentsHeaderTooltip": "Com base no período de relatório escolhido para o programa selecionado.",
   "static.common.positiveIntegerWithLength": "São permitidos números positivos de máximo 10 dígitos e 2 dígitos após o decimal .",
   "static.tree.moveCopyNote": "Nota: toda a ramificação (incluindo todos os nós filhos) será movida/copiada",
   "static.monthlyForecast.ReportPeriod": "Período do relatório",

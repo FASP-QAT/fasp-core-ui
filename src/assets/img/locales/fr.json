@@ -2451,7 +2451,7 @@
   "static.mt.tab3DetailPurpose": "Utilisez cet écran pour lier les commandes ERP à QAT pour la première fois. Les utilisateurs verront une liste des commandes ERP, et lorsquun utilisateur clique sur une commande ERP unique, ils peuvent alors choisir à quelle expédition QAT cette commande ERP doit être liée. Pour toutes les commandes qui sont dans l'ERP qui ne sont pas déjà dans QAT, vous pouvez créer une nouvelle expédition QAT dans cet écran.",
   "static.qpl.noMonths": "Pas de mois",
   "static.common.productFreight": "Coût du produit + fret",
-  "static.dashboard.shipmentsHeaderTooltip": "Basé sur la période de rapport choisie pour le programme sélectionné",
+  "static.dashboard.shipmentsHeaderTooltip": "En fonction de la période de rapport choisie pour le programme sélectionné",
   "static.common.positiveIntegerWithLength": "Un maximum de 10 chiffres entiers positifs et de 2 décimales sont autorisés.",
   "static.tree.moveCopyNote": "Remarque : La branche entière (y compris tous les nœuds enfants) sera déplacée/copiée",
   "static.monthlyForecast.ReportPeriod": "Période de rapportage",
