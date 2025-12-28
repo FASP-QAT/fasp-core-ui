@@ -102,722 +102,625 @@ export default class UserAgreementComponent extends Component {
 
                                 <Col xs="11" sm="11">
                                     <div className="text-justify">
-                                        <h4 className="UserTitle">End-User License Agreement</h4>
+                                        <h4 className="UserTitleH2">Chemonics International Inc.</h4>
+                                        <h4 className="UserTitleH2">Quantification Analytics Tool (QAT)</h4>
+                                        <h4 className="UserTitleH2">Software-as-a-Service (SaaS) End User License Agreement</h4>
+                                        <h4 className="UserTitle">PLEASE READ CAREFULLY BEFORE ACCESSING THE PLATFORM:</h4>
                                         <p>
-                                            This End-User License Agreement (EULA) is a legal agreement between you, either in your
-                                            capacity as an individual or duly authorized agent acting as or on behalf an
-                                            entity, and Chemonics International (hereinafter “Chemonics” or “Owner”)
-                                            for your authorized use of its  Quantification Analytics Tool (QAT) and its applications.
-                                            IF YOU DO NOT AGREE TO ALL OF THE TERMS OF THIS EULA, DO NOT INSTALL, USE OR COPY THE
-                                            SOFTWARE.
+                                            This License agreement (<b>License</b>) is a legal agreement between you (<b>Partner</b> or <b>you</b>) and Chemonics International, Inc. of   
+                                            Corporation Trust Center, 1209 Orange Street, Wilmington, New Castle, Delaware, United States, 19801 (<b>Chemonics, us,  
+                                            our</b> or <b>we</b>) for the provision of (and delivery of the Support Services through) the Platform, and specifically for the purposes   
+                                            of delivering:  
+                                        </p>
+                                        <ul>
+                                            <li>
+                                                Procurement services, (specifically commodity forecasting and supply planning) and any such data supplied with those services as delivered through the Platform.
+                                            </li>
+                                            <li>
+                                                Any online software applications provided as part of the Platform (<b>Software.</b>)
+                                            </li>
+                                            <li>
+                                                Any online documents provided related to the Platform (<b>Documents.</b>)
+                                            </li>
+                                        </ul>
+                                        <p>
+                                            We license use of the Platform (as defined at section 1.1) to you on the basis of this License. We do not sell the Platform to   
+                                            you. Chemonics, or its licensors, remain the owners of the Platform at all times.
                                         </p>
                                         <p>
-                                            <h4 className="UserTitle">Summary</h4>
-                                            <ul class="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>You must agree to all of the terms of this EULA to use this Software.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>If so, you may use the Software for free and for any lawful purpose.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">This Software automatically communicates with QAT servers for three reasons: <br></br>(1) To receive and install updates<br></br> (2) To send error reports and <br></br>(3) To send anonymized usage information. <br></br>You can view sample data to see what information is sent, and you may opt out of sending the anonymized usage data.</p></li>
-                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>This Software is provided "as-is" with no warranties, and you agree that the Owner is not liable for anything you do with it.</p></li>
-                                            </ul>
+                                            The Platform is primarily expected to be accessed via laptops and desktops with standard operating systems such as MS   
+                                            Windows, Linux/Ubuntu, and iOS. The recommended web browser is Google Chrome, but Chromium, Edge, Mozilla Firefox   
+                                            or Safari may also be utilized. It is also suggested that each user of the Platform have enough space on their C: drive to allow   
+                                            for storing browser cache data successfully. The amount of space needed depends on the size of the Platform program that is   
+                                            being downloaded and how many applications are currently running and utilizing browser data. Temporary storage is shared   
+                                            among all web applications running in the browser. This shared pool can require up to one-third of the of available disk space.   
+                                            Each application can then have up to 20% of the shared pool of storage. For example, if the total available C: drive space is   
+                                            60GB, the shared pool is 20GB; thus, the Platform can potentially utilize up to 4GB. This is calculated from 20% (up to 4GB)   
+                                            of one-third (up to 20GB) of the available C: drive space (60GB)  
                                         </p>
+                                        <h4 className="UserTitle"><u>IMPORTANT NOTICE TO ALL USERS:</u></h4>
+                                        <ul>
+                                            <li>
+                                                BY CLICKING ON THE “ACCEPT” BUTTON YOU AGREE TO THE TERMS OF THIS LICENSE WHICH WILL   
+                                                BIND YOU AND YOUR AUTHORISED USERS. THE TERMS OF THIS LICENSE INCLUDE, IN PARTICULAR,   
+                                                LIMITATIONS ON LIABILITY IN SECTION 6 AND SECTION 7.
+                                            </li>
+                                            <li>
+                                                IF YOU DO NOT AGREE TO THE TERMS OF THIS LICENSE, YOU MUST CLICK ON THE “DECLINE”   
+                                                BUTTON AND YOU MAY NOT ACCESS THE PLATFORM.
+                                            </li>
+                                        </ul>
+                                        <h4 className="UserTitle">1. DEFINITIONS</h4>
+                                        <p>1.1 The following definitions are used in this License:</p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                <b>Authorised Users</b> means the employees, agents and independent contractors of you, your subsidiaries and   
+                                                affiliates, determined in accordance with the User Role Types, who you authorise to use the Platform, in   
+                                                accordance with the Data Use Rights Table.  
+                                            </li>
+                                            <li>
+                                                <b>Confidential Information</b> means any information about the Platform that you receive or access, including   
+                                                but not limited to the Documents, as well as User Data and Partner Data that are defined as “Confidential   
+                                                Data” in the Data Use Rights Table.   
+                                            </li>
+                                            <li>
+                                                <b>Data Use Rights</b> means the rights of access to and use of the Platform, granted to Authorised Users in   
+                                                accordance with this Licence, specifically in relation to how access rights and business roles are determined   
+                                                by reference to the applicable User Role Types, as set out in the Data Use Rights Table.  
+                                            </li>
+                                            <li>
+                                                <b>Data Use Rights Table</b> means the table of information relating to the Data Use Rights, found <a href="https://api.quantificationanalytics.org/file/qatTou" target="_blank">here</a> , which   
+                                                may be amended by Chemonics as applicable from time to time.  
+                                            </li>
+                                            <li>
+                                                <b>Good Industry Practice</b> means the exercise of that degree of skill, care, prudence, efficiency, foresight and   
+                                                timeliness as would be expected from a leading company within the relevant industry or business sector.  
+                                            </li>
+                                            <li>
+                                                <b>Governance Council</b> means the governmental, intergovernmental, and non- governmental organizations,   
+                                                corporations, institutions or individuals which are core funding providers to the Platform and strategic support   
+                                                (including in respect of decision-making and governance) in delivering the Platform and the Support Services.  
+                                            </li>
+                                            <li>
+                                                <b>Partner Data</b> means the data owned or controlled by you, and inputted on the Platform by or on behalf of   
+                                                you, for the purpose of using or facilitating your use of the Platform but excluding the Platform Data.  
+                                            </li>
+                                            <li>
+                                                <b>Platform</b> means the Quantification Analytics Tool (<b>QAT</b>) Global Health Instance, a cloud-based software-
+                                                as-a-service that allows Partners to enter, access, and analyze global health forecasting and supply planning   
+                                                data based on role and function. Unless otherwise stated, the term "Platform" shall refer to and include the   
+                                                Software and the Documents.  
+                                            </li>
+                                            <li>
+                                                <b>Platform Data</b> means all data generated by the digital activity of end users (including, without limitation,   
+                                                you and all Authorised Users) whilst using the Platform, whether hosted or stored within the Platform or   
+                                                elsewhere.  
+                                            </li>
+                                            <li>
+                                                <b>Support Services</b> means the support services provided in relation to the Platform by or on behalf of   
+                                                Chemonics (or third parties authorised by Chemonics) to you, as may be specified by us from time to time.  
+                                            </li>
+                                            <li>
+                                                <b>User Role Type(s)</b> means the categories of access to the Platform provided to Authorised Users, as more   
+                                                particularly set out in the Data Use Rights Table.  
+                                            </li>
+                                            <li>
+                                                <b>Viruses</b> means anything or device (including any software, code, file or programme) which may prevent,   
+                                                impair or otherwise adversely affect the operation of any computer software, hardware or network, any   
+                                                telecommunications service, equipment or network or any other service or device; prevent, impair or   
+                                                otherwise adversely affect access to or the operation of any programme or data, including the reliability of   
+                                                any programme or data (whether by re-arranging, altering or erasing the programme or data in whole or part   
+                                                or otherwise); or adversely affect the user experience, including worms, trojan horses, viruses and other   
+                                                similar things or devices.  
+                                            </li>
+                                            <li>
+                                                <b>Vulnerability</b> means a weakness in the computational logic (for example, code) found in software and   
+                                                hardware components that, when exploited, results in a negative impact to confidentiality, integrity, or   
+                                                availability, and the term Vulnerabilities shall be construed accordingly.  
+                                            </li>
+                                        </ol>
+                                        <h4 className="UserTitle">2. LICENSE</h4>
                                         <p>
-                                            <h4 className="UserTitle">The Agreement</h4>
-                                            By downloading, installing, using, or copying the Software, you accept and agree to be bound by the terms of this EULA. If you do not agree to all the terms of this EULA, you may not download, install, use or copy the Software.
-
+                                            2.1 In consideration of the access to and use of the Partner Data by us in delivering the Platform, and otherwise strictly   
+                                            subject to the terms and conditions herein, we grant to you a limited, non-exclusive, non-transferable, revocable   
+                                            License, without the right to sublicense, to access and use the Platform.
                                         </p>
-                                        <p>
-                                            <h4 className="UserTitle"> The License</h4>
-                                            This EULA entitles you to install as many copies of the Software as you want and use the Software for any lawful purpose consistent with this EULA Your license to use the Software is expressly conditioned upon your agreement to all the terms of this EULA. This software is licensed, not sold. Notwithstanding any provision in this EULA to the contrary, this EULA shall not bind the U.S. Agency for International Development (USAID) nor any person acting in their capacity as a USAID employee or staff member.  In the event that a EULA is executed by any such person, that EULA shall be considered null and void.
-                                            All other rights, privileges, duties, and obligations of the Owner pursuant to GHSC-PSM Contract through incorporation by clause or reference remain in effect and fully enforceable, and will control in the event of any discrepancy between the GHSC-PSM Contract and any provision herein included and  created by this EULA.
-
-                                        </p>
-                                        <p>
-
-
-                                            <h4 className="UserTitle"> The Restrictions</h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>When using the Software you must use it in a manner that complies with the applicable laws in the jurisdiction(s) in which you use the Software.</p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>You may not sell, resell, rent, lease or exchange the Software for anything of value.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>You may redistribute the software, but it must include this EULA and you may not repackage or bundle the Software with any other software.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>You may not remove or alter any proprietary notices or marks on the Software.</p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Privacy Notices</h4>
-                                            <div className="rounded-list list-group">
-                                                The Software automatically communicates with QAT servers for three purposes :
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Updating the Software</p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>Sending error reports and</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Sending anonymized usage data so we may improve the Software.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>If you would like to learn more about the specific information we send,<br></br> please visit <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Automatic Software Updates</h4>
-                                            <p>The Software sends information described at the URL above to determine whether
-                                                there are any patches, bug fixes, updates, upgrades or other modifications
-                                                to improve the Software. You agree that the Software may automatically install
-                                                any such improvements to the Software on your computer without providing any
-                                                further notice or receiving any additional consent. This feature may not be
-                                                disabled. If you do not want to receive automatic updates, you must uninstall
-                                                the Software. </p>
-
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Error Reports :</strong> In order to help us improve the Software, when the Software encounters certain errors, it will automatically send some information to QAT about the error (as described at the URL above). This feature may not be disabled. If you do not want to send error reports to QAT, you must uninstall the Software.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Anonymized Usage Data :</strong> QAT collects anonymized data about your usage of the Software to help us improve it. Approximately once a day the Software sends such data (as described in more detail at the URL above) to QAT's servers. If you do not want to send anonymized usage data to QAT, you may opt out by changing your settings in the Preferences view.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Master Data and Reference Data Sync :</strong> The offline app regularly sends and receives data from the web application. This cannot be disabled as it is a core component of the application.</p></li>
-
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Open-Source Notices</h4>
-                                            <p>The Software may be subject to open-source software licenses ("Open-Source Components"),
-                                                which means any software license approved as open-source licenses by the Open Source
-                                                Initiative or any substantially similar licenses, including without limitation any
-                                                license that, as a condition of distribution of the software licensed under such
-                                                license, requires that the distributor make the software available in source code
-                                                format. The Software documentation includes copies of the licenses applicable to the
-                                                Open-Source Components.
-                                            </p>
-                                            <p>To the extent there is conflict between the license terms covering the Open-Source
-                                                Components and this EULA, the terms of such licenses will apply in lieu of the terms
-                                                of this EULA. To the extent the terms of the licenses applicable to Open-Source
-                                                Components prohibit any of the restrictions in this Agreement with respect to such
-                                                Open-Source Component, such restrictions will not apply to such Open-Source Component.
-                                                To the extent the terms of the licenses applicable to Open-Source Components require
-                                                Licensor to make an offer to provide source code in connection with the Product,
-                                                such offer is hereby made, and you may exercise it by
-                                                contacting <a href="support@QAT.org" target=" /blank">support@QAT.org</a></p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Intellectual Property Notices</h4>
-                                            <p>This license, the software subject matter thereof, and The Software in and of itself
-                                                are subject to and controlled by the relevant controlling terms and conditions
-                                                related to intellectual property enumerated by clause or incorporated under the
-                                                GHSC-PSM prime contract, namely 48 CFR 752.227-14 Rights in Data (general) and
-                                                USAID’s unlimited license to the QAT and its applications pursuant thereto,
-                                                and this section of the license must be in agreement therewith in order to be
-                                                enforceable.
-                                            </p>
-                                            <p>The Software and all worldwide copyrights, trade secrets, and other intellectual
-                                                property rights therein are the exclusive property of QAT. QAT reserves all rights
-                                                in and to the Software not expressly granted to you in this EULA.
-                                            </p>
-                                            <p>The names QAT, QAT Desktop, and related QAT logos and/or stylized names are trademarks
-                                                of QAT. You agree not to display or use these trademarks in any manner without the
-                                                Owner’s prior, written permission, except as allowed by QAT's Logos and
-                                                Usage Policy:  <a href="https://QAT.com/logos." target=" /blank">https://QAT.com/logos</a>.</p>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Disclaimers and Limitations on Liability</h4>
-                                            <p>THE SOFTWARE IS PROVIDED ON AN "AS IS" BASIS, AND NO WARRANTY, EITHER EXPRESS OR IMPLIED, IS GIVEN. YOUR USE OF THE SOFTWARE IS AT YOUR SOLE RISK.<br></br> The Owner does not warrant that</p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The Software will meet your specific requirements.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The Software is fully compatible with any particular platform.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Your use of the Software will be uninterrupted, timely, secure, or error-free.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>The results that may be obtained from the use of the Software will be accurate or reliable. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> The quality of any products, services, information, or other material purchased or obtained by you through the Software will meet your expectations. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Or any errors in the Software will be corrected.</p></li>
-
-
-                                            </ul>
-                                            <p>
-                                                YOU EXPRESSLY UNDERSTAND AND AGREE THAT THE OWNER SHALL NOT BE LIABLE FOR ANY DIRECT,
-                                                INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES, INCLUDING BUT NOT
-                                                LIMITED TO, DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA OR OTHER INTANGIBLE
-                                                LOSSES (EVEN IF THE OWNER HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES)
-                                                RELATED TO THE  SOFTWARE,<br></br>Including, For Example:
-                                            </p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>The use or the inability to use the Software.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>The cost of procurement of substitute goods and services resulting
-                                                    from any goods, data, information or services purchased or obtained or messages received or
-                                                    transactions entered into through or from the Software.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Unauthorized access to or alteration of your transmissions or data.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Statements or conduct of any third-party on the Software .</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> Or any other matter relating to the Software.</p></li>
-                                            </ul>
-                                            <p>The Owner reserves the right at any time and from time to time to modify or discontinue,
-                                                temporarily  or permanently, the Software (or any part thereof) with or without notice.
-                                                The Owner shall not be liable to you or to any third-party for any modification,
-                                                price change, suspension or discontinuance of the Software. </p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Miscellanea  </h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>If you configure the Software to work with one or more accounts
-                                                        on the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website or with an instance of QAT Desktop, your use
-                                                        of the Software will also be governed by the <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> website Terms of
-                                                        Service and/or the license agreement applicable to your instance of QAT Desktop.</p>
+                                        <p>2.2 You shall at all times:</p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                provide Chemonics with all necessary:
+                                                <ol class="roman-list">
+                                                    <li>
+                                                        co-operation in relation to this License; and
                                                     </li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>The failure of QAT to exercise or enforce any right or
-                                                        provision of this EULA shall not constitute a waiver of such right or provision.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>This EULA constitutes the entire agreement between you and  the Owner, and governs your use of the Software,
-                                                        superseding any prior agreements between you and the Owner (including, but not limited
-                                                        to, any prior versions of the EULA), and subject to all terms, conditions, and
-                                                        obligations between Owner and . You further agree to fully and completely indemnify
-                                                        Owner from any and all individual and aggregate claims for damages that may be
-                                                        brought against Owner with regard to or arising from the aforementioned conditions
-                                                        in this clause (Incorporations by Reference: ADS 318 Intellectual Property
-                                                        Rights. c</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>You agree that this EULA and your use of the Software
-                                                        are governed under District of Columbia law and any dispute related to the
-                                                        Software must be brought in a tribunal of competent jurisdiction located in
-                                                        or near Washington, DC. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Please send any questions about this EULA to <a href="support@QAT.org">support@QAT.org</a></p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            English shall be the controlling language for this Agreement for any and all procedural and
-                                            substantive matter related thereto, including but not limited to disagreement or other discrepancy
-                                            between the English original writing and translated iteration, in which case the English shall control in full.
-                                        </p>
-
-
-
-
-                                    </div>
-                                </Col><br />
-                                <hr></hr><br />
-                                <Col xs="11" sm="11">
-                                    <div className="text-justify">
-                                        <h4 className="UserTitle">Conditions générales d’utilisation</h4>
-                                        <p>
-                                            Les présentes conditions générales d’utilisation (CGU) constituent un accord contractuel entre vous-même,
-                                            en votre qualité d’individu ou en tant que représentant dûment autorisé agissant en tant que ou au nom d’une
-                                            entité, et Chemonics International (ci-après dénommée « Chemonics » ou le « propriétaire »), afin de vous
-                                            autoriser à utiliser son outil d’analyse quantitative (QAT, Quantification Analytics Tool) et ses applications.
-                                            Si vous n’acceptez pas toutes les modalités des présentes CGU, veuillez ne pas installer, utiliser ou copier le logiciel.
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Résumé</h4>
-                                            <ul class="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>Pour utiliser le logiciel, vous devez accepter l’ensemble des modalités des présentes CGU. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>Dans ce cas, vous pouvez utiliser le logiciel gratuitement à toute fin licite. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">Le présent logiciel communique automatiquement avec les serveurs QAT à trois fins spécifiques : <br></br>(1) réception et installation des mises à jour ;<br></br> (2) envoi de rapports d’erreur ; <br></br>(3) envoi d’informations d’utilisation sous forme anonyme. <br></br>Vous pouvez consulter un échantillon de données afin de connaître les informations sont envoyées et vous pouvez choisir de ne pas envoyer de données d’utilisation sous forme anonyme. </p></li>
-                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Le present logiciel est fourni « en l’état », sans aucune garantie, et vous convenez que le propriétaire ne saurait être tenu pour responsable de l’utilisation que vous en faites. </p></li>
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Le contrat</h4>
-                                            Lorsque vous téléchargez, installez, utilisez ou copiez le logiciel, vous acceptez d’être lié par les dispositions des présentes CGU. Si vous n’acceptez pas toutes les modalités des présentes CGU, vous ne pouvez pas télécharger, installer, utiliser ou copier le logiciel.
-
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle"> La licence </h4>
-                                            En vertu des présentes CGU, vous pouvez installer autant de copies du logiciel que vous le souhaitez et utiliser le logiciel à n’importe quelle fin licite conforme aux présentes CGU. La licence d’utilisation du logiciel est expressément subordonnée à votre acceptation de toutes les dispositions des présentes CGU. Le logiciel vous est concédé sous licence et n’est pas vendu. Nonobstant toute disposition contraire des présentes CGU, les présentes CGU n’engageront pas l’USAID (U.S. Agency for International Development) ni une quelconque personne agissant en son nom en tant qu’employé ou membre du personnel de l’USAID. Au cas où des CGU sont exécutées par une telle personne, lesdites CGU seront réputées nulles et non avenues.
-                                            Tous les autres droits, devoirs, privilèges et obligations du propriétaire en vertu du contrat GHSC-PSM du fait de son intégration par renvoi ou via une disposition restent de plein effet et prévaudront en cas de contradiction entre le contrat GHSC-PSM et toute disposition intégrée aux présentes ou créée par les présentes CGU.
-
-                                        </p>
-                                        <p>
-
-
-                                            <h4 className="UserTitle"> Restrictions</h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Vous devez utiliser le logiciel dans les limites du droit applicable dans la ou les juridictions où vous l’utilisez. </p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>Il vous est interdit de vendre, revendre, louer ou échanger le logiciel contre quoi que ce soit de valeur. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Vous pouvez redistribuer le logiciel, mais vous devez lui intégrer les présentes CGU, et vous ne pouvez pas reconditionner le logiciel ni le regrouper avec un autre logiciel. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Il vous est interdit de supprimer ou de modifier les mentions ou marques de propriété présentes sur le logiciel. </p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avis de confidentialité </h4>
-                                            <div className="rounded-list list-group">
-                                                Le logiciel communique automatiquement avec les serveurs QAT à trois fins spécifiques :
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>mise à jour du logiciel ;</p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>envoi de rapports d’erreurs ;</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>envoi de données d’utilisation sous forme anonyme afin de nous aider à améliorer le logiciel.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p> Pour en savoir plus à propos des informations spécifiques qui sont envoyées,<br></br> veuillez consulter la page <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Mises à niveau automatiques du logiciel</h4>
-                                            <p>Le logiciel envoie les informations précisées à l’adresse URL ci-dessus afin de déterminer
-                                                si des correctifs, corrections de bogues, mises à niveau, mises à jour ou autres modifications
-                                                servant à améliorer le logiciel sont disponibles. Vous acceptez que ces améliorations soient
-                                                installées automatiquement sur le logiciel téléchargé sur votre ordinateur sans qu’un préavis ne vous
-                                                soit adressé ni que votre consentement ne vous soit à nouveau demandé. Cette fonctionnalité ne
-                                                peut pas être désactivée. Si vous refusez que le logiciel soit mis à jour de manière automatique,
-                                                vous devez le désinstaller.  </p>
-
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Rapports d’erreur :</strong> Pour nous aider à améliorer le logiciel, lorsque certaines erreurs se produisent, le logiciel enverra automatiquement certaines informations à QAT, conformément à ce qui est précisé à l’adresse URL ci-dessus. Cette fonctionnalité ne peut pas être désactivée. Si vous refusez que des rapports d’erreur soient envoyés à QAT, vous devez désinstaller le logiciel. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Données d’utilisation anonymisées :</strong> QAT collecte des données anonymisées à propos de votre utilisation du logiciel pour nous aider à améliorer celui-ci. À raison d’une fois par jour en moyenne, le logiciel envoie ces données vers les serveurs de QAT, conformément à ce qui est précisé à l’adresse URL ci-dessus. Si vous ne souhaitez pas que des données d’utilisation anonymes soient envoyées à QAT, accédez à vos paramètres dans le volet Préférences pour désactiver cette fonctionnalité. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Synchronisation des données de référence :</strong> L’application hors ligne envoie et reçoit des données depuis l’application web. Cette fonctionnalité ne peut pas être désactivée, car il s’agit d’un élément central de l’application. </p></li>
-
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Notifications Open Source </h4>
-                                            <p>Le logiciel est susceptible d’être soumis à des licences logicielles (« composants open source »),
-                                                ce qui signifie toute licence logicielle approuvée comme licence open source par l’Open Source
-                                                Initiative ou toute autre licence semblable, y compris sans toutefois s’y limiter toute licence qui,
-                                                en tant que condition de distribution du logiciel attribué sous licence en vertu de ladite licence,
-                                                nécessite que l’éditeur publie le logiciel au format code source. Une copie des licences applicables
-                                                aux composants open source est incluse dans les documents du logiciel.
-                                            </p>
-                                            <p>S’il devait exister un conflit entre les dispositions des licences couvrant les
-                                                composants open source et les présentes CGU, les dispositions de ces licences
-                                                s’appliqueront en lieu et place des dispositions des présentes CGU. Dans la
-                                                mesure où les dispositions des licences applicables aux composants open source
-                                                interdisent l’applicabilité d’une quelconque des restrictions contenues dans le
-                                                présent contrat eu égard à un de ces composants open source, ces restrictions ne
-                                                s’appliqueront pas à ce composant open source. Dans la mesure où les conditions des
-                                                licences applicables aux composants open source nécessitent que le concédant offre
-                                                de fournir le code source en relation avec le produit, une telle offre est réputée survenue en vertu des présentes,
-                                                et vous pouvez l’exercer en contactant <a href="support@QAT.org" target=" /blank">support@QAT.org</a></p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Notifications relatives à la propriété intellectuelle</h4>
-                                            <p>La licence relative au logiciel dont il est ici question et ce logiciel en lui-même sont soumis
-                                                aux conditions générales relatives à la propriété intellectuelle, énoncées dans une disposition
-                                                ou intégrées en vertu du contrat principal GHSC-PSM, à savoir la clause 48 CFR 752.227-14 Droits
-                                                en matière de données (notions générales) ainsi que la licence illimitée de l’USAID eu égard au QAT
-                                                et ses applications en vertu des présentes. Cette section de la licence doit être en accord avec
-                                                lesdites conditions générales pour être applicable.
-                                            </p>
-                                            <p>Le logiciel et tous les droits d’auteur, secrets commerciaux et autres droits ayant trait à
-                                                la propriété intellectuelle à travers le monde sont la propriété exclusive de QAT.
-                                                QAT se réserve tous les droits associés au logiciel qui ne sont pas expressément accordés par les présentes CGU.
-                                            </p>
-                                            <p>Les noms QAT, QAT Desktop et autres logos ou appellations stylisées QAT sont des marques déposées par QAT.
-                                                Vous acceptez de ne pas afficher ni utiliser sans l’autorisation écrite préalable du propriétaire ces marques
-                                                déposées de manière que ce soit, sauf de la manière autorisée par la politique relative aux logos et à l’utilisation
-                                                du nom de marque de QAT, disponible à l’adresse  <a href="https://QAT.com/logos." target=" /blank">https://QAT.com/logos</a>.</p>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avis de non-responsabilité et limitations de responsabilité </h4>
-                                            <p>LE LOGICIEL EST FOURNI « EN L’ÉTAT » ET NE BÉNÉFICIE D’AUCUNE GARANTIE, EXPRESSE OU IMPLICITE. VOUS UTILISEZ CE LOGICIEL À VOS PROPRES RISQUES. Le propriétaire ne garantit pas que</p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>le logiciel répondra à vos besoins spécifiques ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>le logiciel est entièrement compatible avec une quelconque plateforme spécifique ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> votre utilisation du logiciel se fera de manière ininterrompue, régulière, sécurisée ou sans erreur ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>les résultats susceptibles d’être obtenus avec le logiciel sont exacts et fiables ;  </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> la qualité des produits, services, informations ou de tout autre matériel achetés ou obtenus par vous-même du fait de l’utilisation du logiciel répondra à vos attentes ; ni que </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>toute erreur présente dans le logiciel sera corrigée. </p></li>
-
-
-                                            </ul>
-                                            <p>
-                                                VOUS COMPRENEZ ET CONVENEZ EXPRESSÉMENT QUE LE PROPRIÉTAIRE NE POURRA PAS ÊTRE TENU POUR RESPONSABLE
-                                                DE TOUT DOMMAGE DIRECT, INDIRECT, INCIDENTEL, SPÉCIAL, CONSÉCUTIF OU EXEMPLAIRE, Y COMPRIS SANS TOUTEFOIS
-                                                S’Y LIMITER TOUT DOMMAGE DÉCOULANT D’UNE PERTE DE PROFITS, DE CLIENTÈLE, D’UTILISATION, DE DONNÉES OU DE
-                                                TOUTE AUTRE PERTE IMMATÉRIELLE RÉSULTANT DE L’UTILISATION DU LOGICIEL, MÊME SI LE PROPRIÉTAIRE A ÉTÉ AVISÉ
-                                                DE LA POSSIBILITÉ DE TELS DOMMAGES, y compris dans les cas suivants (liste non exhaustive) :
-                                            </p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>utilisation du logiciel ou incapacité à utiliser le logiciel ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>coût de l’achat de biens ou de services de substitution résultant de tous biens, données,
-                                                    informations ou services achetés ou obtenus ou de messages reçus ou de transactions conclues par l’intermédiaire du logiciel ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> tout accès ou toute modification non autorisé de vos transmissions ou données ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>déclarations ou comportement d’un tiers sur le logiciel ;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> ou toute autre question en lien avec le logiciel. </p></li>
-                                            </ul>
-                                            <p>Le propriétaire se réserve le droit, à tout moment et de manière occasionnelle,
-                                                de modifier ou de rendre indisponible le logiciel (ou toute partie de celui-ci),
-                                                de façon temporaire ou permanente, avec ou sans préavis. Le propriétaire n’endosse
-                                                aucune responsabilité vis-à-vis de vous-même ou d’une quelconque tierce partie,
-                                                en cas de modification, variation tarifaire, interruption ou cessation de service du logiciel.  </p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Divers  </h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Si vous configurez le logiciel en vue de travailler avec un ou plusieurs comptes sur le site <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> ou avec une instance de QAT Desktop, votre utilisation du logiciel sera également régie par les conditions d’utilisation et/ou par le contrat de licence du site <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> applicable à votre version de QAT Desktop.</p>
+                                                    <li>
+                                                        access to such information as may be required by Chemonics,
                                                     </li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>L’inexécution ou la non-application par QAT d’un droit ou d’une disposition des présentes CGU ne constitue pas une renonciation audit droit ou à ladite disposition. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Les présentes CGU constituent l’intégralité du contrat entre vous-même et
-                                                        le propriétaire et régissent votre utilisation du logiciel, se substituant à tout accord préalable
-                                                        entre vous-même et le propriétaire (y compris, sans toutefois s’y limiter, toute version précédente
-                                                        des présentes CGU), et sous réserve de toute disposition, condition ou obligation entre le propriétaire
-                                                        et l'utilisateur. En outre, vous acceptez d’indemniser le propriétaire de toute réclamation pour dommage
-                                                        faite à titre individuel ou collectif à l’encontre du propriétaire eu égard aux conditions susmentionnées
-                                                        dans cette clause (Incorporations par renvoi : ADS 318 Droits de propriété intellectuelle). </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Vous convenez que les présentes CGU et votre utilisation du
-                                                        logiciel sont régies par le droit du district de Columbia (États-Unis) et que tout désaccord
-                                                        relatif au logiciel doit être porté devant une juridiction compétente, située à Washington, DC (États-Unis) ou à proximité. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Si vous avez des questions à propos des présentes CGU, veuillez les adresser à <a href="support@QAT.org">support@QAT.org</a></p></li>
                                                 </ol>
-                                            </div>
-                                        </p>
+                                                to the extent required to provide the Platform, including but not limited to Partner Data, security access   
+                                                information and configuration services;  
+                                            </li>
+                                            <li>
+                                                without affecting your other obligations under this License, comply (and ensure that all such Authorised   
+                                                Users comply) with all applicable laws and regulations at all times with respect to your activities under this   
+                                                License; and
+                                            </li>
+                                            <li>
+                                                ensure that your network and systems (and, as applicable, those of the Authorised Users) comply with the   
+                                                relevant specifications provided by Chemonics from time to time.
+                                            </li>
+                                        </ol>
                                         <p>
-                                            L’anglais est la langue de travail pour toute question relative au présent contrat et à
-                                            toute question procédurale et matérielle en lien avec celui-ci, y compris, sans toutefois
-                                            s’y limiter, en cas de désaccord ou de divergence entre la version écrite originale en langue
-                                            anglaise et toute traduction, auquel cas la version en langue anglaise fera foi.
+                                            2.3 You shall have sole responsibility for the legality, reliability, integrity, accuracy and quality of all Partner Data. You   
+                                            hereby license us to use the Partner Data for:  
                                         </p>
-
-
-
-                                    </div>
-                                </Col><br />
-                                <hr></hr><br />
-                                <Col xs="11" sm="11">
-                                    <div className="text-justify">
-                                        <h4 className="UserTitle">Acordo de Licença do Utilizador Final </h4>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                the proper performance and delivery of the Platform and Support Services, including the provision of the   
+                                                Software and the Documents;  
+                                            </li>
+                                            <li>
+                                                the purposes set out in our Privacy Notice.  
+                                            </li>
+                                            <li>
+                                                our making amendments to (and repairing of) the Platform as applicable; and  
+                                            </li>
+                                            <li>
+                                                all other purposes relevant to the proper exercise of our rights and obligations under this License.  
+                                            </li>
+                                        </ol>
                                         <p>
-                                            Este Acordo de Licença do Utilizador Final (ALUF) é um acordo jurídico entre si,
-                                            quer na capacidade individual ou de agente devidamente autorizado a agir em nome
-                                            de uma entidade, e a Chemonics International (doravante “Chemonics” ou “Proprietário”)
-                                            relativamente ao uso autorizado da respetiva Quantification Analytics Tool (QAT) e das
-                                            suas aplicações. SE NÃO ACEITAR TODOS OS TERMOS DO PRESENTE ALUF, NÃO INSTALE, UTILIZE OU COPIE O SOFTWARE.
+                                            2.4 You undertake that:
                                         </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                you will not allow or suffer any User Subscription to be used by more than one individual Authorised User unless it   
+                                                has been reassigned in its entirety to another individual Authorised User (and must be used strictly in accordance with   
+                                                the applicable User Role Type), in which case the prior Authorised User shall no longer have any right to access or   
+                                                use the Platform;  
+                                            </li>
+                                            <li>
+                                                you shall permit Chemonics or a Chemonics’s designated third party to periodically audit (or otherwise monitor) your   
+                                                use of the Platform from time-to-time, specifically in that the Platform is being used in accordance with each   
+                                                applicable User Role Type. This audit or monitoring may take place physically on the Partner’s premises, or remotely,   
+                                                at Chemonics’s option, and Chemonics may deploy reasonable online audit and/or monitoring tools for these purposes; 
+                                            </li>
+                                            <li>
+                                                you shall supervise and control use of the Platform and ensure they are used by your employees and representatives   
+                                                only in accordance with the terms of this License (including but not limited to the Data Use Rights Table); and  
+                                            </li>
+                                            <li>
+                                                you shall comply with all technology control or export laws and regulations, applicable from time to time.  
+                                            </li>
+                                        </ol>
                                         <p>
-                                            <h4 className="UserTitle">Resumo</h4>
-                                            <ul class="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>Tem de aceitar todos os termos do presente ALUF para utilizar este Software. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>Se o fizer, pode utilizar o Software gratuitamente e para qualquer finalidade lícita. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">Este Software comunica automaticamente com servidores da QAT por três motivos:  <br></br>(1) para receber e instalar atualizações;<br></br> (2) para enviar relatórios de erros; e  <br></br>(3) para enviar informações de utilização anonimizadas. <br></br>Pode visualizar dados de amostra para saber que informações são enviadas e pode optar por não enviar os dados de utilização anonimizados. </p></li>
-                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Este Software é fornecido “tal como está”, sem garantias, e o utilizador aceita que o Proprietário não é responsável por nada que faça com ele. </p></li>
-                                            </ul>
+                                            2.5 Where requested and subscribed, Chemonics shall provide the Support Services to you from time to time and strictly   
+                                            in accordance with the terms and conditions herein.
                                         </p>
+                                        <h4 className="UserTitle">3. RESTRICTIONS</h4>
                                         <p>
-                                            <h4 className="UserTitle">O Acordo</h4>
-                                            Ao transferir, instalar, utilizar ou copiar o Software, aceita e concorda em vincular-se aos termos do presente ALUF. Se não aceitar todos os termos do presente ALUF, não transfira, instale, utilize ou copie o Software.
+                                            3.1 Excluding any 'open-source' materials, and except as expressly set out in this License or as permitted by any local law 
+                                            which is incapable of exclusion by agreement between the parties, you shall not:
                                         </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                attempt to copy, modify, duplicate, create derivative works from, frame, mirror, republish, download, display,   
+                                                transmit, or distribute all or any portion of the Platform in any form or media or by any means; or   
+                                            </li>
+                                            <li>
+                                                attempt to de-compile, reverse compile, disassemble, reverse engineer or otherwise reduce to human-perceivable   
+                                                form all or any part of the Software;  
+                                            </li>
+                                            <li>
+                                                access all or any part of the Platform to build a product or service which competes with the Platform;
+                                            </li>
+                                            <li>
+                                                use the Platform to provide services to third parties;
+                                            </li>
+                                            <li>
+                                                license, sell, rent, lease, transfer, assign, distribute, display, disclose, or otherwise commercially exploit, or   
+                                                otherwise make the Platform available to any third party except the Authorised Users; or
+                                            </li>
+                                            <li>
+                                                attempt to obtain, or assist third parties in obtaining, access to the Platform, other than as provided under this   
+                                                License. 
+                                            </li>
+                                        </ol>
                                         <p>
-                                            <h4 className="UserTitle"> A Licença</h4>
-                                            O presente ALUF habilita-o a instalar quantas cópias do Software pretender e a utilizar o Software para qualquer finalidade lícita consistente com o presente ALUF. A sua licença de utilização do Software é expressamente condicionada pela sua aceitação de todos os termos do presente ALUF. Este software é licenciado, e não vendido. Não obstante qualquer disposição em contrário no presente ALUF, este ALUF não vincula a U.S. Agency for International Development (USAID) nem qualquer pessoa que aja na capacidade de funcionário ou membro do pessoal da USAID.  Caso um ALUF seja executado por tal pessoa, esse ALUF será considerado nulo e inválido.
-                                            Todos os outros direitos, privilégios, deveres e obrigações do Proprietário conforme o Contrato GHSC-PSM através da incorporação por cláusula ou referência permanecem em vigor e totalmente aplicáveis, e exercerão o controlo caso haja alguma discrepância entre o Contrato GHSC-PSM e qualquer disposição incluída no e criada pelo presente ALUF.
+                                            3.2 You shall not use the Platform to:  
                                         </p>
-                                        <p>
-
-
-                                            <h4 className="UserTitle">As Restrições </h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Ao utilizar o Software, deve fazê-lo de forma a cumprir a legislação aplicável na(s) jurisdição(ões) onde utiliza o Software. </p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>Não pode vender, revender, alugar, locar ou trocar o Software por algo de valor. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Pode redistribuir o software, mas este deverá incluir o presente ALUF e não poderá reembalar ou juntar o Software a qualquer outro software. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Não pode remover ou alterar quaisquer marcas ou avisos proprietários no Software. </p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avisos de privacidade </h4>
-                                            <div className="rounded-list list-group">
-                                                O Software comunica automaticamente com servidores da QAT para três finalidades:
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>atualizar o Software;</p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>enviar relatórios de erros; e</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>enviar dados de utilização para podermos melhorar o Software. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Para mais informações acerca das informações específicas que enviamos,<br></br> visite <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Atualizações de software automáticas</h4>
-                                            <p>O Software envia as informações descritas no URL acima para determinar se existem correções,
-                                                correções de erros, atualizações ou outras modificações que melhorem o Software. O utilizador
-                                                aceita que o Software poderá instalar automaticamente tais melhorias do Software no seu computador
-                                                sem aviso prévio e sem receber consentimento adicional. Esta funcionalidade não pode ser desativada.
-                                                Se não pretender receber atualizações automáticas, terá de desinstalar o Software. </p>
-
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Relatórios de erros :</strong> Para nos ajudar a melhorar o Software, quando o Software encontra determinados erros, envia automaticamente algumas informações à QAT acerca do erro (conforme descrito no URL acima). Esta funcionalidade não pode ser desativada. Se não pretender enviar relatórios de erros à QAT, terá de desinstalar o Software. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Dados de utilização anonimizados :</strong> A QAT recolhe dados anonimizados acerca da sua utilização do Software para nos ajudar a melhorá-lo. Aproximadamente uma vez por dia, o Software envia estes dados (conforme descrito com mais pormenor no URL acima) para os servidores da QAT. Se não pretender enviar dados de utilização anonimizados para a QAT, pode optar por não o fazer alterando as definições na vista Preferências. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Sincronização de dados de referência e dados principais :</strong> A app offline envia e recebe regularmente dados da aplicação da web. Esta ação não pode ser desativada, uma vez que é um componente essencial da aplicação. </p></li>
-
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avisos de software open-source </h4>
-                                            <p>O Software poderá estar sujeito a licenças de software open-source (“Componentes Open-Source”),
-                                                o que significa qualquer licença de software aprovada como licença open-source pela Open Source
-                                                Initiative ou outra licença substancialmente semelhante, incluindo, sem limitação, qualquer licença
-                                                que, como condição da distribuição do software licenciado ao abrigo da referida licença, requeira
-                                                que o distribuidor torne o software disponível no formato de código fonte. A documentação do Software
-                                                inclui cópias das licenças aplicáveis aos Componentes Open-Source.
-                                            </p>
-                                            <p>Na medida em que haja conflito entre os termos da licença que abrange os Componentes
-                                                Open-Source e o presente ALUF, os termos das referidas licenças serão aplicados,
-                                                em vez dos termos do presente ALUF. Na medida em que os termos das licenças aplicáveis
-                                                a Componentes Open-Source proíbam quaisquer restrições do presente Acordo relativamente
-                                                aos referidos Componentes Open-Source, tais restrições não serão aplicadas aos referidos
-                                                Componentes Open-Source. Na medida em que os termos das licenças aplicáveis a Componentes
-                                                Open-Source requeiram que o Licenciador se ofereça a fornecer código fonte associado ao
-                                                Produto, tal oferta é efetuada pelo presente e poderá exercê-la
-                                                contactando  <a href="support@QAT.org" target=" /blank">support@QAT.org</a></p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Avisos de propriedade intelectual </h4>
-                                            <p>Esta licença, as matérias relativas a software por ela abrangidas e o Software por si
-                                                só estão sujeitos a e são controlados pelos termos e condições controladores relevantes
-                                                relacionados com a propriedade intelectual enumerada por cláusula ou incorporada ao abrigo
-                                                do contrato principal GHSC-PSM, nomeadamente os Direitos sobre dados 48 CFR 752.227-14 (geral)
-                                                e a licença ilimitada da USAID relativa à QAT e às respetivas aplicações, e esta secção da licença
-                                                terá de estar em concordância com o mesmo para ser aplicável.
-                                            </p>
-                                            <p>O Software e todos os direitos de autor, segredos comerciais e outros direitos de propriedade
-                                                intelectual a nível mundial nele presentes são propriedade exclusiva da QAT. A QAT reserva
-                                                todos os direitos de e relacionados com o Software que não lhe sejam expressamente concedidos no presente ALUF.
-                                            </p>
-                                            <p>Os nomes QAT, QAT Desktop e logótipos e/ou nomes estilizados da QAT são marcas comerciais
-                                                da QAT. O utilizador concorda em não apresentar ou utilizar estas marcas comerciais de qualquer
-                                                forma sem a autorização prévia por escrito do Proprietário, exceto conforme permitido pela Política
-                                                de Logótipos e Utilização da QAT:  <a href="https://QAT.com/logos." target=" /blank">https://QAT.com/logos</a>.</p>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Renúncias e limitações de responsabilidade</h4>
-                                            <p>O SOFTWARE É FORNECIDO “TAL COMO ESTÁ” E NÃO SÃO FORNECIDAS QUAISQUER GARANTIAS EXPLÍCITAS OU IMPLÍCITAS. O UTILIZADOR UTILIZA O SOFTWARE POR SUA CONTA E RISCO.<br></br> O Proprietário não garante que</p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>o Software cumpra os seus requisitos específicos; </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>o Software seja totalmente compatível com qualquer plataforma específica; </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> a sua utilização do Software seja ininterrupta, atempada, segura ou livre de erros;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>os resultados que possam ser obtidos a partir da utilização do Software sejam precisos ou fiáveis; </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> a qualidade de quaisquer produtos, serviços, informações ou outros materiais comprados ou obtidos por si através do Software cumpram as suas expectativas; ou </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>quaisquer erros do Software sejam corrigidos. </p></li>
-
-
-                                            </ul>
-                                            <p>
-                                                O UTILIZADOR COMPREENDE E ACEITA EXPRESSAMENTE QUE O PROPRIETÁRIO NÃO SERÁ RESPONSÁVEL POR QUAISQUER DANOS DIRETOS, INDIRETOS, ACIDENTAIS, ESPECIAIS, CONSEQUENTES OU EXEMPLARES, INCLUINDO, SEM LIMITAÇÃO, DANOS POR PERDAS DE LUCROS, FUNDOS DE COMÉRCIO, UTILIZAÇÃO, DADOS OU OUTRAS PERDAS INTANGÍVEIS (MESMO SE O PROPRIETÁRIO TIVER SIDO ALERTADO SOBRE A POSSIBILIDADE DE TAIS DANOS) RELACIONADOS COM O SOFTWARE,<br></br>incluindo, por exemplo:
-                                            </p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>a utilização ou incapacidade de utilização do Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>o custo de aquisição de bens e serviços de substituição resultante da compra ou obtenção de quaisquer bens, dados, informações ou serviços ou de mensagens recebidas ou transações efetuadas através de ou a partir do Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> o acesso não autorizado ou a alteração das suas transmissões ou dos seus dados;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>declarações ou comportamento de terceiros no Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> ou qualquer outro assunto relativo ao Software.</p></li>
-                                            </ul>
-                                            <p>O Proprietário reserva o direito de, a qualquer altura e periodicamente,
-                                                modificar ou descontinuar, de forma temporária ou permanente, o Software
-                                                (ou qualquer parte do mesmo), com ou sem aviso prévio. O Proprietário não
-                                                será responsável perante o utilizador ou terceiros por qualquer modificação,
-                                                alteração do preço, suspensão ou descontinuação do Software.  </p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Assuntos diversos </h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Se configurar o Software de forma a funcionar com uma ou mais contas no website
-                                                        <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> ou uma cópia do QAT Desktop,
-                                                        a sua utilização do Software também será regida pelos Termos de Serviço do website <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> e/ou pelo acordo de licença aplicável à sua cópia do QAT Desktop. </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                distribute or transmit any Viruses or Vulnerability and shall implement procedures in line with Good Industry   
+                                                Practice to prevent such distribution or transmission;  
+                                            </li>
+                                            <li>
+                                                store, access, publish, disseminate, distribute or transmit any material which:
+                                                <ol class="roman-list">
+                                                    <li>
+                                                        is unlawful, harmful, threatening, defamatory, obscene, infringing, harassing or racially or ethnically   
+                                                        offensive;
                                                     </li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>A falha da QAT em exercer ou aplicar qualquer direito ou disposição do presente ALUF não constitui a renúncia de tal direito ou disposição.</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>O presente ALUF constitui o acordo total entre si e o Proprietário e rege a
-                                                        sua utilização do Software, substituindo quaisquer acordos prévios entre si e o Proprietário
-                                                        (incluindo, sem limitação, quaisquer versões anteriores do ALUF) e estando sujeito a todos os
-                                                        termos, condições e obrigações entre o Proprietário e o utilizador. O utilizador aceita indemnizar
-                                                        totalmente o Proprietário por quaisquer e todos os pedidos de indemnização individuais e agregados
-                                                        que possam ser apresentados ao Proprietário em relação a ou resultantes das condições referidas
-                                                        nesta cláusula (Incorporações por referência: Direitos de propriedade intelectual ADS 318. c </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>O utilizador aceita que o presente ALUF e a sua utilização do Software
-                                                        são regidos pela legislação do District of Columbia e que qualquer litígio relacionado com o Software
-                                                        terá de ser levado a um tribunal de jurisdição competente situado em ou perto de Washington, DC. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Envie quaisquer questões acerca do presente ALUF para <a href="support@QAT.org">support@QAT.org</a></p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            O inglês será o idioma de controlo do presente Acordo
-                                            e de quaisquer e todos os assuntos processuais e materiais
-                                            com ele relacionado, incluindo, sem limitação, a falta de concordância
-                                            ou outras discrepâncias entre a escrita original em inglês e as cópias
-                                            traduzidas, em cujo caso o inglês será o único idioma de controlo.
-                                        </p>
-
-
-
-
-                                    </div>
-                                </Col><br />
-                                <hr></hr><br />
-                                <Col xs="11" sm="11">
-                                    <div className="text-justify">
-                                        <h4 className="UserTitle">Contrato de licencia para usuario final </h4>
-                                        <p>
-                                            El presente Contrato de licencia para usuario final (EULA, por sus siglas en inglés)
-                                            es un acuerdo legal entre usted, ya sea en su carácter de individuo o de agente debidamente
-                                            autorizado que actúa como una entidad o en su nombre, y Chemonics International
-                                            (en adelante «Chemonics» o «Propietario») que lo autoriza a utilizar la Herramienta
-                                            de análisis de cuantificación (QAT, por sus siglas en inglés) y sus aplicaciones.
-                                            SI NO ESTÁ DE ACUERDO CON LA TOTALIDAD DE LOS TÉRMINOS DEL PRESENTE EULA, NO INSTALE, NO UTILICE NI COPIE EL SOFTWARE.
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Resumen</h4>
-                                            <ul class="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>  &nbsp;&nbsp;<p>Usted debe estar de acuerdo con la totalidad de los términos del presente EULA para usar el Software. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>Si está de acuerdo, puede usar el Software sin cargo y para cualquier fin legal. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp;<p align="justifly">Este Software se comunica automáticamente con los servidores de la QAT por tres motivos: <br></br>(1) recibir e instalar actualizaciones,<br></br> (2) enviar informes de errores y <br></br>(3) enviar información de uso anonimizada. <br></br>Puede visualizar datos de ejemplo para ver qué información se envía y puede optar por no enviar los datos de uso anonimizados. </p></li>
-                                                <li class="list-summery "><i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>Este Software se proporciona «tal como está», sin garantías, y usted acepta que el Propietario no será responsable de nada de lo que usted haga con el Software. </p></li>
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">El contrato</h4>
-                                            Al descargar, instalar, utilizar o copiar el Software, usted acepta y acuerda quedar
-                                            sujeto a los términos del presente EULA. Si no está de acuerdo con la totalidad de
-                                            los términos del presente EULA, no puede descargar, instalar, utilizar ni copiar el Software. </p>
-                                        <p>
-                                            <h4 className="UserTitle">La licencia </h4>
-                                            l presente EULA le da derecho a instalar tantas copias del Software como desee
-                                            y a utilizar el Software para cualquier fin legal que guarde relación con el presente EULA.
-                                            Su licencia para usar el Software está expresamente condicionada a que usted acepte todos
-                                            los términos del presente EULA. Este software se ofrece bajo licencia, no se vende.
-                                            No obstante cualquier disposición en contrario contenida en el presente EULA,
-                                            el presente EULA no será vinculante para la Agencia de los EE. UU.
-                                            para el Desarrollo Internacional (USAID, por sus siglas en inglés)
-                                            ni para ninguna persona que actúe en calidad de empleado o miembro
-                                            del personal de la USAID.  En el caso de que el EULA sea formalizado por
-                                            alguna de estas personas, deberá considerarse nulo y sin efecto.<br />
-
-                                            Todos los demás derechos, privilegios, deberes y obligaciones del Propietario en
-                                            virtud del Contrato del programa GHSC-PSM, a través de la incorporación mediante una cláusula o referencia, siguen teniendo efecto y plena aplicación, y prevalecerán en caso de que surja una discrepancia entre el Contrato del programa GHSC-PSM y cualquiera de las disposiciones contenidas en el presente EULA y creadas por él.
-                                        </p>
-                                        <p>
-
-
-                                            <h4 className="UserTitle">Las restricciones</h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Cuando use el Software, deberá usarlo de tal manera que cumpla con las leyes aplicables de las jurisdicciones en las que lo utilice. </p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>No puede vender, revender, alquilar, arrendar ni intercambiar el Software por nada de valor. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Puede redistribuir el Software, pero este debe incluir el presente EULA; no puede empaquetarlo ni reempaquetarlo con ningún otro software. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>No puede quitar ni alterar los avisos o marcas sobre derechos de propiedad que aparezcan en el Software. </p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avisos de privacidad </h4>
-                                            <div className="rounded-list list-group">
-                                                El Software se comunica automáticamente con los servidores de la QAT con tres fines:
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>actualizar el Software,</p></li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>enviar informes de errores y</p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>enviar datos de uso anonimizados para poder mejorar el Software. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Si desea saber más sobre la información específica que enviamos,<br></br> visite <a href="https://desktop.QAT.org/usage-data/" target=" /blank">https://desktop.QAT.org/usage-data/</a>.</p></li>
-                                                </ol>
-                                            </div>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Actualizaciones automáticas del Software.</h4>
-                                            <p>El Software envía la información que se describe en la URL antes mencionada para determinar
-                                                si hay revisiones, correcciones de errores, actualizaciones u otras modificaciones para
-                                                mejorar el Software. Usted acepta que el Software pueda instalar automáticamente en su computadora
-                                                cualquiera de dichas mejoras sin previo aviso ni consentimiento adicional. Esta función no se puede
-                                                deshabilitar. Si no desea recibir actualizaciones automáticas, debe desinstalar el Software. </p>
-
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p><strong>Informes de errores :</strong> Cuando el Software encuentra determinados errores, envía automáticamente información relacionada con el error a la QAT (según se describe en la URL antes mencionada) para ayudarnos a mejorar el Software. Esta función no se puede deshabilitar. Si no desea recibir informes de errores en la QAT, debe desinstalar el Software. </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p><strong>Datos de uso anonimizados :</strong> La QAT recolecta datos anonimizados sobre el uso del Software para ayudarnos a mejorarlo. Aproximadamente una vez por día, el Software envía dichos datos (según se describe con más detalle en la URL antes mencionada) a los servidores de la QAT. Si no desea enviar datos de uso anonimizados a la QAT, puede cancelar dicha función cambiando su configuración en la vista Preferencias.</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p><strong>Sincronización de datos maestros y datos de referencia :</strong> La aplicación sin conexión periódicamente envía y recibe datos de la aplicación web. Esta función no se puede deshabilitar porque es un componente esencial de la aplicación. </p></li>
-
-                                            </ul>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Avisos sobre código abierto </h4>
-                                            <p>El Software puede estar sujeto a licencias de software de código abierto («Componentes de código abierto»),
-                                                es decir, a una licencia de software aprobada como licencia de código abierto por la Iniciativa para el
-                                                Código Abierto o cualquier otra licencia similar en esencia, incluidas, entre otras, las licencias que exigen,
-                                                como condición de distribución del software bajo dicha licencia, que el distribuidor proporcione el software en
-                                                formato de código abierto. La documentación del Software incluye copias de las licencias aplicables a los Componentes de código abierto. </p>
-
-                                            <p>En caso de que haya un conflicto entre los términos de las licencias que rigen los Componentes de código abierto y el presente EULA, se aplicarán los términos de dichas licencias en lugar de los términos del presente EULA. Si los términos de las licencias aplicables a los Componentes de código abierto prohíben cualquiera de las restricciones que aparecen en el presente Contrato con respecto a dicho Componente de código abierto, dichas restricciones no se aplicarán a dicho Componente de código abierto. Si los términos de las licencias aplicables a los Componentes de código abierto exigen que el Licenciador ofrezca la opción de código abierto en relación con el Producto, dicho ofrecimiento es parte del presente contrato, y usted puede aceptarlo
-                                                poniéndose en contacto con <a href="support@QAT.org" target=" /blank">support@QAT.org</a></p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Avisos sobre propiedad intelectual </h4>
-                                            <p>Esta licencia, el objeto de esta licencia de software y el Software en
-                                                sí mismo están sujetos a los términos y condiciones y se rigen por los
-                                                términos y condiciones pertinentes relacionados con la propiedad intelectual
-                                                indicada mediante cláusula o incorporada en el contrato principal del GHSC-PSM, es decir,
-                                                el título 48 del Código de Regulaciones Federales (CFR, por sus siglas en inglés),
-                                                en la sección 752.227-14 de Derechos sobre los datos (general) y la licencia ilimitada
-                                                de la USAID para la herramienta QAT y sus aplicaciones en virtud de esta licencia,
-                                                y esta sección de la licencia debe ser compatible con dichas regulaciones y esa licencia para que sea aplicable.
-                                            </p>
-                                            <p>El Software y todos los derechos de autor, secretos comerciales y otros derechos
-                                                de propiedad intelectual internacionales contenidos en dicho Software son de exclusiva
-                                                propiedad de QAT. QAT se reserva todos los derechos sobre el Software que no le sean expresamente otorgados a usted en el presente EULA.
-                                            </p>
-                                            <p>Los nombres QAT, QAT Desktop y los logotipos de QAT o nombres estilizados relacionados
-                                                son marcas registradas de QAT. Usted acepta no mostrar ni usar estas marcas comerciales de
-                                                ninguna manera sin la autorización previa por escrito del Propietario, excepto según lo autoriza
-                                                la Política de uso y logotipos de QAT:  <a href="https://QAT.com/logos." target=" /blank">https://QAT.com/logos</a>.</p>
-                                        </p>
-                                        <p>
-                                            <h4 className="UserTitle">Exenciones y limitaciones a la responsabilidad </h4>
-                                            <p>EL SOFTWARE SE PROPORCIONA «TAL COMO ESTÁ» Y NO SE OFRECE NINGUNA GARANTÍA, NI EXPRESA NI IMPLÍCITA. EL USO QUE USTED HAGA DEL SOFTWARE ES A SU PROPIA CUENTA Y RIESGO. El Propietario no garantiza que</p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>el Software cumpla con los requisitos específicos que usted tenga; </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>el Software sea totalmente compatible con una determinada plataforma;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> el uso del Software sea ininterrumpido, puntual, seguro o esté libre de errores;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>los resultados que se obtengan del uso del Software sean precisos o confiables;  </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> la calidad de los productos, los servicios, la información o demás materiales que usted haya adquirido u obtenido a través del Software cumpla con sus expectativas; ni que </p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>se corregirán los errores del Software. </p></li>
-
-
-                                            </ul>
-                                            <p>
-                                                USTED COMPRENDE Y ACEPTA EXPRESAMENTE QUE EL PROPIETARIO NO SERÁ RESPONSABLE DE
-                                                NINGÚN DAÑO DIRECTO, INDIRECTO, ACCESORIO, ESPECIAL, EMERGENTE O PUNITIVO, INCLUIDOS,
-                                                ENTRE OTROS, LOS DAÑOS Y PERJUICIOS POR PÉRDIDA DE BENEFICIOS, DE REPUTACIÓN COMERCIAL,
-                                                DE USO, DE DATOS U OTRAS PÉRDIDAS INTANGIBLES (AUN CUANDO EL PROPIETARIO HAYA SIDO NOTIFICADO
-                                                DE LA POSIBILIDAD DE DICHOS DAÑOS Y PERJUICIOS) EN RELACIÓN CON EL SOFTWARE, <br></br>incluidos, por ejemplo:
-                                            </p>
-                                            <ul className="list-group">
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp;&nbsp;<p>el uso o la imposibilidad de uso del Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i>&nbsp; &nbsp; <p>el costo de adquisición de productos o servicios alternativos derivado de la compra u obtención de productos, datos, información o servicios o de mensajes recibidos o transacciones realizadas desde o a través del Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p> el acceso no autorizado a sus transmisiones o datos o la alteración de dichas transmisiones o datos;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>declaraciones o conducta de terceros en relación con el Software;</p></li>
-                                                <li class="list-summery  "> <i class="fa fa-dot-circle-o list-summer-icon " aria-hidden="true"></i> &nbsp; &nbsp;<p>o cualquier otro asunto que se relacione con el Software. </p></li>
-                                            </ul>
-                                            <p>El Propietario se reserva el derecho de modificar en cualquier momento y
-                                                periódicamente o de discontinuar temporal o definitivamente el Software
-                                                (o cualquier parte del Software) con o sin aviso. El Propietario no será
-                                                responsable ante usted ni ante un tercero por ninguna modificación,
-                                                cambio de precio, suspensión o discontinuidad del Software.  </p>
-                                        </p>
-
-                                        <p>
-                                            <h4 className="UserTitle">Disposiciones varias </h4>
-                                            <div className="rounded-list list-group">
-                                                <ol className="list-group">
-                                                    <li class=""> &nbsp;&nbsp;<p>Si configura el Software para que funcione con una o más cuentas en el sitio web <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> o con una instancia de QAT Desktop, el uso que haga del Software también se regirá por las Condiciones de servicio del sitio web <a href="QuantificationAnalytics.org" target=" /blank">QuantificationAnalytics.org</a> o el contrato de licencia aplicable a su instancia de QAT Desktop. </p>
+                                                    <li> 
+                                                        facilitates illegal activity;  
                                                     </li>
-                                                    <li class=" ">&nbsp; &nbsp; <p>El hecho de que QAT no ejerza o no aplique alguno de los derechos o disposiciones contenidos en el presente EULA no constituirá la renuncia a dicho derecho o disposición. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>El presente EULA constituye todo el acuerdo entre usted y el
-                                                        Propietario, y rige el uso que usted haga del Software, y reemplaza a los acuerdos anteriores
-                                                        entre usted y el Propietario (incluidas, entre otras, las versiones anteriores del EULA),
-                                                        sujeto a todos los términos, condiciones y obligaciones entre el Propietario y el usuario.
-                                                        Asimismo, usted acepta indemnizar en forma plena y completa al Propietario por todas y
-                                                        cada una de las reclamaciones, individuales y en conjunto, por daños y perjuicios que
-                                                        pudieran presentarse contra el Propietario respecto de las condiciones mencionadas
-                                                        anteriormente en esta cláusula o que surjan de ellas (Incorporaciones mediante referencia:
-                                                        Capítulo 318 del Sistema automatizado de directivas (ADS, por sus siglas en inglés) sobre Derechos de propiedad intelectual). </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Usted acepta que el presente EULA y el uso que usted haga del Software se rigen de conformidad con las leyes del Distrito de Columbia y que toda disputa relacionada con el Software debe ser presentada ante un tribunal con competencia jurisdiccional ubicado en Washington D. C. o en sus inmediaciones. </p></li>
-                                                    <li class=" "> &nbsp; &nbsp;<p>Envíe sus preguntas sobre el presente EULA a <a href="support@QAT.org">support@QAT.org</a></p></li>
+                                                    <li>
+                                                        depicts sexually explicit images;  
+                                                    </li>
+                                                    <li>
+                                                        promotes unlawful violence;  
+                                                    </li>
+                                                    <li>
+                                                        is discriminatory based on race, gender, colour, religious belief, sexual orientation, disability; or  
+                                                    </li>
+                                                    <li>
+                                                        is otherwise illegal or causes damage or injury to any person or property,
+                                                    </li>
                                                 </ol>
-                                            </div>
+                                                and we reserve the right, on no less than thirty (30) days’ prior written notice to you, such notice specifying the   
+                                                breach of this section and requiring it to be remedied within the thirty (30) day period, to disable your access to   
+                                                the Platform for the duration of time that the breach remains unremedied.
+                                            </li>     
+                                        </ol>
+                                        <p>
+                                            3.3 Use of the Platform is subject to all export and technology laws. You agree to comply with all applicable local, state,   
+                                            national, and international laws, treaties, conventions, and regulations in connection with your use, including without   
+                                            limitation those related to data privacy, international communications, antitrust and competition, and the exportation   
+                                            of technical or personal data.
                                         </p>
                                         <p>
-                                            El inglés será la lengua vehicular del presente Contrato para todas y cada una de las cuestiones sustantivas y de procedimiento relacionadas con dicho Contrato, incluidas, entre otras, las discrepancias o incoherencias entre la redacción original en inglés y la traducción, en cuyo caso la versión en inglés será la que prevalezca.
+                                            3.4 The Platform may not be acquired for, provided to, or used or accessed within or by, or otherwise exported to:  
                                         </p>
-
-
-
-
+                                        <ol class="alpha-list">
+                                            <li>
+                                                any United States embargoed or proscribed country or its nationals; or
+                                            </li>
+                                            <li>
+                                                anyone on the United States Treasury Department’s list of Specially Designated Nations, the United States   
+                                                Department of Commerce’s Table of Denial Orders, or other similar list.
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            3.5 You certify that you are not on the U.S. Department of Commerce's Denied Persons List or affiliated lists or on the   
+                                            U.S. Department of Treasury's Specially Designated Nationals List. You agree to comply strictly with all U.S. export   
+                                            laws and assume sole responsibility for obtaining licenses to export or re-export as may be required. You are solely 
+                                            responsible for obtaining all licenses and permissions necessary related to the Partner Data.
+                                        </p>
+                                        <p>
+                                            3.6 You may use the Platform for as long as Chemonics (or such third party as authorised by Chemonics) makes it   
+                                            available to you pursuant to the License.
+                                        </p>  
+                                        <h4 className="UserTitle">4. CONFIDENTIAL INFORMATION</h4>
+                                        <p>
+                                            4.1 Notwithstanding the foregoing obligations of confidentiality, you may disclose Confidential Information to a third   
+                                            party, provided that the third party is also an Authorised User who has permission to access the same Confidential   
+                                            Information in accordance with the Data Use Rights, and otherwise strictly in accordance with the terms and   
+                                            conditions contained herein.  
+                                        </p>
+                                        <h4 className="UserTitle">5. INTELLECTUAL PROPERTY RIGHTS</h4>
+                                        <p>
+                                            5.1 You acknowledge that:
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                all intellectual property rights in the Platform and the Platform Data anywhere in the world belong to us or our   
+                                                licensors, that rights in the Platform are licensed (not sold) to you, and that you have no rights in, or to, the   
+                                                Platform other than the right to use it strictly in accordance with the terms of this License; and
+                                            </li>
+                                            <li>
+                                                you have no right to have access to any Software in source code form.
+                                            </li>
+                                        </ol>
+                                        <p>
+                                        5.2 All intellectual property rights in the Partner Data belong to you. When you submit or otherwise make the Partner   
+                                        Data available on the Platform:
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                you agree that Chemonics, may, on a worldwide basis and free of charge, access and use the Partner Data in   
+                                                accordance with the terms and conditions herein and as otherwise specified in the Data Use Rights Table for the   
+                                                respective, applicable Platform User Role Type. Chemonics shall not access or use the Partner Data in any   
+                                                manner other than as provided in this License. You further acknowledge and agree that the Partner Data may be:
+                                                <ol class="roman-list">
+                                                    <li>
+                                                        accessed, used and processed by Chemonics, the Governance Council, and strategic partners, ;
+                                                    </li>
+                                                    <li>
+                                                        transferred outside of the country or other jurisdiction where you are located; and  
+                                                    </li>
+                                                </ol>
+                                                solely for the purpose of delivering the Platform and Support Services.
+                                            </li>
+                                            <li>
+                                                you represent and warrant that you:
+                                                <ol class="roman-list">
+                                                    <li>
+                                                        have all necessary right, title, interest, and licenses to upload the Partner Data and make it available to   
+                                                        Chemonics, the Governance Council, strategic partners, and other users for their use in accordance with   
+                                                        the terms and conditions herein; and
+                                                    </li>
+                                                    <li>
+                                                        will undertake best efforts not to (or permit the) upload, post, or otherwise transmit or publish through   
+                                                        the Platform any content or any other materials whatsoever which:
+                                                        <ol class="alpha-dot">
+                                                            <li>
+                                                                are (or have the potential to be) defamatory, obscene, invasive to another person’s privacy or   
+                                                                protected data, or tortious;
+                                                            </li>
+                                                            <li>
+                                                                infringe upon any intellectual property rights, including any patent, trademark, trade secret,   
+                                                                copyright, or right of publicity;
+                                                            </li>
+                                                            <li>
+                                                                contain any software viruses or any other harmful computer code, files, or programs, including   
+                                                                any designed to interrupt, destroy, or limit the functionality of any computer software or hardware   
+                                                                or telecommunications equipment; or
+                                                            </li>
+                                                            <li>
+                                                                violate any applicable license, law, or contractual or fiduciary duty or provision, including by   
+                                                                exercise of the rights you grant to Chemonics, any Governance Council member, or other users 
+                                                                of the Platform.
+                                                            </li>
+                                                        </ol>
+                                                    </li>
+                                                </ol>
+                                            </li>
+                                        </ol>
+                                        <h4 className="UserTitle">6. LIMITED WARRANTY</h4>
+                                        <p>
+                                            6.1 We warrant that provided, and for as long as, you receive Support Services:
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>  
+                                                the Support Services and Software will, when properly used and on an operating system for which it was   
+                                                designed, perform substantially in accordance with the functions described in the Documents; and  
+                                            </li>
+                                            <li>
+                                                that the Documents correctly describe the operation of the Support Services and Software in all material   
+                                                respects,
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            6.2 If you notify us in writing of any defect or fault in the Platform as a result of which it fails to perform substantially   
+                                            in accordance with the Documents, we will, at our sole option, either repair or replace the Platform, Software and/or   
+                                            Support Services, provided that you make available all the information that may be necessary to help us to remedy   
+                                            the defect or fault, including sufficient information to enable us to recreate the defect or fault.
+                                        </p>  
+                                        <p>
+                                            6.3 The warranty does not apply:
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>  
+                                                if the defect or fault in the Platform results from you having accessed or used the Platform in breach of the   
+                                                terms of this License; and
+                                            </li>
+                                            <li>
+                                                the Events Outside of Our Control.  
+                                            </li>  
+                                        </ol>
+                                        <h4 className="UserTitle">7. LIMITATION OF LIABILITY </h4> 
+                                        <p>
+                                            7.1 You accept responsibility for the selection of the services delivered via the Platform to achieve your intended results   
+                                            and acknowledge that the Platform has not been developed or designed to meet or support any individual requirements   
+                                            you have, including any particular cybersecurity requirements you might be subject to, or any regulated activity that   
+                                            you may be engaged in, including the provision of an online intermediation service, an online search engine or service   
+                                            that facilitates online interaction between users (such as, but not limited to, a social media platform) (each a <b>Regulated   
+                                            Activity</b>). If you use the Platform for any Regulated Activity you agree to comply with any requirements that apply   
+                                            to such Regulated Activity from time to time (including in any jurisdiction in which you operate or where the   
+                                            Regulated Activity is undertaken) and you shall defend, indemnify and hold us harmless against any loss or damage   
+                                            (including regulatory fines or penalties) costs (including legal fees) and expenses which we may suffer or incur as a   
+                                            result of your breach of this section 7.1.
+                                        </p>
+                                        <p>  
+                                            7.2 We only supply the Platform for internal use by your business, and you agree not to use the Platform for any resale   
+                                            purposes.
+                                        </p>
+                                        <p>
+                                            7.3 We shall not in any circumstances whatever be liable to you, whether in contract, tort (including negligence), breach   
+                                            of statutory duty, or otherwise, arising under or in connection with the License for:  
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>  
+                                                loss of profits, sales, business, or revenue;
+                                            </li>
+                                            <li>  
+                                                business interruption;  
+                                            </li>
+                                            <li>
+                                                loss of anticipated savings;  
+                                            </li>
+                                            <li>
+                                                wasted expenditure;  
+                                            </li>
+                                            <li>
+                                                loss or corruption of data or information; 
+                                            </li>
+                                            <li> 
+                                                loss of business opportunity, goodwill or reputation, 
+                                            </li>
+                                            <li> 
+                                                where any of the losses set out in section 7.3(a) to section 7.3(f) are direct or indirect; or
+                                            </li>
+                                            <li>
+                                                any special, indirect or consequential loss, damage, charges or expenses.  
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            7.4 You accept and acknowledge that we are providing the Platform free of any financial consideration. Other than the   
+                                            losses set out in section 7.3 (for which we are not liable), our maximum aggregate liability under or in connection   
+                                            with this License whether in contract, tort (including negligence) or otherwise, shall in all circumstances be limited   
+                                            to $25,000. This maximum cap does not apply to section 7.5.
+                                        </p>
+                                        <p>  
+                                            7.5 Nothing in this License shall limit or exclude our liability for: 
+                                        </p> 
+                                        <ol class="alpha-list">
+                                            <li>
+                                                death or personal injury resulting from our negligence;
+                                            </li>
+                                            <li>  
+                                                fraud or fraudulent misrepresentation; or  
+                                            </li>
+                                            <li>
+                                                any other liability that cannot be excluded or limited by English law.  
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            7.6 This License sets out the full extent of our obligations and liabilities in respect of the supply of the Platform. Except   
+                                            as expressly stated in this License, there are no sections, warranties, representations or other terms, express or implied,   
+                                            that are binding on us. Any provision, warranty, representation or other term concerning the supply of services and   
+                                            Documents which might otherwise be implied into, or incorporated in, this License whether by statute, common law   
+                                            or otherwise, is excluded to the fullest extent permitted by law.  
+                                        </p>
+                                        <h4 className="UserTitle">8. TERMINATION</h4>  
+                                        <p>
+                                            8.1 We may terminate this License immediately by written notice if you:  
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                (or any of your group companies, associates or suppliers) do anything which brings (or has the potential to   
+                                                bring) us, the Platform or the Governance Council into disrepute;  
+                                            </li>
+                                            <li>
+                                                become insolvent, have appointed a receiver, administrative receiver or administrator of the whole or any part   
+                                                of its assets or business, make any composition or arrangement with your creditors, or are the subject of a   
+                                                resolution passed for the dissolution or liquidation (other than for the purpose of solvent amalgamation or   
+                                                reconstruction) of your business; or  
+                                            </li>
+                                            <li>
+                                                commit a material or persistent breach of any term or terms of this License which you fail to remedy (if   
+                                                remediable) within 14 days after the service of written notice requiring you to do so.  
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            8.2 On termination of this License for any reason:  
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                all rights granted to you under this License shall immediately cease;  
+                                            </li>
+                                            <li>
+                                                you must immediately cease all activities authorised by this License; and  
+                                            </li>
+                                            <li>
+                                                you must immediately and permanently delete or disable interfaces to the Platform from all computer   
+                                                equipment in your possession, and immediately and irreversibly destroy, delete or return to us (at our sole   
+                                                option) all copies of the Documents and Software then in your possession, custody or control and, in the case   
+                                                of destruction or deletion, certify to us that you have done so within ten (10) calendar days.  
+                                            </li>
+                                        </ol>
+                                        <h4 className="UserTitle">9. AMENDMENTS TO THIS LICENSE</h4>  
+                                        <p>
+                                            9.1 We may update the terms of this License at any time on notice to you in accordance with this section 9. Your continued   
+                                            use of the Platform following the deemed receipt and service of the notice under section 9.3 shall constitute your   
+                                            acceptance to the terms of this License, as varied. If you do not wish to accept the terms of the License (as varied)   
+                                            you must immediately stop using and accessing the Platform on the deemed receipt and service of the notice.  
+                                        </p>
+                                        <p>
+                                            9.2 If we have to contact you, we will do so by email you provided in accordance with your user account.
+                                        </p>
+                                        <p>
+                                            9.3 Any notice:
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                given by us to you will be deemed received and properly served 24 hours after it is first posted on our website, 24   
+                                                hours after an email is sent, or three days after the date of posting of any letter; and  
+                                            </li>
+                                            <li>
+                                                given by you to us will be deemed received and properly served 24 hours after an email is sent, or three days after the   
+                                                date of posting of any letter.  
+                                            </li>
+                                        </ol>
+                                        <p>
+                                            9.4 In proving the service of any notice, it will be sufficient to prove, in the case of posting on our website, that the website   
+                                            was generally accessible to the public for a period of 24 hours after the first posting of the notice; in the case of a   
+                                            letter, that such letter was properly addressed, stamped and placed in the post to the address of the recipient given for   
+                                            these purposes; and, in the case of an email, that such email was sent to the email address of the recipient given for   
+                                            these purposes.
+                                        </p>  
+                                        <h4 className="UserTitle">10. EVENTS OUTSIDE OUR CONTROL </h4>  
+                                        <p>
+                                            10.1 Neither we (or the Governance Council) shall be liable or responsible for any failure to perform, or delay in   
+                                            performance of, any of our obligations under this License that is caused by an Event Outside Our Control. An   
+                                            Event Outside Our Control is defined below in section 10.2.  
+                                        </p>
+                                        <p>
+                                            10.2 An <b>Event Outside Our Control</b> means any act or event beyond our reasonable control, including without   
+                                            limitation failure of public or private telecommunications networks.  
+                                        </p>
+                                        <p>
+                                            10.3 If an Event Outside Our Control takes place that affects the performance of our obligations under this License:  
+                                        </p>
+                                        <ol class="alpha-list">
+                                            <li>
+                                                our obligations under this License will be suspended and the time for performance of our obligations will be   
+                                                extended for the duration of the Event Outside Our Control; and  
+                                            </li>
+                                            <li>
+                                                we will use our commercially reasonable endeavours to find a solution by which our obligations under this   
+                                                License may be performed despite the Event Outside Our Control.
+                                            </li>
+                                        </ol>  
+                                        <h4 className="UserTitle">11. HOW WE MAY USE YOUR PERSONAL INFORMATION </h4>   
+                                        <p>
+                                            11.1 We will carry out any processing of personal data in the course of providing the Platform and Support Services (if   
+                                            applicable) to You as a processor on Your behalf, in each case subject to the data processing terms found <a href="https://api.quantificationanalytics.org/file/qatDpa" target="_blank">here</a>, which   
+                                            are hereby incorporated into this License.
+                                        </p>
+                                        <p>  
+                                            11.2 To the extent We at any time act as a controller in respect of personal data of Your users or representatives processed   
+                                            by Us in connection with the Platform and Support Services (if applicable), We will process that personal data as   
+                                            controller as further explained in Chemonics' fair processing notice, which is available <a href="https://api.quantificationanalytics.org/file/qatPrivacyNotice" target="_blank">here</a> (<b>Privacy Notice</b>) and it   
+                                            is important that you read that information.
+                                        </p>
+                                        <p>
+                                            11.3 By accepting the terms of this License, you acknowledge that you have read and understood the terms of the   
+                                            Privacy Notice.
+                                        </p>  
+                                        <h4 className="UserTitle">12. OTHER IMPORTANT TERMS</h4>  
+                                        <p>
+                                            12.1 We may transfer our rights and obligations under this License to another organisation, but this will not affect   
+                                            your rights or our obligations under this License.  
+                                        </p>
+                                        <p>
+                                            12.2 You may only transfer your rights or your obligations under this License to another person if we agree in writing.  
+                                        </p>
+                                        <p>
+                                            12.3 This License and any document referred to in it constitutes the entire agreement between us and supersedes and   
+                                            extinguishes all previous and contemporaneous agreements, promises, assurances and understandings between   
+                                            us, whether written or oral, relating to its subject matter.  
+                                        </p>
+                                        <p>
+                                            12.4 You acknowledge that in entering into this License you do not rely on and shall have no remedies in respect of   
+                                            any statement, representation, assurance or warranty (whether made innocently or negligently) that is not set out   
+                                            in this License or any document expressly referred to in it.
+                                        </p>
+                                        <p>
+                                            12.5 You agree that you shall have no claim for innocent or negligent misrepresentation or negligent misstatement   
+                                            based on any statement in this License or any document expressly referred to in it.  
+                                        </p>
+                                        <p>
+                                            12.6 A waiver of any right or remedy is only effective if given in writing and shall not be deemed a waiver of any   
+                                            subsequent right or remedy.  
+                                        </p>
+                                        <p>
+                                            12.7 A delay or failure to exercise, or the single or partial exercise of, any right or remedy does not waive that or any   
+                                            other right or remedy, nor does it prevent or restrict the further exercise of that or any other right or remedy.  
+                                        </p>
+                                        <p>
+                                            12.8 Each provision of this License operates separately. If any court or competent authority decides that any of them   
+                                            are unlawful or unenforceable, the remaining provisions shall remain in full force and effect.
+                                        </p>
+                                        <p>
+                                            12.9 This License, its subject matter and its formation (and any non-contractual disputes or claims) shall be governed   
+                                            and construed under the laws of the District of Columbia. All disputes shall be resolved by arbitration   
+                                            administered by the American Arbitration Association in accordance with its Commercial Arbitration Rules.   
+                                            Arbitration shall be conduced in Washington, DC. Arbitrators shall be empowered to award only direct damages   
+                                            consistent with the terms of this Agreement. Each party shall bear its own cost of arbitration, including attorneys’   
+                                            fees and experts’ fees. An arbitration decision shall be final and judgment may be entered upon it in accordance   
+                                            with applicable law in any court having jurisdiction. 
+                                        </p>
                                     </div>
                                 </Col><br />
                             </CardBody>
