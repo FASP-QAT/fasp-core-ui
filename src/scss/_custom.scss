@@ -7884,6 +7884,36 @@ h6 {
   color: #20a8d8;
 }
 
+.UserTitleH2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #20a8d8;
+}
+
+.alpha-list {
+  list-style-type: lower-alpha;
+}
+
+.alpha-list li::marker {
+  content: "(" counter(list-item, lower-alpha) ") ";
+}
+
+.roman-list {
+  list-style-type: lower-roman;
+}
+
+.roman-list li::marker {
+  content: "(" counter(list-item, lower-roman) ") ";
+}
+
+.alpha-dot {
+  list-style-type: upper-alpha !important;
+}
+
+.alpha-dot li::marker {
+  content: counter(list-item, upper-alpha) ". ";
+}
+
 /* list */
 .rounded-list ol {
   counter-reset: li;
