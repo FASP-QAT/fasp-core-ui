@@ -2338,7 +2338,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     }
                 }
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                    var budget = elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" ? elInstance.getValueFromCoords(17, y, true) : "";
+                    var budget = elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() ? elInstance.getValueFromCoords(17, y, true) : "";
                     var valid = checkValidtion("text", "R", y, budget, elInstance);
                     var procurementAgent = rowData[7];
                     var fundingSource = rowData[16];
@@ -2382,7 +2382,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
         if (x == 17) {
             var value = rowData[4];
             if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS) {
-                var budget = elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" ? elInstance.getValueFromCoords(17, y, true) : "";
+                var budget = elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() ? elInstance.getValueFromCoords(17, y, true) : "";
                 var valid = checkValidtion("text", "R", y, budget, elInstance);
                 if (valid == false) {
                     elInstance.setValueFromCoords(35, y, 1, true);
@@ -3980,7 +3980,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
                 if (validation == true) {
                     if (rowData[4] == SUBMITTED_SHIPMENT_STATUS || rowData[4] == ARRIVED_SHIPMENT_STATUS || rowData[4] == SHIPPED_SHIPMENT_STATUS || rowData[4] == DELIVERED_SHIPMENT_STATUS || rowData[4] == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
-                        var budget = elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" ? elInstance.getValueFromCoords(17, y, true) : "";
+                        var budget = elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() ? elInstance.getValueFromCoords(17, y, true) : "";
                         var v = checkValidtion("text", "R", y, budget, elInstance);
                         if (v == false) {
                             valid = false;
@@ -4003,7 +4003,7 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                     } else {
                         positiveValidation("R", y, elInstance);
                     }
-                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(40, y, true) != elInstance.getValue(`X${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
+                    if (elInstance.getValueFromCoords(17, y, true) != "" && elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined" && map.get("18") != "" && map.get("4") != CANCELLED_SHIPMENT_STATUS && map.get("33").toString() != "false" && map.get("0").toString() != "false" && elInstance.getValueFromCoords(40, y, true) != elInstance.getValue(`X${parseInt(y) + 1}`, true).toString().replaceAll("\,", "")) {
                         var budget = this.state.budgetListAll.filter(c => c.id == map.get("17"))[0]
                         var totalBudget = budget.budgetAmt * budget.currency.conversionRateToUsd;
                         var usedBudget = budget.usedUsdAmt;
@@ -4174,14 +4174,14 @@ export default class ShipmentsInSupplyPlanComponentForDataEntry extends React.Co
                 }
                 var value = rowData[4];
                 if (value == SUBMITTED_SHIPMENT_STATUS || value == ARRIVED_SHIPMENT_STATUS || value == SHIPPED_SHIPMENT_STATUS || value == DELIVERED_SHIPMENT_STATUS || value == APPROVED_SHIPMENT_STATUS && json[y][1].toString() == "false") {
-                    var budget = elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" ? elInstance.getValueFromCoords(17, y, true) : "";
+                    var budget = elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() ? elInstance.getValueFromCoords(17, y, true) : "";
                     var validation = checkValidtion("text", "R", y, budget, elInstance);
                     if (validation == false) {
                         valid = false;
                         elInstance.setValueFromCoords(35, y, 1, true);
                     }
-                } else if (value == PLANNED_SHIPMENT_STATUS && elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined") {
-                    var budget = elInstance.getValueFromCoords(17, y, true) != "SELECT" && elInstance.getValueFromCoords(17, y, true) != "Select" ? elInstance.getValueFromCoords(17, y, true) : "";
+                } else if (value == PLANNED_SHIPMENT_STATUS && elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() && elInstance.getValueFromCoords(17, y, true) != undefined && elInstance.getValueFromCoords(17, y, true) != "undefined") {
+                    var budget = elInstance.getValueFromCoords(17, y, true).toString().toLowerCase()!=(i18n.t("static.common.select")).toString().toLowerCase() ? elInstance.getValueFromCoords(17, y, true) : "";
                     var validation = checkValidtion("text", "R", y, budget, elInstance);
                     if (validation == false) {
                         valid = false;
