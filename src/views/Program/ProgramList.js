@@ -139,6 +139,7 @@ export default class ProgramList extends Component {
    */
   buildJExcel() {
     let programList = this.state.selProgram;
+    if(programList!=undefined){
     programList.sort((a, b) => {
       var itemLabelA = getLabelText(
         a.program.label,
@@ -280,6 +281,7 @@ export default class ProgramList extends Component {
       languageEl: languageEl,
       loading: false,
     });
+  }
   }
   /**
    * Redirects to the edit program screen on row click.
