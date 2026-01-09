@@ -141,9 +141,10 @@ class CountrySpecificPrices extends Component {
             .then(response => {
                 var proList = []
                 var programIds=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
+                var programIdsView=AuthenticationService.getProgramListBasedOnBusinessFunction('ROLE_BF_VIEW_COUNTRY_SPECIFIC_PRICES')
                 for (var i = 0; i < response.data.length; i++) {
                     if (response.data[i].active == true) {
-                        if(programIds.includes(response.data[i].id)){
+                        if((programIds.includes(response.data[i].id)) || (programIdsView.includes(response.data[i].id))){
                         var programJson = {
                             programId: response.data[i].id,
                             label: response.data[i].label,
@@ -606,6 +607,7 @@ class CountrySpecificPrices extends Component {
                         type: 'dropdown',
                         width: 150,
                         source: programList,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.product.product'),
@@ -613,13 +615,15 @@ class CountrySpecificPrices extends Component {
                         width: 150,
                         source: planningUnitList,
                         filter: this.filterProgramPU,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.report.procurementAgentName'),
                         type: 'autocomplete',
                         source: this.state.procurementAgentArr,
                         filter: this.filterProgram,
-                        width: 150
+                        width: 150,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.program.airfreightperc') + " (%)",
@@ -627,7 +631,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.realmcountry.seaFreightPercentage') + " (%)",
@@ -635,7 +640,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.program.roadfreightperc') + " (%)",
@@ -643,7 +649,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.program.planleadtime'),
@@ -651,7 +658,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.program.submittoapproveleadtime'),
@@ -659,7 +667,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.program.approvetoshipleadtime'),
@@ -667,7 +676,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.realmcountry.shippedToArrivedAirLeadTime'),
@@ -675,7 +685,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.realmcountry.shippedToArrivedSeaLeadTime'),
@@ -683,7 +694,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.realmcountry.shippedToArrivedRoadLeadTime'),
@@ -691,7 +703,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.realmcountry.arrivedToDeliveredLeadTime'),
@@ -699,7 +712,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.product.localProcurementAgentLeadTime'),
@@ -707,7 +721,8 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.forecastReport.unitPrice'),
@@ -715,11 +730,13 @@ class CountrySpecificPrices extends Component {
                         textEditor: true,
                         decimal: '.',
                         mask: '#,##.00',
-                        disabledMaskOnEdition: true
+                        disabledMaskOnEdition: true,
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: i18n.t('static.checkbox.active'),
-                        type: 'checkbox'
+                        type: 'checkbox',
+                        readonly: !AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')
                     },
                     {
                         title: 'programPlanningUnitId',
@@ -761,8 +778,10 @@ class CountrySpecificPrices extends Component {
                             var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
                             cell1.classList.add('readonly');
                         } else {
-                            var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
-                            cell1.classList.remove('readonly');
+                            if(AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES')){
+                                var cell1 = elInstance.getCell(`O${parseInt(y) + 1}`)
+                                cell1.classList.remove('readonly');
+                            }
                         }
                         if (rowData[17] > 0) {
                             var cell1 = elInstance.getCell(`A${parseInt(y) + 1}`)
@@ -1587,7 +1606,7 @@ class CountrySpecificPrices extends Component {
                     { label: (item.programCode), value: item.programId }
                 )
             }, this);
-
+            console.log("Programs",programs);
         const { planningUnitList } = this.state;
         let planningUnits = planningUnitList.length > 0
             && planningUnitList.map((item, i) => {
@@ -1686,7 +1705,7 @@ class CountrySpecificPrices extends Component {
                             <FormGroup>
                                 <Button type="button" size="md" color="danger" className="float-right mr-1" onClick={this.cancelClicked}><i className="fa fa-times"></i> {i18n.t('static.common.cancel')}</Button>
                                 {this.state.changed && <Button type="submit" size="md" color="success" onClick={this.formSubmit} className="float-right mr-1" ><i className="fa fa-check"></i>{i18n.t('static.common.submit')}</Button>}
-                                <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>
+                                {AuthenticationService.checkUserACL(this.state.programValues.map(c=>c.value.toString()),'ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && <Button color="info" size="md" className="float-right mr-1" type="button" onClick={() => this.addRow()}> <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}</Button>}
                                 &nbsp;
                             </FormGroup>
                         </CardFooter>
