@@ -317,10 +317,10 @@ class Login extends Component {
                 </div>
               </Col>
               <Col md="12">
-                {/* <div className="upper-logo logo-MarginTop"> */}
-                  {/* <img src={image1} className="img-fluid " /> */}
-                {/* </div> */}
-                <Row className='pb-lg-5'>
+                <div className="upper-logo logo-MarginTop">
+                  <img src={image1} className="img-fluid " />
+                </div>
+                {/* <Row className='pb-lg-5'>
                   <Col md="4">
                     <div className="upper-logo logo-MarginTop">
                       <img src={image1} className="img-fluid " />
@@ -338,7 +338,7 @@ class Login extends Component {
                       }
                     </div>
                   </Col>
-                </Row>
+                </Row> */}
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
