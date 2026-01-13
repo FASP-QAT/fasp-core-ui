@@ -551,18 +551,18 @@ class EditSupplyPlanStatus extends Component {
                 this.el.setComments(col, "");
             }
         }
-        if (x == 22) {
-            var col = ("W").concat(parseInt(y) + 1);
-            var reg = /^[^'"\\]+$/;
-            if (!reg.test(rowData1[22])) {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setStyle(col, "background-color", "yellow");
-                this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
-            } else {
-                this.el.setStyle(col, "background-color", "transparent");
-                this.el.setComments(col, "");
-            }
-        }
+        // if (x == 22) {
+        //     var col = ("W").concat(parseInt(y) + 1);
+        //     var reg = /^[^'"\\]+$/;
+        //     if (!reg.test(rowData1[22])) {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setStyle(col, "background-color", "yellow");
+        //         this.el.setComments(col, i18n.t("static.label.someSpecialCaseNotAllowed"));
+        //     } else {
+        //         this.el.setStyle(col, "background-color", "transparent");
+        //         this.el.setComments(col, "");
+        //     }
+        // }
         if (problemList.length > 0) {
             if (x == 11) {
                 if (problemList[0].problemStatus.id != value) {
