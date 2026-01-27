@@ -1134,7 +1134,7 @@ export default class syncPage extends Component {
           }
         }
       }
-      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
+      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0)));
       shipmentData.map((item, index) => {
         if (item.erpFlag.toString() == "true") {
           shipmentData[index].active = false;
