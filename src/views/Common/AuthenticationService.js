@@ -865,7 +865,7 @@ class AuthenticationService {
                     case "/programProduct/addCountrySpecificPrice":
                     case "/programProduct/addCountrySpecificPrice/:planningUnitId/:programId":
                     case "/programProduct/addCountrySpecificPrice/1/:colour/:message":
-                        if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES")) {
+                        if (bfunction.includes("ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES") || bfunction.includes("ROLE_BF_VIEW_COUNTRY_SPECIFIC_PRICES")) {
                             return true;
                         }
                         break;
