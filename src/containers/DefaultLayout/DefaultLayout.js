@@ -1691,7 +1691,7 @@ class DefaultLayout extends Component {
                               url: '/programProduct/addCountrySpecificPrice',
                               icon: 'fa fa-cubes',
                               attributes: {
-                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') && this.state.activeTab == 2) ? false : true),
+                                hidden: (((this.state.businessFunctions.includes('ROLE_BF_MAP_COUNTRY_SPECIFIC_PRICES') || this.state.businessFunctions.includes('ROLE_BF_VIEW_COUNTRY_SPECIFIC_PRICES')) && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }
