@@ -18,7 +18,7 @@ import { getDatabase } from '../../CommonComponent/IndexedDbFunctions.js';
 import { jExcelLoadedFunction, jExcelLoadedFunctionForErp, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { filterOptions, generateRandomAplhaNumericCode, hideFirstComponent, hideSecondComponent, paddingZero } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, BATCH_PREFIX, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
+import { API_URL, BATCH_PREFIX, CONSTANT_FOR_TEMP_SHIPMENT, DATE_FORMAT_CAP, DATE_FORMAT_CAP_WITHOUT_DATE, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DATE_FORMAT_WITHOUT_DATE, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, NONE_SELECTED_DATA_SOURCE_ID, PROGRAM_TYPE_SUPPLY_PLAN, PSM_PROCUREMENT_AGENT_ID, SECRET_KEY, SHIPMENT_ID_ARR_MANUAL_TAGGING, SHIPMENT_MODIFIED, STRING_TO_DATE_FORMAT, TBD_FUNDING_SOURCE, USD_CURRENCY_ID } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService.js';
 import FundingSourceService from '../../api/FundingSourceService';
 import ManualTaggingService from '../../api/ManualTaggingService.js';
@@ -690,13 +690,13 @@ export default class ManualTagging extends Component {
             var rowData = json[y];
             if (rowData[14] == 0) {
                 var col = ("L").concat(parseInt(y) + 1);
-                if (this.el.getValueFromCoords(0, y)) {
+                if (this.el.getValueFromCoords(10, y)) {
                 } else {
                     this.el.setStyle(col, "background-color", "transparent");
                     this.el.setComments(col, "");
                 }
                 var col = ("J").concat(parseInt(y) + 1);
-                if (this.el.getValueFromCoords(0, y)) {
+                if (this.el.getValueFromCoords(10, y)) {
                     var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
@@ -2667,7 +2667,7 @@ export default class ManualTagging extends Component {
                         for (var sl = 0; sl < shipmentList.length; sl++) {
                             var arr = [];
                             var list = (fullShipmentList.filter(c => shipmentList[sl].parentShipmentId == 0 ? shipmentList[sl].tempParentShipmentId != null && c.tempParentLinkedShipmentId == shipmentList[sl].tempParentShipmentId : shipmentList[sl].parentShipmentId != null && c.parentLinkedShipmentId == shipmentList[sl].parentShipmentId)).map(item => {
-                                arr.push(item.shipmentId)
+                                arr.push(item.shipmentId!=0?item.shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+item.tempShipmentId))
                             });
                             shipmentList[sl].parentShipmentIdArr = arr;
                             var lsf = linkedShipmentsList.filter(c => shipmentList[sl].shipmentId > 0 ? c.childShipmentId == shipmentList[sl].shipmentId : c.tempChildShipmentId == shipmentList[sl].tempShipmentId);
@@ -3060,7 +3060,7 @@ export default class ManualTagging extends Component {
                         data1 = []
                         data1[0] = list[i].shipmentId > 0 ? (shipmentListArr.includes(list[i].shipmentId) ? true : false) : (tempShipmentListArr.includes(list[i].tempShipmentId) ? true : false);
                         data1[1] = getLabelText(list[i].planningUnit.label, this.state.lang);
-                        data1[2] = list[i].shipmentId;
+                        data1[2] = list[i].shipmentId!=0?list[i].shipmentId:CONSTANT_FOR_TEMP_SHIPMENT+list[i].tempShipmentId;
                         data1[3] = list[i].procurementAgent.code
                         data1[4] = list[i].orderNo;
                         data1[5] = getLabelText(list[i].realmCountryPlanningUnit.label, this.state.lang)
@@ -3098,7 +3098,7 @@ export default class ManualTagging extends Component {
                             },
                             {
                                 title: i18n.t('static.commit.qatshipmentId'),
-                                type: 'numeric',
+                                type: 'text',
                                 readOnly: true,
                                 width: 80
                             },
@@ -3499,7 +3499,7 @@ export default class ManualTagging extends Component {
                 data = [];
                 if (this.state.active1) {
                     data = [];
-                    data[0] = manualTaggingList[j].shipmentId
+                    data[0] = manualTaggingList[j].shipmentId!=0?manualTaggingList[j].shipmentId:CONSTANT_FOR_TEMP_SHIPMENT+manualTaggingList[j].tempShipmentId;
                     data[1] = manualTaggingList[j].shipmentTransId
                     data[2] = getLabelText(manualTaggingList[j].planningUnit.label, this.state.lang)
                     data[3] = manualTaggingList[j].receivedDate != "" && manualTaggingList[j].receivedDate != null && manualTaggingList[j].receivedDate != undefined && manualTaggingList[j].receivedDate != "Invalid date" ? manualTaggingList[j].receivedDate : manualTaggingList[j].expectedDeliveryDate;
@@ -3509,6 +3509,7 @@ export default class ManualTagging extends Component {
                     data[7] = manualTaggingList[j].shipmentQty
                     data[8] = manualTaggingList[j].notes
                     data[9] = manualTaggingList[j].shipmentId != 0 ? -1 : manualTaggingList[j].tempShipmentId;
+                    data[10] = manualTaggingList[j].shipmentId;
                     manualTaggingArray.push(data);
                 } else if (this.state.active2) {
                     data = [];
@@ -3516,8 +3517,9 @@ export default class ManualTagging extends Component {
                     let linkedShipmentsListForTab2 = this.state.versionId.toString().includes("Local") ? this.state.linkedShipmentsListForTab2.filter(c => manualTaggingList[j].shipmentId > 0 ? c.childShipmentId == manualTaggingList[j].shipmentId : c.tempChildShipmentId == manualTaggingList[j].tempShipmentId) : [manualTaggingList[j]];
                     var realmCountryPlanningUnitId = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].qatRealmCountryPlanningUnit.id : manualTaggingList[j].realmCountryPlanningUnit.id;
                     var rcpuForTable = rcpuList.filter(c => c.id == realmCountryPlanningUnitId);
+                    console.log("manualTaggingList[j] Test@123",manualTaggingList[j]);
                     data[0] = true;
-                    data[1] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) + " (" + manualTaggingList[j].childShipmentId : (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + manualTaggingList[j].shipmentId) + ")";
+                    data[1] = (!this.state.versionId.toString().includes("Local") ? (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].parentShipmentId + (manualTaggingList[j].parentLinkedShipmentId != "" && manualTaggingList[j].parentLinkedShipmentId != null ? ", " + manualTaggingList[j].parentLinkedShipmentId : "") : 0) + " (" + manualTaggingList[j].childShipmentId : (linkedShipmentsListForTab2.length > 0 ? (linkedShipmentsListForTab2[0].parentShipmentId!=0?linkedShipmentsListForTab2[0].parentShipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+linkedShipmentsListForTab2[0].tempParentShipmentId)) + (manualTaggingList[j].parentShipmentIdArr.length > 0 ? ", " + manualTaggingList[j].parentShipmentIdArr.toString() : "") : 0) + " (" + (manualTaggingList[j].shipmentId!=0?manualTaggingList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+manualTaggingList[j].tempShipmentId))) + ")";
                     data[2] = !this.state.versionId.toString().includes("Local") ? manualTaggingList[j].childShipmentId : manualTaggingList[j].shipmentId
                     data[3] = (linkedShipmentsListForTab2.length > 0 ? linkedShipmentsListForTab2[0].roNo + " - " + linkedShipmentsListForTab2[0].roPrimeLineNo : "") + " | " + (manualTaggingList[j].orderNo + " - " + manualTaggingList[j].primeLineNo) + (linkedShipmentsListForTab2.length > 0 && linkedShipmentsListForTab2[0].knShipmentNo != "" && linkedShipmentsListForTab2[0].knShipmentNo != null ? " | " + linkedShipmentsListForTab2[0].knShipmentNo : "");
                     data[4] = manualTaggingList[j].orderNo + " | " + manualTaggingList[j].primeLineNo
@@ -3579,7 +3581,7 @@ export default class ManualTagging extends Component {
                     columns: [
                         {
                             title: i18n.t('static.commit.qatshipmentId'),
-                            type: 'numeric',
+                            type: 'text',
                             width: 60,
                         },
                         {
@@ -3635,6 +3637,11 @@ export default class ManualTagging extends Component {
                             // title: 'A',
                             // type: 'text',
                             // visible: false
+                        },
+                        {
+                            title: "Shipment Id",
+                            type: 'hidden',
+                            width: 0,
                         },
                     ],
                     editable: false,
@@ -4248,15 +4255,15 @@ export default class ManualTagging extends Component {
                 if (this.state.active1
                     && this.state.versionId.includes("Local")
                 ) {
-                    row = this.state.outputList.filter(c => (this.el.getValueFromCoords(0, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(0, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
+                    row = this.state.outputList.filter(c => (this.el.getValueFromCoords(10, x) != 0 ? c.shipmentId == this.el.getValueFromCoords(10, x) : c.tempShipmentId == this.el.getValueFromCoords(9, x)))[0];
                     outputListAfterSearch.push(row);
                     var finalShipmentId = []
                     if (outputListAfterSearch[0].orderNo != null && outputListAfterSearch[0].orderNo != "") {
                         json = { id: outputListAfterSearch[0].orderNo, label: outputListAfterSearch[0].orderNo };
-                        finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty, "notes":outputListAfterSearch[0].notes })
+                        finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(10, x), "tempShipmentId": this.el.getValueFromCoords(10, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty, "notes":outputListAfterSearch[0].notes })
                     } else {
                         json = { id: '', label: '' };
-                        finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(0, x), "tempShipmentId": this.el.getValueFromCoords(0, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty, "notes":outputListAfterSearch[0].notes })
+                        finalShipmentId.push({ "shipmentId": this.el.getValueFromCoords(10, x), "tempShipmentId": this.el.getValueFromCoords(10, x) > 0 ? null : this.el.getValueFromCoords(9, x), "index": "", "qty": outputListAfterSearch[0].shipmentQty, "notes":outputListAfterSearch[0].notes })
                         buildJexcelRequired = false;
                     }
                     this.setState({
@@ -4272,7 +4279,7 @@ export default class ManualTagging extends Component {
                         finalShipmentId: finalShipmentId,
                         showAllShipments: false,
                         planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(10, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
                         procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
                         planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
                     }, () => {
@@ -4308,7 +4315,7 @@ export default class ManualTagging extends Component {
                 if (this.state.active3) {
                     this.setState({
                         planningUnitId: (this.state.active3 ? outputListAfterSearch[0].erpPlanningUnit.id : outputListAfterSearch[0].planningUnit.id),
-                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(0, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
+                        shipmentId: (this.state.active1 ? this.el.getValueFromCoords(10, x) : (this.state.active2 ? this.el.getValueFromCoords(1, x) : 0)),
                         procurementAgentId: (this.state.active3 ? 1 : outputListAfterSearch[0].procurementAgent.id),
                         planningUnitName: (this.state.active3 ? row.erpPlanningUnit.label.label_en + "(" + row.skuCode + ")" : row.planningUnit.label.label_en + '(' + row.skuCode + ')')
                     })
@@ -4902,7 +4909,14 @@ export default class ManualTagging extends Component {
                 sort: true,
                 align: 'center',
                 headerAlign: 'center',
-                style: { width: '20px' }
+                style: { width: '20px' },
+                formatter: (cell, row) => {
+                    // if shipmentId is 0, show tempShipmentId
+                    if (cell === 0 || cell === '0' || cell == null) {
+                        return CONSTANT_FOR_TEMP_SHIPMENT+row.tempShipmentId;
+                    }
+                    return cell;
+                }
             },
             {
                 dataField: 'procurementAgent.code',

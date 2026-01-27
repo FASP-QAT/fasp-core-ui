@@ -35,6 +35,7 @@ import {
   APPROVED_SHIPMENT_STATUS,
   ARRIVED_SHIPMENT_STATUS,
   CANCELLED_SHIPMENT_STATUS,
+  CONSTANT_FOR_TEMP_SHIPMENT,
   DATE_FORMAT_CAP_FOUR_DIGITS,
   DELIVERED_SHIPMENT_STATUS,
   DRAFT_SHIPMENT_STATUS,
@@ -384,7 +385,7 @@ class ShipmentSummery extends Component {
           getLabelText(re[item].planningUnit.label, this.state.lang)
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
-          re[item].shipmentId,
+          re[item].shipmentId!=0?re[item].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+re[item].tempShipmentId),
           re[item].emergencyOrder,
           re[item].erpOrder == true ? true : false,
           re[item].localProcurement,
@@ -652,7 +653,7 @@ class ShipmentSummery extends Component {
     let data;
     data = this.state.shipmentDetailsList.map((ele) => [
       getLabelText(ele.planningUnit.label, this.state.lang),
-      ele.shipmentId,
+      ele.shipmentId!=0?ele.shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ele.tempShipmentId),
       ele.emergencyOrder,
       ele.erpOrder == true ? true : false,
       ele.localProcurement,
@@ -1295,7 +1296,7 @@ class ShipmentSummery extends Component {
         shipmentDetailsList[j].planningUnit.label,
         this.state.lang
       );
-      data[1] = shipmentDetailsList[j].shipmentId;
+      data[1] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
       data[2] = shipmentDetailsList[j].emergencyOrder;
       data[3] = shipmentDetailsList[j].erpFlag;
       data[4] = shipmentDetailsList[j].localProcurement;
@@ -1349,7 +1350,7 @@ class ShipmentSummery extends Component {
         },
         {
           title: i18n.t("static.report.id"),
-          type: "numeric",
+          type: "text",
         },
         {
           title: i18n.t("static.supplyPlan.consideAsEmergencyOrder"),
@@ -2416,6 +2417,7 @@ class ShipmentSummery extends Component {
                     }
                     let json = {
                       shipmentId: planningUnitFilter[i].shipmentId,
+                      tempShipmentId: planningUnitFilter[i].tempShipmentId,
                       planningUnit:
                         planningUnit.length > 0
                           ? planningUnit[0]
