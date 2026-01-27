@@ -493,7 +493,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
-                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0)
+                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0)
                                                                             for (var fsl = 0; fsl < tempProblemActionListForShipments.length; fsl++) {
                                                                                 var tempFslShipmentId = tempProblemActionListForShipments[fsl].tempShipmentId
                                                                                 if (!tempShipmentIdsFromShipmnetList.includes(tempFslShipmentId)) {
@@ -502,7 +502,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         && c.program.id == programList[pp].generalData.programId
                                                                                         && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                        && c.tempShipmentId != 0 &&
+                                                                                        && c.tempShipmentId != 0 && c.shipmentId==0 &&
                                                                                         c.tempShipmentId == tempFslShipmentId);
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
@@ -520,7 +520,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
-                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0);
+                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0);
                                                                             for (var d = 0; d < tempProblemActionListForShipmentsIncompliance.length; d++) {
                                                                                 var tempFslShipmentIdInCompliance = tempProblemActionListForShipmentsIncompliance[d].tempShipmentId;
                                                                                 var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
@@ -528,7 +528,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.program.id == programList[pp].generalData.programId
                                                                                     && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.tempShipmentId != 0 &&
+                                                                                    && c.tempShipmentId != 0 && c.shipmentId==0 &&
                                                                                     c.tempShipmentId == tempFslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
@@ -717,7 +717,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
-                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0)
+                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0)
                                                                             for (var fsl = 0; fsl < tempProblemActionListForShipments.length; fsl++) {
                                                                                 var tempFslShipmentId = tempProblemActionListForShipments[fsl].tempShipmentId
                                                                                 if (!tempShipmentIdsFromShipmnetList.includes(tempFslShipmentId)) {
@@ -726,7 +726,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         && c.program.id == programList[pp].generalData.programId
                                                                                         && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                         && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                        && c.tempShipmentId != 0 &&
+                                                                                        && c.tempShipmentId != 0 && c.shipmentId==0 &&
                                                                                         c.tempShipmentId == tempFslShipmentId);
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
@@ -744,7 +744,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
-                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0);
+                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0);
                                                                             for (var d = 0; d < tempProblemActionListForShipmentsIncompliance.length; d++) {
                                                                                 var tempFslShipmentIdInCompliance = tempProblemActionListForShipmentsIncompliance[d].tempShipmentId;
                                                                                 var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
@@ -752,7 +752,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.program.id == programList[pp].generalData.programId
                                                                                     && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
-                                                                                    && c.tempShipmentId != 0 &&
+                                                                                    && c.tempShipmentId != 0 && c.shipmentId==0 &&
                                                                                     c.tempShipmentId == tempFslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
