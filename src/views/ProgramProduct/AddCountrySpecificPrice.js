@@ -952,7 +952,11 @@ class CountrySpecificPrices extends Component {
             if (z != data[i].y) {
                 var index = (instance).getValue(`Q${parseInt(data[i].y) + 1}`, true);
                 if (index === "" || index == null || index == undefined) {
+                    try{
                     (instance).setValueFromCoords(0, data[i].y, this.state.programPlanningUnit.program.label.label_en, true);
+                    }catch(err){
+                        
+                    }
                     // (instance).setValueFromCoords(1, data[i].y, this.state.programPlanningUnit.planningUnit.label.label_en, true);
                     (instance).setValueFromCoords(17, data[i].y, 0, true);
                     (instance).setValueFromCoords(18, data[i].y, 1, true);
