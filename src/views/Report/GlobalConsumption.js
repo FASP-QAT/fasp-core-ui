@@ -212,7 +212,7 @@ class GlobalConsumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.globalconsumption') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")" + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -243,7 +243,7 @@ class GlobalConsumption extends Component {
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")", doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -356,7 +356,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save(i18n.t('static.dashboard.globalconsumption').concat('.pdf'));
+    doc.save(i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")".concat('.pdf'));
   }
   /**
    * Handles the change event for countries.
@@ -1167,14 +1167,14 @@ class GlobalConsumption extends Component {
     const options = {
       title: {
         display: true,
-        text: i18n.t('static.dashboard.globalconsumption'),
+        text: i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")",
         fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+            labelString: i18n.t('static.report.consupmtionqty'),
             fontColor: fontColor
           },
           stacked: true,
@@ -1540,7 +1540,7 @@ class GlobalConsumption extends Component {
                           <Label
                             className="form-check-label"
                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                            {i18n.t('static.stockStatus.onlyShowPUsThatArePartOfAllPrograms')}
+                            {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
                           </Label>
                         </div>
                       </FormGroup>}
@@ -1593,7 +1593,7 @@ class GlobalConsumption extends Component {
                               <tr>
                                 <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
                                 <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty')} {i18n.t('static.report.inmillions')} </th>
+                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty')}</th>
                               </tr>
                             </thead>
                             <tbody>
