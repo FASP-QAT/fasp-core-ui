@@ -687,7 +687,7 @@ class GlobalConsumption extends Component {
   handleDisplayChange() {
     var viewByLabel = document.getElementById("viewById").selectedOptions[0].text.toString()
     this.setState({
-      viewByLabel: viewByLabel
+      viewByLabel: [viewByLabel]
     }, () => {
       this.filterData(this.state.rangeValue)
     })
@@ -704,6 +704,7 @@ class GlobalConsumption extends Component {
     let realmId = AuthenticationService.getRealmId()
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+    let versionId = this.state.programValues.length == 1 ? this.state.versionId : -1;
     if (realmId > 0 && this.state.countryValues.length > 0 && planningUnitIds.length > 0 && this.state.programValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
@@ -714,7 +715,8 @@ class GlobalConsumption extends Component {
         "planningUnitIds": planningUnitIds,
         "startDate": startDate,
         "stopDate": stopDate,
-        "viewBy": viewById
+        "viewBy": viewById,
+        "versionId": versionId
       }
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
@@ -926,7 +928,7 @@ class GlobalConsumption extends Component {
         planningUnitListAll: response.data.planningUnitList,
         planningUnitList: response.data.planningUnitList,
         planningUnitId: [],
-        stockStatusList: []
+        consumptions: []
       }, () => {
         if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
           var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
@@ -939,7 +941,7 @@ class GlobalConsumption extends Component {
     }).catch(
       error => {
         this.setState({
-          stockStatusList: [], loading: false
+          consumptions: [], loading: false
         })
         if (error.message === "Network Error") {
           this.setState({
@@ -999,7 +1001,7 @@ class GlobalConsumption extends Component {
       planningUnitList: planningUnitList,
       yaxisEquUnitLabel: [yaxisEquUnitLabel],
       planningUnitId: [],
-      stockStatusList: [],
+      consumptions: [],
       onlyShowAllPUs: false,
       // planningUnits: [],
       // planningUnitIds: [],
@@ -1031,6 +1033,11 @@ class GlobalConsumption extends Component {
       this.getDropdownLists();
     })
   }
+  handleBlur = (e) => {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    this.filterData(this.state.rangeValue);
+  }
+};
   setPlanningUnit(e) {
     if (this.state.yaxisEquUnit == -1) {
       var selectedText = e.map(item => item.label);
@@ -1063,10 +1070,10 @@ class GlobalConsumption extends Component {
           loading: false
         }, () => {
           if (this.state.planningUnitId.length > 0) {
-            this.filterData(this.state.rangeValue);
+            // this.filterData(this.state.rangeValue);
           } else {
             this.setState({
-              stockStatusList: [],
+              consumptions: [],
             })
           }
         })
@@ -1102,7 +1109,7 @@ class GlobalConsumption extends Component {
     } else {
       this.setState({
         planningUnitId: [],
-        stockStatusList: []
+        consumptions: []
       })
     }
   }
@@ -1493,7 +1500,7 @@ class GlobalConsumption extends Component {
                       </Label>
                       <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
                         <div className="controls">
-                          {this.state.yaxisEquUnit != -1 && <MultiSelect
+                          {this.state.yaxisEquUnit != -1 && <div onBlur={this.handleBlur}><MultiSelect
                             bsSize="sm"
                             name="planningUnitId"
                             id="planningUnitId"
@@ -1503,7 +1510,7 @@ class GlobalConsumption extends Component {
                             options={puList && puList.length > 0 ? puList : []}
                             hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
                             showCheckboxes={this.state.yaxisEquUnit == -1 ? false : true}
-                          />}
+                          /></div>}
                           {this.state.yaxisEquUnit == -1 && <InputGroup>
                             <Input
                               type="select"
