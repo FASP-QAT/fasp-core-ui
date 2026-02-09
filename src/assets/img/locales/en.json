@@ -3641,5 +3641,6 @@
   "static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms": "Only show PUs that are available in ALL selected programs",
   "static.mt.reminders2D1a1A": "If the ERP unit is different from your QAT planning unit, you can add an ARU with the matching ERP unit. After Master Data Syncing, the new ARU will be available in the dropdown selection when linking a new shipment.",
   "static.mt.linkingNotificationNote1": "is only available for local versions. If you don’t see the program or version you need, please",
-  "static.mt.linkingNotificationNote2": "your program first."
+  "static.mt.linkingNotificationNote2": "your program first.",
+  "static.report.localProcurementAgentLeadTimeHeader": "Local Procurement Agent Lead Time"
 }
