@@ -506,6 +506,7 @@ export default class ProblemList extends React.Component {
      */
     buildJExcel() {
         let problemList = this.state.data;
+        console.log("Problem List Test@123",problemList);
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         this.setState({ problemList: problemList });
         let problemArray = [];
