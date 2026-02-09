@@ -185,7 +185,7 @@
   "static.CompareSelect.SymbolDenotes": "symbol denotes that there is no forecast quantity available; the entire row will be gray and non-editable as there is nothing to display or select.",
   "static.message.skucodevalid": "Only letters and numbers allowed",
   "static.problemReport.addressedExample": "A phasing out planning unit only has 8 months of forecasted consumption in the future instead of 18. This is acceptable as it is a phasing out planning unit, but the user will still need to de-activate the planning unit once it is fully phased out, which is why the issue is marked as `Addressed` instead of `Resolved`.",
-  "static.mt.reminders3A": "Once linked, shipments will be non-editable other than the notes field and conversion factor field, which are editable only on the ERP linking screens. ",
+  "static.mt.reminders3A": "Once linked, shipments will be non-editable other than the notes field and ARU field, which are editable only on the ERP linking screens.",
   "static.common.allCategories": "All Categories",
   "static.dashboard.productValidation": "Product Validations",
   "static.integration.editIntegration": "Edit Integration",
@@ -1990,7 +1990,7 @@
   "static.forecastSummary.eitherTreeOrConsumptionValidation": "Multi-select is only available for tree forecasts",
   "static.extrapolation.GettingStarted": "Getting started on extrapolation",
   "static.common.errors": "Type of Forecast Error",
-  "static.mt.reminders2D3": "Your order in the ERP system is 20 packs (10 chocolate bars per pack), but your supply plan is in packs of 100 chocolate bars. To calculate the conversion factor, consider how many single units you have in the ERP pack size (10) and divide by how many single units you have in your QAT planning unit (100). In this example, the conversion factor is 10 bars / 100 bars = 0.1. Multiplying the ERP shipment quantity by 0.1 results in the converted QAT shipment quantity of 2, which is the number that will be used in your supply plan.  ",
+  "static.mt.reminders2D3": "Your order in the ERP system is 20 packs (10 chocolate bars per pack), but your supply plan is in packs of 100 chocolate bars. To calculate the conversion factor and add it as a new ARU, consider how many single units you have in the ERP pack size (10) and divide by how many single units you have in your QAT planning unit (100). In this example, the conversion factor is 10 bars / 100 bars = 0.1. Multiplying the ERP shipment quantity by 0.1 (or dividing by 10) results in the converted QAT shipment quantity of 2, which is the number that will be used in your supply plan.",
   "static.fundingsource.realm": "Realm",
   "static.forecastErrorReport.noActualData": "Current month does not contain actual consumption",
   "static.dashboard.stockoutTooltip": "Red value indicates planning units with at least one month of stockout in the next 18 months. Blue value indicates planning units with no stockouts in the next 18 months",
@@ -3638,5 +3638,6 @@
   "static.program.nestedHeader": "Access control based on the following:",
   "static.tooltip.procurementAgentAcl": "This shows the procurement agent(s) the user is associated with and this field is linked to the Procurement Agent selection in the top half of this screen. You can limit/grant access to a particular Procurement Agent from accessing your program by removing/adding them from the Procurement Agent selection at the top of this screen. Note that the Procurement Agent selection also dictates which dropdowns will appear in your shipment data entry screens.",
   "static.tooltip.fundingSourceAcl": "This shows the funding source(s) the user is associated with and this field is linked to the Funding Source selection in the top half of this screen. You can limit/grant access to a particular Funding Source from accessing your program by removing/adding them from the Funding Source selection at the top of this screen. Note that the Funding Source selection also dictates which dropdowns will appear in your shipment data entry screens.",
-  "static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms": "Only show PUs that are available in ALL selected programs"
+  "static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms": "Only show PUs that are available in ALL selected programs",
+  "static.mt.reminders2D1a1A": "If the ERP unit is different from your QAT planning unit, you can add an ARU with the matching ERP unit. After Master Data Syncing, the new ARU will be available in the dropdown selection when linking a new shipment."
 }
