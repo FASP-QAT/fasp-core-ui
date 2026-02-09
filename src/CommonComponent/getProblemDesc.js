@@ -1,4 +1,5 @@
 import getLabelText from '../CommonComponent/getLabelText';
+import i18n from '../i18n';
 /**
  * This function is used to construct the problem desc based on different dynamic parameters
  * @param {*} row This is the instance of the problem
@@ -298,5 +299,47 @@ export default function getProblemDesc(row, lang) {
         var obj = JSON.parse(row.data5.toString().replaceAll(regex, '<br/>'));
         var label = obj.problemDescription;
         return label;
+    }
+    if (row.realmProblem.problem.problemId == 30) {
+        var obj = JSON.parse(row.data5);
+        var desc_en = row.realmProblem.problem.label.label_en;
+        var desc_fr = row.realmProblem.problem.label.label_fr;
+        var desc_sp = row.realmProblem.problem.label.label_sp;
+        var desc_pr = row.realmProblem.problem.label.label_pr;
+        var label = row.realmProblem.problem.label;
+        var desc = "";
+        if (obj.overMaxMonthsCount > 0) {
+            var count = obj.overMaxMonthsCount;
+            var monthNames = obj.overMaxMonths;
+            desc += i18n.t('static.problemList.minMaxProblemDescOverMax', { count, monthNames });
+        }
+        if (obj.underMinMonthsCount > 0) {
+            var count = obj.underMinMonthsCount;
+            var monthNames = obj.underMinMonths;
+            desc += i18n.t('static.problemList.minMaxProblemDescUnderMin', { count, monthNames });
+        }
+        if (obj.stockedOutMonthsCount > 0) {
+            var count = obj.stockedOutMonthsCount;
+            var monthNames = obj.stockedOutMonths;
+            desc += i18n.t('static.problemList.minMaxProblemDescStockedOut', { count, monthNames });
+        }
+        if (obj.shipmentListMonthsCount > 0) {
+            var monthNames = obj.shipmentListMonths;
+            desc += i18n.t('static.problemList.minMaxProblemDescShipments', { monthNames });
+        }
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%PROBLEM_DESCRIPTION%>').join(desc);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%PROBLEM_DESCRIPTION%>').join(desc);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%PROBLEM_DESCRIPTION%>').join(desc);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%PROBLEM_DESCRIPTION%>').join(desc);
+            label.label_pr = result_pr;
+        }
+        return getLabelText(label, lang);
     }
 }

@@ -505,4 +505,34 @@ export default function getSuggestion(row, lang) {
         var label = obj.suggession;
         return label;
     }
+    if (row.realmProblem.problem.problemId == 30) {
+        var desc_en = row.realmProblem.problem.actionLabel.label_en;
+        var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
+        var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
+        var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
+        var label = row.realmProblem.problem.actionLabel;
+        var obj = JSON.parse(row.data5);
+        var suggestion="";
+        if(obj.underMinMonthsCount == 0 && obj.stockedOutMonthsCount == 0){
+            suggestion=i18n.t('static.problemList.suggestion1')
+        }else if(obj.overMaxMonthsCount == 0 && obj.stockedOutMonthsCount == 0){
+            suggestion=i18n.t('static.problemList.suggestion2')
+        }else{
+            suggestion=i18n.t('static.problemList.suggestion3')
+        }
+        if (desc_en != null && desc_en != '') {
+            const result_en = desc_en.split('<%PROBLEM_SUGGESTION%>').join(suggestion);
+            label.label_en = result_en;
+        } if (desc_fr != null && desc_fr != '') {
+            const result_fr = desc_fr.split('<%PROBLEM_SUGGESTION%>').join(suggestion);
+            label.label_fr = result_fr;
+        } if (desc_sp != null && desc_sp != '') {
+            const result_sp = desc_sp.split('<%PROBLEM_SUGGESTION%>').join(suggestion);
+            label.label_sp = result_sp;
+        } if (desc_pr != null && desc_pr != '') {
+            const result_pr = desc_pr.split('<%PROBLEM_SUGGESTION%>').join(suggestion);
+            label.label_pr = result_pr;
+        }
+        return getLabelText(label, lang);
+    }
 }
