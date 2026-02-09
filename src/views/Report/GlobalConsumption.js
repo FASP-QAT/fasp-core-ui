@@ -8,6 +8,9 @@ import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
 import Picker from 'react-month-picker';
 import { MultiSelect } from "react-multi-select-component";
+import jexcel from 'jspreadsheet';
+import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import {
   Card,
   CardBody,
@@ -21,7 +24,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
@@ -171,6 +174,79 @@ class GlobalConsumption extends Component {
     this.filterProgram = this.filterProgram.bind(this)
     this.setVersionId = this.setVersionId.bind(this)
     this.yAxisChange = this.yAxisChange.bind(this)
+    this.buildConsumptionJexcel = this.buildConsumptionJexcel.bind(this);
+  }
+
+  buildConsumptionJexcel() {
+    var consumptionList = this.state.consumptions;
+    var dataArray = [];
+    let count = 0;
+    if (consumptionList.length > 0) {
+      for (var j = 0; j < consumptionList.length; j++) {
+        data = [];
+        data[0] = getLabelText(this.state.consumptions[j].realmCountry.label, this.state.lang);
+        data[1] = this.state.consumptions[j].consumptionDateString;
+        data[2] = formatter(roundARU(this.state.consumptions[j].planningUnitQty,1), 0);
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("consumptionJexcel"), '');
+    jexcel.destroy(document.getElementById("consumptionJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [20, 80],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: this.state.viewByLabel,
+          type: 'text',
+          editable: false,
+          readOnly: true,
+          width: '110px'
+        },
+        {
+          title: i18n.t('static.common.month'),
+          type: 'text',
+          editable: false,
+          readOnly: true,
+          width: '70px'
+        },
+        {
+          title: i18n.t('static.report.consupmtionqty'),
+          type: 'number',
+          editable: false,
+          readOnly: true,
+          mask: "#,##",
+          width: '70px'
+        }
+      ],
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
+      pagination: false,
+      search: false,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: 'top',
+      filters: true,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+      height: 100,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var consumptionJexcel = jexcel(document.getElementById("consumptionJexcel"), options);
+    this.el = consumptionJexcel;
+    this.setState({
+      consumptionJexcel
+    }
+    );
   }
   /**
    * Exports the data to a CSV file.
@@ -704,7 +780,7 @@ class GlobalConsumption extends Component {
     let realmId = AuthenticationService.getRealmId()
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-    let versionId = this.state.programValues.length == 1 ? this.state.versionId : -1;
+    let versionId = this.state.programValues.length == 1 ? this.state.versionId : 0;
     if (realmId > 0 && this.state.countryValues.length > 0 && planningUnitIds.length > 0 && this.state.programValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
@@ -740,6 +816,7 @@ class GlobalConsumption extends Component {
             message: '',
             loading: false
           }, () => {
+            this.buildConsumptionJexcel();
           });
         }).catch(
           error => {
@@ -788,13 +865,13 @@ class GlobalConsumption extends Component {
           }
         );
     } else if (realmId <= 0) {
-      this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
+      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else if (this.state.programValues.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     }
   }
   /**
@@ -930,6 +1007,7 @@ class GlobalConsumption extends Component {
         planningUnitId: [],
         consumptions: []
       }, () => {
+        this.buildConsumptionJexcel();
         if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
           var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
           var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
@@ -942,7 +1020,7 @@ class GlobalConsumption extends Component {
       error => {
         this.setState({
           consumptions: [], loading: false
-        })
+        }, () => { this.buildConsumptionJexcel() })
         if (error.message === "Network Error") {
           this.setState({
             message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -1002,26 +1080,9 @@ class GlobalConsumption extends Component {
       yaxisEquUnitLabel: [yaxisEquUnitLabel],
       planningUnitId: [],
       consumptions: [],
-      onlyShowAllPUs: false,
-      // planningUnits: [],
-      // planningUnitIds: [],
-      // planningUnitValues: [],
-      // planningUnitLabels: [],
-      // foreastingUnits: [],
-      // forecastingUnitIds: [],
-      // foreastingUnitValues: [],
-      // foreastingUnitLabels: [],
-      // planningUnitId: "",
-      // forecastingUnitId: "",
-      // dataList: [],
-      // loading: false
+      onlyShowAllPUs: false
     }, () => {
-      if (yaxisEquUnit > 0) {//Yes        
-        // this.getPlanningUnitAndForcastingUnit();
-      } else {//NO
-        // this.getPlanningUnitAndForcastingUnit();
-        // this.fetchData();
-      }
+      this.buildConsumptionJexcel();
     })
   }
   setOnlyShowAllPUs(e) {
@@ -1074,7 +1135,7 @@ class GlobalConsumption extends Component {
           } else {
             this.setState({
               consumptions: [],
-            })
+            }, () => { this.buildConsumptionJexcel() })
           }
         })
       }
@@ -1110,7 +1171,7 @@ class GlobalConsumption extends Component {
       this.setState({
         planningUnitId: [],
         consumptions: []
-      })
+      }, () => { this.buildConsumptionJexcel() })
     }
   }
   /**
@@ -1593,35 +1654,9 @@ class GlobalConsumption extends Component {
                   </div>
                   <div className="row">
                     <div className="col-md-12 mt-lg-2">
-                      {this.state.show && this.state.consumptions.length > 0 &&
-                        <div className="fixTableHead">
-                          <Table className="table-striped  table-fixed table-bordered text-center">
-                            <thead>
-                              <tr>
-                                <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
-                                <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty')}</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {
-                                this.state.consumptions.length > 0
-                                &&
-                                this.state.consumptions.map((item, idx) =>
-                                  <tr id="addr0" key={idx} >
-                                    <td>{getLabelText(this.state.consumptions[idx].realmCountry.label, this.state.lang)}</td>
-                                    <td>
-                                      {this.state.consumptions[idx].consumptionDateString}
-                                    </td>
-                                    <td >
-                                      {formatter(roundARU(this.state.consumptions[idx].planningUnitQty,1), 0)}
-                                    </td>
-                                  </tr>)
-                              }
-                            </tbody>
-                          </Table>
-                        </div>
-                      }
+                      <div className="fixTableHead">
+                        <div id="consumptionJexcel" className='DashboardreadonlyBg dashboardTable2Ss jtabs-animation jtabs jss_container' style={{ padding: '2px 8px' }}></div>
+                      </div>
                     </div>
                   </div>
                 </div>
