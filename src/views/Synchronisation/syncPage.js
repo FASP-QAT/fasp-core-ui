@@ -1134,7 +1134,7 @@ export default class syncPage extends Component {
           }
         }
       }
-      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0 && c.erpFlag == true) || (c.shipmentId == 0 && c.active.toString() == "true")));
+      shipmentData = shipmentData.concat(oldProgramDataShipment.filter(c => (c.shipmentId == 0)));
       shipmentData.map((item, index) => {
         if (item.erpFlag.toString() == "true") {
           shipmentData[index].active = false;
@@ -2211,9 +2211,9 @@ export default class syncPage extends Component {
                                                   mergedShipmentData.push(oldModifiedShipmentData[c]);
                                                   existingShipmentId.push(oldModifiedShipmentData[c].shipmentId);
                                                 } else {
-                                                  if (oldModifiedShipmentData[c].active.toString() == "true") {
+                                                  // if (oldModifiedShipmentData[c].active.toString() == "true") {
                                                     mergedShipmentData.push(oldModifiedShipmentData[c]);
-                                                  }
+                                                  // }
                                                 }
                                               }
                                               var latestOtherShipmentEntries = latestModifiedShipmentData.filter(c => !(existingShipmentId.includes(c.shipmentId)));

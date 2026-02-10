@@ -440,32 +440,37 @@ export default class QatProblemActionNew extends Component {
                                                                         var filteredShipmentList = shipmentListForMonths.filter(c =>
                                                                             moment(c.expectedDeliveryDate).add(parseInt(typeProblemList[prob].data1), 'days').format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
                                                                             && c.shipmentStatus.id != 7
-                                                                            && c.shipmentId != 0
+                                                                            // && c.shipmentId != 0
                                                                         );
                                                                         shipmentQplPassed=shipmentListForMonths.filter(c =>
                                                                             moment(c.expectedDeliveryDate).format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
                                                                             && c.shipmentStatus.id != 7
-                                                                            && c.shipmentId != 0
+                                                                            // && c.shipmentId != 0
                                                                         ).length>0?false:shipmentQplPassed;
                                                                         if (filteredShipmentList.length > 0) {
                                                                             var shipmentIdsFromShipmnetList = [];
+                                                                            var tempShipmentIdsFromShipmnetList = [];
                                                                             for (var s = 0; s < filteredShipmentList.length; s++) {
                                                                                 var shipmentDetailsJson = {}
                                                                                 shipmentDetailsJson["procurementAgentCode"] = filteredShipmentList[s].procurementAgent.code;
                                                                                 shipmentDetailsJson["orderNo"] = filteredShipmentList[s].orderNo;
                                                                                 shipmentDetailsJson["shipmentQuantity"] = filteredShipmentList[s].shipmentQty;
                                                                                 shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
+                                                                                if(filteredShipmentList[s].shipmentId!=0){
                                                                                 shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
+                                                                                }else{
+                                                                                tempShipmentIdsFromShipmnetList.push(filteredShipmentList[s].tempShipmentId);
+                                                                                }
                                                                                 var indexShipment = 0;
                                                                                 var newAddShipment = false;
                                                                                 indexShipment = problemActionList.findIndex(
                                                                                     c => c.program.id == programList[pp].generalData.programId
-                                                                                        && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                                                        && (c.shipmentId!=0?(c.shipmentId == filteredShipmentList[s].shipmentId):(c.tempShipmentId==filteredShipmentList[s].tempShipmentId))
                                                                                         && c.realmProblem.problem.problemId == 3
                                                                                 );
                                                                                 if (indexShipment == -1) {
                                                                                     var index = 0;
-                                                                                    createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
+                                                                                    createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, filteredShipmentList[s].tempShipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                     problemActionIndex++;
                                                                                 } else {
                                                                                     problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
@@ -488,6 +493,20 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
+                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0)
+                                                                            for (var fsl = 0; fsl < tempProblemActionListForShipments.length; fsl++) {
+                                                                                var tempFslShipmentId = tempProblemActionListForShipments[fsl].tempShipmentId
+                                                                                if (!tempShipmentIdsFromShipmnetList.includes(tempFslShipmentId)) {
+                                                                                    var notIncludedShipmentIndex = problemActionList.findIndex(c =>
+                                                                                        c.realmProblem.problem.problemId == 3
+                                                                                        && c.program.id == programList[pp].generalData.programId
+                                                                                        && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
+                                                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                        && c.tempShipmentId != 0 && c.shipmentId==0 &&
+                                                                                        c.tempShipmentId == tempFslShipmentId);
+                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                                }
+                                                                            }
                                                                         } else {
                                                                             var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
                                                                             for (var d = 0; d < problemActionListForShipmentsIncompliance.length; d++) {
@@ -501,16 +520,29 @@ export default class QatProblemActionNew extends Component {
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
+                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 3 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0);
+                                                                            for (var d = 0; d < tempProblemActionListForShipmentsIncompliance.length; d++) {
+                                                                                var tempFslShipmentIdInCompliance = tempProblemActionListForShipmentsIncompliance[d].tempShipmentId;
+                                                                                var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
+                                                                                    c.realmProblem.problem.problemId == 3
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
+                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.tempShipmentId != 0 && c.shipmentId==0 &&
+                                                                                    c.tempShipmentId == tempFslShipmentIdInCompliance);
+                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                            }
                                                                         }
                                                                         break;
                                                                     case 4:
                                                                         var myDateShipment = curDate;
                                                                         var filteredShipmentList = shipmentListForMonths.filter(c =>
                                                                             (c.shipmentStatus.id == PLANNED_SHIPMENT_STATUS || c.shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS)
-                                                                            && c.shipmentId != 0
+                                                                            // && c.shipmentId != 0
                                                                         );
                                                                         if (filteredShipmentList.length > 0) {
                                                                             var shipmentIdsFromShipmnetList = [];
+                                                                            var tempShipmentIdsFromShipmnetList = [];
                                                                             for (var s = 0; s < filteredShipmentList.length; s++) {
                                                                                 var papuResult = procurementAgentListForProblemActionreport.filter(c => c.procurementAgentId == filteredShipmentList[s].procurementAgent.id)[0];
                                                                                 var submittedDate = filteredShipmentList[s].submittedDate;
@@ -647,17 +679,21 @@ export default class QatProblemActionNew extends Component {
                                                                                     shipmentQplPassed=false;
                                                                                 }
                                                                                 if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
+                                                                                    if(filteredShipmentList[s].shipmentId!=0){
                                                                                     shipmentIdsFromShipmnetList.push(filteredShipmentList[s].shipmentId);
+                                                                                    }else{
+                                                                                    tempShipmentIdsFromShipmnetList.push(filteredShipmentList[s].tempShipmentId);
+                                                                                    }
                                                                                     var indexShipment = 0;
                                                                                     var newAddShipment = false;
                                                                                     indexShipment = problemActionList.findIndex(
                                                                                         c => c.program.id == programList[pp].generalData.programId
-                                                                                            && c.shipmentId == filteredShipmentList[s].shipmentId
+                                                                                        && (c.shipmentId!=0?(c.shipmentId == filteredShipmentList[s].shipmentId):(c.tempShipmentId==filteredShipmentList[s].tempShipmentId))
                                                                                             && c.realmProblem.problem.problemId == 4
                                                                                     );
                                                                                     if (indexShipment == -1) {
                                                                                         var index = 0;
-                                                                                        createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
+                                                                                        createProcurementScheduleProblems(programList[pp].generalData, versionID, typeProblemList[prob], planningUnitList[p], filteredShipmentList[s].shipmentId, filteredShipmentList[s].tempShipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj);
                                                                                         problemActionIndex++;
                                                                                     } else {
                                                                                         problemActionList[indexShipment].data5 = JSON.stringify(shipmentDetailsJson);
@@ -681,6 +717,20 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
+                                                                            var tempProblemActionListForShipments = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0)
+                                                                            for (var fsl = 0; fsl < tempProblemActionListForShipments.length; fsl++) {
+                                                                                var tempFslShipmentId = tempProblemActionListForShipments[fsl].tempShipmentId
+                                                                                if (!tempShipmentIdsFromShipmnetList.includes(tempFslShipmentId)) {
+                                                                                    var notIncludedShipmentIndex = problemActionList.findIndex(c =>
+                                                                                        c.realmProblem.problem.problemId == 4
+                                                                                        && c.program.id == programList[pp].generalData.programId
+                                                                                        && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
+                                                                                        && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                        && c.tempShipmentId != 0 && c.shipmentId==0 &&
+                                                                                        c.tempShipmentId == tempFslShipmentId);
+                                                                                    incomplianceProblem(notIncludedShipmentIndex, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                                }
+                                                                            }
                                                                         } else {
                                                                             var problemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.shipmentId != 0);
                                                                             for (var d = 0; d < problemActionListForShipmentsIncompliance.length; d++) {
@@ -692,6 +742,18 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.planningUnit.id == planningUnitList[p].planningUnit.id
                                                                                     && c.shipmentId != 0 &&
                                                                                     c.shipmentId == fslShipmentIdInCompliance);
+                                                                                incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                            }
+                                                                            var tempProblemActionListForShipmentsIncompliance = problemActionList.filter(c => c.realmProblem.problem.problemId == 4 && c.program.id == programList[pp].generalData.programId && (c.problemStatus.id == 1 || c.problemStatus.id == 3) && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.tempShipmentId != 0 && c.shipmentId==0);
+                                                                            for (var d = 0; d < tempProblemActionListForShipmentsIncompliance.length; d++) {
+                                                                                var tempFslShipmentIdInCompliance = tempProblemActionListForShipmentsIncompliance[d].tempShipmentId;
+                                                                                var notIncludedShipmentIndexIncompliance = problemActionList.findIndex(c =>
+                                                                                    c.realmProblem.problem.problemId == 4
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && (c.problemStatus.id == 1 || c.problemStatus.id == 3)
+                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.tempShipmentId != 0 && c.shipmentId==0 &&
+                                                                                    c.tempShipmentId == tempFslShipmentIdInCompliance);
                                                                                 incomplianceProblem(notIncludedShipmentIndexIncompliance, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                             }
                                                                         }

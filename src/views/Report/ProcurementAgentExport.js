@@ -3544,14 +3544,18 @@ class ProcurementAgentExport extends Component {
                       id="fundingSourceTypeId"
                       bsSize="md"
                       filterOptions={filterOptions}
-                      value={this.state.fundingSourceTypeValues}
+                      value={Array.isArray(this.state.fundingSourceTypeValues)
+                        ? this.state.fundingSourceTypeValues
+                        : []}
                       onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
-                      options={fundingSourceTypes.length > 0
-                        && fundingSourceTypes.map((item, i) => {
-                          return (
-                            { label: item.code, value: item.id }
-                          )
-                        }, this)}
+                      options={
+                        Array.isArray(fundingSourceTypes)
+                          ? fundingSourceTypes.map(item => ({
+                              label: item.code,
+                              value: item.id
+                            }))
+                          : []
+                      }
                       disabled={this.state.loading}
                     />
                   </div>
