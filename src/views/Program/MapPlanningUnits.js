@@ -830,7 +830,7 @@ export default class MapPlanningUnits extends Component {
                                 tooltip: i18n.t("static.programPU.monthsInPastTooltip")
                             },
                             {
-                                title: i18n.t('static.report.procurmentAgentLeadTimeReport'),
+                                title: i18n.t('static.report.localProcurementAgentLeadTimeHeader'),
                                 type: 'numeric',
                                 textEditor: true,
                                 decimal: '.',
