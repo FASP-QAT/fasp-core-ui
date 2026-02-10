@@ -5438,6 +5438,9 @@ export default class ManualTagging extends Component {
                                                                 </ol>
                                                                 <ol className="list-group list-groupMt">
                                                                     <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D1a")}<b>{i18n.t("static.mt.reminders2D1b")}</b>{i18n.t("static.mt.reminders2D1c")}</p></li>
+                                                                    <ul>
+                                                                        <li><p>{i18n.t("static.mt.reminders2D1a1A")}</p></li>
+                                                                    </ul>
                                                                 </ol>
                                                                 <ol className="list-group list-groupMt">
                                                                     <li class="list-summery  "> <i class="fa fa-square list-summer-iconMt1 " aria-hidden="true"></i> &nbsp;&nbsp;<p>{i18n.t("static.mt.reminders2D2a")}<b>{i18n.t("static.mt.reminders2D2b")}</b>{i18n.t("static.mt.reminders2D2c")}</p></li>
