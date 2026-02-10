@@ -9,7 +9,7 @@ import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { checkValidtion, inValid, jExcelLoadedFunction, jExcelLoadedFunctionOnlyHideRow, positiveValidation } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { formatter, generateRandomAplhaNumericCode, paddingZero } from "../../CommonComponent/JavascriptCommonFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
-import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_NO_REGEX, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from "../../Constants";
+import { APPROVED_SHIPMENT_STATUS, ARRIVED_SHIPMENT_STATUS, BATCH_NO_REGEX, BATCH_PREFIX, CANCELLED_SHIPMENT_STATUS, CONSTANT_FOR_TEMP_SHIPMENT, DELIVERED_SHIPMENT_STATUS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT, JEXCEL_DECIMAL_NO_REGEX_FOR_DATA_ENTRY, JEXCEL_INTEGER_REGEX_FOR_DATA_ENTRY, JEXCEL_MONTH_PICKER_FORMAT, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, MAX_DATE_RESTRICTION_IN_DATA_ENTRY, MIN_DATE_RESTRICTION_IN_DATA_ENTRY, NONE_SELECTED_DATA_SOURCE_ID, ON_HOLD_SHIPMENT_STATUS, PLANNED_SHIPMENT_STATUS, SECRET_KEY, SHIPMENT_DATA_SOURCE_TYPE, SHIPMENT_MODIFIED, SHIPPED_SHIPMENT_STATUS, SUBMITTED_SHIPMENT_STATUS, TBD_FUNDING_SOURCE, TBD_PROCUREMENT_AGENT_ID, USD_CURRENCY_ID } from "../../Constants";
 import i18n from '../../i18n';
 import AuthenticationService from "../Common/AuthenticationService";
 import { calculateSupplyPlan } from "./SupplyPlanCalculations";
@@ -583,7 +583,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 var rcpuForTable = realmCountryPlanningUnitList.filter(c => c.id == shipmentList[i].realmCountryPlanningUnit.id);
                                                 data[0] = shipmentList[i].accountFlag;
                                                 data[1] = shipmentList[i].erpFlag;
-                                                data[2] = shipmentList[i].shipmentId;
+                                                data[2] = shipmentList[i].shipmentId!=0?shipmentList[i].shipmentId:CONSTANT_FOR_TEMP_SHIPMENT+shipmentList[i].tempShipmentId;
                                                 data[3] = shipmentList[i].planningUnit.id;
                                                 data[4] = shipmentList[i].shipmentStatus.id;
                                                 data[5] = shipmentList[i].receivedDate != "" && shipmentList[i].receivedDate != null && shipmentList[i].receivedDate != undefined && shipmentList[i].receivedDate != "Invalid date" ? shipmentList[i].receivedDate : shipmentList[i].expectedDeliveryDate;
@@ -624,6 +624,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[40] = Number(Number(Number(Number(Math.round(Number(Number(Math.round(shipmentList[i].shipmentRcpuQty)) * Number(shipmentList[i].realmCountryPlanningUnit.multiplier)))) * Number(Number(shipmentList[i].rate).toFixed(2))).toFixed(2)) + Number(Number(shipmentList[i].freightCost).toFixed(2))).toFixed(2);
                                                 data[41] = shipmentList[i].realmCountryPlanningUnit.multiplier;
                                                 data[42] = shipmentList[i].shipmentId > 0 ? shipmentList[i].shipmentId : shipmentList[i].tempShipmentId;
+                                                data[43] = shipmentList[i].shipmentId;
                                                 shipmentsArr.push(data);
                                             }
                                             if (shipmentList.length == 0 && ((this.props.shipmentPage == "shipmentDataEntry" && this.props.items.shipmentTypeIds.includes(1)) || this.props.shipmentPage == "supplyPlan" || this.props.shipmentPage == "whatIf")) {
@@ -671,6 +672,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 data[40] = 0;
                                                 data[41] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
                                                 data[42] = 0;
+                                                data[43] = 0;
                                                 shipmentsArr[0] = data;
                                             }
                                             var options = {
@@ -756,6 +758,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, readOnly: true, autoCasting: false },
+                                                    { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                                     { type: 'text', visible: false, width: 0, readOnly: true, autoCasting: false },
                                                 ],
@@ -1381,6 +1384,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         data[40] = 0;
         data[41] = realmCountryPlanningUnitList.length == 1 ? realmCountryPlanningUnitList[0].multiplier : "";
         data[42] = 0;
+        data[43] = 0;
         obj.insertRow(data);
         obj.setValueFromCoords(2, json.length, 0, true);
         obj.setValueFromCoords(12, json.length, 0, true);
@@ -3692,7 +3696,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
         for (var y = 0; y < json.length; y++) {
             var map = new Map(Object.entries(json[y]));
             if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
-                var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
+                var sblIndex = shipmentBudgetList.findIndex(c => (map.get("43") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                 if (sblIndex != -1) {
                     if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                         var productCost = elInstance.getValue(`U${parseInt(y) + 1}`, true).toString().replaceAll("\,", "");
@@ -3714,7 +3718,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                             shipmentAmt: Number(productCost) + Number(freightCost),
                             budgetId: map.get("17"),
                             conversionRateToUsd: c.conversionRateToUsd,
-                            shipmentId: map.get("2"),
+                            shipmentId: map.get("43"),
                             tempShipmentId: map.get("42"),
                             currencyId: c.currencyId
                         })
@@ -4247,7 +4251,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                 var c = (this.state.currencyListAll.filter(c => c.currencyId == map.get("18"))[0])
                                 shipmentDataList[parseInt(map.get("28"))].currency = c;
                                 if (map.get("42") != undefined && map.get("42") != "" && map.get("42") != 0) {
-                                    var sblIndex = shipmentBudgetList.findIndex(c => (map.get("2") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
+                                    var sblIndex = shipmentBudgetList.findIndex(c => (map.get("43") == 0 ? (c.tempShipmentId == map.get("42")) : (c.shipmentId == map.get("42"))));
                                     if (sblIndex != -1) {
                                         if (map.get("0").toString() == "true" && map.get("4") != 8 && map.get("34").toString() == "true") {
                                             var productCost = elInstance.getValue(`U${parseInt(j) + 1}`, true).toString().replaceAll("\,", "");
@@ -4269,7 +4273,7 @@ export default class ShipmentsInSupplyPlanComponent extends React.Component {
                                                 shipmentAmt: Number(productCost) + Number(freightCost),
                                                 budgetId: map.get("17"),
                                                 conversionRateToUsd: c.conversionRateToUsd,
-                                                shipmentId: map.get("2"),
+                                                shipmentId: map.get("43"),
                                                 tempShipmentId: map.get("42"),
                                                 currencyId: c.currencyId
                                             })
