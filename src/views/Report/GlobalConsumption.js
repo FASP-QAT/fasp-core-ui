@@ -9,7 +9,6 @@ import { Bar } from 'react-chartjs-2';
 import Picker from 'react-month-picker';
 import { MultiSelect } from "react-multi-select-component";
 import jexcel from 'jspreadsheet';
-import { jExcelLoadedFunction, jExcelLoadedFunctionForNotes, jExcelLoadedFunctionOnlyHideRow, jExcelLoadedFunctionWithoutPagination } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import {
   Card,
@@ -20,11 +19,14 @@ import {
   Label,
   Table
 } from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
@@ -162,6 +164,9 @@ class GlobalConsumption extends Component {
       planningUnitList: [],
       planningUnitListAll: [],
       planningUnitId: [],
+      consumptionJexcel: '',
+      aggregateData: false,
+      aggregatedConsumptions: []
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
@@ -177,16 +182,21 @@ class GlobalConsumption extends Component {
     this.buildConsumptionJexcel = this.buildConsumptionJexcel.bind(this);
   }
 
+  loaded = function (instance, cell) {
+    jExcelLoadedFunction(instance);
+  }
+
   buildConsumptionJexcel() {
-    var consumptionList = this.state.consumptions;
+    if(this.state.show && this.state.consumptions.length > 0){
+    var consumptionList = this.state.aggregateData ? this.state.aggregatedConsumptions : this.state.consumptions;
     var dataArray = [];
     let count = 0;
     if (consumptionList.length > 0) {
       for (var j = 0; j < consumptionList.length; j++) {
         data = [];
-        data[0] = getLabelText(this.state.consumptions[j].realmCountry.label, this.state.lang);
-        data[1] = this.state.consumptions[j].consumptionDateString;
-        data[2] = formatter(roundARU(this.state.consumptions[j].planningUnitQty,1), 0);
+        data[0] = getLabelText(consumptionList[j].realmCountry.label, this.state.lang);
+        data[1] = consumptionList[j].consumptionDateString;
+        data[2] = formatter(roundARU(consumptionList[j].planningUnitQty,1), 0);
         dataArray[count] = data;
         count++;
       }
@@ -197,22 +207,20 @@ class GlobalConsumption extends Component {
     var options = {
       data: data,
       columnDrag: false,
-      colWidths: [20, 80],
+      colWidths: [50, 50, 50],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
           title: this.state.viewByLabel,
-          type: 'text',
+          type: this.state.aggregateData ? 'hidden' : 'text',
           editable: false,
           readOnly: true,
-          width: '110px'
         },
         {
           title: i18n.t('static.common.month'),
           type: 'text',
           editable: false,
           readOnly: true,
-          width: '70px'
         },
         {
           title: i18n.t('static.report.consupmtionqty'),
@@ -220,23 +228,26 @@ class GlobalConsumption extends Component {
           editable: false,
           readOnly: true,
           mask: "#,##",
-          width: '70px'
         }
       ],
-      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance) },
-      pagination: false,
-      search: false,
+      onload: this.loaded,
+      editable: false,
+      onselection: this.selected,
+      pagination: localStorage.getItem("sesRecordCount"),
+      search: true,
       columnSorting: true,
       wordWrap: true,
       allowInsertColumn: false,
       allowManualInsertColumn: false,
-      allowDeleteRow: false,
+      allowDeleteRow: true,
+      oneditionend: this.onedit,
       copyCompatibility: true,
       allowExport: false,
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: 'top',
       filters: true,
+      parseFormulas: true,
       license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-      height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -244,9 +255,9 @@ class GlobalConsumption extends Component {
     var consumptionJexcel = jexcel(document.getElementById("consumptionJexcel"), options);
     this.el = consumptionJexcel;
     this.setState({
-      consumptionJexcel
+        consumptionJexcel: consumptionJexcel,
+    })
     }
-    );
   }
   /**
    * Exports the data to a CSV file.
@@ -273,13 +284,22 @@ class GlobalConsumption extends Component {
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + this.state.viewByLabel + '"'))
     csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.report.showAggregatedQuantities') + ' : ' + (this.state.aggregateData ? i18n.t("static.program.yes") : i18n.t("static.program.no")) + '"'))
+    csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
-    var A = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
-    re = this.state.consumptions
-    for (var item = 0; item < re.length; item++) {
-      A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+    var A = this.state.aggregateData ? [addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), i18n.t('static.consumption.consumptionqty').replaceAll(' ', '%20')])] : [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), i18n.t('static.consumption.consumptionqty').replaceAll(' ', '%20')])]
+    if(this.state.aggregateData) {
+      re = this.state.aggregatedConsumptions
+      for (var item = 0; item < re.length; item++) {
+        A.push([addDoubleQuoteToRowContent([moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+      }
+    } else {
+      re = this.state.consumptions
+      for (var item = 0; item < re.length; item++) {
+        A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+      }
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -401,6 +421,16 @@ class GlobalConsumption extends Component {
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
     }
+    planningText = doc.splitTextToSize(i18n.t('static.report.showAggregatedQuantities') + ' : ' + (this.state.aggregateData ? i18n.t("static.program.yes") : i18n.t("static.program.no")), doc.internal.pageSize.width * 3 / 4);
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
     const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -418,8 +448,8 @@ class GlobalConsumption extends Component {
       startYtable = 80
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]);
+    const headers = this.state.aggregateData ? [[i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]] : [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
+    const data = this.state.aggregateData ? this.state.aggregatedConsumptions.map(elt => [elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]) : this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -798,9 +828,21 @@ class GlobalConsumption extends Component {
         .then(response => {
           let tempConsumptionData = response.data.dataList;
           var consumptions = [];
+          const aggregatedConsumptions = [];
+          const aggregationMap = {};
           for (var i = 0; i < tempConsumptionData.length; i++) {
             let countryConsumption = Object.values(tempConsumptionData[i].consumption);
             for (var j = 0; j < countryConsumption.length; j++) {
+              let planningUnitQty =
+                countryConsumption[j].actualConsumption == 0
+                  ? countryConsumption[j].forecastedConsumption
+                  : countryConsumption[j].actualConsumption;
+
+              let consumptionDateString = moment(
+                tempConsumptionData[i].transDate,
+                'YYYY-MM-dd'
+              ).format('MMM YY');
+              
               let json = {
                 "realmCountry": countryConsumption[j].label,
                 "consumptionDate": tempConsumptionData[i].transDate,
@@ -809,10 +851,23 @@ class GlobalConsumption extends Component {
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
               consumptions.push(json);
+
+              if (!aggregationMap[consumptionDateString]) {
+                aggregationMap[consumptionDateString] = {
+                  "realmCountry": countryConsumption[j].label,
+                  "consumptionDate": tempConsumptionData[i].transDate,
+                  "planningUnitQty": 0,
+                  "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
+                  "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
+                };
+                aggregatedConsumptions.push(aggregationMap[consumptionDateString]);
+              }
+              aggregationMap[consumptionDateString].planningUnitQty += planningUnitQty;
             }
           }
           this.setState({
             consumptions: consumptions,
+            aggregatedConsumptions: aggregatedConsumptions,
             message: '',
             loading: false
           }, () => {
@@ -1089,9 +1144,16 @@ class GlobalConsumption extends Component {
     var checked = e.target.checked;
     this.setState({
       onlyShowAllPUs: checked,
-      // yaxisEquUnit: -1
     }, () => {
       this.getDropdownLists();
+    })
+  }
+  setAggregateData(e) {
+    var checked = e.target.checked;
+    this.setState({
+      aggregateData: checked
+    }, () => {
+      this.buildConsumptionJexcel();
     })
   }
   handleBlur = (e) => {
@@ -1199,7 +1261,7 @@ class GlobalConsumption extends Component {
   /**
    * Toggles the value of the 'show' state variable.
    */
-  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }), () => { this.buildConsumptionJexcel() });
   /**
    * Handles the dismiss of the range picker component.
    * Updates the component state with the new range value and triggers a data fetch.
@@ -1364,13 +1426,16 @@ class GlobalConsumption extends Component {
     }, this);
 
     const lightModeColors = [
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
     ]
     const darkModeColors = [
       '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
@@ -1615,20 +1680,40 @@ class GlobalConsumption extends Component {
                     </FormGroup>
                     <FormGroup className="col-md-3">
                       <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
-                      <div className="controls">
-                        <InputGroup>
+                      <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
+                        <div className="controls">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="viewById"
+                              id="viewById"
+                              bsSize="sm"
+                              onChange={this.handleDisplayChange}
+                            >
+                              <option value="1">{i18n.t('static.report.country')}</option>
+                              <option value="2">{i18n.t('static.consumption.program')}</option>
+                            </Input>
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
+                      <FormGroup style={{ "marginTop": "-10px" }}>
+                        <div className={"col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
                           <Input
-                            type="select"
-                            name="viewById"
-                            id="viewById"
-                            bsSize="sm"
-                            onChange={this.handleDisplayChange}
-                          >
-                            <option value="1">{i18n.t('static.report.country')}</option>
-                            <option value="2">{i18n.t('static.consumption.program')}</option>
-                          </Input>
-                        </InputGroup>
-                      </div>
+                            className="form-check-input"
+                            type="checkbox"
+                            id="aggregateData"
+                            name="aggregateData"
+                            checked={this.state.aggregateData}
+                            onClick={(e) => { this.setAggregateData(e); }}
+                            style={{ marginTop: '2px' }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                            {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
+                          </Label>
+                        </div>
+                      </FormGroup>
                     </FormGroup>
                   </div>
                 </div>
@@ -1654,9 +1739,10 @@ class GlobalConsumption extends Component {
                   </div>
                   <div className="row">
                     <div className="col-md-12 mt-lg-2">
-                      <div className="fixTableHead">
-                        <div id="consumptionJexcel" className='DashboardreadonlyBg dashboardTable2Ss jtabs-animation jtabs jss_container' style={{ padding: '2px 8px' }}></div>
-                      </div>
+                      {this.state.show && this.state.consumptions.length > 0 &&
+                      <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                        <div id="consumptionJexcel" className='jexcelremoveReadonlybackground' style={{ padding: '2px 8px' }}></div>
+                      </CardBody>}
                     </div>
                   </div>
                 </div>
