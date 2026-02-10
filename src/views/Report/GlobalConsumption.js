@@ -1710,7 +1710,7 @@ class GlobalConsumption extends Component {
                           <Label
                             className="form-check-label"
                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                            {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
+                            {i18n.t('static.report.showAggregatedQuantities')}
                           </Label>
                         </div>
                       </FormGroup>
