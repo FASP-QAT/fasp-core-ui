@@ -310,21 +310,21 @@ export default function getProblemDesc(row, lang) {
         var desc = "";
         if (obj.overMaxMonthsCount > 0) {
             var count = obj.overMaxMonthsCount;
-            var monthNames = obj.overMaxMonths.replaceAll(",",", ");
+            var monthNames = obj.overMaxMonths.toString().replaceAll(",",", ");
             desc += i18n.t('static.problemList.minMaxProblemDescOverMax', { count, monthNames });
         }
         if (obj.underMinMonthsCount > 0) {
             var count = obj.underMinMonthsCount;
-            var monthNames = obj.underMinMonths.replaceAll(",",", ");
+            var monthNames = obj.underMinMonths.toString().replaceAll(",",", ");
             desc += i18n.t('static.problemList.minMaxProblemDescUnderMin', { count, monthNames });
         }
         if (obj.stockedOutMonthsCount > 0) {
             var count = obj.stockedOutMonthsCount;
-            var monthNames = obj.stockedOutMonths.replaceAll(",",", ");;
+            var monthNames = obj.stockedOutMonths.toString().replaceAll(",",", ");;
             desc += i18n.t('static.problemList.minMaxProblemDescStockedOut', { count, monthNames });
         }
         if (obj.shipmentListMonthsCount > 0) {
-            var monthNames = obj.shipmentListMonths.replaceAll(",",", ");;
+            var monthNames = obj.shipmentListMonths.toString().replaceAll(",",", ");;
             desc += i18n.t('static.problemList.minMaxProblemDescShipments', { monthNames });
         }
         if (desc_en != null && desc_en != '') {
