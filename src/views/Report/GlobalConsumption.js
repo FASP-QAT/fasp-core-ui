@@ -17,16 +17,18 @@ import {
   Form,
   FormGroup, Input, InputGroup,
   Label,
-  Table
+  Table,
+  Popover,
+  PopoverBody
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
+import { jExcelLoadedFunction, loadedForNonEditableTables, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_WITHOUT_DATE_CAMELCASE, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
@@ -180,6 +182,7 @@ class GlobalConsumption extends Component {
     this.setVersionId = this.setVersionId.bind(this)
     this.yAxisChange = this.yAxisChange.bind(this)
     this.buildConsumptionJexcel = this.buildConsumptionJexcel.bind(this);
+    this.toggleEu = this.toggleEu.bind(this);
   }
 
   loaded = function (instance, cell) {
@@ -195,7 +198,7 @@ class GlobalConsumption extends Component {
       for (var j = 0; j < consumptionList.length; j++) {
         data = [];
         data[0] = getLabelText(consumptionList[j].realmCountry.label, this.state.lang);
-        data[1] = consumptionList[j].consumptionDateString;
+        data[1] = consumptionList[j].consumptionDate;
         data[2] = formatter(roundARU(consumptionList[j].planningUnitQty,1), 0);
         dataArray[count] = data;
         count++;
@@ -218,7 +221,11 @@ class GlobalConsumption extends Component {
         },
         {
           title: i18n.t('static.common.month'),
-          type: 'text',
+          type: 'calendar',
+          options: {
+              format: JEXCEL_DATE_FORMAT_WITHOUT_DATE_CAMELCASE,
+              type: 'year-month-picker'
+          },
           editable: false,
           readOnly: true,
         },
@@ -798,6 +805,11 @@ class GlobalConsumption extends Component {
       this.filterData(this.state.rangeValue)
     })
   }
+  toggleEu() {
+    this.setState({
+        popoverOpen: !this.state.popoverOpen,
+    });
+  }
   /**
    * Filters data based on selected parameters and updates component state accordingly.
    */
@@ -1288,7 +1300,10 @@ class GlobalConsumption extends Component {
    * @returns {JSX.Element} - Global Consumption report table.
    */
   render() {
-
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
     const { isDarkMode } = this.state;
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -1679,7 +1694,7 @@ class GlobalConsumption extends Component {
                       </FormGroup>}
                     </FormGroup>
                     <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                      <Label className="form-check-label">{i18n.t('static.common.display')}</Label>
                       <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
                         <div className="controls">
                           <InputGroup>
@@ -1696,6 +1711,11 @@ class GlobalConsumption extends Component {
                           </InputGroup>
                         </div>
                       </FormGroup>
+                      <div>
+                          <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
+                              <PopoverBody>{i18n.t('static.tooltip.showAggregatedQuantities')}</PopoverBody>
+                          </Popover>
+                      </div>
                       <FormGroup style={{ "marginTop": "-10px" }}>
                         <div className={"col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
                           <Input
@@ -1710,7 +1730,7 @@ class GlobalConsumption extends Component {
                           <Label
                             className="form-check-label"
                             check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                            {i18n.t('static.report.showAggregatedQuantities')}
+                            {i18n.t('static.report.showAggregatedQuantities')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
                           </Label>
                         </div>
                       </FormGroup>
@@ -1740,9 +1760,9 @@ class GlobalConsumption extends Component {
                   <div className="row">
                     <div className="col-md-12 mt-lg-2">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                      <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                       <div className='consumptionDataEntryTable'>
                         <div id="consumptionJexcel" className='jexcelremoveReadonlybackground' style={{ padding: '2px 8px' }}></div>
-                      </CardBody>}
+                      </div>}
                     </div>
                   </div>
                 </div>
