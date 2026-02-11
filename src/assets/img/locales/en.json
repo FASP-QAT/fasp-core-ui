@@ -3648,5 +3648,6 @@
   "static.problemList.suggestion1":"Please consider delaying/canceling shipment(s), review future expiries, or donating stock. Indicate if any of these actions have been/will be taken, and you face any obstacles.",
   "static.problemList.suggestion2":"Please consider planning & ordering, expediting, or increasing shipment quantity. Indicate if any of these actions have been/will be taken, and you face any obstacles.",
   "static.problemList.suggestion3":"Please consider adjust shipment quantity. Indicate if any of these actions have been/will be taken, and you face any obstacles.",
-  "static.report.showAggregatedQuantities": "Show Aggregated Quantities"
+  "static.report.showAggregatedQuantities": "Show Aggregated Quantities",
+  "static.budget.duplicateBudget": "Budget code already exists for following program"
 }
