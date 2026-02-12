@@ -64,7 +64,6 @@ class ShipmentGlobalView extends Component {
             countrys: [],
             planningUnits: [],
             consumptions: [],
-            productCategories: [],
             countryValues: [],
             procurementAgents: [],
             procurementAgentTypes: [],
@@ -79,14 +78,10 @@ class ShipmentGlobalView extends Component {
             fundingSourceValues: [],
             procurementAgentValues: [],
             procurementAgentTypeValues: [],
-            shipmentList: [],
-            dateSplitList: [],
             countrySplitList: [],
             countryShipmentSplitList: [],
             data:
             {
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: []
             },
@@ -109,15 +104,24 @@ class ShipmentGlobalView extends Component {
             fundingSourceTypes: [],
             fundingSourceTypeValues: [],
             fundingSourceTypeLabels: [],
+            equivalencyUnitList: [],
+            programEquivalencyUnitList: [],
+            yaxisEquUnit: -1,
+            forecastingUnits: [],
+            allForecastingUnits: [],
+            forecastingUnitValues: [],
+            forecastingUnitLabels: [],
+            planningUnitList: [],
+            planningUnitListAll: [],
+            planningUnitId: [],
         };
         this.getCountrys = this.getCountrys.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getPlanningUnit = this.getPlanningUnit.bind(this);
         this.handleChange = this.handleChange.bind(this)
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
-        this.getProductCategories = this.getProductCategories.bind(this)
         this.filterProgram = this.filterProgram.bind(this);
+        this.yAxisChange = this.yAxisChange.bind(this)
     }
     /**
      * Exports the data to a CSV file.
@@ -364,6 +368,7 @@ class ShipmentGlobalView extends Component {
             programLabels: programIds.map(ele => ele.label)
         }, () => {
             this.getFundingSource();
+            this.getDropdownLists();
             this.fetchData()
         })
     }
@@ -435,75 +440,6 @@ class ShipmentGlobalView extends Component {
                     }
                 }
             );
-    }
-    /**
-     * Retrieves the list of planning units for a selected product category.
-     */
-    getPlanningUnit() {
-        this.setState({ loading: true })
-        let productCategoryId = document.getElementById("productCategoryId").value;
-        var lang = this.state.lang
-        if (productCategoryId != -1) {
-            PlanningUnitService.getActivePlanningUnitByProductCategoryId(productCategoryId).then(response => {
-                (response.data).sort(function (a, b) {
-                    return getLabelText(a.label, lang).localeCompare(getLabelText(b.label, lang));
-                });
-                this.setState({
-                    planningUnits: response.data, loading: false
-                }, () => {
-                    this.fetchData()
-                });
-            }).catch(
-                error => {
-                    this.setState({
-                        planningUnits: [],
-                        planningUnitValues: []
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 409:
-                                this.setState({
-                                    message: i18n.t('static.common.accessDenied'),
-                                    loading: false,
-                                    color: "#BA0C2F",
-                                });
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: error.response.data.messageCode,
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-        }
     }
     /**
      * Toggles the view based on the selected option.
@@ -737,76 +673,6 @@ class ShipmentGlobalView extends Component {
             );
     }
     /**
-     * Retrieves the list of product categories based on the realm ID and updates the state with the list.
-     */
-    getProductCategories() {
-        this.setState({
-            loading: true
-        })
-        let realmId = AuthenticationService.getRealmId();
-        ProductService.getProductCategoryList(realmId)
-            .then(response => {
-                var list = response.data;
-                // list.sort((a, b) => {
-                //     var itemLabelA = getLabelText(a.payload.label, this.state.lang).toUpperCase(); 
-                //     var itemLabelB = getLabelText(b.payload.label, this.state.lang).toUpperCase(); 
-                //     return itemLabelA > itemLabelB ? 1 : -1;
-                // });
-                this.setState({
-                    productCategories: list, loading: false
-                }, () => { })
-            }).catch(
-                error => {
-                    this.setState({
-                        productCategories: [], loading: false
-                    })
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 409:
-                                this.setState({
-                                    message: i18n.t('static.common.accessDenied'),
-                                    loading: false,
-                                    color: "#BA0C2F",
-                                });
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.productcategory') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
-                        }
-                    }
-                }
-            );
-    }
-
-    /**
      * Retrieves the list of funding sources types.
      */
     getFundingSourceType = () => {
@@ -887,7 +753,137 @@ class ShipmentGlobalView extends Component {
                 }
             );
     }
-
+    getDropdownLists() {
+        var json = {
+        programIds: this.state.programValues.map(ele => ele.value),
+        onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
+        }
+        ReportService.getDropdownListByProgramIds(json).then(response => {
+        this.setState({
+            equivalencyUnitList: response.data.equivalencyUnitList,
+            planningUnitListAll: response.data.planningUnitList,
+            planningUnitList: response.data.planningUnitList,
+            planningUnitId: [],
+            consumptions: []
+        }, () => {
+            if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
+            var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+            var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+            this.setState({
+                planningUnitList: planningUnitList
+            })
+            }
+        })
+        }).catch(
+        error => {
+            this.setState({
+            consumptions: [], loading: false
+            }, () => { })
+            if (error.message === "Network Error") {
+            this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+            });
+            } else {
+            switch (error.response ? error.response.status : "") {
+                case 401:
+                this.props.history.push(`/login/static.message.sessionExpired`)
+                break;
+                case 409:
+                this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                });
+                break;
+                case 403:
+                this.props.history.push(`/accessDenied`)
+                break;
+                case 500:
+                case 404:
+                case 406:
+                this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                });
+                break;
+                case 412:
+                this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                    loading: false
+                });
+                break;
+                default:
+                this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                });
+                break;
+            }
+            }
+        }
+        );
+    }
+    yAxisChange(e) {
+        var yaxisEquUnit = e.target.value;
+        var planningUnitList = this.state.planningUnitListAll;
+        var yaxisEquUnitLabel = document.getElementById("yaxisEquUnit").selectedOptions[0].text.toString()
+        if (yaxisEquUnit != -1) {
+            var validFu = this.state.equivalencyUnitList.filter(x => x.id == e.target.value)[0].forecastingUnitIds;
+            planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+        }
+        this.setState({
+            yaxisEquUnit: yaxisEquUnit,
+            planningUnitList: planningUnitList,
+            yaxisEquUnitLabel: [yaxisEquUnitLabel],
+            planningUnitId: [],
+            consumptions: [],
+            onlyShowAllPUs: false
+        }, () => {
+            
+        })
+    }
+    setPlanningUnit(e) {
+        if (this.state.yaxisEquUnit == -1) {
+        var selectedText = e.map(item => item.label);
+        var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
+        var planningUnitIds = e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList; 
+        this.setState({
+            planningUnitId: planningUnitIds,
+            planningUnitLabels: planningUnitIds.map(ele => ele.label),
+            planningUnitIdExport: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
+            show: false,
+            dataList: [],
+            consumptionAdjForStockOutId: false,
+            loading: false,
+            planningUnitDetails: "",
+            planningUnitDetailsExport: ""
+        }, () => {
+            // this.filterData(this.state.rangeValue);
+        })
+        } else {
+            if (this.state.yaxisEquUnit > 0) {
+                var planningUnitIds = e.map(ele => ele)
+                this.setState({
+                planningUnitId: planningUnitIds,
+                planningUnitLabels: planningUnitIds.map(ele => ele.label),
+                planningUnitIdExport: e.map(ele => ele),
+                show: false,
+                dataList: [],
+                consumptionAdjForStockOutId: false,
+                loading: false
+                }, () => {
+                if (this.state.planningUnitId.length > 0) {
+                    // this.filterData(this.state.rangeValue);
+                } else {
+                    this.setState({
+                    consumptions: [],
+                    }, () => { })
+                }
+                })
+            }
+        }
+    }
     /**
      * Handles the dismiss of the range picker component.
      * Updates the component state with the new range value and triggers a data fetch.
@@ -919,12 +915,10 @@ class ShipmentGlobalView extends Component {
         let procurementAgentTypeIds = this.state.procurementAgentTypeValues.length == this.state.procurementAgentTypes.length ? [] : this.state.procurementAgentTypeValues.map(ele => (ele.value).toString());
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let fundingSourcetypeIds = this.state.fundingSourceTypeValues.length == this.state.fundingSourceTypes.length ? [] : this.state.fundingSourceTypeValues.map(ele => (ele.value).toString());
-        let productCategoryId = document.getElementById("productCategoryId").value;
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-        let useApprovedVersion = document.getElementById("includeApprovedVersions").value
         let includePlanningShipments = document.getElementById("includePlanningShipments").value
         let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-        let planningUnitId = document.getElementById("planningUnitId").value;
+        let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
         let fundingSourceProcurementAgentIds = [];
@@ -938,23 +932,21 @@ class ShipmentGlobalView extends Component {
             fundingSourceProcurementAgentIds = fundingSourcetypeIds;
         }
 
-        if (realmId > 0 && planningUnitId != 0 && productCategoryId != -1 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0) || (viewby == 4 && this.state.fundingSourceTypeValues.length > 0))) {
-            let planningUnitUnit = this.state.planningUnits.filter(c => c.planningUnitId == planningUnitId)[0].unit;
+        if (realmId > 0 && planningUnitIds.length != 0 && this.state.countryValues.length > 0 && this.state.programValues.length > 0 && ((viewby == 2 && this.state.procurementAgentValues.length > 0) || (viewby == 3 && this.state.procurementAgentTypeValues.length > 0) || (viewby == 1 && this.state.fundingSourceValues.length > 0) || (viewby == 4 && this.state.fundingSourceTypeValues.length > 0))) {
             this.setState({
                 message: '',
-                loading: true,
-                puUnit: planningUnitUnit
+                loading: true
             })
             var inputjson = {
                 realmId: realmId,
                 startDate: startDate,
                 stopDate: endDate,
                 realmCountryIds: CountryIds,
+                equivalencyUnitId: this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit,
                 programIds: programIds,
-                planningUnitId: planningUnitId,
+                planningUnitIds: planningUnitIds,
                 reportView: viewby,
-                fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds
-                , useApprovedSupplyPlanOnly: useApprovedVersion,
+                fundingSourceProcurementAgentIds: fundingSourceProcurementAgentIds,
                 includePlannedShipments: includePlanningShipments
             }
             ReportService.ShipmentGlobalView(inputjson)
@@ -975,8 +967,6 @@ class ShipmentGlobalView extends Component {
                         }
                         this.setState({
                             data: response.data,
-                            shipmentList: response.data.shipmentList,
-                            dateSplitList: response.data.dateSplitList,
                             countrySplitList: response.data.countrySplitList,
                             countryShipmentSplitList: response.data.countryShipmentSplitList,
                             table1Headers: table1Headers,
@@ -990,8 +980,6 @@ class ShipmentGlobalView extends Component {
                     else {
                         this.setState({
                             data: response.data,
-                            shipmentList: response.data.shipmentList,
-                            dateSplitList: response.data.dateSplitList,
                             countrySplitList: response.data.countrySplitList,
                             countryShipmentSplitList: response.data.countryShipmentSplitList,
                             table1Headers: [],
@@ -1056,8 +1044,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.common.realmtext'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1069,8 +1055,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.program.validcountrytext'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1082,8 +1066,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.common.selectProgram'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1091,25 +1073,10 @@ class ShipmentGlobalView extends Component {
                 lab: [],
                 val: []
             });
-        } else if (productCategoryId == -1) {
-            this.setState({
-                message: i18n.t('static.common.selectProductCategory'),
-                data: [],
-                shipmentList: [],
-                dateSplitList: [],
-                countrySplitList: [],
-                countryShipmentSplitList: [],
-                table1Headers: [],
-                table1Body: [],
-                lab: [],
-                val: []
-            });
-        } else if (planningUnitId == 0) {
+        } else if (planningUnitIds.length == 0) {
             this.setState({
                 message: i18n.t('static.procurementUnit.validPlanningUnitText'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1121,8 +1088,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.fundingSource.selectFundingSource'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1134,8 +1099,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.procurementAgent.selectProcurementAgent'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1147,8 +1110,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.shipment.shipmentProcurementAgentType'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1160,8 +1121,6 @@ class ShipmentGlobalView extends Component {
             this.setState({
                 message: i18n.t('static.shipment.selectFundingSourceType'),
                 data: [],
-                shipmentList: [],
-                dateSplitList: [],
                 countrySplitList: [],
                 countryShipmentSplitList: [],
                 table1Headers: [],
@@ -1293,13 +1252,13 @@ class ShipmentGlobalView extends Component {
                             this.setState({
                                 programLst: listArray
                             }, () => {
-                                this.getProductCategories();
+                                this.getDropdownLists();
                             });
                         } else {
                             this.setState({
                                 programLst: []
                             }, () => {
-                                this.getProductCategories()
+                                this.getDropdownLists();
                             });
                         }
                     }).catch(
@@ -1365,14 +1324,6 @@ class ShipmentGlobalView extends Component {
      * @returns {JSX.Element} - Shipment Global View report table.
      */
     render() {
-        const { planningUnits } = this.state;
-        let planningUnitList = [];
-        planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    { label: getLabelText(item.label, this.state.lang), value: item.planningUnitId }
-                )
-            }, this);
         const { procurementAgents } = this.state;
         let procurementAgentList = [];
         procurementAgentList = procurementAgents.length > 0
@@ -1410,7 +1361,6 @@ class ShipmentGlobalView extends Component {
         let countryList = countrys.length > 0 && countrys.map((item, i) => {
             return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
         }, this);
-        const { productCategories } = this.state;
         const { programLst } = this.state;
         let programList = [];
         programList = programLst.length > 0
@@ -1419,6 +1369,23 @@ class ShipmentGlobalView extends Component {
                     { label: (item.code), value: item.id }
                 )
             }, this);
+        const { equivalencyUnitList } = this.state;
+        let equivalencyUnitList1 = equivalencyUnitList.length > 0
+        && equivalencyUnitList.map((item, i) => {
+            return (
+            <option key={i} value={item.id}>
+                {item.label.label_en}
+            </option>
+            )
+        }, this);
+        const { planningUnitList, lang } = this.state;
+        let puList = planningUnitList.length > 0 && planningUnitList.sort(function (a, b) {
+        a = getLabelText(a.label, lang).toLowerCase();
+        b = getLabelText(b.label, lang).toLowerCase();
+        return a < b ? -1 : a > b ? 1 : 0;
+        }).map((item, i) => {
+        return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
+        }, this);
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -1431,13 +1398,16 @@ class ShipmentGlobalView extends Component {
         }
 
         const lightModeColors = [
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-            '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-            '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
         ]
 
         const darkModeColors = [
@@ -1564,7 +1534,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.puUnit.label.label_en,
+                        labelString: "Quantity",
                         fontColor: fontColor
                     },
                     stacked: true,
@@ -1649,7 +1619,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.puUnit.label.label_en,
+                        labelString: "Quantity",
                         fontColor: fontColor
                     },
                     gridLines: {
@@ -1702,7 +1672,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.puUnit.label.label_en,
+                        labelString: "Quantity",
                         fontColor: fontColor
                     },
                     gridLines: {
@@ -1753,7 +1723,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.puUnit.label.label_en,
+                        labelString: "Quantity",
                         fontColor: fontColor,
                     },
                     stacked: true,
@@ -1815,46 +1785,27 @@ class ShipmentGlobalView extends Component {
             }
         }
 
+        
+        const countrySplitList = this.state.countrySplitList || [];
+
+        const amountKeys =
+        countrySplitList.length > 0
+            ? Object.keys(countrySplitList[0].amount || {})
+            : [];
+
+        const datasets = amountKeys.map((key, index) => ({
+            label: key,
+            data: countrySplitList.map(ele => ele.amount?.[key] || 0),
+            backgroundColor: backgroundColor[index], // optional dynamic color function
+            borderWidth: 0
+        }));
+
         const bar = {
-            labels: this.state.countryShipmentSplitList.map(ele => (ele.country.label.label_en)),
-            datasets: [{
-                label: i18n.t('static.shipment.orderedShipment'),
-                data: this.state.countryShipmentSplitList.map(ele => (ele.orderedShipmentAmt)),
-                backgroundColor: '#0067B9',
-                borderWidth: 0
-            },
-            {
-                label: i18n.t('static.shipment.plannedShipment'),
-                data: this.state.countryShipmentSplitList.map(ele => (ele.plannedShipmentAmt)),
-                backgroundColor: '#A7C6ED',
-                borderWidth: 0,
-            }
-            ]
-        }
-        let displaylabel = (this.state.dateSplitList.length > 0 ? Object.keys(this.state.dateSplitList[0].amount) : []);
-        let dateSplitList = this.state.dateSplitList;
-        let displayObject = [];
-        for (var i = 0; i < displaylabel.length; i++) {
-            let holdArray = [];
-            for (var j = 0; j < dateSplitList.length; j++) {
-                let subArraylab = Object.keys(dateSplitList[j].amount);
-                let subArrayval = Object.values(dateSplitList[j].amount);
-                for (var x = 0; x < subArraylab.length; x++) {
-                    if (displaylabel[i].localeCompare(subArraylab[x]) == 0) {
-                        holdArray.push(subArrayval[x]);
-                        x = subArraylab.length;
-                    }
-                }
-            }
-            displayObject.push(holdArray);
-        }
-        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
-        var bar1 = []
-        const dataSet = displaylabel.map((item, index) => ({ label: item, data: displayObject[index], borderWidth: 0, backgroundColor: backgroundColor1[index] }))
-        bar1 = {
-            labels: [...new Set(this.state.dateSplitList.map(ele => (dateFormatterLanguage(moment(ele.transDate, 'YYYY-MM-dd')))))],
-            datasets: dataSet
-        }
+        labels: countrySplitList.map(
+            ele => ele.country.label.label_en
+        ),
+        datasets: datasets
+        };
         return (
             <div className="animated fadeIn" >
                 <AuthenticationServiceComponent history={this.props.history} />
@@ -1862,7 +1813,7 @@ class ShipmentGlobalView extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
-                        {(this.state.shipmentList.length > 0 || this.state.dateSplitList.length > 0 || this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
+                        {(this.state.countrySplitList.length > 0 || this.state.countryShipmentSplitList.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
@@ -1885,7 +1836,7 @@ class ShipmentGlobalView extends Component {
                                         }
                                     }}
                                     />
-                                    {(this.state.shipmentList.length > 0 || this.state.countrySplitList.length > 0) &&
+                                    {(this.state.countrySplitList.length > 0) &&
                                         <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                     }
                                 </a>
@@ -1951,53 +1902,49 @@ class ShipmentGlobalView extends Component {
                                                     <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                                                 )}
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                        <FormGroup className="col-md-3" id="equivelencyUnitDiv">
+                                            <Label htmlFor="appendedInputButton">{i18n.t("static.forecastReport.yAxisInEquivalencyUnit")}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="productCategoryId"
-                                                        id="productCategoryId"
-                                                        bsSize="sm"
-                                                        onChange={this.getPlanningUnit}
-                                                    >
-                                                        <option value="-1">{i18n.t('static.common.select')}</option>
-                                                        {productCategories.length > 0
-                                                            && productCategories.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.payload.productCategoryId} disabled={item.payload.active ? "" : "disabled"}>
-                                                                        {Array(item.level).fill(' ').join('') + (getLabelText(item.payload.label, this.state.lang))}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
+                                                <Input
+                                                    type="select"
+                                                    name="yaxisEquUnit"
+                                                    id="yaxisEquUnit"
+                                                    bsSize="sm"
+                                                    value={this.state.yaxisEquUnit}
+                                                    onChange={(e) => { this.yAxisChange(e); }}
+                                                >
+                                                    <option value="-1">{i18n.t('static.program.no')}</option>
+                                                    {equivalencyUnitList1}
+                                                </Input>
+
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-sm-3" id="hideDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                                            <div className="controls">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="planningUnitId"
-                                                        id="planningUnitId"
-                                                        bsSize="sm"
-                                                        onChange={this.fetchData}
-                                                    >
-                                                        <option value="0">{i18n.t('static.common.select')}</option>
-                                                        {planningUnits.length > 0
-                                                            && planningUnits.map((item, i) => {
-                                                                return (
-                                                                    <option key={i} value={item.planningUnitId}>
-                                                                        {getLabelText(item.label, this.state.lang)}
-                                                                    </option>
-                                                                )
-                                                            }, this)}
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
+                                        <FormGroup className="col-md-3" >
+                                            <Label
+                                                className="form-check-label"
+                                                // check htmlFor="inline-radio1"
+                                                title={i18n.t('static.report.planningUnit')}>
+                                                {i18n.t('static.report.planningUnit')}
+                                            </Label>
+                                            <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
+                                                <div className="controls">
+                                                    <div onBlur={this.handleBlur}>
+                                                        <MultiSelect
+                                                            bsSize="sm"
+                                                            name="planningUnitId"
+                                                            id="planningUnitId"
+                                                            filterOptions={filterOptions}
+                                                            value={this.state.planningUnitId}
+                                                            onChange={(e) => { this.setPlanningUnit(e); }}
+                                                            options={puList && puList.length > 0 ? puList : []}
+                                                            hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
+                                                            showCheckboxes={this.state.yaxisEquUnit == -1 ? false : true}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </FormGroup>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
@@ -2089,23 +2036,6 @@ class ShipmentGlobalView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="includeApprovedVersions"
-                                                        id="includeApprovedVersions"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.fetchData() }}
-                                                    >
-                                                        <option value="true">{i18n.t('static.program.yes')}</option>
-                                                        <option value="false">{i18n.t('static.program.no')}</option>
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -2132,13 +2062,6 @@ class ShipmentGlobalView extends Component {
                                             <div className="col-md-6">
                                                 <div className="chart-wrapper chart-graph-report">
                                                     <Bar id="cool-canvas1" data={bar} options={options} />
-                                                </div>
-                                            </div>
-                                        }
-                                        {this.state.dateSplitList.length > 0 &&
-                                            <div className="col-md-6">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas2" data={bar1} options={this.state.viewby == 1 ? options1 : this.state.viewby == 2 ? options2 : this.state.viewby == 3 ? options3 : options4} />
                                                 </div>
                                             </div>
                                         }
@@ -2174,48 +2097,6 @@ class ShipmentGlobalView extends Component {
                                                                                     </td>
                                                                                 )
                                                                             }
-                                                                        </tr>
-                                                                    )}
-                                                            </tbody>
-                                                        </Table>
-                                                    </div>
-                                                }
-                                                {this.state.shipmentList.length > 0 &&
-                                                    <div className="table-responsive ">
-                                                        <Table id="mytable2" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th className="text-center" style={{ width: '350px' }}> {i18n.t('static.dashboard.months')} </th>
-                                                                    <th className="text-center " style={{ width: '350px' }}> {i18n.t('static.program.realmcountry')} </th>
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.supplyPlan.amountInUSD')}</th>
-                                                                    {
-                                                                        this.state.viewby == 1 &&
-                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.budget.fundingsource')}</th>
-                                                                    }
-                                                                    {
-                                                                        this.state.viewby == 2 &&
-                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.procurementagent.procurementagent')}</th>
-                                                                    }
-                                                                    {
-                                                                        this.state.viewby == 3 &&
-                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.dashboard.procurementagentType')}</th>
-                                                                    }
-                                                                    {
-                                                                        this.state.viewby == 4 &&
-                                                                        <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.funderTypeHead.funderType')}</th>
-                                                                    }
-                                                                    <th className="text-center" style={{ width: '350px' }}>{i18n.t('static.common.status')}</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {
-                                                                    this.state.shipmentList.map((item, idx) =>
-                                                                        <tr id="addr0" key={idx} >
-                                                                            <td>{moment(this.state.shipmentList[idx].transDate, 'YYYY-MM-dd').format('MMM YYYY')}</td>
-                                                                            <td>{getLabelText(this.state.shipmentList[idx].country.label, this.state.lang)}</td>
-                                                                            <td>{this.state.shipmentList[idx].amount.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                            <td>{getLabelText(this.state.shipmentList[idx].fundingSourceProcurementAgent.label, this.state.lang)}</td>
-                                                                            <td>{getLabelText(this.state.shipmentList[idx].shipmentStatus.label, this.state.lang)}</td>
                                                                         </tr>
                                                                     )}
                                                             </tbody>
