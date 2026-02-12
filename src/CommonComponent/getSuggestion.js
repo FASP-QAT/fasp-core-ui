@@ -516,6 +516,8 @@ export default function getSuggestion(row, lang) {
             suggestion=i18n.t('static.problemList.suggestion1')
         }else if(obj.overMaxMonthsCount == 0 && obj.stockedOutMonthsCount == 0){
             suggestion=i18n.t('static.problemList.suggestion2')
+        }else if(obj.underMinMonthsCount == 0 && obj.overMaxMonthsCount == 0){
+            suggestion=i18n.t('static.problemList.suggestion2')
         }else{
             suggestion=i18n.t('static.problemList.suggestion3')
         }
