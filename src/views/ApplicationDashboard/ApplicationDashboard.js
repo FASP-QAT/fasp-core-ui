@@ -1180,8 +1180,8 @@ class ApplicationDashboard extends Component {
           }, () => {
             if (document.getElementById("shipmentsTBDJexcel")) {
               this.buildStockedOutJexcel();
-              this.buildForecastErrorJexcel();
               this.buildShipmentsTBDJexcel();
+              this.buildForecastErrorJexcel();
               this.buildExpiriesJexcel();
               this.setState({
                 bottomSubmitLoader: false,
@@ -1869,8 +1869,8 @@ class ApplicationDashboard extends Component {
       if (key == "dashboardBottomData") {
         if (document.getElementById("shipmentsTBDJexcel")) {
           this.buildStockedOutJexcel();
-          this.buildForecastErrorJexcel();
           this.buildShipmentsTBDJexcel();
+          this.buildForecastErrorJexcel();
           this.buildExpiriesJexcel();
         }
         this.setState({
@@ -1993,7 +1993,7 @@ class ApplicationDashboard extends Component {
         }
       ],
       onload: function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance, 1);
+        jExcelLoadedFunctionWithoutPagination(instance, 2);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         var elInstance = instance.worksheets[0];
@@ -2022,7 +2022,7 @@ class ApplicationDashboard extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-      height: 10,
+      height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -2072,7 +2072,7 @@ class ApplicationDashboard extends Component {
           width: '70px'
         }
       ],
-      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
       pagination: false,
       search: false,
       columnSorting: true,
@@ -2183,7 +2183,7 @@ class ApplicationDashboard extends Component {
     var options = {
       data: data,
       columnDrag: false,
-      colWidths: [20, 80],
+      colWidths: [20, 40],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -3577,6 +3577,9 @@ class ApplicationDashboard extends Component {
                       <th scope="col">{i18n.t("static.common.programAndProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.activePlanningUnits")}</th>
                       <th scope="col">{i18n.t("static.dashboard.stockoutPUs")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">Stock Status Score</th>
+                      <th scope="col" width="125px">Quality Score</th>
+                      <th scope="col" width="125px">Overall Score</th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.totalExpiriesCost")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope='col' width="125px">{i18n.t("static.dashboard.openQATProblems")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
                       <th scope='col'>{i18n.t("static.dashboard.uploadedDate")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
@@ -3610,6 +3613,15 @@ class ApplicationDashboard extends Component {
                                   </div>
                                 </div>
                               </div>
+                            </td>
+                            <td>
+                              0
+                            </td>
+                            <td>
+                              0
+                            </td>
+                            <td>
+                              0
                             </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
@@ -3788,10 +3800,20 @@ class ApplicationDashboard extends Component {
                 {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
                   {/* <div className='col-md-12'> */}
                   <div className='row px-3 pt-lg-2'>
-                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
+                    <div className={'col-md-3'}>
+                      <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
+                        <div class="card-header justify-content-between">
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                        </div>
+                        <div class="card-body pt-lg-2 scrollable-content">
+                        </div>
+                      </div>
+                    </div>
+                    <div className={'col-md-3'}>
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalShipments")}: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{this.state.dashboardBottomData.stockStatusScore}{"%"}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
@@ -3804,19 +3826,7 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
-                      {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
-                        <div class="card-header  justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> {i18n.t("static.report.error")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                        </div>
-                        <div class="card-body px-1 py-2">
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='col-md-6'>
+                    <div className={'col-md-6'}>
                       <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>{i18n.t("static.report.orders")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
@@ -3872,6 +3882,7 @@ class ApplicationDashboard extends Component {
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalShipments")}: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{this.state.dashboardBottomData.supplyPlanQualityScore}{"%"}</b></i></div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
@@ -3911,7 +3922,19 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className='col-md-6'>
+                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
+                      {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
+                      <div className="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{ overflow: 'visible' }}>
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> {i18n.t("static.report.error")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                        </div>
+                        <div class="card-body px-1 py-2 scrollable-content" style={{ overflow: 'visible' }}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '3px 8px' }}>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={this.state.onlyDownloadedBottomProgram ? "col-md-6" : "col-md-3"}>
                       <div className='row'>
                         <div class="col-md-12">
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{ overflow: 'visible' }}>

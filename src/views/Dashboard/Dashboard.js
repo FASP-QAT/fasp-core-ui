@@ -193,6 +193,12 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             shipmentDetailsList.map(item => {
                                 shipmentTotal += Number(item.cost)
                             })
+                            var flaggedCountForecastConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length;
+                            var flaggedCountActualConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length;
+                            var flaggedCountInventoryData = [...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length;
+                            var flaggedCountShipmentData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+console.log("StockStatusScore",Number(stockOut),Number(underStock),Number(adequate),Number(overStock))
+console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flaggedCountActualConsumptionData),Number(flaggedCountInventoryData),Number(flaggedCountShipmentData))
                             dashboardBottomData = {
                                 "stockStatus": {
                                     "stockOut": stockOut,
@@ -214,22 +220,24 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 "forecastErrorList": [],
                                 "forecastConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountForecastConsumptionData
                                 },
                                 "actualConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountActualConsumptionData
                                 },
                                 "inventoryQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountInventoryData
                                 },
                                 "shipmentQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountShipmentData
                                 },
                                 "expiryTotal": expiryTotal,
-                                "shipmentTotal": shipmentTotal
+                                "shipmentTotal": shipmentTotal,
+                                "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
+                                "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
                             }
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                             props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
