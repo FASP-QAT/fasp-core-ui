@@ -2939,6 +2939,14 @@ export default class CommitTreeComponent extends React.Component {
                                     consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
+                                for(var t=0;t<treeList.length;t++){
+                                    var flatList=treeList[t].tree.flatList;
+                                    for(var fl=0;fl<flatList.length;fl++){
+                                        flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.targetScenarioId);
+                                    }
+                                    treeList[t].tree.flatList=flatList;
+                                }
+                                programJson.treeList=treeList;
                                 var regionList=programJson.regionList;
                                 var planningUnitToUpdate = programJson.planningUnitList;
                                 for (var pl = 0; pl < planningUnitToUpdate.length; pl++) {
