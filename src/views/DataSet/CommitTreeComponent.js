@@ -2795,25 +2795,43 @@ export default class CommitTreeComponent extends React.Component {
         var checkIfThereAreTreesWithBlankFU = false;
         var localDatasetData = this.state.finalProgramJson;
         var treeList = localDatasetData.treeList;
-        for (var tl = 0; tl < treeList.length && !checkIfThereAreTreesWithBlankPU && !checkIfThereAreTreesWithBlankFU; tl++) {
+        var invalidNodes = []; // Array to store invalid nodes information
+        for (var tl = 0; tl < treeList.length; tl++) {
             var tree = treeList[tl];
             var scenarioList = tree.scenarioList
-            for (var ndm = 0; ndm < scenarioList.length && !checkIfThereAreTreesWithBlankPU && !checkIfThereAreTreesWithBlankFU; ndm++) {
-                var flatList = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[scenarioList[ndm].id][0].puNode.planningUnit.id == null);
-                if (flatList.length > 0) {
+            for (var ndm = 0; ndm < scenarioList.length; ndm++) {
+                var flatListPU = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 5 && (c.payload.nodeDataMap[scenarioList[ndm].id][0].puNode.planningUnit.id == null || c.payload.nodeDataMap[scenarioList[ndm].id][0].puNode.planningUnit.id == ""));
+                if (flatListPU.length > 0) {
                     checkIfThereAreTreesWithBlankPU = true;
+                    flatListPU.forEach(node => {
+                        invalidNodes.push({
+                            treeName: getLabelText(tree.label),
+                            scenarioName: getLabelText(scenarioList[ndm].label),
+                            nodeType: "Planning Unit Node",
+                            nodeName: getLabelText(node.payload.label)
+                        });
+                    });
                 }
-                var flatList1 = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 4 && c.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode.forecastingUnit.id == null);
-                if (flatList.length > 0) {
-                    checkIfThereAreTreesWithBlankPU = true;
-                }
-                if (flatList1.length > 0) {
+                var flatListFU = (tree.tree).flatList.filter(c => c.payload.nodeType.id == 4 && (c.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode.forecastingUnit.id == null || c.payload.nodeDataMap[scenarioList[ndm].id][0].fuNode.forecastingUnit.id == ""));
+                if (flatListFU.length > 0) {
                     checkIfThereAreTreesWithBlankFU = true;
+                    flatListFU.forEach(node => {
+                    invalidNodes.push({
+                        treeName: getLabelText(tree.label),
+                        scenarioName: getLabelText(scenarioList[ndm].label),
+                        nodeType: "Forecasting Unit Node",
+                        nodeName: getLabelText(node.payload.label)
+                    });
+                })
                 }
             }
         }
         if (checkIfThereAreTreesWithBlankFU || checkIfThereAreTreesWithBlankPU) {
-            alert(i18n.t("static.commitTree.noPUorFUMapping"));
+            let alertMessage = i18n.t("static.commitTree.noPUorFUMapping") + "\n\n";
+        invalidNodes.forEach((node, index) => {
+            alertMessage += `${index + 1}. Tree Name: ${node.treeName}\n Scenario Name: ${node.scenarioName} Node Type: ${node.nodeType} Node Name: ${node.nodeName}\n\n`;
+        });
+        alert(alertMessage);
         } else {
             this.setState({ showValidation: !this.state.showValidation }, () => {
                 this.setState({
@@ -2922,6 +2940,14 @@ export default class CommitTreeComponent extends React.Component {
                                     consumptionExtrapolationToUpdate[ce].extrapolationDataList = cel;
                                 }
                                 programJson.consumptionExtrapolation = consumptionExtrapolationToUpdate;
+                                for(var t=0;t<treeList.length;t++){
+                                    var flatList=treeList[t].tree.flatList;
+                                    for(var fl=0;fl<flatList.length;fl++){
+                                        flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.targetScenarioId);
+                                    }
+                                    treeList[t].tree.flatList=flatList;
+                                }
+                                programJson.treeList=treeList;
                                 var regionList=programJson.regionList;
                                 var planningUnitToUpdate = programJson.planningUnitList;
                                 for (var pl = 0; pl < planningUnitToUpdate.length; pl++) {
