@@ -6,6 +6,8 @@ import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
 import Picker from 'react-month-picker';
 import { MultiSelect } from 'react-multi-select-component';
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import {
     Card,
     CardBody,
@@ -15,10 +17,13 @@ import {
     Label,
     Table
 } from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import FundingSourceService from '../../api/FundingSourceService';
 import PlanningUnitService from '../../api/PlanningUnitService';
@@ -31,6 +36,7 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import WorldMap from '../../CommonComponent/WorldMap.js';
 const ref = React.createRef();
 // const backgroundColor = [
 //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
@@ -114,6 +120,9 @@ class ShipmentGlobalView extends Component {
             planningUnitList: [],
             planningUnitListAll: [],
             planningUnitId: [],
+            shipmentJexcel: '',
+            yaxisEquUnitLabel: [i18n.t('static.program.no')],
+            viewByLabel: [i18n.t('static.dashboard.fundingsource')],
         };
         this.getCountrys = this.getCountrys.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -121,7 +130,112 @@ class ShipmentGlobalView extends Component {
         this.handleChange = this.handleChange.bind(this)
         this.handleChangeProgram = this.handleChangeProgram.bind(this)
         this.filterProgram = this.filterProgram.bind(this);
-        this.yAxisChange = this.yAxisChange.bind(this)
+        this.yAxisChange = this.yAxisChange.bind(this);
+        this.buildShipmentJexcel = this.buildShipmentJexcel.bind(this);
+        this.calculateTotals = this.calculateTotals.bind(this);
+        this.recalculateFooter = this.recalculateFooter.bind(this);
+    }
+    loaded = function (instance, cell) {
+        jExcelLoadedFunction(instance);
+    }
+    buildShipmentJexcel() {
+        if(this.state.countrySplitList.length > 0){
+            const countrySplitList = this.state.countrySplitList || [];
+            const amountKeys =
+            countrySplitList.length > 0
+                ? Object.keys(countrySplitList[0].amount || {})
+                : [];
+
+            var data = countrySplitList.map(ele => {
+                const fundingValues = amountKeys.map(
+                    key => ele.amount?.[key] || 0
+                );
+
+                const total = fundingValues.reduce((a, b) => a + b, 0);
+
+                return [
+                    ele.country.label.label_en,
+                    ...fundingValues,
+                    total
+                ];
+            });
+            let columnTotals = new Array(amountKeys.length).fill(0);
+            let grandTotal = 0;
+
+            data.forEach(row => {
+                amountKeys.forEach((_, index) => {
+                    columnTotals[index] += row[index + 1];
+                });
+                grandTotal += row[row.length - 1];
+            });
+
+            const footerRow = [
+                "Total",
+                ...columnTotals,
+                grandTotal
+            ];
+            this.el = jexcel(document.getElementById("shipmentJexcel"), '');
+            jexcel.destroy(document.getElementById("shipmentJexcel"), true);
+            var options = {
+            data: data,
+            columnDrag: false,
+            colWidths: [50, 50, 50],
+            colHeaderClasses: ["Reqasterisk"],
+            columns: [
+                { type: 'text', title: 'Country' },
+                ...amountKeys.map(key => ({
+                    type: 'numeric',
+                    title: key,
+                    mask: '#,##'
+                })),
+                { type: 'numeric', title: 'Total', mask: '#,##' }
+            ],
+            onload: this.loaded,
+            editable: false,
+            onselection: this.selected,
+            pagination: localStorage.getItem("sesRecordCount"),
+            search: true,
+            columnSorting: true,
+            wordWrap: true,
+            allowInsertColumn: false,
+            allowManualInsertColumn: false,
+            allowDeleteRow: true,
+            oneditionend: this.onedit,
+            copyCompatibility: true,
+            allowExport: false,
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            position: 'top',
+            filters: true,
+            parseFormulas: true,
+            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            contextMenu: function (obj, x, y, e) {
+                return false;
+            }.bind(this),
+            footers: [
+                this.calculateTotals(data, amountKeys.length)
+            ],
+            onfilter: (instance) => {
+                this.recalculateFooter(instance, amountKeys);
+            },
+
+            onsort: (instance) => {
+                setTimeout(() => {
+                    this.recalculateFooter(instance);
+                }, 0);
+            },
+            updateTable: function(instance, cell, col, row) {
+                if (row === instance.getData().length) {
+                    cell.style.fontWeight = 'bold';
+                    cell.style.background = '#f3f3f3';
+                }
+            }
+            };
+            var shipmentJexcel = jexcel(document.getElementById("shipmentJexcel"), options);
+            this.el = shipmentJexcel;
+            this.setState({
+                shipmentJexcel: shipmentJexcel,
+            })
+        }
     }
     /**
      * Exports the data to a CSV file.
@@ -136,9 +250,10 @@ class ShipmentGlobalView extends Component {
         this.state.programLabels.map(ele =>
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.dashboard.productcategory') + ' : ' + (document.getElementById("productCategoryId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + ( this.state.yaxisEquUnitLabel.join('; '))).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (document.getElementById("planningUnitId").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        this.state.planningUnitLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
         var viewby = document.getElementById("viewById").value;
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
@@ -157,65 +272,63 @@ class ShipmentGlobalView extends Component {
                 csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('')
-        csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
         csvRow.push('"' + ((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        var re;
-        if (this.state.table1Body.length > 0) {
-            var A = [];
-            let tableHead = this.state.table1Headers;
-            let tableHeadTemp = [];
-            for (var i = 0; i < tableHead.length; i++) {
-                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
-            }
-            A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
-            re = this.state.table1Body
-            for (var item = 0; item < re.length; item++) {
-                A.push([[('"' + getLabelText(re[item].country.label, this.state.lang)).replaceAll(' ', '%20') + '"', addDoubleQuoteToRowContent(re[item].amount)]])
-            }
-            for (var i = 0; i < A.length; i++) {
-                csvRow.push(A[i].join(","))
-            }
-        }
         csvRow.push('')
-        csvRow.push('')
-        csvRow.push('')
-        if (this.state.shipmentList.length > 0) {
-            let tempLabel = '';
-            if (viewby == 1) {
-                tempLabel = i18n.t('static.budget.fundingsource');
-            } else if (viewby == 2) {
-                tempLabel = i18n.t('static.procurementagent.procurementagent');
-            } else if (viewby == 3) {
-                tempLabel = i18n.t('static.dashboard.procurementagentType');
-            } else if (viewby == 4) {
-                tempLabel = i18n.t('static.funderTypeHead.funderType');
+        const amountKeys =
+            this.state.countrySplitList.length > 0
+                ? Object.keys(this.state.countrySplitList[0].amount || {})
+                : [];
+        const data = this.state.countrySplitList.map(ele => {
+                const fundingValues = amountKeys.map(
+                    key => ele.amount?.[key] || 0
+                );
+
+                const total = fundingValues.reduce((a, b) => a + b, 0);
+
+                return [
+                    ele.country.label.label_en,
+                    ...fundingValues,
+                    total
+                ];
+            });
+        const csvHeader = [
+            ...this.state.table1Headers,
+            i18n.t("static.supplyPlan.total")
+        ];
+        csvRow.push(addDoubleQuoteToRowContent(csvHeader)); // <-- Add this line
+        data.forEach(row => {
+            csvRow.push(addDoubleQuoteToRowContent(row));
+        });
+        if (data.length > 0) {
+            const colCount = data[0].length;
+            let totals = new Array(colCount).fill(0);
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 1; j < colCount; j++) {
+                    totals[j] += Number(data[i][j]) || 0;
+                }
             }
-            var B = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.months').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.program.realmcountry').replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.supplyPlan.amountInUSD').replaceAll(',', ' ')).replaceAll(' ', '%20'), (tempLabel.replaceAll(',', ' ')).replaceAll(' ', '%20'), (i18n.t('static.common.status').replaceAll(',', ' ')).replaceAll(' ', '%20')])];
-            re = this.state.shipmentList;
-            for (var item = 0; item < re.length; item++) {
-                B.push([addDoubleQuoteToRowContent([(moment(re[item].transDate, 'YYYY-MM-dd').format(DATE_FORMAT_CAP_FOUR_DIGITS).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].country.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), re[item].amount, (getLabelText(re[item].fundingSourceProcurementAgent.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (getLabelText(re[item].shipmentStatus.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20')])])
+            totals[0] = "Total";
+            for (let j = 1; j < colCount; j++) {
+                totals[j] = totals[j].toLocaleString('en-US');
             }
-            for (var i = 0; i < B.length; i++) {
-                csvRow.push(B[i].join(","))
-            }
+            csvRow.push(addDoubleQuoteToRowContent(totals));
         }
         var csvString = csvRow.join("%0A")
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentGlobalViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.report.orders') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
     /**
      * Exports the data to a PDF file.
      */
-    exportPDF = () => {
+    exportPDF = async () => {
         const addFooters = doc => {
             const pageCount = doc.internal.getNumberOfPages()
             doc.setFont('helvetica', 'bold')
@@ -224,10 +337,10 @@ class ShipmentGlobalView extends Component {
                 doc.setPage(i)
                 doc.setPage(i)
                 doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                    align: 'center'
+                align: 'center'
                 })
                 doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                    align: 'center'
+                align: 'center'
                 })
             }
         }
@@ -239,8 +352,9 @@ class ShipmentGlobalView extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.shipmentGlobalViewheader'), doc.internal.pageSize.width / 2, 60, {
-                    align: 'center'
+                doc.text(i18n.t('static.report.orders') + " (" + i18n.t('static.report.byCountry') + ")", doc.internal.pageSize.width / 2, 60, {
+                // doc.text(i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")", doc.internal.pageSize.width / 2, 60, {
+                align: 'center'
                 })
                 if (i == 1) {
                     doc.setFont('helvetica', 'normal')
@@ -248,46 +362,6 @@ class ShipmentGlobalView extends Component {
                     doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
                         align: 'left'
                     })
-                    var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
-                    var len = 120 + countryLabelsText.length * 10
-                    var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-                    doc.text(doc.internal.pageSize.width / 8, len, planningText)
-                    len = len + 10 + planningText.length * 10
-                    doc.text(i18n.t('static.planningunit.planningunit') + ' : ' + document.getElementById("planningUnitId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                        align: 'left'
-                    })
-                    len = len + 20
-                    doc.text(i18n.t('static.dashboard.productcategory') + ' : ' + document.getElementById("productCategoryId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                        align: 'left'
-                    })
-                    len = len + 20
-                    doc.text(i18n.t('static.common.display') + ' : ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                        align: 'left'
-                    })
-                    len = len + 20
-                    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                        align: 'left'
-                    })
-                    len = len + 20
-                    doc.text(i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, {
-                        align: 'left'
-                    })
-                    len = len + 20
-                    var viewby = document.getElementById("viewById").value;
-                    if (viewby == 1) {
-                        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, len, fundingSourceText)
-                    } else if (viewby == 2) {
-                        var procurementAgentText = doc.splitTextToSize((i18n.t('static.procurementagent.procurementagent') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, len, procurementAgentText)
-                    } else if (viewby == 3) {
-                        var procurementAgentTypeText = doc.splitTextToSize((i18n.t('static.dashboard.procurementagentType') + ' : ' + this.state.procurementAgentTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, len, procurementAgentTypeText)
-                    } else if (viewby == 4) {
-                        var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-                        doc.text(doc.internal.pageSize.width / 8, len, fundingSourceTypeText)
-                    }
                 }
             }
         }
@@ -296,63 +370,189 @@ class ShipmentGlobalView extends Component {
         const orientation = "landscape";
         const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
-        doc.setFontSize(10);
-        const title = i18n.t('static.dashboard.shipmentGlobalViewheader');
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor("#002f6c");
+        var y = 110;
+        var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + this.state.yaxisEquUnitLabel.join('; '), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize(i18n.t('static.common.display') + ' : ' + this.state.viewByLabel.join('; '), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize((this.state.viewByLabel.join('; ') + ' : ' + (this.state.viewby == 1 ? this.state.fundingSourceLabels.join('; ') : this.state.viewby == 2 ? this.state.procurementAgentLabels.join('; ') : this.state.viewby == 3 ? this.state.procurementAgentTypeLabels.join('; ') : this.state.fundingSourceTypeLabels.join('; ') )), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        planningText = doc.splitTextToSize((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").value ), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        const title = i18n.t('static.dashboard.globalconsumption');
         var canvas = document.getElementById("cool-canvas1");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
-        var width = doc.internal.pageSize.width;
         var height = doc.internal.pageSize.height;
-        doc.addImage(canvasImg, 'png', 50, 260, 300, 200, 'a', 'CANVAS');
-        canvas = document.getElementById("cool-canvas2");
-        canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', width / 2, 260, 300, 200, 'b', 'CANVAS');
-        let displaylabel = [];
-        displaylabel = this.state.dateSplitList.filter((i, index) => (index < 1)).map(ele => (Object.keys(ele.amount)));
-        if (displaylabel.length > 0) {
-            displaylabel = displaylabel[0];
+        var h1 = 50;
+        let startY = y + 10
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
         }
-        let length = displaylabel.length + 1;
-        let content1 = {
-            margin: { top: 80, bottom: 50 },
-            startY: height,
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 520 / displaylabel.length, halign: 'center' },
-            columnStyles: {
-            },
-            html: '#mytable1',
-            didDrawCell: function (data) {
-                if (data.column.index === length && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var img = td.getElementsByTagName('img')[0];
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        doc.setTextColor("#fff");
+        if (startYtable > (height - 400)) {
+            doc.addPage()
+            startYtable = 80
+        }
+        doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
+
+        // Add Map if available
+        const mapContainer = document.querySelector(".world-map-container");
+        if (mapContainer) {
+            const svg = mapContainer.querySelector("svg");
+            if (svg) {
+                try {
+                    const svgData = await new Promise((resolve, reject) => {
+                        const serializer = new XMLSerializer();
+                        const svgString = serializer.serializeToString(svg);
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+                        const img = new Image();
+                        const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+                        const url = URL.createObjectURL(svgBlob);
+                        
+                        img.onload = () => {
+                            canvas.width = svg.getBoundingClientRect().width || 800;
+                            canvas.height = svg.getBoundingClientRect().height || 400;
+                            ctx.fillStyle = "#ffffff";
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                            URL.revokeObjectURL(url);
+                            resolve(canvas.toDataURL("image/png"));
+                        };
+                        img.onerror = (e) => {
+                            reject(e);
+                        }
+                        img.src = url;
+                    });
+                    
+                    let mapY = startYtable + 270;
+                    if ((mapY + 300) > height - 50) { 
+                         doc.addPage();
+                         mapY = 50;
+                    }
+                    doc.addImage(svgData, 'PNG', 100, mapY, 650, 300, 'MAP');
+                } catch (e) {
+                    console.error("Error exporting map", e);
                 }
             }
-        };
-        doc.autoTable(content1);
-        let content2 = {
-            margin: { top: 80, bottom: 50 },
-            startY: doc.autoTableEndPosY() + 50,
-            pageBreak: 'auto',
-            styles: { lineWidth: 1, fontSize: 8, cellWidth: 120, halign: 'center' },
-            columnStyles: {
-                3: { cellWidth: 281.89 },
-            },
-            html: '#mytable2',
-            didDrawCell: function (data) {
-                if (data.column.index === 5 && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var img = td.getElementsByTagName('img')[0];
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
+        }
+        const headers = [
+            ...this.state.table1Headers,
+            i18n.t("static.supplyPlan.total")
+        ];
+        const amountKeys =
+            this.state.countrySplitList.length > 0
+                ? Object.keys(this.state.countrySplitList[0].amount || {})
+                : [];
+        const data = this.state.countrySplitList.map(ele => {
+            const fundingValues = amountKeys.map(
+                key => (ele.amount?.[key] || 0).toLocaleString('en-US')
+            );
+            const total = fundingValues
+                .map(val => Number(val.replace(/,/g, "")))
+                .reduce((a, b) => a + b, 0)
+                .toLocaleString('en-US');
+            return [
+                ele.country.label.label_en,
+                ...fundingValues,
+                total
+            ];
+        });
+
+        let totalRow = [];
+        if (data.length > 0) {
+            const colCount = data[0].length;
+            let totals = new Array(colCount).fill(0);
+            for (let i = 0; i < data.length; i++) {
+                for (let j = 1; j < colCount; j++) {
+                    totals[j] += Number(data[i][j].toString().replace(/,/g, "")) || 0;
                 }
             }
+            totals[0] = "Total";
+            for (let j = 1; j < colCount; j++) {
+                totals[j] = totals[j].toLocaleString('en-US');
+            }
+            totalRow = totals;
+        }
+        doc.addPage()
+        startYtable = 80
+        let content = {
+            margin: { top: 80, bottom: 50 },
+            startY: startYtable,
+            head: [headers],
+            body: [...data, totalRow],
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
         };
-        doc.autoTable(content2);
+        doc.autoTable(content);
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.shipmentGlobalViewheader').concat('.pdf'));
+        doc.save(i18n.t('static.report.orders') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")".concat('.pdf'));
     }
     /**
      * Handles the change event for program selection.
@@ -446,8 +646,10 @@ class ShipmentGlobalView extends Component {
      */
     toggleView = () => {
         let viewby = document.getElementById("viewById").value;
+        var viewByLabel = document.getElementById("viewById").selectedOptions[0].text.toString();
         this.setState({
-            viewby: viewby
+            viewby: viewby,
+            viewByLabel: [viewByLabel]
         });
         if (viewby == 1) {
             document.getElementById("fundingSourceDiv").style.display = "block";
@@ -840,7 +1042,15 @@ class ShipmentGlobalView extends Component {
             consumptions: [],
             onlyShowAllPUs: false
         }, () => {
-            
+            this.fetchData();
+        })
+    }
+    setOnlyShowAllPUs(e) {
+        var checked = e.target.checked;
+        this.setState({
+            onlyShowAllPUs: checked,
+        }, () => {
+            this.getDropdownLists();
         })
     }
     setPlanningUnit(e) {
@@ -859,6 +1069,7 @@ class ShipmentGlobalView extends Component {
             planningUnitDetails: "",
             planningUnitDetailsExport: ""
         }, () => {
+            this.fetchData();
             // this.filterData(this.state.rangeValue);
         })
         } else {
@@ -874,6 +1085,7 @@ class ShipmentGlobalView extends Component {
                 loading: false
                 }, () => {
                 if (this.state.planningUnitId.length > 0) {
+                    this.fetchData();
                     // this.filterData(this.state.rangeValue);
                 } else {
                     this.setState({
@@ -975,6 +1187,7 @@ class ShipmentGlobalView extends Component {
                             val: val,
                             loading: false
                         }, () => {
+                            this.buildShipmentJexcel();
                         })
                     }
                     else {
@@ -1319,11 +1532,62 @@ class ShipmentGlobalView extends Component {
             }
         })
     }
+    calculateTotals = (rows, amountKeysLength) => {
+
+        let columnTotals = new Array(amountKeysLength).fill(0);
+        let grandTotal = 0;
+
+        rows.forEach(row => {
+            for (let i = 0; i < amountKeysLength; i++) {
+            columnTotals[i] += Number(row[i + 1]) || 0;
+            }
+            grandTotal += Number(row[row.length - 1]) || 0;
+        });
+
+        return [
+            "Total",
+            ...columnTotals.map(col => col.toLocaleString('en-US')),
+            grandTotal.toLocaleString('en-US')
+        ];
+    }
+    recalculateFooter = (instance) => {
+
+        const data = instance.getData();
+        const visibleRows = instance.results && instance.results.length > 0 ? instance.results : data.map((_, idx) => idx);
+
+        if (!visibleRows || visibleRows.length === 0) {
+            instance.setFooter([["Total"]]);
+            return;
+        }
+
+        const columnCount = data[0].length;
+        let totals = new Array(columnCount).fill(0);
+
+        visibleRows.forEach(rowIndex => {
+            const row = data[rowIndex];
+            for (let col = 1; col < columnCount; col++) {
+                // Remove commas before summing
+                totals[col] += Number(row[col].toString().replace(/,/g, "")) || 0;
+            }
+        });
+
+        for (let col = 1; col < columnCount; col++) {
+            totals[col] = totals[col].toLocaleString('en-US'); 
+        }
+
+        totals[0] = "Total";
+
+        instance.setFooter([totals]);
+    };
     /**
      * Renders the Shipment Global View report table.
      * @returns {JSX.Element} - Shipment Global View report table.
      */
     render() {
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         const { procurementAgents } = this.state;
         let procurementAgentList = [];
         procurementAgentList = procurementAgents.length > 0
@@ -1427,7 +1691,7 @@ class ShipmentGlobalView extends Component {
         const options = {
             title: {
                 display: true,
-                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                text: (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ),
                 fontColor: fontColor
             },
             scales: {
@@ -1448,7 +1712,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: this.state.puUnit.label.label_en,
+                        labelString: i18n.t("static.report.qty"),
                         fontColor: fontColor
                     },
                     stacked: true,
@@ -1534,7 +1798,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: "Quantity",
+                        labelString: i18n.t("static.report.qty"),
                         fontColor: fontColor
                     },
                     stacked: true,
@@ -1619,7 +1883,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: "Quantity",
+                        labelString: i18n.t("static.report.qty"),
                         fontColor: fontColor
                     },
                     gridLines: {
@@ -1672,7 +1936,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: "Quantity",
+                        labelString: i18n.t("static.report.qty"),
                         fontColor: fontColor
                     },
                     gridLines: {
@@ -1723,7 +1987,7 @@ class ShipmentGlobalView extends Component {
                 yAxes: [{
                     scaleLabel: {
                         display: true,
-                        labelString: "Quantity",
+                        labelString: i18n.t("static.report.qty"),
                         fontColor: fontColor,
                     },
                     stacked: true,
@@ -1945,6 +2209,24 @@ class ShipmentGlobalView extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
+                                            {this.state.programValues.length > 1 && <FormGroup style={{ "marginTop": "-10px" }}>
+                                                <div className={this.state.yaxisEquUnit != 1 ? "col-md-12" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
+                                                <Input
+                                                    className="form-check-input"
+                                                    type="checkbox"
+                                                    id="onlyShowAllPUs"
+                                                    name="onlyShowAllPUs"
+                                                    checked={this.state.onlyShowAllPUs}
+                                                    onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                                                    style={{ marginTop: '2px' }}
+                                                />
+                                                <Label
+                                                    className="form-check-label"
+                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                                                    {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
+                                                </Label>
+                                                </div>
+                                            </FormGroup>}
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
@@ -2058,12 +2340,20 @@ class ShipmentGlobalView extends Component {
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <Col md="12 pl-0">
                                     <div className="row grid-divider">
-                                        {this.state.countryShipmentSplitList.length > 0 &&
-                                            <div className="col-md-6">
-                                                <div className="chart-wrapper chart-graph-report">
-                                                    <Bar id="cool-canvas1" data={bar} options={options} />
+                                        {this.state.countryShipmentSplitList.length > 0 && 
+                                            <>
+                                                <div className="col-md-6">
+                                                    <div className="chart-wrapper chart-graph-report">
+                                                        <Bar id="cool-canvas1" data={bar} options={options} />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                <div className="col-md-6 world-map-container">
+                                                    <WorldMap 
+                                                        countrySplitList={this.state.countrySplitList} 
+                                                        title={(this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] )}
+                                                    />
+                                                </div>
+                                            </>
                                         }
                                     </div>
                                 </Col>
@@ -2072,36 +2362,9 @@ class ShipmentGlobalView extends Component {
                                         <div className="row">
                                             <div className="col-md-12">
                                                 {this.state.table1Body.length > 0 &&
-                                                    <div className="table-responsive ">
-                                                        <Table id="mytable1" responsive className="table-striped  table-fixed table-bordered text-center mt-2">
-                                                            <thead>
-                                                                <tr>
-                                                                    {
-                                                                        this.state.table1Headers.map((item, idx) =>
-                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '350px' }}>
-                                                                                {this.state.table1Headers[idx]}
-                                                                            </th>
-                                                                        )
-                                                                    }
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {
-                                                                    this.state.table1Body.map((item, idx) =>
-                                                                        <tr id="addr0" key={idx} >
-                                                                            <td>{getLabelText(this.state.table1Body[idx].country.label, this.state.lang)}</td>
-                                                                            {
-                                                                                this.state.table1Body[idx].amount.map((item, idx1) =>
-                                                                                    <td id="addr1" key={idx1}>
-                                                                                        {this.state.table1Body[idx].amount[idx1].toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                    </td>
-                                                                                )
-                                                                            }
-                                                                        </tr>
-                                                                    )}
-                                                            </tbody>
-                                                        </Table>
-                                                    </div>
+                                                <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                                                    <div id="shipmentJexcel" className='jexcelremoveReadonlybackground' style={{ padding: '2px 8px' }}></div>
+                                                </CardBody>
                                                 }
                                             </div>
                                         </div>
