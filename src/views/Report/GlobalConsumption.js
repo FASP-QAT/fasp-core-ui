@@ -8,6 +8,8 @@ import React, { Component } from 'react';
 import { Bar } from 'react-chartjs-2';
 import Picker from 'react-month-picker';
 import { MultiSelect } from "react-multi-select-component";
+import jexcel from 'jspreadsheet';
+import { onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
 import {
   Card,
   CardBody,
@@ -15,13 +17,18 @@ import {
   Form,
   FormGroup, Input, InputGroup,
   Label,
-  Table
+  Table,
+  Popover,
+  PopoverBody
 } from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
+import { jExcelLoadedFunction, loadedForNonEditableTables, jExcelLoadedFunctionWithoutPagination, jExcelLoadedFunctionOnlyHideRow } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DATE_FORMAT_WITHOUT_DATE_CAMELCASE, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY, JEXCEL_PRO_KEY, JEXCEL_PAGINATION_OPTION } from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import ReportService from '../../api/ReportService';
 import csvicon from '../../assets/img/csv.png';
@@ -134,6 +141,9 @@ class GlobalConsumption extends Component {
       countryLabels: [],
       planningUnitValues: [],
       planningUnitLabels: [],
+      yaxisEquUnitLabel: [i18n.t('static.program.no')],
+      viewByLabel: [i18n.t('static.report.country')],
+      versionLabel: [],
       programValues: [],
       programLabels: [],
       programs: [],
@@ -143,18 +153,118 @@ class GlobalConsumption extends Component {
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
       loading: true,
-      programLst: []
+      programLst: [],
+      versions: [],
+      versionId: [],
+      equivalencyUnitList: [],
+      programEquivalencyUnitList: [],
+      yaxisEquUnit: -1,
+      forecastingUnits: [],
+      allForecastingUnits: [],
+      forecastingUnitValues: [],
+      forecastingUnitLabels: [],
+      planningUnitList: [],
+      planningUnitListAll: [],
+      planningUnitId: [],
+      consumptionJexcel: '',
+      aggregateData: false,
+      aggregatedConsumptions: []
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-    this.getPlanningUnit = this.getPlanningUnit.bind(this);
     this.handleChange = this.handleChange.bind(this)
     this.handleChangeProgram = this.handleChangeProgram.bind(this)
     this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
     this.handleDisplayChange = this.handleDisplayChange.bind(this)
     this.filterProgram = this.filterProgram.bind(this)
+    this.setVersionId = this.setVersionId.bind(this)
+    this.yAxisChange = this.yAxisChange.bind(this)
+    this.buildConsumptionJexcel = this.buildConsumptionJexcel.bind(this);
+    this.toggleEu = this.toggleEu.bind(this);
+  }
+
+  loaded = function (instance, cell) {
+    jExcelLoadedFunction(instance);
+  }
+
+  buildConsumptionJexcel() {
+    if(this.state.show && this.state.consumptions.length > 0){
+    var consumptionList = this.state.aggregateData ? this.state.aggregatedConsumptions : this.state.consumptions;
+    var dataArray = [];
+    let count = 0;
+    if (consumptionList.length > 0) {
+      for (var j = 0; j < consumptionList.length; j++) {
+        data = [];
+        data[0] = getLabelText(consumptionList[j].realmCountry.label, this.state.lang);
+        data[1] = consumptionList[j].consumptionDate;
+        data[2] = formatter(roundARU(consumptionList[j].planningUnitQty,1), 0);
+        dataArray[count] = data;
+        count++;
+      }
+    }
+    this.el = jexcel(document.getElementById("consumptionJexcel"), '');
+    jexcel.destroy(document.getElementById("consumptionJexcel"), true);
+    var data = dataArray;
+    var options = {
+      data: data,
+      columnDrag: false,
+      colWidths: [50, 50, 50],
+      colHeaderClasses: ["Reqasterisk"],
+      columns: [
+        {
+          title: this.state.viewByLabel,
+          type: this.state.aggregateData ? 'hidden' : 'text',
+          editable: false,
+          readOnly: true,
+        },
+        {
+          title: i18n.t('static.common.month'),
+          type: 'calendar',
+          options: {
+              format: JEXCEL_DATE_FORMAT_WITHOUT_DATE_CAMELCASE,
+              type: 'year-month-picker'
+          },
+          editable: false,
+          readOnly: true,
+        },
+        {
+          title: i18n.t('static.report.consupmtionqty'),
+          type: 'number',
+          editable: false,
+          readOnly: true,
+          mask: "#,##",
+        }
+      ],
+      onload: this.loaded,
+      editable: false,
+      onselection: this.selected,
+      pagination: localStorage.getItem("sesRecordCount"),
+      search: true,
+      columnSorting: true,
+      wordWrap: true,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: true,
+      oneditionend: this.onedit,
+      copyCompatibility: true,
+      allowExport: false,
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
+      position: 'top',
+      filters: true,
+      parseFormulas: true,
+      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+      contextMenu: function (obj, x, y, e) {
+        return false;
+      }.bind(this),
+    };
+    var consumptionJexcel = jexcel(document.getElementById("consumptionJexcel"), options);
+    this.el = consumptionJexcel;
+    this.setState({
+        consumptionJexcel: consumptionJexcel,
+    })
+    }
   }
   /**
    * Exports the data to a CSV file.
@@ -169,19 +279,34 @@ class GlobalConsumption extends Component {
     this.state.programLabels.map(ele =>
       csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
-    this.state.planningUnitValues.map(ele =>
-      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele.label).toString()).replaceAll(' ', '%20') + '"'))
+    if(this.state.programValues.length == 1) {
+      csvRow.push('"' + (i18n.t('static.report.version') + ' : ' + this.state.versionLabel + '"'))
+      csvRow.push('')
+    }
+    this.state.yaxisEquUnitLabel.map(ele =>
+      csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + (ele).toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
-    csvRow.push('"' + ((i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+    this.state.planningUnitLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + (ele).toString()).replaceAll(' ', '%20') + '"'))
     csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + this.state.viewByLabel + '"'))
+    csvRow.push('')
+    csvRow.push('"' + (i18n.t('static.report.showAggregatedQuantities') + ' : ' + (this.state.aggregateData ? i18n.t("static.program.yes") : i18n.t("static.program.no")) + '"'))
     csvRow.push('')
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
     csvRow.push('')
     var re;
-    var A = [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), (i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')).replaceAll(' ', '%20')])]
-    re = this.state.consumptions
-    for (var item = 0; item < re.length; item++) {
-      A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+    var A = this.state.aggregateData ? [addDoubleQuoteToRowContent([(i18n.t('static.report.month')).replaceAll(' ', '%20'), i18n.t('static.consumption.consumptionqty').replaceAll(' ', '%20')])] : [addDoubleQuoteToRowContent([(i18n.t('static.dashboard.country')).replaceAll(' ', '%20'), (i18n.t('static.report.month')).replaceAll(' ', '%20'), i18n.t('static.consumption.consumptionqty').replaceAll(' ', '%20')])]
+    if(this.state.aggregateData) {
+      re = this.state.aggregatedConsumptions
+      for (var item = 0; item < re.length; item++) {
+        A.push([addDoubleQuoteToRowContent([moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+      }
+    } else {
+      re = this.state.consumptions
+      for (var item = 0; item < re.length; item++) {
+        A.push([addDoubleQuoteToRowContent([getLabelText(re[item].realmCountry.label), moment(re[item].consumptionDateString1).format(DATE_FORMAT_CAP_FOUR_DIGITS), roundARU(re[item].planningUnitQty,1)])])
+      }
     }
     for (var i = 0; i < A.length; i++) {
       csvRow.push(A[i].join(","))
@@ -190,7 +315,7 @@ class GlobalConsumption extends Component {
     var a = document.createElement("a")
     a.href = 'data:attachment/csv,' + csvString
     a.target = "_Blank"
-    a.download = i18n.t('static.dashboard.globalconsumption') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+    a.download = i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")" + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
     document.body.appendChild(a)
     a.click()
   }
@@ -221,7 +346,7 @@ class GlobalConsumption extends Component {
         doc.setPage(i)
         doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
         doc.setTextColor("#002f6c");
-        doc.text(i18n.t('static.dashboard.globalconsumption'), doc.internal.pageSize.width / 2, 60, {
+        doc.text(i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")", doc.internal.pageSize.width / 2, 60, {
           align: 'center'
         })
         if (i == 1) {
@@ -261,6 +386,28 @@ class GlobalConsumption extends Component {
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
     }
+    if(this.state.programValues.length == 1) {
+      planningText = doc.splitTextToSize(i18n.t('static.report.version') + ' : ' + this.state.versionLabel.join('; '), doc.internal.pageSize.width * 3 / 4);
+      y = y + 10;
+      for (var i = 0; i < planningText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 80;
+        }
+        doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+        y = y + 10;
+      }
+    }
+    planningText = doc.splitTextToSize(i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + this.state.yaxisEquUnitLabel.join('; '), doc.internal.pageSize.width * 3 / 4);
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
     planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
     y = y + 10;
     for (var i = 0; i < planningText.length; i++) {
@@ -271,9 +418,26 @@ class GlobalConsumption extends Component {
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
     }
-    doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
-      align: 'left'
-    })
+    planningText = doc.splitTextToSize(i18n.t('static.common.display') + ' : ' + this.state.viewByLabel.join('; '), doc.internal.pageSize.width * 3 / 4);
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
+    planningText = doc.splitTextToSize(i18n.t('static.report.showAggregatedQuantities') + ' : ' + (this.state.aggregateData ? i18n.t("static.program.yes") : i18n.t("static.program.no")), doc.internal.pageSize.width * 3 / 4);
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 80;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
     const title = i18n.t('static.dashboard.globalconsumption');
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -291,8 +455,8 @@ class GlobalConsumption extends Component {
       startYtable = 80
     }
     doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
-    const headers = [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty') + ' ' + i18n.t('static.report.inmillions')]]
-    const data = this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]);
+    const headers = this.state.aggregateData ? [[i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]] : [[i18n.t('static.dashboard.country'), i18n.t('static.report.month'), i18n.t('static.consumption.consumptionqty')]]
+    const data = this.state.aggregateData ? this.state.aggregatedConsumptions.map(elt => [elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]) : this.state.consumptions.map(elt => [getLabelText(elt.realmCountry.label, this.state.lang), elt.consumptionDateString, formatter(roundARU(elt.planningUnitQty,1), 0)]);
     doc.addPage()
     startYtable = 80
     let content = {
@@ -305,7 +469,7 @@ class GlobalConsumption extends Component {
     doc.autoTable(content);
     addHeaders(doc)
     addFooters(doc)
-    doc.save(i18n.t('static.dashboard.globalconsumption').concat('.pdf'));
+    doc.save(i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")".concat('.pdf'));
   }
   /**
    * Handles the change event for countries.
@@ -425,8 +589,195 @@ class GlobalConsumption extends Component {
       programValues: programIds.map(ele => ele),
       programLabels: programIds.map(ele => ele.label)
     }, () => {
-      this.getPlanningUnit();
+      this.filterVersion();
     })
+  }
+  consolidatedVersionList = (programId) => {
+    const { versions } = this.state;
+    var verList = versions;
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(["programData"], "readwrite");
+      var program = transaction.objectStore("programData");
+      var getRequest = program.getAll();
+      getRequest.onerror = function (event) {
+      };
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(
+          localStorage.getItem("curUser"),
+          SECRET_KEY
+        );
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        for (var i = 0; i < myResult.length; i++) {
+          if (
+            myResult[i].programId == programId
+          ) {
+            var databytes = CryptoJS.AES.decrypt(
+              myResult[i].programData.generalData,
+              SECRET_KEY
+            );
+            var programData = databytes.toString(CryptoJS.enc.Utf8);
+            var version = JSON.parse(programData).currentVersion;
+            version.versionId = `${version.versionId} (Local)`;
+            version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
+            // verList.push(version);
+          }
+        }
+        let versionList = verList.filter(function (x, i, a) {
+          return a.indexOf(x) === i;
+        });
+        versionList.reverse();
+        this.setState(
+          {
+            versions: versionList,
+            versionId: versionList[0].versionId,
+            versionLabel: [versionList[0].versionStatus.id == 2 && versionList[0].versionType.id == 2
+              ? versionList[0].versionId + "*"
+              : versionList[0].versionId + " " + "("+
+            (moment(versionList[0].createdDate).format(`MMM DD YYYY`)) + ")"]
+          },
+          () => {
+            this.filterData(this.state.rangeValue);
+            this.getDropdownLists();
+          }
+        );
+      }.bind(this);
+    }.bind(this);
+  };
+  filterVersion = () => {
+    let programId = this.state.programValues;
+    if (programId.length == 1) {
+      programId = programId[0].value
+      const program = this.state.programLst.filter(
+        (c) => c.id == programId
+      );
+      if (program.length == 1) {
+        if (localStorage.getItem("sessionType") === 'Online') {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              DropdownService.getVersionListForSPProgram(
+                programId
+              )
+                .then((response) => {
+                  this.setState(
+                    {
+                      versions: [],
+                    },
+                    () => {
+                      this.setState(
+                        {
+                          versions: response.data,
+                        },
+                        () => {
+                          this.consolidatedVersionList(programId);
+                        }
+                      );
+                    }
+                  );
+                })
+                .catch((error) => {
+                  this.setState({
+                    programs: [],
+                    loading: false,
+                  });
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      message: API_URL.includes("uat")
+                        ? i18n.t("static.common.uatNetworkErrorMessage")
+                        : API_URL.includes("demo")
+                          ? i18n.t("static.common.demoNetworkErrorMessage")
+                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                      loading: false,
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+                      case 401:
+                        this.props.history.push(
+                          `/login/static.message.sessionExpired`
+                        );
+                        break;
+                      case 409:
+                        this.setState({
+                          message: i18n.t('static.common.accessDenied'),
+                          loading: false,
+                          color: "#BA0C2F",
+                        });
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`);
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: "static.unkownError",
+                          loading: false,
+                        });
+                        break;
+                    }
+                  }
+                });
+            }
+          );
+        } else {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              this.consolidatedVersionList(programId);
+            }
+          );
+        }
+      } else {
+        this.setState({
+          versions: [],
+        });
+      }
+    } else {
+      this.setState({
+        versions: [],
+      }, () => {
+        this.getDropdownLists();
+      });
+    }
+  };
+  setVersionId(event) {
+    var versionLabel = document.getElementById("versionId").selectedOptions[0].text.toString()
+    this.setState(
+      {
+        versionLabel: versionLabel,
+        versionId: event.target.value,
+      },
+      () => {
+        if (this.state.versionId != "")
+          this.getDropdownLists();
+      }
+    );
   }
   /**
    * Handles the change event for planning units.
@@ -447,7 +798,17 @@ class GlobalConsumption extends Component {
    * Handles the change event for display options.
    */
   handleDisplayChange() {
-    this.filterData(this.state.rangeValue)
+    var viewByLabel = document.getElementById("viewById").selectedOptions[0].text.toString()
+    this.setState({
+      viewByLabel: [viewByLabel]
+    }, () => {
+      this.filterData(this.state.rangeValue)
+    })
+  }
+  toggleEu() {
+    this.setState({
+        popoverOpen: !this.state.popoverOpen,
+    });
   }
   /**
    * Filters data based on selected parameters and updates component state accordingly.
@@ -455,47 +816,74 @@ class GlobalConsumption extends Component {
   filterData(rangeValue) {
     setTimeout('', 10000);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+    let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     let viewById = document.getElementById("viewById").value;
     let realmId = AuthenticationService.getRealmId()
-    let useApprovedVersion = document.getElementById("includeApprovedVersions").value
     let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
     let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-    if (realmId > 0 && this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0) {
+    let versionId = this.state.programValues.length == 1 ? this.state.versionId : 0;
+    if (realmId > 0 && this.state.countryValues.length > 0 && planningUnitIds.length > 0 && this.state.programValues.length > 0) {
       this.setState({ loading: true })
       var inputjson = {
         "realmId": realmId,
         "realmCountryIds": CountryIds,
         "programIds": programIds,
+        "equivalencyUnitId": this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit,
         "planningUnitIds": planningUnitIds,
         "startDate": startDate,
         "stopDate": stopDate,
-        "reportView": viewById,
-        "useApprovedSupplyPlanOnly": useApprovedVersion
+        "viewBy": viewById,
+        "versionId": versionId
       }
       ReportService.getGlobalConsumptiondata(inputjson)
         .then(response => {
-          let tempConsumptionData = response.data;
+          let tempConsumptionData = response.data.dataList;
           var consumptions = [];
+          const aggregatedConsumptions = [];
+          const aggregationMap = {};
           for (var i = 0; i < tempConsumptionData.length; i++) {
-            let countryConsumption = Object.values(tempConsumptionData[i].countryConsumption);
+            let countryConsumption = Object.values(tempConsumptionData[i].consumption);
             for (var j = 0; j < countryConsumption.length; j++) {
+              let planningUnitQty =
+                countryConsumption[j].actualConsumption == 0
+                  ? countryConsumption[j].forecastedConsumption
+                  : countryConsumption[j].actualConsumption;
+
+              let consumptionDateString = moment(
+                tempConsumptionData[i].transDate,
+                'YYYY-MM-dd'
+              ).format('MMM YY');
+              
               let json = {
-                "realmCountry": countryConsumption[j].country,
+                "realmCountry": countryConsumption[j].label,
                 "consumptionDate": tempConsumptionData[i].transDate,
-                "planningUnitQty": ((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption / 1000000) : (countryConsumption[j].actualConsumption / 1000000))),
+                "planningUnitQty": ((countryConsumption[j].actualConsumption == 0 ? (countryConsumption[j].forecastedConsumption) : (countryConsumption[j].actualConsumption))),
                 "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
                 "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
               }
               consumptions.push(json);
+
+              if (!aggregationMap[consumptionDateString]) {
+                aggregationMap[consumptionDateString] = {
+                  "realmCountry": countryConsumption[j].label,
+                  "consumptionDate": tempConsumptionData[i].transDate,
+                  "planningUnitQty": 0,
+                  "consumptionDateString": moment(tempConsumptionData[i].transDate, 'YYYY-MM-dd').format('MMM YY'),
+                  "consumptionDateString1": moment(tempConsumptionData[i].transDate, 'yyyy-MM-dd')
+                };
+                aggregatedConsumptions.push(aggregationMap[consumptionDateString]);
+              }
+              aggregationMap[consumptionDateString].planningUnitQty += planningUnitQty;
             }
           }
           this.setState({
             consumptions: consumptions,
+            aggregatedConsumptions: aggregatedConsumptions,
             message: '',
             loading: false
           }, () => {
+            this.buildConsumptionJexcel();
           });
         }).catch(
           error => {
@@ -544,13 +932,13 @@ class GlobalConsumption extends Component {
           }
         );
     } else if (realmId <= 0) {
-      this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.realmtext'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else if (this.state.countryValues.length == 0) {
-      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] });
+      this.setState({ message: i18n.t('static.program.validcountrytext'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else if (this.state.programValues.length == 0) {
-      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] });
+      this.setState({ message: i18n.t('static.common.selectProgram'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     } else {
-      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] });
+      this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), consumptions: [] }, () => { this.buildConsumptionJexcel() });
     }
   }
   /**
@@ -673,79 +1061,192 @@ class GlobalConsumption extends Component {
   /**
    * Retrieves the list of planning units for a selected programs.
    */
-  getPlanningUnit() {
-    this.setState({ loading: true })
-    let programValues = this.state.programValues.map(c => c.value);
-    this.setState({
-      planningUnits: [],
-      planningUnitValues: [],
-      planningUnitLabels: []
-    }, () => {
-      if (programValues.length > 0) {
-        var programJson = {
-          tracerCategoryIds: [],
-          programIds: programValues
-        }
-        DropdownService.getProgramPlanningUnitDropdownList(programJson).then(response => {
-          var listArray = response.data;
-          listArray.sort((a, b) => {
-            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
+  getDropdownLists() {
+    var json = {
+      programIds: this.state.programValues.map(ele => ele.value),
+      onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
+    }
+    ReportService.getDropdownListByProgramIds(json).then(response => {
+      this.setState({
+        equivalencyUnitList: response.data.equivalencyUnitList,
+        planningUnitListAll: response.data.planningUnitList,
+        planningUnitList: response.data.planningUnitList,
+        planningUnitId: [],
+        consumptions: []
+      }, () => {
+        this.buildConsumptionJexcel();
+        if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
+          var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+          var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
           this.setState({
-            planningUnits: listArray, loading: false
-          }, () => {
-            this.filterData(this.state.rangeValue)
+            planningUnitList: planningUnitList
           })
-        }).catch(
-          error => {
-            if (error.message === "Network Error") {
+        }
+      })
+    }).catch(
+      error => {
+        this.setState({
+          consumptions: [], loading: false
+        }, () => { this.buildConsumptionJexcel() })
+        if (error.message === "Network Error") {
+          this.setState({
+            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+            loading: false
+          });
+        } else {
+          switch (error.response ? error.response.status : "") {
+            case 401:
+              this.props.history.push(`/login/static.message.sessionExpired`)
+              break;
+            case 409:
               this.setState({
-                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                message: i18n.t('static.common.accessDenied'),
+                loading: false,
+                color: "#BA0C2F",
+              });
+              break;
+            case 403:
+              this.props.history.push(`/accessDenied`)
+              break;
+            case 500:
+            case 404:
+            case 406:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
                 loading: false
               });
-            } else {
-              switch (error.response ? error.response.status : "") {
-                case 401:
-                  this.props.history.push(`/login/static.message.sessionExpired`)
-                  break;
-                case 409:
-                  this.setState({
-                    message: i18n.t('static.common.accessDenied'),
-                    loading: false,
-                    color: "#BA0C2F",
-                  });
-                  break;
-                case 403:
-                  this.props.history.push(`/accessDenied`)
-                  break;
-                case 500:
-                case 404:
-                case 406:
-                  this.setState({
-                    message: error.response.data.messageCode,
-                    loading: false
-                  });
-                  break;
-                case 412:
-                  this.setState({
-                    message: error.response.data.messageCode,
-                    loading: false
-                  });
-                  break;
-                default:
-                  this.setState({
-                    message: 'static.unkownError',
-                    loading: false
-                  });
-                  break;
-              }
-            }
+              break;
+            case 412:
+              this.setState({
+                message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                loading: false
+              });
+              break;
+            default:
+              this.setState({
+                message: 'static.unkownError',
+                loading: false
+              });
+              break;
           }
-        );
+        }
       }
+    );
+  }
+  yAxisChange(e) {
+    var yaxisEquUnit = e.target.value;
+    var planningUnitList = this.state.planningUnitListAll;
+    var yaxisEquUnitLabel = document.getElementById("yaxisEquUnit").selectedOptions[0].text.toString()
+    if (yaxisEquUnit != -1) {
+      var validFu = this.state.equivalencyUnitList.filter(x => x.id == e.target.value)[0].forecastingUnitIds;
+      planningUnitList = planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+    }
+    this.setState({
+      yaxisEquUnit: yaxisEquUnit,
+      planningUnitList: planningUnitList,
+      yaxisEquUnitLabel: [yaxisEquUnitLabel],
+      planningUnitId: [],
+      consumptions: [],
+      onlyShowAllPUs: false
+    }, () => {
+      this.buildConsumptionJexcel();
     })
+  }
+  setOnlyShowAllPUs(e) {
+    var checked = e.target.checked;
+    this.setState({
+      onlyShowAllPUs: checked,
+    }, () => {
+      this.getDropdownLists();
+    })
+  }
+  setAggregateData(e) {
+    var checked = e.target.checked;
+    this.setState({
+      aggregateData: checked
+    }, () => {
+      this.buildConsumptionJexcel();
+    })
+  }
+  handleBlur = (e) => {
+  if (!e.currentTarget.contains(e.relatedTarget)) {
+    this.filterData(this.state.rangeValue);
+  }
+};
+  setPlanningUnit(e) {
+    if (this.state.yaxisEquUnit == -1) {
+      var selectedText = e.map(item => item.label);
+      var tempPUList = e.filter(puItem => !this.state.planningUnitId.map(ele => ele).includes(puItem));
+      var planningUnitIds = e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList; 
+      this.setState({
+        planningUnitId: planningUnitIds,
+        planningUnitLabels: planningUnitIds.map(ele => ele.label),
+        planningUnitIdExport: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false,
+        planningUnitDetails: "",
+        planningUnitDetailsExport: ""
+      }, () => {
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.filterData(this.state.rangeValue);
+      })
+    } else {
+      if (this.state.yaxisEquUnit > 0) {
+        var planningUnitIds = e.map(ele => ele)
+        this.setState({
+          planningUnitId: planningUnitIds,
+          planningUnitLabels: planningUnitIds.map(ele => ele.label),
+          planningUnitIdExport: e.map(ele => ele),
+          show: false,
+          dataList: [],
+          consumptionAdjForStockOutId: false,
+          loading: false
+        }, () => {
+          if (this.state.planningUnitId.length > 0) {
+            // this.filterData(this.state.rangeValue);
+          } else {
+            this.setState({
+              consumptions: [],
+            }, () => { this.buildConsumptionJexcel() })
+          }
+        })
+      }
+    }
+  }
+  /**
+    * Sets the planning unit based on the provided event data.
+    * @param {Object} e - Event data containing planning unit information.
+    */
+  setPlanningUnitSingle(e) {
+    var planningUnitId = e.target.value;
+    if (planningUnitId != "") {
+      var planningUnitLabel = document.getElementById("planningUnitId").selectedOptions[0].text.toString()
+      var planningUnit = [{
+        value: Number(planningUnitId),
+        label: planningUnitLabel
+      }]
+      this.setState({
+        planningUnitId: planningUnit,
+        planningUnitLabels: [planningUnitLabel],
+        show: false,
+        dataList: [],
+        consumptionAdjForStockOutId: false,
+        loading: false
+      }, () => {
+        if (this.state.programValues.length == 1) {
+          // this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programValues[0].value, planningUnitId, false);
+        }
+        // document.getElementById("consumptionAdjusted").checked = false;
+        this.filterData(this.state.rangeValue);
+      })
+    } else {
+      this.setState({
+        planningUnitId: [],
+        consumptions: []
+      }, () => { this.buildConsumptionJexcel() })
+    }
   }
   /**
    * Calls the get countrys function on page load
@@ -772,7 +1273,7 @@ class GlobalConsumption extends Component {
   /**
    * Toggles the value of the 'show' state variable.
    */
-  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }));
+  toggledata = () => this.setState((currentState) => ({ show: !currentState.show }), () => { this.buildConsumptionJexcel() });
   /**
    * Handles the dismiss of the range picker component.
    * Updates the component state with the new range value and triggers a data fetch.
@@ -799,7 +1300,10 @@ class GlobalConsumption extends Component {
    * @returns {JSX.Element} - Global Consumption report table.
    */
   render() {
-
+    jexcel.setDictionary({
+      Show: " ",
+      entries: " ",
+    });
     const { isDarkMode } = this.state;
     const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -808,14 +1312,14 @@ class GlobalConsumption extends Component {
     const options = {
       title: {
         display: true,
-        text: i18n.t('static.dashboard.globalconsumption'),
+        text: i18n.t('static.report.consumption_') + " (" + (this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] ) + ")",
         fontColor: fontColor
       },
       scales: {
         yAxes: [{
           scaleLabel: {
             display: true,
-            labelString: i18n.t('static.report.consupmtionqty') + i18n.t('static.report.inmillions'),
+            labelString: i18n.t('static.report.consupmtionqty'),
             fontColor: fontColor
           },
           stacked: true,
@@ -893,14 +1397,6 @@ class GlobalConsumption extends Component {
         }
       }
     }
-    const { planningUnits } = this.state;
-    let planningUnitList = [];
-    planningUnitList = planningUnits.length > 0
-      && planningUnits.map((item, i) => {
-        return (
-          { label: getLabelText(item.label, this.state.lang), value: item.id }
-        )
-      }, this);
     const { programLst } = this.state;
     let programList = [];
     programList = programLst.length > 0
@@ -913,14 +1409,48 @@ class GlobalConsumption extends Component {
     let countryList = countrys.length > 0 && countrys.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
+    const { versions } = this.state;
+    let versionList =
+      versions.length > 0 &&
+      versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionStatus.id == 2 && item.versionType.id == 2
+              ? item.versionId + "*"
+              : item.versionId}{" "}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
+          </option>
+        );
+      }, this);
+    const { equivalencyUnitList } = this.state;
+    let equivalencyUnitList1 = equivalencyUnitList.length > 0
+      && equivalencyUnitList.map((item, i) => {
+        return (
+          <option key={i} value={item.id}>
+            {item.label.label_en}
+          </option>
+        )
+      }, this);
+    const { planningUnitList, lang } = this.state;
+    let puList = planningUnitList.length > 0 && planningUnitList.sort(function (a, b) {
+      a = getLabelText(a.label, lang).toLowerCase();
+      b = getLabelText(b.label, lang).toLowerCase();
+      return a < b ? -1 : a > b ? 1 : 0;
+    }).map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang) + " | " + item.id, value: item.id })
+    }, this);
+
     const lightModeColors = [
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
-      '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-      '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-      '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+      '#002F6C', '#BA0C2F', '#118B70', '#EDBA26', '#A7C6ED',
+      '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
     ]
     const darkModeColors = [
       '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
@@ -1060,57 +1590,150 @@ class GlobalConsumption extends Component {
                           <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                         )}
                     </FormGroup>
-                    <FormGroup className="col-sm-3" id="hideDiv">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.planningunit.planningunit')}</Label>
-                      <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                      <div className="controls">
-                        <MultiSelect
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="sm"
-                          value={this.state.planningUnitValues}
-                          onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                          options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                          filterOptions={filterOptions}
-                          disabled={this.state.loading}
-                          overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                          selectSomeItems: i18n.t('static.common.select')}}
-                        />
-                      </div>
-                    </FormGroup>
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.common.display')}</Label>
+                    {this.state.programValues.length == 1 && <FormGroup className="col-md-3">
+                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                       <div className="controls">
                         <InputGroup>
                           <Input
                             type="select"
-                            name="viewById"
-                            id="viewById"
+                            name="versionId"
+                            id="versionId"
                             bsSize="sm"
-                            onChange={this.handleDisplayChange}
+                            onChange={(e) => {
+                              this.setVersionId(e);
+                            }}
+                            value={this.state.versionId}
                           >
-                            <option value="1">{i18n.t('static.report.planningUnit')}</option>
-                            <option value="2">{i18n.t('static.dashboard.forecastingunit')}</option>
+                            <option value="0">
+                              {i18n.t("static.common.select")}
+                            </option>
+                            {versionList}
                           </Input>
                         </InputGroup>
                       </div>
-                    </FormGroup>
-                    <FormGroup className="col-md-3">
-                      <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
+                    </FormGroup>}
+                    <FormGroup className="col-md-2" id="equivelencyUnitDiv">
+                      <Label htmlFor="appendedInputButton">{i18n.t("static.forecastReport.yAxisInEquivalencyUnit")}</Label>
                       <div className="controls ">
                         <InputGroup>
                           <Input
                             type="select"
-                            name="includeApprovedVersions"
-                            id="includeApprovedVersions"
+                            name="yaxisEquUnit"
+                            id="yaxisEquUnit"
                             bsSize="sm"
-                            onChange={(e) => { this.filterData(this.state.rangeValue) }}
+                            value={this.state.yaxisEquUnit}
+                            onChange={(e) => { this.yAxisChange(e); }}
                           >
-                            <option value="true">{i18n.t('static.program.yes')}</option>
-                            <option value="false">{i18n.t('static.program.no')}</option>
+                            <option value="-1">{i18n.t('static.program.no')}</option>
+                            {equivalencyUnitList1}
                           </Input>
+
                         </InputGroup>
                       </div>
+                    </FormGroup>
+
+                    <FormGroup className="col-md-4" >
+                      <Label
+                        className="form-check-label"
+                        // check htmlFor="inline-radio1"
+                        title={i18n.t('static.report.planningUnit')}>
+                        {i18n.t('static.report.planningUnit')}
+                      </Label>
+                      <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
+                        <div className="controls">
+                          {this.state.yaxisEquUnit != -1 && <div onBlur={this.handleBlur}><MultiSelect
+                            bsSize="sm"
+                            name="planningUnitId"
+                            id="planningUnitId"
+                            filterOptions={filterOptions}
+                            value={this.state.planningUnitId}
+                            onChange={(e) => { this.setPlanningUnit(e); }}
+                            options={puList && puList.length > 0 ? puList : []}
+                            hasSelectAll={this.state.yaxisEquUnit == -1 ? false : true}
+                            showCheckboxes={this.state.yaxisEquUnit == -1 ? false : true}
+                          /></div>}
+                          {this.state.yaxisEquUnit == -1 && <InputGroup>
+                            <Input
+                              type="select"
+                              name="planningUnitId"
+                              id="planningUnitId"
+                              value={this.state.planningUnitId.length > 0 ? this.state.planningUnitId[0].value : ""}
+                              onChange={(e) => { this.setPlanningUnitSingle(e); }}
+                              bsSize="sm"
+                            >
+                              <option value="">{i18n.t('static.common.select')}</option>
+                              {puList.length > 0
+                                && puList.map((item, i) => {
+                                  return (
+                                    <option key={i} value={item.value}>
+                                      {item.label}
+                                    </option>
+                                  )
+                                }, this)}
+                            </Input>
+                          </InputGroup>}
+                        </div>
+                      </FormGroup>
+                      {this.state.programValues.length > 1 && <FormGroup style={{ "marginTop": "-10px" }}>
+                        <div className={this.state.yaxisEquUnit != 1 ? "col-md-12" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
+                          <Input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="onlyShowAllPUs"
+                            name="onlyShowAllPUs"
+                            checked={this.state.onlyShowAllPUs}
+                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                            style={{ marginTop: '2px' }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                            {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
+                          </Label>
+                        </div>
+                      </FormGroup>}
+                    </FormGroup>
+                    <FormGroup className="col-md-3">
+                      <Label className="form-check-label">{i18n.t('static.common.display')}</Label>
+                      <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
+                        <div className="controls">
+                          <InputGroup>
+                            <Input
+                              type="select"
+                              name="viewById"
+                              id="viewById"
+                              bsSize="sm"
+                              onChange={this.handleDisplayChange}
+                            >
+                              <option value="1">{i18n.t('static.report.country')}</option>
+                              <option value="2">{i18n.t('static.consumption.program')}</option>
+                            </Input>
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
+                      <div>
+                          <Popover placement="top" isOpen={this.state.popoverOpen} target="Popover1" trigger="hover" toggle={this.toggleEu}>
+                              <PopoverBody>{i18n.t('static.tooltip.showAggregatedQuantities')}</PopoverBody>
+                          </Popover>
+                      </div>
+                      <FormGroup style={{ "marginTop": "-10px" }}>
+                        <div className={"col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
+                          <Input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="aggregateData"
+                            name="aggregateData"
+                            checked={this.state.aggregateData}
+                            onClick={(e) => { this.setAggregateData(e); }}
+                            style={{ marginTop: '2px' }}
+                          />
+                          <Label
+                            className="form-check-label"
+                            check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
+                            {i18n.t('static.report.showAggregatedQuantities')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover1" onClick={this.toggleEu} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                          </Label>
+                        </div>
+                      </FormGroup>
                     </FormGroup>
                   </div>
                 </div>
@@ -1137,34 +1760,9 @@ class GlobalConsumption extends Component {
                   <div className="row">
                     <div className="col-md-12 mt-lg-2">
                       {this.state.show && this.state.consumptions.length > 0 &&
-                        <div className="fixTableHead">
-                          <Table className="table-striped  table-fixed table-bordered text-center">
-                            <thead>
-                              <tr>
-                                <th className="text-center" style={{ width: '34%' }}> {i18n.t('static.dashboard.country')} </th>
-                                <th className="text-center " style={{ width: '34%' }}> {i18n.t('static.report.month')} </th>
-                                <th className="text-center" style={{ width: '34%' }}>{i18n.t('static.report.consupmtionqty')} {i18n.t('static.report.inmillions')} </th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {
-                                this.state.consumptions.length > 0
-                                &&
-                                this.state.consumptions.map((item, idx) =>
-                                  <tr id="addr0" key={idx} >
-                                    <td>{getLabelText(this.state.consumptions[idx].realmCountry.label, this.state.lang)}</td>
-                                    <td>
-                                      {this.state.consumptions[idx].consumptionDateString}
-                                    </td>
-                                    <td >
-                                      {formatter(roundARU(this.state.consumptions[idx].planningUnitQty,1), 0)}
-                                    </td>
-                                  </tr>)
-                              }
-                            </tbody>
-                          </Table>
-                        </div>
-                      }
+                       <div className='consumptionDataEntryTable'>
+                        <div id="consumptionJexcel" className='jexcelremoveReadonlybackground' style={{ padding: '2px 8px' }}></div>
+                      </div>}
                     </div>
                   </div>
                 </div>

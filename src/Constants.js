@@ -70,6 +70,7 @@ export const JIRA_PROJECT_ISSUE_TYPE_ADD_UPDATE_MASTER_DATA = "Add / Update Mast
 export const JEXCEL_DATE_FORMAT = "DD-MON-YY"
 export const JEXCEL_DATE_FORMAT_SM = "DD-Mon-YY"
 export const JEXCEL_DATE_FORMAT_WITHOUT_DATE = "MON-YY"
+export const JEXCEL_DATE_FORMAT_WITHOUT_DATE_CAMELCASE = "Mon-YY"
 export const APP_VERSION_REACT = `[${process.env.REACT_APP_VERSION.split('.').pop()}]`
 export const BATCH_PREFIX = "QAT"
 export const NONE_SELECTED_DATA_SOURCE_ID = 17
