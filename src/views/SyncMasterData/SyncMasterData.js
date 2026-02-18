@@ -672,7 +672,7 @@ export default class SyncMasterData extends Component {
                                                     var lastModifiedDateForShipment="";
                                                     var ppu = programPlanningUnitList.filter(c => c.program.id == generalJson.programId && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id);
                                                     var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == generalJson.programId && c.procurementAgent.id == getPlannedShipments[pss].procurementAgent.id && c.planningUnit.id == getPlannedShipments[pss].planningUnit.id && c.active);
-                                                    if (programPriceList.length > 0) {
+                                                    if (programPriceList.length > 0 && programPriceList[0].price !== null) {
                                                         pricePerUnit = Number(programPriceList[0].price);
                                                         lastModifiedDateForShipment=programPriceList[0].lastModifiedDate;
                                                     } else {

@@ -13,7 +13,7 @@ import moment from 'moment';
  * @param {*} problemActionList This is the list of all the existing problems
  * @param {*} openProblemStatusObj This is the Open problem status obj with details of open status
  */
-export default function createProcurementScheduleProblems(programObj, versionID, problemObj, planningUnitObj, shipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj) {
+export default function createProcurementScheduleProblems(programObj, versionID, problemObj, planningUnitObj, shipmentId, tempShipmentId, newAddShipment, problemActionIndex, userId, username, problemActionList, shipmentDetailsJson, openProblemStatusObj) {
     var json = {
         problemReportId: 0,
         program: {
@@ -32,6 +32,7 @@ export default function createProcurementScheduleProblems(programObj, versionID,
             label: planningUnitObj.planningUnit.label,
         },
         shipmentId: shipmentId,
+        tempShipmentId: tempShipmentId,
         data5: JSON.stringify(shipmentDetailsJson),
         planningUnitActive: true,
         newAdded: newAddShipment,

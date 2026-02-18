@@ -148,3 +148,4 @@ export const ENCRYPTION_EXPORT_PASSWORD="dgwsgdjwgyo3kjledhqwuigdwui";
 export const DRAFT_VERSION_TYPE = 1;
 export const DECIMAL_NO_REGEX_8_DECIMALS = /^\d+(\.\d{1,8})?$/
 export const JEXCEL_DECIMAL_MONTHLY_CHANGE_8_DECIMAL_POSITIVE = /^\d{0,10}(\.\d{1,8})?$/
+export const CONSTANT_FOR_TEMP_SHIPMENT="Temp-"

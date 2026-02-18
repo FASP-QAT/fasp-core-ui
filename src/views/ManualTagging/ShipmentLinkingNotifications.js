@@ -1347,6 +1347,7 @@ export default class ShipmentLinkingNotifications extends Component {
                             <div id="tableDiv1" className="jexcelremoveReadonlybackground RowClickable consumptionDataEntryTable TableWidth100">
                             </div>
                         </div>
+                        <p>{i18n.t("static.mt.shipmentLinkingNotification")} {i18n.t("static.mt.showDetails")} {i18n.t("static.mt.linkingNotificationNote1")} <b><a href="/#/program/downloadProgram" target="_blank">{i18n.t("static.common.download")}</a></b> {i18n.t("static.mt.linkingNotificationNote2")}</p>
                         <div className="col-md-12 pl-0">
                             <Row>
                                 <FormGroup className="col-md-3 ZindexFeild">
