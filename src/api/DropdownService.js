@@ -74,6 +74,14 @@ class DropdownService {
       {}
     );
   }
+
+  getBudgetForProgramsDropdownList(json) {
+    return axios.post(
+      `${API_URL}/api/budget/programIds`,
+      json,
+      {}
+    );
+  }
   getProcurementAgentDropdownList() {
     return axios.get(`${API_URL}/api/dropdown/procurementAgent`, {});
   }
