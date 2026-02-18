@@ -296,40 +296,40 @@ class ShipmentGlobalView extends Component {
      */
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)) + '"')
         csvRow.push('')
         this.state.countryLabels.map(ele =>
-            csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+            csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())) + '"'))
         csvRow.push('')
         this.state.programLabels.map(ele =>
-            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()) + '"'))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + ( this.state.yaxisEquUnitLabel.join('; '))).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.equivalancyUnit.equivalancyUnit') + ' : ' + ( this.state.yaxisEquUnitLabel.join('; '))) + '"')
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()) + '"'))
         var viewby = document.getElementById("viewById").value;
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (document.getElementById("viewById").selectedOptions[0].text)) + '"')
         csvRow.push('')
         if (viewby == 1) {
             this.state.fundingSourceLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + (ele.toString())) + '"'))
         } else if (viewby == 2) {
             this.state.procurementAgentLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+                csvRow.push('"' + (i18n.t('static.procurementagent.procurementagent') + ' : ' + (ele.toString())) + '"'))
         } else if (viewby == 3) {
             this.state.procurementAgentTypeLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.dashboard.procurementagentType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+                csvRow.push('"' + (i18n.t('static.dashboard.procurementagentType') + ' : ' + (ele.toString())) + '"'))
         } else if (viewby == 4) {
             this.state.fundingSourceTypeLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+                csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())) + '"'))
         }
         csvRow.push('')
         // csvRow.push('"' + ((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
         // csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')) + '"')
         csvRow.push('')
         csvRow.push('')
         const amountKeys =
@@ -378,13 +378,16 @@ class ShipmentGlobalView extends Component {
             }
             csvRow.push(addDoubleQuoteToRowContent(totals));
         }
-        var csvString = csvRow.join("%0A")
-        var a = document.createElement("a")
-        a.href = 'data:attachment/csv,' + csvString
+        var csvString = csvRow.join("\n")
+        var blob = new Blob(["\uFEFF" + csvString], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
         a.target = "_Blank"
         a.download = i18n.t('static.report.orders') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
+        document.body.removeChild(a); 
     }
     /**
      * Exports the data to a PDF file.
