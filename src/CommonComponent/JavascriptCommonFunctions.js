@@ -480,3 +480,24 @@ export function decryptFCData(encryptedData) {
   }
   return JSON.parse(programData);
 }
+
+export function formatMonthRanges(arr){
+  const m={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  arr=[...arr].map(x=>({o:x.trim(),i:(+x.split("-")[1])*12+m[x.split("-")[0]]}))
+              .sort((a,b)=>a.i-b.i);
+
+  let r=[],s=arr[0],p=arr[0];
+
+  for(let i=1;i<arr.length;i++){
+    if(arr[i].i===p.i+1){
+      p=arr[i];
+    }else{
+      r.push(s.i===p.i ? s.o : `${s.o} to ${p.o}`);
+      s=arr[i];
+      p=arr[i];
+    }
+  }
+
+  r.push(s.i===p.i ? s.o : `${s.o} to ${p.o}`);
+  return r.join(", ");
+}

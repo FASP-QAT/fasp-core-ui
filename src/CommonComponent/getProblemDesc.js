@@ -1,5 +1,6 @@
 import getLabelText from '../CommonComponent/getLabelText';
 import i18n from '../i18n';
+import { formatMonthRanges } from './JavascriptCommonFunctions';
 /**
  * This function is used to construct the problem desc based on different dynamic parameters
  * @param {*} row This is the instance of the problem
@@ -310,21 +311,21 @@ export default function getProblemDesc(row, lang) {
         var desc = "";
         if (obj.overMaxMonthsCount > 0) {
             var count = obj.overMaxMonthsCount;
-            var monthNames = obj.overMaxMonths.toString().replaceAll(",",", ");
+            var monthNames = formatMonthRanges(obj.overMaxMonths.toString().split(",")).toString().replaceAll(",",", ");
             desc += i18n.t('static.problemList.minMaxProblemDescOverMax', { count, monthNames });
         }
         if (obj.underMinMonthsCount > 0) {
             var count = obj.underMinMonthsCount;
-            var monthNames = obj.underMinMonths.toString().replaceAll(",",", ");
+            var monthNames = formatMonthRanges(obj.underMinMonths.toString().split(",")).toString().replaceAll(",",", ");
             desc += i18n.t('static.problemList.minMaxProblemDescUnderMin', { count, monthNames });
         }
         if (obj.stockedOutMonthsCount > 0) {
             var count = obj.stockedOutMonthsCount;
-            var monthNames = obj.stockedOutMonths.toString().replaceAll(",",", ");;
+            var monthNames = formatMonthRanges(obj.stockedOutMonths.toString().split(",")).toString().replaceAll(",",", ")
             desc += i18n.t('static.problemList.minMaxProblemDescStockedOut', { count, monthNames });
         }
         if (obj.shipmentListMonthsCount > 0) {
-            var monthNames = obj.shipmentListMonths.toString().replaceAll(",",", ");;
+            var monthNames = formatMonthRanges(obj.shipmentListMonths.toString().split(",")).toString().replaceAll(",",", ");
             desc += i18n.t('static.problemList.minMaxProblemDescShipments', { monthNames });
         }
         if (desc_en != null && desc_en != '') {
