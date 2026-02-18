@@ -399,7 +399,7 @@ const routes = [
   { path: '/report/procurementAgentExport', name: 'static.report.shipmentCostReport', component: ProcurementAgentExport },
   { path: '/report/supplierLeadTimes', name: 'static.dashboard.supplierLeadTimes', component: SupplierLeadTimes },
   { path: '/report/shipmentGlobalDemandView', name: 'static.dashboard.shipmentGlobalDemandViewheader', component: ShipmentGlobalDemandView },
-  { path: '/report/shipmentGlobalView', name: 'static.dashboard.shipmentGlobalViewheader', component: ShipmentGlobalView },
+  { path: '/report/shipmentGlobalView', name: 'static.dashboard.shipmentByCountryheader', component: ShipmentGlobalView },
   { path: '/report/annualShipmentCost', name: 'static.report.annualshipmentcost', component: AnnualShipmentCost },
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
   { path: '/report/editStatus/:programId/:versionId', name: 'static.supplyPlan.updateProgramStatus', component: EditSupplyPlanStatus },
@@ -2055,7 +2055,7 @@ class DefaultLayout extends Component {
                               attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_GLOBAL_DEMAND_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                               children: [
                                 {
-                                  name: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                                  name: i18n.t('static.dashboard.shipmentByCountryheader'),
                                   url: '/report/shipmentGlobalView',
                                   icon: 'fa fa-globe',
                                   attributes: {
