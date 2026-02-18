@@ -723,7 +723,9 @@ class ShipmentGlobalView extends Component {
         })
         this.setState({
             programValues: programIds.map(ele => ele),
-            programLabels: programIds.map(ele => ele.label)
+            programLabels: programIds.map(ele => ele.label).sort((a, b) => a.localeCompare(b)),
+            yaxisEquUnit: -1,
+            yaxisEquUnitLabel: [i18n.t('static.program.no')],
         }, () => {
             this.getFundingSource();
             this.getDropdownLists();
@@ -1224,7 +1226,7 @@ class ShipmentGlobalView extends Component {
         var planningUnitIds = e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList; 
         this.setState({
             planningUnitId: planningUnitIds,
-            planningUnitLabels: planningUnitIds.map(ele => ele.label),
+            planningUnitLabels: planningUnitIds.map(ele => ele.label).sort((a, b) => a.localeCompare(b)),
             planningUnitIdExport: e.map(ele => ele).length == 0 ? [] : e.length == 1 ? e.map(ele => ele) : tempPUList,
             show: false,
             dataList: [],
@@ -1241,7 +1243,7 @@ class ShipmentGlobalView extends Component {
                 var planningUnitIds = e.map(ele => ele)
                 this.setState({
                 planningUnitId: planningUnitIds,
-                planningUnitLabels: planningUnitIds.map(ele => ele.label),
+                planningUnitLabels: planningUnitIds.map(ele => ele.label).sort((a, b) => a.localeCompare(b)),
                 planningUnitIdExport: e.map(ele => ele),
                 show: false,
                 dataList: [],
@@ -1598,7 +1600,7 @@ class ShipmentGlobalView extends Component {
         })
         this.setState({
             countryValues: countrysId.map(ele => ele),
-            countryLabels: countrysId.map(ele => ele.label)
+            countryLabels: countrysId.map(ele => ele.label).sort((a, b) => a.localeCompare(b))
         }, () => {
             this.filterProgram();
         })
@@ -2058,7 +2060,7 @@ class ShipmentGlobalView extends Component {
                                                 )}
                                         </FormGroup>
                                         <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t("static.forecastReport.yAxisInEquivalencyUnit")}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t("static.shipmentReport.yAxisInEquivalencyUnit")}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                 <Input
@@ -2087,6 +2089,7 @@ class ShipmentGlobalView extends Component {
                                                 <div className="controls">
                                                     <div onBlur={this.handleBlur}>
                                                         <MultiSelect
+                                                            className={this.state.yaxisEquUnit == -1 ? "hide-checkbox" : ""}
                                                             bsSize="sm"
                                                             name="planningUnitId"
                                                             id="planningUnitId"
@@ -2130,16 +2133,16 @@ class ShipmentGlobalView extends Component {
                                                         bsSize="sm"
                                                         onChange={this.toggleView}
                                                     >
-                                                        <option value="1">{i18n.t('static.dashboard.fundingsource')}</option>
+                                                        <option value="1">{i18n.t('static.fundingSourceHead.fundingSource')}</option>
                                                         {/* <option value="4">{i18n.t('static.funderTypeHead.funderType')}</option> */}
-                                                        <option value="2">{i18n.t('static.procurementagent.procurementagent')}</option>
+                                                        <option value="2">{i18n.t('static.report.procurementAgentName')}</option>
                                                         {/* <option value="3">{i18n.t('static.dashboard.procurementagentType')}</option> */}
                                                     </Input>
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" id="procurementAgentDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.procurementagent.procurementagent')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.procurementAgentName')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
                                                 <MultiSelect
@@ -2173,7 +2176,7 @@ class ShipmentGlobalView extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" id="fundingSourceDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.fundingSourceHead.fundingSource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
                                                 <MultiSelect
@@ -2254,7 +2257,7 @@ class ShipmentGlobalView extends Component {
                                             <div className="col-md-12">
                                                 {this.state.table1Body.length > 0 &&
                                                 <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
-                                                    <div id="shipmentJexcel" className='jexcelremoveReadonlybackground' style={{ padding: '2px 8px' }}></div>
+                                                    <div id="shipmentJexcel" className='jexcelremoveReadonlybackground shipmentJexcel' style={{ padding: '2px 8px' }}></div>
                                                 </CardBody>
                                                 }
                                             </div>

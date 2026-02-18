@@ -15,7 +15,7 @@ class WorldMap extends React.Component {
     super(props);
     this.state = {
       zoom: 1,
-      center: [0, 20],
+      center: [0, 0],
       tooltip: {
         visible: false,
         content: "",
@@ -104,7 +104,7 @@ class WorldMap extends React.Component {
             {this.props.title}
           </div>
         )}
-        <ComposableMap projectionConfig={{ scale: 150 }}>
+        <ComposableMap projectionConfig={{ scale: 160 }} width={800} height={400}>
           <ZoomableGroup 
             zoom={this.state.zoom} 
             center={this.state.center} 
