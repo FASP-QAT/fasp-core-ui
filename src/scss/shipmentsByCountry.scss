@@ -1,0 +1,7 @@
+.jss > tfoot > tr > td:not(:nth-child(2)) {
+    border-left: 1px solid #ccc !important;
+}
+
+.jss>tfoot>tr>td {
+    font-weight: bold;
+}

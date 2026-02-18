@@ -35,7 +35,6 @@ import {
   APPROVED_SHIPMENT_STATUS,
   ARRIVED_SHIPMENT_STATUS,
   CANCELLED_SHIPMENT_STATUS,
-  CONSTANT_FOR_TEMP_SHIPMENT,
   DATE_FORMAT_CAP_FOUR_DIGITS,
   DELIVERED_SHIPMENT_STATUS,
   DRAFT_SHIPMENT_STATUS,
@@ -204,11 +203,13 @@ class ShipmentSummery extends Component {
       },
       loading: true,
       programId: "",
-      versionId: "",
       fundingSources: [],
+      procurementAgents: [],
       // fundingSourcesOriginal: [],//implemented for funding source type changes
       fundingSourceValues: [],
       fundingSourceLabels: [],
+      procurementAgentValues: [],
+      procurementAgentLabels: [],
       budgets: [],
       budgetValues: [],
       budgetLabels: [],
@@ -217,17 +218,476 @@ class ShipmentSummery extends Component {
       fundingSourceTypes: [],
       fundingSourceTypeValues: [],
       fundingSourceTypeLabels: [],
+      countryValues: [],
+      countrys: [],
+      programValues: [],
+      programLst: [],
+      versionId: [],
+      planningUnitList: [],
+      planningUnitListAll: [],
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
     this.getFundingSourceList = this.getFundingSourceList.bind(this);
+    this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
     this.getBudgetList = this.getBudgetList.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
     this.loaded = this.loaded.bind(this);
     this.selected = this.selected.bind(this);
     this.getFundingSourceType = this.getFundingSourceType.bind(this);
+    this.handleChange = this.handleChange.bind(this)
+    this.getCountrys = this.getCountrys.bind(this);
+    this.handleChangeProgram = this.handleChangeProgram.bind(this);
+    this.setViewById = this.setViewById.bind(this);
+  }
+  setViewById(e) {
+    this.setState({
+      viewById: e.target.value
+    }, () => {
+      this.fetchData()
+    })
+  }
+  /**
+   * Handles the change event for countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
+  handleChange(countrysId) {
+    countrysId = countrysId.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      countryValues: countrysId.map(ele => ele),
+      countryLabels: countrysId.map(ele => ele.label),
+      programValues: [],
+      programLabels: [],
+      versionLabel: "",
+      versionId: "",
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      budgetValues: [],
+      budgetLabels: [],
+      fundingSourceValues: [],
+      fundingSourceLabels: [],
+      filteredBudgetList: [],
+      procurementAgentValuesValues: [],
+      procurementAgentLabels: []
+    }, () => {
+      this.filterProgram();
+    })
+  }
+  /**
+   * Retrieves the list of countries based on the realm ID and updates the state with the list.
+   */
+  getCountrys() {
+    this.setState({ loading: true })
+    if (localStorage.getItem("sessionType") === 'Online') {
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getRealmCountryDropdownList(realmId)
+        .then(response => {
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              countrys: listArray,
+              loading: false
+            }, () => { })
+          } else {
+            this.setState({ message: response.data.messageCode, loading: false },
+              () => { this.hideSecondComponent(); })
+          }
+        })
+        .catch(
+          error => {
+            this.setState({
+              countrys: []
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['country'], 'readwrite');
+        var Country = transaction.objectStore('country');
+        var getRequest = Country.getAll();
+        var proList = []
+        getRequest.onerror = function (event) {
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+          for (var i = 0; i < myResult.length; i++) {
+            var CountryJson = {
+              label: myResult[i].label,
+              id: myResult[i].countryId
+            }
+            proList.push(CountryJson)
+          }
+          proList.sort((a, b) => {
+            var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+            var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({
+            countrys: proList,
+            loading: false
+          })
+        }.bind(this);
+      }.bind(this)
+    }
+    this.fetchData();
+  }
+  /**
+   * Filters programs based on selected countries.
+   */
+  filterProgram = () => {
+    let countryIds = this.state.countryValues.map(ele => ele.value);
+    this.setState({
+      programLst: [],
+      programValues: [],
+      programLabels: [],
+      loading: true
+    }, () => {
+      if (countryIds.length != 0) {
+        let newCountryList = [... new Set(countryIds)];
+        if (localStorage.getItem("sessionType") === 'Online') {
+          DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
+            .then(response => {
+              var listArray = response.data;
+              listArray.sort((a, b) => {
+                var itemLabelA = a.code.toUpperCase();
+                var itemLabelB = b.code.toUpperCase();
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              if (listArray.length > 0) {
+                this.setState({
+                  programLst: listArray
+                }, () => {
+                  this.fetchData()
+                });
+              } else {
+                this.setState({
+                  programLst: []
+                }, () => {
+                  this.fetchData()
+                });
+              }
+            }).catch(
+              error => {
+                this.setState({
+                  programLst: [], loading: false
+                })
+                if (error.message === "Network Error") {
+                  this.setState({
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
+                  });
+                } else {
+                  switch (error.response ? error.response.status : "") {
+                    case 401:
+                      this.props.history.push(`/login/static.message.sessionExpired`)
+                      break;
+                    case 409:
+                      this.setState({
+                        message: i18n.t('static.common.accessDenied'),
+                        loading: false,
+                        color: "#BA0C2F",
+                      });
+                      break;
+                    case 403:
+                      this.props.history.push(`/accessDenied`)
+                      break;
+                    case 500:
+                    case 404:
+                    case 406:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    case 412:
+                      this.setState({
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
+                      });
+                      break;
+                    default:
+                      this.setState({
+                        message: 'static.unkownError',
+                        loading: false
+                      });
+                      break;
+                  }
+                }
+              }
+            );
+        } else {
+          var db1;
+          getDatabase();
+          var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+          openRequest.onsuccess = function (e) {
+            db1 = e.target.result;
+            var transaction = db1.transaction(['programData'], 'readwrite');
+            var Country = transaction.objectStore('programData');
+            var getRequest = Country.getAll();
+            var proList = []
+            getRequest.onerror = function (event) {
+            };
+            getRequest.onsuccess = function (event) {
+              var myResult = [];
+              myResult = getRequest.result;
+              var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+              var userId = userBytes.toString(CryptoJS.enc.Utf8);
+              for (var i = 0; i < myResult.length; i++) {
+                if (myResult[i].userId == userId) {
+                  var generalProgramDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                  var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                  var generalProgramJson = JSON.parse(generalProgramData);
+                  if (generalProgramJson.realmCountry.country.countryId == this.state.countryValues[0].value) {
+                    var json = {
+                      code: myResult[i].programCode,
+                      id: myResult[i].id.split("_")[0]
+                    }
+                    proList.push(json)
+                  }
+                }
+              }
+              proList.sort((a, b) => {
+                var itemLabelA = a.code;
+                var itemLabelB = b.code;
+                return itemLabelA > itemLabelB ? 1 : -1;
+              });
+              this.setState({
+                programLst: proList,
+                loading: false
+              }, () => {
+                this.fetchData()
+              })
+            }.bind(this);
+          }.bind(this)
+        }
+      } else {
+        this.setState({
+          programLst: []
+        }, () => {
+          this.fetchData()
+        });
+      }
+    })
+  }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
+  handleChangeProgram(programIds) {
+    programIds = programIds.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      programValues: programIds.map(ele => ele),
+      programLabels: programIds.map(ele => ele.label),
+      versions: [],
+      versionLabel: "",
+      versionId: "",
+      planningUnitValues: [],
+      planningUnitLabels: [],
+      budgetValues: [],
+      budgetLabels: [],
+      fundingSourceValues: [],
+      fundingSourceLabels: [],
+      filteredBudgetList: [],
+      procurementAgentValuesValues: [],
+      procurementAgentLabels: []
+    }, () => {
+      this.filterVersion();
+      this.getPlanningUnit();
+      this.getFundingSourceList();
+      this.getProcurementAgentList();
+      this.fetchData();
+    })
+  }
+  filterVersion = () => {
+    let programId = this.state.programValues;
+    if (programId.length == 1) {
+      programId = programId[0].value
+      const program = this.state.programLst.filter(
+        (c) => c.id == programId
+      );
+      if (program.length == 1) {
+        if (localStorage.getItem("sessionType") === 'Online') {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              DropdownService.getVersionListForSPProgram(
+                programId
+              )
+                .then((response) => {
+                  this.setState(
+                    {
+                      versions: [],
+                    },
+                    () => {
+                      this.setState(
+                        {
+                          versions: response.data.sort((a, b) => a.versionId - b.versionId),
+                        },
+                        () => {
+                          this.consolidatedVersionList(programId);
+                        }
+                      );
+                    }
+                  );
+                })
+                .catch((error) => {
+                  this.setState({
+                    programs: [],
+                    loading: false,
+                  });
+                  if (error.message === "Network Error") {
+                    this.setState({
+                      message: API_URL.includes("uat")
+                        ? i18n.t("static.common.uatNetworkErrorMessage")
+                        : API_URL.includes("demo")
+                          ? i18n.t("static.common.demoNetworkErrorMessage")
+                          : i18n.t("static.common.prodNetworkErrorMessage"),
+                      loading: false,
+                    });
+                  } else {
+                    switch (error.response ? error.response.status : "") {
+                      case 401:
+                        this.props.history.push(
+                          `/login/static.message.sessionExpired`
+                        );
+                        break;
+                      case 409:
+                        this.setState({
+                          message: i18n.t('static.common.accessDenied'),
+                          loading: false,
+                          color: "#BA0C2F",
+                        });
+                        break;
+                      case 403:
+                        this.props.history.push(`/accessDenied`);
+                        break;
+                      case 500:
+                      case 404:
+                      case 406:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      case 412:
+                        this.setState({
+                          message: i18n.t(error.response.data.messageCode, {
+                            entityname: i18n.t("static.dashboard.program"),
+                          }),
+                          loading: false,
+                        });
+                        break;
+                      default:
+                        this.setState({
+                          message: "static.unkownError",
+                          loading: false,
+                        });
+                        break;
+                    }
+                  }
+                });
+            }
+          );
+        } else {
+          this.setState(
+            {
+              versions: [],
+            },
+            () => {
+              this.consolidatedVersionList(programId);
+            }
+          );
+        }
+      } else {
+        this.setState({
+          versions: [],
+        });
+      }
+    } else {
+      this.setState({
+        versions: [],
+      }, () => {
+        this.getPlanningUnit();
+      });
+    }
+  };
+  setVersionId(event) {
+    var versionLabel = document.getElementById("versionId").selectedOptions[0].text.toString()
+    this.setState(
+      {
+        versionLabel: versionLabel,
+        versionId: event.target.value,
+      },
+      () => {
+        if (this.state.versionId != "" && this.state.versionId != 0) {
+          localStorage.setItem("sesVersionIdReport", this.state.versionId);
+          this.getPlanningUnit();
+          this.fetchData();
+        }
+      }
+    );
   }
   /**
    * Exports the data to a CSV file.
@@ -246,67 +706,29 @@ class ShipmentSummery extends Component {
       '"'
     );
     csvRow.push("");
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.program.program") +
-        " : " +
-        document.getElementById("programId").selectedOptions[0].text
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.report.versionFinal*") +
-        "  :  " +
-        document.getElementById("versionId").selectedOptions[0].text
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
+    this.state.countryLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    this.state.programLabels.map(ele =>
+      csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+    csvRow.push('')
+    if (this.state.programValues.length == 1) {
+      csvRow.push(
+        '"' +
+        (
+          i18n.t("static.report.versionFinal*") +
+          "  :  " +
+          document.getElementById("versionId").selectedOptions[0].text
+        ).replaceAll(" ", "%20") +
+        '"'
+      );
+      csvRow.push('')
+    }
     this.state.planningUnitLabels.map((ele) =>
       csvRow.push(
         '"' +
         (
           i18n.t("static.planningunit.planningunit") +
-          " : " +
-          ele.toString()
-        ).replaceAll(" ", "%20") +
-        '"'
-      )
-    );
-    // csvRow.push("");
-    // this.state.fundingSourceTypeLabels.map((ele) =>
-    //   csvRow.push(
-    //     '"' +
-    //     (
-    //       i18n.t("static.funderTypeHead.funderType") +
-    //       " : " +
-    //       ele.toString()
-    //     ).replaceAll(" ", "%20") +
-    //     '"'
-    //   )
-    // );
-    csvRow.push("");
-    this.state.fundingSourceLabels.map((ele) =>
-      csvRow.push(
-        '"' +
-        (
-          i18n.t("static.budget.fundingsource") +
-          " : " +
-          ele.toString()
-        ).replaceAll(" ", "%20") +
-        '"'
-      )
-    );
-    csvRow.push("");
-    this.state.budgetLabels.map((ele) =>
-      csvRow.push(
-        '"' +
-        (
-          i18n.t("static.budgetHead.budget") +
           " : " +
           ele.toString()
         ).replaceAll(" ", "%20") +
@@ -323,13 +745,57 @@ class ShipmentSummery extends Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
+    if (this.state.fundingSourceLabels.length > 0) {
+      csvRow.push("");
+    }
+    this.state.fundingSourceLabels.map((ele) =>
+      csvRow.push(
+        '"' +
+        (
+          i18n.t("static.budget.fundingsource") +
+          " : " +
+          ele.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
+      )
+    );
+    if (this.state.budgetLabels.length > 0) {
+      csvRow.push("");
+    }
+    this.state.budgetLabels.map((ele) =>
+      csvRow.push(
+        '"' +
+        (
+          i18n.t("static.budgetHead.budget") +
+          " : " +
+          ele.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
+      )
+    );
+    if (this.state.procurementAgentLabels.length > 0) {
+      csvRow.push("");
+    }
+    this.state.procurementAgentLabels.map((ele) =>
+      csvRow.push(
+        '"' +
+        (
+          i18n.t("static.dashboard.procurementagentheader") +
+          " : " +
+          ele.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
+      )
+    );
     csvRow.push("");
     csvRow.push("");
     let viewById = this.state.viewById;
     var re;
     var A = [
       addDoubleQuoteToRowContent([
-        i18n.t("static.budget.fundingsource").replaceAll(" ", "%20"),
+        this.state.viewById == 1 ? i18n.t("static.budget.fundingsource").replaceAll(" ", "%20") : i18n.t("static.dashboard.procurementagentheader").replaceAll(" ", "%20"),
+        i18n.t("static.dashboard.countryheader").replaceAll(" ", "%20"),
+        i18n.t("static.dashboard.program").replaceAll(" ", "%20"),
         i18n.t("static.report.orders").replaceAll(" ", "%20"),
         i18n.t("static.report.costUsd").replaceAll(" ", "%20"),
       ]),
@@ -337,8 +803,10 @@ class ShipmentSummery extends Component {
     this.state.shipmentDetailsFundingSourceList.map((ele) =>
       A.push(
         addDoubleQuoteToRowContent([
-          ele.fundingSource.code.replaceAll(" ", "%20"),
-          ele.orderCount,
+          ele.fspa.code.replaceAll(" ", "%20"),
+          ele.countries,
+          ele.programs,
+          ele.shipments,
           ele.cost,
         ])
       )
@@ -348,12 +816,11 @@ class ShipmentSummery extends Component {
     }
     csvRow.push("");
     csvRow.push("");
-    csvRow.push("");
     var B = [
       addDoubleQuoteToRowContent([
-        i18n.t("static.report.qatPIDFID").replaceAll(" ", "%20"),
+        i18n.t("static.program.programMaster").replaceAll(" ", "%20"),
         i18n
-          .t("static.report.planningUnit/ForecastingUnit")
+          .t("static.report.planningUnit")
           .replaceAll(" ", "%20"),
         i18n.t("static.report.id").replaceAll(" ", "%20"),
         i18n
@@ -381,8 +848,8 @@ class ShipmentSummery extends Component {
     for (var item = 0; item < re.length; item++) {
       B.push(
         addDoubleQuoteToRowContent([
-          re[item].planningUnit.id,
-          getLabelText(re[item].planningUnit.label, this.state.lang)
+          re[item].program.code.replaceAll(" ", "%20"),
+          (getLabelText(re[item].planningUnit.label, this.state.lang) + " | " + re[item].planningUnit.id)
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
           re[item].shipmentId!=0?re[item].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+re[item].tempShipmentId),
@@ -409,9 +876,7 @@ class ShipmentSummery extends Component {
           getLabelText(re[item].shipmentStatus.label, this.state.lang)
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
-          viewById == 1
-            ? Number(re[item].shipmentQty).toFixed(3)
-            : (Number(Number(re[item].shipmentQty) * re[item].multiplier)).toFixed(3),
+          Number(re[item].shipmentQty).toFixed(3),
           moment(re[item].expectedDeliveryDate)
             .format(DATE_FORMAT_CAP_FOUR_DIGITS)
             .replaceAll(",", " ")
@@ -486,52 +951,6 @@ class ShipmentSummery extends Component {
             align: "center",
           }
         );
-        if (i == 1) {
-          doc.setFont("helvetica", "normal");
-          doc.setFontSize(8);
-          doc.text(
-            i18n.t("static.report.dateRange") +
-            " : " +
-            makeText(this.state.rangeValue.from) +
-            " ~ " +
-            makeText(this.state.rangeValue.to),
-            doc.internal.pageSize.width / 8,
-            90,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.program.program") +
-            " : " +
-            document.getElementById("programId").selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            110,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.report.versionFinal*") +
-            " : " +
-            document.getElementById("versionId").selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            130,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.common.display") +
-            " : " +
-            document.getElementById("viewById").selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            150,
-            {
-              align: "left",
-            }
-          );
-        }
       }
     };
     const unit = "pt";
@@ -543,53 +962,58 @@ class ShipmentSummery extends Component {
     doc.setFont('helvetica', 'normal')
     doc.setTextColor("#002f6c");
     // var y = 190;
-    var y = 170;
-
-    // var fundingSourceTypeText = doc.splitTextToSize(
-    //   i18n.t("static.funderTypeHead.funderType") +
-    //   " : " +
-    //   this.state.fundingSourceTypeLabels.join("; "),
-    //   (doc.internal.pageSize.width * 3) / 4
-    // );
-    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceTypeText);
-    // y = y + fundingSourceTypeText.length * 10 + 10;
-
-    var fundingSourceText = doc.splitTextToSize(
-      i18n.t("static.budget.fundingsource") +
+    var y = 90;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text(
+      i18n.t("static.report.dateRange") +
       " : " +
-      this.state.fundingSourceLabels.join("; "),
-      (doc.internal.pageSize.width * 3) / 4
+      makeText(this.state.rangeValue.from) +
+      " ~ " +
+      makeText(this.state.rangeValue.to),
+      doc.internal.pageSize.width / 8,
+      90,
+      {
+        align: "left",
+      }
     );
-    // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
-    for (var i = 0; i < fundingSourceText.length; i++) {
+    y = y + 20;
+    var planningText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ': ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+    for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
         y = 100;
       }
-      doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
     }
+    planningText = doc.splitTextToSize(i18n.t('static.program.program') + ': ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
     y = y + 10;
-
-    var budgetText = doc.splitTextToSize(
-      i18n.t("static.budgetHead.budget") +
-      " : " +
-      this.state.budgetLabels.join("; "),
-      (doc.internal.pageSize.width * 3) / 4
-    );
-    // y = y + 5;
-    for (var i = 0; i < budgetText.length; i++) {
+    for (var i = 0; i < planningText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
         doc.addPage();
         y = 100;
       }
-      doc.text(doc.internal.pageSize.width / 8, y, budgetText[i]);
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
     }
+    if (this.state.programValues.length == 1) {
+      planningText = doc.splitTextToSize(i18n.t('static.report.version') + ': ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+      y = y + 10;
+      for (var i = 0; i < planningText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 100;
+        }
+        doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+        y = y + 10;
+      }
+    }
+
     y = y + 10;
     var planningText = doc.splitTextToSize(
       i18n.t("static.planningunit.planningunit") +
-      " : " +
+      ": " +
       this.state.planningUnitLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
@@ -600,6 +1024,68 @@ class ShipmentSummery extends Component {
       }
       doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
       y = y + 10;
+    }
+
+    planningText = doc.splitTextToSize(i18n.t('static.common.display') + ': ' + document.getElementById("viewById").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+    y = y + 10;
+    for (var i = 0; i < planningText.length; i++) {
+      if (y > doc.internal.pageSize.height - 100) {
+        doc.addPage();
+        y = 100;
+      }
+      doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+      y = y + 10;
+    }
+    if (this.state.viewById == 1) {
+      var fundingSourceText = doc.splitTextToSize(
+        i18n.t("static.budget.fundingsource") +
+        ": " +
+        this.state.fundingSourceLabels.join("; "),
+        (doc.internal.pageSize.width * 3) / 4
+      );
+      y = y + 10;
+      // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+      for (var i = 0; i < fundingSourceText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 100;
+        }
+        doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+        y = y + 10;
+      }
+
+      var budgetText = doc.splitTextToSize(
+        i18n.t("static.budgetHead.budget") +
+        ": " +
+        this.state.budgetLabels.join("; "),
+        (doc.internal.pageSize.width * 3) / 4
+      );
+      y = y + 10;
+      for (var i = 0; i < budgetText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 100;
+        }
+        doc.text(doc.internal.pageSize.width / 8, y, budgetText[i]);
+        y = y + 10;
+      }
+    } else {
+      var paText = doc.splitTextToSize(
+        i18n.t("static.dashboard.procurementagentheader") +
+        ": " +
+        this.state.procurementAgentLabels.join("; "),
+        (doc.internal.pageSize.width * 3) / 4
+      );
+      y = y + 10;
+      // doc.text(doc.internal.pageSize.width / 8, 170, fundingSourceText);
+      for (var i = 0; i < paText.length; i++) {
+        if (y > doc.internal.pageSize.height - 100) {
+          doc.addPage();
+          y = 100;
+        }
+        doc.text(doc.internal.pageSize.width / 8, y, paText[i]);
+        y = y + 10;
+      }
     }
     var canvas = document.getElementById("cool-canvas");
     var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -617,13 +1103,13 @@ class ShipmentSummery extends Component {
     let content1 = {
       margin: { top: 80, bottom: 100 },
       startY: height,
-      styles: { lineWidth: 1, fontSize: 8, cellWidth: 190, halign: "center" },
+      styles: { lineWidth: 1, fontSize: 8, cellWidth: 145, halign: "center" },
       columnStyles: {
         0: { cellWidth: 191.89 },
       },
       html: "#mytable1",
       didDrawCell: function (data) {
-        if (data.column.index === 4 && data.cell.section === "body") {
+        if (data.column.index === 6 && data.cell.section === "body") {
           var td = data.cell.raw;
           var img = td.getElementsByTagName("img")[0];
           var dim = data.cell.height - data.cell.padding("vertical");
@@ -634,7 +1120,8 @@ class ShipmentSummery extends Component {
     };
     doc.autoTable(content1);
     let headerTable2 = [];
-    headerTable2.push(i18n.t("static.report.planningUnit/ForecastingUnit"));
+    headerTable2.push(i18n.t("static.program.programMaster"));
+    headerTable2.push(i18n.t("static.report.planningUnit"));
     headerTable2.push(i18n.t("static.report.id"));
     headerTable2.push(i18n.t("static.supplyPlan.consideAsEmergencyOrder"));
     headerTable2.push(i18n.t("static.report.erpOrder"));
@@ -652,7 +1139,8 @@ class ShipmentSummery extends Component {
     headerTable2.push(i18n.t("static.program.notes"));
     let data;
     data = this.state.shipmentDetailsList.map((ele) => [
-      getLabelText(ele.planningUnit.label, this.state.lang),
+      ele.program.code,
+      getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id,
       ele.shipmentId!=0?ele.shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ele.tempShipmentId),
       ele.emergencyOrder,
       ele.erpOrder == true ? true : false,
@@ -662,9 +1150,7 @@ class ShipmentSummery extends Component {
       ele.fundingSource.code,
       ele.budget.code,
       getLabelText(ele.shipmentStatus.label, this.state.lang),
-      this.state.viewById == 1
-        ? formatter(Number(ele.shipmentQty).toFixed(3), 0)
-        : formatter(Number(Number(ele.shipmentQty) * ele.multiplier).toFixed(3), 0),
+      formatter(Number(ele.shipmentQty).toFixed(3), 0),
       moment(ele.expectedDeliveryDate).format("YYYY-MM-DD"),
       ele.productCost
         .toFixed(2)
@@ -688,8 +1174,8 @@ class ShipmentSummery extends Component {
       body: data,
       styles: { lineWidth: 1, fontSize: 8, halign: "center" },
       columnStyles: {
-        0: { cellWidth: 100 },
-        15: { cellWidth: 110 },
+        1: { cellWidth: 100 },
+        16: { cellWidth: 110 },
       },
     };
     doc.autoTable(contentTable2);
@@ -804,43 +1290,6 @@ class ShipmentSummery extends Component {
     }
   }
 
-  // handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
-
-  //   fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
-  //     return parseInt(a.value) - parseInt(b.value);
-  //   })
-  //   this.setState({
-  //     fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
-  //     fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
-  //   }, () => {
-  //     var filteredFundingSourceArr = [];
-  //     var fundingSources = this.state.fundingSourcesOriginal;//original fs list
-  //     for (var i = 0; i < fundingSourceTypeIds.length; i++) {
-  //       for (var j = 0; j < fundingSources.length; j++) {
-  //         if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
-  //           filteredFundingSourceArr.push(fundingSources[j]);
-  //         }
-  //       }
-  //     }
-
-  //     if (filteredFundingSourceArr.length > 0) {
-  //       filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
-  //         a = a.code.toLowerCase();
-  //         b = b.code.toLowerCase();
-  //         return a < b ? -1 : a > b ? 1 : 0;
-  //       });
-  //     }
-  //     this.setState({
-  //       fundingSources: filteredFundingSourceArr,
-  //       fundingSourceValues: [],
-  //       fundingSourceLabels: [],
-  //     }, () => {
-  //       this.fetchData();
-  //     });
-
-  //   })
-  // }
-
   /**
    * Retrieves the list of funding sources.
    */
@@ -849,7 +1298,7 @@ class ShipmentSummery extends Component {
       this.setState({
         loading: true
       })
-      var programIds = [Number(this.state.programId)];
+      var programIds = this.state.programValues.map(ele => ele.value);
       DropdownService.getFundingSourceForProgramsDropdownList(programIds)
         .then((response) => {
           var listArray = response.data;
@@ -918,7 +1367,7 @@ class ShipmentSummery extends Component {
         fSourceRequest.onerror = function (event) {
         }.bind(this);
         fSourceRequest.onsuccess = function (event) {
-          fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programId)));
+          fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
           var fundingSource = [];
           for (var i = 0; i < fSourceResult.length; i++) {
             var arr = {
@@ -927,7 +1376,7 @@ class ShipmentSummery extends Component {
               label: fSourceResult[i].label,
               fundingSourceType: fSourceRequest.result[i].fundingSourceType
             };
-            fundingSource[i] = arr;
+            fundingSource.push(arr);
           }
           this.setState(
             {
@@ -949,21 +1398,130 @@ class ShipmentSummery extends Component {
     }
   }
   /**
+   * Retrieves the list of procurement agents.
+   */
+  getProcurementAgentList() {
+    if (localStorage.getItem("sessionType") === 'Online') {
+      this.setState({
+        loading: true
+      })
+      var programIds = this.state.programValues.map(ele => ele.value);
+      DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programIds)
+        .then((response) => {
+          var listArray = response.data;
+          listArray.sort((a, b) => {
+            var itemLabelA = a.code.toUpperCase();
+            var itemLabelB = b.code.toUpperCase();
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState(
+            {
+              procurementAgents: listArray,
+              loading: false,
+              procurementAgentValues: [],
+              procurementAgentLabels: [],
+              budgetValues: [],
+              budgetLabels: [],
+              filteredBudgetList: [],
+            },
+            () => {
+            }
+          );
+        })
+        .catch((error) => {
+          this.setState({
+            procurementAgents: [],
+          });
+          if (error.message === "Network Error") {
+            this.setState({
+              message: API_URL.includes("uat")
+                ? i18n.t("static.common.uatNetworkErrorMessage")
+                : API_URL.includes("demo")
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
+            });
+          } else {
+            switch (error.response ? error.response.status : "") {
+              case 500:
+              case 401:
+              case 404:
+              case 406:
+              case 412:
+                this.setState({
+                  message: i18n.t(error.response.data.messageCode, {
+                    entityname: i18n.t("static.fundingsource.fundingsource"),
+                  }),
+                });
+                break;
+              default:
+                this.setState({ message: "static.unkownError" });
+                break;
+            }
+          }
+        });
+    } else {
+      var db3;
+      var paResult = [];
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db3 = e.target.result;
+        var paTransaction = db3.transaction(
+          ["procurementAgent"],
+          "readwrite"
+        );
+        var paOs = paTransaction.objectStore("procurementAgent");
+        var paRequest = paOs.getAll();
+        paRequest.onerror = function (event) {
+        }.bind(this);
+        paRequest.onsuccess = function (event) {
+          paResult = paRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
+          var pa = [];
+          for (var i = 0; i < paResult.length; i++) {
+            var arr = {
+              id: paResult[i].procurementAgentId,
+              code: paResult[i].procurementAgentCode,
+              label: paResult[i].label,
+            };
+            pa.push(arr);
+          }
+          this.setState(
+            {
+              procurementAgents: pa.sort(function (a, b) {
+                a = a.code.toLowerCase();
+                b = b.code.toLowerCase();
+                return a < b ? -1 : a > b ? 1 : 0;
+              }),
+              procurementAgentValues: [],
+              procurementAgentLabels: [],
+              filteredBudgetList: [],
+              budgetValues: [],
+              budgetLabels: []
+            },
+            () => {
+            }
+          );
+        }.bind(this);
+      }.bind(this);
+    }
+  }
+  /**
    * Retrieves the list of budgets.
    */
   getBudgetList() {
-    var programId = this.state.programId;
-    if (this.state.programId != "" && this.state.programId != 0 && programId != "") {
+    var programId = this.state.programValues[0].value;
+    if (this.state.programValues.length > 0) {
       if (localStorage.getItem("sessionType") === 'Online') {
-        DropdownService.getBudgetDropdownBasedOnProgram(programId)
+        var programIds = this.state.programValues.map(ele => ele.value);
+        DropdownService.getBudgetForProgramsDropdownList(programIds)
           .then((response) => {
             var listArray = response.data;
             var proList = [];
             for (var i = 0; i < listArray.length; i++) {
               var programJson = {
-                budgetId: listArray[i].id,
+                budgetId: listArray[i].budgetId,
                 label: listArray[i].label,
-                budgetCode: listArray[i].code,
+                budgetCode: listArray[i].budgetCode,
               };
               proList[i] = programJson;
             }
@@ -1053,7 +1611,7 @@ class ShipmentSummery extends Component {
               budgetLabelsFromProps.push(this.props.match.params.budgetCode);
             }
             fSourceResult = fSourceRequest.result.filter(
-              (b) => [...new Set(b.programs.map(ele => ele.id))].includes(programId)
+              (b) => [...new Set(b.programs.map(ele => ele.id.toString()))].includes(programId.toString())
             );
             this.setState(
               {
@@ -1119,14 +1677,14 @@ class ShipmentSummery extends Component {
             var budgetList = response.data;
             var bList = [];
             for (var i = 0; i < budgetList.length; i++) {
-              if(this.state.filteredBudgetList.some(c=>c.budgetId==budgetList[i].id)){
-              var budgetJson = {
-                budgetId: budgetList[i].id,
-                label: budgetList[i].label,
-                budgetCode: budgetList[i].code,
-              };
-              bList.push(budgetJson);
-            }
+              if (this.state.filteredBudgetList.some(c => c.budgetId == budgetList[i].id)) {
+                var budgetJson = {
+                  budgetId: budgetList[i].id,
+                  label: budgetList[i].label,
+                  budgetCode: budgetList[i].code,
+                };
+                bList.push(budgetJson);
+              }
             }
             this.setState(
               {
@@ -1206,7 +1764,7 @@ class ShipmentSummery extends Component {
           });
       }
       else {
-        var programId = this.state.programId;
+        var programId = this.state.programValues[0].value;
         var db3;
         var fSourceResult = [];
         getDatabase();
@@ -1266,6 +1824,21 @@ class ShipmentSummery extends Component {
     }
   };
   /**
+   * Handles the change event for procurement agents.
+   * @param {Array} procurementAgentIds - An array containing the selected funding source IDs.
+   */
+  handleProcurementAgentChange = (procurementAgentIds) => {
+    this.setState(
+      {
+        procurementAgentValuesValues: procurementAgentIds.map((ele) => ele),
+        procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
+      },
+      () => {
+        this.fetchData();
+      }
+    );
+  };
+  /**
    * Handles the change event for budgets.
    * @param {Array} budgetIds - An array containing the selected budget IDs.
    */
@@ -1287,43 +1860,41 @@ class ShipmentSummery extends Component {
    * Builds the jexcel table based on the shipment details list list.
    */
   buildJExcel() {
-    let shipmentDetailsList = this.state.shipmentDetailsList;
+    let shipmentDetailsList = this.state.shipmentDetailsList.sort((a, b) => { return new Date(b.expectedDeliveryDate) - new Date(a.expectedDeliveryDate); });
     let shipmentDetailsListArray = [];
     let count = 0;
     for (var j = 0; j < shipmentDetailsList.length; j++) {
       data = [];
-      data[0] = getLabelText(
+      data[0] =
+        shipmentDetailsList[j].program.code;
+      data[1] = getLabelText(
         shipmentDetailsList[j].planningUnit.label,
         this.state.lang
-      );
-      data[1] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
-      data[2] = shipmentDetailsList[j].emergencyOrder;
-      data[3] = shipmentDetailsList[j].erpFlag;
-      data[4] = shipmentDetailsList[j].localProcurement;
-      data[5] =
+      ) + " | " + shipmentDetailsList[j].planningUnit.id;
+      data[2] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
+      data[3] = shipmentDetailsList[j].emergencyOrder;
+      data[4] = shipmentDetailsList[j].erpFlag;
+      data[5] = shipmentDetailsList[j].localProcurement;
+      data[6] =
         shipmentDetailsList[j].orderNo != null
           ? shipmentDetailsList[j].orderNo
           : "";
-      data[6] = shipmentDetailsList[j].procurementAgent.code;
-      data[7] = shipmentDetailsList[j].fundingSource.code;
-      data[8] = shipmentDetailsList[j].budget.code;
-      data[9] = getLabelText(
+      data[7] = shipmentDetailsList[j].procurementAgent.code;
+      data[8] = shipmentDetailsList[j].fundingSource.code;
+      data[9] = shipmentDetailsList[j].budget.code;
+      data[10] = getLabelText(
         shipmentDetailsList[j].shipmentStatus.label,
         this.state.lang
       );
-      data[10] =
-        this.state.viewById == 1
-          ? shipmentDetailsList[j].shipmentQty
-          : (Number(shipmentDetailsList[j].shipmentQty) *
-          shipmentDetailsList[j].multiplier);
-      data[11] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
+      data[11] = shipmentDetailsList[j].shipmentQty;
+      data[12] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
         "YYYY-MM-DD"
       );
-      data[12] = shipmentDetailsList[j].productCost.toFixed(2);
-      data[13] = shipmentDetailsList[j].freightCost.toFixed(2);
-      data[14] = shipmentDetailsList[j].totalCost.toFixed(2);
-      data[15] = shipmentDetailsList[j].notes;
-      data[16] = shipmentDetailsList[j].planningUnit.id;
+      data[13] = shipmentDetailsList[j].productCost.toFixed(2);
+      data[14] = shipmentDetailsList[j].freightCost.toFixed(2);
+      data[15] = shipmentDetailsList[j].totalCost.toFixed(2);
+      data[16] = shipmentDetailsList[j].notes;
+      data[17] = shipmentDetailsList[j].planningUnit.id;
       shipmentDetailsListArray[count] = data;
       count++;
     }
@@ -1345,7 +1916,11 @@ class ShipmentSummery extends Component {
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
-          title: i18n.t("static.report.planningUnit/ForecastingUnit"),
+          title: i18n.t("static.program.programMaster"),
+          type: "text",
+        },
+        {
+          title: i18n.t("static.report.planningUnit"),
           type: "text",
         },
         {
@@ -1387,7 +1962,7 @@ class ShipmentSummery extends Component {
         {
           title: i18n.t("static.report.qty"),
           type: "numeric",
-          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false")?'#,##.000':'#,##', decimal: '.',
+          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
           decimal: ".",
         },
         {
@@ -1425,7 +2000,7 @@ class ShipmentSummery extends Component {
         },
       ],
       editable: false,
-      license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+      license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
       filters: true,
       onload: this.loaded,
       pagination: localStorage.getItem("sesRecordCount"),
@@ -1476,9 +2051,10 @@ class ShipmentSummery extends Component {
         "N",
         "O",
         "P",
+        "Q"
       ];
       var rowData = elInstance.getRowData(j);
-      var emergencyOrder = rowData[2];
+      var emergencyOrder = rowData[3];
       if (emergencyOrder) {
         for (var i = 0; i < colArr.length; i++) {
           var cell = elInstance.getCell(colArr[i].concat(parseInt(j) + 1));
@@ -1494,11 +2070,11 @@ class ShipmentSummery extends Component {
     if (e.buttons == 1) {
       if ((x == 0 && value != 0) || y == 0) {
       } else {
-        let versionId = document.getElementById("versionId").value;
-        let programId = document.getElementById("programId").value;
+        let versionId = document.getElementById("versionId") ? document.getElementById("versionId").value : "";
+        let programId = this.state.programValues[0].value;
         let userId = AuthenticationService.getLoggedInUserId();
         if (versionId.includes("Local")) {
-          var planningUnitId = this.el.getValueFromCoords(16, x);
+          var planningUnitId = this.el.getValueFromCoords(17, x);
           var rangeValue = this.state.rangeValue;
           var programIdd =
             programId + "_v" + versionId.split(" ")[0] + "_uId_" + userId;
@@ -1511,320 +2087,6 @@ class ShipmentSummery extends Component {
       }
     }
   };
-  /**
-   * Retrieves the list of programs.
-   */
-  getPrograms = () => {
-    if (localStorage.getItem("sessionType") === 'Online') {
-      let realmId = AuthenticationService.getRealmId();
-      DropdownService.getSPProgramBasedOnRealmId(realmId)
-        .then((response) => {
-          var proList = [];
-          for (var i = 0; i < response.data.length; i++) {
-            var programJson = {
-              programId: response.data[i].id,
-              label: response.data[i].label,
-              programCode: response.data[i].code,
-            };
-            proList[i] = programJson;
-          }
-          this.setState(
-            {
-              programs: proList,
-              loading: false,
-            },
-            () => {
-              this.consolidatedProgramList();
-            }
-          );
-        })
-        .catch((error) => {
-          this.setState(
-            {
-              programs: [],
-              loading: false,
-            },
-            () => {
-              this.consolidatedProgramList();
-            }
-          );
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat")
-                ? i18n.t("static.common.uatNetworkErrorMessage")
-                : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
-              loading: false,
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`);
-                break;
-              case 409:
-                this.setState({
-                  message: i18n.t('static.common.accessDenied'),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`);
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              default:
-                this.setState({
-                  message: "static.unkownError",
-                  loading: false,
-                });
-                break;
-            }
-          }
-        });
-    } else {
-      this.setState({ loading: false });
-      this.consolidatedProgramList();
-    }
-  };
-  /**
-   * Consolidates the list of programs obtained from Server and local programs.
-   */
-  consolidatedProgramList = () => {
-    const { programs } = this.state;
-    var proList = programs;
-    var db1;
-    getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(["programData"], "readwrite");
-      var program = transaction.objectStore("programData");
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-      };
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(
-          localStorage.getItem("curUser"),
-          SECRET_KEY
-        );
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var databytes = CryptoJS.AES.decrypt(
-              myResult[i].programData.generalData,
-              SECRET_KEY
-            );
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            var f = 0;
-            for (var k = 0; k < this.state.programs.length; k++) {
-              if (this.state.programs[k].programId == programData.programId) {
-                f = 1;
-              }
-            }
-            if (f == 0) {
-              proList.push(programData);
-            }
-          }
-        }
-        if (
-          localStorage.getItem("sesProgramIdReport") != "" &&
-          localStorage.getItem("sesProgramIdReport") != undefined
-        ) {
-          this.setState(
-            {
-              programs: proList.sort(function (a, b) {
-                a = a.programCode.toLowerCase();
-                b = b.programCode.toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }),
-              programId: localStorage.getItem("sesProgramIdReport"),
-            },
-            () => {
-              this.getFundingSourceList();
-              this.filterVersion();
-            }
-          );
-        } else {
-          this.setState({
-            programs: proList.sort(function (a, b) {
-              a = a.programCode.toLowerCase();
-              b = b.programCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
-          });
-        }
-      }.bind(this);
-    }.bind(this);
-  };
-  /**
-   * Filters versions based on the selected program ID and updates the state accordingly.
-   * Sets the selected program ID in local storage.
-   * Fetches version list for the selected program and updates the state with the fetched versions.
-   * Handles error cases including network errors, session expiry, access denial, and other status codes.
-   */
-  filterVersion = () => {
-    let programId = this.state.programId;
-    if (programId != 0) {
-      localStorage.setItem("sesProgramIdReport", programId);
-      const program = this.state.programs.filter(
-        (c) => c.programId == programId
-      );
-      if (program.length == 1) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-          this.setState(
-            {
-              versions: [],
-              planningUnits: [],
-              planningUnitValues: [],
-            },
-            () => {
-              DropdownService.getVersionListForSPProgram(
-                programId
-              )
-                .then((response) => {
-                  this.setState(
-                    {
-                      versions: [],
-                    },
-                    () => {
-                      this.setState(
-                        {
-                          versions: response.data,
-                        },
-                        () => {
-                          this.consolidatedVersionList(programId);
-                        }
-                      );
-                    }
-                  );
-                })
-                .catch((error) => {
-                  this.setState({
-                    programs: [],
-                    loading: false,
-                  });
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: API_URL.includes("uat")
-                        ? i18n.t("static.common.uatNetworkErrorMessage")
-                        : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
-                      loading: false,
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-                      case 401:
-                        this.props.history.push(
-                          `/login/static.message.sessionExpired`
-                        );
-                        break;
-                      case 409:
-                        this.setState({
-                          message: i18n.t('static.common.accessDenied'),
-                          loading: false,
-                          color: "#BA0C2F",
-                        });
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`);
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t("static.dashboard.program"),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t("static.dashboard.program"),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: "static.unkownError",
-                          loading: false,
-                        });
-                        break;
-                    }
-                  }
-                });
-            }
-          );
-        } else {
-          this.setState(
-            {
-              versions: [],
-            },
-            () => {
-              this.consolidatedVersionList(programId);
-            }
-          );
-        }
-      } else {
-        this.setState({
-          versions: [],
-        });
-      }
-    } else {
-      var budgetValuesFromProps = [];
-      var budgetLabelsFromProps = [];
-      if (
-        this.props.match.params.budgetId != "" &&
-        this.props.match.params.budgetId != undefined
-      ) {
-        budgetValuesFromProps.push({
-          label: this.props.match.params.budgetCode,
-          value: parseInt(this.props.match.params.budgetId),
-        });
-        budgetLabelsFromProps.push(this.props.match.params.budgetCode);
-      }
-      this.setState({
-        versions: [],
-        planningUnits: [],
-        planningUnitValues: [],
-        budgetValues: budgetValuesFromProps,
-        budgetLabels: budgetLabelsFromProps,
-        budgets: [],
-        filteredBudgetList: [],
-      });
-    }
-    this.fetchData();
-  };
-  /**
-   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
-   * Filters out duplicate versions and reverses the list.
-   * Sets the version list in the state and triggers fetching of planning units.
-   * Handles cases where a version is selected from local storage or the default version is selected.
-   * @param {number} programId - The ID of the selected program
-   */
   consolidatedVersionList = (programId) => {
     const { versions } = this.state;
     var verList = versions;
@@ -1917,8 +2179,7 @@ class ShipmentSummery extends Component {
    * Retrieves the list of planning units for a selected program and selected version.
    */
   getPlanningUnit = () => {
-    let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
+    let versionId = document.getElementById("versionId") != null ? document.getElementById("versionId").value : "0";
     this.setState(
       {
         planningUnits: [],
@@ -1926,7 +2187,7 @@ class ShipmentSummery extends Component {
         planningUnitLabels: [],
       },
       () => {
-        if (versionId == 0) {
+        if (this.state.programValues.length == 1 && versionId == 0) {
           this.setState({
             message: i18n.t("static.program.validversion"),
             data: [],
@@ -1936,18 +2197,18 @@ class ShipmentSummery extends Component {
           });
         } else {
           localStorage.setItem("sesVersionIdReport", versionId);
-          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
-          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-          var rangeValue = this.state.rangeValue;
-          if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
-            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
-          }
-          this.setState({
-            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-            rangeValue: rangeValue
-          })
           if (versionId.includes("Local")) {
+            var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
+            var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
+            var rangeValue = this.state.rangeValue;
+            if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
+              var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
+              rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
+            }
+            this.setState({
+              minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
+              rangeValue: rangeValue
+            })
             var db1;
             getDatabase();
             var openRequest = indexedDB.open(
@@ -1969,22 +2230,25 @@ class ShipmentSummery extends Component {
               planningunitRequest.onsuccess = function (e) {
                 var myResult = [];
                 myResult = planningunitRequest.result;
-                var programId = document
-                  .getElementById("programId")
-                  .value.split("_")[0];
+                var programId = this.state.programValues[0].value;
                 var proList = [];
                 for (var i = 0; i < myResult.length; i++) {
                   if (
                     myResult[i].program.id == programId &&
                     myResult[i].active == true
                   ) {
-                    proList[i] = myResult[i].planningUnit;
+                    proList.push(myResult[i].planningUnit);
                   }
                 }
                 var lang = this.state.lang;
                 this.setState(
                   {
-                    planningUnits: proList.sort(function (a, b) {
+                    planningUnitListAll: proList.sort(function (a, b) {
+                      a = getLabelText(a.label, lang).toLowerCase();
+                      b = getLabelText(b.label, lang).toLowerCase();
+                      return a < b ? -1 : a > b ? 1 : 0;
+                    }),
+                    planningUnitList: proList.sort(function (a, b) {
                       a = getLabelText(a.label, lang).toLowerCase();
                       b = getLabelText(b.label, lang).toLowerCase();
                       return a < b ? -1 : a > b ? 1 : 0;
@@ -1998,53 +2262,31 @@ class ShipmentSummery extends Component {
               }.bind(this);
             }.bind(this);
           } else {
-            var programJson = {
-              tracerCategoryIds: [],
-              programIds: [programId],
-            };
-            DropdownService.getProgramPlanningUnitDropdownList(programJson)
-              .then((response) => {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                  var itemLabelA = getLabelText(
-                    a.label,
-                    this.state.lang
-                  ).toUpperCase();
-                  var itemLabelB = getLabelText(
-                    b.label,
-                    this.state.lang
-                  ).toUpperCase();
-                  return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState(
-                  {
-                    planningUnits: listArray,
-                    message: "",
-                  },
-                  () => {
-                    this.fetchData();
-                  }
-                );
+            var json = {
+              programIds: this.state.programValues.map(ele => ele.value),
+              onlyAllowPuPresentAcrossAllPrograms: false
+            }
+            ReportService.getDropdownListByProgramIds(json).then(response => {
+              this.setState({
+                planningUnitListAll: response.data.planningUnitList,
+                planningUnitList: response.data.planningUnitList,
+                planningUnitId: []
+              }, () => {
               })
-              .catch((error) => {
+            }).catch(
+              error => {
                 this.setState({
-                  planningUnits: [],
-                });
+                  loading: false
+                }, () => { })
                 if (error.message === "Network Error") {
                   this.setState({
-                    message: API_URL.includes("uat")
-                      ? i18n.t("static.common.uatNetworkErrorMessage")
-                      : API_URL.includes("demo")
-                        ? i18n.t("static.common.demoNetworkErrorMessage")
-                        : i18n.t("static.common.prodNetworkErrorMessage"),
-                    loading: false,
+                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                    loading: false
                   });
                 } else {
                   switch (error.response ? error.response.status : "") {
                     case 401:
-                      this.props.history.push(
-                        `/login/static.message.sessionExpired`
-                      );
+                      this.props.history.push(`/login/static.message.sessionExpired`)
                       break;
                     case 409:
                       this.setState({
@@ -2054,39 +2296,32 @@ class ShipmentSummery extends Component {
                       });
                       break;
                     case 403:
-                      this.props.history.push(`/accessDenied`);
+                      this.props.history.push(`/accessDenied`)
                       break;
                     case 500:
                     case 404:
                     case 406:
                       this.setState({
-                        message: i18n.t(error.response.data.messageCode, {
-                          entityname: i18n.t(
-                            "static.planningunit.planningunit"
-                          ),
-                        }),
-                        loading: false,
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
                       });
                       break;
                     case 412:
                       this.setState({
-                        message: i18n.t(error.response.data.messageCode, {
-                          entityname: i18n.t(
-                            "static.planningunit.planningunit"
-                          ),
-                        }),
-                        loading: false,
+                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                        loading: false
                       });
                       break;
                     default:
                       this.setState({
-                        message: "static.unkownError",
-                        loading: false,
+                        message: 'static.unkownError',
+                        loading: false
                       });
                       break;
                   }
                 }
-              });
+              }
+            );
           }
         }
       }
@@ -2130,8 +2365,7 @@ class ShipmentSummery extends Component {
     });
 
 
-    this.getPrograms();
-    this.getFundingSourceType();
+    this.getCountrys();
   }
   /**     
    * Sets the selected program ID selected by the user.
@@ -2152,54 +2386,16 @@ class ShipmentSummery extends Component {
     );
   }
   /**
-   * Sets the version ID and updates the tracer category list.
-   * @param {Object} event - The event object containing the version ID value.
-   */
-  setVersionId(event) {
-    if (this.state.versionId != "" || this.state.versionId != undefined) {
-      this.setState(
-        {
-          versionId: event.target.value,
-        },
-        () => {
-          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == this.state.versionId)[0].cutOffDate;
-          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-          var rangeValue = this.state.rangeValue;
-          if (moment(this.state.rangeValue.from.year + "-" + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + "-01").format("YYYY-MM") < moment(cutOffDate).format("YYYY-MM")) {
-            var cutOffEndDate = moment(cutOffDate).add(18, 'months').startOf('month').format("YYYY-MM-DD");
-            rangeValue = { from: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) }, to: { year: parseInt(moment(cutOffEndDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) } };
-            // localStorage.setItem("sesRangeValue", JSON.stringify(rangeValue));
-          }
-          this.setState({
-            minDate: { year: parseInt(moment(cutOffDate).format("YYYY")), month: parseInt(moment(cutOffDate).format("M")) },
-            rangeValue: rangeValue
-          })
-          localStorage.setItem("sesVersionIdReport", this.state.versionId);
-          this.fetchData();
-        }
-      );
-    } else {
-      this.setState(
-        {
-          versionId: event.target.value,
-        },
-        () => {
-          this.getPlanningUnit();
-        }
-      );
-    }
-  }
-  /**
    * Fetches data based on selected filters.
    */
   fetchData = () => {
-    let versionId = document.getElementById("versionId").value;
-    let programId = document.getElementById("programId").value;
-    let viewById = document.getElementById("viewById").value;
+    let versionId = this.state.programValues.length == 1 ? this.state.versionId : "0";
+    let reportView = document.getElementById("viewById").value;
     let planningUnitIds =
       this.state.planningUnitValues.length == this.state.planningUnits.length
         ? []
         : this.state.planningUnitValues.map((ele) => ele.value);
+    console.log("this.state.planningUnitValues.length", this.state.planningUnitValues.length)
     let startDate =
       this.state.rangeValue.from.year +
       "-" +
@@ -2219,19 +2415,27 @@ class ShipmentSummery extends Component {
       this.state.fundingSourceValues.length == this.state.fundingSources.length
         ? []
         : this.state.fundingSourceValues.map((ele) => ele.value);
+    let myProcurementAgentIds =
+      this.state.procurementAgentValues.length == this.state.procurementAgents.length
+        ? []
+        : this.state.procurementAgentValues.map((ele) => ele.value);
     let myBudgetIds =
       this.state.budgetValues.length == this.state.budgets.length
         ? []
         : this.state.budgetValues.map((ele) => ele.value);
+    let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
     if (
-      programId > 0 &&
-      versionId != 0 &&
-      this.state.planningUnitValues.length > 0
+      this.state.programValues.length > 0 &&
+      this.state.planningUnitValues.length > 0 && ((this.state.programValues.length == 1 && versionId != "") || this.state.programValues.length > 1)
     ) {
       if (versionId.includes("Local")) {
         this.setState({ loading: true });
         planningUnitIds = this.state.planningUnitValues.map((ele) => ele.value);
         myFundingSourceIds = this.state.fundingSourceValues.map(
+          (ele) => ele.value
+        );
+        myProcurementAgentIds = this.state.procurementAgentValues.map(
           (ele) => ele.value
         );
         myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
@@ -2256,7 +2460,7 @@ class ShipmentSummery extends Component {
             SECRET_KEY
           );
           var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          var program = `${programId}_v${version}_uId_${userId}`;
+          var program = `${this.state.programValues[0].value}_v${version}_uId_${userId}`;
           var programDataOs = programDataTransaction.objectStore("programData");
           var programRequest = programDataOs.get(program);
           programRequest.onerror = function (event) {
@@ -2416,8 +2620,10 @@ class ShipmentSummery extends Component {
                       }
                     }
                     let json = {
+                      program: {
+                        code: programRequest.result.programCode
+                      },
                       shipmentId: planningUnitFilter[i].shipmentId,
-                      tempShipmentId: planningUnitFilter[i].tempShipmentId,
                       planningUnit:
                         planningUnit.length > 0
                           ? planningUnit[0]
@@ -2466,58 +2672,105 @@ class ShipmentSummery extends Component {
                     data.push(json);
                   }
                   data =
-                    myFundingSourceIds.length > 0
+                    this.state.viewById == 1 ? (myFundingSourceIds.length > 0
                       ? data.filter((f) =>
                         myFundingSourceIds.includes(f.fundingSource.id)
                       )
-                      : data;
+                      : data) : (
+                      myProcurementAgentIds.length > 0
+                        ? data.filter((f) =>
+                          myProcurementAgentIds.includes(f.procurementAgent.id)
+                        )
+                        : data
+                    );
                   data =
-                    myBudgetIds.length > 0
+                    this.state.viewById == 1 && myBudgetIds.length > 0
                       ? data.filter((b) => myBudgetIds.includes(b.budget.id))
                       : data;
                   data = data.sort(function (a, b) {
                     return parseInt(a.shipmentId) - parseInt(b.shipmentId);
                   });
                   var shipmentDetailsFundingSourceList = [];
-                  const fundingSourceIds = [
-                    ...new Set(data.map((q) => parseInt(q.fundingSource.id))),
-                  ];
-                  fundingSourceIds.map((ele) => {
-                    var fundingSource = this.state.fundingSources.filter(
-                      (c) => c.id == ele
-                    );
-                    if (fundingSource.length > 0) {
-                      var simpleFSObject = {
-                        id: fundingSource[0].id,
-                        label: fundingSource[0].label,
-                        code: fundingSource[0].code,
+                  if (this.state.viewById == 1) {
+                    const fundingSourceIds = [
+                      ...new Set(data.map((q) => parseInt(q.fundingSource.id))),
+                    ];
+                    fundingSourceIds.map((ele) => {
+                      var fundingSource = this.state.fundingSources.filter(
+                        (c) => c.id == ele
+                      );
+                      if (fundingSource.length > 0) {
+                        var simpleFSObject = {
+                          id: fundingSource[0].id,
+                          label: fundingSource[0].label,
+                          code: fundingSource[0].code,
+                        };
+                      }
+                      var fundingSourceList = data.filter(
+                        (c) => c.fundingSource.id == ele
+                      );
+                      var cost = 0;
+                      var quantity = 0;
+                      fundingSourceList.map((c) => {
+                        cost =
+                          cost + Number(c.productCost) + Number(c.freightCost);
+                        quantity =
+                          quantity +
+                          (Number(c.shipmentQty));
+                      });
+                      var json = {
+                        fspa:
+                          fundingSource.length > 0
+                            ? simpleFSObject
+                            : fundingSourceList[0].fundingSource,
+                        shipments: fundingSourceList.length,
+                        cost: cost,
+                        quantity: quantity,
+                        countries: quantity > 0 ? 1 : 0,
+                        programs: quantity > 0 ? 1 : 0
                       };
-                    }
-                    var fundingSourceList = data.filter(
-                      (c) => c.fundingSource.id == ele
-                    );
-                    var cost = 0;
-                    var quantity = 0;
-                    fundingSourceList.map((c) => {
-                      cost =
-                        cost + Number(c.productCost) + Number(c.freightCost);
-                      quantity =
-                        quantity +
-                        (viewById == 1
-                          ? Number(c.shipmentQty)
-                          : Number(c.shipmentQty) * c.multiplier);
+                      shipmentDetailsFundingSourceList.push(json);
                     });
-                    var json = {
-                      fundingSource:
-                        fundingSource.length > 0
-                          ? simpleFSObject
-                          : fundingSourceList[0].fundingSource,
-                      orderCount: fundingSourceList.length,
-                      cost: cost,
-                      quantity: quantity,
-                    };
-                    shipmentDetailsFundingSourceList.push(json);
-                  });
+                  } else {
+                    const procurementAgentIds = [
+                      ...new Set(data.map((q) => parseInt(q.procurementAgent.id))),
+                    ];
+                    procurementAgentIds.map((ele) => {
+                      var procurementAgent = this.state.procurementAgents.filter(
+                        (c) => c.id == ele
+                      );
+                      if (procurementAgent.length > 0) {
+                        var simplePAObject = {
+                          id: procurementAgent[0].id,
+                          label: procurementAgent[0].label,
+                          code: procurementAgent[0].code,
+                        };
+                      }
+                      var procurementAgentList = data.filter(
+                        (c) => c.procurementAgent.id == ele
+                      );
+                      var cost = 0;
+                      var quantity = 0;
+                      procurementAgentList.map((c) => {
+                        cost =
+                          cost + Number(c.productCost) + Number(c.freightCost);
+                        quantity =
+                          quantity + (Number(c.shipmentQty));
+                      });
+                      var json = {
+                        fspa:
+                          procurementAgent.length > 0
+                            ? simplePAObject
+                            : procurementAgentList[0].fundingSource,
+                        shipments: procurementAgentList.length,
+                        cost: cost,
+                        quantity: quantity,
+                        countries: quantity > 0 ? 1 : 0,
+                        programs: quantity > 0 ? 1 : 0
+                      };
+                      shipmentDetailsFundingSourceList.push(json);
+                    });
+                  }
                   var shipmentDetailsMonthList = [];
                   var monthstartfrom = this.state.rangeValue.from.month;
                   for (
@@ -2543,13 +2796,16 @@ class ShipmentSummery extends Component {
                           : c.receivedDate >= dt && c.receivedDate <= enddtStr
                       );
                       shiplist =
-                        myFundingSourceIds.length > 0
+                        this.state.viewById == 1 ? (myFundingSourceIds.length > 0
                           ? shiplist.filter((f) =>
                             myFundingSourceIds.includes(f.fundingSource.id)
                           )
-                          : shiplist;
+                          : shiplist) : (myProcurementAgentIds.length > 0
+                            ? shiplist.filter((f) =>
+                              myProcurementAgentIds.includes(f.procurementAgent.id))
+                            : shiplist);
                       shiplist =
-                        myBudgetIds.length > 0
+                        this.state.viewById == 1 && myBudgetIds.length > 0
                           ? shiplist.filter((b) =>
                             myBudgetIds.includes(b.budget.id)
                           )
@@ -2637,7 +2893,7 @@ class ShipmentSummery extends Component {
                               shipmentDetailsFundingSourceList,
                             shipmentDetailsMonthList: shipmentDetailsMonthList,
                             message: "",
-                            viewById: viewById,
+                            // viewById: viewById,
                             loading: false,
                           },
                           () => {
@@ -2657,14 +2913,15 @@ class ShipmentSummery extends Component {
       } else {
         this.setState({ loading: true });
         var inputjson = {
-          programId: programId,
-          versionId: versionId,
           startDate: startDate,
           stopDate: endDate,
+          realmCountryIds: CountryIds,
+          programIds: programIds,
+          versionId: versionId,
           planningUnitIds: planningUnitIds,
-          fundingSourceIds: myFundingSourceIds,
-          budgetIds: myBudgetIds,
-          reportView: viewById,
+          reportView: reportView,
+          fundingSourceProcurementAgentIds: this.state.viewById == 1 ? myFundingSourceIds : myProcurementAgentIds,
+          budgetIds: myBudgetIds
         };
         ReportService.ShipmentSummery(inputjson)
           .then((response) => {
@@ -2676,7 +2933,7 @@ class ShipmentSummery extends Component {
                 shipmentDetailsList: response.data.shipmentDetailsList,
                 shipmentDetailsMonthList:
                   response.data.shipmentDetailsMonthList,
-                viewById: viewById,
+                viewById: reportView,
                 message: "",
                 loading: false,
               },
@@ -2740,14 +2997,15 @@ class ShipmentSummery extends Component {
             }
           });
       }
-    } else if (programId == 0) {
+    } else if (this.state.countryValues.length == 0) {
       this.setState(
         {
-          message: i18n.t("static.common.selectProgram"),
+          message: i18n.t("static.program.validcountrytext"),
           data: [],
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
+          loading: false
         },
         () => {
           this.el = jexcel(
@@ -2760,7 +3018,29 @@ class ShipmentSummery extends Component {
           );
         }
       );
-    } else if (versionId == 0) {
+    }
+    else if (this.state.programValues.length == 0) {
+      this.setState(
+        {
+          message: i18n.t("static.common.selectProgram"),
+          data: [],
+          shipmentDetailsList: [],
+          shipmentDetailsFundingSourceList: [],
+          shipmentDetailsMonthList: [],
+          loading: false
+        },
+        () => {
+          this.el = jexcel(
+            document.getElementById("shipmentDetailsListTableDiv"),
+            ""
+          );
+          jexcel.destroy(
+            document.getElementById("shipmentDetailsListTableDiv"),
+            true
+          );
+        }
+      );
+    } else if (this.state.programValues.length == 1 && versionId == 0) {
       this.setState(
         {
           message: i18n.t("static.program.validversion"),
@@ -2768,6 +3048,7 @@ class ShipmentSummery extends Component {
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
+          loading: false
         },
         () => {
           this.el = jexcel(
@@ -2788,6 +3069,7 @@ class ShipmentSummery extends Component {
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
+          loading: false
         },
         () => {
           this.el = jexcel(
@@ -2833,6 +3115,31 @@ class ShipmentSummery extends Component {
    * @returns {JSX.Element} - Shipment Summery report table.
    */
   render() {
+    const { countrys } = this.state;
+    let countryList = countrys.length > 0 && countrys.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+    }, this);
+    const { programLst } = this.state;
+    let programList = [];
+    programList = programLst.length > 0
+      && programLst.map((item, i) => {
+        return (
+          { label: item.code, value: item.id }
+        )
+      }, this);
+    const { versions } = this.state;
+    let versionList =
+      versions.length > 0 &&
+      versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionStatus.id == 2 && item.versionType.id == 2
+              ? item.versionId + "*"
+              : item.versionId}{" "}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
+          </option>
+        );
+      }, this);
     const darkModeColors = [
       '#d4bbff',
     ];
@@ -2869,7 +3176,7 @@ class ShipmentSummery extends Component {
           {
             scaleLabel: {
               display: true,
-              labelString: i18n.t("static.graph.costInUSD"),
+              labelString: this.state.planningUnitValues.length == 1 ? i18n.t("static.report.qty") : i18n.t("static.graph.costInUSD"),
               fontColor: fontColor
             },
             gridLines: {
@@ -2952,36 +3259,31 @@ class ShipmentSummery extends Component {
       Show: " ",
       entries: " ",
     });
-    const { programs } = this.state;
-    const { versions } = this.state;
-    let versionList =
-      versions.length > 0 &&
-      versions.map((item, i) => {
-        return (
-          <option key={i} value={item.versionId}>
-            {item.versionStatus.id == 2 && item.versionType.id == 2
-              ? item.versionId + "*"
-              : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
-          </option>
-        );
-      }, this);
-    const { planningUnits } = this.state;
-    let planningUnitList =
-      planningUnits.length > 0 &&
-      planningUnits.map((item, i) => {
+    const { planningUnitList } = this.state;
+    let planningUnits =
+      planningUnitList.length > 0 &&
+      planningUnitList.map((item, i) => {
         return {
           label: getLabelText(item.label, this.state.lang),
-          value: item.id,
+          value: Number(item.id),
         };
       }, this);
     // const { fundingSourceTypes } = this.state;
     const { fundingSources } = this.state;
     const { filteredBudgetList } = this.state;
     const { rangeValue } = this.state;
+    const { procurementAgents } = this.state;
 
     let fundingSourceListDD = fundingSources.length > 0 &&
       fundingSources.map((item, i) => {
+        return {
+          label: item.code,
+          value: item.id,
+        };
+      }, this);
+
+    let procurementAgentListDD = procurementAgents.length > 0 &&
+      procurementAgents.map((item, i) => {
         return {
           label: item.code,
           value: item.id,
@@ -3002,7 +3304,7 @@ class ShipmentSummery extends Component {
           pointBorderColor: "#fff",
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 7)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.receivedCost
           ),
         },
@@ -3015,7 +3317,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 6)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.arrivedCost
           ),
         },
@@ -3028,7 +3330,7 @@ class ShipmentSummery extends Component {
           pointBorderColor: "#fff",
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 5)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.shippedCost
           ),
         },
@@ -3041,7 +3343,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 4)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.approvedCost
           ),
         },
@@ -3054,7 +3356,7 @@ class ShipmentSummery extends Component {
           pointBorderColor: "#fff",
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 3)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.submittedCost
           ),
         },
@@ -3067,7 +3369,7 @@ class ShipmentSummery extends Component {
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
           stack: 1,
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 1)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.plannedCost
           ),
         },
@@ -3080,7 +3382,7 @@ class ShipmentSummery extends Component {
           pointBorderColor: "#fff",
           pointHoverBackgroundColor: "#fff",
           pointHoverBorderColor: "rgba(179,181,198,1)",
-          data: this.state.shipmentDetailsMonthList.map(
+          data: this.state.planningUnitValues.length == 1 ? this.state.shipmentDetailsMonthList.map(monthItem => { return this.state.shipmentDetailsList.filter(shipment => (moment(shipment.expectedDeliveryDate).format("YYYY-MM") == moment(monthItem.dt).format("YYYY-MM") && shipment.shipmentStatus.id == 9)).reduce((sum, shipment) => sum + (shipment.shipmentQty || 0), 0); }) : this.state.shipmentDetailsMonthList.map(
             (item, index) => item.onholdCost
           ),
         },
@@ -3167,41 +3469,54 @@ class ShipmentSummery extends Component {
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.program.program")}
-                        </Label>
-                        <div className="controls ">
-                          <InputGroup>
-                            <Input
-                              type="select"
-                              name="programId"
-                              id="programId"
-                              bsSize="sm"
-                              onChange={(e) => {
-                                this.setProgramId(e);
-                              }}
-                              value={this.state.programId}
-                            >
-                              <option value="0">
-                                {i18n.t("static.common.select")}
-                              </option>
-                              {programs.length > 0 &&
-                                programs.map((item, i) => {
-                                  return (
-                                    <option key={i} value={item.programId}>
-                                      {item.programCode}
-                                    </option>
-                                  );
-                                }, this)}
-                            </Input>
-                          </InputGroup>
+                        <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                        <div className="controls edit">
+                          <MultiSelect
+                            bsSize="sm"
+                            name="countrysId"
+                            id="countrysId"
+                            value={this.state.countryValues}
+                            onChange={(e) => { this.handleChange(e) }}
+                            options={countryList && countryList.length > 0 ? countryList : []}
+                            filterOptions={filterOptions}
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')
+                            }}
+                          />
+                          {!!this.props.error &&
+                            this.props.touched && (
+                              <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
+                            )}
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.report.versionFinal*")}
-                        </Label>
-                        <div className="controls ">
+                        <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                        <MultiSelect
+                          bsSize="sm"
+                          name="programIds"
+                          id="programIds"
+                          value={this.state.programValues}
+                          onChange={(e) => { this.handleChangeProgram(e) }}
+                          options={programList && programList.length > 0 ? programList : []}
+                          filterOptions={filterOptions}
+                          disabled={this.state.loading}
+                          overrideStrings={{
+                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                            selectSomeItems: i18n.t('static.common.select')
+                          }}
+                        />
+                        {!!this.props.error &&
+                          this.props.touched && (
+                            <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
+                          )}
+                      </FormGroup>
+                      {this.state.programValues.length == 1 && <FormGroup className="col-md-3">
+                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                        <div className="controls">
                           <InputGroup>
                             <Input
                               type="select"
@@ -3220,7 +3535,7 @@ class ShipmentSummery extends Component {
                             </Input>
                           </InputGroup>
                         </div>
-                      </FormGroup>
+                      </FormGroup>}
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">
                           {i18n.t("static.report.planningUnit")}
@@ -3237,13 +3552,15 @@ class ShipmentSummery extends Component {
                               this.handlePlanningUnitChange(e);
                             }}
                             options={
-                              planningUnitList && planningUnitList.length > 0
-                                ? planningUnitList
+                              planningUnits && planningUnits.length > 0
+                                ? planningUnits
                                 : []
                             }
                             disabled={this.state.loading}
-                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                            selectSomeItems: i18n.t('static.common.select')}}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')
+                            }}
                           />
                         </div>
                       </FormGroup>
@@ -3258,13 +3575,13 @@ class ShipmentSummery extends Component {
                               name="viewById"
                               id="viewById"
                               bsSize="sm"
-                              onChange={this.fetchData}
+                              onChange={(e) => { this.setViewById(e) }}
                             >
                               <option value="1">
-                                {i18n.t("static.report.planningUnit")}
+                                {i18n.t("static.fundingSourceHead.fundingSource")}
                               </option>
                               <option value="2">
-                                {i18n.t("static.dashboard.forecastingunit")}
+                                {i18n.t("static.report.procurementAgentName")}
                               </option>
                             </Input>
                           </InputGroup>
@@ -3291,7 +3608,7 @@ class ShipmentSummery extends Component {
                           />
                         </div>
                       </FormGroup> */}
-                      <FormGroup className="col-md-3" id="fundingSourceDiv">
+                      {this.state.viewById == 1 && <FormGroup className="col-md-3" id="fundingSourceDiv">
                         <Label htmlFor="appendedInputButton">
                           {i18n.t("static.budget.fundingsource")}
                         </Label>
@@ -3312,12 +3629,42 @@ class ShipmentSummery extends Component {
                                 : []
                             }
                             disabled={this.state.loading}
-                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                            selectSomeItems: i18n.t('static.common.select')}}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')
+                            }}
                           />
                         </div>
-                      </FormGroup>
-                      {this.state.filteredBudgetList.length > 0 && (
+                      </FormGroup>}
+                      {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
+                        <Label htmlFor="appendedInputButton">
+                          {i18n.t("static.dashboard.procurementagentheader")}
+                        </Label>
+                        <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                        <div className="controls">
+                          <MultiSelect
+                            name="procurementAgentId"
+                            id="procurementAgentId"
+                            bsSize="md"
+                            value={this.state.procurementAgentValues}
+                            filterOptions={filterOptions}
+                            onChange={(e) => {
+                              this.handleProcurementAgentChange(e);
+                            }}
+                            options={
+                              procurementAgentListDD && procurementAgentListDD.length > 0
+                                ? procurementAgentListDD
+                                : []
+                            }
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')
+                            }}
+                          />
+                        </div>
+                      </FormGroup>}
+                      {this.state.viewById == 1 && this.state.filteredBudgetList.length > 0 && (
                         <FormGroup className="col-md-3" id="fundingSourceDiv">
                           <Label htmlFor="appendedInputButton">
                             {i18n.t("static.budgetHead.budget")}
@@ -3342,8 +3689,10 @@ class ShipmentSummery extends Component {
                                   };
                                 }, this)
                               }
-                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')}}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
                             />
                           </div>
                         </FormGroup>
@@ -3391,7 +3740,25 @@ class ShipmentSummery extends Component {
                                         "text-align": "center",
                                       }}
                                     >
-                                      {i18n.t("static.budget.fundingsource")}
+                                      {this.state.viewById == 1 ? i18n.t("static.budget.fundingsource") : i18n.t("static.procurementagent.procurmentAgentMaster")}
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25px",
+                                        cursor: "pointer",
+                                        "text-align": "center",
+                                      }}
+                                    >
+                                      {i18n.t("static.dashboard.countryheader")}
+                                    </th>
+                                    <th
+                                      style={{
+                                        width: "25px",
+                                        cursor: "pointer",
+                                        "text-align": "center",
+                                      }}
+                                    >
+                                      {i18n.t("static.dashboard.program")}
                                     </th>
                                     <th
                                       style={{
@@ -3424,7 +3791,7 @@ class ShipmentSummery extends Component {
                                               this.state
                                                 .shipmentDetailsFundingSourceList[
                                                 idx
-                                              ].fundingSource.label,
+                                              ].fspa.label,
                                               this.state.lang
                                             )}
                                           </td>
@@ -3433,7 +3800,23 @@ class ShipmentSummery extends Component {
                                               this.state
                                                 .shipmentDetailsFundingSourceList[
                                                 idx
-                                              ].orderCount
+                                              ].countries
+                                            }
+                                          </td>
+                                          <td style={{ "text-align": "center" }}>
+                                            {
+                                              this.state
+                                                .shipmentDetailsFundingSourceList[
+                                                idx
+                                              ].programs
+                                            }
+                                          </td>
+                                          <td style={{ "text-align": "center" }}>
+                                            {
+                                              this.state
+                                                .shipmentDetailsFundingSourceList[
+                                                idx
+                                              ].shipments
                                             }
                                           </td>
                                           <td style={{ "text-align": "center" }}>
