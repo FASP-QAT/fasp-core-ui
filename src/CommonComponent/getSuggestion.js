@@ -14,7 +14,7 @@ export default function getSuggestion(row, lang) {
         var res = [];
         for (var i in obj)
             res.push(obj[i]);
-        monthString = res[1].noActualConsumptionMonth + "," + res[2].noActualConsumptionMonth + "," + res[3].noActualConsumptionMonth;
+        monthString = res[1].noActualConsumptionMonth + ", " + res[2].noActualConsumptionMonth + ", " + res[3].noActualConsumptionMonth;
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -41,7 +41,7 @@ export default function getSuggestion(row, lang) {
         var res = [];
         for (var i in obj)
             res.push(obj[i]);
-        monthString = res[1].noInventoryMonth + "," + res[2].noInventoryMonth + "," + res[3].noInventoryMonth;
+        monthString = res[1].noInventoryMonth + ", " + res[2].noInventoryMonth + ", " + res[3].noInventoryMonth;
         var desc_en = row.realmProblem.problem.actionLabel.label_en;
         var desc_fr = row.realmProblem.problem.actionLabel.label_fr;
         var desc_sp = row.realmProblem.problem.actionLabel.label_sp;
@@ -180,16 +180,16 @@ export default function getSuggestion(row, lang) {
         var desc_pr = row.realmProblem.problem.actionLabel.label_pr;
         var label = row.realmProblem.problem.actionLabel;
         if (desc_en != null && desc_en != '') {
-            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_en = desc_en.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse((row.data5.toString().replaceAll(",",", ")))).split('<%NOOFMONTHS%>').join((row.data5).split(', ').length);
             label.label_en = result_en;
         } if (desc_fr != null && desc_fr != '') {
-            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_fr = desc_fr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse((row.data5.toString().replaceAll(",",", ")))).split('<%NOOFMONTHS%>').join((row.data5).split(', ').length);
             label.label_fr = result_fr;
         } if (desc_sp != null && desc_sp != '') {
-            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_sp = desc_sp.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse((row.data5.toString().replaceAll(",",", ")))).split('<%NOOFMONTHS%>').join((row.data5).split(', ').length);
             label.label_sp = result_sp;
         } if (desc_pr != null && desc_pr != '') {
-            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse(row.data5)).split('<%NOOFMONTHS%>').join((row.data5).split(',').length);
+            const result_pr = desc_pr.split('<%PLANNING_UNIT%>').join(getLabelText(row.planningUnit.label, lang)).split('<%REGION%>').join(getLabelText(row.region.label, lang)).split('<%MONTHARRAY%>').join(JSON.parse((row.data5.toString().replaceAll(",",", ")))).split('<%NOOFMONTHS%>').join((row.data5).split(', ').length);
             label.label_pr = result_pr;
         }
         return getLabelText(label, lang);
@@ -515,6 +515,8 @@ export default function getSuggestion(row, lang) {
         if(obj.underMinMonthsCount == 0 && obj.stockedOutMonthsCount == 0){
             suggestion=i18n.t('static.problemList.suggestion1')
         }else if(obj.overMaxMonthsCount == 0 && obj.stockedOutMonthsCount == 0){
+            suggestion=i18n.t('static.problemList.suggestion2')
+        }else if(obj.underMinMonthsCount == 0 && obj.overMaxMonthsCount == 0){
             suggestion=i18n.t('static.problemList.suggestion2')
         }else{
             suggestion=i18n.t('static.problemList.suggestion3')

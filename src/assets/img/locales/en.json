@@ -3632,11 +3632,11 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.problemList.minMaxProblemDescOverMax":" * is over max for {{count}} month(s) ({{monthNames}})\n",
-  "static.problemList.minMaxProblemDescUnderMin":" * is under min for {{count}} month(s) ({{monthNames}})\n",
-  "static.problemList.minMaxProblemDescStockedOut":" * is stocked out for {{count}} month(s) ({{monthNames}})\n",
-  "static.problemList.minMaxProblemDescShipments":" * has shipments in {{monthNames}}",
-  "static.problemList.suggestion1":"Please consider delaying/canceling shipment(s), reviewing future expiries, or donating stock. Indicate if any of these actions have been/will be taken, and you face any obstacles.",
+  "static.problemList.minMaxProblemDescOverMax":" * OVER MAX for {{count}} month(s) ({{monthNames}})\n",
+  "static.problemList.minMaxProblemDescUnderMin":" * UNDER MIN for {{count}} month(s) ({{monthNames}})\n",
+  "static.problemList.minMaxProblemDescStockedOut":" * STOCKED OUT for {{count}} month(s) ({{monthNames}})\n",
+  "static.problemList.minMaxProblemDescShipments":"\nThere are shipments in {{monthNames}}",
+  "static.problemList.suggestion1":"Please consider delaying/canceling shipment(s), reviewing future expiries, or donating stock. Indicate if any of these actions have been/will be taken, and if you face any obstacles.",
   "static.problemList.suggestion2":"Please consider planning & ordering, expediting, or increasing shipment quantities. Indicate if any of these actions have been/will be taken, and if you face any obstacles.",
   "static.problemList.suggestion3":"Please consider adjusting shipment quantities. Indicate if any of these actions have been/will be taken, and if you face any obstacles."
 }
