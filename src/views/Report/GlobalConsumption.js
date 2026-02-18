@@ -587,7 +587,9 @@ class GlobalConsumption extends Component {
     })
     this.setState({
       programValues: programIds.map(ele => ele),
-      programLabels: programIds.map(ele => ele.label)
+      programLabels: programIds.map(ele => ele.label),
+      yaxisEquUnit: -1,
+      yaxisEquUnitLabel: [i18n.t('static.program.no')],
     }, () => {
       this.filterVersion();
     })
