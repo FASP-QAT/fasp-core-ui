@@ -2,7 +2,8 @@ import React from "react";
 import {
   ComposableMap,
   Geographies,
-  Geography
+  Geography,
+  ZoomableGroup
 } from "react-simple-maps";
 
 import worldData from "../assets/maps/countries-110m.json";
@@ -13,6 +14,8 @@ class WorldMap extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      zoom: 1,
+      center: [0, 20],
       tooltip: {
         visible: false,
         content: "",
@@ -21,6 +24,18 @@ class WorldMap extends React.Component {
       }
     };
   }
+
+  handleZoomIn = () => {
+    this.setState(prevState => ({ zoom: prevState.zoom * 1.5 }));
+  };
+
+  handleZoomOut = () => {
+    this.setState(prevState => ({ zoom: prevState.zoom / 1.5 }));
+  };
+
+  handleMoveEnd = (position) => {
+    this.setState({ center: position.coordinates, zoom: position.zoom });
+  };
 
   handleMouseEnter = (geo, value, event) => {
     const { clientX, clientY } = event;
@@ -90,44 +105,95 @@ class WorldMap extends React.Component {
           </div>
         )}
         <ComposableMap projectionConfig={{ scale: 150 }}>
-          <Geographies geography={worldData}>
-            {({ geographies }) =>
-              geographies.map(geo => {
-                let isoCode =
-                  geo.properties?.ISO_A3 ||
-                  geo.properties?.iso_a3 ||
-                  geo.properties?.ADM0_A3;
+          <ZoomableGroup 
+            zoom={this.state.zoom} 
+            center={this.state.center} 
+            onMoveEnd={this.handleMoveEnd} 
+            disableScrolling
+          >
+            <Geographies geography={worldData}>
+              {({ geographies }) =>
+                geographies.map(geo => {
+                  let isoCode =
+                    geo.properties?.ISO_A3 ||
+                    geo.properties?.iso_a3 ||
+                    geo.properties?.ADM0_A3;
 
-                if (!isoCode && geo.id) {
-                  isoCode = numericToAlpha3[geo.id] || geo.id;
-                }
+                  if (!isoCode && geo.id) {
+                    isoCode = numericToAlpha3[geo.id] || geo.id;
+                  }
 
-                const value = countryTotals[isoCode];
-                // console.log("Hello",value,isoCode,geo.rsmKey)
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={
-                      value
-                        ? colorScale(value)
-                        : "#EEE"
-                    }
-                    stroke="#FFF"
-                    style={{
-                      default: { outline: "none" },
-                      hover: { fill: "#BA0C2F", outline: "none", cursor: "pointer" },
-                      pressed: { outline: "none" }
-                    }}
-                    onMouseEnter={(event) => this.handleMouseEnter(geo, value, event)}
-                    onMouseMove={this.handleMouseMove}
-                    onMouseLeave={this.handleMouseLeave}
-                  />
-                );
-              })
-            }
-          </Geographies>
+                  const value = countryTotals[isoCode];
+                  // console.log("Hello",value,isoCode,geo.rsmKey)
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill={
+                        value
+                          ? colorScale(value)
+                          : "#EEE"
+                      }
+                      stroke="#FFF"
+                      style={{
+                        default: { outline: "none" },
+                        hover: { fill: "#BA0C2F", outline: "none", cursor: "pointer" },
+                        pressed: { outline: "none" }
+                      }}
+                      onMouseEnter={(event) => this.handleMouseEnter(geo, value, event)}
+                      onMouseMove={this.handleMouseMove}
+                      onMouseLeave={this.handleMouseLeave}
+                    />
+                  );
+                })
+              }
+            </Geographies>
+          </ZoomableGroup>
         </ComposableMap>
+
+        {/* Zoom Buttons */}
+        <div style={{ position: "absolute", top: "20px", right: "20px", display: "flex", flexDirection: "column", gap: "5px" }}>
+            <button 
+                onClick={this.handleZoomIn}
+                style={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    width: "30px",
+                    height: "30px",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+                title="Zoom In"
+            >
+                +
+            </button>
+            <button 
+                onClick={this.handleZoomOut}
+                style={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    width: "30px",
+                    height: "30px",
+                    cursor: "pointer",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#333",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+                title="Zoom Out"
+            >
+                -
+            </button>
+        </div>
 
         {/* Tooltip */}
         {tooltip.visible && (

@@ -19,6 +19,7 @@ import {
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import "../../scss/shipmentsByCountry.scss"
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
@@ -38,6 +39,15 @@ import AuthenticationServiceComponent from '../Common/AuthenticationServiceCompo
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import WorldMap from '../../CommonComponent/WorldMap.js';
 const ref = React.createRef();
+function getColumnLetter(index) {
+    let letter = '';
+    while (index >= 0) {
+        letter = String.fromCharCode((index % 26) + 65) + letter;
+        index = Math.floor(index / 26) - 1;
+    }
+    return letter;
+}
+
 // const backgroundColor = [
 //     '#002F6C', '#BA0C2F', '#212721', '#0067B9', '#A7C6ED',
 //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
@@ -142,23 +152,38 @@ class ShipmentGlobalView extends Component {
         if(this.state.countrySplitList.length > 0){
             const countrySplitList = this.state.countrySplitList || [];
             const amountKeys =
-            countrySplitList.length > 0
-                ? Object.keys(countrySplitList[0].amount || {})
-                : [];
+                countrySplitList.length > 0
+                    ? Object.keys(countrySplitList[0].amount || {})
+                    : [];
+
+            // Sort amountKeys alphabetically
+            const sortedAmountKeys = amountKeys.slice().sort((a, b) => a.localeCompare(b));
+
+            // Build columns array
+            const columns = [
+                { type: 'text', title: 'Country' },
+                ...sortedAmountKeys.map(key => ({
+                    type: 'numeric',
+                    title: key,
+                    mask: '#,##'
+                })),
+                { type: 'numeric', title: 'Total', mask: '#,##' }
+            ];
 
             var data = countrySplitList.map(ele => {
-                const fundingValues = amountKeys.map(
+                const fundingValues = sortedAmountKeys.map(
                     key => ele.amount?.[key] || 0
                 );
-
                 const total = fundingValues.reduce((a, b) => a + b, 0);
-
                 return [
                     ele.country.label.label_en,
                     ...fundingValues,
                     total
                 ];
             });
+
+            // Sort data rows by country name (first column)
+            data.sort((a, b) => a[0].localeCompare(b[0]));
             let columnTotals = new Array(amountKeys.length).fill(0);
             let grandTotal = 0;
 
@@ -181,15 +206,7 @@ class ShipmentGlobalView extends Component {
             columnDrag: false,
             colWidths: [50, 50, 50],
             colHeaderClasses: ["Reqasterisk"],
-            columns: [
-                { type: 'text', title: 'Country' },
-                ...amountKeys.map(key => ({
-                    type: 'numeric',
-                    title: key,
-                    mask: '#,##'
-                })),
-                { type: 'numeric', title: 'Total', mask: '#,##' }
-            ],
+            columns: columns,
             onload: this.loaded,
             editable: false,
             onselection: this.selected,
@@ -224,9 +241,46 @@ class ShipmentGlobalView extends Component {
                 }, 0);
             },
             updateTable: function(instance, cell, col, row) {
-                if (row === instance.getData().length) {
+                if(cell) {
+                    const lastCol = columns.length - 1;
+                    if (col === 0 || col === lastCol) {
+                        cell.style.fontWeight = 'bold';
+                    } else {
+                        cell.style.fontWeight = 'normal';
+                    }
+                    try {
+                        if (row === data.length) { 
+                            cell.style.background = '#f3f3f3';
+                            cell.style.borderTop = '2px solid #888';
+                            cell.style.borderBottom = '2px solid #888';
+                            cell.style.borderLeft = '1px solid #888';
+                            cell.style.borderRight = '1px solid #888';
+                        }
+                    } catch (e) {
+                         console.warn("Footer styling error", e);
+                    }
+                }
+            },
+            onchangepage: function(el, pageNo, oldPageNo) {
+                var elInstance = el;
+                var json = elInstance.getJson(null, false);
+                var jsonLength = (pageNo + 1) * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+                if (jsonLength == undefined) {
+                    jsonLength = 15
+                }
+                if (json.length < jsonLength) {
+                    jsonLength = json.length;
+                }
+                var start = pageNo * (document.getElementsByClassName("jss_pagination_dropdown")[0]).value;
+                for (var y = start; y < jsonLength; y++) {
+                    var rowData = elInstance.getRowData(y);
+                    const totalColumns = rowData.length;
+                    const firstColumnLetter = getColumnLetter(0);
+                    const lastColumnLetter = getColumnLetter(totalColumns - 1);
+                    var cell = elInstance.getCell(firstColumnLetter.concat(parseInt(y) + 1))
                     cell.style.fontWeight = 'bold';
-                    cell.style.background = '#f3f3f3';
+                    var cell = elInstance.getCell(lastColumnLetter.concat(parseInt(y) + 1))
+                    cell.style.fontWeight = 'bold';
                 }
             }
             };
@@ -272,8 +326,8 @@ class ShipmentGlobalView extends Component {
                 csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
         }
         csvRow.push('')
-        csvRow.push('"' + ((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
+        // csvRow.push('"' + ((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").selectedOptions[0].text).replaceAll(' ', '%20') + '"'))
+        // csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
@@ -282,23 +336,30 @@ class ShipmentGlobalView extends Component {
             this.state.countrySplitList.length > 0
                 ? Object.keys(this.state.countrySplitList[0].amount || {})
                 : [];
-        const data = this.state.countrySplitList.map(ele => {
-                const fundingValues = amountKeys.map(
-                    key => ele.amount?.[key] || 0
-                );
+        const sortedAmountKeys = amountKeys.slice().sort((a, b) => a.localeCompare(b));
 
-                const total = fundingValues.reduce((a, b) => a + b, 0);
-
-                return [
-                    ele.country.label.label_en,
-                    ...fundingValues,
-                    total
-                ];
-            });
+        // Build header
         const csvHeader = [
-            ...this.state.table1Headers,
+            i18n.t('static.dashboard.country'),
+            ...sortedAmountKeys,
             i18n.t("static.supplyPlan.total")
         ];
+        // Build and sort data rows
+        const data = this.state.countrySplitList.map(ele => {
+            const fundingValues = sortedAmountKeys.map(
+                key => ele.amount?.[key] || 0
+            );
+            const total = fundingValues.reduce((a, b) => a + b, 0);
+            return [
+                ele.country.label.label_en,
+                ...fundingValues,
+                total
+            ];
+        });
+
+        // Sort rows alphabetically by country name
+        data.sort((a, b) => a[0].localeCompare(b[0]));
+
         csvRow.push(addDoubleQuoteToRowContent(csvHeader)); // <-- Add this line
         data.forEach(row => {
             csvRow.push(addDoubleQuoteToRowContent(row));
@@ -433,16 +494,16 @@ class ShipmentGlobalView extends Component {
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
         }
-        planningText = doc.splitTextToSize((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").value ), doc.internal.pageSize.width * 3 / 4);
-        y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-            }
-            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
-            y = y + 10;
-        }
+        // planningText = doc.splitTextToSize((i18n.t('static.program.isincludeplannedshipment') + ' : ' + document.getElementById("includePlanningShipments").value ), doc.internal.pageSize.width * 3 / 4);
+        // y = y + 10;
+        // for (var i = 0; i < planningText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
+        //     }
+        //     doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+        //     y = y + 10;
+        // }
         const title = i18n.t('static.dashboard.globalconsumption');
         var canvas = document.getElementById("cool-canvas1");
         var canvasImg = canvas.toDataURL("image/png", 1.0);
@@ -455,13 +516,30 @@ class ShipmentGlobalView extends Component {
         }
         let startYtable = startY - ((height - h1) * (pages - 1))
         doc.setTextColor("#fff");
-        if (startYtable > (height - 400)) {
-            doc.addPage()
-            startYtable = 80
-        }
-        doc.addImage(canvasImg, 'png', 50, startYtable, 750, 260, 'CANVAS');
 
-        // Add Map if available
+        // --- Chart Aspect Ratio Logic ---
+        const CHART_MAX_WIDTH = 750;
+        const CHART_MAX_HEIGHT = 300; // Limit height if needed
+        let chartWidth = canvas.width;
+        let chartHeight = canvas.height;
+        let chartRatio = chartWidth / chartHeight;
+
+        let finalChartWidth = CHART_MAX_WIDTH;
+        let finalChartHeight = finalChartWidth / chartRatio;
+
+        if (finalChartHeight > CHART_MAX_HEIGHT) {
+             finalChartHeight = CHART_MAX_HEIGHT;
+             finalChartWidth = finalChartHeight * chartRatio;
+        }
+
+        if (startYtable > (height - finalChartHeight - 50)) { // Check if chart doesn't fit
+            doc.addPage()
+            startYtable = 100
+        }
+        let chartX = (doc.internal.pageSize.width - finalChartWidth) / 2;
+        doc.addImage(canvasImg, 'png', chartX, startYtable, finalChartWidth, finalChartHeight, 'CANVAS');
+        
+        // --- Map Export Logic ---
         const mapContainer = document.querySelector(".world-map-container");
         if (mapContainer) {
             const svg = mapContainer.querySelector("svg");
@@ -483,7 +561,11 @@ class ShipmentGlobalView extends Component {
                             ctx.fillRect(0, 0, canvas.width, canvas.height);
                             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                             URL.revokeObjectURL(url);
-                            resolve(canvas.toDataURL("image/png"));
+                            resolve({
+                                dataUrl: canvas.toDataURL("image/png"),
+                                width: canvas.width,
+                                height: canvas.height
+                            });
                         };
                         img.onerror = (e) => {
                             reject(e);
@@ -491,27 +573,89 @@ class ShipmentGlobalView extends Component {
                         img.src = url;
                     });
                     
-                    let mapY = startYtable + 270;
-                    if ((mapY + 300) > height - 50) { 
-                         doc.addPage();
-                         mapY = 50;
+                    // --- Map Aspect Ratio Logic ---
+                    let mapWidth = svgData.width;
+                    let mapHeight = svgData.height;
+                    let mapRatio = mapWidth / mapHeight;
+
+                    const MAP_MAX_WIDTH = 650;
+                    const MAP_MAX_HEIGHT = 400;
+
+                    let finalMapWidth = MAP_MAX_WIDTH;
+                    let finalMapHeight = finalMapWidth / mapRatio;
+
+                    if (finalMapHeight > MAP_MAX_HEIGHT) {
+                        finalMapHeight = MAP_MAX_HEIGHT;
+                        finalMapWidth = finalMapHeight * mapRatio;
                     }
-                    doc.addImage(svgData, 'PNG', 100, mapY, 650, 300, 'MAP');
+
+                    let mapY = startYtable + finalChartHeight + 30; // Add spacing after chart
+                    if ((mapY + finalMapHeight) > height - 50) { 
+                         doc.addPage();
+                         mapY = 100;
+                    }
+                    
+                    let mapX = (doc.internal.pageSize.width - finalMapWidth) / 2;
+                    doc.addImage(svgData.dataUrl, 'PNG', mapX, mapY, finalMapWidth, finalMapHeight, 'MAP');
+
+                    // --- Draw Gradient Legend ---
+                    const countryTotals = {};
+                    (this.state.countrySplitList || []).forEach(ele => {
+                        const total = Object.values(ele.amount || {}).reduce((sum, val) => sum + val, 0);
+                        if (ele.country && ele.country.code) {
+                             countryTotals[ele.country.code] = total;
+                        }
+                    });
+                    const maxValue = Math.max(...Object.values(countryTotals), 0);
+
+                    const legendX = mapX + finalMapWidth + 10; 
+                    const legendY = mapY + finalMapHeight - 100;
+                    const legendWidth = 15;
+                    const legendHeight = 100;
+
+                    // Gradient: #E6F2FF (Light) to #002F6C (Dark)
+                    const r1 = 230, g1 = 242, b1 = 255; 
+                    const r2 = 0, g2 = 47, b2 = 108; 
+
+                    for (let i = 0; i < legendHeight; i++) {
+                        const ratio = i / legendHeight;
+                        const r = Math.round(r1 + (r2 - r1) * ratio);
+                        const g = Math.round(g1 + (g2 - g1) * ratio);
+                        const b = Math.round(b1 + (b2 - b1) * ratio);
+                        
+                        doc.setFillColor(r, g, b);
+                        doc.rect(legendX, legendY + legendHeight - 1 - i, legendWidth, 2, 'F');
+                    }
+                    
+                    doc.setDrawColor(200, 200, 200);
+                    doc.rect(legendX, legendY, legendWidth, legendHeight, 'S');
+
+                    doc.setFontSize(8);
+                    doc.setTextColor(100, 100, 100);
+                    doc.text("0", legendX + legendWidth + 5, legendY + legendHeight);
+                    doc.text(maxValue.toLocaleString('en-US'), legendX + legendWidth + 5, legendY + 5);
+
                 } catch (e) {
                     console.error("Error exporting map", e);
                 }
             }
         }
-        const headers = [
-            ...this.state.table1Headers,
-            i18n.t("static.supplyPlan.total")
-        ];
         const amountKeys =
             this.state.countrySplitList.length > 0
                 ? Object.keys(this.state.countrySplitList[0].amount || {})
                 : [];
+        const sortedAmountKeys = amountKeys.slice().sort((a, b) => a.localeCompare(b));
+
+        // Build header
+        const headers = [
+            i18n.t('static.dashboard.country'),
+            ...sortedAmountKeys,
+            i18n.t("static.supplyPlan.total")
+        ];
+
+        // Build and sort data rows
         const data = this.state.countrySplitList.map(ele => {
-            const fundingValues = amountKeys.map(
+            const fundingValues = sortedAmountKeys.map(
                 key => (ele.amount?.[key] || 0).toLocaleString('en-US')
             );
             const total = fundingValues
@@ -524,6 +668,10 @@ class ShipmentGlobalView extends Component {
                 total
             ];
         });
+
+        // Sort rows alphabetically by country name
+        data.sort((a, b) => a[0].localeCompare(b[0]));
+
 
         let totalRow = [];
         if (data.length > 0) {
@@ -547,7 +695,14 @@ class ShipmentGlobalView extends Component {
             startY: startYtable,
             head: [headers],
             body: [...data, totalRow],
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' }
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            didParseCell: function (data) {
+                if (data.section === 'body') {
+                    if (data.row.index === data.table.body.length - 1 || data.column.index === 0 || data.column.index === data.table.columns.length - 1) {
+                        data.cell.styles.fontStyle = 'bold';
+                    }
+                }
+            }
         };
         doc.autoTable(content);
         addHeaders(doc)
@@ -732,7 +887,10 @@ class ShipmentGlobalView extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    procurementAgents: listArray, loading: false
+                    procurementAgents: listArray,
+                    procurementAgentValues: listArray.map(item => ({ label: item.code, value: item.id })),
+                    procurementAgentLabels: listArray.map(item => item.code),
+                    loading: false
                 })
             }).catch(
                 error => {
@@ -822,7 +980,10 @@ class ShipmentGlobalView extends Component {
                     return itemLabelA > itemLabelB ? 1 : -1;
                 });
                 this.setState({
-                    fundingSources: listArray, loading: false
+                    fundingSources: listArray,
+                    fundingSourceValues: listArray.map(item => ({ label: item.code, value: item.id })),
+                    fundingSourceLabels: listArray.map(item => item.code),
+                    loading: false
                 }, () => { this.getProcurementAgentType(); this.getFundingSourceType(); })
             }).catch(
                 error => {
@@ -1128,7 +1289,7 @@ class ShipmentGlobalView extends Component {
         let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
         let fundingSourcetypeIds = this.state.fundingSourceTypeValues.length == this.state.fundingSourceTypes.length ? [] : this.state.fundingSourceTypeValues.map(ele => (ele.value).toString());
         let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-        let includePlanningShipments = document.getElementById("includePlanningShipments").value
+        let includePlanningShipments = true;
         let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1774,287 +1935,14 @@ class ShipmentGlobalView extends Component {
                 }
             }
         }
-        const options1 = {
-            title: {
-                display: true,
-                text: i18n.t('static.shipment.shipmentfundingSource'),
-                fontColor: fontColor
-            },
-            scales: {
-                xAxes: [{
-                    labelMaxWidth: 100,
-                    stacked: true,
-                    fontColor: fontColor,
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                    ticks: {
-                        fontColor: fontColor,
-                    }
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t("static.report.qty"),
-                        fontColor: fontColor
-                    },
-                    stacked: true,
-                    labelString: i18n.t('static.shipment.amount'),
-                    fontColor: fontColor,
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: fontColor,
-                        callback: function (value) {
-                            var cell1 = value
-                            cell1 += '';
-                            var x = cell1.split('.');
-                            var x1 = x[0];
-                            var x2 = x.length > 1 ? '.' + x[1] : '';
-                            var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return x1 + x2;
-                        }
-                    },
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                }],
-            },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor
-                }
-            }
-        }
-        const options2 = {
-            title: {
-                display: true,
-                text: i18n.t('static.shipment.shipmentProcurementAgent'),
-                fontColor: fontColor
-            },
-            scales: {
-                xAxes: [{
-                    labelMaxWidth: 100,
-                    stacked: true,
-                    fontColor: fontColor,
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                    ticks: {
-                        fontColor: fontColor,
-                    }
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t("static.report.qty"),
-                        fontColor: fontColor
-                    },
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                    stacked: true,
-                    labelString: i18n.t('static.shipment.amount'),
-                    fontColor: fontColor,
-                }],
-            },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor
-                }
-            }
-        }
-        const options3 = {
-            title: {
-                display: true,
-                text: i18n.t('static.shipment.shipmentProcurementAgentType'),
-                fontColor: fontColor
-            },
-            scales: {
-                xAxes: [{
-                    labelMaxWidth: 100,
-                    stacked: true,
-                    fontColor: fontColor,
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                    ticks: {
-                        fontColor: fontColor,
-                    }
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t("static.report.qty"),
-                        fontColor: fontColor
-                    },
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                    stacked: true,
-                    labelString: i18n.t('static.shipment.amount'),
-                    fontColor: fontColor,
-                }],
-            },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor
-                }
-            }
-        }
-
-        const options4 = {
-            title: {
-                display: true,
-                text: i18n.t('static.shipment.shipmentFundingSourceType'),
-                fontColor: fontColor
-            },
-            scales: {
-                xAxes: [{
-                    labelMaxWidth: 100,
-                    stacked: true,
-                    fontColor: fontColor,
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                }],
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t("static.report.qty"),
-                        fontColor: fontColor,
-                    },
-                    stacked: true,
-                    labelString: i18n.t('static.shipment.amount'),
-                    fontColor: fontColor,
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: fontColor,
-                        callback: function (value) {
-                            var cell1 = value
-                            cell1 += '';
-                            var x = cell1.split('.');
-                            var x1 = x[0];
-                            var x2 = x.length > 1 ? '.' + x[1] : '';
-                            var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return x1 + x2;
-                        }
-                    },
-                    gridLines: {
-                        display: true,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    },
-                }],
-            },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor,
-                }
-            }
-        }
-
         
-        const countrySplitList = this.state.countrySplitList || [];
+        const countrySplitList = (this.state.countrySplitList || []).slice().sort((a, b) => 
+            a.country.label.label_en.localeCompare(b.country.label.label_en)
+        );
 
         const amountKeys =
         countrySplitList.length > 0
-            ? Object.keys(countrySplitList[0].amount || {})
+            ? Object.keys(countrySplitList[0].amount || {}).sort((a, b) => a.localeCompare(b))
             : [];
 
         const datasets = amountKeys.map((key, index) => ({
@@ -2065,10 +1953,10 @@ class ShipmentGlobalView extends Component {
         }));
 
         const bar = {
-        labels: countrySplitList.map(
-            ele => ele.country.label.label_en
-        ),
-        datasets: datasets
+            labels: countrySplitList.map(
+                ele => ele.country.label.label_en
+            ),
+            datasets: datasets
         };
         return (
             <div className="animated fadeIn" >
@@ -2240,9 +2128,9 @@ class ShipmentGlobalView extends Component {
                                                         onChange={this.toggleView}
                                                     >
                                                         <option value="1">{i18n.t('static.dashboard.fundingsource')}</option>
-                                                        <option value="4">{i18n.t('static.funderTypeHead.funderType')}</option>
+                                                        {/* <option value="4">{i18n.t('static.funderTypeHead.funderType')}</option> */}
                                                         <option value="2">{i18n.t('static.procurementagent.procurementagent')}</option>
-                                                        <option value="3">{i18n.t('static.dashboard.procurementagentType')}</option>
+                                                        {/* <option value="3">{i18n.t('static.dashboard.procurementagentType')}</option> */}
                                                     </Input>
                                                 </InputGroup>
                                             </div>
@@ -2317,7 +2205,7 @@ class ShipmentGlobalView extends Component {
                                                 />
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-3">
+                                        {/* <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.program.isincludeplannedshipment')}</Label>
                                             <div className="controls ">
                                                 <InputGroup>
@@ -2333,7 +2221,7 @@ class ShipmentGlobalView extends Component {
                                                     </Input>
                                                 </InputGroup>
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup> */}
                                     </div>
                                 </div>
                             </Form>
