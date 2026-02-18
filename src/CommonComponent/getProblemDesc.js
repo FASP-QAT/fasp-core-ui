@@ -311,21 +311,21 @@ export default function getProblemDesc(row, lang) {
         var desc = "";
         if (obj.overMaxMonthsCount > 0) {
             var count = obj.overMaxMonthsCount;
-            var monthNames = formatMonthRanges(obj.overMaxMonths.toString().split(",")).toString().replaceAll(",",", ");
+            var monthNames = formatMonthRanges(obj.overMaxMonths.toString().split(","));
             desc += i18n.t('static.problemList.minMaxProblemDescOverMax', { count, monthNames });
         }
         if (obj.underMinMonthsCount > 0) {
             var count = obj.underMinMonthsCount;
-            var monthNames = formatMonthRanges(obj.underMinMonths.toString().split(",")).toString().replaceAll(",",", ");
+            var monthNames = formatMonthRanges(obj.underMinMonths.toString().split(","));
             desc += i18n.t('static.problemList.minMaxProblemDescUnderMin', { count, monthNames });
         }
         if (obj.stockedOutMonthsCount > 0) {
             var count = obj.stockedOutMonthsCount;
-            var monthNames = formatMonthRanges(obj.stockedOutMonths.toString().split(",")).toString().replaceAll(",",", ")
+            var monthNames = formatMonthRanges(obj.stockedOutMonths.toString().split(","));
             desc += i18n.t('static.problemList.minMaxProblemDescStockedOut', { count, monthNames });
         }
         if (obj.shipmentListMonthsCount > 0) {
-            var monthNames = formatMonthRanges(obj.shipmentListMonths.toString().split(",")).toString().replaceAll(",",", ");
+            var monthNames = formatMonthRanges(obj.shipmentListMonths.toString().split(","));
             desc += i18n.t('static.problemList.minMaxProblemDescShipments', { monthNames });
         }
         if (desc_en != null && desc_en != '') {
