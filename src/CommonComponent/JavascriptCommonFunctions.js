@@ -487,7 +487,17 @@ export function formatMonthRanges(arr){
               .sort((a,b)=>a.i-b.i);
 
   let r=[],s=arr[0],p=arr[0];
-  for(let i=1;i<arr.length;i++) arr[i].i===p.i+1 ? p=arr[i] : (r.push(s.i===p.i?s.o:`${s.o} to ${p.o}`), s=p=arr[i]);
-  r.push(s.i===p.i?s.o:`${s.o} to ${p.o}`);
+
+  for(let i=1;i<arr.length;i++){
+    if(arr[i].i===p.i+1){
+      p=arr[i];
+    }else{
+      r.push(s.i===p.i ? s.o : `${s.o} to ${p.o}`);
+      s=arr[i];
+      p=arr[i];
+    }
+  }
+
+  r.push(s.i===p.i ? s.o : `${s.o} to ${p.o}`);
   return r.join(", ");
 }
