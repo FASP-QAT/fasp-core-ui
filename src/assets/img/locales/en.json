@@ -3650,5 +3650,11 @@
   "static.report.byCountry": "by Country",
   "static.dashboard.shipmentByCountryheader": "Shipments (by Country)",
   "static.shipmentReport.yAxisInEquivalencyUnit": "Y-axis in Equivalency Unit" ,
-  "static.shipmentDetails.erpLinkedShipments":"ERP-linked Shipments"
+  "static.shipmentDetails.erpLinkedShipments":"ERP-linked Shipments",
+  "static.shipementDetails.quantityOfShipments":"Quantity of Shipments",
+  "static.shipementDetails.costOfShipments":"Cost of Shipments",
+  "static.shipmentDetails.planningUnitInfo":"When PU is single‑select, the graph shows shipment quantity by status. When PU is multi‑select, it shows shipment cost by status.",
+  "static.shipmentDetails.costUSDFS":"Total cost per Funding Source across all programs and PUs selected",
+  "static.shipmentDetails.costUSDPA":"Total cost per Procurement Agent across all programs and PUs selected",
+  "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost"
 }
