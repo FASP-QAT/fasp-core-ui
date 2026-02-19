@@ -224,8 +224,7 @@ class ShipmentSummery extends Component {
       programLst: [],
       versionId: [],
       planningUnitList: [],
-      planningUnitListAll: [],
-      scrollPosition:0
+      planningUnitListAll: []
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -2021,17 +2020,6 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           type: "hidden",
         },
       ],
-      onsort: function(worksheet, column, order) {
-        const scrollable = document.querySelector('.jss_content');
-        
-        const scrollTop = scrollable.scrollTop;
-        const scrollLeft = scrollable.scrollLeft;
-    
-        requestAnimationFrame(() => {
-            scrollable.scrollTop = scrollTop;
-            scrollable.scrollLeft = scrollLeft;
-        });
-    },
       editable: false,
       license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
       filters: true,
