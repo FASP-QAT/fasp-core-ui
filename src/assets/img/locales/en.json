@@ -3639,5 +3639,11 @@
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
-  "static.shipmentDetails.erpLinkedShipments":"ERP-linked Shipments"
+  "static.shipmentDetails.erpLinkedShipments":"ERP-linked Shipments",
+  "static.shipementDetails.quantityOfShipments":"Quantity of Shipments",
+  "static.shipementDetails.costOfShipments":"Cost of Shipments",
+  "static.shipmentDetails.planningUnitInfo":"When PU is single‑select, the graph shows shipment quantity by status. When PU is multi‑select, it shows shipment cost by status.",
+  "static.shipmentDetails.costUSDFS":"Total cost per Funding Source across all programs and PUs selected",
+  "static.shipmentDetails.costUSDPA":"Total cost per Procurement Agent across all programs and PUs selected",
+  "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost"
 }

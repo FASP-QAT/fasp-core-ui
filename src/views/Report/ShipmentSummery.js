@@ -226,6 +226,7 @@ class ShipmentSummery extends Component {
       versionId: [],
       planningUnitList: [],
       planningUnitListAll: [],
+      scrollPosition:0
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -1890,10 +1891,10 @@ class ShipmentSummery extends Component {
       ) + " | " + shipmentDetailsList[j].planningUnit.id;
       data[2] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
       data[3] = shipmentDetailsList[j].emergencyOrder;
-      data[4] = `<input type="checkbox" style="pointer-events: none; cursor: default;" 
+      data[4] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
             ${shipmentDetailsList[j].erpFlag ? "checked" : ""}>`;
 
-data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;" 
+data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
             ${shipmentDetailsList[j].localProcurement ? "checked" : ""}>`;
       data[6] =
         shipmentDetailsList[j].orderNo != null
@@ -2021,6 +2022,17 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
           type: "hidden",
         },
       ],
+      onsort: function(worksheet, column, order) {
+        const scrollable = document.querySelector('.jss_content');
+        
+        const scrollTop = scrollable.scrollTop;
+        const scrollLeft = scrollable.scrollLeft;
+    
+        requestAnimationFrame(() => {
+            scrollable.scrollTop = scrollTop;
+            scrollable.scrollLeft = scrollLeft;
+        });
+    },
       editable: false,
       license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
       filters: true,
@@ -2062,6 +2074,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
       var colArr = [
         "A",
         "B",
+        "C",
         "F",
         "G",
         "H",
@@ -2075,6 +2088,10 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
         "P",
         "Q"
       ];
+      var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
+      var tr = asterisk.firstChild;
+      tr.children[15].classList.add('InfoTr');
+      tr.children[15].title = i18n.t('static.shipmentDetails.totalCostUSD');
       var rowData = elInstance.getRowData(j);
       var emergencyOrder = rowData[3];
       if (emergencyOrder) {
@@ -3179,7 +3196,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
     const options = {
       title: {
         display: true,
-        text: "Shipments",
+        text: this.state.planningUnitValues.length == 1 ? i18n.t("static.shipementDetails.quantityOfShipments") : i18n.t("static.shipementDetails.costOfShipments"),
         fontColor: fontColor
       },
       scales: {
@@ -3560,8 +3577,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
                         </div>
                       </FormGroup>}
                       <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.report.planningUnit")}
+                        <Label htmlFor="appendedInputButton" title={i18n.t('static.shipmentDetails.planningUnitInfo')}>
+                          {i18n.t("static.report.planningUnit")}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
@@ -3799,8 +3816,9 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;"
                                         cursor: "pointer",
                                         "text-align": "center",
                                       }}
+                                      title={this.state.viewById==1?i18n.t("static.shipmentDetails.costUSDFS"):i18n.t("static.shipmentDetails.costUSDPA")}
                                     >
-                                      {i18n.t("static.report.costUsd")}
+                                      {i18n.t("static.report.costUsd")}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
                                     </th>
                                   </tr>
                                 </thead>
