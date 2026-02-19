@@ -752,7 +752,7 @@ class ShipmentSummery extends Component {
       csvRow.push(
         '"' +
         (
-          i18n.t("static.budget.fundingsource") +
+          i18n.t("static.fundingSourceHead.fundingSource") +
           " : " +
           ele.toString()
         ).replaceAll(" ", "%20") +
@@ -780,7 +780,7 @@ class ShipmentSummery extends Component {
       csvRow.push(
         '"' +
         (
-          i18n.t("static.dashboard.procurementagentheader") +
+          i18n.t("static.report.procurementAgentName") +
           " : " +
           ele.toString()
         ).replaceAll(" ", "%20") +
@@ -793,7 +793,7 @@ class ShipmentSummery extends Component {
     var re;
     var A = [
       addDoubleQuoteToRowContent([
-        this.state.viewById == 1 ? i18n.t("static.budget.fundingsource").replaceAll(" ", "%20") : i18n.t("static.dashboard.procurementagentheader").replaceAll(" ", "%20"),
+        this.state.viewById == 1 ? i18n.t("static.fundingSourceHead.fundingSource").replaceAll(" ", "%20") : i18n.t("static.report.procurementAgentName").replaceAll(" ", "%20"),
         i18n.t("static.dashboard.countryheader").replaceAll(" ", "%20"),
         i18n.t("static.dashboard.program").replaceAll(" ", "%20"),
         i18n.t("static.report.orders").replaceAll(" ", "%20"),
@@ -826,14 +826,14 @@ class ShipmentSummery extends Component {
         i18n
           .t("static.supplyPlan.consideAsEmergencyOrder")
           .replaceAll(" ", "%20"),
-        i18n.t("static.report.erpOrder").replaceAll(" ", "%20"),
+        i18n.t("static.shipmentDetails.erpLinkedShipments").replaceAll(" ", "%20"),
         i18n.t("static.report.localprocurement").replaceAll(" ", "%20"),
         i18n
           .t("static.report.orderNo")
           .replaceAll(" ", "%20")
           .replaceAll("#", "%23"),
         i18n.t("static.report.procurementAgentName").replaceAll(" ", "%20"),
-        i18n.t("static.budget.fundingsource").replaceAll(" ", "%20"),
+        i18n.t("static.fundingSourceHead.fundingSource").replaceAll(" ", "%20"),
         i18n.t("static.budgetHead.budget").replaceAll(" ", "%20"),
         i18n.t("static.common.status").replaceAll(" ", "%20"),
         i18n.t("static.report.qty").replaceAll(" ", "%20"),
@@ -1038,7 +1038,7 @@ class ShipmentSummery extends Component {
     }
     if (this.state.viewById == 1) {
       var fundingSourceText = doc.splitTextToSize(
-        i18n.t("static.budget.fundingsource") +
+        i18n.t("static.fundingSourceHead.fundingSource") +
         ": " +
         this.state.fundingSourceLabels.join("; "),
         (doc.internal.pageSize.width * 3) / 4
@@ -1071,7 +1071,7 @@ class ShipmentSummery extends Component {
       }
     } else {
       var paText = doc.splitTextToSize(
-        i18n.t("static.dashboard.procurementagentheader") +
+        i18n.t("static.report.procurementAgentName") +
         ": " +
         this.state.procurementAgentLabels.join("; "),
         (doc.internal.pageSize.width * 3) / 4
@@ -1124,11 +1124,11 @@ class ShipmentSummery extends Component {
     headerTable2.push(i18n.t("static.report.planningUnit"));
     headerTable2.push(i18n.t("static.report.id"));
     headerTable2.push(i18n.t("static.supplyPlan.consideAsEmergencyOrder"));
-    headerTable2.push(i18n.t("static.report.erpOrder"));
+    headerTable2.push(i18n.t("static.shipmentDetails.erpLinkedShipments"));
     headerTable2.push(i18n.t("static.report.localprocurement"));
     headerTable2.push(i18n.t("static.report.orderNo"));
     headerTable2.push(i18n.t("static.report.procurementAgentName"));
-    headerTable2.push(i18n.t("static.budget.fundingsource"));
+    headerTable2.push(i18n.t("static.fundingSourceHead.fundingSource"));
     headerTable2.push(i18n.t("static.dashboard.budget"));
     headerTable2.push(i18n.t("static.common.status"));
     headerTable2.push(i18n.t("static.report.qty"));
@@ -1167,15 +1167,31 @@ class ShipmentSummery extends Component {
       ele.notes,
     ]);
     let contentTable2 = {
-      margin: { top: 80, bottom: 100 },
-      startY: 200,
+      margin: { top: 80, bottom: 100, left: 5 },
+      startY: doc.lastAutoTable.finalY + 20,
       pageBreak: "auto",
+      tableWidth: "auto",
       head: [headerTable2],
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign: "center" },
+      styles: { lineWidth: 1, fontSize: 8, halign: "center",overflow: "linebreak", },
       columnStyles: {
-        1: { cellWidth: 100 },
-        16: { cellWidth: 110 },
+        0: { cellWidth: 50 },
+        1: { cellWidth: 70 },
+        2: { cellWidth: 50 },
+        3: { cellWidth: 40 },
+        4: { cellWidth: 40 },
+        5: { cellWidth: 40 },
+        6: { cellWidth: 40 },
+        7: { cellWidth: 40 },
+        8: { cellWidth: 45 },
+        9: { cellWidth: 50 },
+        10: { cellWidth: 44 },
+        11: { cellWidth: 50 },
+        12: { cellWidth: 50 },
+        13: { cellWidth: 50 },
+        14: { cellWidth: 50 },
+        15: { cellWidth: 50 },
+        16: { cellWidth: 70 },
       },
     };
     doc.autoTable(contentTable2);
@@ -1311,8 +1327,8 @@ class ShipmentSummery extends Component {
             {
               fundingSources: listArray,
               loading: false,
-              fundingSourceValues: [],
-              fundingSourceLabels: [],
+              fundingSourceValues: listArray.map(c=>{return {value:c.id,label:c.code}}),
+              fundingSourceLabels: listArray.map(c=>c.code),
               filteredBudgetList: [],
             },
             () => {
@@ -1385,8 +1401,8 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
-              fundingSourceValues: [],
-              fundingSourceLabels: [],
+              fundingSourceValues: fundingSource.map(c=>{return {value:c.id,label:c.code}}),
+              fundingSourceLabels: fundingSource.map(c=>c.code),
               filteredBudgetList: [],
             },
             () => {
@@ -1418,8 +1434,8 @@ class ShipmentSummery extends Component {
             {
               procurementAgents: listArray,
               loading: false,
-              procurementAgentValues: [],
-              procurementAgentLabels: [],
+              procurementAgentValues: listArray.map(c=>{return {value:c.id,label:c.code}}),
+              procurementAgentLabels: listArray.map(c=>c.code),
               budgetValues: [],
               budgetLabels: [],
               filteredBudgetList: [],
@@ -1492,8 +1508,8 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
-              procurementAgentValues: [],
-              procurementAgentLabels: [],
+              procurementAgentValues: pa.map(c=>{return {value:c.id,label:c.code}}),
+              procurementAgentLabels: pa.map(c=>c.code),
               filteredBudgetList: [],
               budgetValues: [],
               budgetLabels: []
@@ -1509,8 +1525,8 @@ class ShipmentSummery extends Component {
    * Retrieves the list of budgets.
    */
   getBudgetList() {
-    var programId = this.state.programValues[0].value;
     if (this.state.programValues.length > 0) {
+      var programId = this.state.programValues[0].value;
       if (localStorage.getItem("sessionType") === 'Online') {
         var programIds = this.state.programValues.map(ele => ele.value);
         DropdownService.getBudgetForProgramsDropdownList(programIds)
@@ -1544,8 +1560,8 @@ class ShipmentSummery extends Component {
             }
             this.setState(
               {
-                budgetValues: budgetValuesFromProps,
-                budgetLabels: budgetLabelsFromProps,
+                budgetValues: budgetValuesFromProps.length>0?budgetValuesFromProps:proList.map(item=>{return {label:getLabelText(item.label,this.state.lang),value:item.budgetId}}),
+                budgetLabels: budgetLabelsFromProps.length>0?budgetLabelsFromProps:proList.map(item=>getLabelText(item.label,this.state.lang)), 
                 budgets: proList,
                 filteredBudgetList: proList,
               },
@@ -1688,8 +1704,8 @@ class ShipmentSummery extends Component {
             }
             this.setState(
               {
-                budgetValues: [],
-                budgetLabels: [],
+                budgetValues: bList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }), 
+                budgetLabels: bList.map(item => getLabelText(item.label, this.state.lang)),
                 fundingSourceValues: fundingSourceIds.map((ele) => ele),
                 fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
                 filteredBudgetList: bList,
@@ -1794,8 +1810,8 @@ class ShipmentSummery extends Component {
             );
             this.setState(
               {
-                budgetValues: [],
-                budgetLabels: [],
+                budgetValues: fSourceResult.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }), 
+                budgetLabels: fSourceResult.map(item => getLabelText(item.label, this.state.lang)),
                 fundingSourceValues: fundingSourceIds.map((ele) => ele),
                 fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
                 filteredBudgetList: fSourceResult.sort(function (a, b) {
@@ -1860,7 +1876,7 @@ class ShipmentSummery extends Component {
    * Builds the jexcel table based on the shipment details list list.
    */
   buildJExcel() {
-    let shipmentDetailsList = this.state.shipmentDetailsList.sort((a, b) => { return new Date(b.expectedDeliveryDate) - new Date(a.expectedDeliveryDate); });
+    let shipmentDetailsList = this.state.shipmentDetailsList.sort((a, b) => { return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate); });
     let shipmentDetailsListArray = [];
     let count = 0;
     for (var j = 0; j < shipmentDetailsList.length; j++) {
@@ -1873,8 +1889,11 @@ class ShipmentSummery extends Component {
       ) + " | " + shipmentDetailsList[j].planningUnit.id;
       data[2] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
       data[3] = shipmentDetailsList[j].emergencyOrder;
-      data[4] = shipmentDetailsList[j].erpFlag;
-      data[5] = shipmentDetailsList[j].localProcurement;
+      data[4] = `<input type="checkbox" style="pointer-events: none; cursor: default;" 
+            ${shipmentDetailsList[j].erpFlag ? "checked" : ""}>`;
+
+data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;" 
+            ${shipmentDetailsList[j].localProcurement ? "checked" : ""}>`;
       data[6] =
         shipmentDetailsList[j].orderNo != null
           ? shipmentDetailsList[j].orderNo
@@ -1911,17 +1930,19 @@ class ShipmentSummery extends Component {
       data: data,
       columnDrag: false,
       colWidths: [
-        150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
+        150, 150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
       ],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
           title: i18n.t("static.program.programMaster"),
           type: "text",
+          width:100
         },
         {
           title: i18n.t("static.report.planningUnit"),
           type: "text",
+          width:150
         },
         {
           title: i18n.t("static.report.id"),
@@ -1932,12 +1953,12 @@ class ShipmentSummery extends Component {
           type: "hidden",
         },
         {
-          title: i18n.t("static.report.erpOrder"),
-          type: "checkbox",
+          title: i18n.t("static.shipmentDetails.erpLinkedShipments"),
+          type: "html",
         },
         {
           title: i18n.t("static.report.localprocurement"),
-          type: "checkbox",
+          type: "html",
         },
         {
           title: i18n.t("static.report.orderNo"),
@@ -1948,7 +1969,7 @@ class ShipmentSummery extends Component {
           type: "text",
         },
         {
-          title: i18n.t("static.budget.fundingsource"),
+          title: i18n.t("static.fundingSourceHead.fundingSource"),
           type: "text",
         },
         {
@@ -2389,7 +2410,7 @@ class ShipmentSummery extends Component {
    * Fetches data based on selected filters.
    */
   fetchData = () => {
-    let versionId = this.state.programValues.length == 1 ? this.state.versionId : "0";
+    let versionId = this.state.programValues.length == 1 ? this.state.versionId.toString() : "0";
     let reportView = document.getElementById("viewById").value;
     let planningUnitIds =
       this.state.planningUnitValues.length == this.state.planningUnits.length
@@ -3610,7 +3631,7 @@ class ShipmentSummery extends Component {
                       </FormGroup> */}
                       {this.state.viewById == 1 && <FormGroup className="col-md-3" id="fundingSourceDiv">
                         <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.budget.fundingsource")}
+                          {i18n.t("static.fundingSourceHead.fundingSource")}
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
@@ -3638,7 +3659,7 @@ class ShipmentSummery extends Component {
                       </FormGroup>}
                       {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
                         <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.dashboard.procurementagentheader")}
+                          {i18n.t("static.report.procurementAgentName")}
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
@@ -3720,6 +3741,7 @@ class ShipmentSummery extends Component {
                         </div>
                       )}
                     </div>
+                    <br/>
                     <div className="row">
                       <div className="col-md-12 pl-0 pr-0">
                         {this.state.shipmentDetailsFundingSourceList.length >
@@ -3729,18 +3751,18 @@ class ShipmentSummery extends Component {
                                 id="mytable1"
                                 responsive
                                 className="table-bordered table-striped text-center "
-                                style={{ width: "50%", margin: "auto" }}
+                                style={{ width: "75%", margin: "auto" }}
                               >
                                 <thead>
                                   <tr>
                                     <th
                                       style={{
-                                        width: "25px",
+                                        width: "100px",
                                         cursor: "pointer",
                                         "text-align": "center",
                                       }}
                                     >
-                                      {this.state.viewById == 1 ? i18n.t("static.budget.fundingsource") : i18n.t("static.procurementagent.procurmentAgentMaster")}
+                                      {this.state.viewById == 1 ? i18n.t("static.fundingSourceHead.fundingSource") : i18n.t("static.procurementagent.procurmentAgentMaster")}
                                     </th>
                                     <th
                                       style={{
