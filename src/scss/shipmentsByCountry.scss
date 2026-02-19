@@ -1,22 +1,23 @@
-.jss > tfoot > tr > td:not(:nth-child(2)) {
-    border-left: 1px solid #ccc !important;
+.jss>tfoot>tr>td:not(:nth-child(2)) {
+  border-left: 1px solid #ccc !important;
 }
 
 .jss>tfoot>tr>td {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .hide-checkbox .select-item input[type="checkbox"] {
-    display: none !important;
+  display: none !important;
 }
 
 .hide-checkbox .select-item {
-    padding-left: 10px !important;
+  padding-left: 10px !important;
 }
 
 #shipmentJexcel {
   overflow: visible !important;
 }
-.shipmentJexcel > div .jss_filters {
-  top: 0px !important;
+
+.shipmentJexcel>div .jss_filters {
+  top: -60px !important;
 }

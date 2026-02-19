@@ -104,7 +104,12 @@ class WorldMap extends React.Component {
             {this.props.title}
           </div>
         )}
-        <ComposableMap projectionConfig={{ scale: 160 }} width={800} height={400}>
+        <ComposableMap 
+          projectionConfig={{ scale: 160, center: [20, -10] }} 
+          width={800} 
+          height={400} 
+          style={{ width: "100%", height: "100%" }}
+        >
           <ZoomableGroup 
             zoom={this.state.zoom} 
             center={this.state.center} 
@@ -220,7 +225,7 @@ class WorldMap extends React.Component {
         <div
           style={{
             position: "absolute",
-            bottom: "20px",
+            bottom: "50px",
             right: "0",
             display: "flex",
             alignItems: "center",
