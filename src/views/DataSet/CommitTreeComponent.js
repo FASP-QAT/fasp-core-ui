@@ -2943,7 +2943,9 @@ export default class CommitTreeComponent extends React.Component {
                                 for(var t=0;t<treeList.length;t++){
                                     var flatList=treeList[t].tree.flatList;
                                     for(var fl=0;fl<flatList.length;fl++){
-                                        flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.targetScenarioId);
+                                        if(flatList[fl].payload.downwardAggregationList) {
+                                            flatList[fl].payload.downwardAggregationList=flatList[fl].payload.downwardAggregationList.filter(c=>c.targetScenarioId);
+                                        }
                                     }
                                     treeList[t].tree.flatList=flatList;
                                 }
