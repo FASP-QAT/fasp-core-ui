@@ -3178,7 +3178,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
 
     const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
-    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const fontColor = isDarkMode ? '#fff' : '#212721';
     const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
