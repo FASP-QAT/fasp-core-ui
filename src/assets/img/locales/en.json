@@ -3656,5 +3656,6 @@
   "static.shipmentDetails.planningUnitInfo":"When PU is single‑select, the graph shows shipment quantity by status. When PU is multi‑select, it shows shipment cost by status.",
   "static.shipmentDetails.costUSDFS":"Total cost per Funding Source across all programs and PUs selected",
   "static.shipmentDetails.costUSDPA":"Total cost per Procurement Agent across all programs and PUs selected",
-  "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost"
+  "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost",
+  "static.shipment.noData" : "There is no available shipment data for this planning unit during the selected report period"
 }
