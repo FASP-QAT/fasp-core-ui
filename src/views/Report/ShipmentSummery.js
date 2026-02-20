@@ -2451,7 +2451,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
         ? []
         : this.state.budgetValues.map((ele) => ele.value);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-    let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+    let programIds = this.state.programValues.map(ele => (ele.value).toString());
     if (
       this.state.programValues.length > 0 &&
       this.state.planningUnitValues.length > 0 && ((this.state.programValues.length == 1 && versionId != "") || this.state.programValues.length > 1)
