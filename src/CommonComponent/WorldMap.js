@@ -99,7 +99,7 @@ class WorldMap extends React.Component {
             marginBottom: "10px", 
             fontSize: "12px", 
             fontWeight: "bold",
-            color: "#666" 
+            color: this.props.isDarkMode ? "#fff" : "#666"
           }}>
             {this.props.title}
           </div>
@@ -234,7 +234,7 @@ class WorldMap extends React.Component {
             zIndex: 100
           }}
         >
-          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100px", marginRight: "5px", textAlign: "right" }}>
+          <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", height: "100px", marginRight: "5px", textAlign: "right", color: this.props.isDarkMode ? "#fff" : "#666"  }}>
             <span>{maxValue.toLocaleString('en-US')}</span>
             <span>0</span>
           </div>

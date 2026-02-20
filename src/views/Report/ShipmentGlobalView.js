@@ -133,6 +133,7 @@ class ShipmentGlobalView extends Component {
             shipmentJexcel: '',
             yaxisEquUnitLabel: [i18n.t('static.program.no')],
             viewByLabel: [i18n.t('static.dashboard.fundingsource')],
+            noData: false
         };
         this.getCountrys = this.getCountrys.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -1365,7 +1366,8 @@ class ShipmentGlobalView extends Component {
                             table1Body: [],
                             lab: [],
                             val: [],
-                            loading: false
+                            loading: false,
+                            noData: true
                         }, () => { }
                         )
                     }
@@ -1841,17 +1843,17 @@ class ShipmentGlobalView extends Component {
         ]
 
         const darkModeColors = [
-            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#d4bbff', '#BA0C2F', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#BC8985', '#cfcdc9',
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-            '#EEE4B1', '#ba4e00', '#6C6463', '#BC8985', '#cfcdc9',
+            '#d4bbff', '#BA0C2F', '#0067B9', '#A7C6ED',
+            '#EEE4B1', '#ba4e00', '#BC8985', '#cfcdc9',
             '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-            '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
+            '#d4bbff', '#BA0C2F', '#0067B9', '#A7C6ED',
         ]
         const { isDarkMode } = this.state;
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-        const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+        const fontColor = isDarkMode ? '#fff' : '#212721';
         const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
         const options = {
@@ -2245,6 +2247,7 @@ class ShipmentGlobalView extends Component {
                                                     <WorldMap 
                                                         countrySplitList={this.state.countrySplitList} 
                                                         title={(this.state.yaxisEquUnit == -1 ? this.state.planningUnitLabels[0] : this.state.yaxisEquUnitLabel[0] )}
+                                                        isDarkMode={this.state.isDarkMode}
                                                     />
                                                 </div>
                                             </>
@@ -2259,6 +2262,9 @@ class ShipmentGlobalView extends Component {
                                                 <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                                                     <div id="shipmentJexcel" className='jexcelremoveReadonlybackground shipmentJexcel' style={{ padding: '2px 8px' }}></div>
                                                 </CardBody>
+                                                }
+                                                {this.state.noData &&
+                                                    <h5 className="red">{i18n.t("static.shipment.noData")}</h5>
                                                 }
                                             </div>
                                         </div>
