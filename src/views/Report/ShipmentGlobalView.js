@@ -724,9 +724,7 @@ class ShipmentGlobalView extends Component {
         })
         this.setState({
             programValues: programIds.map(ele => ele),
-            programLabels: programIds.map(ele => ele.label).sort((a, b) => a.localeCompare(b)),
-            yaxisEquUnit: -1,
-            yaxisEquUnitLabel: [i18n.t('static.program.no')],
+            programLabels: programIds.map(ele => ele.label).sort((a, b) => a.localeCompare(b))
         }, () => {
             this.getFundingSource();
             this.getDropdownLists();
@@ -1128,21 +1126,32 @@ class ShipmentGlobalView extends Component {
         onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
         }
         ReportService.getDropdownListByProgramIds(json).then(response => {
-        this.setState({
-            equivalencyUnitList: response.data.equivalencyUnitList,
-            planningUnitListAll: response.data.planningUnitList,
-            planningUnitList: response.data.planningUnitList,
-            planningUnitId: [],
-            consumptions: []
-        }, () => {
-            if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
-            var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
-            var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+            const newPlanningUnitList = response.data.planningUnitList;
+            const prevSelectedIds = this.state.planningUnitId.map(ele => ele.value || ele); // handles both object and value
+            const filteredPlanningUnitId = newPlanningUnitList
+                .filter(pu => prevSelectedIds.includes(pu.id))
+                .map(pu => ({ label: getLabelText(pu.label, this.state.lang) + " | " + pu.id, value: pu.id }));
             this.setState({
-                planningUnitList: planningUnitList
+                equivalencyUnitList: response.data.equivalencyUnitList,
+                planningUnitListAll: newPlanningUnitList,
+                planningUnitList: newPlanningUnitList,
+                planningUnitId: filteredPlanningUnitId,
+                consumptions: []
+            }, () => {
+                if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0 && this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit).length > 0) {
+                    var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+                    var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+                    this.setState({
+                        planningUnitList: planningUnitList
+                    })
+                } else {
+                    this.setState({
+                        yaxisEquUnit: -1,
+                        yaxisEquUnitLabel: [i18n.t('static.program.no')],
+                        noData: false
+                    })
+                }
             })
-            }
-        })
         }).catch(
         error => {
             this.setState({
@@ -2263,7 +2272,7 @@ class ShipmentGlobalView extends Component {
                                                     <div id="shipmentJexcel" className='jexcelremoveReadonlybackground shipmentJexcel' style={{ padding: '2px 8px' }}></div>
                                                 </CardBody>
                                                 }
-                                                {this.state.noData &&
+                                                {this.state.noData && this.state.planningUnitId.length > 0 &&
                                                     <h5 className="red">{i18n.t("static.shipment.noData")}</h5>
                                                 }
                                             </div>
