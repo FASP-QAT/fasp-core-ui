@@ -2077,8 +2077,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
       ];
       var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
       var tr = asterisk.firstChild;
-      tr.children[15].classList.add('InfoTr');
-      tr.children[15].title = i18n.t('static.shipmentDetails.totalCostUSD');
+      tr.children[16].classList.add('InfoTr');
+      tr.children[16].title = i18n.t('static.shipmentDetails.totalCostUSD');
       var rowData = elInstance.getRowData(j);
       var emergencyOrder = rowData[3];
       if (emergencyOrder) {
@@ -3176,7 +3176,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
 
     const { isDarkMode } = this.state;
     const colors = isDarkMode ? darkModeColors : lightModeColors;
-    const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
+    const fontColor = isDarkMode ? '#fff' : '#212721';
     const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
     const options = {
