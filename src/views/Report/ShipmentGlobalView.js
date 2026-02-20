@@ -789,12 +789,6 @@ class ShipmentGlobalView extends Component {
                                     loading: false
                                 });
                                 break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
                         }
                     }
                 }
@@ -915,9 +909,6 @@ class ShipmentGlobalView extends Component {
                             case 412:
                                 this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
                                 break;
-                            default:
-                                this.setState({ message: 'static.unkownError', loading: false });
-                                break;
                         }
                     }
                 }
@@ -958,9 +949,6 @@ class ShipmentGlobalView extends Component {
                             case 406:
                             case 412:
                                 this.setState({ loading: false, message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
-                                break;
-                            default:
-                                this.setState({ message: 'static.unkownError', loading: false });
                                 break;
                         }
                     }
@@ -1025,12 +1013,6 @@ class ShipmentGlobalView extends Component {
                             case 412:
                                 this.setState({
                                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
                                     loading: false
                                 });
                                 break;
@@ -1109,12 +1091,6 @@ class ShipmentGlobalView extends Component {
                                     loading: false
                                 });
                                 break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
                         }
                     }
                 }
@@ -1188,12 +1164,6 @@ class ShipmentGlobalView extends Component {
                 case 412:
                 this.setState({
                     message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                    loading: false
-                });
-                break;
-                default:
-                this.setState({
-                    message: 'static.unkownError',
                     loading: false
                 });
                 break;
@@ -1417,12 +1387,6 @@ class ShipmentGlobalView extends Component {
                                 case 412:
                                     this.setState({
                                         message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
                                         loading: false
                                     });
                                     break;
@@ -1687,12 +1651,6 @@ class ShipmentGlobalView extends Component {
                                     case 412:
                                         this.setState({
                                             message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
                                             loading: false
                                         });
                                         break;
