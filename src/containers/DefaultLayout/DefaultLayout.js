@@ -2633,6 +2633,14 @@ class DefaultLayout extends Component {
                               attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                               children: [
                                 {
+                                  name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                  url: '/report/shipmentGlobalDemandView',
+                                  icon: 'fa fa-pie-chart',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_OVERVIEW_REPORT') && this.state.activeTab == 2) ? false : true)
+                                  }
+                                },
+                                {
                                   name: i18n.t('static.report.shipmentDetailReport'),
                                   url: '/report/shipmentSummery',
                                   icon: 'fa fa-truck',

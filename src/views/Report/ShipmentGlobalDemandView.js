@@ -267,7 +267,11 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourceTypeValues: [],
             fundingSourceTypeLabels: [],
             groupByFundingSourceType: false,
-            groupBy: 1
+            groupBy: 1,
+            procurementAgentValues: [],
+            procurementAgentLabels: [],
+            procurementAgents: [],
+            viewById: 1
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -275,6 +279,16 @@ class ShipmentGlobalDemandView extends Component {
         this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
         this.handleChange = this.handleChange.bind(this)
         this.getFundingSourceType = this.getFundingSourceType.bind(this);
+        this.setViewById = this.setViewById.bind(this);
+        this.setVersionId = this.setVersionId.bind(this);
+        this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
+    }
+    setViewById(e) {
+        this.setState({
+            viewById: e.target.value
+        }, () => {
+            this.fetchData()
+        })
     }
     /**
      * Exports the data to a CSV file.
@@ -513,150 +527,10 @@ class ShipmentGlobalDemandView extends Component {
      * Fetches data based on selected filters.
      */
     fetchData = () => {
-        if (localStorage.getItem("sessionType") === 'Online') {
-            let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
-            let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-            let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
-            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
-            let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
-            let realmId = AuthenticationService.getRealmId()
-            let useApprovedVersion = document.getElementById("includeApprovedVersions").value
-            // let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
-            let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
-            let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
-            let groupByProcurementAgentType = this.state.procurementAgentTypeId;
-            let groupByFundingSourceType = this.state.groupByFundingSourceType;
-            console.log("Hello",groupByProcurementAgentType, groupByFundingSourceType,)
-            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
-                this.setState({
-                    message: '', loading: true
-                })
-                var inputjson = {
-                    realmId: realmId,
-                    startDate: startDate,
-                    stopDate: endDate,
-                    realmCountryIds: CountryIds,
-                    programIds: programIds,
-                    planningUnitIds: planningUnitIds,
-                    fundingSourceIds: fundingSourceIds,
-                    shipmentStatusIds: shipmentStatusIds,
-                    useApprovedSupplyPlanOnly: useApprovedVersion,
-                    groupByProcurementAgentType: groupByProcurementAgentType,
-                    groupByFundingSourceType: groupByFundingSourceType
-                }
-                ReportService.shipmentOverview(inputjson)
-                    .then(response => {
-                        try {
-                            var table1Headers = [];
-                            table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
-                            this.setState({
-                                data: response.data,
-                                fundingSourceSplit: response.data.fundingSourceSplit,
-                                planningUnitSplit: response.data.planningUnitSplit,
-                                procurementAgentSplit: response.data.procurementAgentSplit,
-                                table1Headers: table1Headers,
-                                loading: false
-                            }, () => {
-                            })
-                        } catch (error) {
-                            this.setState({ loading: false })
-                        }
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 409:
-                                        this.setState({
-                                            message: i18n.t('static.common.accessDenied'),
-                                            loading: false,
-                                            color: "#BA0C2F",
-                                        });
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
-                            }
-                        }
-                    );
-            } else if (this.state.countryValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.program.validcountrytext'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            } else if (this.state.programValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.common.selectProgram'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            }
-            else if (this.state.planningUnitValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            } else if (this.state.fundingSourceValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.fundingSource.selectFundingSource'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            } else if (this.state.shipmentStatusValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.report.validShipmentStatusText'),
-                    data: [],
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: []
-                });
-            }
-        } else {
+        let versionId = this.state.programValues.length == 1 ? this.state.versionId.toString() : "0";
+        if (versionId.includes("Local")) {
             let versionId = document.getElementById("versionId").value;
-            let programId = document.getElementById("programId").value;
+            let programId = this.state.programValues[0].value;
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
@@ -824,7 +698,8 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
-                    table1Headers: []
+                    table1Headers: [],
+                    loading: false
                 });
             } else if (versionId == 0) {
                 this.setState({
@@ -833,7 +708,8 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
-                    table1Headers: []
+                    table1Headers: [],
+                    loading: false
                 });
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
@@ -842,7 +718,8 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
-                    table1Headers: []
+                    table1Headers: [],
+                    loading: false
                 });
             } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({
@@ -851,7 +728,8 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
-                    table1Headers: []
+                    table1Headers: [],
+                    loading: false
                 });
             } else if (this.state.shipmentStatusValues.length == 0) {
                 this.setState({
@@ -860,7 +738,168 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
-                    table1Headers: []
+                    table1Headers: [],
+                    loading: false
+                });
+            }
+        } else {
+            let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
+            let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
+            let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+            let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
+            let realmId = AuthenticationService.getRealmId()
+            let useApprovedVersion = 0
+            // let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
+            let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+            let programIds = this.state.programValues.map(ele => (ele.value).toString());
+            let groupByProcurementAgentType = this.state.procurementAgentTypeId;
+            let groupByFundingSourceType = 0;
+            let versionId = this.state.programValues.length == 1 ? this.state.versionId.toString() : "0";
+            console.log("Hello", groupByProcurementAgentType, groupByFundingSourceType,)
+            console.log("this.state.programValues.length == 1 && versionId == 0 Test@123", this.state.programValues.length == 1 && versionId == 0);
+            console.log("this.state.programValues.length == 1 Test@123", this.state.programValues.length);
+            console.log("versionId Test@123", versionId);
+            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0 && ((this.state.programValues.length == 1 && versionId != "") || this.state.programValues.length > 1)) {
+                this.setState({
+                    message: '', loading: true
+                })
+                var inputjson = {
+                    realmId: realmId,
+                    startDate: startDate,
+                    stopDate: endDate,
+                    realmCountryIds: CountryIds,
+                    programIds: programIds,
+                    planningUnitIds: planningUnitIds,
+                    fundingSourceIds: fundingSourceIds,
+                    shipmentStatusIds: shipmentStatusIds,
+                    useApprovedSupplyPlanOnly: useApprovedVersion,
+                    groupByProcurementAgentType: groupByProcurementAgentType,
+                    groupByFundingSourceType: groupByFundingSourceType
+                }
+                ReportService.shipmentOverview(inputjson)
+                    .then(response => {
+                        try {
+                            var table1Headers = [];
+                            table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
+                            this.setState({
+                                data: response.data,
+                                fundingSourceSplit: response.data.fundingSourceSplit,
+                                planningUnitSplit: response.data.planningUnitSplit,
+                                procurementAgentSplit: response.data.procurementAgentSplit,
+                                table1Headers: table1Headers,
+                                loading: false
+                            }, () => {
+                            })
+                        } catch (error) {
+                            this.setState({ loading: false })
+                        }
+                    }).catch(
+                        error => {
+                            if (error.message === "Network Error") {
+                                this.setState({
+                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                    loading: false
+                                });
+                            } else {
+                                switch (error.response ? error.response.status : "") {
+                                    case 401:
+                                        this.props.history.push(`/login/static.message.sessionExpired`)
+                                        break;
+                                    case 409:
+                                        this.setState({
+                                            message: i18n.t('static.common.accessDenied'),
+                                            loading: false,
+                                            color: "#BA0C2F",
+                                        });
+                                        break;
+                                    case 403:
+                                        this.props.history.push(`/accessDenied`)
+                                        break;
+                                    case 500:
+                                    case 404:
+                                    case 406:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    case 412:
+                                        this.setState({
+                                            message: error.response.data.messageCode,
+                                            loading: false
+                                        });
+                                        break;
+                                    default:
+                                        this.setState({
+                                            message: 'static.unkownError',
+                                            loading: false
+                                        });
+                                        break;
+                                }
+                            }
+                        }
+                    );
+            } else if (this.state.countryValues.length == 0) {
+                this.setState({
+                    message: i18n.t('static.program.validcountrytext'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: [],
+                    loading: false
+                });
+            } else if (this.state.programValues.length == 0) {
+                this.setState({
+                    message: i18n.t('static.common.selectProgram'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: [],
+                    loading: false
+                });
+            } else if (this.state.programValues.length == 1 && versionId == 0) {
+                this.setState(
+                    {
+                        message: i18n.t("static.program.validversion"),
+                        data: [],
+                        fundingSourceSplit: [],
+                        planningUnitSplit: [],
+                        procurementAgentSplit: [],
+                        table1Headers: [],
+                        loading: false
+                    });
+            } else if (this.state.planningUnitValues.length == 0) {
+                this.setState({
+                    message: i18n.t('static.procurementUnit.validPlanningUnitText'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: [],
+                    loading: false
+                });
+            } else if (this.state.fundingSourceValues.length == 0) {
+                this.setState({
+                    message: i18n.t('static.fundingSource.selectFundingSource'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: [],
+                    loading: false
+                });
+            } else if (this.state.shipmentStatusValues.length == 0) {
+                this.setState({
+                    message: i18n.t('static.report.validShipmentStatusText'),
+                    data: [],
+                    fundingSourceSplit: [],
+                    planningUnitSplit: [],
+                    procurementAgentSplit: [],
+                    table1Headers: [],
+                    loading: false
                 });
             }
         }
@@ -937,84 +976,114 @@ class ShipmentGlobalDemandView extends Component {
                 }
             },
         });
-        if (localStorage.getItem("sessionType") === 'Online') {
-            this.getCountrys();
-            // this.getFundingSourceType();
-            // this.getFundingSource();
-            this.getShipmentStatusList();
-        } else {
-            this.setState({ loading: false })
-            this.getPrograms();
-            // this.getFundingSourceType();
-            // this.getFundingSource();
-            this.getShipmentStatusList();
-        }
+        this.getCountrys();
+        this.getShipmentStatusList();
     }
     /**
      * Retrieves the list of countries based on the realm ID and updates the state with the list.
      */
     getCountrys = () => {
-        let realmId = AuthenticationService.getRealmId();
-        DropdownService.getRealmCountryDropdownList(realmId)
-            .then(response => {
-                var listArray = response.data;
-                listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    countrys: listArray
-                }, () => { this.fetchData(); })
-            }).catch(
-                error => {
+        this.setState({
+            loading: true
+        })
+        if (localStorage.getItem("sessionType") === 'Online') {
+            let realmId = AuthenticationService.getRealmId();
+            DropdownService.getRealmCountryDropdownList(realmId)
+                .then(response => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
                     this.setState({
-                        countrys: []
-                    })
-                    if (error.message === "Network Error") {
+                        countrys: listArray
+                    }, () => { this.fetchData(); })
+                }).catch(
+                    error => {
                         this.setState({
-                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                            loading: false
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 401:
-                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                break;
-                            case 409:
-                                this.setState({
-                                    message: i18n.t('static.common.accessDenied'),
-                                    loading: false,
-                                    color: "#BA0C2F",
-                                });
-                                break;
-                            case 403:
-                                this.props.history.push(`/accessDenied`)
-                                break;
-                            case 500:
-                            case 404:
-                            case 406:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                    loading: false
-                                });
-                                break;
-                            default:
-                                this.setState({
-                                    message: 'static.unkownError',
-                                    loading: false
-                                });
-                                break;
+                            countrys: []
+                        })
+                        if (error.message === "Network Error") {
+                            this.setState({
+                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                loading: false
+                            });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401:
+                                    this.props.history.push(`/login/static.message.sessionExpired`)
+                                    break;
+                                case 409:
+                                    this.setState({
+                                        message: i18n.t('static.common.accessDenied'),
+                                        loading: false,
+                                        color: "#BA0C2F",
+                                    });
+                                    break;
+                                case 403:
+                                    this.props.history.push(`/accessDenied`)
+                                    break;
+                                case 500:
+                                case 404:
+                                case 406:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                case 412:
+                                    this.setState({
+                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                                        loading: false
+                                    });
+                                    break;
+                                default:
+                                    this.setState({
+                                        message: 'static.unkownError',
+                                        loading: false
+                                    });
+                                    break;
+                            }
                         }
                     }
-                }
-            );
+                );
+        } else {
+            var db1;
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db1 = e.target.result;
+                var transaction = db1.transaction(['country'], 'readwrite');
+                var Country = transaction.objectStore('country');
+                var getRequest = Country.getAll();
+                var proList = []
+                getRequest.onerror = function (event) {
+                };
+                getRequest.onsuccess = function (event) {
+                    var myResult = [];
+                    myResult = getRequest.result;
+                    for (var i = 0; i < myResult.length; i++) {
+                        var CountryJson = {
+                            label: myResult[i].label,
+                            id: myResult[i].countryId
+                        }
+                        proList.push(CountryJson)
+                    }
+                    proList.sort((a, b) => {
+                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState({
+                        countrys: proList,
+                        loading: false
+                    }, () => {
+                        this.fetchData();
+                    })
+                }.bind(this);
+            }.bind(this)
+        }
     }
     /**
      * Handles the change event for countries.
@@ -1036,9 +1105,13 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitSplit: [],
             procurementAgentSplit: [],
             table1Headers: [],
-            programLst: []
+            programLst: [],
+            versionId: "",
+            procurementAgentValues: [],
+            procurementAgentLabels: []
         }, () => {
             this.getPrograms();
+            this.fetchData();
         })
     }
     /**
@@ -1051,13 +1124,141 @@ class ShipmentGlobalDemandView extends Component {
         })
         this.setState({
             programValues: programIds.map(ele => ele),
-            programLabels: programIds.map(ele => ele.label)
+            programLabels: programIds.map(ele => ele.label),
+            versionId: "",
+            procurementAgentValues: [],
+            procurementAgentLabels: []
         }, () => {
+            this.filterVersion();
             this.getFundingSource();
             this.fetchData();
             this.getPlanningUnit();
+            this.getProcurementAgentList();
         })
     }
+    /**
+   * Retrieves the list of procurement agents.
+   */
+    getProcurementAgentList() {
+        this.setState({
+            loading: true
+        })
+        if (localStorage.getItem("sessionType") === 'Online') {
+            var programIds = this.state.programValues.map(ele => ele.value);
+            DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programIds)
+                .then((response) => {
+                    var listArray = response.data;
+                    listArray.sort((a, b) => {
+                        var itemLabelA = a.code.toUpperCase();
+                        var itemLabelB = b.code.toUpperCase();
+                        return itemLabelA > itemLabelB ? 1 : -1;
+                    });
+                    this.setState(
+                        {
+                            procurementAgents: listArray,
+                            loading: false,
+                            procurementAgentValues: listArray.map(c => { return { value: c.id, label: c.code } }),
+                            procurementAgentLabels: listArray.map(c => c.code),
+                            budgetValues: [],
+                            budgetLabels: [],
+                            filteredBudgetList: [],
+                        },
+                        () => {
+                        }
+                    );
+                })
+                .catch((error) => {
+                    this.setState({
+                        procurementAgents: [],
+                    });
+                    if (error.message === "Network Error") {
+                        this.setState({
+                            message: API_URL.includes("uat")
+                                ? i18n.t("static.common.uatNetworkErrorMessage")
+                                : API_URL.includes("demo")
+                                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                        });
+                    } else {
+                        switch (error.response ? error.response.status : "") {
+                            case 500:
+                            case 401:
+                            case 404:
+                            case 406:
+                            case 412:
+                                this.setState({
+                                    message: i18n.t(error.response.data.messageCode, {
+                                        entityname: i18n.t("static.fundingsource.fundingsource"),
+                                    }),
+                                });
+                                break;
+                            default:
+                                this.setState({ message: "static.unkownError" });
+                                break;
+                        }
+                    }
+                });
+        } else {
+            var db3;
+            var paResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var paTransaction = db3.transaction(
+                    ["procurementAgent"],
+                    "readwrite"
+                );
+                var paOs = paTransaction.objectStore("procurementAgent");
+                var paRequest = paOs.getAll();
+                paRequest.onerror = function (event) {
+                }.bind(this);
+                paRequest.onsuccess = function (event) {
+                    paResult = paRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
+                    var pa = [];
+                    for (var i = 0; i < paResult.length; i++) {
+                        var arr = {
+                            id: paResult[i].procurementAgentId,
+                            code: paResult[i].procurementAgentCode,
+                            label: paResult[i].label,
+                        };
+                        pa.push(arr);
+                    }
+                    this.setState(
+                        {
+                            procurementAgents: pa.sort(function (a, b) {
+                                a = a.code.toLowerCase();
+                                b = b.code.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            procurementAgentValues: pa.map(c => { return { value: c.id, label: c.code } }),
+                            procurementAgentLabels: pa.map(c => c.code),
+                            filteredBudgetList: [],
+                            budgetValues: [],
+                            budgetLabels: []
+                        },
+                        () => {
+                        }
+                    );
+                }.bind(this);
+            }.bind(this);
+        }
+    }
+    /**
+     * Handles the change event for procurement agents.
+     * @param {Array} procurementAgentIds - An array containing the selected funding source IDs.
+     */
+    handleProcurementAgentChange = (procurementAgentIds) => {
+        this.setState(
+            {
+                procurementAgentValuesValues: procurementAgentIds.map((ele) => ele),
+                procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
+            },
+            () => {
+                this.fetchData();
+            }
+        );
+    };
     /**
      * Retrieves the list of shipment statuses.
      */
@@ -1329,6 +1530,9 @@ class ShipmentGlobalDemandView extends Component {
      * Retrieves the list of funding sources.
      */
     getFundingSource = () => {
+        this.setState({
+            loading: true
+        })
         if (localStorage.getItem("sessionType") === 'Online') {
             let programIds = this.state.programValues.map((ele) =>
                 Number(ele.value)
@@ -1337,14 +1541,14 @@ class ShipmentGlobalDemandView extends Component {
                 .then(response => {
                     this.setState({
                         fundingSources: response.data, loading: false,
-                        fundingSourceValues: [],
-                        fundingSourceLabels: []
-                    }, () => { this.consolidatedFundingSourceList() })
+                        fundingSourceValues: response.data.map(c => { return { value: c.id, label: c.code } }),
+                        fundingSourceLabels: response.data.map(c => c.code),
+                    }, () => { })
                 }).catch(
                     error => {
                         this.setState({
                             fundingSources: []
-                        }, () => { this.consolidatedFundingSourceList() })
+                        }, () => { })
                         if (error.message === "Network Error") {
                             this.setState({
                                 message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
@@ -1390,57 +1594,56 @@ class ShipmentGlobalDemandView extends Component {
                     }
                 );
         } else {
-            this.consolidatedFundingSourceList()
+            var db3;
+            var fSourceResult = [];
+            getDatabase();
+            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            openRequest.onsuccess = function (e) {
+                db3 = e.target.result;
+                var fSourceTransaction = db3.transaction(
+                    ["fundingSource"],
+                    "readwrite"
+                );
+                var fSourceOs = fSourceTransaction.objectStore("fundingSource");
+                var fSourceRequest = fSourceOs.getAll();
+                fSourceRequest.onerror = function (event) {
+                }.bind(this);
+                fSourceRequest.onsuccess = function (event) {
+                    fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
+                    var fundingSource = [];
+                    for (var i = 0; i < fSourceResult.length; i++) {
+                        var arr = {
+                            id: fSourceResult[i].fundingSourceId,
+                            code: fSourceResult[i].fundingSourceCode,
+                            label: fSourceResult[i].label,
+                            fundingSourceType: fSourceRequest.result[i].fundingSourceType
+                        };
+                        fundingSource.push(arr);
+                    }
+                    this.setState(
+                        {
+                            fundingSources: fundingSource.sort(function (a, b) {
+                                a = a.code.toLowerCase();
+                                b = b.code.toLowerCase();
+                                return a < b ? -1 : a > b ? 1 : 0;
+                            }),
+                            fundingSourceValues: fundingSource.map(c => { return { value: c.id, label: c.code } }),
+                            fundingSourceLabels: fundingSource.map(c => c.code),
+                        },
+                        () => {
+                        }
+                    );
+                }.bind(this);
+            }.bind(this);
         }
-    }
-    /**
-     * Consolidates the list of funding source obtained from Server and local programs.
-     */
-    consolidatedFundingSourceList = () => {
-        // const { fundingSources } = this.state
-        // var proList = fundingSources;
-        // var db1;
-        // getDatabase();
-        // var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        // openRequest.onsuccess = function (e) {
-        //     db1 = e.target.result;
-        //     var transaction = db1.transaction(['fundingSource'], 'readwrite');
-        //     var fundingSource = transaction.objectStore('fundingSource');
-        //     var getRequest = fundingSource.getAll();
-        //     getRequest.onerror = function (event) {
-        //     };
-        //     getRequest.onsuccess = function (event) {
-        //         var myResult = [];
-        //         myResult = getRequest.result;
-        //         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-        //         var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        //         for (var i = 0; i < myResult.length; i++) {
-        //             var f = 0
-        //             for (var k = 0; k < this.state.fundingSources.length; k++) {
-        //                 if (this.state.fundingSources[k].fundingSourceId == myResult[i].fundingSourceId) {
-        //                     f = 1;
-        //                 }
-        //             }
-        //             var programData = myResult[i];
-        //             if (f == 0) {
-        //                 proList.push(programData)
-        //             }
-        //         }
-        //         proList.sort((a, b) => {
-        //             var itemLabelA = a.fundingSourceCode.toUpperCase();
-        //             var itemLabelB = b.fundingSourceCode.toUpperCase();
-        //             return itemLabelA > itemLabelB ? 1 : -1;
-        //         });
-        //         this.setState({
-        //             fundingSources: proList
-        //         })
-        //     }.bind(this);
-        // }.bind(this);
     }
     /**
      * Retrieves the list of programs.
      */
     getPrograms = () => {
+        this.setState({
+            loading: true
+        })
         if (localStorage.getItem("sessionType") === 'Online') {
             let countryIds = this.state.countryValues.map((ele) => ele.value);
             let newCountryList = [...new Set(countryIds)];
@@ -1507,85 +1710,175 @@ class ShipmentGlobalDemandView extends Component {
                     );
             }
         } else {
-            this.consolidatedProgramList()
+            let countryIds = this.state.countryValues.map((ele) => ele.value);
+            let newCountryList = [...new Set(countryIds)];
+            if (newCountryList.length > 0) {
+                var db1;
+                getDatabase();
+                var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+                openRequest.onsuccess = function (e) {
+                    db1 = e.target.result;
+                    var transaction = db1.transaction(['programData'], 'readwrite');
+                    var Country = transaction.objectStore('programData');
+                    var getRequest = Country.getAll();
+                    var proList = []
+                    getRequest.onerror = function (event) {
+                    };
+                    getRequest.onsuccess = function (event) {
+                        var myResult = [];
+                        myResult = getRequest.result;
+                        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        for (var i = 0; i < myResult.length; i++) {
+                            if (myResult[i].userId == userId) {
+                                var generalProgramDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
+                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
+                                var generalProgramJson = JSON.parse(generalProgramData);
+                                if (generalProgramJson.realmCountry.country.countryId == this.state.countryValues[0].value) {
+                                    var json = {
+                                        code: myResult[i].programCode,
+                                        id: myResult[i].id.split("_")[0]
+                                    }
+                                    proList.push(json)
+                                }
+                            }
+                        }
+                        proList.sort((a, b) => {
+                            var itemLabelA = a.code;
+                            var itemLabelB = b.code;
+                            return itemLabelA > itemLabelB ? 1 : -1;
+                        });
+                        this.setState({
+                            programLst: proList,
+                            loading: false
+                        }, () => {
+                            this.fetchData()
+                        })
+                    }.bind(this);
+                }.bind(this)
+            }
         }
     }
-    /**
-     * Consolidates the list of program obtained from Server and local programs.
-     */
-    consolidatedProgramList = () => {
-        const { programLst } = this.state
-        var proList = programLst;
-        var db1;
-        getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onsuccess = function (e) {
-            db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-            };
-            getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-                var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId) {
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8))
-                        proList.push(programData)
-                    }
-                }
-                proList.sort((a, b) => {
-                    var itemLabelA = a.programCode.toUpperCase();
-                    var itemLabelB = b.programCode.toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                });
-                this.setState({
-                    programLst: proList
-                })
-            }.bind(this);
-        }.bind(this);
-    }
-    /**
-     * Filters versions based on the selected program ID and updates the state accordingly.
-     * Sets the selected program ID in local storage.
-     * Fetches version list for the selected program and updates the state with the fetched versions.
-     * Handles error cases including network errors, session expiry, access denial, and other status codes.
-     */
     filterVersion = () => {
-        let programId = document.getElementById("programId").value;
-        if (programId != 0) {
-            const program = this.state.programLst.filter(c => c.id == programId)
+        this.setState({
+            loading: true
+        })
+        let programId = this.state.programValues;
+        if (programId.length == 1) {
+            programId = programId[0].value
+            const program = this.state.programLst.filter(
+                (c) => c.id == programId
+            );
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    this.setState({
-                        versions: []
-                    }, () => {
-                        this.setState({
-                            versions: program[0].versionList.filter(function (x, i, a) {
-                                return a.indexOf(x) === i;
-                            })
-                        }, () => { this.consolidatedVersionList(programId) });
-                    });
+                    this.setState(
+                        {
+                            versions: [],
+                        },
+                        () => {
+                            DropdownService.getVersionListForSPProgram(
+                                programId
+                            )
+                                .then((response) => {
+                                    this.setState(
+                                        {
+                                            versions: [],
+                                        },
+                                        () => {
+                                            this.setState(
+                                                {
+                                                    versions: response.data.sort((a, b) => a.versionId - b.versionId),
+                                                },
+                                                () => {
+                                                    this.consolidatedVersionList(programId);
+                                                }
+                                            );
+                                        }
+                                    );
+                                })
+                                .catch((error) => {
+                                    this.setState({
+                                        programs: [],
+                                        loading: false,
+                                    });
+                                    if (error.message === "Network Error") {
+                                        this.setState({
+                                            message: API_URL.includes("uat")
+                                                ? i18n.t("static.common.uatNetworkErrorMessage")
+                                                : API_URL.includes("demo")
+                                                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                                                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                                            loading: false,
+                                        });
+                                    } else {
+                                        switch (error.response ? error.response.status : "") {
+                                            case 401:
+                                                this.props.history.push(
+                                                    `/login/static.message.sessionExpired`
+                                                );
+                                                break;
+                                            case 409:
+                                                this.setState({
+                                                    message: i18n.t('static.common.accessDenied'),
+                                                    loading: false,
+                                                    color: "#BA0C2F",
+                                                });
+                                                break;
+                                            case 403:
+                                                this.props.history.push(`/accessDenied`);
+                                                break;
+                                            case 500:
+                                            case 404:
+                                            case 406:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, {
+                                                        entityname: i18n.t("static.dashboard.program"),
+                                                    }),
+                                                    loading: false,
+                                                });
+                                                break;
+                                            case 412:
+                                                this.setState({
+                                                    message: i18n.t(error.response.data.messageCode, {
+                                                        entityname: i18n.t("static.dashboard.program"),
+                                                    }),
+                                                    loading: false,
+                                                });
+                                                break;
+                                            default:
+                                                this.setState({
+                                                    message: "static.unkownError",
+                                                    loading: false,
+                                                });
+                                                break;
+                                        }
+                                    }
+                                });
+                        }
+                    );
                 } else {
-                    this.setState({
-                        versions: []
-                    }, () => { this.consolidatedVersionList(programId) })
+                    this.setState(
+                        {
+                            versions: [],
+                        },
+                        () => {
+                            this.consolidatedVersionList(programId);
+                        }
+                    );
                 }
             } else {
                 this.setState({
-                    versions: []
-                })
+                    versions: [],
+                });
             }
         } else {
             this.setState({
-                versions: []
-            })
+                versions: [],
+            }, () => {
+                this.getPlanningUnit();
+            });
         }
-    }
+    };
     /**
      * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
      * Filters out duplicate versions and reverses the list.
@@ -1594,52 +1887,108 @@ class ShipmentGlobalDemandView extends Component {
      * @param {number} programId - The ID of the selected program
      */
     consolidatedVersionList = (programId) => {
-        const { versions } = this.state
+        this.setState({
+            loading: true
+        })
+        const { versions } = this.state;
         var verList = versions;
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(['programData'], 'readwrite');
-            var program = transaction.objectStore('programData');
+            var transaction = db1.transaction(["programData"], "readwrite");
+            var program = transaction.objectStore("programData");
             var getRequest = program.getAll();
             getRequest.onerror = function (event) {
             };
             getRequest.onsuccess = function (event) {
                 var myResult = [];
                 myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+                var userBytes = CryptoJS.AES.decrypt(
+                    localStorage.getItem("curUser"),
+                    SECRET_KEY
+                );
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
-                        var bytes = CryptoJS.AES.decrypt(myResult[i].programName, SECRET_KEY);
+                    if (
+                        myResult[i].userId == userId &&
+                        myResult[i].programId == programId
+                    ) {
+                        var bytes = CryptoJS.AES.decrypt(
+                            myResult[i].programName,
+                            SECRET_KEY
+                        );
                         var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData, SECRET_KEY);
-                        var programData = databytes.toString(CryptoJS.enc.Utf8)
-                        var version = JSON.parse(programData).currentVersion
-                        version.versionId = `${version.versionId} (Local)`
-                        verList.push(version)
+                        var databytes = CryptoJS.AES.decrypt(
+                            myResult[i].programData.generalData,
+                            SECRET_KEY
+                        );
+                        var programData = databytes.toString(CryptoJS.enc.Utf8);
+                        var version = JSON.parse(programData).currentVersion;
+                        version.versionId = `${version.versionId} (Local)`;
+                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
+                        verList.push(version);
                     }
                 }
-                this.setState({
-                    versions: verList.filter(function (x, i, a) {
-                        return a.indexOf(x) === i;
-                    })
-                })
+                let versionList = verList.filter(function (x, i, a) {
+                    return a.indexOf(x) === i;
+                });
+                versionList.reverse();
+                if (
+                    localStorage.getItem("sesVersionIdReport") != "" &&
+                    localStorage.getItem("sesVersionIdReport") != undefined
+                ) {
+                    let versionVar = versionList.filter(
+                        (c) => c.versionId == localStorage.getItem("sesVersionIdReport")
+                    );
+                    if (versionVar != "" && versionVar != undefined) {
+                        this.setState(
+                            {
+                                versions: versionList,
+                                versionId: localStorage.getItem("sesVersionIdReport"),
+                            },
+                            () => {
+                                this.getPlanningUnit();
+                            }
+                        );
+                    } else {
+                        this.setState(
+                            {
+                                versions: versionList,
+                                versionId: versionList[0].versionId,
+                            },
+                            () => {
+                                this.getPlanningUnit();
+                            }
+                        );
+                    }
+                } else {
+                    this.setState(
+                        {
+                            versions: versionList,
+                            versionId: versionList[0].versionId,
+                        },
+                        () => {
+                            this.getPlanningUnit();
+                        }
+                    );
+                }
             }.bind(this);
         }.bind(this);
-    }
+    };
     /**
      * Retrieves the list of planning units for a selected program.
      */
     getPlanningUnit = () => {
         this.setState({
             planningUnits: [],
-            planningUnitValues: []
+            planningUnitValues: [],
+            loading: true
         }, () => {
-            if (!localStorage.getItem("sessionType") === 'Online') {
-
+            console.log("Test@123",localStorage.getItem("sessionType") === 'Online');
+            if (!(localStorage.getItem("sessionType") === 'Online')) {
+                console.log("In if Test@123")
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -1654,11 +2003,11 @@ class ShipmentGlobalDemandView extends Component {
                     planningunitRequest.onsuccess = function (e) {
                         var myResult = [];
                         myResult = planningunitRequest.result;
-                        var programId = (document.getElementById("programId").value).split("_")[0];
+                        var programId = this.state.programValues[0].value;
                         var proList = []
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                proList[i] = myResult[i]
+                                proList[i] = myResult[i].planningUnit
                             }
                         }
                         this.setState({
@@ -1670,6 +2019,7 @@ class ShipmentGlobalDemandView extends Component {
                 }.bind(this)
             }
             else {
+                console.log("In else Test@123")
                 let programValues = this.state.programValues.map(c => c.value);
                 this.setState({
                     planningUnits: [],
@@ -1859,6 +2209,23 @@ class ShipmentGlobalDemandView extends Component {
         }, () => {
             this.fetchData();
         })
+    }
+
+    setVersionId(event) {
+        var versionLabel = document.getElementById("versionId").selectedOptions[0].text.toString()
+        this.setState(
+            {
+                versionLabel: versionLabel,
+                versionId: event.target.value,
+            },
+            () => {
+                if (this.state.versionId != "" && this.state.versionId != 0) {
+                    localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                    this.getPlanningUnit();
+                    this.fetchData();
+                }
+            }
+        );
     }
 
     /**
@@ -2069,6 +2436,14 @@ class ShipmentGlobalDemandView extends Component {
                     { label: item.code, value: item.id }
                 )
             }, this);
+        const { procurementAgents } = this.state;
+        let procurementAgentListDD = procurementAgents.length > 0 &&
+            procurementAgents.map((item, i) => {
+                return {
+                    label: item.code,
+                    value: item.id,
+                };
+            }, this);
         const { shipmentStatuses } = this.state;
         let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
             return (
@@ -2084,28 +2459,28 @@ class ShipmentGlobalDemandView extends Component {
                     </option>
                 )
             }, this);
-            const darkModeColors1 = [
-                '#A7C6ED',
-                '#BA0C2F',
-            ];
-    
-            const lightModeColors1 = [
-                '#002F6C',  // Color 1 
-                '#BA0C2F',
-            ];
-            const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
+        const darkModeColors1 = [
+            '#A7C6ED',
+            '#BA0C2F',
+        ];
+
+        const lightModeColors1 = [
+            '#002F6C',  // Color 1 
+            '#BA0C2F',
+        ];
+        const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
         const chartData = {
             labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
             datasets: [{
                 label: i18n.t('static.shipment.orderedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.orderedShipmentQty,1))),
+                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.orderedShipmentQty, 1))),
                 // backgroundColor: '#0067B9',
                 backgroundColor: backgroundColor1[0],
                 borderWidth: 0
             },
             {
                 label: i18n.t('static.shipment.plannedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.plannedShipmentQty,1))),
+                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.plannedShipmentQty, 1))),
                 // backgroundColor: '#A7C6ED',
                 backgroundColor: backgroundColor1[1],
                 borderWidth: 0,
@@ -2121,7 +2496,7 @@ class ShipmentGlobalDemandView extends Component {
             '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
             '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
-        
+
         const lightModeColors = [
             '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
             '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
@@ -2132,7 +2507,7 @@ class ShipmentGlobalDemandView extends Component {
             '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-        
+
         const chartDataForPie = {
             labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
             datasets: [{
@@ -2147,8 +2522,8 @@ class ShipmentGlobalDemandView extends Component {
                 //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
                 //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
                 // ],
-                
-        
+
+
                 legend: {
                     position: 'bottom',
                     fontColor: fontColor,
@@ -2283,33 +2658,7 @@ class ShipmentGlobalDemandView extends Component {
                                                 />
                                             </div>
                                         </FormGroup>
-                                        {checkOnline === 'Offline' &&
-                                            <FormGroup className="col-md-3">
-                                                <Label htmlFor="appendedInputButton">{i18n.t('static.program.program')}</Label>
-                                                <div className="controls ">
-                                                    <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="programId"
-                                                            id="programId"
-                                                            bsSize="sm"
-                                                            onChange={this.filterVersion}
-                                                        >
-                                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                                            {programLst.length > 0
-                                                                && programLst.map((item, i) => {
-                                                                    return (
-                                                                        <option key={i} value={item.programId}>
-                                                                            {getLabelText(item.label, this.state.lang)}
-                                                                        </option>
-                                                                    )
-                                                                }, this)}
-                                                        </Input>
-                                                    </InputGroup>
-                                                </div>
-                                            </FormGroup>
-                                        }
-                                        {checkOnline === 'Offline' &&
+                                        {this.state.programValues.length == 1 &&
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
                                                 <div className="controls ">
@@ -2319,7 +2668,8 @@ class ShipmentGlobalDemandView extends Component {
                                                             name="versionId"
                                                             id="versionId"
                                                             bsSize="sm"
-                                                            onChange={(e) => { this.getPlanningUnit(); }}
+                                                            value={this.state.versionId}
+                                                            onChange={(e) => { this.setVersionId(e); }}
                                                         >
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {versionList}
@@ -2348,28 +2698,30 @@ class ShipmentGlobalDemandView extends Component {
                                                 />
                                             </div>
                                         </FormGroup>
-                                        {/* <FormGroup id="fundingSourceTypeDiv" className="col-md-3" style={{ zIndex: "1" }} >
-                                            <Label htmlFor="fundingSourceTypeId">{i18n.t('static.funderTypeHead.funderType')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls">
-                                                <MultiSelect
-                                                    name="fundingSourceTypeId"
-                                                    id="fundingSourceTypeId"
-                                                    bsSize="md"
-                                                    // filterOptions={this.filterOptions}
-                                                    value={this.state.fundingSourceTypeValues}
-                                                    onChange={(e) => { this.handleFundingSourceTypeChange(e) }}
-                                                    options={fundingSourceTypes.length > 0
-                                                        && fundingSourceTypes.map((item, i) => {
-                                                            return (
-                                                                { label: item.fundingSourceTypeCode, value: item.fundingSourceTypeId }
-                                                            )
-                                                        }, this)}
-                                                    disabled={this.state.loading}
-                                                />
+                                        <FormGroup className="col-md-3">
+                                            <Label htmlFor="appendedInputButton">
+                                                {i18n.t("static.common.display")}
+                                            </Label>
+                                            <div className="controls ">
+                                                <InputGroup>
+                                                    <Input
+                                                        type="select"
+                                                        name="viewById"
+                                                        id="viewById"
+                                                        bsSize="sm"
+                                                        onChange={(e) => { this.setViewById(e) }}
+                                                    >
+                                                        <option value="1">
+                                                            {i18n.t("static.fundingSourceHead.fundingSource")}
+                                                        </option>
+                                                        <option value="2">
+                                                            {i18n.t("static.report.procurementAgentName")}
+                                                        </option>
+                                                    </Input>
+                                                </InputGroup>
                                             </div>
-                                        </FormGroup> */}
-                                        <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                        </FormGroup>
+                                        {this.state.viewById == 1 && <FormGroup className="col-md-3" id="fundingSourceDiv">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                                             <div className="controls ">
@@ -2388,7 +2740,35 @@ class ShipmentGlobalDemandView extends Component {
                                                     filterOptions={filterOptions}
                                                 />
                                             </div>
-                                        </FormGroup>
+                                        </FormGroup>}
+                                        {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
+                                            <Label htmlFor="appendedInputButton">
+                                                {i18n.t("static.report.procurementAgentName")}
+                                            </Label>
+                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect
+                                                    name="procurementAgentId"
+                                                    id="procurementAgentId"
+                                                    bsSize="md"
+                                                    value={this.state.procurementAgentValues}
+                                                    filterOptions={filterOptions}
+                                                    onChange={(e) => {
+                                                        this.handleProcurementAgentChange(e);
+                                                    }}
+                                                    options={
+                                                        procurementAgentListDD && procurementAgentListDD.length > 0
+                                                            ? procurementAgentListDD
+                                                            : []
+                                                    }
+                                                    disabled={this.state.loading}
+                                                    overrideStrings={{
+                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                        selectSomeItems: i18n.t('static.common.select')
+                                                    }}
+                                                />
+                                            </div>
+                                        </FormGroup>}
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
@@ -2407,42 +2787,6 @@ class ShipmentGlobalDemandView extends Component {
                                                     }}
                                                     filterOptions={filterOptions}
                                                 />
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.includeapproved')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="includeApprovedVersions"
-                                                        id="includeApprovedVersions"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.fetchData() }}
-                                                    >
-                                                        <option value="true">{i18n.t('static.program.yes')}</option>
-                                                        <option value="false">{i18n.t('static.program.no')}</option>
-                                                    </Input>
-                                                </InputGroup>
-                                            </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="groupBy">{i18n.t('static.shipment.groupBy')}</Label>
-                                            <div className="controls ">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="groupByPA"
-                                                        id="groupByPA"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.setGroupByValues(e); }}
-                                                    >
-                                                        <option value="0">{i18n.t('static.fundingSourceHead.fundingSource')} - {i18n.t('static.report.procurementAgentName')}</option>
-                                                        <option value="1">{i18n.t('static.fundingSourceHead.fundingSource')} - {i18n.t('static.dashboard.procurementagentType')}</option>
-                                                        <option value="2">{i18n.t('static.funderTypeHead.funderType')} - {i18n.t('static.report.procurementAgentName')}</option>
-                                                        <option value="3">{i18n.t('static.funderTypeHead.funderType')} - {i18n.t('static.dashboard.procurementagentType')}</option>
-                                                    </Input>
-                                                </InputGroup>
                                             </div>
                                         </FormGroup>
                                     </div>
