@@ -224,7 +224,8 @@ class ShipmentSummery extends Component {
       programLst: [],
       versionId: [],
       planningUnitList: [],
-      planningUnitListAll: []
+      planningUnitListAll: [],
+      noData:false
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -2218,6 +2219,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
             message: i18n.t("static.program.validversion"),
             data: [],
             shipmentDetailsList: [],
+            noData:false,
             shipmentDetailsFundingSourceList: [],
             shipmentDetailsMonthList: [],
           });
@@ -2915,6 +2917,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                         this.setState(
                           {
                             shipmentDetailsList: data,
+                            noData: data.length > 0 ? false : true,
                             shipmentDetailsFundingSourceList:
                               shipmentDetailsFundingSourceList,
                             shipmentDetailsMonthList: shipmentDetailsMonthList,
@@ -2957,6 +2960,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                 shipmentDetailsFundingSourceList:
                   response.data.shipmentDetailsFundingSourceList,
                 shipmentDetailsList: response.data.shipmentDetailsList,
+                noData: response.data.shipmentDetailsList.length > 0 ? false : true,
                 shipmentDetailsMonthList:
                   response.data.shipmentDetailsMonthList,
                 viewById: reportView,
@@ -3031,7 +3035,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
-          loading: false
+          loading: false,
+          noData:false
         },
         () => {
           this.el = jexcel(
@@ -3053,7 +3058,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
-          loading: false
+          loading: false,
+          noData:false
         },
         () => {
           this.el = jexcel(
@@ -3074,7 +3080,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
-          loading: false
+          loading: false,
+          noData:false
         },
         () => {
           this.el = jexcel(
@@ -3095,7 +3102,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsList: [],
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
-          loading: false
+          loading: false,
+          noData:false
         },
         () => {
           this.el = jexcel(
@@ -3901,6 +3909,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                           }
                         ></div>
                       </div>
+                      {this.state.noData && <h5 className="red">{i18n.t("static.shipmentDetails.noData")}</h5>}
                     </div>
                   </Col>
                 </div>

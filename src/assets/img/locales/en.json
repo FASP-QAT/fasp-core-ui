@@ -3658,5 +3658,6 @@
   "static.shipmentDetails.costUSDPA":"Total cost per Procurement Agent across all programs and PUs selected",
   "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost",
   "static.shipment.noData" : "There is no available shipment data for this planning unit during the selected report period",
-  "static.problemList.critical":"Critical"
+  "static.problemList.critical":"Critical",
+  "static.shipmentDetails.noData":"There is no available shipment data for the planning unit(s) during the selected report period"
 }
