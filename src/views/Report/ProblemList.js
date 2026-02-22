@@ -442,7 +442,7 @@ export default class ProblemList extends React.Component {
                             }
                             programJson.problemReportList = problemReportListForUpdate;
                             programJson.currentVersionNotes = this.state.currentVersionNotes;
-                            programJson.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                            programJson.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                             var openCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 1)).length;
                             var addressedCount = (problemReportListForUpdate.filter(c => c.problemStatus.id == 3)).length;
                             programQPLDetails.openCount = openCount;
@@ -506,7 +506,7 @@ export default class ProblemList extends React.Component {
      */
     buildJExcel() {
         let problemList = this.state.data;
-        console.log("Problem List Test@123",problemList);
+        console.log("Problem List Test@123", problemList);
         problemList = problemList.filter(c => c.planningUnitActive != false && c.regionActive != false);
         this.setState({ problemList: problemList });
         let problemArray = [];
@@ -668,7 +668,7 @@ export default class ProblemList extends React.Component {
             allowDeleteRow: false,
             onselection: this.selected,
             filters: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
             onchange: this.rowChanged,
             copyCompatibility: true,
             allowExport: false,
@@ -913,27 +913,18 @@ export default class ProblemList extends React.Component {
             var colArr = ['U']
             var rowData = elInstance.getRowData(j);
             var criticalityId = rowData[16];
-            if (criticalityId == 3) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', '#f48282');
-                    let textColor = contrast('#f48282');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
+            if (criticalityId == 4) {
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('criticalCriticality');
+            }else if (criticalityId == 3) {
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('highCriticality');
             } else if (criticalityId == 2) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'orange');
-                    let textColor = contrast('orange');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('mediumCriticality');
             } else if (criticalityId == 1) {
-                for (var i = 0; i < colArr.length; i++) {
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'transparent');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'background-color', 'yellow');
-                    let textColor = contrast('yellow');
-                    elInstance.setStyle(`${colArr[i]}${parseInt(j) + 1}`, 'color', textColor);
-                }
+                var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                cell.classList.add('lowCriticality');
             }
         }
     }
@@ -1015,9 +1006,15 @@ export default class ProblemList extends React.Component {
                         this.setState({ loading: false });
                     };
                     programRequest.onsuccess = function (event) {
+
+                        var problemTransaction = db1.transaction(['problem'], 'readwrite');
+                    var problemOS = problemTransaction.objectStore('problem');
+                    var problemRequest = problemOS.getAll();
+                    problemRequest.onsuccess = function (event) {
                         this.setState({ loading: true },
                             () => {
                             })
+                            var problemList=problemRequest.result;
                         var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData.generalData, SECRET_KEY);
                         var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
                         var programJson = JSON.parse(programData);
@@ -1040,6 +1037,9 @@ export default class ProblemList extends React.Component {
                         if (reviewedCheck != -1) {
                             problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
                         }
+                        problemReportFilterList.map(item=>{
+                            item.realmProblem=problemList.filter(c=>c.realmProblemId==item.realmProblem.realmProblemId)[0]
+                        })
                         this.setState({
                             data: problemReportFilterList,
                             message: '',
@@ -1050,6 +1050,7 @@ export default class ProblemList extends React.Component {
                             });
                     }.bind(this)
                 }.bind(this)
+            }.bind(this)
             }
             else if (programId == 0) {
                 this.setState({ message: i18n.t('static.common.selectProgram'), data: [], loading: false },
@@ -1268,7 +1269,7 @@ export default class ProblemList extends React.Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             position: "top",
             filters: true,
-            license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
             contextMenu: function (obj, x, y, e) {
                 return false;
             }.bind(this),
@@ -1448,8 +1449,10 @@ export default class ProblemList extends React.Component {
                                             options={problemStatus && problemStatus.length > 0 ? problemStatus : []}
                                             labelledBy={i18n.t('static.common.select')}
                                             filterOptions={filterOptions}
-                                            overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                            selectSomeItems: i18n.t('static.common.select')}}
+                                            overrideStrings={{
+                                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                selectSomeItems: i18n.t('static.common.select')
+                                            }}
                                         />
                                     </div>
                                 </FormGroup>
@@ -1507,9 +1510,10 @@ export default class ProblemList extends React.Component {
                         </Col>
                         <FormGroup className="col-md-6 mt-5 pl-0" >
                             <ul className="legendcommitversion list-group">
-                                <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
-                                <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
-                                <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
+                            <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.critical')}</span></li>
+                                <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
+                                <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
+                                <li><span className="problemList-blue legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                             </ul>
                         </FormGroup>
                         <div className="" >
