@@ -273,7 +273,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
-      procurementAgentValuesValues: [],
+      procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
       this.filterProgram();
@@ -548,7 +548,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
-      procurementAgentValuesValues: [],
+      procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
       this.filterVersion();
@@ -1848,7 +1848,7 @@ class ShipmentSummery extends Component {
   handleProcurementAgentChange = (procurementAgentIds) => {
     this.setState(
       {
-        procurementAgentValuesValues: procurementAgentIds.map((ele) => ele),
+        procurementAgentValues: procurementAgentIds.map((ele) => ele),
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
       },
       () => {
