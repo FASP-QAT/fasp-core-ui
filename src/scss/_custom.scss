@@ -10271,6 +10271,10 @@ label.arrow_label:before {
   background-color: yellow;
 }
 
+.problemList-blue {
+  background-color: #A7C6ED;
+}
+
 .TemplateCornerAll,
 .InfoTemplate,
 .CursorFrame,
@@ -11132,18 +11136,22 @@ label.arrow_label:before {
   width: 150px !important;
 }
 
-.highCriticality {
+.criticalCriticality {
   background-color: #f48282 !important;
   color: #000000 !important;
 }
 
-.mediumCriticality {
+.highCriticality {
   background-color: orange !important;
   color: #000000 !important;
 }
 
-.lowCriticality {
+.mediumCriticality {
   background-color: yellow !important;
+  color: #000000 !important;
+}
+.lowCriticality{
+  background-color: #A7C6ED !important;
   color: #000000 !important;
 }
 
