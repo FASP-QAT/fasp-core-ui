@@ -1038,7 +1038,7 @@ export default class ProblemList extends React.Component {
                             problemReportFilterList = problemReportFilterList.filter(c => (c.reviewed == reviewedCheck));
                         }
                         problemReportFilterList.map(item=>{
-                            item.realmProblem=problemList.filter(c=>c.realmProblemId==item.realmProblem.realmProblemId)[0]
+                            item.realmProblem.criticality=problemList.filter(c=>c.realmProblemId==item.realmProblem.realmProblemId)[0].criticality;
                         })
                         this.setState({
                             data: problemReportFilterList,
