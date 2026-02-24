@@ -4126,9 +4126,10 @@ class EditSupplyPlanStatus extends Component {
                     <br />
                     <FormGroup className="col-md-6 mt-5 pl-0" >
                         <ul className="legendcommitversion list-group">
-                            <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
-                            <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
-                            <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
+                        <li><span className="problemList-red legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.critical')}</span></li>
+                                <li><span className="problemList-orange legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.high')}</span></li>
+                                <li><span className="problemList-yellow legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.medium')}</span></li>
+                                <li><span className="problemList-blue legendcolor"></span> <span className="legendcommitversionText">{i18n.t('static.problemList.low')} </span></li>
                         </ul>
                     </FormGroup>
                     <div className='col-md-6'>
@@ -4608,7 +4609,10 @@ class EditSupplyPlanStatus extends Component {
                 }
                 var rowData = elInstance.getRowData(y);
                 var criticalityId = rowData[17];
-                if (criticalityId == 3) {
+                if (criticalityId == 4) {
+                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                    cell.classList.add('criticalCriticality');
+                } else if (criticalityId == 3) {
                     var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     cell.classList.add('highCriticality');
                 } else if (criticalityId == 2) {

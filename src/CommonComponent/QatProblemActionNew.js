@@ -306,7 +306,7 @@ export default class QatProblemActionNew extends Component {
                                                                         (moment(qplLastModifiedDate).format("YYYY-MM-DD") < moment(curDate).format("YYYY-MM-DD") && c.problem.shipmentTrigger)
                                                                 );
                                                             }
-                                                            var shipmentQplPassed=true;
+                                                            var shipmentQplPassed = true;
                                                             for (var prob = 0; prob < typeProblemList.length; prob++) {
                                                                 switch (typeProblemList[prob].problem.problemId) {
                                                                     case 1:
@@ -442,7 +442,7 @@ export default class QatProblemActionNew extends Component {
                                                                             && c.shipmentStatus.id != 7
                                                                             // && c.shipmentId != 0
                                                                         );
-                                                                        shipmentQplPassed=shipmentListForMonths.filter(c =>
+                                                                        shipmentQplPassed = shipmentListForMonths.filter(c =>
                                                                             moment(c.expectedDeliveryDate).format('YYYY-MM-DD') < moment(myDateShipment).format('YYYY-MM-DD')
                                                                             && c.shipmentStatus.id != 7
                                                                             // && c.shipmentId != 0
@@ -551,20 +551,20 @@ export default class QatProblemActionNew extends Component {
                                                                                 var arrivedDate = filteredShipmentList[s].arrivedDate;
                                                                                 var expectedDeliveryDate = filteredShipmentList[s].expectedDeliveryDate;
                                                                                 if (filteredShipmentList[s].localProcurement) {
-                                                                                    var ppu=programPlanningUnitList.filter(c =>
+                                                                                    var ppu = programPlanningUnitList.filter(c =>
                                                                                         c.planningUnit.id == filteredShipmentList[s].planningUnit.id
                                                                                         && c.program.id == programList[pp].generalData.programId
                                                                                     );
-                                                                                    var programPriceList=ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
+                                                                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
                                                                                     var addLeadTimes = ppu[0].localProcurementLeadTime;
-                                                                                    if(programPriceList.length>0){
-                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                        if(programPAPU.length>0 && programPAPU[0].localProcurementLeadTime!==null){
-                                                                                            addLeadTimes=programPAPU[0].localProcurementLeadTime;
-                                                                                        }else{
-                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                            if(programPA.length>0 && programPA[0].localProcurementLeadTime!==null){
-                                                                                                addLeadTimes=programPA[0].localProcurementLeadTime;
+                                                                                    if (programPriceList.length > 0) {
+                                                                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if (programPAPU.length > 0 && programPAPU[0].localProcurementLeadTime !== null) {
+                                                                                            addLeadTimes = programPAPU[0].localProcurementLeadTime;
+                                                                                        } else {
+                                                                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                            if (programPA.length > 0 && programPA[0].localProcurementLeadTime !== null) {
+                                                                                                addLeadTimes = programPA[0].localProcurementLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -574,24 +574,24 @@ export default class QatProblemActionNew extends Component {
                                                                                     approvedDate = moment(shippedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                     submittedDate = moment(approvedDate).subtract(parseFloat(leadTimesPerStatus * 30), 'days').format("YYYY-MM-DD");
                                                                                 } else {
-                                                                                    var ppu=programPlanningUnitList.filter(c =>
+                                                                                    var ppu = programPlanningUnitList.filter(c =>
                                                                                         c.planningUnit.id == filteredShipmentList[s].planningUnit.id
                                                                                         && c.program.id == programList[pp].generalData.programId
                                                                                     );
-                                                                                    var programPriceList=ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
+                                                                                    var programPriceList = ppu[0].programPlanningUnitProcurementAgentPrices.filter(c => c.program.id == programList[pp].generalData.programId && c.procurementAgent.id == filteredShipmentList[s].procurementAgent.id && c.active)
                                                                                     var ppUnit = papuResult;
                                                                                     var submittedToApprovedLeadTime = ppUnit.submittedToApprovedLeadTime;
                                                                                     if (submittedToApprovedLeadTime == 0 || submittedToApprovedLeadTime == "" || submittedToApprovedLeadTime == null) {
                                                                                         submittedToApprovedLeadTime = programJson.submittedToApprovedLeadTime;
                                                                                     }
-                                                                                    if(programPriceList.length>0){
-                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                        if(programPAPU.length>0 && programPAPU[0].submittedToApprovedLeadTime!==null){
-                                                                                            submittedToApprovedLeadTime=programPAPU[0].submittedToApprovedLeadTime;
-                                                                                        }else{
-                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                            if(programPA.length>0 && programPA[0].submittedToApprovedLeadTime!==null){
-                                                                                                submittedToApprovedLeadTime=programPA[0].submittedToApprovedLeadTime;
+                                                                                    if (programPriceList.length > 0) {
+                                                                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if (programPAPU.length > 0 && programPAPU[0].submittedToApprovedLeadTime !== null) {
+                                                                                            submittedToApprovedLeadTime = programPAPU[0].submittedToApprovedLeadTime;
+                                                                                        } else {
+                                                                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                            if (programPA.length > 0 && programPA[0].submittedToApprovedLeadTime !== null) {
+                                                                                                submittedToApprovedLeadTime = programPA[0].submittedToApprovedLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -600,67 +600,67 @@ export default class QatProblemActionNew extends Component {
                                                                                     if (approvedToShippedLeadTime == 0 || approvedToShippedLeadTime == "" || approvedToShippedLeadTime == null) {
                                                                                         approvedToShippedLeadTime = programJson.approvedToShippedLeadTime;
                                                                                     }
-                                                                                    if(programPriceList.length>0){
-                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                        if(programPAPU.length>0 && programPAPU[0].approvedToShippedLeadTime!==null){
-                                                                                            approvedToShippedLeadTime=programPAPU[0].approvedToShippedLeadTime;
-                                                                                        }else{
-                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                            if(programPA.length>0 && programPA[0].approvedToShippedLeadTime!==null){
-                                                                                                approvedToShippedLeadTime=programPA[0].approvedToShippedLeadTime;
+                                                                                    if (programPriceList.length > 0) {
+                                                                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if (programPAPU.length > 0 && programPAPU[0].approvedToShippedLeadTime !== null) {
+                                                                                            approvedToShippedLeadTime = programPAPU[0].approvedToShippedLeadTime;
+                                                                                        } else {
+                                                                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                            if (programPA.length > 0 && programPA[0].approvedToShippedLeadTime !== null) {
+                                                                                                approvedToShippedLeadTime = programPA[0].approvedToShippedLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
                                                                                     var shippedToArrivedLeadTime = ""
                                                                                     if (filteredShipmentList[s].shipmentMode == "Air") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByAirLeadTime);
-                                                                                        if(programPriceList.length>0){
-                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedByAirLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByAirLeadTime;
-                                                                                            }else{
-                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedByAirLeadTime!==null){
-                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByAirLeadTime;
+                                                                                        if (programPriceList.length > 0) {
+                                                                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByAirLeadTime !== null) {
+                                                                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByAirLeadTime;
+                                                                                            } else {
+                                                                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByAirLeadTime !== null) {
+                                                                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByAirLeadTime;
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     } else if (filteredShipmentList[s].shipmentMode == "Road") {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedByRoadLeadTime);
-                                                                                        if(programPriceList.length>0){
-                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedByRoadLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedByRoadLeadTime;
-                                                                                            }else{
-                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedByRoadLeadTime!==null){
-                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedByRoadLeadTime;
+                                                                                        if (programPriceList.length > 0) {
+                                                                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedByRoadLeadTime;
+                                                                                            } else {
+                                                                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                                if (programPA.length > 0 && programPA[0].shippedToArrivedByRoadLeadTime !== null) {
+                                                                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedByRoadLeadTime;
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     } else {
                                                                                         shippedToArrivedLeadTime = parseFloat(programJson.shippedToArrivedBySeaLeadTime);
-                                                                                        if(programPriceList.length>0){
-                                                                                            var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                            if(programPAPU.length>0 && programPAPU[0].shippedToArrivedBySeaLeadTime!==null){
-                                                                                                shippedToArrivedLeadTime=programPAPU[0].shippedToArrivedBySeaLeadTime;
-                                                                                            }else{
-                                                                                                var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                                if(programPA.length>0 && programPA[0].shippedToArrivedBySeaLeadTime!==null){
-                                                                                                    shippedToArrivedLeadTime=programPA[0].shippedToArrivedBySeaLeadTime;
+                                                                                        if (programPriceList.length > 0) {
+                                                                                            var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                            if (programPAPU.length > 0 && programPAPU[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                                                                shippedToArrivedLeadTime = programPAPU[0].shippedToArrivedBySeaLeadTime;
+                                                                                            } else {
+                                                                                                var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                                if (programPA.length > 0 && programPA[0].shippedToArrivedBySeaLeadTime !== null) {
+                                                                                                    shippedToArrivedLeadTime = programPA[0].shippedToArrivedBySeaLeadTime;
                                                                                                 }
                                                                                             }
                                                                                         }
                                                                                     }
-                                                                                    var arrivedToDeliveredLeadTime=programJson.arrivedToDeliveredLeadTime;
-                                                                                    if(programPriceList.length>0){
-                                                                                        var programPAPU=programPriceList.filter(c=>c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
-                                                                                        if(programPAPU.length>0 && programPAPU[0].arrivedToDeliveredLeadTime!==null){
-                                                                                            arrivedToDeliveredLeadTime=programPAPU[0].arrivedToDeliveredLeadTime;
-                                                                                        }else{
-                                                                                            var programPA=programPriceList.filter(c=>c.planningUnit.id == -1);
-                                                                                            if(programPA.length>0 && programPA[0].arrivedToDeliveredLeadTime!==null){
-                                                                                                arrivedToDeliveredLeadTime=programPA[0].arrivedToDeliveredLeadTime;
+                                                                                    var arrivedToDeliveredLeadTime = programJson.arrivedToDeliveredLeadTime;
+                                                                                    if (programPriceList.length > 0) {
+                                                                                        var programPAPU = programPriceList.filter(c => c.planningUnit.id == filteredShipmentList[s].planningUnit.id);
+                                                                                        if (programPAPU.length > 0 && programPAPU[0].arrivedToDeliveredLeadTime !== null) {
+                                                                                            arrivedToDeliveredLeadTime = programPAPU[0].arrivedToDeliveredLeadTime;
+                                                                                        } else {
+                                                                                            var programPA = programPriceList.filter(c => c.planningUnit.id == -1);
+                                                                                            if (programPA.length > 0 && programPA[0].arrivedToDeliveredLeadTime !== null) {
+                                                                                                arrivedToDeliveredLeadTime = programPA[0].arrivedToDeliveredLeadTime;
                                                                                             }
                                                                                         }
                                                                                     }
@@ -676,7 +676,7 @@ export default class QatProblemActionNew extends Component {
                                                                                 shipmentDetailsJson["shipmentDate"] = filteredShipmentList[s].receivedDate == null || filteredShipmentList[s].receivedDate == "" ? filteredShipmentList[s].expectedDeliveryDate : filteredShipmentList[s].receivedDate;
                                                                                 shipmentDetailsJson["submittedDate"] = submittedDate;
                                                                                 if ((moment(submittedDate).format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
-                                                                                    shipmentQplPassed=false;
+                                                                                    shipmentQplPassed = false;
                                                                                 }
                                                                                 if ((moment(submittedDate).add(parseInt(typeProblemList[prob].data1), 'days').format("YYYY-MM-DD") <= moment(myDateShipment).format("YYYY-MM-DD"))) {
                                                                                     if(filteredShipmentList[s].shipmentId!=0){
@@ -830,7 +830,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     && c.consumptionDate <= myEndDate
                                                                                     && c.active.toString() == "true"
                                                                                     && c.region.id == regionList[r].regionId
-                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.consumptionQty!=0);
+                                                                                    && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.consumptionQty != 0);
                                                                                 var index = problemActionList.findIndex(
                                                                                     c =>
                                                                                         c.region != null &&
@@ -991,7 +991,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
-                                                                        }else{
+                                                                        } else {
                                                                             var index = problemActionList.findIndex(
                                                                                 c =>
                                                                                     c.planningUnit.id == planningUnitList[p].planningUnit.id
@@ -1186,7 +1186,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
-                                                                        }else{
+                                                                        } else {
                                                                             var index = problemActionList.findIndex(
                                                                                 c =>
                                                                                     c.planningUnit.id == planningUnitList[p].planningUnit.id
@@ -1259,11 +1259,175 @@ export default class QatProblemActionNew extends Component {
                                                                             }
                                                                         }
                                                                         break;
+                                                                    case 30:
+                                                                        if (planningUnitList[p].planBasedOn == 1) {
+                                                                            var region = {};
+                                                                            region["regionId"] = 0;
+                                                                            region["label"] = {};
+                                                                            var overMaxMonths = [];
+                                                                            var underMinMonths = [];
+                                                                            var stockedOutMonths = [];
+                                                                            var shipmentListMonths = [];
+                                                                            var filteredShipmentList = shipmentListForMonths.filter(c => moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('YYYY-MM'));
+                                                                            shipmentListMonths = filteredShipmentList.map(c => moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('MMM-YY'));
+                                                                            var toleranceNoOfMonthsBelowMin = realm.minQplTolerance;
+                                                                            var toleranceCutoffMinMoS = realm.minQplToleranceCutOff;
+                                                                            var toleranceNoOfMonthsOverMax = realm.maxQplTolerance;
+                                                                            for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
+                                                                                var m = moment(curDate).add(mosCounter, 'months');
+                                                                                var supplyPlanJson = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                    c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                    && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
+                                                                                var mos = "";
+                                                                                var maxForMonths = "";
+                                                                                var minForMonths = "";
+                                                                                if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
+                                                                                    mos = Number(supplyPlanJson[0].mos);
+                                                                                    maxForMonths = maxStockMoSQty;
+                                                                                    minForMonths = minStockMoSQty;
+                                                                                    if (mos == 0) {
+                                                                                        stockedOutMonths.push(moment(m).format('MMM-YY'));
+                                                                                    } else {
+                                                                                        if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                            if (mos < minForMonths && mos != 0) {
+                                                                                                underMinMonths.push(moment(m).format('MMM-YY'));
+                                                                                            }
+                                                                                        } else {
+                                                                                            if (mos < (minForMonths - parseInt(toleranceNoOfMonthsBelowMin)) && mos != 0) {
+                                                                                                underMinMonths.push(moment(m).format('MMM-YY'));
+                                                                                            }
+                                                                                        }
+                                                                                        if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
+                                                                                            overMaxMonths.push(moment(m).format('MMM-YY'));
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            var cause = {};
+                                                                            cause["underMinMonths"] = underMinMonths;
+                                                                            cause["overMaxMonths"] = overMaxMonths;
+                                                                            cause["stockedOutMonths"] = stockedOutMonths;
+                                                                            cause["shipmentListMonths"] = shipmentListMonths;
+                                                                            cause["underMinMonthsCount"] = underMinMonths.length;
+                                                                            cause["overMaxMonthsCount"] = overMaxMonths.length;
+                                                                            cause["stockedOutMonthsCount"] = stockedOutMonths.length;
+                                                                            cause["shipmentListMonthsCount"] = shipmentListMonths.length;
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (underMinMonths.length > 0 || overMaxMonths.length > 0 || stockedOutMonths.length > 0) {
+                                                                                if (index == -1) {
+                                                                                    createMinMaxProblems(programList[pp].generalData, versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    problemActionIndex++;
+                                                                                } else {
+                                                                                    problemActionList[index].dt = curDate;
+                                                                                    problemActionList[index].data5 = JSON.stringify(cause);
+                                                                                    if (problemActionList[index].problemStatus.id == 4) {
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
+                                                                                    }
+                                                                                }
+                                                                            } else {
+                                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                                }
+                                                                            }
+                                                                        } else {
+                                                                            var region = {};
+                                                                            region["regionId"] = 0;
+                                                                            region["label"] = {};
+                                                                            var overMaxMonths = [];
+                                                                            var underMinMonths = [];
+                                                                            var stockedOutMonths = [];
+                                                                            var shipmentListMonths = [];
+                                                                            var filteredShipmentList = shipmentListForMonths.filter(c => moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('YYYY-MM') >= moment(curDate).add(1, "months").format('YYYY-MM') && moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('YYYY-MM') <= moment(curDate).add(parseInt(typeProblemList[prob].data1), "months").format('YYYY-MM'));
+                                                                            shipmentListMonths = filteredShipmentList.map(c => moment(c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date" ? c.receivedDate : c.expectedDeliveryDate).format('MMM-YY'));
+                                                                            var toleranceNoOfMonthsBelowMin = 0;
+                                                                            var toleranceCutoffMinMoS = 0;
+                                                                            var toleranceNoOfMonthsOverMax = 0;
+                                                                            for (var mosCounter = 1; mosCounter <= parseInt(typeProblemList[prob].data1); mosCounter++) {
+                                                                                var m = moment(curDate).add(mosCounter, 'months');
+                                                                                var supplyPlanJson = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                    c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                    && moment(c.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"));
+                                                                                var mos = "";
+                                                                                var maxForMonths = "";
+                                                                                var minForMonths = "";
+                                                                                if (supplyPlanJson.length > 0 && supplyPlanJson[0].mos != null) {
+                                                                                    mos = Number(supplyPlanJson[0].mos);
+                                                                                    if (mos == 0) {
+                                                                                        stockedOutMonths.push(moment(m).format('MMM-YY'));
+                                                                                    }
+                                                                                }
+                                                                                if (supplyPlanJson.length > 0 && supplyPlanJson[0].closingBalance != 0) {
+                                                                                    mos = Number(supplyPlanJson[0].closingBalance);
+                                                                                    maxForMonths = Number(supplyPlanJson[0].maxStock);
+                                                                                    minForMonths = Number(supplyPlanJson[0].minStock);
+                                                                                    if (minForMonths <= parseInt(toleranceCutoffMinMoS)) {
+                                                                                        if (mos < minForMonths && mos != 0) {
+                                                                                            underMinMonths.push(moment(m).format('MMM-YY'));
+                                                                                        }
+                                                                                    } else {
+                                                                                        if (mos < (minForMonths - parseInt(toleranceNoOfMonthsBelowMin)) && mos != 0) {
+                                                                                            underMinMonths.push(moment(m).format('MMM-YY'));
+                                                                                        }
+                                                                                    }
+                                                                                    if (mos > (maxForMonths + parseInt(toleranceNoOfMonthsOverMax)) && mos != 0) {
+                                                                                        var count = 0;
+                                                                                        for (var dlt = 0; dlt <= (planningUnitList[p].distributionLeadTime); dlt++) {
+                                                                                            var mosDlt = programJsonForPlanningUnit.supplyPlan.filter(c =>
+                                                                                                c.planningUnitId == planningUnitList[p].planningUnit.id
+                                                                                                && moment(c.transDate).format("YYYY-MM") == moment(m).add(dlt, 'months').format("YYYY-MM"));
+                                                                                            if (mosDlt.length > 0 && mosDlt[0].closingBalance > mosDlt[0].maxStock && mosDlt[0].closingBalance != 0) {
+                                                                                                count = count + 1;
+                                                                                            }
+                                                                                        }
+                                                                                        if (count == (planningUnitList[p].distributionLeadTime) + 1) {
+                                                                                            overMaxMonths.push(moment(m).format('MMM-YY'));
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            var cause = {};
+                                                                            cause["underMinMonths"] = underMinMonths;
+                                                                            cause["overMaxMonths"] = overMaxMonths;
+                                                                            cause["stockedOutMonths"] = stockedOutMonths;
+                                                                            cause["shipmentListMonths"] = shipmentListMonths;
+                                                                            cause["underMinMonthsCount"] = underMinMonths.length;
+                                                                            cause["overMaxMonthsCount"] = overMaxMonths.length;
+                                                                            cause["stockedOutMonthsCount"] = stockedOutMonths.length;
+                                                                            cause["shipmentListMonthsCount"] = shipmentListMonths.length;
+                                                                            var index = problemActionList.findIndex(
+                                                                                c =>
+                                                                                    c.planningUnit.id == planningUnitList[p].planningUnit.id
+                                                                                    && c.program.id == programList[pp].generalData.programId
+                                                                                    && c.realmProblem.problem.problemId == typeProblemList[prob].problem.problemId
+                                                                            );
+                                                                            if (underMinMonths.length > 0 || overMaxMonths.length > 0 || stockedOutMonths.length > 0) {
+                                                                                if (index == -1) {
+                                                                                    createMinMaxProblems(programList[pp].generalData, versionID, typeProblemList[prob], region, planningUnitList[p], cause, problemActionIndex, userId, username, problemActionList, openProblemStatusObj);
+                                                                                    problemActionIndex++;
+                                                                                } else {
+                                                                                    problemActionList[index].dt = curDate;
+                                                                                    problemActionList[index].data5 = JSON.stringify(cause);
+                                                                                    if (problemActionList[index].problemStatus.id == 4) {
+                                                                                        openProblem(index, username, userId, problemActionList, openProblemStatusObj);
+                                                                                    }
+                                                                                }
+                                                                            } else {
+                                                                                if (index != -1 && (problemActionList[index].problemStatus.id == 1 || problemActionList[index].problemStatus.id == 3) && problemActionList[index].program.id == programList[pp].generalData.programId) {
+                                                                                    incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        break;
                                                                     default:
                                                                         break;
                                                                 }
                                                             }
-                                                            
+
                                                         } else {
                                                             for (var pal = 0; pal < problemActionList.length; pal++) {
                                                                 if (problemActionList[pal].planningUnit.id == planningUnitList[p].planningUnit.id) {
@@ -1271,18 +1435,18 @@ export default class QatProblemActionNew extends Component {
                                                                 }
                                                             }
                                                         }
-                                                        if(programList[pp].generalData.dashboardData!=undefined){
-                                                        if(programList[pp].generalData.dashboardData.bottomPuData==undefined || programList[pp].generalData.dashboardData.bottomPuData==""){
-                                                            programList[pp].generalData.dashboardData.bottomPuData=[]
+                                                        if (programList[pp].generalData.dashboardData != undefined) {
+                                                            if (programList[pp].generalData.dashboardData.bottomPuData == undefined || programList[pp].generalData.dashboardData.bottomPuData == "") {
+                                                                programList[pp].generalData.dashboardData.bottomPuData = []
+                                                            }
+                                                            var paListForDashboard = problemActionList.filter(c => c.program.id == programList[pp].generalData.programId && c.planningUnit.id == planningUnitList[p].planningUnit.id && c.problemStatus.id != 4);
+                                                            if (programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id] != undefined) {
+                                                                // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
+                                                                // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25).length>0?false:true;
+                                                                // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
+                                                                // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4).length>0?false:true;
+                                                            }
                                                         }
-                                                        var paListForDashboard=problemActionList.filter(c => c.program.id == programList[pp].generalData.programId && c.planningUnit.id==planningUnitList[p].planningUnit.id && c.problemStatus.id!=4);
-                                                        if(programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id]!=undefined){
-                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].forecastConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==8).length>0?false:true;
-                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].actualConsumptionQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25).length>0?false:true;
-                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].inventoryQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==2).length>0?false:true;
-                                                        // programList[pp].generalData.dashboardData.bottomPuData[planningUnitList[p].planningUnit.id].shipmentQplPassed=paListForDashboard.filter(c=> c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4).length>0?false:true;
-                                                        }
-                                                    }
                                                     }
                                                     var problemTransaction = db1.transaction([objectStoreFromProps], 'readwrite');
                                                     var problemOs = problemTransaction.objectStore(objectStoreFromProps);
@@ -1290,7 +1454,7 @@ export default class QatProblemActionNew extends Component {
                                                     programList[pp].generalData.problemReportList = paList;
                                                     programList[pp].generalData.actionList = [];
                                                     programList[pp].generalData.qplLastModifiedDate = curDate;
-                                                    programList[pp].generalData.lastModifiedDate=moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
+                                                    programList[pp].generalData.lastModifiedDate = moment(new Date().toLocaleString("en-US", { timeZone: "America/New_York" })).format("YYYY-MM-DD HH:mm:ss");
                                                     var openCount = (paList.filter(c => c.problemStatus.id == 1 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var addressedCount = (paList.filter(c => c.problemStatus.id == 3 && c.planningUnitActive != false && c.regionActive != false)).length;
                                                     var programQPLDetailsJson = {
@@ -1303,7 +1467,7 @@ export default class QatProblemActionNew extends Component {
                                                         programId: programList[pp].generalData.programId,
                                                         programModified: programQPLDetailsGetRequest.result.programModified,
                                                         readonly: programQPLDetailsGetRequest.result.readonly,
-                                                        cutOffDate:programQPLDetailsGetRequest.result.cutOffDate
+                                                        cutOffDate: programQPLDetailsGetRequest.result.cutOffDate
                                                     }
                                                     programRequestList[pp].programData.generalData = (CryptoJS.AES.encrypt(JSON.stringify(programList[pp].generalData), SECRET_KEY)).toString();
                                                 } catch (err) {
