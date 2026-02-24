@@ -10201,7 +10201,7 @@ label.arrow_label:before {
 }
 
 .problemList-orange {
-  background-color: orange;
+  background-color: #FFB021;
 }
 
 .TemplateItem,
@@ -10268,7 +10268,11 @@ label.arrow_label:before {
 }
 
 .problemList-yellow {
-  background-color: yellow;
+  background-color: #FFFF65;
+}
+
+.problemList-blue {
+  background-color: #A7C6ED;
 }
 
 .TemplateCornerAll,
@@ -10958,7 +10962,7 @@ label.arrow_label:before {
 }
 
 .problemList-yellow {
-  background-color: yellow;
+  background-color: #FFFF65;
 }
 
 .pipelineimportfile {
@@ -11132,18 +11136,22 @@ label.arrow_label:before {
   width: 150px !important;
 }
 
-.highCriticality {
+.criticalCriticality {
   background-color: #f48282 !important;
   color: #000000 !important;
 }
 
-.mediumCriticality {
-  background-color: orange !important;
+.highCriticality {
+  background-color: #FFB021 !important;
   color: #000000 !important;
 }
 
-.lowCriticality {
-  background-color: yellow !important;
+.mediumCriticality {
+  background-color: #FFFF65 !important;
+  color: #000000 !important;
+}
+.lowCriticality{
+  background-color: #A7C6ED !important;
   color: #000000 !important;
 }
 
