@@ -548,10 +548,17 @@ class AddBudgetComponent extends Component {
                                                             });
                                                             break;
                                                         case 406:
-                                                            this.setState({
-                                                                message: i18n.t('static.budget.duplicateDisplayName'),
-                                                                loading: false
-                                                            });
+                                                            if (error.response) {
+                                                                this.setState({
+                                                                    message: i18n.t('static.budget.duplicateBudget') + ": " + error.response.data.duplicateLabels.map(x => x.label_en),
+                                                                    loading: false
+                                                                });        
+                                                            } else {
+                                                                this.setState({
+                                                                    message: i18n.t('static.budget.duplicateDisplayName'),
+                                                                    loading: false
+                                                                });
+                                                            }
                                                             break;
                                                         case 412:
                                                             this.setState({

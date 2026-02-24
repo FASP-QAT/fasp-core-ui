@@ -762,6 +762,7 @@ class GlobalConsumption extends Component {
       this.setState({
         versions: [],
       }, () => {
+        this.filterData(this.state.rangeValue);
         this.getDropdownLists();
       });
     }
@@ -1067,21 +1068,32 @@ class GlobalConsumption extends Component {
       onlyAllowPuPresentAcrossAllPrograms: this.state.onlyShowAllPUs
     }
     ReportService.getDropdownListByProgramIds(json).then(response => {
+      const newPlanningUnitList = response.data.planningUnitList;
+      const prevSelectedIds = this.state.planningUnitId.map(ele => ele.value || ele); // handles both object and value
+      const filteredPlanningUnitId = newPlanningUnitList
+          .filter(pu => prevSelectedIds.includes(pu.id))
+          .map(pu => ({ label: getLabelText(pu.label, this.state.lang) + " | " + pu.id, value: pu.id }));
       this.setState({
         equivalencyUnitList: response.data.equivalencyUnitList,
-        planningUnitListAll: response.data.planningUnitList,
-        planningUnitList: response.data.planningUnitList,
-        planningUnitId: [],
+        planningUnitListAll: newPlanningUnitList,
+        planningUnitList: newPlanningUnitList,
+        planningUnitId: filteredPlanningUnitId,
         consumptions: []
       }, () => {
-        this.buildConsumptionJexcel();
-        if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0) {
-          var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
-          var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
-          this.setState({
-            planningUnitList: planningUnitList
-          })
+        if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0 && this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit).length > 0) {
+            var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
+            var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
+            this.setState({
+                planningUnitList: planningUnitList
+            })
+        } else {
+            this.setState({
+                yaxisEquUnit: -1,
+                yaxisEquUnitLabel: [i18n.t('static.program.no')],
+                noData: false
+            })
         }
+        this.buildConsumptionJexcel();
       })
     }).catch(
       error => {
