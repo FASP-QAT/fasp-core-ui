@@ -83,6 +83,10 @@ class SupplyPlanScoreCard extends Component {
       programList: [],
       datasetList: [],
       countryList: [],
+      countrys: [],
+      countryValues: [],
+      countryLabels: [],
+      technicalAreas: [],
       technicalAreaList: [],
       shipmentStatusList: [],
       message: '',
@@ -120,6 +124,254 @@ class SupplyPlanScoreCard extends Component {
 
   }
   /**
+   * Handles the change event for countries.
+   * @param {Array} countrysId - An array containing the selected country IDs.
+   */
+  handleChange(countrysId) {
+    countrysId = countrysId.sort(function (a, b) {
+      return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+      countryValues: countrysId.map(ele => ele),
+      countryLabels: countrysId.map(ele => ele.label)
+    }, () => {
+      this.filterTechnicalArea();
+    })
+  }
+  /**
+   * Retrieves the list of countries based on the realm ID and updates the state with the list.
+   */
+  getCountrys() {
+    this.setState({ loading: true })
+    if (localStorage.getItem("sessionType") === 'Online') {
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getRealmCountryDropdownList(realmId)
+        .then(response => {
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              countrys: listArray,
+              loading: false
+            }, () => { })
+          } else {
+            this.setState({ message: response.data.messageCode, loading: false },
+              () => { this.hideSecondComponent(); })
+          }
+        })
+        .catch(
+          error => {
+            this.setState({
+              countrys: []
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      const lan = 'en';
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['CountryData'], 'readwrite');
+        var Country = transaction.objectStore('CountryData');
+        var getRequest = Country.getAll();
+        var proList = []
+        getRequest.onerror = function (event) {
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          for (var i = 0; i < myResult.length; i++) {
+            if (myResult[i].userId == userId) {
+              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
+              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+              var CountryJson = {
+                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
+                id: myResult[i].id
+              }
+              proList[i] = CountryJson
+            }
+          }
+          proList.sort((a, b) => {
+            var itemLabelA = a.name.toUpperCase();
+            var itemLabelB = b.name.toUpperCase();
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({
+            countrys: proList,
+            loading: false
+          })
+        }.bind(this);
+      }
+    }
+    this.getHealthAreaList();
+    // this.filterData(this.state.rangeValue);
+  }
+  
+  getHealthAreaList() {
+    this.setState({ loading: true })
+    if (localStorage.getItem("sessionType") === 'Online') {
+      let realmId = AuthenticationService.getRealmId();
+      DropdownService.getHealthAreaDropdownList(realmId)
+        .then(response => {
+          if (response.status == 200) {
+            var listArray = response.data;
+            listArray.sort((a, b) => {
+              var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
+              var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
+              return itemLabelA > itemLabelB ? 1 : -1;
+            });
+            this.setState({
+              technicalAreas: listArray,
+              loading: false
+            }, () => { })
+          } else {
+            this.setState({ message: response.data.messageCode, loading: false },
+              () => { this.hideSecondComponent(); })
+          }
+        })
+        .catch(
+          error => {
+            this.setState({
+              technicalAreas: []
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 401:
+                  this.props.history.push(`/login/static.message.sessionExpired`)
+                  break;
+                case 409:
+                  this.setState({
+                    message: i18n.t('static.common.accessDenied'),
+                    loading: false,
+                    color: "#BA0C2F",
+                  });
+                  break;
+                case 403:
+                  this.props.history.push(`/accessDenied`)
+                  break;
+                case 500:
+                case 404:
+                case 406:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                case 412:
+                  this.setState({
+                    message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
+                    loading: false
+                  });
+                  break;
+                default:
+                  this.setState({
+                    message: 'static.unkownError',
+                    loading: false
+                  });
+                  break;
+              }
+            }
+          }
+        );
+    } else {
+      const lan = 'en';
+      var db1;
+      getDatabase();
+      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var transaction = db1.transaction(['CountryData'], 'readwrite');
+        var Country = transaction.objectStore('CountryData');
+        var getRequest = Country.getAll();
+        var proList = []
+        getRequest.onerror = function (event) {
+        };
+        getRequest.onsuccess = function (event) {
+          var myResult = [];
+          myResult = getRequest.result;
+          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+          var userId = userBytes.toString(CryptoJS.enc.Utf8);
+          for (var i = 0; i < myResult.length; i++) {
+            if (myResult[i].userId == userId) {
+              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
+              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
+              var CountryJson = {
+                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
+                id: myResult[i].id
+              }
+              proList[i] = CountryJson
+            }
+          }
+          proList.sort((a, b) => {
+            var itemLabelA = a.name.toUpperCase();
+            var itemLabelB = b.name.toUpperCase();
+            return itemLabelA > itemLabelB ? 1 : -1;
+          });
+          this.setState({
+            technicalAreas: proList,
+            loading: false
+          })
+        }.bind(this);
+      }
+    }
+    this.filterData(this.state.rangeValue);
+  }
+  /**
    * Displays a loading indicator while data is being loaded.
    */
   loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
@@ -137,7 +389,14 @@ class SupplyPlanScoreCard extends Component {
     const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
     const gridLineColor = isDarkMode ? '#444' : '#ddd';
 
-
+    const { countrys } = this.state;
+    let countryList = countrys.length > 0 && countrys.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+    }, this);
+    const { technicalAreas } = this.state;
+    let technicalAreaList = technicalAreaList.length > 0 && technicalAreaList.map((item, i) => {
+      return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
+    }, this);
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
@@ -204,35 +463,45 @@ class SupplyPlanScoreCard extends Component {
             <div class="card custom-card DashboardBg1 pb-lg-2">
                 <div class="card-body py-1">
                     <div className='row'>
-                        <FormGroup className='col-md-3 FormGroupD'>
-                            <Label htmlFor="countryId">Country<span class="red Reqasterisk">*</span></Label>
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                          <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                          <div className="controls edit">
                             <MultiSelect
-                                name="countryId"
-                                id="countryId"
-                                bsSize="sm"
-                                value={this.state.countryId}
-                                onChange={(e) => { this.handleCountryIdChange(e) }}
-                                options={topCountryList && topCountryList.length > 0 ? topCountryList : []}
-                                labelledBy={i18n.t('static.common.regiontext')}
+                              bsSize="sm"
+                              name="countrysId"
+                              id="countrysId"
+                              value={this.state.countryValues}
+                              onChange={(e) => { this.handleChange(e) }}
+                              options={countryList && countryList.length > 0 ? countryList : []}
+                              filterOptions={filterOptions}
+                              disabled={this.state.loading}
+                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')}}
                             />
-                            </FormGroup>
-                            <FormGroup className='col-md-3 FormGroupD'>
-                            <Label htmlFor="topTechnicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
-                            <MultiSelect
-                                name="topTechnicalAreaId"
-                                id="topTechnicalAreaId"
-                                bsSize="sm"
-                                value={this.state.topTechnicalAreaId}
-                                onChange={(e) => { this.handleTopTechnicalAreaIdChange(e) }}
-                                options={topTechnicalAreaList && topTechnicalAreaList.length > 0 ? topTechnicalAreaList : []}
-                                labelledBy={i18n.t('static.common.regiontext')}
-                            />
-                            </FormGroup>
+                            {!!this.props.error &&
+                              this.props.touched && (
+                                <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
+                              )}
+                          </div>
+                        </FormGroup>
+                          <FormGroup className='col-md-3 FormGroupD'>
+                          <Label htmlFor="topTechnicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
+                          <MultiSelect
+                              name="topTechnicalAreaId"
+                              id="topTechnicalAreaId"
+                              bsSize="sm"
+                              value={this.state.technicalAreaList}
+                              onChange={(e) => { this.handleTechnicalAreaIdChange(e) }}
+                              options={technicalAreaList && technicalAreaList.length > 0 ? technicalAreaList : []}
+                              labelledBy={i18n.t('static.common.regiontext')}
+                          />
+                        </FormGroup>
                     </div>
                 </div>
                     <div class="row pt-lg-2">
                         <div class="col-5 Topsectiondashboard">
-                        <FormGroup className='FormGroupD col-10 px-0'>
+                        {/* <FormGroup className='FormGroupD col-10 px-0'>
                             <h4 style={{ fontWeight: 900 }}>{i18n.t("static.dashboard.overview")}</h4>
                             <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.dashboard.programheader")}
                             <FormGroup className='MarginTopCheckBox'>
@@ -270,7 +539,7 @@ class SupplyPlanScoreCard extends Component {
                             labelledBy={i18n.t('static.common.regiontext')}
                             filterOptions={filterOptions}
                             />
-                        </FormGroup>
+                        </FormGroup> */}
                         <FormGroup className='col-1' style={{ marginTop: '58px', display: this.state.topProgramIdChange ? "block" : "none" }}>
                             <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
                         </FormGroup>
@@ -279,7 +548,6 @@ class SupplyPlanScoreCard extends Component {
                 </div>    
             </div>
         </div>
-      </div>
     );
   }
 }
