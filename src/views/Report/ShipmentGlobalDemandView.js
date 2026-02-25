@@ -249,7 +249,6 @@ class ShipmentGlobalDemandView extends Component {
             countrys: [],
             countryValues: [],
             countryLabels: [],
-            data: [],
             realmList: [],
             fundingSourceSplit: [],
             planningUnitSplit: [],
@@ -271,7 +270,13 @@ class ShipmentGlobalDemandView extends Component {
             procurementAgentValues: [],
             procurementAgentLabels: [],
             procurementAgents: [],
-            viewById: 1
+            viewById: 1,
+            data: {
+                planningUnitQuantity: [],
+                fspaCostAndPerc: [],
+                fspaProgramSplit: [],
+                fspaCountrySplit: []
+            }
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -679,7 +684,12 @@ class ShipmentGlobalDemandView extends Component {
                             var table1Headers = [];
                             table1Headers = (procurementAgentSplit.length == 0) ? [] : Object.keys(procurementAgentSplit[0].procurementAgentQty);
                             this.setState({
-                                data: [],
+                                data: {
+                                    planningUnitQuantity: [],
+                                    fspaCostAndPerc: [],
+                                    fspaProgramSplit: [],
+                                    fspaCountrySplit: []
+                                },
                                 message: '',
                                 fundingSourceSplit: fundingSourceSplit,
                                 planningUnitSplit: planningUnitSplit,
@@ -694,7 +704,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (programId == 0) {
                 this.setState({
                     message: i18n.t('static.common.selectProgram'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -704,7 +719,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (versionId == 0) {
                 this.setState({
                     message: i18n.t('static.program.validversion'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -714,7 +734,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -724,7 +749,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -734,7 +764,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.shipmentStatusValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -747,6 +782,7 @@ class ShipmentGlobalDemandView extends Component {
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
             let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
+            let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgentValues.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             let realmId = AuthenticationService.getRealmId()
             let useApprovedVersion = 0
@@ -770,23 +806,23 @@ class ShipmentGlobalDemandView extends Component {
                     stopDate: endDate,
                     realmCountryIds: CountryIds,
                     programIds: programIds,
+                    versionId: versionId,
                     planningUnitIds: planningUnitIds,
-                    fundingSourceIds: fundingSourceIds,
+                    fundingSourceIds: this.state.viewById == 1 ? fundingSourceIds : procurementAgentIds,
                     shipmentStatusIds: shipmentStatusIds,
-                    useApprovedSupplyPlanOnly: useApprovedVersion,
-                    groupByProcurementAgentType: groupByProcurementAgentType,
-                    groupByFundingSourceType: groupByFundingSourceType
+                    reportView: this.state.viewById
                 }
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
                         try {
+                            console.log("Response Test@123", response);
                             var table1Headers = [];
-                            table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
+                            // table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
                             this.setState({
                                 data: response.data,
-                                fundingSourceSplit: response.data.fundingSourceSplit,
-                                planningUnitSplit: response.data.planningUnitSplit,
-                                procurementAgentSplit: response.data.procurementAgentSplit,
+                                fundingSourceSplit: [],
+                                planningUnitSplit: [],
+                                procurementAgentSplit: [],
                                 table1Headers: table1Headers,
                                 loading: false
                             }, () => {
@@ -843,7 +879,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.countryValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.program.validcountrytext'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -853,7 +894,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.programValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.common.selectProgram'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -864,7 +910,12 @@ class ShipmentGlobalDemandView extends Component {
                 this.setState(
                     {
                         message: i18n.t("static.program.validversion"),
-                        data: [],
+                        data: {
+                            planningUnitQuantity: [],
+                            fspaCostAndPerc: [],
+                            fspaProgramSplit: [],
+                            fspaCountrySplit: []
+                        },
                         fundingSourceSplit: [],
                         planningUnitSplit: [],
                         procurementAgentSplit: [],
@@ -874,7 +925,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.planningUnitValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -884,7 +940,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.fundingSourceValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.fundingSource.selectFundingSource'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -894,7 +955,12 @@ class ShipmentGlobalDemandView extends Component {
             } else if (this.state.shipmentStatusValues.length == 0) {
                 this.setState({
                     message: i18n.t('static.report.validShipmentStatusText'),
-                    data: [],
+                    data: {
+                        planningUnitQuantity: [],
+                        fspaCostAndPerc: [],
+                        fspaProgramSplit: [],
+                        fspaCountrySplit: []
+                    },
                     fundingSourceSplit: [],
                     planningUnitSplit: [],
                     procurementAgentSplit: [],
@@ -1100,7 +1166,12 @@ class ShipmentGlobalDemandView extends Component {
             programLabels: [],
             planningUnitValues: [],
             planningUnitLabels: [],
-            data: [],
+            data: {
+                planningUnitQuantity: [],
+                fspaCostAndPerc: [],
+                fspaProgramSplit: [],
+                fspaCountrySplit: []
+            },
             fundingSourceSplit: [],
             planningUnitSplit: [],
             procurementAgentSplit: [],
@@ -1986,7 +2057,7 @@ class ShipmentGlobalDemandView extends Component {
             planningUnitValues: [],
             loading: true
         }, () => {
-            console.log("Test@123",localStorage.getItem("sessionType") === 'Online');
+            console.log("Test@123", localStorage.getItem("sessionType") === 'Online');
             if (!(localStorage.getItem("sessionType") === 'Online')) {
                 console.log("In if Test@123")
                 var db1;
@@ -2460,33 +2531,61 @@ class ShipmentGlobalDemandView extends Component {
                 )
             }, this);
         const darkModeColors1 = [
-            '#A7C6ED',
-            '#BA0C2F',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
 
         const lightModeColors1 = [
-            '#002F6C',  // Color 1 
-            '#BA0C2F',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
         ];
         const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
+        const planningUnitQuantity = this.state.data.planningUnitQuantity || [];
+
+        /* 1️⃣ X-Axis Labels (Planning Units) */
+        const labels = planningUnitQuantity.map(item =>
+            getLabelText(item.planningUnit.label, this.state.lang)
+        );
+
+        /* 2️⃣ Get All Unique FSPA Codes */
+        const allFspaCodes = [
+            ...new Set(
+                planningUnitQuantity.flatMap(item =>
+                    Object.keys(item.fspaQuantity || {})
+                )
+            )
+        ];
+
+        /* 3️⃣ Build Dataset Per FSPA */
+        const datasets = allFspaCodes.map((code, index) => ({
+            label: code,  // 👈 Directly using GFATM, TBD
+            data: planningUnitQuantity.map(item =>
+                roundARU(
+                    (item.fspaQuantity && item.fspaQuantity[code]) || 0,
+                    1
+                )
+            ),
+            backgroundColor: backgroundColor1[index % backgroundColor1.length],
+            borderWidth: 0
+        }));
+
+        /* 4️⃣ Final Chart Data */
         const chartData = {
-            labels: [...new Set(this.state.planningUnitSplit.map(ele => (getLabelText(ele.planningUnit.label, this.state.lang))))],
-            datasets: [{
-                label: i18n.t('static.shipment.orderedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.orderedShipmentQty, 1))),
-                // backgroundColor: '#0067B9',
-                backgroundColor: backgroundColor1[0],
-                borderWidth: 0
-            },
-            {
-                label: i18n.t('static.shipment.plannedShipment'),
-                data: this.state.planningUnitSplit.map(ele => (roundARU(ele.plannedShipmentQty, 1))),
-                // backgroundColor: '#A7C6ED',
-                backgroundColor: backgroundColor1[1],
-                borderWidth: 0,
-            }
-            ]
+            labels,
+            datasets
         };
+
+        console.log("Data Test@123",this.state.data.planningUnitQuantity)
         const darkModeColors = [
             '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
             '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
@@ -2509,9 +2608,9 @@ class ShipmentGlobalDemandView extends Component {
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 
         const chartDataForPie = {
-            labels: [...new Set(this.state.fundingSourceSplit.map(ele => ele.fundingSource.code))],
+            labels: [...new Set(this.state.data.fspaCostAndPerc.map(ele => ele.fspa.code))],
             datasets: [{
-                data: this.state.fundingSourceSplit.map(ele => (ele.amount)),
+                data: this.state.data.fspaCostAndPerc.map(ele => (Number(ele.perc).toFixed(2))),
                 backgroundColor: backgroundColor,  // Apply the color scheme
                 // backgroundColor: [
                 //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
@@ -2541,7 +2640,7 @@ class ShipmentGlobalDemandView extends Component {
         const optionsPie = {
             title: {
                 display: true,
-                text: this.state.groupByFundingSourceType ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
+                text: this.state.viewById==1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'),
                 fontColor: fontColor,
                 padding: 30
             },
@@ -2796,7 +2895,7 @@ class ShipmentGlobalDemandView extends Component {
                                 <Col md="12 pl-0  ">
                                     <div className="row grid-divider ">
                                         {
-                                            this.state.planningUnitSplit.length > 0 &&
+                                            this.state.data.planningUnitQuantity.length > 0 &&
                                             <Col md="8 pl-0">
                                                 <div className="chart-wrapper shipmentOverviewgraphheight" >
                                                     <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
@@ -2804,7 +2903,7 @@ class ShipmentGlobalDemandView extends Component {
                                             </Col>
                                         }
                                         {
-                                            this.state.fundingSourceSplit.length > 0 &&
+                                            this.state.data.fspaCostAndPerc.length > 0 &&
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
                                                     <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
