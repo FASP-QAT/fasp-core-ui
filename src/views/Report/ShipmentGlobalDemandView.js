@@ -276,7 +276,11 @@ class ShipmentGlobalDemandView extends Component {
                 fspaCostAndPerc: [],
                 fspaProgramSplit: [],
                 fspaCountrySplit: []
-            }
+            },
+            aggregateByCountry: false,
+            hideCalculations: false,
+            collapsePlanningUnits: false,
+            collapsedRows: new Set()
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -287,6 +291,25 @@ class ShipmentGlobalDemandView extends Component {
         this.setViewById = this.setViewById.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
+        this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
+        this.toggleCollapse = this.toggleCollapse.bind(this);
+    }
+
+    handleCheckboxChange(e) {
+        const { name, checked } = e.target;
+        this.setState({
+            [name]: checked
+        });
+    }
+
+    toggleCollapse(key) {
+        let newCollapsedRows = new Set(this.state.collapsedRows);
+        if (newCollapsedRows.has(key)) {
+            newCollapsedRows.delete(key);
+        } else {
+            newCollapsedRows.add(key);
+        }
+        this.setState({ collapsedRows: newCollapsedRows });
     }
     setViewById(e) {
         this.setState({
@@ -311,21 +334,25 @@ class ShipmentGlobalDemandView extends Component {
             csvRow.push('')
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
-            // csvRow.push('')
-            // this.state.fundingSourceTypeLabels.map(ele =>
-            //     csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
             csvRow.push('')
-            this.state.fundingSourceLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
+            csvRow.push('')
+            if (this.state.viewById == 1) {
+                this.state.fundingSourceLabels.map(ele =>
+                    csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            } else {
+                this.state.procurementAgentLabels.map(ele =>
+                    csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            }
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
             csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
             csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-            // csvRow.push('')
-            // csvRow.push('"' + (i18n.t('static.shipment.groupByFundingSourceType') + ' : ' + (this.state.groupByFundingSourceType ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         } else {
             csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
@@ -334,35 +361,168 @@ class ShipmentGlobalDemandView extends Component {
             this.state.planningUnitLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
             csvRow.push('')
-            this.state.fundingSourceLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
+            csvRow.push('')
+            if (this.state.viewById == 1) {
+                this.state.fundingSourceLabels.map(ele =>
+                    csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            } else {
+                this.state.procurementAgentLabels.map(ele =>
+                    csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            }
             csvRow.push('')
             this.state.shipmentStatusLabels.map(ele =>
                 csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         }
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         var re;
-        if (this.state.procurementAgentSplit.length > 0) {
+        var re;
+        let dataList = this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit;
+
+        if (dataList && dataList.length > 0) {
             var A = [];
-            let tableHead = this.state.table1Headers;
+
+            // CSV Headers
             let tableHeadTemp = [];
-            tableHeadTemp.push(i18n.t('static.report.qatPID').replaceAll(' ', '%20'));
-            tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
-            for (var i = 0; i < tableHead.length; i++) {
-                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            let fspaHeader = this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName');
+            let progHeader = this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program');
+            tableHeadTemp.push(`${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`.replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.shipment.qty').replaceAll(' ', '%20'));
+            if (!this.state.hideCalculations) {
+                tableHeadTemp.push(i18n.t('static.shipment.totalPUCost').replaceAll(' ', '%20'));
+                tableHeadTemp.push(i18n.t('static.shipment.totalFreightCost').replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.report.totalCost').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.shipment.totalCostPerc').replaceAll(' ', '%20'));
             A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
-            re = this.state.procurementAgentSplit;
-            for (var item = 0; item < re.length; item++) {
-                let item1 = Object.values(re[item].procurementAgentQty);
-                A.push([addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
+
+            // Calculate Groupings (same as render logic)
+            let grandPUCost = 0;
+            let grandFreightCost = 0;
+            let grandTotalCost = 0;
+
+            let grouping = {};
+            dataList.forEach(item => {
+                let fspa = item.fspa;
+                let fspaId = fspa ? fspa.id : 0;
+                let fspaCode = fspa ? fspa.code : 'N/A';
+
+                grandPUCost += item.cost;
+                grandFreightCost += item.freightCost;
+                grandTotalCost += item.totalCost;
+
+                if (!grouping[fspaId]) {
+                    grouping[fspaId] = {
+                        id: fspaId,
+                        code: fspaCode,
+                        totalPuCost: 0,
+                        totalFreightCost: 0,
+                        totalCost: 0,
+                        programs: {}
+                    };
+                }
+
+                grouping[fspaId].totalPuCost += item.cost;
+                grouping[fspaId].totalFreightCost += item.freightCost;
+                grouping[fspaId].totalCost += item.totalCost;
+
+                let prog = item.programCountry;
+                let progId = prog ? prog.id : 0;
+                let progCode = prog ? prog.code : 'N/A';
+
+                if (!grouping[fspaId].programs[progId]) {
+                    grouping[fspaId].programs[progId] = {
+                        id: progId,
+                        code: progCode,
+                        totalPuCost: 0,
+                        totalFreightCost: 0,
+                        totalCost: 0,
+                        pus: []
+                    };
+                }
+
+                grouping[fspaId].programs[progId].totalPuCost += item.cost;
+                grouping[fspaId].programs[progId].totalFreightCost += item.freightCost;
+                grouping[fspaId].programs[progId].totalCost += item.totalCost;
+                grouping[fspaId].programs[progId].pus.push({
+                    id: item.planningUnit.id,
+                    display: getLabelText(item.planningUnit.label, this.state.lang),
+                    quantity: item.quantity,
+                    totalPuCost: item.cost,
+                    totalFreightCost: item.freightCost,
+                    totalCost: item.totalCost
+                });
+            });
+
+            let fspasList = Object.values(grouping).sort((a, b) => a.code.localeCompare(b.code));
+            fspasList.forEach(f => {
+                f.programsList = Object.values(f.programs).sort((a, b) => a.code.localeCompare(b.code));
+                f.programsList.forEach(p => {
+                    p.pus.sort((a, b) => a.display.localeCompare(b.display));
+                });
+            });
+
+            const renderPerc = (value) => {
+                return (value * 100).toFixed(2) + "%";
+            };
+
+            // Build CSV rows
+            fspasList.forEach(fspa => {
+                let row = [(fspa.code).replaceAll(',', ' ').replaceAll(' ', '%20'), '',];
+                if (!this.state.hideCalculations) {
+                    row.push(fspa.totalPuCost);
+                    row.push(fspa.totalFreightCost);
+                }
+                row.push(fspa.totalCost);
+                row.push(grandTotalCost > 0 ? renderPerc(fspa.totalCost / grandTotalCost) : '0%');
+                A.push(addDoubleQuoteToRowContent(row));
+
+                fspa.programsList.forEach(prog => {
+                    let progRow = [("  " + prog.code).replaceAll(',', ' ').replaceAll(' ', '%20'), '',];
+                    if (!this.state.hideCalculations) {
+                        progRow.push(prog.totalPuCost);
+                        progRow.push(prog.totalFreightCost);
+                    }
+                    progRow.push(prog.totalCost);
+                    progRow.push(fspa.totalCost > 0 ? renderPerc(prog.totalCost / fspa.totalCost) : '0%');
+                    A.push(addDoubleQuoteToRowContent(progRow));
+
+                    if (!this.state.collapsePlanningUnits) {
+                        prog.pus.forEach(pu => {
+                            let puRow = [("    " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
+                            if (!this.state.hideCalculations) {
+                                puRow.push(pu.totalPuCost);
+                                puRow.push(pu.totalFreightCost);
+                            }
+                            puRow.push(pu.totalCost);
+                            puRow.push(prog.totalCost > 0 ? renderPerc(pu.totalCost / prog.totalCost) : '0%');
+                            A.push(addDoubleQuoteToRowContent(puRow));
+                        });
+                    }
+                });
+            });
+
+            // Grand Total
+            let totalRow = [i18n.t('static.supplyPlan.total').replaceAll(' ', '%20'), ''];
+            if (!this.state.hideCalculations) {
+                totalRow.push(grandPUCost);
+                totalRow.push(grandFreightCost);
             }
+            totalRow.push(grandTotalCost);
+            totalRow.push('');
+            A.push(addDoubleQuoteToRowContent(totalRow));
+
             for (var i = 0; i < A.length; i++) {
-                csvRow.push(A[i].join(","))
+                csvRow.push(A[i].join(","));
             }
         }
         var csvString = csvRow.join("%0A")
@@ -441,24 +601,28 @@ class ShipmentGlobalDemandView extends Component {
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
 
-        // var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        // for (var i = 0; i < fundingSourceTypeText.length; i++) {
-        //     if (y > doc.internal.pageSize.height - 100) {
-        //         doc.addPage();
-        //         y = 80;
-        //     };
-        //     doc.text(doc.internal.pageSize.width / 8, y, fundingSourceTypeText[i]);
-        //     y = y + 10
-        // }
-
-        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        y = y + 10;
-        for (var i = 0; i < fundingSourceText.length; i++) {
+        var viewByText = doc.splitTextToSize((i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))), doc.internal.pageSize.width * 3 / 4);
+        for (var i = 0; i < viewByText.length; i++) {
             if (y > doc.internal.pageSize.height - 100) {
                 doc.addPage();
                 y = 80;
             };
-            doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+            doc.text(doc.internal.pageSize.width / 8, y, viewByText[i]);
+            y = y + 10
+        }
+        var sourceOrAgentText;
+        if (this.state.viewById == 1) {
+            sourceOrAgentText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        } else {
+            sourceOrAgentText = doc.splitTextToSize((i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        }
+        y = y + 10;
+        for (var i = 0; i < sourceOrAgentText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            };
+            doc.text(doc.internal.pageSize.width / 8, y, sourceOrAgentText[i]);
             y = y + 10
         }
         var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
@@ -480,50 +644,102 @@ class ShipmentGlobalDemandView extends Component {
             doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
             y = y + 10;
         }
-        doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
-            align: 'left'
-        })
+        y = y + 10;
+        var filterProps = [
+            i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No"),
+            i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No"),
+            i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")
+        ];
+        for (var i = 0; i < filterProps.length; i++) {
+            var propText = doc.splitTextToSize(filterProps[i], doc.internal.pageSize.width * 3 / 4);
+            for (var j = 0; j < propText.length; j++) {
+                if (y > doc.internal.pageSize.height - 100) {
+                    doc.addPage();
+                    y = 80;
+                }
+                doc.text(doc.internal.pageSize.width / 8, y, propText[j]);
+                y = y + 10;
+            }
+            y = y + 10;
+        }
         doc.setTextColor("#fff");
-        var canvas = document.getElementById("cool-canvas11");
-        var canvasImg = canvas.toDataURL("image/png", 1.0);
         var height = doc.internal.pageSize.height;
         var h1 = 50;
-        let startY = y + 10
-        let pages = Math.ceil(startY / height)
-        for (var j = 1; j < pages; j++) {
-            doc.addPage()
-        }
-        let startYtable = startY - ((height - h1) * (pages - 1))
-        if (startYtable > height - 500) {
-            doc.addPage()
-            startYtable = 80
-        }
-        doc.addImage(canvasImg, 'png', 10, startYtable, 500, 280, 'a', 'CANVAS');
-        canvas = document.getElementById("cool-canvas2");
-        canvasImg = canvas.toDataURL("image/png", 1.0);
-        doc.addImage(canvasImg, 'png', 500, startYtable, 340, 280, 'b', 'CANVAS');
-        let length = this.state.table1Headers.length + 3;
-        doc.addPage()
-        startYtable = 80
-        let content1 = {
-            margin: { top: 80, bottom: 70 },
-            startY: startYtable,
-            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
-            columnStyles: {
-                0: { cellWidth: 61.89 },
-            },
-            html: '#mytable1',
-            didDrawCell: function (data) {
-                if (data.column.index === length && data.cell.section === 'body') {
-                    var td = data.cell.raw;
-                    var img = td.getElementsByTagName('img')[0];
-                    var dim = data.cell.height - data.cell.padding('vertical');
-                    var textPos = data.cell.textPos;
-                    doc.addImage(img.src, textPos.x, textPos.y, dim, dim);
-                }
+        let startY = y + 10;
+
+        var canvas = document.getElementById("cool-canvas1");
+        if (canvas) {
+            var canvasImg = canvas.toDataURL("image/png", 1.0);
+            let pages = Math.ceil(startY / height);
+            for (var j = 1; j < pages; j++) {
+                doc.addPage();
             }
-        };
-        doc.autoTable(content1);
+            let startYtable = startY - ((height - h1) * (pages - 1));
+            if (startYtable > height - 300) {
+                doc.addPage();
+                startYtable = 80;
+            }
+            // Display the bar graph centered and wider
+            let barWidth = doc.internal.pageSize.width - 20;
+            doc.addImage(canvasImg, 'png', 10, startYtable, barWidth, 280, 'a', 'CANVAS');
+        }
+
+        var canvas2 = document.getElementById("cool-canvas2");
+        if (canvas2) {
+            var canvasImg2 = canvas2.toDataURL("image/png", 1.0);
+            doc.addPage();
+            // Display the pie chart less wide and centered
+            let pieWidth = 340;
+            let pieX = (doc.internal.pageSize.width - pieWidth) / 2;
+            doc.addImage(canvasImg2, 'png', pieX, 80, pieWidth, 280, 'b', 'CANVAS');
+        }
+
+        doc.addPage();
+        let startYtable2 = 80;
+
+        let table = document.getElementById("mytable1");
+        if (table) {
+            let cloneTable = table.cloneNode(true);
+            cloneTable.id = "mytable1_clone";
+
+            // Remove first column (expand/collapse icon) from thead
+            let theadTrs = cloneTable.querySelectorAll('thead tr');
+            theadTrs.forEach(tr => { if (tr.children.length > 0) tr.removeChild(tr.children[0]); });
+            // Remove first column (expand/collapse icon) from tbody
+            let tbodyTrs = cloneTable.querySelectorAll('tbody tr');
+            tbodyTrs.forEach(tr => { if (tr.children.length > 0) tr.removeChild(tr.children[0]); });
+
+            cloneTable.style.position = "absolute";
+            cloneTable.style.left = "-9999px";
+            document.body.appendChild(cloneTable);
+
+            let content1 = {
+                margin: { top: 80, bottom: 70 },
+                startY: startYtable2,
+                styles: { lineWidth: 1, fontSize: 8, halign: 'right' },
+                columnStyles: {
+                    0: { halign: 'left' }
+                },
+                html: '#mytable1_clone',
+                didParseCell: function (data) {
+                    if (data.column.index === 0 && data.cell.section === 'body') {
+                        let td = data.cell.raw;
+                        if (td && td.style && td.style.paddingLeft) {
+                            let pad = parseInt(td.style.paddingLeft.replace('px', ''));
+                            if (!isNaN(pad)) {
+                                let cp = data.cell.styles.cellPadding;
+                                let padObj = typeof cp === 'object' ? { ...cp } : { top: cp, right: cp, bottom: cp, left: cp };
+                                padObj.left = (padObj.left || 2) + pad / 2.5;
+                                data.cell.styles.cellPadding = padObj;
+                            }
+                        }
+                    }
+                }
+            };
+            doc.autoTable(content1);
+
+            document.body.removeChild(cloneTable);
+        }
         addHeaders(doc)
         addFooters(doc)
         doc.save(i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + ".pdf")
@@ -538,7 +754,7 @@ class ShipmentGlobalDemandView extends Component {
             let programId = this.state.programValues[0].value;
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
             let endDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month + 1, 0).getDate();
-            let planningUnitIds = this.state.planningUnitValues.length == this.state.planningUnits.length ? [] : this.state.planningUnitValues.map(ele => (ele.value).toString());
+            let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
             let fundingSourceIds = this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
             if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
@@ -568,36 +784,45 @@ class ShipmentGlobalDemandView extends Component {
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
                         this.setState({ loading: true })
-                        var programDataBytes = CryptoJS.AES.decrypt(programRequest.result.programData, SECRET_KEY);
-                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                        var programJson = JSON.parse(programData);
-                        var shipmentList = (programJson.shipmentList);
-                        const activeFilter = shipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
-                        let planningUnitFilter = [];
+
+                        var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
+                        let combinedShipmentList = [];
+
                         for (let i = 0; i < planningUnitIds.length; i++) {
-                            for (let j = 0; j < dateFilter.length; j++) {
-                                if (dateFilter[j].planningUnit.id == planningUnitIds[i]) {
-                                    planningUnitFilter.push(dateFilter[j]);
+                            var planningUnitDataIndex = planningUnitDataList.findIndex(c => c.planningUnitId == planningUnitIds[i]);
+                            var programJson = {};
+                            if (planningUnitDataIndex != -1) {
+                                var planningUnitData = planningUnitDataList.filter(c => c.planningUnitId == planningUnitIds[i])[0];
+                                var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                programJson = JSON.parse(programData);
+                            } else {
+                                programJson = { shipmentList: [] };
+                            }
+
+                            var shipmentList = (programJson.shipmentList);
+                            if (shipmentList) {
+                                for (let j = 0; j < shipmentList.length; j++) {
+                                    if (shipmentList[j].planningUnit.id == planningUnitIds[i]) {
+                                        combinedShipmentList.push(shipmentList[j]);
+                                    }
                                 }
                             }
                         }
-                        let fundingSourceFilter = [];
-                        for (let i = 0; i < fundingSourceIds.length; i++) {
-                            for (let j = 0; j < planningUnitFilter.length; j++) {
-                                if (planningUnitFilter[j].fundingSource.id == fundingSourceIds[i]) {
-                                    fundingSourceFilter.push(planningUnitFilter[j]);
-                                }
-                            }
+
+                        const activeFilter = combinedShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
+                        console.log("DateFilter Test@123", dateFilter)
+                        let reportView = this.state.viewById;
+                        let fspaFilter = [];
+                        if (reportView == 1) {
+                            fspaFilter = dateFilter.filter(c => fundingSourceIds.includes(c.fundingSource.id.toString()));
+                        } else {
+                            let procurementAgentIds = this.state.procurementAgentValues.map(ele => (ele.value).toString());
+                            fspaFilter = dateFilter.filter(c => procurementAgentIds.includes(c.procurementAgent.id.toString()));
                         }
-                        let shipmentStatusFilter = [];
-                        for (let i = 0; i < shipmentStatusIds.length; i++) {
-                            for (let j = 0; j < fundingSourceFilter.length; j++) {
-                                if (fundingSourceFilter[j].shipmentStatus.id == shipmentStatusIds[i]) {
-                                    shipmentStatusFilter.push(fundingSourceFilter[j]);
-                                }
-                            }
-                        }
+
+                        let shipmentStatusFilter = fspaFilter.filter(c => shipmentStatusIds.includes(c.shipmentStatus.id.toString()));
                         var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
                         var procurementAgentRequest = procurementAgentOs.getAll();
@@ -673,25 +898,120 @@ class ShipmentGlobalDemandView extends Component {
                             var planningUnitSplit = result1.filter(function (itm, i, a) {
                                 return i == a.indexOf(itm);
                             });
-                            let preFundingSourceSplit = shipmentStatusFilter.map((item) => { return { fundingSource: item.fundingSource, amount: (item.productCost * item.currency.conversionRateToUsd) + (item.freightCost * item.currency.conversionRateToUsd) } });
-                            let fundingSourceSplit = Object.values(preFundingSourceSplit.reduce((a, { fundingSource, amount }) => {
-                                if (!a[fundingSource.id])
-                                    a[fundingSource.id] = Object.assign({}, { fundingSource, amount });
-                                else
-                                    a[fundingSource.id].amount += amount;
-                                return a;
-                            }, {}));
+                            let reportViewLoc = this.state.viewById;
+                            let fspaCostAndPercMap = {};
+                            let totalGrandCost = 0;
+
+                            shipmentStatusFilter.forEach((item) => {
+                                let fspa = reportViewLoc == 1 ? item.fundingSource : item.procurementAgent;
+                                let fspaId = fspa ? fspa.id : 0;
+                                let conversionRate = (item.currency && item.currency.conversionRateToUsd) ? item.currency.conversionRateToUsd : 1;
+                                let amount = (item.productCost || 0) * conversionRate + (item.freightCost || 0) * conversionRate;
+                                totalGrandCost += amount;
+                                if (!fspaCostAndPercMap[fspaId]) {
+                                    fspaCostAndPercMap[fspaId] = {
+                                        fspa: fspa,
+                                        cost: 0,
+                                        perc: 0
+                                    }
+                                }
+                                fspaCostAndPercMap[fspaId].cost += amount;
+                            });
+
+                            let locFspaCostAndPerc = Object.values(fspaCostAndPercMap);
+                            if (totalGrandCost > 0) {
+                                locFspaCostAndPerc.forEach(x => { x.perc = x.cost / totalGrandCost; });
+                            }
                             var table1Headers = [];
-                            table1Headers = (procurementAgentSplit.length == 0) ? [] : Object.keys(procurementAgentSplit[0].procurementAgentQty);
+                            let reportView = this.state.viewById;
+                            let fspaProgramSplitMap = {};
+                            let fspaCountrySplitMap = {};
+                            let planningUnitQuantityMap = {};
+
+                            let programInfo = {
+                                id: this.state.programValues[0].value,
+                                label: { label_en: this.state.programValues[0].label },
+                                code: this.state.programValues[0].label
+                            };
+
+                            let countryInfo = this.state.countryValues && this.state.countryValues.length === 1 ? {
+                                id: this.state.countryValues[0].value,
+                                label: { label_en: this.state.countryValues[0].label },
+                                code: this.state.countryValues[0].label
+                            } : programInfo;
+                            console.log("shipmentStatusFilter Test@123", shipmentStatusFilter);
+                            shipmentStatusFilter.forEach(item => {
+                                let fspa = reportView == 1 ? item.fundingSource : item.procurementAgent;
+                                let fspaId = fspa ? fspa.id : 0;
+                                let fspaCode = fspa ? fspa.code : "N/A";
+                                let puId = item.planningUnit.id;
+
+                                let qty = item.shipmentQty || 0;
+                                let conversionRate = (item.currency && item.currency.conversionRateToUsd) ? item.currency.conversionRateToUsd : 1;
+                                let cost = (item.productCost || 0) * conversionRate;
+                                let freightCost = (item.freightCost || 0) * conversionRate;
+                                let totalCost = cost + freightCost;
+
+                                // Build planningUnitQuantityMap
+                                if (!planningUnitQuantityMap[puId]) {
+                                    planningUnitQuantityMap[puId] = {
+                                        planningUnit: item.planningUnit,
+                                        fspaQuantity: {}
+                                    };
+                                }
+                                if (!planningUnitQuantityMap[puId].fspaQuantity[fspaCode]) {
+                                    planningUnitQuantityMap[puId].fspaQuantity[fspaCode] = 0;
+                                }
+                                planningUnitQuantityMap[puId].fspaQuantity[fspaCode] += qty;
+
+                                let progKey = fspaId + "_" + programInfo.id + "_" + puId;
+                                if (!fspaProgramSplitMap[progKey]) {
+                                    fspaProgramSplitMap[progKey] = {
+                                        fspa: fspa,
+                                        programCountry: programInfo,
+                                        planningUnit: item.planningUnit,
+                                        quantity: 0,
+                                        cost: 0,
+                                        freightCost: 0,
+                                        totalCost: 0
+                                    };
+                                }
+                                fspaProgramSplitMap[progKey].quantity += qty;
+                                fspaProgramSplitMap[progKey].cost += cost;
+                                fspaProgramSplitMap[progKey].freightCost += freightCost;
+                                fspaProgramSplitMap[progKey].totalCost += totalCost;
+
+                                let ctryKey = fspaId + "_" + countryInfo.id + "_" + puId;
+                                if (!fspaCountrySplitMap[ctryKey]) {
+                                    fspaCountrySplitMap[ctryKey] = {
+                                        fspa: fspa,
+                                        programCountry: countryInfo,
+                                        planningUnit: item.planningUnit,
+                                        quantity: 0,
+                                        cost: 0,
+                                        freightCost: 0,
+                                        totalCost: 0
+                                    };
+                                }
+                                fspaCountrySplitMap[ctryKey].quantity += qty;
+                                fspaCountrySplitMap[ctryKey].cost += cost;
+                                fspaCountrySplitMap[ctryKey].freightCost += freightCost;
+                                fspaCountrySplitMap[ctryKey].totalCost += totalCost;
+                            });
+
+                            let locFspaProgramSplit = Object.values(fspaProgramSplitMap);
+                            let locFspaCountrySplit = Object.values(fspaCountrySplitMap);
+                            let locPlanningUnitQuantity = Object.values(planningUnitQuantityMap);
+
                             this.setState({
                                 data: {
-                                    planningUnitQuantity: [],
-                                    fspaCostAndPerc: [],
-                                    fspaProgramSplit: [],
-                                    fspaCountrySplit: []
+                                    planningUnitQuantity: locPlanningUnitQuantity,
+                                    fspaCostAndPerc: locFspaCostAndPerc,
+                                    fspaProgramSplit: locFspaProgramSplit,
+                                    fspaCountrySplit: locFspaCountrySplit
                                 },
                                 message: '',
-                                fundingSourceSplit: fundingSourceSplit,
+                                fundingSourceSplit: locFspaCostAndPerc,
                                 planningUnitSplit: planningUnitSplit,
                                 procurementAgentSplit: procurementAgentSplit,
                                 table1Headers: table1Headers,
@@ -992,7 +1312,7 @@ class ShipmentGlobalDemandView extends Component {
 
         Chart.plugins.register({
             afterDraw: function (chart) {
-                if (chart.config.type === 'pie') {
+                if (chart.config.type === 'pie' && chart.canvas.id === 'cool-canvas2') {
                     const ctx = chart.chart.ctx;
                     const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
                     chart.data.datasets.forEach((dataset, datasetIndex) => {
@@ -1003,7 +1323,6 @@ class ShipmentGlobalDemandView extends Component {
                                     // Draw the connecting lines
                                     ctx.save();
                                     const model = element._model;
-                                    const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
                                     const startAngle = model.startAngle;
                                     const endAngle = model.endAngle;
                                     const midAngle = startAngle + (endAngle - startAngle) / 2;
@@ -1011,28 +1330,48 @@ class ShipmentGlobalDemandView extends Component {
                                     const x = Math.cos(midAngle);
                                     const y = Math.sin(midAngle);
 
-                                    // Calculate the end point for the line
-                                    const lineX = model.x + x * model.outerRadius;
-                                    const lineY = model.y + y * model.outerRadius;
-                                    const labelX = model.x + x * (model.outerRadius + 10);
-                                    const labelY = model.y + y * (model.outerRadius + 10);
+                                    // Calculate the points for the line
+                                    const lineStartX = model.x + x * model.outerRadius;
+                                    const lineStartY = model.y + y * model.outerRadius;
+                                    const labelX = model.x + x * (model.outerRadius + 30);
+                                    const labelY = model.y + y * (model.outerRadius + 30);
 
-                                    const label = chart.data.labels[index];
                                     const value = dataset.data[index];
-                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(0) + '%' : '0%';
 
-                                    if (((value / total) * 100).toFixed(2) > 2) {
+                                    if (total > 0 && ((value / total) * 100) >= 0.5) {
+                                        // Draw line
                                         ctx.beginPath();
-                                        ctx.moveTo(model.x, model.y);
-                                        ctx.lineTo(lineX, lineY);
+                                        ctx.moveTo(lineStartX, lineStartY);
                                         ctx.lineTo(labelX, labelY);
-                                        ctx.strokeStyle = dataset.backgroundColor[index];
+                                        ctx.strokeStyle = '#6c6463'; // USAID Dark Gray
+                                        ctx.lineWidth = 1;
                                         ctx.stroke();
-                                        ctx.textAlign = x >= 0 ? 'left' : 'right';
-                                        ctx.font = 'bold 12px Arial';
-                                        // ctx.textBaseline = 'middle';
-                                        ctx.fillStyle = dataset.backgroundColor[index];
-                                        ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
+
+                                        // Draw Box for text
+                                        ctx.font = '12px Arial';
+                                        const textWidth = ctx.measureText(percentage).width;
+                                        const padding = 4;
+                                        const boxWidth = textWidth + padding * 2;
+                                        const boxHeight = 16 + padding;
+
+                                        const boxX = x >= 0 ? labelX : labelX - boxWidth;
+                                        const boxY = labelY - boxHeight / 2;
+
+                                        ctx.fillStyle = '#ffffff';
+                                        ctx.shadowBlur = 2;
+                                        ctx.shadowColor = "rgba(0,0,0,0.2)";
+                                        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
+                                        ctx.shadowBlur = 0; // Reset shadow
+
+                                        ctx.strokeStyle = '#cfcdc9'; // USAID Light Gray border
+                                        ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
+
+                                        ctx.fillStyle = '#000000';
+                                        ctx.textAlign = 'center';
+                                        ctx.textBaseline = 'middle';
+                                        ctx.fillText(percentage, boxX + boxWidth / 2, boxY + boxHeight / 2);
+
                                         ctx.restore();
                                     }
                                 }
@@ -2305,6 +2644,70 @@ class ShipmentGlobalDemandView extends Component {
      */
     render() {
 
+        let grouping = {};
+        let dataSource = this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit;
+
+        let grandTotalCost = 0;
+        let grandPUCost = 0;
+        let grandFreightCost = 0;
+
+        if (dataSource && dataSource.length > 0) {
+            dataSource.forEach(d => {
+                let fspaCode = d.fspa.code;
+                let programCode = d.programCountry ? d.programCountry.code : "N/A";
+
+                if (!grouping[fspaCode]) {
+                    grouping[fspaCode] = { code: fspaCode, label: d.fspa.label, programs: {}, totalPuCost: 0, totalFreightCost: 0, totalCost: 0 };
+                }
+
+                if (!grouping[fspaCode].programs[programCode]) {
+                    grouping[fspaCode].programs[programCode] = { code: programCode, label: d.programCountry ? d.programCountry.label : "N/A", pus: [], totalPuCost: 0, totalFreightCost: 0, totalCost: 0 };
+                }
+
+                let puLabel = getLabelText(d.planningUnit.label, this.state.lang);
+                let puDisplay = `${puLabel} | ${d.planningUnit.id}`;
+
+                grouping[fspaCode].programs[programCode].pus.push({
+                    id: d.planningUnit.id,
+                    display: puDisplay,
+                    quantity: d.quantity,
+                    totalPuCost: d.cost,
+                    totalFreightCost: d.freightCost,
+                    totalCost: d.totalCost
+                });
+
+                grouping[fspaCode].programs[programCode].totalPuCost += d.cost;
+                grouping[fspaCode].programs[programCode].totalFreightCost += d.freightCost;
+                grouping[fspaCode].programs[programCode].totalCost += d.totalCost;
+
+                grouping[fspaCode].totalPuCost += d.cost;
+                grouping[fspaCode].totalFreightCost += d.freightCost;
+                grouping[fspaCode].totalCost += d.totalCost;
+
+                grandPUCost += d.cost;
+                grandFreightCost += d.freightCost;
+                grandTotalCost += d.totalCost;
+            });
+        }
+
+        let fspasList = Object.values(grouping).sort((a, b) => a.code.localeCompare(b.code));
+        fspasList.forEach(f => {
+            f.programsList = Object.values(f.programs).sort((a, b) => a.code.localeCompare(b.code));
+            f.programsList.forEach(p => {
+                p.pus.sort((a, b) => a.display.localeCompare(b.display));
+            });
+        });
+
+        const formatCurr = (val) => {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
+        }
+        const formatNum = (val) => {
+            return val ? new Intl.NumberFormat('en-US').format(val) : 0;
+        }
+        const formatPerc = (val) => {
+            return (val * 100).toFixed(0) + "%";
+        }
+
         const { isDarkMode } = this.state;
         // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
@@ -2319,7 +2722,7 @@ class ShipmentGlobalDemandView extends Component {
             },
             title: {
                 display: true,
-                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                text: i18n.t('static.shipmentOverview.planningUnitQuantityByPU') + " " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
                 fontColor: fontColor
             },
             scales: {
@@ -2412,7 +2815,7 @@ class ShipmentGlobalDemandView extends Component {
             },
             title: {
                 display: true,
-                text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+                text: i18n.t('static.shipmentOverview.planningUnitQuantityByPU') + " " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
                 fontColor: fontColor
             },
             scales: {
@@ -2585,7 +2988,7 @@ class ShipmentGlobalDemandView extends Component {
             datasets
         };
 
-        console.log("Data Test@123",this.state.data.planningUnitQuantity)
+        console.log("Data Test@123", this.state.data.planningUnitQuantity)
         const darkModeColors = [
             '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
             '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
@@ -2607,26 +3010,26 @@ class ShipmentGlobalDemandView extends Component {
         ];
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 
+        const pieLabels = [...new Set(this.state.data.fspaCostAndPerc.map(ele => ele.fspa.code))];
+        const usaidColors = [
+            '#002F6C', // USAID Dark Blue
+            '#BA0C2F', // USAID Red
+            '#A7C6ED', // USAID Light Blue
+            '#0067b9', // USAID Medium Blue
+            '#6c6463', // USAID Dark Gray
+            '#cfcdc9', // USAID Light Gray
+            '#205493', // USAID Web Blue
+            '#EDB944', // USAID Yellow
+            '#118B70', // USAID Green
+        ];
+
         const chartDataForPie = {
-            labels: [...new Set(this.state.data.fspaCostAndPerc.map(ele => ele.fspa.code))],
+            labels: pieLabels,
             datasets: [{
-                data: this.state.data.fspaCostAndPerc.map(ele => (Number(ele.perc).toFixed(2))),
-                backgroundColor: backgroundColor,  // Apply the color scheme
-                // backgroundColor: [
-                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-                //     '#205493', '#651D32', '#6C6463', '#BC8985', '#cfcdc9',
-                //     '#49A4A1', '#118B70', '#EDB944', '#F48521', '#ED5626',
-                //     '#d4bbff', '#BA0C2F', '#757575', '#0067B9', '#A7C6ED',
-                // ],
-
-
-                legend: {
-                    position: 'bottom',
-                    fontColor: fontColor,
-                }
+                data: this.state.data.fspaCostAndPerc.map(ele => ele.cost),
+                backgroundColor: usaidColors.slice(0, pieLabels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff',
             }],
         }
         const pickerLang = {
@@ -2640,27 +3043,32 @@ class ShipmentGlobalDemandView extends Component {
         const optionsPie = {
             title: {
                 display: true,
-                text: this.state.viewById==1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'),
+                text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
                 fontColor: fontColor,
                 padding: 30
             },
             legend: {
-                position: 'bottom',
-                fontColor: fontColor,
+                position: 'right',
                 labels: {
-                    padding: 25,
+                    padding: 20,
                     fontColor: fontColor,
+                    usePointStyle: true,
                 }
             },
             tooltips: {
                 callbacks: {
                     label: function (tooltipItems, data) {
-                        return data.labels[tooltipItems.index] +
-                            " : " + " $ " +
-                            (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+                        var label = data.labels[tooltipItems.index];
+                        var value = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index];
+                        return label + " : $ " + value.toLocaleString();
                     }
                 }
             },
+            plugins: {
+                datalabels: {
+                    display: false
+                }
+            }
         }
 
         return (
@@ -2670,7 +3078,7 @@ class ShipmentGlobalDemandView extends Component {
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
-                        {(this.state.fundingSourceSplit.length > 0 || this.state.planningUnitSplit.length > 0 || this.state.procurementAgentSplit.length > 0) &&
+                        {(this.state.data.planningUnitQuantity.length > 0 || this.state.data.fspaCostAndPerc.length > 0 || this.state.data.fspaCountrySplit.length > 0) &&
                             <div className="card-header-actions">
                                 <a className="card-header-action">
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
@@ -2926,46 +3334,105 @@ class ShipmentGlobalDemandView extends Component {
                                 <Col md="12 pl-0 pb-lg-1">
                                     <div className="globalviwe-scroll">
                                         <div className="row">
-                                            <div className="col-md-12 mt-2">
-                                                {this.state.procurementAgentSplit.length > 0 &&
-                                                    <div className="fixTableHead">
-                                                        <Table id="mytable1" className="table-striped table-bordered text-center">
-                                                            <thead className='Theadtablesticky'>
-                                                                <tr>
-                                                                    <th rowSpan={2}>{i18n.t('static.dashboard.planningunitheader')}</th>
-                                                                    <th colSpan={this.state.table1Headers.length} align='center'>{this.state.procurementAgentTypeId ? i18n.t('static.dashboard.procurementagentType') : i18n.t('static.report.procurementAgentName')}</th>
-                                                                    <th rowSpan={2}>{i18n.t('static.report.totalUnit')}</th>
-                                                                </tr>
-                                                                <tr>
-                                                                    {
-                                                                        this.state.table1Headers.map((item, idx) =>
-                                                                            <th id="addr0" key={idx} className="text-center" style={{ width: '100px' }}>
-                                                                                {this.state.table1Headers[idx]}
-                                                                            </th>
-                                                                        )
-                                                                    }
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {
-                                                                    this.state.procurementAgentSplit.map((item, idx) =>
-                                                                        <tr id="addr0" key={idx} >
-                                                                            <td>{getLabelText(this.state.procurementAgentSplit[idx].planningUnit.label, this.state.lang)}</td>
-                                                                            {
-                                                                                Object.values(this.state.procurementAgentSplit[idx].procurementAgentQty).map((item, idx1) =>
-                                                                                    <td id="addr1" key={idx1}>
-                                                                                        {item.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}
-                                                                                    </td>
-                                                                                )
-                                                                            }
-                                                                            <td>{this.state.procurementAgentSplit[idx].total.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</td>
-                                                                        </tr>
-                                                                    )}
-                                                            </tbody>
-                                                        </Table>
-                                                    </div>
-                                                }
-                                            </div>
+                                            {fspasList.length > 0 && <div className="col-md-12 mt-2">
+                                                <div className="text-left">
+                                                    <FormGroup check inline style={{ paddingLeft: 0 }}>
+                                                        <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="aggregateByCountry" name="aggregateByCountry" checked={this.state.aggregateByCountry} onChange={this.handleCheckboxChange} />
+                                                        <Label className="form-check-label" check htmlFor="aggregateByCountry">{i18n.t('static.shipment.aggregateByCountry')}</Label>
+                                                    </FormGroup>
+                                                    <br />
+                                                    <FormGroup check inline style={{ paddingLeft: 0 }}>
+                                                        <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="hideCalculations" name="hideCalculations" checked={this.state.hideCalculations} onChange={this.handleCheckboxChange} />
+                                                        <Label className="form-check-label" check htmlFor="hideCalculations">{i18n.t('static.shipment.hideCalculations') || 'Hide Calculations'}</Label>
+                                                    </FormGroup>
+                                                    <br />
+                                                    <FormGroup check inline style={{ paddingLeft: 0 }}>
+                                                        <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="collapsePlanningUnits" name="collapsePlanningUnits" checked={this.state.collapsePlanningUnits} onChange={this.handleCheckboxChange} />
+                                                        <Label className="form-check-label" check htmlFor="collapsePlanningUnits">{i18n.t('static.shipment.collapsePlanningUnits') || 'Collapse Planning Units'}</Label>
+                                                    </FormGroup>
+                                                </div>
+
+                                                <div className="fixTableHead mt-3">
+                                                    <Table id="mytable1" className="table-bordered text-center">
+                                                        <thead className='Theadtablesticky' style={{ backgroundColor: '#fff', color: '#000' }}>
+                                                            <tr>
+                                                                <th style={{ width: '2%' }}></th>
+                                                                <th className="text-left">{this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')} / {this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program')} / {i18n.t('static.dashboard.planningunitheader')}</th>
+                                                                <th className="text-right">{i18n.t('static.shipment.qty')}</th>
+                                                                {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalPUCost')}</th>}
+                                                                {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalFreightCost')}</th>}
+                                                                <th className="text-right">{i18n.t('static.report.totalCost')}</th>
+                                                                <th className="text-right">{i18n.t('static.shipment.totalCostPerc')}</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody style={{ backgroundColor: '#fff', color: '#000' }}>
+                                                            {fspasList.map((fspa, fIndex) => {
+                                                                let isFspaCollapsed = this.state.collapsedRows.has(`fspa_${fspa.code}`);
+                                                                let fspaRows = [
+                                                                    <tr key={`fspa_${fspa.code}`} style={{ fontWeight: 'bold' }} >
+                                                                        <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(`fspa_${fspa.code}`)}>
+                                                                            <i className={"fa " + (isFspaCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
+                                                                        </td>
+                                                                        <td className="text-left">{fspa.code}</td>
+                                                                        <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
+                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalPuCost)}</td>}
+                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalFreightCost)}</td>}
+                                                                        <td className="text-right">{formatCurr(fspa.totalCost)}</td>
+                                                                        <td className="text-right">{grandTotalCost > 0 ? formatPerc(fspa.totalCost / grandTotalCost) : '0%'}</td>
+                                                                    </tr>
+                                                                ];
+
+                                                                if (!isFspaCollapsed) {
+                                                                    fspa.programsList.forEach((prog, pIndex) => {
+                                                                        let progKey = `prog_${fspa.code}_${prog.code}`;
+                                                                        let isProgCollapsed = this.state.collapsedRows.has(progKey);
+
+                                                                        fspaRows.push(
+                                                                            <tr key={progKey} style={{ fontWeight: 'bold' }} >
+                                                                                <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
+                                                                                    <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
+                                                                                </td>
+                                                                                <td className="text-left" style={{ paddingLeft: '30px' }}>{prog.code}</td>
+                                                                                <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
+                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
+                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
+                                                                                <td className="text-right">{formatCurr(prog.totalCost)}</td>
+                                                                                <td className="text-right">{fspa.totalCost > 0 ? formatPerc(prog.totalCost / fspa.totalCost) : '0%'}</td>
+                                                                            </tr>
+                                                                        );
+
+                                                                        if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
+                                                                            prog.pus.forEach((pu, puIndex) => {
+                                                                                fspaRows.push(
+                                                                                    <tr key={`${progKey}_pu_${pu.id}`}>
+                                                                                        <td></td>
+                                                                                        <td className="text-left" style={{ paddingLeft: '50px' }}>{pu.display}</td>
+                                                                                        <td className="text-right">{formatNum(pu.quantity)}</td>
+                                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
+                                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
+                                                                                        <td className="text-right">{formatCurr(pu.totalCost)}</td>
+                                                                                        <td className="text-right">{prog.totalCost > 0 ? formatPerc(pu.totalCost / prog.totalCost) : '0%'}</td>
+                                                                                    </tr>
+                                                                                );
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }
+                                                                return fspaRows;
+                                                            })}
+                                                            <tr style={{ fontWeight: 'bold', borderTop: '2px solid black', borderBottom: '2px solid black' }}>
+                                                                <td></td>
+                                                                <td className="text-left">{i18n.t('static.supplyPlan.total')}</td>
+                                                                <td className="text-right"></td>
+                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandPUCost)}</td>}
+                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandFreightCost)}</td>}
+                                                                <td className="text-right">{formatCurr(grandTotalCost)}</td>
+                                                                <td className="text-right"></td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </Table>
+                                                </div>
+                                            </div>}
                                         </div>
                                     </div>
                                 </Col>

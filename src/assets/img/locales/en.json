@@ -3646,5 +3646,12 @@
   "static.shipmentDetails.costUSDFS":"Total cost per Funding Source across all programs and PUs selected",
   "static.shipmentDetails.costUSDPA":"Total cost per Procurement Agent across all programs and PUs selected",
   "static.shipmentDetails.totalCostUSD":"Total Cost = Planning Unit Cost + Freight Cost",
-  "static.shipmentDetails.noData":"There is no available shipment data for the planning unit(s) during the selected report period"
+  "static.shipmentDetails.noData":"There is no available shipment data for the planning unit(s) during the selected report period",
+  "static.shipmentOverview.planningUnitQuantityByPU":"Planning Unit Quantity by",
+  "static.shipment.aggregateByCountry": "Aggregate by Country",
+  "static.shipment.hideCalculations": "Hide Calculations",
+  "static.shipment.collapsePlanningUnits": "Collapse Planning Units",
+  "static.shipment.totalPUCost":"Total Planning Unit Cost (USD)",
+  "static.shipment.totalFreightCost":"Total Freight Cost (USD)",
+  "static.shipment.totalCostPerc":"Total Cost (%)"
 }
