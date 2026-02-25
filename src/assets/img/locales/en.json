@@ -3658,5 +3658,12 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.shipmentOverview.planningUnitQuantityByPU":"Planning Unit Quantity by",
+  "static.shipment.aggregateByCountry": "Aggregate by Country",
+  "static.shipment.hideCalculations": "Hide Calculations",
+  "static.shipment.collapsePlanningUnits": "Collapse Planning Units",
+  "static.shipment.totalPUCost":"Total Planning Unit Cost (USD)",
+  "static.shipment.totalFreightCost":"Total Freight Cost (USD)",
+  "static.shipment.totalCostPerc":"Total Cost (%)"
 }
