@@ -2957,7 +2957,7 @@ class ShipmentGlobalDemandView extends Component {
 
         /* 1️⃣ X-Axis Labels (Planning Units) */
         const labels = planningUnitQuantity.map(item =>
-            getLabelText(item.planningUnit.label, this.state.lang)
+            getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id
         );
 
         /* 2️⃣ Get All Unique FSPA Codes */
@@ -3392,7 +3392,7 @@ class ShipmentGlobalDemandView extends Component {
                                                                                 <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
                                                                                     <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
                                                                                 </td>
-                                                                                <td className="text-left" style={{ paddingLeft: '30px' }}>{prog.code}</td>
+                                                                                <td className="text-left custom-padding-program" style={{ paddingLeft: '30px' }}>{prog.code}</td>
                                                                                 <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
                                                                                 {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
                                                                                 {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
@@ -3406,7 +3406,7 @@ class ShipmentGlobalDemandView extends Component {
                                                                                 fspaRows.push(
                                                                                     <tr key={`${progKey}_pu_${pu.id}`}>
                                                                                         <td></td>
-                                                                                        <td className="text-left" style={{ paddingLeft: '50px' }}>{pu.display}</td>
+                                                                                        <td className="text-left custom-padding-pu" style={{ paddingLeft: '50px' }}>{pu.display}</td>
                                                                                         <td className="text-right">{formatNum(pu.quantity)}</td>
                                                                                         {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
                                                                                         {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
