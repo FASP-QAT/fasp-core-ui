@@ -3665,5 +3665,6 @@
   "static.shipment.collapsePlanningUnits": "Collapse Planning Units",
   "static.shipment.totalPUCost":"Total Planning Unit Cost (USD)",
   "static.shipment.totalFreightCost":"Total Freight Cost (USD)",
-  "static.shipment.totalCostPerc":"Total Cost (%)"
+  "static.shipment.totalCostPerc":"Total Cost (%)",
+  "static.budgetReport.budgetForMultiProgram":"For multi-program budgets, the numbers in the graph/table represent the total budget amounts, regardless of which programs are selected in the program dropdown."
 }
