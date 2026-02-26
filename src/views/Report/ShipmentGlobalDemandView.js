@@ -1333,8 +1333,8 @@ class ShipmentGlobalDemandView extends Component {
                                     // Calculate the points for the line
                                     const lineStartX = model.x + x * model.outerRadius;
                                     const lineStartY = model.y + y * model.outerRadius;
-                                    const labelX = model.x + x * (model.outerRadius + 30);
-                                    const labelY = model.y + y * (model.outerRadius + 30);
+                                    const labelX = model.x + x * (model.outerRadius + 15);
+                                    const labelY = model.y + y * (model.outerRadius + 15);
 
                                     const value = dataset.data[index];
                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(0) + '%' : '0%';
@@ -3041,6 +3041,9 @@ class ShipmentGlobalDemandView extends Component {
         const checkOnline = localStorage.getItem('sessionType');
 
         const optionsPie = {
+            layout: {
+                padding: 10
+            },
             title: {
                 display: true,
                 text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
@@ -3048,9 +3051,9 @@ class ShipmentGlobalDemandView extends Component {
                 padding: 30
             },
             legend: {
-                position: 'right',
+                position: 'bottom',
                 labels: {
-                    padding: 20,
+                    padding: 10,
                     fontColor: fontColor,
                     usePointStyle: true,
                 }
@@ -3315,7 +3318,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
                                                     <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
-                                                    /><br />
+                                                    />
                                                 </div>
                                                 <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
                                                 <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
