@@ -1333,8 +1333,8 @@ class ShipmentGlobalDemandView extends Component {
                                     // Calculate the points for the line
                                     const lineStartX = model.x + x * model.outerRadius;
                                     const lineStartY = model.y + y * model.outerRadius;
-                                    const labelX = model.x + x * (model.outerRadius + 30);
-                                    const labelY = model.y + y * (model.outerRadius + 30);
+                                    const labelX = model.x + x * (model.outerRadius + 15);
+                                    const labelY = model.y + y * (model.outerRadius + 15);
 
                                     const value = dataset.data[index];
                                     const percentage = total > 0 ? ((value / total) * 100).toFixed(0) + '%' : '0%';
@@ -2957,7 +2957,7 @@ class ShipmentGlobalDemandView extends Component {
 
         /* 1️⃣ X-Axis Labels (Planning Units) */
         const labels = planningUnitQuantity.map(item =>
-            getLabelText(item.planningUnit.label, this.state.lang)
+            getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id
         );
 
         /* 2️⃣ Get All Unique FSPA Codes */
@@ -3041,6 +3041,9 @@ class ShipmentGlobalDemandView extends Component {
         const checkOnline = localStorage.getItem('sessionType');
 
         const optionsPie = {
+            layout: {
+                padding: 10
+            },
             title: {
                 display: true,
                 text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
@@ -3048,9 +3051,9 @@ class ShipmentGlobalDemandView extends Component {
                 padding: 30
             },
             legend: {
-                position: 'right',
+                position: 'bottom',
                 labels: {
-                    padding: 20,
+                    padding: 10,
                     fontColor: fontColor,
                     usePointStyle: true,
                 }
@@ -3305,7 +3308,7 @@ class ShipmentGlobalDemandView extends Component {
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
                                                     <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
-                                                    /><br />
+                                                    />
                                                 </div>
                                                 <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
                                                 <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
@@ -3382,7 +3385,7 @@ class ShipmentGlobalDemandView extends Component {
                                                                                 <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
                                                                                     <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
                                                                                 </td>
-                                                                                <td className="text-left" style={{ paddingLeft: '30px' }}>{prog.code}</td>
+                                                                                <td className="text-left custom-padding-program" style={{ paddingLeft: '30px' }}>{prog.code}</td>
                                                                                 <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
                                                                                 {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
                                                                                 {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
@@ -3396,7 +3399,7 @@ class ShipmentGlobalDemandView extends Component {
                                                                                 fspaRows.push(
                                                                                     <tr key={`${progKey}_pu_${pu.id}`}>
                                                                                         <td></td>
-                                                                                        <td className="text-left" style={{ paddingLeft: '50px' }}>{pu.display}</td>
+                                                                                        <td className="text-left custom-padding-pu" style={{ paddingLeft: '50px' }}>{pu.display}</td>
                                                                                         <td className="text-right">{formatNum(pu.quantity)}</td>
                                                                                         {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
                                                                                         {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
