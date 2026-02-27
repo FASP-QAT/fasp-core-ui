@@ -1772,7 +1772,7 @@ class ShipmentGlobalDemandView extends Component {
         const optionsPie = {
             layout: { padding: 10 },
             title: { display: true, text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')), fontColor, padding: 30 },
-            legend: { position: 'bottom', labels: { padding: 10, fontColor, usePointStyle: true } },
+            legend: { position: 'bottom', labels: { padding: 25, fontColor, usePointStyle: true } },
             tooltips: { callbacks: { label: function (tooltipItems, data) { var value = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]; return data.labels[tooltipItems.index] + " : $ " + value.toLocaleString(); } } },
             plugins: { datalabels: { display: false } }
         };
