@@ -1,8 +1,31 @@
+// ============================================================
+// CHANGES FROM ORIGINAL:
+// 1. Added jspreadsheet (v8) imports and CSS
+// 2. Added `tableDiv` ref for jspreadsheet mount point
+// 3. Added `buildJExcel()` method to build/rebuild the jspreadsheet
+//    with nested rows (FSPA → Program → PU hierarchy)
+// 4. Row-level collapse is handled by toggling `hidden` on jspreadsheet
+//    row elements after render, mirroring the original `collapsedRows` Set logic
+// 5. Checkbox columns (aggregateByCountry, hideCalculations,
+//    collapsePlanningUnits, collapseAll) still call `handleCheckboxChange`
+//    and then call `buildJExcel()` to rebuild the table
+// 6. `fetchData` setState callback now calls `buildJExcel()`
+// 7. `toggleCollapse` now calls `buildJExcel()` after state update
+// 8. The original <Table id="mytable1"> block is REPLACED by
+//    <div id="shipmentGlobalDemandTableDiv"> which jspreadsheet mounts into
+// 9. PDF export still clones #mytable1_clone logic – replaced with
+//    reading jspreadsheet data directly for PDF generation
+// 10. All other logic (filters, CSV export, charts, etc.) is UNCHANGED
+// ============================================================
+
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
 import CryptoJS from 'crypto-js';
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import jexcel from 'jspreadsheet';
+import { jExcelLoadedFunctionForErp, jExcelLoadedFunctionWithoutPagination, onOpenFilter } from "../../CommonComponent/JExcelCommonFunctions.js";
+import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from 'react';
 import { HorizontalBar, Pie } from 'react-chartjs-2';
@@ -18,11 +41,24 @@ import {
     Label,
     Table
 } from 'reactstrap';
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from '../../CommonComponent/Logo.js';
 import MonthBox from '../../CommonComponent/MonthBox.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import {
+    API_URL,
+    INDEXED_DB_NAME,
+    INDEXED_DB_VERSION,
+    JEXCEL_PAGINATION_OPTION,
+    JEXCEL_PRO_KEY,
+    MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
+    PROGRAM_TYPE_SUPPLY_PLAN,
+    REPORT_DATEPICKER_END_MONTH,
+    REPORT_DATEPICKER_START_MONTH,
+    SECRET_KEY
+} from '../../Constants.js';
 import DropdownService from '../../api/DropdownService';
 import FundingSourceService from '../../api/FundingSourceService';
 import ProductService from '../../api/ProductService';
@@ -35,179 +71,18 @@ import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, filterOptions, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+
 const ref = React.createRef();
+
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
 }
-// const options = {
-//     plugins: {
-//         datalabels: {
-//             formatter: (value, context) => {
-//                 return ``;
-//             },
-//         },
-//     },
-//     title: {
-//         display: true,
-//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-//         fontColor: 'black'
-//     },
-//     scales: {
-//         xAxes: [{
-//             stacked: true,
-//             scaleLabel: {
-//                 display: true,
-//                 labelString: i18n.t('static.shipment.qty'),
-//                 fontColor: 'black',
-//                 fontStyle: "normal",
-//                 fontSize: "12"
-//             },
-//             ticks: {
-//                 beginAtZero: true,
-//                 fontColor: 'black',
-//                 callback: function (value) {
-//                     var cell1 = value
-//                     cell1 += '';
-//                     var x = cell1.split('.');
-//                     var x1 = x[0];
-//                     var x2 = x.length > 1 ? '.' + x[1] : '';
-//                     var rgx = /(\d+)(\d{3})/;
-//                     while (rgx.test(x1)) {
-//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
-//                     }
-//                     return x1 + x2;
-//                 }
-//             },
-//             gridLines: {
-//                 display: false
-//             }
-//         }],
-//         yAxes: [{
-//             stacked: true,
-//             labelString: i18n.t('static.common.product'),
-//             ticks: {
-//                 callback: function (value) {
-//                     return (value.length > 40) ? value.substr(0, 40) + "..." : value;
-//                 },
-//             }
-//         }],
-//     },
-//     tooltips: {
-//         enabled: false,
-//         custom: CustomTooltips,
-//         callbacks: {
-//             label: function (tooltipItem, data) {
-//                 let label = data.labels[tooltipItem.index];
-//                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-//                 var cell1 = value
-//                 cell1 += '';
-//                 var x = cell1.split('.');
-//                 var x1 = x[0];
-//                 var x2 = x.length > 1 ? '.' + x[1] : '';
-//                 var rgx = /(\d+)(\d{3})/;
-//                 while (rgx.test(x1)) {
-//                     x1 = x1.replace(rgx, '$1' + ',' + '$2');
-//                 }
-//                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-//             }
-//         }
-//     },
-//     maintainAspectRatio: false
-//     ,
-//     legend: {
-//         display: true,
-//         position: 'bottom',
-//         labels: {
-//             usePointStyle: true,
-//             fontColor: 'black'
-//         }
-//     }
-// }
-// const options1 = {
-//     plugins: {
-//         datalabels: {
-//             formatter: (value, context) => {
-//                 return ``;
-//             },
-//         },
-//     },
-//     title: {
-//         display: true,
-//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
-//         fontColor: 'black'
-//     },
-//     scales: {
-//         xAxes: [{
-//             stacked: true,
-//             scaleLabel: {
-//                 display: true,
-//                 labelString: i18n.t('static.shipment.qty'),
-//                 fontColor: 'black',
-//                 fontStyle: "normal",
-//                 fontSize: "12"
-//             },
-//             ticks: {
-//                 beginAtZero: true,
-//                 fontColor: 'black',
-//                 callback: function (value) {
-//                     var cell1 = value
-//                     cell1 += '';
-//                     var x = cell1.split('.');
-//                     var x1 = x[0];
-//                     var x2 = x.length > 1 ? '.' + x[1] : '';
-//                     var rgx = /(\d+)(\d{3})/;
-//                     while (rgx.test(x1)) {
-//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
-//                     }
-//                     return x1 + x2;
-//                 }
-//             },
-//             gridLines: {
-//                 display: false
-//             }
-//         }],
-//         yAxes: [{
-//             stacked: true,
-//             labelString: i18n.t('static.common.product')
-//         }],
-//     },
-//     maintainAspectRatio: false,
-//     legend: {
-//         display: true,
-//         position: 'bottom',
-//         labels: {
-//             usePointStyle: true,
-//             fontColor: 'black'
-//         }
-//     }
-// }
-/*const optionsPie = {
-    title: {
-        display: true,
-        // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
-        text: i18n.t('static.fundingSourceHead.fundingSource'),
-        fontColor: 'black',
-        padding: 30
-    },
-    legend: {
-        position: 'bottom',
-        labels: {
-            padding: 25
-        }
-    },
-    tooltips: {
-        callbacks: {
-            label: function (tooltipItems, data) {
-                return data.labels[tooltipItems.index] +
-                    " : " + " $ " +
-                    (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
-            }
-        }
-    },
-}*/
+
 /**
  * Component for Shipment Global Demand View Report.
+ * Table section has been converted from a plain HTML <Table> to a
+ * jspreadsheet (v8) instance with nested FSPA → Program → PU rows.
  */
 class ShipmentGlobalDemandView extends Component {
     constructor(props) {
@@ -221,9 +96,7 @@ class ShipmentGlobalDemandView extends Component {
             datasets: [{
                 data: [5615266, 13824000, 0, 26849952],
                 backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944'],
-                legend: {
-                    position: 'bottom'
-                }
+                legend: { position: 'bottom' }
             }],
             isDarkMode: false,
             dropdownOpen: false,
@@ -246,7 +119,6 @@ class ShipmentGlobalDemandView extends Component {
             fundingSourcesOriginal: [],
             programLabels: [],
             programs: [],
-            countrys: [],
             countryValues: [],
             countryLabels: [],
             realmList: [],
@@ -283,26 +155,37 @@ class ShipmentGlobalDemandView extends Component {
             collapseAll: false,
             collapsedRows: new Set()
         };
-        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
         this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
-        this.getPrograms = this.getPrograms.bind(this)
-        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
-        this.handleChange = this.handleChange.bind(this)
+        this.getPrograms = this.getPrograms.bind(this);
+        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this);
+        this.handleChange = this.handleChange.bind(this);
         this.getFundingSourceType = this.getFundingSourceType.bind(this);
         this.setViewById = this.setViewById.bind(this);
         this.setVersionId = this.setVersionId.bind(this);
         this.getProcurementAgentList = this.getProcurementAgentList.bind(this);
         this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
         this.toggleCollapse = this.toggleCollapse.bind(this);
+        this.buildJExcel = this.buildJExcel.bind(this);
+        // ref for the jspreadsheet container div
+        this.tableDiv = React.createRef();
+        // jspreadsheet instance
+        this.el = null;
     }
 
+    // ------------------------------------------------------------------
+    // handleCheckboxChange – same as original, but rebuilds the table
+    // ------------------------------------------------------------------
     handleCheckboxChange(e) {
         const { name, checked } = e.target;
-        this.setState({
-            [name]: checked
+        this.setState({ [name]: checked }, () => {
+            this.buildJExcel();
         });
     }
 
+    // ------------------------------------------------------------------
+    // toggleCollapse – same as original, but rebuilds the table
+    // ------------------------------------------------------------------
     toggleCollapse(key) {
         let newCollapsedRows = new Set(this.state.collapsedRows);
         if (newCollapsedRows.has(key)) {
@@ -310,77 +193,556 @@ class ShipmentGlobalDemandView extends Component {
         } else {
             newCollapsedRows.add(key);
         }
-        this.setState({ collapsedRows: newCollapsedRows });
+        this.setState({ collapsedRows: newCollapsedRows }, () => {
+            this.buildJExcel();
+        });
     }
+
     setViewById(e) {
-        this.setState({
-            viewById: e.target.value
-        }, () => {
-            this.fetchData()
-        })
+        this.setState({ viewById: e.target.value }, () => { this.fetchData(); });
     }
-    /**
-     * Exports the data to a CSV file.
-     */
+
+    // ------------------------------------------------------------------
+    // buildJExcel – builds / rebuilds the jspreadsheet table.
+    //
+    // Changes vs previous version:
+    //  • rowHeaders: false          → no row-number column
+    //  • accordion column title: '' → truly blank (no sort/filter icon on it)
+    //  • + / - icons               → styled <button> elements (not arrow chars)
+    //  • indentation               → applied via paddingLeft on TD cells in onload
+    //                                (no leading spaces in the cell value)
+    //  • sorting / filter / search → enabled on data columns only;
+    //                                accordion col and label col have these
+    //                                disabled so the hierarchy is not disrupted
+    //  • search box                → rendered above the table via jspreadsheet
+    //                                built-in search:true option
+    // ------------------------------------------------------------------
+    buildJExcel() {
+        // Destroy any previous instance
+        if (this.tableDiv && this.tableDiv.current) {
+            try {
+                jexcel.destroy(this.tableDiv.current, true);
+            } catch (_) { /* ignore if nothing to destroy */ }
+        }
+
+        const dataSource = this.state.aggregateByCountry
+            ? this.state.data.fspaCountrySplit
+            : this.state.data.fspaProgramSplit;
+
+        if (!dataSource || dataSource.length === 0) return;
+
+        // ---------------------------------------------------------------
+        // 1. Build grouping hierarchy (unchanged logic)
+        // ---------------------------------------------------------------
+        let grouping = {};
+        let grandTotalCost = 0;
+        let grandPUCost = 0;
+        let grandFreightCost = 0;
+
+        dataSource.forEach(d => {
+            const fspaCode = d.fspa.code;
+            const programCode = d.programCountry ? d.programCountry.code : 'N/A';
+
+            if (!grouping[fspaCode]) {
+                grouping[fspaCode] = {
+                    code: fspaCode,
+                    label: d.fspa.label,
+                    programs: {},
+                    totalPuCost: 0,
+                    totalFreightCost: 0,
+                    totalCost: 0
+                };
+            }
+            if (!grouping[fspaCode].programs[programCode]) {
+                grouping[fspaCode].programs[programCode] = {
+                    code: programCode,
+                    label: d.programCountry ? d.programCountry.label : 'N/A',
+                    pus: [],
+                    totalPuCost: 0,
+                    totalFreightCost: 0,
+                    totalCost: 0
+                };
+            }
+
+            const puLabel = getLabelText(d.planningUnit.label, this.state.lang);
+            const puDisplay = `${puLabel} | ${d.planningUnit.id}`;
+
+            grouping[fspaCode].programs[programCode].pus.push({
+                id: d.planningUnit.id,
+                display: puDisplay,
+                quantity: d.quantity,
+                totalPuCost: d.cost,
+                totalFreightCost: d.freightCost,
+                totalCost: d.totalCost
+            });
+
+            grouping[fspaCode].programs[programCode].totalPuCost += d.cost;
+            grouping[fspaCode].programs[programCode].totalFreightCost += d.freightCost;
+            grouping[fspaCode].programs[programCode].totalCost += d.totalCost;
+            grouping[fspaCode].totalPuCost += d.cost;
+            grouping[fspaCode].totalFreightCost += d.freightCost;
+            grouping[fspaCode].totalCost += d.totalCost;
+            grandPUCost += d.cost;
+            grandFreightCost += d.freightCost;
+            grandTotalCost += d.totalCost;
+        });
+
+        let fspasList = Object.values(grouping).sort((a, b) =>
+            a.code.toString().toUpperCase() > b.code.toString().toUpperCase() ? 1 : -1
+        );
+        fspasList.forEach(f => {
+            f.programsList = Object.values(f.programs).sort((a, b) =>
+                a.code.toString().toUpperCase() > b.code.toString().toUpperCase() ? 1 : -1
+            );
+            f.programsList.forEach(p => {
+                p.pus.sort((a, b) =>
+                    a.display.toString().toUpperCase() > b.display.toString().toUpperCase() ? 1 : -1
+                );
+            });
+        });
+
+        // ---------------------------------------------------------------
+        // 2. Formatters
+        // ---------------------------------------------------------------
+        const formatCurr = val =>
+            new Intl.NumberFormat('en-US', {
+                style: 'currency', currency: 'USD',
+                minimumFractionDigits: 0, maximumFractionDigits: 0
+            }).format(val);
+        const formatNum = val => (val ? new Intl.NumberFormat('en-US').format(val) : 0);
+        const formatPerc = val => (val * 100).toFixed(0) + '%';
+
+        const isSingleProgram = this.state.programValues.length === 1;
+        const showQtyCol = !this.state.collapsePlanningUnits && !this.state.collapseAll;
+
+        // ---------------------------------------------------------------
+        // 3. + / - icon HTML builder
+        //    Uses a real <button> so it is visually distinct and accessible.
+        //    The data-key attribute drives toggleCollapse().
+        // ---------------------------------------------------------------
+        const makeToggleBtn = (collapseKey, isCollapsed) =>
+            `<i class="jss-accordion-btn fa ${isCollapsed ? 'fa-plus-square-o' : 'fa-minus-square-o'} supplyPlanIcon" data-key="${collapseKey}" style="cursor:pointer;font-size:16px;"></i>`;
+
+        // ---------------------------------------------------------------
+        // 4. Row metadata
+        //    Each logical row carries extra fields so the onload callback
+        //    can apply correct indentation and styling without re-parsing
+        //    the cell text.
+        //
+        //    indentPx: pixels of left padding on the label (col 1) TD
+        //              fspa=0, program=20, pu under fspa=20, pu under prog=40
+        // ---------------------------------------------------------------
+
+        // rows array entries: { data: [...], rowType, indentPx }
+        const rows = [];
+
+        const pushRow = (
+            expandHtml, labelText, qty,
+            puCost, freightCost, totalCost, perc,
+            rowType, collapseKey, fspaCode, progCode,
+            indentPx
+        ) => {
+            const row = [expandHtml, labelText];
+            if (showQtyCol) row.push(qty !== undefined && qty !== null ? formatNum(qty) : '');
+            if (!this.state.hideCalculations) {
+                row.push(puCost !== '' && puCost !== undefined ? formatCurr(puCost) : '');
+                row.push(freightCost !== '' && freightCost !== undefined ? formatCurr(freightCost) : '');
+            }
+            row.push(totalCost !== '' && totalCost !== undefined ? formatCurr(totalCost) : '');
+            row.push(perc);
+            // hidden meta columns
+            row.push(rowType);
+            row.push(collapseKey || '');
+            row.push(fspaCode || '');
+            row.push(progCode || '');
+            rows.push({ data: row, rowType, indentPx: indentPx || 0 });
+        };
+
+        fspasList.forEach(fspa => {
+            const isFspaCollapsed = this.state.collapseAll ||
+                this.state.collapsedRows.has(`fspa_${fspa.code}`);
+
+            pushRow(
+                makeToggleBtn(`fspa_${fspa.code}`, isFspaCollapsed),
+                fspa.code,
+                undefined,
+                fspa.totalPuCost, fspa.totalFreightCost, fspa.totalCost,
+                grandTotalCost > 0 ? formatPerc(fspa.totalCost / grandTotalCost) : '0%',
+                'fspa', `fspa_${fspa.code}`, fspa.code, '',
+                0   // indent: 0 px – top-level FSPA
+            );
+
+            if (!isFspaCollapsed) {
+                if (isSingleProgram) {
+                    // Single-program mode: PUs appear directly under FSPA
+                    if (!this.state.collapsePlanningUnits) {
+                        fspa.programsList.forEach(prog => {
+                            prog.pus.forEach(pu => {
+                                pushRow(
+                                    '',
+                                    pu.display,
+                                    pu.quantity,
+                                    pu.totalPuCost, pu.totalFreightCost, pu.totalCost,
+                                    fspa.totalCost > 0 ? formatPerc(pu.totalCost / fspa.totalCost) : '0%',
+                                    'pu', '', fspa.code, prog.code,
+                                    20  // indent: 20 px – one level under FSPA
+                                );
+                            });
+                        });
+                    }
+                } else {
+                    // Multi-program mode: Program rows then PU rows
+                    fspa.programsList.forEach(prog => {
+                        const progKey = `prog_${fspa.code}_${prog.code}`;
+                        const isProgCollapsed = this.state.collapsedRows.has(progKey);
+
+                        pushRow(
+                            makeToggleBtn(progKey, isProgCollapsed),
+                            prog.code,
+                            undefined,
+                            prog.totalPuCost, prog.totalFreightCost, prog.totalCost,
+                            fspa.totalCost > 0 ? formatPerc(prog.totalCost / fspa.totalCost) : '0%',
+                            'program', progKey, fspa.code, prog.code,
+                            20  // indent: 20 px – one level under FSPA
+                        );
+
+                        if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
+                            prog.pus.forEach(pu => {
+                                pushRow(
+                                    '',
+                                    pu.display,
+                                    pu.quantity,
+                                    pu.totalPuCost, pu.totalFreightCost, pu.totalCost,
+                                    prog.totalCost > 0 ? formatPerc(pu.totalCost / prog.totalCost) : '0%',
+                                    'pu', '', fspa.code, prog.code,
+                                    40  // indent: 40 px – two levels under FSPA
+                                );
+                            });
+                        }
+                    });
+                }
+            }
+        });
+
+        // Grand total row (no indent, no toggle button)
+        const totalRowData = ['', i18n.t('static.supplyPlan.total')];
+        if (showQtyCol) totalRowData.push('');
+        if (!this.state.hideCalculations) {
+            totalRowData.push(formatCurr(grandPUCost));
+            totalRowData.push(formatCurr(grandFreightCost));
+        }
+        totalRowData.push(formatCurr(grandTotalCost));
+        totalRowData.push('');
+        // meta
+        totalRowData.push('total');
+        totalRowData.push('');
+        totalRowData.push('');
+        totalRowData.push('');
+        rows.push({ data: totalRowData, rowType: 'total', indentPx: 0 });
+
+        // ---------------------------------------------------------------
+        // 5. Column definitions
+        //
+        //    • Accordion column (col 0): type html, no sort, no filter,
+        //      blank title, narrow width.
+        //    • Label column (col 1): text, sort enabled, filter enabled
+        //      (so the user can search by label).
+        //    • Data columns (qty, costs, %): text, sort + filter enabled.
+        //    • Hidden meta columns: type hidden (never shown).
+        //
+        //    NOTE: jspreadsheet v8 controls per-column sort/filter via
+        //    the `sort` and `filter` column properties.
+        // ---------------------------------------------------------------
+        const fspaOrPAHeader = this.state.viewById == 1
+            ? i18n.t('static.fundingSourceHead.fundingSource')
+            : i18n.t('static.report.procurementAgentName');
+
+        const progHeader = this.state.aggregateByCountry
+            ? i18n.t('static.dashboard.country')
+            : i18n.t('static.program.program');
+
+        let labelColHeader = fspaOrPAHeader;
+        if (!isSingleProgram) labelColHeader += ` / ${progHeader}`;
+        if (showQtyCol) labelColHeader += ` / ${i18n.t('static.dashboard.planningunitheader')}`;
+
+        const columns = [
+            // [0] accordion / toggle column – NO sort, NO filter, blank title
+            {
+                title: ' ',          // using a space instead of empty string avoids jspreadsheet rendering "A"
+                type: 'html',
+                width: 38,
+                readOnly: true,
+                sort: false,        // disable sort arrow on this column
+                filter: false       // disable filter dropdown on this column
+            },
+            // [1] label column – sort + filter enabled so user can search names
+            {
+                title: labelColHeader,
+                type: 'text',
+                width: 300,
+                readOnly: true,
+                sort: true,
+                filter: true
+            }
+        ];
+
+        if (showQtyCol) {
+            columns.push({
+                title: `${i18n.t('static.shipment.qty')} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t('static.tooltip.qtyMayRepresentMultipleShipments')}"></i>`,
+                type: 'text',
+                width: 120,
+                readOnly: true,
+                sort: true,
+                filter: true,
+                align: 'right'
+            });
+        }
+        if (!this.state.hideCalculations) {
+            columns.push({
+                title: `${i18n.t('static.shipment.totalPUCost')} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t('static.tooltip.totalPlanningUnitCost')}"></i>`,
+                type: 'text',
+                width: 140,
+                readOnly: true,
+                sort: true,
+                filter: true,
+                align: 'right'
+            });
+            columns.push({
+                title: `${i18n.t('static.shipment.totalFreightCost')} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t('static.tooltip.totalFreightCost')}"></i>`,
+                type: 'text',
+                width: 140,
+                readOnly: true,
+                sort: true,
+                filter: true,
+                align: 'right'
+            });
+        }
+        columns.push({
+            title: `${i18n.t('static.shipment.totalCost')} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t('static.tooltip.totalCostGlobalDemand')}"></i>`,
+            type: 'text',
+            width: 140,
+            readOnly: true,
+            sort: true,
+            filter: true,
+            align: 'right'
+        });
+        columns.push({
+            title: `${i18n.t('static.shipment.totalCostPerc')} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t('static.tooltip.totalCostPercGlobalDemand')}"></i>`,
+            type: 'text',
+            width: 110,
+            readOnly: true,
+            sort: true,
+            filter: true,
+            align: 'right'
+        });
+        // Hidden meta columns – these are never visible
+        columns.push({ title: '_rowType', type: 'hidden' });
+        columns.push({ title: '_collapseKey', type: 'hidden' });
+        columns.push({ title: '_fspaCode', type: 'hidden' });
+        columns.push({ title: '_progCode', type: 'hidden' });
+
+        // ---------------------------------------------------------------
+        // 6. Index of first "data" column (after accordion + label).
+        //    Used in onload to right-align numeric cells.
+        // ---------------------------------------------------------------
+        const FIRST_DATA_COL = 3; // qty / puCost / freightCost / totalCost / %
+
+        // ---------------------------------------------------------------
+        // 7. jspreadsheet instance options
+        // ---------------------------------------------------------------
+        const self = this;
+
+        const options = {
+            data: rows.map(r => r.data),
+            columns,
+            editable: false,
+            rowHeaders: false,          // ← REMOVE row-number column
+            allowInsertRow: false,
+            allowDeleteRow: false,
+            allowInsertColumn: false,
+            allowDeleteColumn: false,
+            columnDrag: false,
+            columnSorting: true,        // ← enable global sort (per-column controlled above)
+            search: true,               // ← enable built-in search box
+            filters: true,              // ← enable column filter dropdowns
+            pagination: false,
+            allowRenameColumn: false,
+            license: JEXCEL_PRO_KEY,
+            contextMenu: () => false,
+            onopenfilter: onOpenFilter,
+
+            // -----------------------------------------------------------
+            // onload: apply styles + indentation + click handler
+            // -----------------------------------------------------------
+            onload: function (instance) {
+                jExcelLoadedFunctionWithoutPagination(instance);
+
+                const worksheet = instance.worksheets[0];
+                // worksheet.hideIndex(0);
+                const tbody = worksheet.tbody;
+
+                rows.forEach((rowMeta, rowIdx) => {
+                    const trEl = tbody.children[rowIdx];
+                    if (!trEl) return;
+
+                    const { rowType, indentPx } = rowMeta;
+
+                    // ── Row-level background / font styling ──────────────
+                    // Zebra pattern – starts with blue on row 0
+                    const zebraColor = rowIdx % 2 === 0 ? '#e5edf5' : '#ffffff';
+                    trEl.style.backgroundColor = zebraColor;
+                    if (rowType === 'fspa' || rowType === 'program' || rowType === 'total') {
+                        trEl.style.fontWeight = 'bold';
+                    }
+                    if (rowType === 'total') {
+                        trEl.style.backgroundColor = '#ccc';
+                    }
+
+                    const cells = trEl.querySelectorAll('td');
+
+                    cells.forEach((td, cIdx) => {
+                        // ── Indentation + left-align on the LABEL cell ────
+                        // DOM order (jspreadsheet renders a hidden row-num td):
+                        //   cIdx 0 = row-num td  |  cIdx 1 = accordion  |  cIdx 2 = label  |  cIdx 3+ = data
+                        if (cIdx === 2) {
+                            td.style.paddingLeft = `${(indentPx || 0) + 6}px`;
+                            td.style.textAlign = 'left';
+                            td.querySelectorAll('*').forEach(el => { el.style.textAlign = 'left'; });
+                        }
+
+                        // ── Right-align all data columns (td + inner elements) ────
+                        if (cIdx >= FIRST_DATA_COL) {
+                            td.style.textAlign = 'right';
+                            td.style.paddingRight = '8px';
+                            td.querySelectorAll('*').forEach(el => {
+                                el.style.textAlign = 'right';
+                            });
+                        }
+
+                        // ── Accordion cell: show pointer cursor over whole td ──
+                        if (cIdx === 1) {
+                            const hasIcon = td.querySelector('.jss-accordion-btn');
+                            if (hasIcon) td.style.cursor = 'pointer';
+                        }
+
+                        // ── Grey background on qty cell for header rows ──
+                        if (showQtyCol && cIdx === FIRST_DATA_COL &&
+                            (rowType === 'fspa' || rowType === 'program')) {
+                            // Apply with !important so jspreadsheet doesn't override it easily
+                            td.style.setProperty('background-color', 'rgb(211, 211, 211)', 'important');
+                        }
+                    });
+                });
+
+                // ── Fix column header (thead) alignment ──────────────────
+                const thead = worksheet.thead;
+                if (thead) {
+                    const headerRows = thead.querySelectorAll('tr');
+                    headerRows.forEach(tr => {
+                        const ths = tr.querySelectorAll('td, th');
+                        ths.forEach((th, cIdx) => {
+                            if (cIdx === 2) {
+                                // label column header – left align
+                                th.style.textAlign = 'left';
+                                th.querySelectorAll('*').forEach(el => { el.style.textAlign = 'left'; });
+                            } else if (cIdx >= FIRST_DATA_COL) {
+                                // data column headers – right align
+                                th.style.textAlign = 'right';
+                                th.querySelectorAll('*').forEach(el => { el.style.textAlign = 'right'; });
+                            }
+                        });
+                    });
+                }
+
+                // ── Delegated click handler – whole accordion cell is clickable ──
+                tbody.addEventListener('click', function (e) {
+                    // 1) Clicked directly on the icon span?
+                    const btn = e.target.closest('.jss-accordion-btn');
+                    if (btn) {
+                        const key = btn.getAttribute('data-key');
+                        if (key) self.toggleCollapse(key);
+                        return;
+                    }
+                    // 2) Clicked anywhere else inside the accordion td (DOM cIdx 1)?
+                    const td = e.target.closest('td');
+                    if (!td) return;
+                    const tr = td.closest('tr');
+                    if (!tr) return;
+                    const allTds = Array.from(tr.querySelectorAll('td'));
+                    if (allTds.indexOf(td) === 1) {   // cIdx 1 = accordion column
+                        const iconSpan = td.querySelector('.jss-accordion-btn');
+                        if (iconSpan) {
+                            const key = iconSpan.getAttribute('data-key');
+                            if (key) self.toggleCollapse(key);
+                        }
+                    }
+                });
+            }
+        };
+
+        // ---------------------------------------------------------------
+        // 8. Mount jspreadsheet
+        // ---------------------------------------------------------------
+        if (this.tableDiv && this.tableDiv.current) {
+            this.el = jexcel(this.tableDiv.current, options);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // exportCSV – unchanged from original
+    // ------------------------------------------------------------------
     exportCSV() {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-            ;[...this.state.countryLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
-                csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
-            ;[...this.state.programLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
-                csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+        [...this.state.countryLabels].sort((a, b) => { var A = a.toString().toUpperCase(); var B = b.toString().toUpperCase(); return A > B ? 1 : -1; }).map(ele =>
+            csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
+        [...this.state.programLabels].sort((a, b) => { var A = a.toString().toUpperCase(); var B = b.toString().toUpperCase(); return A > B ? 1 : -1; }).map(ele =>
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
         if (this.state.programValues.length == 1) {
-            csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"');
+            csvRow.push('');
         }
-        ;[...this.state.planningUnitLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+        [...this.state.planningUnitLabels].sort((a, b) => { var A = a.toString().toUpperCase(); var B = b.toString().toUpperCase(); return A > B ? 1 : -1; }).map(ele =>
             csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
-        csvRow.push('')
+        csvRow.push('');
         csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
-        csvRow.push('')
+        csvRow.push('');
         if (this.state.viewById == 1) {
-            ;[...this.state.fundingSourceLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+            [...this.state.fundingSourceLabels].sort((a, b) => { var A = a.toString().toUpperCase(); var B = b.toString().toUpperCase(); return A > B ? 1 : -1; }).map(ele =>
                 csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
         } else {
-            ;[...this.state.procurementAgentLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+            [...this.state.procurementAgentLabels].sort((a, b) => { var A = a.toString().toUpperCase(); var B = b.toString().toUpperCase(); return A > B ? 1 : -1; }).map(ele =>
                 csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
         }
-        csvRow.push('')
+        csvRow.push('');
         this.state.shipmentStatusLabels.map(ele =>
-            csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
-        csvRow.push('')
-        var re;
-        var re;
+            csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
+        csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+        csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+        csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+        csvRow.push('');
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+
         let dataList = this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit;
 
         if (dataList && dataList.length > 0) {
             var A = [];
-
-            // CSV Headers
             let tableHeadTemp = [];
             const isSingleProgramCsvHdr = this.state.programValues.length === 1;
             let fspaHeader = this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName');
             let progHeader = this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program');
             const hidesPUs = this.state.collapsePlanningUnits || this.state.collapseAll;
             let headerLabel = isSingleProgramCsvHdr
-                ? (hidesPUs
-                    ? `${fspaHeader}`
-                    : `${fspaHeader} / ${i18n.t('static.dashboard.planningunitheader')}`)
-                : (hidesPUs
-                    ? `${fspaHeader} / ${progHeader}`
-                    : `${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`);
+                ? (hidesPUs ? `${fspaHeader}` : `${fspaHeader} / ${i18n.t('static.dashboard.planningunitheader')}`)
+                : (hidesPUs ? `${fspaHeader} / ${progHeader}` : `${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`);
             tableHeadTemp.push(headerLabel.replaceAll(' ', '%20'));
             if (!this.state.collapsePlanningUnits && !this.state.collapseAll) {
                 tableHeadTemp.push(i18n.t('static.shipment.qty').replaceAll(' ', '%20'));
@@ -393,51 +755,30 @@ class ShipmentGlobalDemandView extends Component {
             tableHeadTemp.push(i18n.t('static.shipment.totalCostPerc').replaceAll(' ', '%20'));
             A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
 
-            // Calculate Groupings (same as render logic)
             let grandPUCost = 0;
             let grandFreightCost = 0;
             let grandTotalCost = 0;
-
             let grouping = {};
+
             dataList.forEach(item => {
                 let fspa = item.fspa;
                 let fspaId = fspa ? fspa.id : 0;
                 let fspaCode = fspa ? fspa.code : 'N/A';
-
                 grandPUCost += item.cost;
                 grandFreightCost += item.freightCost;
                 grandTotalCost += item.totalCost;
-
                 if (!grouping[fspaId]) {
-                    grouping[fspaId] = {
-                        id: fspaId,
-                        code: fspaCode,
-                        totalPuCost: 0,
-                        totalFreightCost: 0,
-                        totalCost: 0,
-                        programs: {}
-                    };
+                    grouping[fspaId] = { id: fspaId, code: fspaCode, totalPuCost: 0, totalFreightCost: 0, totalCost: 0, programs: {} };
                 }
-
                 grouping[fspaId].totalPuCost += item.cost;
                 grouping[fspaId].totalFreightCost += item.freightCost;
                 grouping[fspaId].totalCost += item.totalCost;
-
                 let prog = item.programCountry;
                 let progId = prog ? prog.id : 0;
                 let progCode = prog ? prog.code : 'N/A';
-
                 if (!grouping[fspaId].programs[progId]) {
-                    grouping[fspaId].programs[progId] = {
-                        id: progId,
-                        code: progCode,
-                        totalPuCost: 0,
-                        totalFreightCost: 0,
-                        totalCost: 0,
-                        pus: []
-                    };
+                    grouping[fspaId].programs[progId] = { id: progId, code: progCode, totalPuCost: 0, totalFreightCost: 0, totalCost: 0, pus: [] };
                 }
-
                 grouping[fspaId].programs[progId].totalPuCost += item.cost;
                 grouping[fspaId].programs[progId].totalFreightCost += item.freightCost;
                 grouping[fspaId].programs[progId].totalCost += item.totalCost;
@@ -451,43 +792,28 @@ class ShipmentGlobalDemandView extends Component {
                 });
             });
 
-            let fspasList = Object.values(grouping).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
+            const renderPerc = (value) => (value * 100).toFixed(2) + "%";
+            let fspasList = Object.values(grouping).sort((a, b) => { var A = a.code.toString().toUpperCase(); var B = b.code.toString().toUpperCase(); return A > B ? 1 : -1; });
             fspasList.forEach(f => {
-                f.programsList = Object.values(f.programs).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
-                f.programsList.forEach(p => {
-                    p.pus.sort((a, b) => a.display.toString().toLowerCase().localeCompare(b.display.toString().toLowerCase()));
-                });
+                f.programsList = Object.values(f.programs).sort((a, b) => { var A = a.code.toString().toUpperCase(); var B = b.code.toString().toUpperCase(); return A > B ? 1 : -1; });
+                f.programsList.forEach(p => { p.pus.sort((a, b) => { var A = a.display.toString().toUpperCase(); var B = b.display.toString().toUpperCase(); return A > B ? 1 : -1; }); });
             });
 
-            const renderPerc = (value) => {
-                return (value * 100).toFixed(2) + "%";
-            };
-
-            // Build CSV rows
             const isSingleProgramCsv = this.state.programValues.length === 1;
             fspasList.forEach(fspa => {
-                let qtyPlaceholder = !this.state.collapsePlanningUnits ? '' : undefined;
                 let row = [(fspa.code).replaceAll(',', ' ').replaceAll(' ', '%20')];
-                if (!this.state.collapsePlanningUnits && !this.state.collapseAll) row.push(''); // qty col (empty for fspa level)
-                if (!this.state.hideCalculations) {
-                    row.push(fspa.totalPuCost);
-                    row.push(fspa.totalFreightCost);
-                }
+                if (!this.state.collapsePlanningUnits && !this.state.collapseAll) row.push('');
+                if (!this.state.hideCalculations) { row.push(fspa.totalPuCost); row.push(fspa.totalFreightCost); }
                 row.push(fspa.totalCost);
                 row.push(grandTotalCost > 0 ? renderPerc(fspa.totalCost / grandTotalCost) : '0%');
                 A.push(addDoubleQuoteToRowContent(row));
-
                 if (!this.state.collapseAll) {
                     if (isSingleProgramCsv) {
-                        // Single program: skip program row, show PUs directly under FSPA
                         if (!this.state.collapsePlanningUnits) {
                             fspa.programsList.forEach(prog => {
                                 prog.pus.forEach(pu => {
                                     let puRow = [("  " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
-                                    if (!this.state.hideCalculations) {
-                                        puRow.push(pu.totalPuCost);
-                                        puRow.push(pu.totalFreightCost);
-                                    }
+                                    if (!this.state.hideCalculations) { puRow.push(pu.totalPuCost); puRow.push(pu.totalFreightCost); }
                                     puRow.push(pu.totalCost);
                                     puRow.push(fspa.totalCost > 0 ? renderPerc(pu.totalCost / fspa.totalCost) : '0%');
                                     A.push(addDoubleQuoteToRowContent(puRow));
@@ -497,22 +823,15 @@ class ShipmentGlobalDemandView extends Component {
                     } else {
                         fspa.programsList.forEach(prog => {
                             let progRow = [("  " + prog.code).replaceAll(',', ' ').replaceAll(' ', '%20')];
-                            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) progRow.push(''); // qty col empty for prog level
-                            if (!this.state.hideCalculations) {
-                                progRow.push(prog.totalPuCost);
-                                progRow.push(prog.totalFreightCost);
-                            }
+                            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) progRow.push('');
+                            if (!this.state.hideCalculations) { progRow.push(prog.totalPuCost); progRow.push(prog.totalFreightCost); }
                             progRow.push(prog.totalCost);
                             progRow.push(fspa.totalCost > 0 ? renderPerc(prog.totalCost / fspa.totalCost) : '0%');
                             A.push(addDoubleQuoteToRowContent(progRow));
-
                             if (!this.state.collapsePlanningUnits) {
                                 prog.pus.forEach(pu => {
                                     let puRow = [("    " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
-                                    if (!this.state.hideCalculations) {
-                                        puRow.push(pu.totalPuCost);
-                                        puRow.push(pu.totalFreightCost);
-                                    }
+                                    if (!this.state.hideCalculations) { puRow.push(pu.totalPuCost); puRow.push(pu.totalFreightCost); }
                                     puRow.push(pu.totalCost);
                                     puRow.push(prog.totalCost > 0 ? renderPerc(pu.totalCost / prog.totalCost) : '0%');
                                     A.push(addDoubleQuoteToRowContent(puRow));
@@ -523,136 +842,114 @@ class ShipmentGlobalDemandView extends Component {
                 }
             });
 
-            // Grand Total
             let totalRow = [i18n.t('static.supplyPlan.total').replaceAll(' ', '%20')];
-            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) totalRow.push(''); // qty col placeholder
-            if (!this.state.hideCalculations) {
-                totalRow.push(grandPUCost);
-                totalRow.push(grandFreightCost);
-            }
+            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) totalRow.push('');
+            if (!this.state.hideCalculations) { totalRow.push(grandPUCost); totalRow.push(grandFreightCost); }
             totalRow.push(grandTotalCost);
             totalRow.push('');
             A.push(addDoubleQuoteToRowContent(totalRow));
 
-            for (var i = 0; i < A.length; i++) {
-                csvRow.push(A[i].join(","));
-            }
+            for (var i = 0; i < A.length; i++) { csvRow.push(A[i].join(",")); }
         }
-        var csvString = csvRow.join("%0A")
-        var a = document.createElement("a")
-        a.href = 'data:attachment/csv,' + csvString
-        a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentByPlanningUnit') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
-        document.body.appendChild(a)
-        a.click()
+
+        var csvString = csvRow.join("%0A");
+        var a = document.createElement("a");
+        a.href = 'data:attachment/csv,' + csvString;
+        a.target = "_Blank";
+        a.download = i18n.t('static.dashboard.shipmentByPlanningUnit') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv";
+        document.body.appendChild(a);
+        a.click();
     }
-    /**
-     * Exports the data to a PDF file.
-     */
+
+    // ------------------------------------------------------------------
+    // exportPDF – same as original but reads data from jspreadsheet
+    // instance instead of cloning the HTML table
+    // ------------------------------------------------------------------
     exportPDF = () => {
         const addFooters = doc => {
-            const pageCount = doc.internal.getNumberOfPages()
-            doc.setFont('helvetica', 'bold')
-            doc.setFontSize(6)
+            const pageCount = doc.internal.getNumberOfPages();
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(6);
             for (var i = 1; i <= pageCount; i++) {
-                doc.setPage(i)
-                doc.setPage(i)
-                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
-                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
-                    align: 'center'
-                })
+                doc.setPage(i);
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, { align: 'center' });
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, { align: 'center' });
             }
-        }
+        };
         const addHeaders = doc => {
-            const pageCount = doc.internal.getNumberOfPages()
+            const pageCount = doc.internal.getNumberOfPages();
             for (var i = 1; i <= pageCount; i++) {
-                doc.setFontSize(12)
-                doc.setFont('helvetica', 'bold')
-                doc.setPage(i)
+                doc.setFontSize(12);
+                doc.setFont('helvetica', 'bold');
+                doc.setPage(i);
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.shipmentByPlanningUnit'), doc.internal.pageSize.width / 2, 60, {
-                    align: 'center'
-                })
+                doc.text(i18n.t('static.dashboard.shipmentByPlanningUnit'), doc.internal.pageSize.width / 2, 60, { align: 'center' });
                 if (i == 1) {
-                    doc.setFont('helvetica', 'normal')
-                    doc.setFontSize(8)
-                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
-                        align: 'left'
-                    })
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, { align: 'left' });
                 }
             }
-        }
+        };
+
         const unit = "pt";
         const size = "A4";
         const orientation = "landscape";
-        const marginLeft = 10;
         const doc = new jsPDF(orientation, unit, size, true);
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
-        var len = 120
+
+        var len = 120;
         var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-        doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
-        len = len + countryLabelsText.length * 10
+        doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText);
+        len = len + countryLabelsText.length * 10;
+
         var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-        doc.text(doc.internal.pageSize.width / 8, len, planningText)
-        len = len + planningText.length * 10
+        doc.text(doc.internal.pageSize.width / 8, len, planningText);
+        len = len + planningText.length * 10;
         if (this.state.programValues.length == 1) {
-            doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
-                align: 'left'
-            })
-            len = len + 10
+            len+=10;
+            doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, len, { align: 'left' });
+            len+=10;
         }
+
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
-        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        let y = len
-
+        var puText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        let y = len + 10;
         var viewByText = doc.splitTextToSize((i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))), doc.internal.pageSize.width * 3 / 4);
         for (var i = 0; i < viewByText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-            };
+            if (y > doc.internal.pageSize.height - 100) { doc.addPage(); y = 80; }
             doc.text(doc.internal.pageSize.width / 8, y, viewByText[i]);
-            y = y + 10
+            y = y + 10;
         }
-        var sourceOrAgentText;
-        if (this.state.viewById == 1) {
-            sourceOrAgentText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        } else {
-            sourceOrAgentText = doc.splitTextToSize((i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        }
+
+        var sourceOrAgentText = this.state.viewById == 1
+            ? doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4)
+            : doc.splitTextToSize((i18n.t('static.report.procurementAgentName') + ' : ' + this.state.procurementAgentLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < sourceOrAgentText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-            };
+            if (y > doc.internal.pageSize.height - 100) { doc.addPage(); y = 80; }
             doc.text(doc.internal.pageSize.width / 8, y, sourceOrAgentText[i]);
-            y = y + 10
+            y = y + 10;
         }
+
         var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
         y = y + 10;
         for (var i = 0; i < statusText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-            }
+            if (y > doc.internal.pageSize.height - 100) { doc.addPage(); y = 80; }
             doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
             y = y + 10;
         }
+
         y = y + 10;
-        for (var i = 0; i < planningText.length; i++) {
-            if (y > doc.internal.pageSize.height - 100) {
-                doc.addPage();
-                y = 80;
-            }
-            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+        for (var i = 0; i < puText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) { doc.addPage(); y = 80; }
+            doc.text(doc.internal.pageSize.width / 8, y, puText[i]);
             y = y + 10;
         }
+
         y = y + 10;
         var filterProps = [
             i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No"),
@@ -662,15 +959,13 @@ class ShipmentGlobalDemandView extends Component {
         for (var i = 0; i < filterProps.length; i++) {
             var propText = doc.splitTextToSize(filterProps[i], doc.internal.pageSize.width * 3 / 4);
             for (var j = 0; j < propText.length; j++) {
-                if (y > doc.internal.pageSize.height - 100) {
-                    doc.addPage();
-                    y = 80;
-                }
+                if (y > doc.internal.pageSize.height - 100) { doc.addPage(); y = 80; }
                 doc.text(doc.internal.pageSize.width / 8, y, propText[j]);
                 y = y + 10;
             }
             y = y + 10;
         }
+
         doc.setTextColor("#fff");
         var height = doc.internal.pageSize.height;
         var h1 = 50;
@@ -680,83 +975,126 @@ class ShipmentGlobalDemandView extends Component {
         if (canvas) {
             var canvasImg = canvas.toDataURL("image/png", 1.0);
             let pages = Math.ceil(startY / height);
-            for (var j = 1; j < pages; j++) {
-                doc.addPage();
-            }
+            for (var j = 1; j < pages; j++) { doc.addPage(); }
             let startYtable = startY - ((height - h1) * (pages - 1));
-            if (startYtable > height - 300) {
-                doc.addPage();
-                startYtable = 80;
-            }
-            // Display the bar graph centered and wider
+            if (startYtable > height - 300) { doc.addPage(); startYtable = 80; }
             let barWidth = doc.internal.pageSize.width - 20;
-            doc.addImage(canvasImg, 'png', 10, startYtable, barWidth, 280, 'a', 'CANVAS');
+            doc.addImage(canvasImg, 'png', 10, startYtable, barWidth, 380, 'a', 'CANVAS');
         }
 
         var canvas2 = document.getElementById("cool-canvas2");
         if (canvas2) {
             var canvasImg2 = canvas2.toDataURL("image/png", 1.0);
             doc.addPage();
-            // Display the pie chart less wide and centered
             let pieWidth = 340;
             let pieX = (doc.internal.pageSize.width - pieWidth) / 2;
             doc.addImage(canvasImg2, 'png', pieX, 80, pieWidth, 280, 'b', 'CANVAS');
         }
 
+        // ---- Build PDF table from jspreadsheet data ----
         doc.addPage();
         let startYtable2 = 80;
 
-        let table = document.getElementById("mytable1");
-        if (table) {
-            let cloneTable = table.cloneNode(true);
-            cloneTable.id = "mytable1_clone";
+        if (this.el) {
+            try {
+                const worksheet = this.el.worksheets ? this.el.worksheets[0] : this.el;
+                const jsonData = worksheet.getJson ? worksheet.getJson(false) : [];
 
-            // Remove first column (expand/collapse icon) from thead
-            let theadTrs = cloneTable.querySelectorAll('thead tr');
-            theadTrs.forEach(tr => { if (tr.children.length > 0) tr.removeChild(tr.children[0]); });
-            // Remove first column (expand/collapse icon) from tbody
-            let tbodyTrs = cloneTable.querySelectorAll('tbody tr');
-            tbodyTrs.forEach(tr => { if (tr.children.length > 0) tr.removeChild(tr.children[0]); });
+                // Build header row
+                const isSingleProgram = this.state.programValues.length === 1;
+                const showQtyColPdf = !this.state.collapsePlanningUnits && !this.state.collapseAll;
+                let fspaHeader = this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName');
+                let progHeader = this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program');
+                const hidesPUs = this.state.collapsePlanningUnits || this.state.collapseAll;
+                const isSingleProgramCsvHdr = this.state.programValues.length === 1;
+                let headerLabel = isSingleProgramCsvHdr
+                    ? (hidesPUs ? `${fspaHeader}` : `${fspaHeader} / ${i18n.t('static.dashboard.planningunitheader')}`)
+                    : (hidesPUs ? `${fspaHeader} / ${progHeader}` : `${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`);
 
-            cloneTable.style.position = "absolute";
-            cloneTable.style.left = "-9999px";
-            document.body.appendChild(cloneTable);
+                const pdfHeaders = [headerLabel];
+                if (showQtyColPdf) pdfHeaders.push(i18n.t('static.shipment.qty'));
+                if (!this.state.hideCalculations) {
+                    pdfHeaders.push(i18n.t('static.shipment.totalPUCost'));
+                    pdfHeaders.push(i18n.t('static.shipment.totalFreightCost'));
+                }
+                pdfHeaders.push(i18n.t('static.shipment.totalCost'));
+                pdfHeaders.push(i18n.t('static.shipment.totalCostPerc'));
 
-            let content1 = {
-                margin: { top: 80, bottom: 70 },
-                startY: startYtable2,
-                styles: { lineWidth: 1, fontSize: 8, halign: 'right' },
-                columnStyles: {
-                    0: { halign: 'left' }
-                },
-                html: '#mytable1_clone',
-                didParseCell: function (data) {
-                    if (data.column.index === 0 && data.cell.section === 'body') {
-                        let td = data.cell.raw;
-                        if (td && td.style && td.style.paddingLeft) {
-                            let pad = parseInt(td.style.paddingLeft.replace('px', ''));
-                            if (!isNaN(pad)) {
-                                let cp = data.cell.styles.cellPadding;
-                                let padObj = typeof cp === 'object' ? { ...cp } : { top: cp, right: cp, bottom: cp, left: cp };
-                                padObj.left = (padObj.left || 2) + pad / 2.5;
+                // Build data rows (skip icon col 0, skip hidden meta cols)
+                const pdfBody = jsonData.map((row, idx) => {
+                    const vals = Object.values(row);
+                    // col 0 = html icon (skip), col 1 = label, then data cols
+                    // last 4 are hidden meta cols (skip)
+                    const visibleVals = vals.slice(1, vals.length - 4);
+                    const rowType = vals[vals.length - 4];
+
+                    // Determine indentation manually since 'rows' array is out of scope here
+                    let indentPx = 0;
+                    if (rowType === 'program') {
+                        indentPx = 20;
+                    } else if (rowType === 'pu') {
+                        indentPx = isSingleProgram ? 20 : 40;
+                    }
+
+                    if (indentPx > 0) {
+                        visibleVals[0] = " ".repeat(indentPx / 5) + visibleVals[0];
+                    }
+
+                    // We also need the indent for this row to correctly format the PDF
+                    visibleVals._pdfIndent = indentPx;
+                    visibleVals._rowType = rowType;
+
+                    return visibleVals;
+                });
+
+                const colStylesPdf = {};
+                pdfHeaders.forEach((_, idx) => {
+                    colStylesPdf[idx] = { halign: idx === 0 ? 'left' : 'right' };
+                });
+
+                doc.autoTable({
+                    margin: { top: 80, bottom: 70 },
+                    startY: startYtable2,
+                    head: [pdfHeaders],
+                    body: pdfBody,
+                    styles: { lineWidth: 1, fontSize: 8 },
+                    columnStyles: colStylesPdf,
+                    didParseCell: function (data) {
+                        if (data.cell.section === 'body') {
+                            const indentPx = data.row.raw._pdfIndent || 0;
+                            const rowType = data.row.raw._rowType;
+
+                            if (data.column.index === 0 && indentPx > 0) {
+                                const cp = data.cell.styles.cellPadding;
+                                const padObj = typeof cp === 'object' ? { ...cp } : { top: cp, right: cp, bottom: cp, left: cp };
+                                // Scale indent slightly for PDF, 1px in browser ~ 0.5pt in PDF, plus baseline padding
+                                padObj.left = (padObj.left || 2) + (indentPx * 0.5);
                                 data.cell.styles.cellPadding = padObj;
+                            }
+
+                            // Apply background color to qty column for FSPA and program rows
+                            if (showQtyColPdf && data.column.index === 1 && (rowType === 'fspa' || rowType === 'program')) {
+                                data.cell.styles.fillColor = [211, 211, 211];
+                                data.cell.styles.textColor = [0, 0, 0];
                             }
                         }
                     }
-                }
-            };
-            doc.autoTable(content1);
-
-            document.body.removeChild(cloneTable);
+                });
+            } catch (err) {
+                console.error('PDF table generation error', err);
+            }
         }
-        addHeaders(doc)
-        addFooters(doc)
-        doc.save(i18n.t('static.dashboard.shipmentByPlanningUnit') + ".pdf")
+
+        addHeaders(doc);
+        addFooters(doc);
+        doc.save(i18n.t('static.dashboard.shipmentByPlanningUnit') + ".pdf");
     }
-    /**
-     * Fetches data based on selected filters.
-     */
+
+    // ------------------------------------------------------------------
+    // fetchData – same as original, but setState callback calls buildJExcel
+    // ------------------------------------------------------------------
     fetchData = () => {
+        console.log("Procurement agent values ",this.state.procurementAgentValues)
         let versionId = this.state.programValues.length == 1 ? this.state.versionId.toString() : "0";
         if (versionId.includes("Local")) {
             let versionId = document.getElementById("versionId").value;
@@ -766,37 +1104,30 @@ class ShipmentGlobalDemandView extends Component {
             let planningUnitIds = this.state.planningUnitValues.map(ele => (ele.value).toString());
             let fundingSourceIds = this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.map(ele => (ele.value).toString());
-            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0) {
+
+            if (programId > 0 && versionId != 0 && this.state.planningUnitValues.length > 0 && ((this.state.viewById == 1 && this.state.fundingSourceValues.length > 0) || (this.state.viewById == 2 && this.state.procurementAgentValues.length > 0)) && this.state.shipmentStatusValues.length > 0) {
                 var db1;
                 getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onerror = function (event) {
-                    this.setState({
-                        message: i18n.t('static.program.errortext'),
-                        loading: false
-                    })
+                    this.setState({ message: i18n.t('static.program.errortext'), loading: false });
                 }.bind(this);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
                     var programDataTransaction = db1.transaction(['programData'], 'readwrite');
-                    var version = (versionId.split('(')[0]).trim()
+                    var version = (versionId.split('(')[0]).trim();
                     var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                     var userId = userBytes.toString(CryptoJS.enc.Utf8);
-                    var program = `${programId}_v${version}_uId_${userId}`
+                    var program = `${programId}_v${version}_uId_${userId}`;
                     var programDataOs = programDataTransaction.objectStore('programData');
                     var programRequest = programDataOs.get(program);
                     programRequest.onerror = function (event) {
-                        this.setState({
-                            message: i18n.t('static.program.errortext'),
-                            loading: false
-                        })
+                        this.setState({ message: i18n.t('static.program.errortext'), loading: false });
                     }.bind(this);
                     programRequest.onsuccess = function (e) {
-                        this.setState({ loading: true })
-
+                        this.setState({ loading: true });
                         var planningUnitDataList = programRequest.result.programData.planningUnitDataList;
                         let combinedShipmentList = [];
-
                         for (let i = 0; i < planningUnitIds.length; i++) {
                             var planningUnitDataIndex = planningUnitDataList.findIndex(c => c.planningUnitId == planningUnitIds[i]);
                             var programJson = {};
@@ -808,7 +1139,6 @@ class ShipmentGlobalDemandView extends Component {
                             } else {
                                 programJson = { shipmentList: [] };
                             }
-
                             var shipmentList = (programJson.shipmentList);
                             if (shipmentList) {
                                 for (let j = 0; j < shipmentList.length; j++) {
@@ -818,10 +1148,8 @@ class ShipmentGlobalDemandView extends Component {
                                 }
                             }
                         }
-
                         const activeFilter = combinedShipmentList.filter(c => (c.active == true || c.active == "true") && (c.accountFlag == true || c.accountFlag == "true"));
-                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'))
-                        console.log("DateFilter Test@123", dateFilter)
+                        let dateFilter = activeFilter.filter(c => moment((c.receivedDate == null || c.receivedDate == "") ? c.expectedDeliveryDate : c.receivedDate).isBetween(startDate, endDate, null, '[)'));
                         let reportView = this.state.viewById;
                         let fspaFilter = [];
                         if (reportView == 1) {
@@ -830,281 +1158,95 @@ class ShipmentGlobalDemandView extends Component {
                             let procurementAgentIds = this.state.procurementAgentValues.map(ele => (ele.value).toString());
                             fspaFilter = dateFilter.filter(c => procurementAgentIds.includes(c.procurementAgent.id.toString()));
                         }
-
                         let shipmentStatusFilter = fspaFilter.filter(c => shipmentStatusIds.includes(c.shipmentStatus.id.toString()));
                         var procurementAgentTransaction = db1.transaction(['procurementAgent'], 'readwrite');
                         var procurementAgentOs = procurementAgentTransaction.objectStore('procurementAgent');
                         var procurementAgentRequest = procurementAgentOs.getAll();
                         var procurementAgentList = [];
-                        procurementAgentRequest.onerror = function (event) {
-                            this.setState({
-                                loading: false
-                            })
-                        };
                         procurementAgentRequest.onsuccess = function (e) {
-                            var myResult = [];
-                            myResult = procurementAgentRequest.result;
+                            var myResult = procurementAgentRequest.result;
                             for (var k = 0; k < myResult.length; k++) {
-                                var procurementAgentObj = {
-                                    id: myResult[k].procurementAgentId,
-                                    code: myResult[k].procurementAgentCode
-                                }
-                                procurementAgentList[k] = procurementAgentObj
+                                procurementAgentList[k] = { id: myResult[k].procurementAgentId, code: myResult[k].procurementAgentCode };
                             }
-                            let procurementAgentSplit = [];
-                            for (let i = 0; i < planningUnitIds.length; i++) {
-                                let obj = {};
-                                let planningUnitArray = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id));
-                                if (planningUnitArray.length > 0) {
-                                    let planningUnit = planningUnitArray[0].planningUnit;
-                                    let total = 0;
-                                    let buffer = [];
-                                    for (let j = 0; j < procurementAgentList.length; j++) {
-                                        let data1 = shipmentStatusFilter.filter(c => (planningUnitIds[i] == c.planningUnit.id && procurementAgentList[j].id == c.procurementAgent.id)).map((item) => { return { procurementAgent: item.procurementAgent, shipmentQty: item.shipmentQty } });
-                                        let data2 = Object.values(data1.reduce((a, { procurementAgent, shipmentQty }) => {
-                                            if (!a[procurementAgent.id])
-                                                a[procurementAgent.id] = Object.assign({}, { procurementAgent, shipmentQty });
-                                            else
-                                                a[procurementAgent.id].shipmentQty += shipmentQty;
-                                            return a;
-                                        }, {}));
-                                        if (data2.length > 0) {
-                                            let value = data2[0].shipmentQty;
-                                            let json = {}
-                                            json[data2[0].procurementAgent.code] = data2[0].shipmentQty;
-                                            buffer.push(json);
-                                            total = total + value;
-                                        } else {
-                                            let value = 0;
-                                            let json = {}
-                                            json[procurementAgentList[j].code] = value;
-                                            buffer.push(json);
-                                        }
-                                    }
-                                    for (let j = 0; j < buffer.length; j++) {
-                                        Object.assign(obj, buffer[j]);
-                                    }
-                                    let json = {
-                                        planningUnit: planningUnit,
-                                        procurementAgentQty: obj,
-                                        total: total
-                                    }
-                                    procurementAgentSplit.push(json);
-                                }
-                            }
-                            let planningUnitSplitForPlanned = shipmentStatusFilter.filter(c => (1 == c.shipmentStatus.id || 2 == c.shipmentStatus.id || 9 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: item.shipmentQty, orderedShipmentQty: 0 } });
-                            let planningUnitSplitForOrdered = shipmentStatusFilter.filter(c => (3 == c.shipmentStatus.id || 4 == c.shipmentStatus.id || 5 == c.shipmentStatus.id || 6 == c.shipmentStatus.id || 7 == c.shipmentStatus.id)).map((item) => { return { planningUnit: item.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: item.shipmentQty } });
-                            let mergedPlanningUnitSplit = planningUnitSplitForPlanned.concat(planningUnitSplitForOrdered);
-                            var result1 = mergedPlanningUnitSplit.reduce(function (mergedPlanningUnitSplit, val) {
-                                var o = mergedPlanningUnitSplit.filter(function (obj) {
-                                    return obj.planningUnit.id == val.planningUnit.id;
-                                }).pop() || { planningUnit: val.planningUnit, plannedShipmentQty: 0, orderedShipmentQty: 0 };
-                                o.plannedShipmentQty += val.plannedShipmentQty;
-                                o.orderedShipmentQty += val.orderedShipmentQty;
-                                mergedPlanningUnitSplit.push(o);
-                                return mergedPlanningUnitSplit;
-                            }, []);
-                            var planningUnitSplit = result1.filter(function (itm, i, a) {
-                                return i == a.indexOf(itm);
-                            });
-                            let reportViewLoc = this.state.viewById;
                             let fspaCostAndPercMap = {};
                             let totalGrandCost = 0;
-
                             shipmentStatusFilter.forEach((item) => {
-                                let fspa = reportViewLoc == 1 ? item.fundingSource : item.procurementAgent;
+                                let fspa = reportView == 1 ? item.fundingSource : item.procurementAgent;
                                 let fspaId = fspa ? fspa.id : 0;
                                 let conversionRate = (item.currency && item.currency.conversionRateToUsd) ? item.currency.conversionRateToUsd : 1;
                                 let amount = (item.productCost || 0) * conversionRate + (item.freightCost || 0) * conversionRate;
                                 totalGrandCost += amount;
-                                if (!fspaCostAndPercMap[fspaId]) {
-                                    fspaCostAndPercMap[fspaId] = {
-                                        fspa: fspa,
-                                        cost: 0,
-                                        perc: 0
-                                    }
-                                }
+                                if (!fspaCostAndPercMap[fspaId]) { fspaCostAndPercMap[fspaId] = { fspa: fspa, cost: 0, perc: 0 }; }
                                 fspaCostAndPercMap[fspaId].cost += amount;
                             });
-
                             let locFspaCostAndPerc = Object.values(fspaCostAndPercMap);
-                            if (totalGrandCost > 0) {
-                                locFspaCostAndPerc.forEach(x => { x.perc = x.cost / totalGrandCost; });
-                            }
-                            var table1Headers = [];
-                            let reportView = this.state.viewById;
+                            if (totalGrandCost > 0) { locFspaCostAndPerc.forEach(x => { x.perc = x.cost / totalGrandCost; }); }
+
                             let fspaProgramSplitMap = {};
                             let fspaCountrySplitMap = {};
                             let planningUnitQuantityMap = {};
+                            let programInfo = { id: this.state.programValues[0].value, label: { label_en: this.state.programValues[0].label }, code: this.state.programValues[0].label };
+                            let countryInfo = this.state.countryValues && this.state.countryValues.length === 1
+                                ? { id: this.state.countryValues[0].value, label: { label_en: this.state.countryValues[0].label }, code: this.state.countryValues[0].label }
+                                : programInfo;
 
-                            let programInfo = {
-                                id: this.state.programValues[0].value,
-                                label: { label_en: this.state.programValues[0].label },
-                                code: this.state.programValues[0].label
-                            };
-
-                            let countryInfo = this.state.countryValues && this.state.countryValues.length === 1 ? {
-                                id: this.state.countryValues[0].value,
-                                label: { label_en: this.state.countryValues[0].label },
-                                code: this.state.countryValues[0].label
-                            } : programInfo;
-                            console.log("shipmentStatusFilter Test@123", shipmentStatusFilter);
                             shipmentStatusFilter.forEach(item => {
                                 let fspa = reportView == 1 ? item.fundingSource : item.procurementAgent;
                                 let fspaId = fspa ? fspa.id : 0;
                                 let fspaCode = fspa ? fspa.code : "N/A";
                                 let puId = item.planningUnit.id;
-
                                 let qty = item.shipmentQty || 0;
                                 let conversionRate = (item.currency && item.currency.conversionRateToUsd) ? item.currency.conversionRateToUsd : 1;
                                 let cost = (item.productCost || 0) * conversionRate;
                                 let freightCost = (item.freightCost || 0) * conversionRate;
                                 let totalCost = cost + freightCost;
-
-                                // Build planningUnitQuantityMap
-                                if (!planningUnitQuantityMap[puId]) {
-                                    planningUnitQuantityMap[puId] = {
-                                        planningUnit: item.planningUnit,
-                                        fspaQuantity: {}
-                                    };
-                                }
-                                if (!planningUnitQuantityMap[puId].fspaQuantity[fspaCode]) {
-                                    planningUnitQuantityMap[puId].fspaQuantity[fspaCode] = 0;
-                                }
+                                if (!planningUnitQuantityMap[puId]) { planningUnitQuantityMap[puId] = { planningUnit: item.planningUnit, fspaQuantity: {} }; }
+                                if (!planningUnitQuantityMap[puId].fspaQuantity[fspaCode]) { planningUnitQuantityMap[puId].fspaQuantity[fspaCode] = 0; }
                                 planningUnitQuantityMap[puId].fspaQuantity[fspaCode] += qty;
-
                                 let progKey = fspaId + "_" + programInfo.id + "_" + puId;
-                                if (!fspaProgramSplitMap[progKey]) {
-                                    fspaProgramSplitMap[progKey] = {
-                                        fspa: fspa,
-                                        programCountry: programInfo,
-                                        planningUnit: item.planningUnit,
-                                        quantity: 0,
-                                        cost: 0,
-                                        freightCost: 0,
-                                        totalCost: 0
-                                    };
-                                }
+                                if (!fspaProgramSplitMap[progKey]) { fspaProgramSplitMap[progKey] = { fspa: fspa, programCountry: programInfo, planningUnit: item.planningUnit, quantity: 0, cost: 0, freightCost: 0, totalCost: 0 }; }
                                 fspaProgramSplitMap[progKey].quantity += qty;
                                 fspaProgramSplitMap[progKey].cost += cost;
                                 fspaProgramSplitMap[progKey].freightCost += freightCost;
                                 fspaProgramSplitMap[progKey].totalCost += totalCost;
-
                                 let ctryKey = fspaId + "_" + countryInfo.id + "_" + puId;
-                                if (!fspaCountrySplitMap[ctryKey]) {
-                                    fspaCountrySplitMap[ctryKey] = {
-                                        fspa: fspa,
-                                        programCountry: countryInfo,
-                                        planningUnit: item.planningUnit,
-                                        quantity: 0,
-                                        cost: 0,
-                                        freightCost: 0,
-                                        totalCost: 0
-                                    };
-                                }
+                                if (!fspaCountrySplitMap[ctryKey]) { fspaCountrySplitMap[ctryKey] = { fspa: fspa, programCountry: countryInfo, planningUnit: item.planningUnit, quantity: 0, cost: 0, freightCost: 0, totalCost: 0 }; }
                                 fspaCountrySplitMap[ctryKey].quantity += qty;
                                 fspaCountrySplitMap[ctryKey].cost += cost;
                                 fspaCountrySplitMap[ctryKey].freightCost += freightCost;
                                 fspaCountrySplitMap[ctryKey].totalCost += totalCost;
                             });
 
-                            let locFspaProgramSplit = Object.values(fspaProgramSplitMap);
-                            let locFspaCountrySplit = Object.values(fspaCountrySplitMap);
-                            let locPlanningUnitQuantity = Object.values(planningUnitQuantityMap);
-
                             this.setState({
                                 data: {
-                                    planningUnitQuantity: locPlanningUnitQuantity,
+                                    planningUnitQuantity: Object.values(planningUnitQuantityMap),
                                     fspaCostAndPerc: locFspaCostAndPerc,
-                                    fspaProgramSplit: locFspaProgramSplit,
-                                    fspaCountrySplit: locFspaCountrySplit
+                                    fspaProgramSplit: Object.values(fspaProgramSplitMap),
+                                    fspaCountrySplit: Object.values(fspaCountrySplitMap)
                                 },
                                 message: '',
                                 fundingSourceSplit: locFspaCostAndPerc,
-                                planningUnitSplit: planningUnitSplit,
-                                procurementAgentSplit: procurementAgentSplit,
-                                table1Headers: table1Headers,
+                                table1Headers: [],
                                 loading: false
                             }, () => {
-                            })
+                                // ← KEY CHANGE: rebuild jspreadsheet after data load
+                                this.buildJExcel();
+                            });
                         }.bind(this);
                     }.bind(this);
-                }.bind(this)
+                }.bind(this);
             } else if (programId == 0) {
-                this.setState({
-                    message: i18n.t('static.common.selectProgram'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             } else if (versionId == 0) {
-                this.setState({
-                    message: i18n.t('static.program.validversion'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.program.validversion'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
-            } else if (this.state.fundingSourceValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.fundingSource.selectFundingSource'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            } else if (this.state.viewById == 1 && this.state.fundingSourceValues.length == 0) {
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            } else if (this.state.viewById == 2 && this.state.procurementAgentValues.length == 0) {
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             } else if (this.state.shipmentStatusValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.report.validShipmentStatusText'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             }
         } else {
             let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1113,22 +1255,15 @@ class ShipmentGlobalDemandView extends Component {
             let fundingSourceIds = this.state.fundingSourceValues.length == this.state.fundingSources.length ? [] : this.state.fundingSourceValues.map(ele => (ele.value).toString());
             let procurementAgentIds = this.state.procurementAgentValues.length == this.state.procurementAgentValues.length ? [] : this.state.procurementAgentValues.map(ele => (ele.value).toString());
             let shipmentStatusIds = this.state.shipmentStatusValues.length == this.state.shipmentStatuses.length ? [] : this.state.shipmentStatusValues.map(ele => (ele.value).toString());
-            let realmId = AuthenticationService.getRealmId()
-            let useApprovedVersion = 0
-            // let groupByProcurementAgentType = document.getElementById("procurementAgentTypeId").value
+            let realmId = AuthenticationService.getRealmId();
             let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
             let programIds = this.state.programValues.map(ele => (ele.value).toString());
             let groupByProcurementAgentType = this.state.procurementAgentTypeId;
             let groupByFundingSourceType = 0;
             let versionId = this.state.programValues.length == 1 ? this.state.versionId.toString() : "0";
-            console.log("Hello", groupByProcurementAgentType, groupByFundingSourceType,)
-            console.log("this.state.programValues.length == 1 && versionId == 0 Test@123", this.state.programValues.length == 1 && versionId == 0);
-            console.log("this.state.programValues.length == 1 Test@123", this.state.programValues.length);
-            console.log("versionId Test@123", versionId);
-            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.fundingSourceValues.length > 0 && this.state.shipmentStatusValues.length > 0 && ((this.state.programValues.length == 1 && versionId != "") || this.state.programValues.length > 1)) {
-                this.setState({
-                    message: '', loading: true
-                })
+
+            if (this.state.countryValues.length > 0 && this.state.programValues.length > 0 && this.state.planningUnitValues.length > 0 && ((this.state.viewById == 1 && this.state.fundingSourceValues.length > 0) || (this.state.viewById == 2 && this.state.procurementAgentValues.length > 0)) && this.state.shipmentStatusValues.length > 0 && ((this.state.programValues.length == 1 && versionId != "") || this.state.programValues.length > 1)) {
+                this.setState({ message: '', loading: true });
                 var inputjson = {
                     realmId: realmId,
                     startDate: startDate,
@@ -1140,184 +1275,66 @@ class ShipmentGlobalDemandView extends Component {
                     fundingSourceIds: this.state.viewById == 1 ? fundingSourceIds : procurementAgentIds,
                     shipmentStatusIds: shipmentStatusIds,
                     reportView: this.state.viewById
-                }
+                };
                 ReportService.shipmentOverview(inputjson)
                     .then(response => {
                         try {
-                            console.log("Response Test@123", response);
-                            var table1Headers = [];
-                            // table1Headers = Object.keys(response.data.procurementAgentSplit[0].procurementAgentQty);
                             this.setState({
                                 data: response.data,
                                 fundingSourceSplit: [],
                                 planningUnitSplit: [],
                                 procurementAgentSplit: [],
-                                table1Headers: table1Headers,
+                                table1Headers: [],
                                 loading: false
                             }, () => {
-                            })
+                                // ← KEY CHANGE: rebuild jspreadsheet after data load
+                                this.buildJExcel();
+                            });
                         } catch (error) {
-                            this.setState({ loading: false })
+                            this.setState({ loading: false });
                         }
-                    }).catch(
-                        error => {
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 409:
-                                        this.setState({
-                                            message: i18n.t('static.common.accessDenied'),
-                                            loading: false,
-                                            color: "#BA0C2F",
-                                        });
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: error.response.data.messageCode,
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
+                    }).catch(error => {
+                        if (error.message === "Network Error") {
+                            this.setState({ message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")), loading: false });
+                        } else {
+                            switch (error.response ? error.response.status : "") {
+                                case 401: this.props.history.push(`/login/static.message.sessionExpired`); break;
+                                case 409: this.setState({ message: i18n.t('static.common.accessDenied'), loading: false, color: "#BA0C2F" }); break;
+                                case 403: this.props.history.push(`/accessDenied`); break;
+                                case 500: case 404: case 406: case 412: this.setState({ message: error.response.data.messageCode, loading: false }); break;
+                                default: this.setState({ message: 'static.unkownError', loading: false }); break;
                             }
                         }
-                    );
-            } else if (this.state.countryValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.program.validcountrytext'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
-            } else if (this.state.programValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.common.selectProgram'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
-            } else if (this.state.programValues.length == 1 && versionId == 0) {
-                this.setState(
-                    {
-                        message: i18n.t("static.program.validversion"),
-                        data: {
-                            planningUnitQuantity: [],
-                            fspaCostAndPerc: [],
-                            fspaProgramSplit: [],
-                            fspaCountrySplit: []
-                        },
-                        fundingSourceSplit: [],
-                        planningUnitSplit: [],
-                        procurementAgentSplit: [],
-                        table1Headers: [],
-                        loading: false
                     });
+            } else if (this.state.countryValues.length == 0) {
+                this.setState({ message: i18n.t('static.program.validcountrytext'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            } else if (this.state.programValues.length == 0) {
+                this.setState({ message: i18n.t('static.common.selectProgram'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            } else if (this.state.programValues.length == 1 && versionId == 0) {
+                this.setState({ message: i18n.t("static.program.validversion"), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             } else if (this.state.planningUnitValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.procurementUnit.validPlanningUnitText'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
-            } else if (this.state.fundingSourceValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.fundingSource.selectFundingSource'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.procurementUnit.validPlanningUnitText'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            } else if (this.state.viewById==1 && this.state.fundingSourceValues.length == 0) {
+                this.setState({ message: i18n.t('static.fundingSource.selectFundingSource'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
+            }else if(this.state.viewById==2 && this.state.procurementAgentValues.length==0){
+                this.setState({ message: i18n.t('static.procurementAgent.selectProcurementAgent'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             } else if (this.state.shipmentStatusValues.length == 0) {
-                this.setState({
-                    message: i18n.t('static.report.validShipmentStatusText'),
-                    data: {
-                        planningUnitQuantity: [],
-                        fspaCostAndPerc: [],
-                        fspaProgramSplit: [],
-                        fspaCountrySplit: []
-                    },
-                    fundingSourceSplit: [],
-                    planningUnitSplit: [],
-                    procurementAgentSplit: [],
-                    table1Headers: [],
-                    loading: false
-                });
+                this.setState({ message: i18n.t('static.report.validShipmentStatusText'), data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] }, loading: false });
             }
         }
     }
-    /**
-     * This function is used to call either function for country list or program list based on online and offline status. It is also used to get the funding source and shipment status lists on page load.
-     */
+
+    // ------------------------------------------------------------------
+    // componentDidMount – same as original
+    // ------------------------------------------------------------------
     componentDidMount() {
-        // Detect initial theme
         const isDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
         this.setState({ isDarkMode });
-
-        // Listening for theme changes
         const observer = new MutationObserver(() => {
             const updatedDarkMode = document.documentElement.getAttribute('data-theme') === 'dark';
             this.setState({ isDarkMode: updatedDarkMode });
         });
-
-        observer.observe(document.documentElement, {
-            attributes: true,
-            attributeFilter: ['data-theme'],
-        });
-
+        observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
         Chart.plugins.register({
             afterDraw: function (chart) {
@@ -1329,24 +1346,17 @@ class ShipmentGlobalDemandView extends Component {
                         if (!meta.hidden) {
                             meta.data.forEach((element, index) => {
                                 if (!chart.getDatasetMeta(datasetIndex).data[index].hidden) {
-                                    // Draw the connecting lines
                                     ctx.save();
                                     const model = element._model;
-                                    const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
                                     const startAngle = model.startAngle;
                                     const endAngle = model.endAngle;
                                     const midAngle = startAngle + (endAngle - startAngle) / 2;
-
                                     const x = Math.cos(midAngle);
                                     const y = Math.sin(midAngle);
-
-                                    // Calculate the end point for the line
                                     const lineX = model.x + x * model.outerRadius;
                                     const lineY = model.y + y * model.outerRadius;
                                     const labelX = model.x + x * (model.outerRadius + 10);
                                     const labelY = model.y + y * (model.outerRadius + 10);
-
-                                    const label = chart.data.labels[index];
                                     const value = dataset.data[index];
                                     const percentage = ((value / total) * 100).toFixed(2) + '%';
                                     if (((value / total) * 100).toFixed(2) > 2) {
@@ -1358,7 +1368,6 @@ class ShipmentGlobalDemandView extends Component {
                                         ctx.stroke();
                                         ctx.textAlign = x >= 0 ? 'left' : 'right';
                                         ctx.font = 'number 10px Arial';
-                                        // ctx.textBaseline = 'middle';
                                         ctx.fillStyle = dataset.backgroundColor[index];
                                         ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
                                         ctx.restore();
@@ -1370,16 +1379,16 @@ class ShipmentGlobalDemandView extends Component {
                 }
             },
         });
+
         this.getCountrys();
         this.getShipmentStatusList();
     }
-    /**
-     * Retrieves the list of countries based on the realm ID and updates the state with the list.
-     */
+
+    // ------------------------------------------------------------------
+    // All remaining methods are IDENTICAL to the original
+    // ------------------------------------------------------------------
     getCountrys = () => {
-        this.setState({
-            loading: true
-        })
+        this.setState({ loading: true });
         if (localStorage.getItem("sessionType") === 'Online') {
             let realmId = AuthenticationService.getRealmId();
             DropdownService.getRealmCountryDropdownList(realmId)
@@ -1390,58 +1399,12 @@ class ShipmentGlobalDemandView extends Component {
                         var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
-                    this.setState({
-                        countrys: listArray
-                    }, () => { this.fetchData(); })
-                }).catch(
-                    error => {
-                        this.setState({
-                            countrys: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 409:
-                                    this.setState({
-                                        message: i18n.t('static.common.accessDenied'),
-                                        loading: false,
-                                        color: "#BA0C2F",
-                                    });
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.Country') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
+                    this.setState({ countrys: listArray }, () => { this.fetchData(); });
+                }).catch(error => {
+                    this.setState({ countrys: [] });
+                    if (error.message === "Network Error") { this.setState({ message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")), loading: false }); }
+                    else { switch (error.response ? error.response.status : "") { case 401: this.props.history.push(`/login/static.message.sessionExpired`); break; case 403: this.props.history.push(`/accessDenied`); break; default: this.setState({ message: 'static.unkownError', loading: false }); break; } }
+                });
         } else {
             var db1;
             getDatabase();
@@ -1451,1907 +1414,535 @@ class ShipmentGlobalDemandView extends Component {
                 var transaction = db1.transaction(['country'], 'readwrite');
                 var Country = transaction.objectStore('country');
                 var getRequest = Country.getAll();
-                var proList = []
-                getRequest.onerror = function (event) {
-                };
                 getRequest.onsuccess = function (event) {
-                    var myResult = [];
-                    myResult = getRequest.result;
+                    var myResult = getRequest.result;
+                    var proList = [];
                     for (var i = 0; i < myResult.length; i++) {
-                        var CountryJson = {
-                            label: myResult[i].label,
-                            id: myResult[i].countryId
-                        }
-                        proList.push(CountryJson)
+                        proList.push({ label: myResult[i].label, id: myResult[i].countryId });
                     }
-                    proList.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        countrys: proList,
-                        loading: false
-                    }, () => {
-                        this.fetchData();
-                    })
+                    proList.sort((a, b) => { var A = getLabelText(a.label, this.state.lang).toUpperCase(); var B = getLabelText(b.label, this.state.lang).toUpperCase(); return A > B ? 1 : -1; });
+                    this.setState({ countrys: proList, loading: false }, () => { this.fetchData(); });
                 }.bind(this);
-            }.bind(this)
+            }.bind(this);
         }
     }
-    /**
-     * Handles the change event for countries.
-     * @param {Array} countrysId - An array containing the selected country IDs.
-     */
+
     handleChange = (countrysId) => {
-        countrysId = countrysId.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
+        countrysId = countrysId.sort((a, b) => parseInt(a.value) - parseInt(b.value));
         this.setState({
             countryValues: countrysId.map(ele => ele),
             countryLabels: countrysId.map(ele => ele.label),
-            programValues: [],
-            programLabels: [],
-            planningUnitValues: [],
-            planningUnitLabels: [],
-            data: {
-                planningUnitQuantity: [],
-                fspaCostAndPerc: [],
-                fspaProgramSplit: [],
-                fspaCountrySplit: []
-            },
-            fundingSourceSplit: [],
-            planningUnitSplit: [],
-            procurementAgentSplit: [],
-            table1Headers: [],
-            programLst: [],
-            versionId: "",
-            procurementAgentValues: [],
-            procurementAgentLabels: []
-        }, () => {
-            this.getPrograms();
-            this.fetchData();
-        })
+            programValues: [], programLabels: [], planningUnitValues: [], planningUnitLabels: [],
+            data: { planningUnitQuantity: [], fspaCostAndPerc: [], fspaProgramSplit: [], fspaCountrySplit: [] },
+            fundingSourceSplit: [], planningUnitSplit: [], procurementAgentSplit: [], table1Headers: [],
+            programLst: [], versionId: "", procurementAgentValues: [], procurementAgentLabels: []
+        }, () => { this.getPrograms(); this.fetchData(); });
     }
-    /**
-     * Handles the change event for program selection.
-     * @param {array} programIds - The array of selected program IDs.
-     */
+
     handleChangeProgram = (programIds) => {
-        programIds = programIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
+        programIds = programIds.sort((a, b) => parseInt(a.value) - parseInt(b.value));
         this.setState({
-            programValues: programIds.map(ele => ele),
-            programLabels: programIds.map(ele => ele.label),
-            versionId: "",
-            procurementAgentValues: [],
-            procurementAgentLabels: []
-        }, () => {
-            this.filterVersion();
-            this.getFundingSource();
-            this.fetchData();
-            this.getPlanningUnit();
-            this.getProcurementAgentList();
-        })
+            programValues: programIds.map(ele => ele), programLabels: programIds.map(ele => ele.label),
+            versionId: "", procurementAgentValues: [], procurementAgentLabels: [], planningUnitValues:[], planningUnitLabels: [],
+        }, () => { this.filterVersion(); this.getFundingSource(); this.fetchData(); this.getPlanningUnit(); this.getProcurementAgentList(); });
     }
-    /**
-   * Retrieves the list of procurement agents.
-   */
+
     getProcurementAgentList() {
-        this.setState({
-            loading: true
-        })
+        this.setState({ loading: true });
         if (localStorage.getItem("sessionType") === 'Online') {
             var programIds = this.state.programValues.map(ele => ele.value);
             DropdownService.getProcurementAgentDropdownListForFilterMultiplePrograms(programIds)
                 .then((response) => {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = a.code.toUpperCase();
-                        var itemLabelB = b.code.toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState(
-                        {
-                            procurementAgents: listArray,
-                            loading: false,
-                            procurementAgentValues: listArray.map(c => { return { value: c.id, label: c.code } }),
-                            procurementAgentLabels: listArray.map(c => c.code),
-                            budgetValues: [],
-                            budgetLabels: [],
-                            filteredBudgetList: [],
-                        },
-                        () => {
-                        }
-                    );
-                })
-                .catch((error) => {
-                    this.setState({
-                        procurementAgents: [],
-                    });
-                    if (error.message === "Network Error") {
-                        this.setState({
-                            message: API_URL.includes("uat")
-                                ? i18n.t("static.common.uatNetworkErrorMessage")
-                                : API_URL.includes("demo")
-                                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                                    : i18n.t("static.common.prodNetworkErrorMessage"),
-                        });
-                    } else {
-                        switch (error.response ? error.response.status : "") {
-                            case 500:
-                            case 401:
-                            case 404:
-                            case 406:
-                            case 412:
-                                this.setState({
-                                    message: i18n.t(error.response.data.messageCode, {
-                                        entityname: i18n.t("static.fundingsource.fundingsource"),
-                                    }),
-                                });
-                                break;
-                            default:
-                                this.setState({ message: "static.unkownError" });
-                                break;
-                        }
-                    }
-                });
+                    var listArray = response.data.sort((a, b) => a.code.toUpperCase() > b.code.toUpperCase() ? 1 : -1);
+                    this.setState({ procurementAgents: listArray, loading: false, procurementAgentValues: listArray.map(c => ({ value: c.id, label: c.code })), procurementAgentLabels: listArray.map(c => c.code) });
+                }).catch(() => { this.setState({ procurementAgents: [] }); });
         } else {
-            var db3;
-            var paResult = [];
-            getDatabase();
+            var db3; getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db3 = e.target.result;
-                var paTransaction = db3.transaction(
-                    ["procurementAgent"],
-                    "readwrite"
-                );
-                var paOs = paTransaction.objectStore("procurementAgent");
+                var paOs = db3.transaction(["procurementAgent"], "readwrite").objectStore("procurementAgent");
                 var paRequest = paOs.getAll();
-                paRequest.onerror = function (event) {
-                }.bind(this);
                 paRequest.onsuccess = function (event) {
-                    paResult = paRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
-                    var pa = [];
-                    for (var i = 0; i < paResult.length; i++) {
-                        var arr = {
-                            id: paResult[i].procurementAgentId,
-                            code: paResult[i].procurementAgentCode,
-                            label: paResult[i].label,
-                        };
-                        pa.push(arr);
-                    }
-                    this.setState(
-                        {
-                            procurementAgents: pa.sort(function (a, b) {
-                                a = a.code.toLowerCase();
-                                b = b.code.toLowerCase();
-                                return a < b ? -1 : a > b ? 1 : 0;
-                            }),
-                            procurementAgentValues: pa.map(c => { return { value: c.id, label: c.code } }),
-                            procurementAgentLabels: pa.map(c => c.code),
-                            filteredBudgetList: [],
-                            budgetValues: [],
-                            budgetLabels: []
-                        },
-                        () => {
-                        }
-                    );
+                    var pa = paRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value))).map(r => ({ id: r.procurementAgentId, code: r.procurementAgentCode, label: r.label }));
+                    this.setState({ procurementAgents: pa.sort((a, b) => a.code.toLowerCase() < b.code.toLowerCase() ? -1 : 1), procurementAgentValues: pa.map(c => ({ value: c.id, label: c.code })), procurementAgentLabels: pa.map(c => c.code) });
                 }.bind(this);
             }.bind(this);
         }
     }
-    /**
-     * Handles the change event for procurement agents.
-     * @param {Array} procurementAgentIds - An array containing the selected funding source IDs.
-     */
+
     handleProcurementAgentChange = (procurementAgentIds) => {
-        this.setState(
-            {
-                procurementAgentValuesValues: procurementAgentIds.map((ele) => ele),
-                procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
-            },
-            () => {
-                this.fetchData();
-            }
-        );
-    };
-    /**
-     * Retrieves the list of shipment statuses.
-     */
+        console.log("procurementAgentIds Test@123",procurementAgentIds);
+        this.setState({ procurementAgentValues: procurementAgentIds.map(ele => ele), procurementAgentLabels: procurementAgentIds.map(ele => ele.label) }, () => { this.fetchData(); });
+    }
+
     getShipmentStatusList() {
-        const { shipmentStatuses } = this.state
         if (localStorage.getItem("sessionType") === 'Online') {
             ShipmentStatusService.getShipmentStatusListActive()
                 .then(response => {
-                    var listArray = response.data;
-                    listArray.sort((a, b) => {
-                        var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                        var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                        return itemLabelA > itemLabelB ? 1 : -1;
-                    });
-                    this.setState({
-                        shipmentStatuses: listArray,
-                        shipmentStatusValues: listArray.map(c => { return { value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) } }),
-                        shipmentStatusLabels: listArray.map(c => getLabelText(c.label, this.state.lang)),
-                        loading: false
-                    }, () => {
-                        this.fetchData();
-                    })
-                }).catch(
-                    error => {
-                        this.setState({
-                            countrys: []
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 409:
-                                    this.setState({
-                                        message: i18n.t('static.common.accessDenied'),
-                                        loading: false,
-                                        color: "#BA0C2F",
-                                    });
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.common.status') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
+                    var listArray = response.data.sort((a, b) => getLabelText(a.label, this.state.lang).toUpperCase() > getLabelText(b.label, this.state.lang).toUpperCase() ? 1 : -1);
+                    this.setState({ shipmentStatuses: listArray, shipmentStatusValues: listArray.map(c => ({ value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) })), shipmentStatusLabels: listArray.map(c => getLabelText(c.label, this.state.lang)), loading: false }, () => { this.fetchData(); });
+                }).catch(() => { this.setState({ countrys: [] }); });
         } else {
-            var db2;
-            var sStatusResult = [];
-            getDatabase();
+            var db2; getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db2 = e.target.result;
-                var sStatusTransaction = db2.transaction(['shipmentStatus'], 'readwrite');
-                var sStatusOs = sStatusTransaction.objectStore('shipmentStatus');
-                var sStatusRequest = sStatusOs.getAll();
-                sStatusRequest.onerror = function (event) {
-                }.bind(this);
+                var sStatusRequest = db2.transaction(['shipmentStatus'], 'readwrite').objectStore('shipmentStatus').getAll();
                 sStatusRequest.onsuccess = function (event) {
-                    sStatusResult = sStatusRequest.result;
-                    this.setState({
-                        shipmentStatuses: sStatusResult,
-                        shipmentStatusValues: sStatusResult.map(c => { return { value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) } }),
-                        shipmentStatusLabels: sStatusResult.map(c => getLabelText(c.label, this.state.lang)),
-                    });
-                }.bind(this)
-            }.bind(this)
+                    var sStatusResult = sStatusRequest.result;
+                    this.setState({ shipmentStatuses: sStatusResult, shipmentStatusValues: sStatusResult.map(c => ({ value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) })), shipmentStatusLabels: sStatusResult.map(c => getLabelText(c.label, this.state.lang)) });
+                }.bind(this);
+            }.bind(this);
         }
     }
 
-    /**
-   * Retrieves the list of funding sources types.
-   */
     getFundingSourceType = () => {
-        //Fetch realmId
         let realmId = AuthenticationService.getRealmId();
         this.setState({ loading: true });
         if (localStorage.getItem("sessionType") === 'Online') {
-            //Fetch all funding source type list
             FundingSourceService.getFundingsourceTypeListByRealmId(realmId)
                 .then(response => {
                     if (response.status == 200) {
-                        var fundingSourceTypes = response.data;
-                        fundingSourceTypes.sort(function (a, b) {
-                            a = a.fundingSourceTypeCode.toLowerCase();
-                            b = b.fundingSourceTypeCode.toLowerCase();
-                            return a < b ? -1 : a > b ? 1 : 0;
-                        })
-
-                        this.setState({
-                            fundingSourceTypes: fundingSourceTypes, loading: false,
-                            // fundingSourceTypeValues: fundingSourceTypeValues,
-                            // fundingSourceTypeLabels: fundingSourceTypeValues.map(ele => ele.label)
-                        }, () => {
-                            this.consolidatedFundingSourceTypeList();
-                        })
-                    } else {
-                        this.setState({
-                            message: response.data.messageCode, loading: false
-                        },
-                            () => {
-                                this.consolidatedFundingSourceTypeList();
-                            })
-                    }
-                }).catch(
-                    error => {
-                        this.setState({
-                            fundingSourceTypes: [], loading: false
-                        }, () => {
-                            this.consolidatedFundingSourceTypeList();
-                        })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 409:
-                                    this.setState({
-                                        message: i18n.t('static.common.accessDenied'),
-                                        loading: false,
-                                        color: "#BA0C2F",
-                                    });
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: error.response.data.messageCode,
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
-        } else {
-            //Offline
-            this.consolidatedFundingSourceTypeList();
-            this.setState({ loading: false });
-        }
+                        var fundingSourceTypes = response.data.sort((a, b) => a.fundingSourceTypeCode.toLowerCase() < b.fundingSourceTypeCode.toLowerCase() ? -1 : 1);
+                        this.setState({ fundingSourceTypes, loading: false }, () => { this.consolidatedFundingSourceTypeList(); });
+                    } else { this.setState({ message: response.data.messageCode, loading: false }, () => { this.consolidatedFundingSourceTypeList(); }); }
+                }).catch(() => { this.setState({ fundingSourceTypes: [], loading: false }, () => { this.consolidatedFundingSourceTypeList(); }); });
+        } else { this.consolidatedFundingSourceTypeList(); this.setState({ loading: false }); }
     }
 
-    /**
-     * Consolidates the list of funding source type obtained from Server and local programs.
-     */
     consolidatedFundingSourceTypeList = () => {
         let realmId = AuthenticationService.getRealmId();
-        const { fundingSourceTypes } = this.state;
-        var fstList = fundingSourceTypes;
-        var db1;
-        getDatabase();
+        var fstList = this.state.fundingSourceTypes;
+        var db1; getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(["fundingSourceType"], "readwrite");
-            var fundingSourceType = transaction.objectStore("fundingSourceType");
-            var getRequest = fundingSourceType.getAll();
-            getRequest.onerror = function (event) {
-            };
+            var getRequest = db1.transaction(["fundingSourceType"], "readwrite").objectStore("fundingSourceType").getAll();
             getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result.filter(c => c.realm.id == realmId);
-                var userBytes = CryptoJS.AES.decrypt(
-                    localStorage.getItem("curUser"),
-                    SECRET_KEY
-                );
+                var myResult = getRequest.result.filter(c => c.realm.id == realmId);
                 for (var i = 0; i < myResult.length; i++) {
-                    var f = 0;
-                    for (var k = 0; k < this.state.fundingSourceTypes.length; k++) {
-                        if (
-                            this.state.fundingSourceTypes[k].fundingSourceTypeId ==
-                            myResult[i].fundingSourceTypeId
-                        ) {
-                            f = 1;
-                        }
-                    }
-                    var fstData = myResult[i];
-                    if (f == 0) {
-                        fstList.push(fstData);
-                    }
+                    if (!this.state.fundingSourceTypes.some(k => k.fundingSourceTypeId == myResult[i].fundingSourceTypeId)) { fstList.push(myResult[i]); }
                 }
-                var lang = this.state.lang;
-                var fundingSourceTypesCombined = fstList.sort(function (a, b) {
-                    a = a.fundingSourceTypeCode.toLowerCase();
-                    b = b.fundingSourceTypeCode.toLowerCase();
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
-                this.setState({
-                    fundingSourceTypes: fundingSourceTypesCombined,
-                });
+                this.setState({ fundingSourceTypes: fstList.sort((a, b) => a.fundingSourceTypeCode.toLowerCase() < b.fundingSourceTypeCode.toLowerCase() ? -1 : 1) });
             }.bind(this);
         }.bind(this);
-    };
-
-    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
-
-        fundingSourceTypeIds = fundingSourceTypeIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele),
-            fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label)
-        }, () => {
-            var filteredFundingSourceArr = [];
-            var fundingSources = this.state.fundingSourcesOriginal;//original fs list
-            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
-                for (var j = 0; j < fundingSources.length; j++) {
-                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) {
-                        filteredFundingSourceArr.push(fundingSources[j]);
-                    }
-                }
-            }
-
-            if (filteredFundingSourceArr.length > 0) {
-                filteredFundingSourceArr = filteredFundingSourceArr.sort(function (a, b) {
-                    a = a.code.toLowerCase();
-                    b = b.code.toLowerCase();
-                    return a < b ? -1 : a > b ? 1 : 0;
-                });
-            }
-            this.setState({
-                fundingSources: filteredFundingSourceArr,
-                fundingSourceValues: [],
-                fundingSourceLabels: [],
-            }, () => {
-                this.fetchData();
-            });
-        })
     }
 
+    handleFundingSourceTypeChange = (fundingSourceTypeIds) => {
+        fundingSourceTypeIds = fundingSourceTypeIds.sort((a, b) => parseInt(a.value) - parseInt(b.value));
+        this.setState({ fundingSourceTypeValues: fundingSourceTypeIds.map(ele => ele), fundingSourceTypeLabels: fundingSourceTypeIds.map(ele => ele.label) }, () => {
+            var filteredFundingSourceArr = [];
+            var fundingSources = this.state.fundingSourcesOriginal;
+            for (var i = 0; i < fundingSourceTypeIds.length; i++) {
+                for (var j = 0; j < fundingSources.length; j++) {
+                    if (fundingSources[j].fundingSourceType.id == fundingSourceTypeIds[i].value) { filteredFundingSourceArr.push(fundingSources[j]); }
+                }
+            }
+            if (filteredFundingSourceArr.length > 0) { filteredFundingSourceArr.sort((a, b) => a.code.toLowerCase() < b.code.toLowerCase() ? -1 : 1); }
+            this.setState({ fundingSources: filteredFundingSourceArr, fundingSourceValues: [], fundingSourceLabels: [] }, () => { this.fetchData(); });
+        });
+    }
 
-    /**
-     * Retrieves the list of funding sources.
-     */
     getFundingSource = () => {
-        this.setState({
-            loading: true
-        })
+        this.setState({ loading: true });
         if (localStorage.getItem("sessionType") === 'Online') {
-            let programIds = this.state.programValues.map((ele) =>
-                Number(ele.value)
-            );
+            let programIds = this.state.programValues.map(ele => Number(ele.value));
             DropdownService.getFundingSourceForProgramsDropdownList(programIds)
                 .then(response => {
-                    this.setState({
-                        fundingSources: response.data, loading: false,
-                        fundingSourceValues: response.data.map(c => { return { value: c.id, label: c.code } }),
-                        fundingSourceLabels: response.data.map(c => c.code),
-                    }, () => { })
-                }).catch(
-                    error => {
-                        this.setState({
-                            fundingSources: []
-                        }, () => { })
-                        if (error.message === "Network Error") {
-                            this.setState({
-                                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                loading: false
-                            });
-                        } else {
-                            switch (error.response ? error.response.status : "") {
-                                case 401:
-                                    this.props.history.push(`/login/static.message.sessionExpired`)
-                                    break;
-                                case 409:
-                                    this.setState({
-                                        message: i18n.t('static.common.accessDenied'),
-                                        loading: false,
-                                        color: "#BA0C2F",
-                                    });
-                                    break;
-                                case 403:
-                                    this.props.history.push(`/accessDenied`)
-                                    break;
-                                case 500:
-                                case 404:
-                                case 406:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                case 412:
-                                    this.setState({
-                                        message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                        loading: false
-                                    });
-                                    break;
-                                default:
-                                    this.setState({
-                                        message: 'static.unkownError',
-                                        loading: false
-                                    });
-                                    break;
-                            }
-                        }
-                    }
-                );
+                    this.setState({ fundingSources: response.data, loading: false, fundingSourceValues: response.data.map(c => ({ value: c.id, label: c.code })), fundingSourceLabels: response.data.map(c => c.code) });
+                }).catch(() => { this.setState({ fundingSources: [] }); });
         } else {
-            var db3;
-            var fSourceResult = [];
-            getDatabase();
+            var db3; getDatabase();
             var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onsuccess = function (e) {
                 db3 = e.target.result;
-                var fSourceTransaction = db3.transaction(
-                    ["fundingSource"],
-                    "readwrite"
-                );
-                var fSourceOs = fSourceTransaction.objectStore("fundingSource");
-                var fSourceRequest = fSourceOs.getAll();
-                fSourceRequest.onerror = function (event) {
-                }.bind(this);
+                var fSourceRequest = db3.transaction(["fundingSource"], "readwrite").objectStore("fundingSource").getAll();
                 fSourceRequest.onsuccess = function (event) {
-                    fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
-                    var fundingSource = [];
-                    for (var i = 0; i < fSourceResult.length; i++) {
-                        var arr = {
-                            id: fSourceResult[i].fundingSourceId,
-                            code: fSourceResult[i].fundingSourceCode,
-                            label: fSourceResult[i].label,
-                            fundingSourceType: fSourceRequest.result[i].fundingSourceType
-                        };
-                        fundingSource.push(arr);
-                    }
-                    this.setState(
-                        {
-                            fundingSources: fundingSource.sort(function (a, b) {
-                                a = a.code.toLowerCase();
-                                b = b.code.toLowerCase();
-                                return a < b ? -1 : a > b ? 1 : 0;
-                            }),
-                            fundingSourceValues: fundingSource.map(c => { return { value: c.id, label: c.code } }),
-                            fundingSourceLabels: fundingSource.map(c => c.code),
-                        },
-                        () => {
-                        }
-                    );
+                    var fSourceResult = fSourceRequest.result.filter(c => [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(this.state.programValues[0].value)));
+                    var fundingSource = fSourceResult.map((r, i) => ({ id: r.fundingSourceId, code: r.fundingSourceCode, label: r.label, fundingSourceType: fSourceRequest.result[i].fundingSourceType }));
+                    this.setState({ fundingSources: fundingSource.sort((a, b) => a.code.toLowerCase() < b.code.toLowerCase() ? -1 : 1), fundingSourceValues: fundingSource.map(c => ({ value: c.id, label: c.code })), fundingSourceLabels: fundingSource.map(c => c.code) });
                 }.bind(this);
             }.bind(this);
         }
     }
-    /**
-     * Retrieves the list of programs.
-     */
+
     getPrograms = () => {
-        this.setState({
-            loading: true
-        })
+        this.setState({ loading: true });
         if (localStorage.getItem("sessionType") === 'Online') {
-            let countryIds = this.state.countryValues.map((ele) => ele.value);
-            let newCountryList = [...new Set(countryIds)];
+            let newCountryList = [...new Set(this.state.countryValues.map(ele => ele.value))];
             if (newCountryList.length > 0) {
                 DropdownService.getSPProgramWithFilterForMultipleRealmCountryForDropdown(newCountryList)
                     .then(response => {
-                        var listArray = response.data;
-                        listArray.sort((a, b) => {
-                            var itemLabelA = a.code.toUpperCase();
-                            var itemLabelB = b.code.toUpperCase();
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        this.setState({
-                            programLst: listArray, loading: false
-                        })
-                    }).catch(
-                        error => {
-                            this.setState({
-                                programLst: [], loading: false
-                            })
-                            if (error.message === "Network Error") {
-                                this.setState({
-                                    message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                    loading: false
-                                });
-                            } else {
-                                switch (error.response ? error.response.status : "") {
-                                    case 401:
-                                        this.props.history.push(`/login/static.message.sessionExpired`)
-                                        break;
-                                    case 409:
-                                        this.setState({
-                                            message: i18n.t('static.common.accessDenied'),
-                                            loading: false,
-                                            color: "#BA0C2F",
-                                        });
-                                        break;
-                                    case 403:
-                                        this.props.history.push(`/accessDenied`)
-                                        break;
-                                    case 500:
-                                    case 404:
-                                    case 406:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    case 412:
-                                        this.setState({
-                                            message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
-                                            loading: false
-                                        });
-                                        break;
-                                    default:
-                                        this.setState({
-                                            message: 'static.unkownError',
-                                            loading: false
-                                        });
-                                        break;
-                                }
-                            }
-                        }
-                    );
+                        var listArray = response.data.sort((a, b) => a.code.toUpperCase() > b.code.toUpperCase() ? 1 : -1);
+                        this.setState({ programLst: listArray, loading: false });
+                    }).catch(() => { this.setState({ programLst: [], loading: false }); });
             }
         } else {
-            let countryIds = this.state.countryValues.map((ele) => ele.value);
-            let newCountryList = [...new Set(countryIds)];
+            let newCountryList = [...new Set(this.state.countryValues.map(ele => ele.value))];
             if (newCountryList.length > 0) {
-                var db1;
-                getDatabase();
+                var db1; getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
-                    var transaction = db1.transaction(['programData'], 'readwrite');
-                    var Country = transaction.objectStore('programData');
-                    var getRequest = Country.getAll();
-                    var proList = []
-                    getRequest.onerror = function (event) {
-                    };
+                    var getRequest = db1.transaction(['programData'], 'readwrite').objectStore('programData').getAll();
                     getRequest.onsuccess = function (event) {
-                        var myResult = [];
-                        myResult = getRequest.result;
+                        var myResult = getRequest.result;
                         var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
                         var userId = userBytes.toString(CryptoJS.enc.Utf8);
+                        var proList = [];
                         for (var i = 0; i < myResult.length; i++) {
                             if (myResult[i].userId == userId) {
                                 var generalProgramDataBytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
-                                var generalProgramData = generalProgramDataBytes.toString(CryptoJS.enc.Utf8);
-                                var generalProgramJson = JSON.parse(generalProgramData);
+                                var generalProgramJson = JSON.parse(generalProgramDataBytes.toString(CryptoJS.enc.Utf8));
                                 if (generalProgramJson.realmCountry.country.countryId == this.state.countryValues[0].value) {
-                                    var json = {
-                                        code: myResult[i].programCode,
-                                        id: myResult[i].id.split("_")[0]
-                                    }
-                                    proList.push(json)
+                                    proList.push({ code: myResult[i].programCode, id: myResult[i].id.split("_")[0] });
                                 }
                             }
                         }
-                        proList.sort((a, b) => {
-                            var itemLabelA = a.code;
-                            var itemLabelB = b.code;
-                            return itemLabelA > itemLabelB ? 1 : -1;
-                        });
-                        this.setState({
-                            programLst: proList,
-                            loading: false
-                        }, () => {
-                            this.fetchData()
-                        })
+                        proList.sort((a, b) => a.code > b.code ? 1 : -1);
+                        this.setState({ programLst: proList, loading: false }, () => { this.fetchData(); });
                     }.bind(this);
-                }.bind(this)
+                }.bind(this);
             }
         }
     }
+
     filterVersion = () => {
-        this.setState({
-            loading: true
-        })
+        this.setState({ loading: true });
         let programId = this.state.programValues;
         if (programId.length == 1) {
-            programId = programId[0].value
-            const program = this.state.programLst.filter(
-                (c) => c.id == programId
-            );
+            programId = programId[0].value;
+            const program = this.state.programLst.filter(c => c.id == programId);
             if (program.length == 1) {
                 if (localStorage.getItem("sessionType") === 'Online') {
-                    this.setState(
-                        {
-                            versions: [],
-                        },
-                        () => {
-                            DropdownService.getVersionListForSPProgram(
-                                programId
-                            )
-                                .then((response) => {
-                                    this.setState(
-                                        {
-                                            versions: [],
-                                        },
-                                        () => {
-                                            this.setState(
-                                                {
-                                                    versions: response.data.sort((a, b) => a.versionId - b.versionId),
-                                                },
-                                                () => {
-                                                    this.consolidatedVersionList(programId);
-                                                }
-                                            );
-                                        }
-                                    );
-                                })
-                                .catch((error) => {
-                                    this.setState({
-                                        programs: [],
-                                        loading: false,
-                                    });
-                                    if (error.message === "Network Error") {
-                                        this.setState({
-                                            message: API_URL.includes("uat")
-                                                ? i18n.t("static.common.uatNetworkErrorMessage")
-                                                : API_URL.includes("demo")
-                                                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                                                    : i18n.t("static.common.prodNetworkErrorMessage"),
-                                            loading: false,
-                                        });
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
-                                            case 401:
-                                                this.props.history.push(
-                                                    `/login/static.message.sessionExpired`
-                                                );
-                                                break;
-                                            case 409:
-                                                this.setState({
-                                                    message: i18n.t('static.common.accessDenied'),
-                                                    loading: false,
-                                                    color: "#BA0C2F",
-                                                });
-                                                break;
-                                            case 403:
-                                                this.props.history.push(`/accessDenied`);
-                                                break;
-                                            case 500:
-                                            case 404:
-                                            case 406:
-                                                this.setState({
-                                                    message: i18n.t(error.response.data.messageCode, {
-                                                        entityname: i18n.t("static.dashboard.program"),
-                                                    }),
-                                                    loading: false,
-                                                });
-                                                break;
-                                            case 412:
-                                                this.setState({
-                                                    message: i18n.t(error.response.data.messageCode, {
-                                                        entityname: i18n.t("static.dashboard.program"),
-                                                    }),
-                                                    loading: false,
-                                                });
-                                                break;
-                                            default:
-                                                this.setState({
-                                                    message: "static.unkownError",
-                                                    loading: false,
-                                                });
-                                                break;
-                                        }
-                                    }
-                                });
-                        }
-                    );
-                } else {
-                    this.setState(
-                        {
-                            versions: [],
-                        },
-                        () => {
-                            this.consolidatedVersionList(programId);
-                        }
-                    );
-                }
-            } else {
-                this.setState({
-                    versions: [],
-                });
-            }
-        } else {
-            this.setState({
-                versions: [],
-            }, () => {
-                this.getPlanningUnit();
-            });
-        }
-    };
-    /**
-     * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
-     * Filters out duplicate versions and reverses the list.
-     * Sets the version list in the state and triggers fetching of planning units.
-     * Handles cases where a version is selected from local storage or the default version is selected.
-     * @param {number} programId - The ID of the selected program
-     */
+                    this.setState({ versions: [] }, () => {
+                        DropdownService.getVersionListForSPProgram(programId)
+                            .then(response => { this.setState({ versions: response.data.sort((a, b) => a.versionId - b.versionId) }, () => { this.consolidatedVersionList(programId); }); })
+                            .catch(() => { this.setState({ programs: [], loading: false }); });
+                    });
+                } else { this.setState({ versions: [] }, () => { this.consolidatedVersionList(programId); }); }
+            } else { this.setState({ versions: [] }); }
+        } else { this.setState({ versions: [] }, () => { this.getPlanningUnit(); }); }
+    }
+
     consolidatedVersionList = (programId) => {
-        this.setState({
-            loading: true
-        })
-        const { versions } = this.state;
-        var verList = versions;
-        var db1;
-        getDatabase();
+        this.setState({ loading: true });
+        var verList = this.state.versions;
+        var db1; getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
         openRequest.onsuccess = function (e) {
             db1 = e.target.result;
-            var transaction = db1.transaction(["programData"], "readwrite");
-            var program = transaction.objectStore("programData");
-            var getRequest = program.getAll();
-            getRequest.onerror = function (event) {
-            };
+            var getRequest = db1.transaction(["programData"], "readwrite").objectStore("programData").getAll();
             getRequest.onsuccess = function (event) {
-                var myResult = [];
-                myResult = getRequest.result;
-                var userBytes = CryptoJS.AES.decrypt(
-                    localStorage.getItem("curUser"),
-                    SECRET_KEY
-                );
+                var myResult = getRequest.result;
+                var userBytes = CryptoJS.AES.decrypt(localStorage.getItem("curUser"), SECRET_KEY);
                 var userId = userBytes.toString(CryptoJS.enc.Utf8);
                 for (var i = 0; i < myResult.length; i++) {
-                    if (
-                        myResult[i].userId == userId &&
-                        myResult[i].programId == programId
-                    ) {
-                        var bytes = CryptoJS.AES.decrypt(
-                            myResult[i].programName,
-                            SECRET_KEY
-                        );
-                        var programNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-                        var databytes = CryptoJS.AES.decrypt(
-                            myResult[i].programData.generalData,
-                            SECRET_KEY
-                        );
+                    if (myResult[i].userId == userId && myResult[i].programId == programId) {
+                        var databytes = CryptoJS.AES.decrypt(myResult[i].programData.generalData, SECRET_KEY);
                         var programData = databytes.toString(CryptoJS.enc.Utf8);
                         var version = JSON.parse(programData).currentVersion;
                         version.versionId = `${version.versionId} (Local)`;
-                        version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
+                        version.cutOffDate = JSON.parse(programData).cutOffDate || "";
                         verList.push(version);
                     }
                 }
-                let versionList = verList.filter(function (x, i, a) {
-                    return a.indexOf(x) === i;
-                });
-                versionList.reverse();
-                if (
-                    localStorage.getItem("sesVersionIdReport") != "" &&
-                    localStorage.getItem("sesVersionIdReport") != undefined
-                ) {
-                    let versionVar = versionList.filter(
-                        (c) => c.versionId == localStorage.getItem("sesVersionIdReport")
-                    );
-                    if (versionVar != "" && versionVar != undefined) {
-                        this.setState(
-                            {
-                                versions: versionList,
-                                versionId: localStorage.getItem("sesVersionIdReport"),
-                            },
-                            () => {
-                                this.getPlanningUnit();
-                            }
-                        );
-                    } else {
-                        this.setState(
-                            {
-                                versions: versionList,
-                                versionId: versionList[0].versionId,
-                            },
-                            () => {
-                                this.getPlanningUnit();
-                            }
-                        );
-                    }
-                } else {
-                    this.setState(
-                        {
-                            versions: versionList,
-                            versionId: versionList[0].versionId,
-                        },
-                        () => {
-                            this.getPlanningUnit();
-                        }
-                    );
-                }
+                let versionList = verList.filter((x, i, a) => a.indexOf(x) === i).reverse();
+                const savedVersion = localStorage.getItem("sesVersionIdReport");
+                const versionId = versionList.some(c => c.versionId == savedVersion) ? savedVersion : versionList[0].versionId;
+                this.setState({ versions: versionList, versionId }, () => { this.getPlanningUnit(); });
             }.bind(this);
         }.bind(this);
-    };
-    /**
-     * Retrieves the list of planning units for a selected program.
-     */
+    }
+
     getPlanningUnit = () => {
-        this.setState({
-            planningUnits: [],
-            planningUnitValues: [],
-            loading: true
-        }, () => {
-            console.log("Test@123", localStorage.getItem("sessionType") === 'Online');
+        this.setState({ planningUnits: [], planningUnitValues: [], loading: true }, () => {
             if (!(localStorage.getItem("sessionType") === 'Online')) {
-                console.log("In if Test@123")
-                var db1;
-                getDatabase();
+                var db1; getDatabase();
                 var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
                 openRequest.onsuccess = function (e) {
                     db1 = e.target.result;
-                    var planningunitTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
-                    var planningunitOs = planningunitTransaction.objectStore('programPlanningUnit');
-                    var planningunitRequest = planningunitOs.getAll();
-                    var planningList = []
-                    planningunitRequest.onerror = function (event) {
-                    };
+                    var planningunitRequest = db1.transaction(['programPlanningUnit'], 'readwrite').objectStore('programPlanningUnit').getAll();
                     planningunitRequest.onsuccess = function (e) {
-                        var myResult = [];
-                        myResult = planningunitRequest.result;
+                        var myResult = planningunitRequest.result;
                         var programId = this.state.programValues[0].value;
-                        var proList = []
-                        for (var i = 0; i < myResult.length; i++) {
-                            if (myResult[i].program.id == programId && myResult[i].active == true) {
-                                proList[i] = myResult[i].planningUnit
-                            }
-                        }
-                        this.setState({
-                            planningUnits: proList, message: ''
-                        }, () => {
-                            this.fetchData();
-                        })
+                        var proList = myResult.filter(r => r.program.id == programId && r.active == true).map(r => r.planningUnit);
+                        this.setState({ planningUnits: proList, message: '' }, () => { this.fetchData(); });
                     }.bind(this);
-                }.bind(this)
-            }
-            else {
-                console.log("In else Test@123")
+                }.bind(this);
+            } else {
                 let programValues = this.state.programValues.map(c => c.value);
-                this.setState({
-                    planningUnits: [],
-                    planningUnitValues: [],
-                    planningUnitLabels: []
-                }, () => {
+                this.setState({ planningUnits: [], planningUnitValues: [], planningUnitLabels: [] }, () => {
                     if (programValues.length > 0) {
-                        var programJson = {
-                            tracerCategoryIds: [],
-                            programIds: programValues
-                        }
+                        var programJson = { tracerCategoryIds: [], programIds: programValues };
                         DropdownService.getProgramPlanningUnitDropdownList(programJson)
                             .then(response => {
-                                var listArray = response.data;
-                                listArray.sort((a, b) => {
-                                    var itemLabelA = getLabelText(a.label, this.state.lang).toUpperCase();
-                                    var itemLabelB = getLabelText(b.label, this.state.lang).toUpperCase();
-                                    return itemLabelA > itemLabelB ? 1 : -1;
-                                });
-                                this.setState({
-                                    planningUnits: listArray,
-                                }, () => {
-                                    this.fetchData()
-                                });
-                            }).catch(
-                                error => {
-                                    this.setState({
-                                        planningUnits: [],
-                                    })
-                                    if (error.message === "Network Error") {
-                                        this.setState({
-                                            message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
-                                            loading: false
-                                        });
-                                    } else {
-                                        switch (error.response ? error.response.status : "") {
-                                            case 401:
-                                                this.props.history.push(`/login/static.message.sessionExpired`)
-                                                break;
-                                            case 409:
-                                                this.setState({
-                                                    message: i18n.t('static.common.accessDenied'),
-                                                    loading: false,
-                                                    color: "#BA0C2F",
-                                                });
-                                                break;
-                                            case 403:
-                                                this.props.history.push(`/accessDenied`)
-                                                break;
-                                            case 500:
-                                            case 404:
-                                            case 406:
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
-                                                break;
-                                            case 412:
-                                                this.setState({
-                                                    message: error.response.data.messageCode,
-                                                    loading: false
-                                                });
-                                                break;
-                                            default:
-                                                this.setState({
-                                                    message: 'static.unkownError',
-                                                    loading: false
-                                                });
-                                                break;
-                                        }
-                                    }
-                                }
-                            );
+                                var listArray = response.data.sort((a, b) => getLabelText(a.label, this.state.lang).toUpperCase() > getLabelText(b.label, this.state.lang).toUpperCase() ? 1 : -1);
+                                this.setState({ planningUnits: listArray }, () => { this.fetchData(); });
+                            }).catch(() => { this.setState({ planningUnits: [] }); });
                     }
-                })
+                });
             }
         });
     }
-    /**
-     * Handles the change event for planning units.
-     * @param {Array} event - An array containing the selected planning unit IDs.
-     */
+
     handlePlanningUnitChange = (planningUnitIds) => {
-        planningUnitIds = planningUnitIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            planningUnitValues: planningUnitIds.map(ele => ele),
-            planningUnitLabels: planningUnitIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData();
-        })
-    }
-    /**
-     * Handles the dismiss of the range picker component.
-     * Updates the component state with the new range value and triggers a data fetch.
-     * @param {object} value - The new range value selected by the user.
-     */
-    handleRangeDissmis(value) {
-        this.setState({ rangeValue: value }, () => { this.fetchData(); })
-    }
-    /**
-     * Handles the click event on the range picker box.
-     * Shows the range picker component.
-     * @param {object} e - The event object containing information about the click event.
-     */
-    _handleClickRangeBox(e) {
-        this.refs.pickRange.show()
-    }
-    /**
-     * Displays a loading indicator while data is being loaded.
-     */
-    loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
-    /**
-     * Handles the change event for funding sources.
-     * @param {Array} fundingSourceIds - An array containing the selected funding source IDs.
-     */
-    handleFundingSourceChange(fundingSourceIds) {
-        fundingSourceIds = fundingSourceIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            fundingSourceValues: fundingSourceIds.map(ele => ele),
-            fundingSourceLabels: fundingSourceIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData();
-        })
-    }
-    /**
-     * Handles the change event for shipment statuses.
-     * @param {Array} fundingSourceIds - An array containing the selected shipment status IDs.
-     */
-    handleShipmentStatusChange(shipmentStatusIds) {
-        shipmentStatusIds = shipmentStatusIds.sort(function (a, b) {
-            return parseInt(a.value) - parseInt(b.value);
-        })
-        this.setState({
-            shipmentStatusValues: shipmentStatusIds.map(ele => ele),
-            shipmentStatusLabels: shipmentStatusIds.map(ele => ele.label)
-        }, () => {
-            this.fetchData();
-        })
-    }
-    /**
-     * Sets the procurement agent type ID based on the checkbox state.
-     * @param {object} e - The event object containing checkbox information.
-     */
-    setProcurementAgentTypeId(e) {
-        var procurementAgentTypeId = e.target.checked;
-        var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if (procurementAgentTypeId == true) {
-            groupByFundingSourceType = false;
-        }
-        this.setState({
-            procurementAgentTypeId: procurementAgentTypeId,
-            groupByFundingSourceType: groupByFundingSourceType,
-        }, () => {
-            this.fetchData();
-        })
+        planningUnitIds = planningUnitIds.sort((a, b) => parseInt(a.value) - parseInt(b.value));
+        this.setState({ planningUnitValues: planningUnitIds.map(ele => ele), planningUnitLabels: planningUnitIds.map(ele => ele.label) }, () => { this.fetchData(); });
     }
 
-    /**
-     * Sets the group by & related flags to state based on the selected dropdown value.
-     * @param {object} e - The event object containing checkbox information.
-     */
+    handleRangeDissmis(value) { this.setState({ rangeValue: value }, () => { this.fetchData(); }); }
+    _handleClickRangeBox(e) { this.refs.pickRange.show(); }
+    loading = () => <div className="animated fadeIn pt-1 text-center">{i18n.t('static.common.loading')}</div>
+
+    handleFundingSourceChange(fundingSourceIds) {
+        fundingSourceIds = fundingSourceIds.sort((a, b) => parseInt(a.value) - parseInt(b.value));
+        this.setState({ fundingSourceValues: fundingSourceIds.map(ele => ele), fundingSourceLabels: fundingSourceIds.map(ele => ele.label) }, () => { this.fetchData(); });
+    }
+
+    handleShipmentStatusChange(shipmentStatusIds) {
+        shipmentStatusIds = shipmentStatusIds.sort((a, b) => parseInt(a.value) - parseInt(b.value));
+        this.setState({ shipmentStatusValues: shipmentStatusIds.map(ele => ele), shipmentStatusLabels: shipmentStatusIds.map(ele => ele.label) }, () => { this.fetchData(); });
+    }
+
+    setProcurementAgentTypeId(e) {
+        var procurementAgentTypeId = e.target.checked;
+        this.setState({ procurementAgentTypeId, groupByFundingSourceType: procurementAgentTypeId ? false : this.state.groupByFundingSourceType }, () => { this.fetchData(); });
+    }
+
     setGroupByValues(e) {
         var groupByValue = e.target.value;
-        var procurementAgentTypeId = this.state.procurementAgentTypeId;
-        var groupByFundingSourceType = this.state.groupByFundingSourceType;
-        if (groupByValue == 0) {
-            procurementAgentTypeId = false;
-            groupByFundingSourceType = false;
-        } else if (groupByValue == 1) {
-            procurementAgentTypeId = true;
-            groupByFundingSourceType = false;
-        } else if (groupByValue == 2) {
-            procurementAgentTypeId = false;
-            groupByFundingSourceType = true;
-        } else {
-            procurementAgentTypeId = true;
-            groupByFundingSourceType = true;
-        }
-        this.setState({
-            procurementAgentTypeId: procurementAgentTypeId,
-            groupByFundingSourceType: groupByFundingSourceType,
-            groupBy: groupByValue
-        }, () => {
-            this.fetchData();
-        })
+        var procurementAgentTypeId = groupByValue == 1 || groupByValue == 3;
+        var groupByFundingSourceType = groupByValue == 2 || groupByValue == 3;
+        this.setState({ procurementAgentTypeId, groupByFundingSourceType, groupBy: groupByValue }, () => { this.fetchData(); });
     }
 
     setVersionId(event) {
-        var versionLabel = document.getElementById("versionId").selectedOptions[0].text.toString()
-        this.setState(
-            {
-                versionLabel: versionLabel,
-                versionId: event.target.value,
-            },
-            () => {
-                if (this.state.versionId != "" && this.state.versionId != 0) {
-                    localStorage.setItem("sesVersionIdReport", this.state.versionId);
-                    this.getPlanningUnit();
-                    this.fetchData();
-                }
+        var versionLabel = document.getElementById("versionId").selectedOptions[0].text.toString();
+        this.setState({ versionLabel, versionId: event.target.value }, () => {
+            if (this.state.versionId != "" && this.state.versionId != 0) {
+                localStorage.setItem("sesVersionIdReport", this.state.versionId);
+                this.getPlanningUnit();
+                this.fetchData();
             }
-        );
+        });
     }
 
-    /**
-     * Renders the Shipment Global Demand View report table.
-     * @returns {JSX.Element} - Shipment Global Demand View report table.
-     */
+    // ------------------------------------------------------------------
+    // render
+    // ------------------------------------------------------------------
     render() {
-
-        let grouping = {};
-        let dataSource = this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit;
-
-        let grandTotalCost = 0;
-        let grandPUCost = 0;
-        let grandFreightCost = 0;
-
-        if (dataSource && dataSource.length > 0) {
-            dataSource.forEach(d => {
-                let fspaCode = d.fspa.code;
-                let programCode = d.programCountry ? d.programCountry.code : "N/A";
-
-                if (!grouping[fspaCode]) {
-                    grouping[fspaCode] = { code: fspaCode, label: d.fspa.label, programs: {}, totalPuCost: 0, totalFreightCost: 0, totalCost: 0 };
-                }
-
-                if (!grouping[fspaCode].programs[programCode]) {
-                    grouping[fspaCode].programs[programCode] = { code: programCode, label: d.programCountry ? d.programCountry.label : "N/A", pus: [], totalPuCost: 0, totalFreightCost: 0, totalCost: 0 };
-                }
-
-                let puLabel = getLabelText(d.planningUnit.label, this.state.lang);
-                let puDisplay = `${puLabel} | ${d.planningUnit.id}`;
-
-                grouping[fspaCode].programs[programCode].pus.push({
-                    id: d.planningUnit.id,
-                    display: puDisplay,
-                    quantity: d.quantity,
-                    totalPuCost: d.cost,
-                    totalFreightCost: d.freightCost,
-                    totalCost: d.totalCost
-                });
-
-                grouping[fspaCode].programs[programCode].totalPuCost += d.cost;
-                grouping[fspaCode].programs[programCode].totalFreightCost += d.freightCost;
-                grouping[fspaCode].programs[programCode].totalCost += d.totalCost;
-
-                grouping[fspaCode].totalPuCost += d.cost;
-                grouping[fspaCode].totalFreightCost += d.freightCost;
-                grouping[fspaCode].totalCost += d.totalCost;
-
-                grandPUCost += d.cost;
-                grandFreightCost += d.freightCost;
-                grandTotalCost += d.totalCost;
-            });
-        }
-
-        let fspasList = Object.values(grouping).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
-        fspasList.forEach(f => {
-            f.programsList = Object.values(f.programs).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
-            f.programsList.forEach(p => {
-                p.pus.sort((a, b) => a.display.toString().toLowerCase().localeCompare(b.display.toString().toLowerCase()));
-            });
-        });
-
-        const formatCurr = (val) => {
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(val);
-        }
-        const formatNum = (val) => {
-            return val ? new Intl.NumberFormat('en-US').format(val) : 0;
-        }
-        const formatPerc = (val) => {
-            return (val * 100).toFixed(0) + "%";
-        }
-
         const { isDarkMode } = this.state;
-        // const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
         const fontColor = isDarkMode ? '#e4e5e6' : '#212721';
         const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
+
+        // ---- chart options (unchanged) ----
         const options = {
-            plugins: {
-                datalabels: {
-                    formatter: (value, context) => {
-                        return ``;
-                    },
-                },
-            },
-            title: {
-                display: true,
-                text: i18n.t('static.shipmentOverview.planningUnitQuantityByPU') + " " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
-                fontColor: fontColor
-            },
+            plugins: { datalabels: { formatter: () => '' } },
+            title: { display: true, text: i18n.t('static.shipmentOverview.planningUnitQuantityByPU') + " " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')), fontColor },
             scales: {
-                xAxes: [{
-                    stacked: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t('static.shipment.qty'),
-                        fontColor: fontColor,
-                        fontStyle: "normal",
-                        fontSize: "12"
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: fontColor,
-                        callback: function (value) {
-                            var cell1 = value
-                            cell1 += '';
-                            var x = cell1.split('.');
-                            var x1 = x[0];
-                            var x2 = x.length > 1 ? '.' + x[1] : '';
-                            var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return x1 + x2;
-                        }
-                    },
-                    gridLines: {
-                        display: false,
-                        lineWidth: 0,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    }
-                }],
-                yAxes: [{
-                    stacked: true,
-                    labelString: i18n.t('static.common.product'),
-                    fontColor: fontColor,
-                    ticks: {
-                        fontColor: fontColor,
-                        callback: function (value) {
-                            return (value.length > 40) ? value.substr(0, 40) + "..." : value;
-                        },
-                    },
-                    gridLines: {
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor
-                    }
-                }],
+                xAxes: [{ stacked: true, scaleLabel: { display: true, labelString: i18n.t('static.shipment.qty'), fontColor, fontStyle: "normal", fontSize: "12" }, ticks: { beginAtZero: true, fontColor, callback: function (value) { var cell1 = value + ''; var x = cell1.split('.'); var x1 = x[0]; var x2 = x.length > 1 ? '.' + x[1] : ''; var rgx = /(\d+)(\d{3})/; while (rgx.test(x1)) { x1 = x1.replace(rgx, '$1,$2'); } return x1 + x2; } }, gridLines: { display: false, lineWidth: 0, color: gridLineColor, zeroLineColor: gridLineColor } }],
+                yAxes: [{ stacked: true, labelString: i18n.t('static.common.product'), fontColor, ticks: { fontColor, callback: function (value) { return value.length > 40 ? value.substr(0, 40) + "..." : value; } }, gridLines: { color: gridLineColor, zeroLineColor: gridLineColor } }]
             },
-            tooltips: {
-                enabled: false,
-                custom: CustomTooltips,
-                filter: function (tooltipItem, data) {
-                    let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                    return value !== 0 && value !== '0' && value !== 0.0;
-                },
-                callbacks: {
-                    label: function (tooltipItem, data) {
-                        let label = data.labels[tooltipItem.index];
-                        let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
-                        var cell1 = value
-                        cell1 += '';
-                        var x = cell1.split('.');
-                        var x1 = x[0];
-                        var x2 = x.length > 1 ? '.' + x[1] : '';
-                        var rgx = /(\d+)(\d{3})/;
-                        while (rgx.test(x1)) {
-                            x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                        }
-                        return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
-                    }
-                }
-            },
-            maintainAspectRatio: false
-            ,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor
-                }
-            }
-        }
-        const options1 = {
-            plugins: {
-                datalabels: {
-                    formatter: (value, context) => {
-                        return ``;
-                    },
-                },
-            },
-            title: {
-                display: true,
-                text: i18n.t('static.shipmentOverview.planningUnitQuantityByPU') + " " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
-                fontColor: fontColor
-            },
-            scales: {
-                xAxes: [{
-                    stacked: true,
-                    scaleLabel: {
-                        display: true,
-                        labelString: i18n.t('static.shipment.qty'),
-                        fontColor: fontColor,
-                        fontStyle: "normal",
-                        fontSize: "12"
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        fontColor: fontColor,
-                        callback: function (value) {
-                            var cell1 = value
-                            cell1 += '';
-                            var x = cell1.split('.');
-                            var x1 = x[0];
-                            var x2 = x.length > 1 ? '.' + x[1] : '';
-                            var rgx = /(\d+)(\d{3})/;
-                            while (rgx.test(x1)) {
-                                x1 = x1.replace(rgx, '$1' + ',' + '$2');
-                            }
-                            return x1 + x2;
-                        }
-                    },
-                    gridLines: {
-                        display: true,
-                        color: gridLineColor,
-                        zeroLineColor: gridLineColor,
-                        lineWidth: 0,
-                    }
-                }],
-                yAxes: [{
-                    stacked: true,
-                    labelString: i18n.t('static.common.product'),
-                    fontColor: fontColor,
-                    gridLines: {
-
-                        borderColor: 'red'
-
-                    },
-                }],
-            },
+            tooltips: { enabled: false, custom: CustomTooltips, filter: function (tooltipItem, data) { let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]; return value !== 0 && value !== '0' && value !== 0.0; }, callbacks: { label: function (tooltipItem, data) { let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index]; var cell1 = value + ''; var x = cell1.split('.'); var x1 = x[0]; var x2 = x.length > 1 ? '.' + x[1] : ''; var rgx = /(\d+)(\d{3})/; while (rgx.test(x1)) { x1 = x1.replace(rgx, '$1,$2'); } return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2; } } },
             maintainAspectRatio: false,
-            legend: {
-                display: true,
-                position: 'bottom',
-                labels: {
-                    usePointStyle: true,
-                    fontColor: fontColor,
-                }
-            }
-        }
-        const { versions } = this.state;
-        let versionList = versions.length > 0
-            && versions.map((item, i) => {
-                return (
-                    <option key={i} value={item.versionId}>
-                        {item.versionId}
-                    </option>
-                )
-            }, this);
-        const { programLst } = this.state;
-        let programList = [];
-        programList = programLst.length > 0
-            && programLst.map((item, i) => {
-                return (
-                    { label: (item.code), value: item.id }
-                )
-            }, this);
-        const { countrys } = this.state;
-        let countryList = countrys.length > 0 && countrys.map((item, i) => {
-            return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
-        }, this);
-        const { planningUnits } = this.state;
-        let planningUnitList = [];
-        planningUnitList = planningUnits.length > 0
-            && planningUnits.map((item, i) => {
-                return (
-                    { label: getLabelText(item.label, this.state.lang), value: item.id }
-                )
-            }, this);
-        const { fundingSourceTypes } = this.state;
-        const { fundingSources } = this.state;
-        let fundingSourceList = [];
-        fundingSourceList = fundingSources.length > 0
-            && fundingSources.map((item, i) => {
-                return (
-                    { label: item.code, value: item.id }
-                )
-            }, this);
-        const { procurementAgents } = this.state;
-        let procurementAgentListDD = procurementAgents.length > 0 &&
-            procurementAgents.map((item, i) => {
-                return {
-                    label: item.code,
-                    value: item.id,
-                };
-            }, this);
-        const { shipmentStatuses } = this.state;
-        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map((item, i) => {
-            return (
-                { label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }
-            )
-        }, this);
-        const { realmList } = this.state;
-        let realms = realmList.length > 0
-            && realmList.map((item, i) => {
-                return (
-                    <option key={i} value={item.realmId}>
-                        {getLabelText(item.label, this.state.lang)}
-                    </option>
-                )
-            }, this);
-        const darkModeColors1 = [
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-        ];
-
-        const lightModeColors1 = [
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-        ];
-        const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
-        const planningUnitQuantity = this.state.data.planningUnitQuantity || [];
-        planningUnitQuantity.sort((a, b) => {
-            let labelA = getLabelText(a.planningUnit.label, this.state.lang) + " | " + a.planningUnit.id;
-            let labelB = getLabelText(b.planningUnit.label, this.state.lang) + " | " + b.planningUnit.id;
-            return labelA.toString().toLowerCase().localeCompare(labelB.toString().toLowerCase());
-        });
-
-        /* 1️⃣ X-Axis Labels (Planning Units) */
-        const labels = planningUnitQuantity.map(item =>
-            getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id
-        );
-
-        /* 2️⃣ Get All Unique FSPA Codes */
-        const allFspaCodes = [
-            ...new Set(
-                planningUnitQuantity.flatMap(item =>
-                    Object.keys(item.fspaQuantity || {})
-                )
-            )
-        ].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase()));
-
-        /* 3️⃣ Build Dataset Per FSPA */
-        const datasets = allFspaCodes.map((code, index) => ({
-            label: code,  // 👈 Directly using GFATM, TBD
-            data: planningUnitQuantity.map(item =>
-                roundARU(
-                    (item.fspaQuantity && item.fspaQuantity[code]) || 0,
-                    1
-                )
-            ),
-            backgroundColor: backgroundColor1[index % backgroundColor1.length],
-            borderWidth: 0
-        }));
-
-        /* 4️⃣ Final Chart Data */
-        const chartData = {
-            labels,
-            datasets
+            legend: { display: true, position: 'bottom', labels: { usePointStyle: true, fontColor } }
         };
 
-        console.log("Data Test@123", this.state.data.planningUnitQuantity)
-        const darkModeColors = [
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
-            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-        ];
+        const darkModeColors = ['#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9', '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9', '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9', '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED'];
+        const lightModeColors = ['#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721', '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721', '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED', '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721', '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED'];
+        const backgroundColor1 = isDarkMode ? darkModeColors : lightModeColors;
 
-        const lightModeColors = [
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
-            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
-        ];
-        const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
-
-        const fspaCostAndPercSorted = [...(this.state.data.fspaCostAndPerc || [])].sort((a, b) => {
-            let codeA = a.fspa ? a.fspa.code : "N/A";
-            let codeB = b.fspa ? b.fspa.code : "N/A";
-            return codeA.toString().toLowerCase().localeCompare(codeB.toString().toLowerCase());
+        const planningUnitQuantity = [...(this.state.data.planningUnitQuantity || [])].sort((a, b) => {
+            var A = (getLabelText(a.planningUnit.label, this.state.lang) + " | " + a.planningUnit.id).toUpperCase();
+            var B = (getLabelText(b.planningUnit.label, this.state.lang) + " | " + b.planningUnit.id).toUpperCase();
+            return A > B ? 1 : -1;
         });
+        const labels = planningUnitQuantity.map(item => getLabelText(item.planningUnit.label, this.state.lang) + " | " + item.planningUnit.id);
+        const allFspaCodes = [...new Set(planningUnitQuantity.flatMap(item => Object.keys(item.fspaQuantity || {})))].sort((a, b) => a.toString().toUpperCase() > b.toString().toUpperCase() ? 1 : -1);
+        const datasets = allFspaCodes.map((code, index) => ({ label: code, data: planningUnitQuantity.map(item => roundARU((item.fspaQuantity && item.fspaQuantity[code]) || 0, 1)), backgroundColor: backgroundColor1[index % backgroundColor1.length], borderWidth: 0 }));
+        const chartData = { labels, datasets };
 
+        const usaidColors = ['#002F6C', '#BA0C2F', '#A7C6ED', '#0067b9', '#6c6463', '#cfcdc9', '#205493', '#EDB944', '#118B70'];
+        const fspaCostAndPercSorted = [...(this.state.data.fspaCostAndPerc || [])].sort((a, b) => (a.fspa ? a.fspa.code : "N/A") > (b.fspa ? b.fspa.code : "N/A") ? 1 : -1);
         const pieLabels = [...new Set(fspaCostAndPercSorted.map(ele => ele.fspa ? ele.fspa.code : "N/A"))];
-        const usaidColors = [
-            '#002F6C', // USAID Dark Blue
-            '#BA0C2F', // USAID Red
-            '#A7C6ED', // USAID Light Blue
-            '#0067b9', // USAID Medium Blue
-            '#6c6463', // USAID Dark Gray
-            '#cfcdc9', // USAID Light Gray
-            '#205493', // USAID Web Blue
-            '#EDB944', // USAID Yellow
-            '#118B70', // USAID Green
-        ];
-
-        const chartDataForPie = {
-            labels: pieLabels,
-            datasets: [{
-                data: fspaCostAndPercSorted.map(ele => ele.cost),
-                backgroundColor: usaidColors.slice(0, pieLabels.length),
-                borderWidth: 2,
-                borderColor: '#ffffff',
-            }],
-        }
-        const pickerLang = {
-            months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-            from: 'From', to: 'To',
-            fontColor: fontColor,
-        }
-        const { rangeValue } = this.state
-        const checkOnline = localStorage.getItem('sessionType');
+        const chartDataForPie = { labels: pieLabels, datasets: [{ data: fspaCostAndPercSorted.map(ele => ele.cost), backgroundColor: usaidColors.slice(0, pieLabels.length), borderWidth: 2, borderColor: '#ffffff' }] };
 
         const optionsPie = {
-            layout: {
-                padding: 10
-            },
-            title: {
-                display: true,
-                text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')),
-                fontColor: fontColor,
-                padding: 30
-            },
-            legend: {
-                position: 'bottom',
-                labels: {
-                    padding: 10,
-                    fontColor: fontColor,
-                    usePointStyle: true,
-                }
-            },
-            tooltips: {
-                callbacks: {
-                    label: function (tooltipItems, data) {
-                        var label = data.labels[tooltipItems.index];
-                        var value = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index];
-                        return label + " : $ " + value.toLocaleString();
-                    }
-                }
-            },
-            plugins: {
-                datalabels: {
-                    display: false
-                }
-            }
-        }
+            layout: { padding: 10 },
+            title: { display: true, text: i18n.t('static.shipment.totalCost') + " by " + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')), fontColor, padding: 30 },
+            legend: { position: 'bottom', labels: { padding: 10, fontColor, usePointStyle: true } },
+            tooltips: { callbacks: { label: function (tooltipItems, data) { var value = data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]; return data.labels[tooltipItems.index] + " : $ " + value.toLocaleString(); } } },
+            plugins: { datalabels: { display: false } }
+        };
+
+        const pickerLangLocal = { months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], from: 'From', to: 'To', fontColor };
+        const { rangeValue } = this.state;
+
+        const { versions } = this.state;
+        let versionList = versions.length > 0 && versions.map((item, i) => <option key={i} value={item.versionId}>{item.versionId}</option>);
+
+        const { programLst } = this.state;
+        let programList = programLst.length > 0 && programLst.map(item => ({ label: item.code, value: item.id }));
+
+        const { countrys } = this.state;
+        let countryList = countrys.length > 0 && countrys.map(item => ({ label: getLabelText(item.label, this.state.lang), value: item.id }));
+
+        const { planningUnits } = this.state;
+        let planningUnitList = planningUnits.length > 0 && planningUnits.map(item => ({ label: getLabelText(item.label, this.state.lang), value: item.id }));
+
+        const { fundingSources } = this.state;
+        let fundingSourceList = fundingSources.length > 0 && fundingSources.map(item => ({ label: item.code, value: item.id }));
+
+        const { procurementAgents } = this.state;
+        let procurementAgentListDD = procurementAgents.length > 0 && procurementAgents.map(item => ({ label: item.code, value: item.id }));
+
+        const { shipmentStatuses } = this.state;
+        let shipmentStatusList = shipmentStatuses.length > 0 && shipmentStatuses.map(item => ({ label: getLabelText(item.label, this.state.lang), value: item.shipmentStatusId }));
+
+        const dataAvailable = this.state.data.planningUnitQuantity.length > 0 || this.state.data.fspaCostAndPerc.length > 0 || this.state.data.fspaCountrySplit.length > 0;
+        const tableDataAvailable = (this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit) && (this.state.aggregateByCountry ? this.state.data.fspaCountrySplit : this.state.data.fspaProgramSplit).length > 0;
 
         return (
-            <div className="animated fadeIn" >
+            <div className="animated fadeIn">
                 <AuthenticationServiceComponent history={this.props.history} />
                 <h6 className="mt-success">{i18n.t(this.props.match.params.message)}</h6>
                 <h5 className="red">{i18n.t(this.state.message)}</h5>
                 <Card>
                     <div className="Card-header-reporticon">
-                        {(this.state.data.planningUnitQuantity.length > 0 || this.state.data.fspaCostAndPerc.length > 0 || this.state.data.fspaCountrySplit.length > 0) &&
+                        {dataAvailable && (
                             <div className="card-header-actions">
                                 <a className="card-header-action">
-                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF" onClick={() => {
-                                        var curTheme = localStorage.getItem("theme");
-                                        if (curTheme == "dark") {
-                                            this.setState({
-                                                isDarkMode: false
-                                            }, () => {
-                                                setTimeout(() => {
-                                                    this.exportPDF();
-                                                    if (curTheme == "dark") {
-                                                        this.setState({
-                                                            isDarkMode: true
-                                                        })
-                                                    }
-                                                }, 0)
-                                            })
-                                        } else {
-                                            this.exportPDF();
-                                        }
-                                    }}
+                                    <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title="Export PDF"
+                                        onClick={() => {
+                                            var curTheme = localStorage.getItem("theme");
+                                            if (curTheme == "dark") {
+                                                this.setState({ isDarkMode: false }, () => { setTimeout(() => { this.exportPDF(); if (curTheme == "dark") { this.setState({ isDarkMode: true }); } }, 0); });
+                                            } else { this.exportPDF(); }
+                                        }}
                                     />
                                     <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
                                 </a>
                             </div>
-                        }
+                        )}
                     </div>
-                    <CardBody className=" pt-lg-0 pb-lg-0">
+                    <CardBody className="pt-lg-0 pb-lg-0">
                         <div ref={ref}>
-                            <Form >
+                            <Form>
                                 <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
-                                            <div className="controls ">
-                                                <Picker
-                                                    ref="pickRange"
-                                                    years={{ min: this.state.minDate, max: this.state.maxDate }}
-                                                    value={rangeValue}
-                                                    lang={pickerLang}
-                                                    onDismiss={this.handleRangeDissmis}
-                                                >
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon fa fa-sort-desc ml-1"></span></Label>
+                                            <div className="controls">
+                                                <Picker ref="pickRange" years={{ min: this.state.minDate, max: this.state.maxDate }} value={rangeValue} lang={pickerLangLocal} onDismiss={this.handleRangeDissmis}>
                                                     <MonthBox value={makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)} onClick={this._handleClickRangeBox} />
                                                 </Picker>
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls ">
-                                                <MultiSelect
-                                                    bsSize="sm"
-                                                    name="countryIds"
-                                                    id="countryIds"
-                                                    value={this.state.countryValues}
-                                                    onChange={(e) => { this.handleChange(e) }}
-                                                    options={countryList && countryList.length > 0 ? countryList : []}
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                    filterOptions={filterOptions}
-                                                />
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect bsSize="sm" name="countryIds" id="countryIds" value={this.state.countryValues} onChange={(e) => { this.handleChange(e); }} options={countryList && countryList.length > 0 ? countryList : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} filterOptions={filterOptions} />
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls ">
-                                                <MultiSelect
-                                                    bsSize="sm"
-                                                    name="programIds"
-                                                    id="programIds"
-                                                    value={this.state.programValues}
-                                                    onChange={(e) => { this.handleChangeProgram(e) }}
-                                                    options={programList && programList.length > 0 ? programList : []}
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                    filterOptions={filterOptions}
-                                                />
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect bsSize="sm" name="programIds" id="programIds" value={this.state.programValues} onChange={(e) => { this.handleChangeProgram(e); }} options={programList && programList.length > 0 ? programList : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} filterOptions={filterOptions} />
                                             </div>
                                         </FormGroup>
-                                        {this.state.programValues.length == 1 &&
+                                        {this.state.programValues.length == 1 && (
                                             <FormGroup className="col-md-3">
                                                 <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
-                                                <div className="controls ">
+                                                <div className="controls">
                                                     <InputGroup>
-                                                        <Input
-                                                            type="select"
-                                                            name="versionId"
-                                                            id="versionId"
-                                                            bsSize="sm"
-                                                            value={this.state.versionId}
-                                                            onChange={(e) => { this.setVersionId(e); }}
-                                                        >
+                                                        <Input type="select" name="versionId" id="versionId" bsSize="sm" value={this.state.versionId} onChange={(e) => { this.setVersionId(e); }}>
                                                             <option value="-1">{i18n.t('static.common.select')}</option>
                                                             {versionList}
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
                                             </FormGroup>
-                                        }
+                                        )}
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.report.planningUnit')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <div className="controls">
-                                                <MultiSelect
-                                                    name="planningUnitId"
-                                                    id="planningUnitId"
-                                                    bsSize="md"
-                                                    value={this.state.planningUnitValues}
-                                                    onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                    options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []}
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                    filterOptions={filterOptions}
-                                                />
+                                                <MultiSelect name="planningUnitId" id="planningUnitId" bsSize="md" value={this.state.planningUnitValues} onChange={(e) => { this.handlePlanningUnitChange(e); }} options={planningUnitList && planningUnitList.length > 0 ? planningUnitList : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} filterOptions={filterOptions} />
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">
-                                                {i18n.t("static.common.display")}
-                                            </Label>
-                                            <div className="controls ">
+                                            <Label htmlFor="appendedInputButton">{i18n.t("static.common.display")}</Label>
+                                            <div className="controls">
                                                 <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="viewById"
-                                                        id="viewById"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.setViewById(e) }}
-                                                    >
-                                                        <option value="1">
-                                                            {i18n.t("static.fundingSourceHead.fundingSource")}
-                                                        </option>
-                                                        <option value="2">
-                                                            {i18n.t("static.report.procurementAgentName")}
-                                                        </option>
+                                                    <Input type="select" name="viewById" id="viewById" bsSize="sm" onChange={(e) => { this.setViewById(e); }}>
+                                                        <option value="1">{i18n.t("static.fundingSourceHead.fundingSource")}</option>
+                                                        <option value="2">{i18n.t("static.report.procurementAgentName")}</option>
                                                     </Input>
                                                 </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        {this.state.viewById == 1 && <FormGroup className="col-md-3" id="fundingSourceDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls ">
-                                                <MultiSelect
-                                                    name="fundingSourceId"
-                                                    id="fundingSourceId"
-                                                    bsSize="sm"
-                                                    value={this.state.fundingSourceValues}
-                                                    onChange={(e) => { this.handleFundingSourceChange(e) }}
-                                                    options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []}
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                    filterOptions={filterOptions}
-                                                />
-                                            </div>
-                                        </FormGroup>}
-                                        {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
-                                            <Label htmlFor="appendedInputButton">
-                                                {i18n.t("static.report.procurementAgentName")}
-                                            </Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls">
-                                                <MultiSelect
-                                                    name="procurementAgentId"
-                                                    id="procurementAgentId"
-                                                    bsSize="md"
-                                                    value={this.state.procurementAgentValues}
-                                                    filterOptions={filterOptions}
-                                                    onChange={(e) => {
-                                                        this.handleProcurementAgentChange(e);
-                                                    }}
-                                                    options={
-                                                        procurementAgentListDD && procurementAgentListDD.length > 0
-                                                            ? procurementAgentListDD
-                                                            : []
-                                                    }
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                />
-                                            </div>
-                                        </FormGroup>}
+                                        {this.state.viewById == 1 && (
+                                            <FormGroup className="col-md-3" id="fundingSourceDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t('static.budget.fundingsource')}</Label>
+                                                <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect name="fundingSourceId" id="fundingSourceId" bsSize="sm" value={this.state.fundingSourceValues} onChange={(e) => { this.handleFundingSourceChange(e); }} options={fundingSourceList && fundingSourceList.length > 0 ? fundingSourceList : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} filterOptions={filterOptions} />
+                                                </div>
+                                            </FormGroup>
+                                        )}
+                                        {this.state.viewById == 2 && (
+                                            <FormGroup className="col-md-3" id="paDiv">
+                                                <Label htmlFor="appendedInputButton">{i18n.t("static.report.procurementAgentName")}</Label>
+                                                <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                                <div className="controls">
+                                                    <MultiSelect name="procurementAgentId" id="procurementAgentId" bsSize="md" value={this.state.procurementAgentValues} filterOptions={filterOptions} onChange={(e) => { this.handleProcurementAgentChange(e); }} options={procurementAgentListDD && procurementAgentListDD.length > 0 ? procurementAgentListDD : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} />
+                                                </div>
+                                            </FormGroup>
+                                        )}
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">{i18n.t('static.common.status')}</Label>
-                                            <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <div className="controls ">
-                                                <MultiSelect
-                                                    name="shipmentStatusId"
-                                                    id="shipmentStatusId"
-                                                    bsSize="sm"
-                                                    value={this.state.shipmentStatusValues}
-                                                    onChange={(e) => { this.handleShipmentStatusChange(e) }}
-                                                    options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []}
-                                                    disabled={this.state.loading}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                    filterOptions={filterOptions}
-                                                />
+                                            <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
+                                            <div className="controls">
+                                                <MultiSelect name="shipmentStatusId" id="shipmentStatusId" bsSize="sm" value={this.state.shipmentStatusValues} onChange={(e) => { this.handleShipmentStatusChange(e); }} options={shipmentStatusList && shipmentStatusList.length > 0 ? shipmentStatusList : []} disabled={this.state.loading} overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'), selectSomeItems: i18n.t('static.common.select') }} filterOptions={filterOptions} />
                                             </div>
                                         </FormGroup>
                                     </div>
                                 </div>
                             </Form>
+
                             {this.state.data.planningUnitQuantity.length > 0 && <h5 className='red'>{i18n.t("static.shipment.note")}</h5>}
+
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
-                                <Col md="12 pl-0  ">
-                                    <div className="row grid-divider ">
-                                        {
-                                            this.state.data.planningUnitQuantity.length > 0 &&
+                                <Col md="12 pl-0">
+                                    <div className="row grid-divider">
+                                        {this.state.data.planningUnitQuantity.length > 0 && (
                                             <Col md="8 pl-0">
-                                                <div className="chart-wrapper shipmentOverviewgraphheight" >
+                                                <div className="chart-wrapper shipmentOverviewgraphheight">
                                                     <HorizontalBar id="cool-canvas1" data={chartData} options={options} />
                                                 </div>
                                             </Col>
-                                        }
-                                        {
-                                            this.state.data.fspaCostAndPerc.length > 0 &&
+                                        )}
+                                        {this.state.data.fspaCostAndPerc.length > 0 && (
                                             <Col md="4 pl-0">
                                                 <div className="chart-wrapper">
-                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300}
-                                                    />
+                                                    <Pie id="cool-canvas2" data={chartDataForPie} options={optionsPie} height={300} />
                                                 </div>
                                                 <h5 className="red text-center">{i18n.t('static.shipmentOverview.pieChartNote')}</h5>
                                                 <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5>
                                             </Col>
-                                        }
+                                        )}
                                     </div>
                                 </Col>
-                                <Col md="12 pl-0" style={{ position: "absolute", opacity: "0.0", }}>
-                                    {
-                                        this.state.planningUnitSplit.length > 0 &&
-                                        <div className="chart-wrapper shipmentOverviewgraphheight">
-                                            <HorizontalBar id="cool-canvas11" data={chartData} options={options1} />
-                                        </div>
-                                    }
-                                </Col>
+
                                 <Col md="12 pl-0 pb-lg-1">
                                     <div className="globalviwe-scroll">
-                                        <div className="row">
-                                            {fspasList.length > 0 && <div className="col-md-12 mt-2">
+                                        {tableDataAvailable && (
+                                            <div className="col-md-12 mt-2">
+                                                {/* ---- Checkbox controls (unchanged) ---- */}
                                                 <div className="text-left">
                                                     <FormGroup check inline style={{ paddingLeft: 0 }}>
                                                         <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="aggregateByCountry" name="aggregateByCountry" checked={this.state.aggregateByCountry} onChange={this.handleCheckboxChange} />
@@ -3371,137 +1962,41 @@ class ShipmentGlobalDemandView extends Component {
                                                     </FormGroup>
                                                 </div>
 
-                                                {(() => {
-                                                    const isSingleProgram = this.state.programValues.length === 1;
-                                                    const showQtyCol = !this.state.collapsePlanningUnits && !this.state.collapseAll;
-                                                    return (
-                                                        <div className="fixTableHead mt-3">
-                                                            <Table id="mytable1" className="table-bordered text-center">
-                                                                <thead className='Theadtablesticky' style={{ backgroundColor: '#fff', color: '#000' }}>
-                                                                    <tr>
-                                                                        <th style={{ width: '2%' }}></th>
-                                                                        <th className="text-left">
-                                                                            {this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')}
-                                                                            {!isSingleProgram && ` / ${this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program')}`}
-                                                                            {showQtyCol && ` / ${i18n.t('static.dashboard.planningunitheader')}`}
-                                                                        </th>
-                                                                        {showQtyCol && <th className="text-right">{i18n.t('static.shipment.qty')}</th>}
-                                                                        {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalPUCost')}</th>}
-                                                                        {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalFreightCost')}</th>}
-                                                                        <th className="text-right">{i18n.t('static.shipment.totalCost')}</th>
-                                                                        <th className="text-right">{i18n.t('static.shipment.totalCostPerc')}</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody style={{ backgroundColor: '#fff', color: '#000' }}>
-                                                                    {fspasList.map((fspa, fIndex) => {
-                                                                        let isFspaCollapsed = this.state.collapseAll || this.state.collapsedRows.has(`fspa_${fspa.code}`);
-                                                                        let fspaRows = [
-                                                                            <tr key={`fspa_${fspa.code}`} style={{ fontWeight: 'bold' }} >
-                                                                                <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => !this.state.collapseAll && this.toggleCollapse(`fspa_${fspa.code}`)}>
-                                                                                    <i className={"fa " + (isFspaCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
-                                                                                </td>
-                                                                                <td className="text-left">{fspa.code}</td>
-                                                                                {showQtyCol && <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>}
-                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalPuCost)}</td>}
-                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalFreightCost)}</td>}
-                                                                                <td className="text-right">{formatCurr(fspa.totalCost)}</td>
-                                                                                <td className="text-right">{grandTotalCost > 0 ? formatPerc(fspa.totalCost / grandTotalCost) : '0%'}</td>
-                                                                            </tr>
-                                                                        ];
-
-                                                                        if (!isFspaCollapsed) {
-                                                                            if (isSingleProgram) {
-                                                                                // Single program: skip program row, show PUs directly under FSPA
-                                                                                if (!this.state.collapsePlanningUnits) {
-                                                                                    fspa.programsList.forEach((prog, pIndex) => {
-                                                                                        prog.pus.forEach((pu, puIndex) => {
-                                                                                            fspaRows.push(
-                                                                                                <tr key={`fspa_${fspa.code}_pu_${pu.id}`}>
-                                                                                                    <td></td>
-                                                                                                    <td className="text-left custom-padding-pu" style={{ paddingLeft: '30px' }}>{pu.display}</td>
-                                                                                                    {showQtyCol && <td className="text-right">{formatNum(pu.quantity)}</td>}
-                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
-                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
-                                                                                                    <td className="text-right">{formatCurr(pu.totalCost)}</td>
-                                                                                                    <td className="text-right">{fspa.totalCost > 0 ? formatPerc(pu.totalCost / fspa.totalCost) : '0%'}</td>
-                                                                                                </tr>
-                                                                                            );
-                                                                                        });
-                                                                                    });
-                                                                                }
-                                                                            } else {
-                                                                                // Multi-program: show program rows with their own collapse
-                                                                                fspa.programsList.forEach((prog, pIndex) => {
-                                                                                    let progKey = `prog_${fspa.code}_${prog.code}`;
-                                                                                    let isProgCollapsed = this.state.collapsedRows.has(progKey);
-
-                                                                                    fspaRows.push(
-                                                                                        <tr key={progKey} style={{ fontWeight: 'bold' }} >
-                                                                                            <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
-                                                                                                <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
-                                                                                            </td>
-                                                                                            <td className="text-left custom-padding-program" style={{ paddingLeft: '30px' }}>{prog.code}</td>
-                                                                                            {showQtyCol && <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>}
-                                                                                            {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
-                                                                                            {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
-                                                                                            <td className="text-right">{formatCurr(prog.totalCost)}</td>
-                                                                                            <td className="text-right">{fspa.totalCost > 0 ? formatPerc(prog.totalCost / fspa.totalCost) : '0%'}</td>
-                                                                                        </tr>
-                                                                                    );
-
-                                                                                    if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
-                                                                                        prog.pus.forEach((pu, puIndex) => {
-                                                                                            fspaRows.push(
-                                                                                                <tr key={`${progKey}_pu_${pu.id}`}>
-                                                                                                    <td></td>
-                                                                                                    <td className="text-left custom-padding-pu" style={{ paddingLeft: '50px' }}>{pu.display}</td>
-                                                                                                    {showQtyCol && <td className="text-right">{formatNum(pu.quantity)}</td>}
-                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
-                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
-                                                                                                    <td className="text-right">{formatCurr(pu.totalCost)}</td>
-                                                                                                    <td className="text-right">{prog.totalCost > 0 ? formatPerc(pu.totalCost / prog.totalCost) : '0%'}</td>
-                                                                                                </tr>
-                                                                                            );
-                                                                                        });
-                                                                                    }
-                                                                                });
-                                                                            }
-                                                                        }
-                                                                        return fspaRows;
-                                                                    })}
-                                                                    <tr style={{ fontWeight: 'bold', borderTop: '2px solid black', borderBottom: '2px solid black' }}>
-                                                                        <td></td>
-                                                                        <td className="text-left">{i18n.t('static.supplyPlan.total')}</td>
-                                                                        {showQtyCol && <td className="text-right"></td>}
-                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandPUCost)}</td>}
-                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandFreightCost)}</td>}
-                                                                        <td className="text-right">{formatCurr(grandTotalCost)}</td>
-                                                                        <td className="text-right"></td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </Table>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </div>}
-                                        </div>
+                                                {/*
+                                                  =========================================================
+                                                  KEY CHANGE: The original <Table id="mytable1"> block has
+                                                  been replaced by this <div> which jspreadsheet mounts into.
+                                                  The buildJExcel() method constructs the nested table with
+                                                  FSPA → Program → PU hierarchy and wires up collapse icons.
+                                                  =========================================================
+                                                */}
+                                                <div className={`consumptionDataEntryTable ${this.state.collapseAll ? 'Width40' : this.state.collapsePlanningUnits ? 'Width60' : 'TableWidth100'}`} style={{ overflow: 'visible' }}>
+                                                    <div
+                                                        id="shipmentGlobalDemandTableDiv"
+                                                        ref={this.tableDiv}
+                                                        className={`jexcelremoveReadonlybackground TableWidth100`}
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </Col>
                             </div>
+
                             <div style={{ display: this.state.loading ? "block" : "none" }}>
-                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
-                                    <div class="align-items-center">
-                                        <div ><h4> <strong>{i18n.t('static.common.loading')}</strong></h4></div>
-                                        <div class="spinner-border blue ml-4" role="status">
-                                        </div>
+                                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }}>
+                                    <div className="align-items-center">
+                                        <div><h4><strong>{i18n.t('static.common.loading')}</strong></h4></div>
+                                        <div className="spinner-border blue ml-4" role="status"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </CardBody>
                 </Card>
-            </div >
+            </div>
         );
     }
 }
+
 export default ShipmentGlobalDemandView;

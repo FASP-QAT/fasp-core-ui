@@ -18276,3 +18276,19 @@ label.arrow_label:before {
 .table td.custom-padding-pu {
   padding-left: 25px !important;
 }
+#shipmentGlobalDemandTableDiv .jss>tbody>tr>td:nth-child(3) {
+  text-align: left !important;
+}
+
+#shipmentGlobalDemandTableDiv .jss>thead>tr>td:nth-child(3) {
+  text-align: left !important;
+}
+
+/* Data columns (4th td onwards = col index 3+) → right align */
+#shipmentGlobalDemandTableDiv .jss>tbody>tr>td:nth-child(n+4) {
+  text-align: right !important;
+}
+
+#shipmentGlobalDemandTableDiv .jss>thead>tr>td:nth-child(n+4) {
+  text-align: right !important;
+}
