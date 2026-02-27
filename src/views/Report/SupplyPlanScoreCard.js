@@ -37,6 +37,7 @@ import {
   Input,
   FormGroup,
   Label,
+  InputGroup,
   Popover,
   Table,
   PopoverBody,
@@ -80,15 +81,22 @@ class SupplyPlanScoreCard extends Component {
       activeIndexUser: 0,
       activeIndexErp: 0,
       problemActionList: [],
-      programList: [],
-      datasetList: [],
       countryList: [],
       countrys: [],
       countryValues: [],
       countryLabels: [],
       technicalAreas: [],
-      technicalAreaList: [],
+      technicalAreaValues: [],
+      technicalAreaLabels: [],
+      programLst: [],
+      programValues: [],
+      programLabels: [],
       shipmentStatusList: [],
+      viewBy: 0,
+      viewByLabel: [],
+      showDetail: 0,
+      showDetailLabel: [],
+      onlyDownloadedProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? false : true : false,
       message: '',
       dashboard: '',
       users: [],
@@ -103,8 +111,6 @@ class SupplyPlanScoreCard extends Component {
       topTechnicalAreaId: [],
       bottomProgramId: localStorage.getItem('bottomProgramId') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem('bottomProgramId') : localStorage.getItem("bottomLocalProgram") == "false" ? "" : localStorage.getItem('bottomProgramId') : "",
       displayBy: 1,
-      onlyDownloadedTopProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("topLocalProgram") == "false" ? false : true : true : false,
-      onlyDownloadedBottomProgram: AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') ? localStorage.getItem('sessionType') === 'Online' ? localStorage.getItem("bottomLocalProgram") == "false" ? false : true : true : false,
       rangeValue: localStorage.getItem("bottomReportPeriod") ? JSON.parse(localStorage.getItem("bottomReportPeriod")) : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
       minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
       maxDate: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
@@ -116,12 +122,38 @@ class SupplyPlanScoreCard extends Component {
       totalCount:0,
       initialCount:0
     };
+    this.getCountrys = this.getCountrys.bind(this);
+    this.getHealthAreaList = this.getHealthAreaList.bind(this);
+    this.getPrograms = this.getPrograms.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
   /**
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
-
+    this.getCountrys();
+  }
+  /**
+    * Handles the change event of the diplaying only downloaded programs.
+    * @param {Object} event - The event object containing the checkbox state.
+    */
+  changeOnlyDownloadedProgram(event) {
+    var flag = event.target.checked ? 1 : 0
+    if (flag) {
+      this.setState({
+        onlyDownloadedProgram: true,
+        programValues: []
+      }, () => {
+        this.getPrograms();
+      })
+    } else {
+      this.setState({
+        onlyDownloadedProgram: false,
+        programValues: []
+      }, () => {
+        this.getCountrys();
+      })
+    }
   }
   /**
    * Handles the change event for countries.
@@ -135,7 +167,34 @@ class SupplyPlanScoreCard extends Component {
       countryValues: countrysId.map(ele => ele),
       countryLabels: countrysId.map(ele => ele.label)
     }, () => {
-      this.filterTechnicalArea();
+      this.getHealthAreaList();
+    })
+  }
+  /**
+   * Handles the change event for program selection.
+   * @param {array} programIds - The array of selected program IDs.
+   */
+  handleChangeProgram = (programIds) => {
+    programIds = programIds.sort(function (a, b) {
+        return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+        programValues: programIds.map(ele => ele),
+        programLabels: programIds.map(ele => ele.label)
+    }, () => {
+        this.fetchData();
+    })
+  }
+  handleTechnicalAreaIdChange = (technicalAreaIds) => {
+    technicalAreaIds = technicalAreaIds.sort(function (a, b) {
+        return parseInt(a.value) - parseInt(b.value);
+    })
+    this.setState({
+        technicalAreaValues: technicalAreaIds.map(ele => ele),
+        technicalAreaLabels: technicalAreaIds.map(ele => ele.label)
+    }, () => {
+      this.getPrograms();
+        // this.fetchData();
     })
   }
   /**
@@ -212,46 +271,6 @@ class SupplyPlanScoreCard extends Component {
             }
           }
         );
-    } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['CountryData'], 'readwrite');
-        var Country = transaction.objectStore('CountryData');
-        var getRequest = Country.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
-              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var CountryJson = {
-                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              proList[i] = CountryJson
-            }
-          }
-          proList.sort((a, b) => {
-            var itemLabelA = a.name.toUpperCase();
-            var itemLabelB = b.name.toUpperCase();
-            return itemLabelA > itemLabelB ? 1 : -1;
-          });
-          this.setState({
-            countrys: proList,
-            loading: false
-          })
-        }.bind(this);
-      }
     }
     this.getHealthAreaList();
     // this.filterData(this.state.rangeValue);
@@ -261,7 +280,7 @@ class SupplyPlanScoreCard extends Component {
     this.setState({ loading: true })
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
-      DropdownService.getHealthAreaDropdownList(realmId)
+      ProgramService.getHealthAreaListByRealmCountryIds(this.state.countrys.map(ele => (ele.id).toString()))
         .then(response => {
           if (response.status == 200) {
             var listArray = response.data;
@@ -273,7 +292,7 @@ class SupplyPlanScoreCard extends Component {
             this.setState({
               technicalAreas: listArray,
               loading: false
-            }, () => { })
+            }, () => { this.getPrograms() })
           } else {
             this.setState({ message: response.data.messageCode, loading: false },
               () => { this.hideSecondComponent(); })
@@ -328,48 +347,330 @@ class SupplyPlanScoreCard extends Component {
             }
           }
         );
-    } else {
-      const lan = 'en';
-      var db1;
-      getDatabase();
-      var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-      openRequest.onsuccess = function (e) {
-        db1 = e.target.result;
-        var transaction = db1.transaction(['CountryData'], 'readwrite');
-        var Country = transaction.objectStore('CountryData');
-        var getRequest = Country.getAll();
-        var proList = []
-        getRequest.onerror = function (event) {
-        };
-        getRequest.onsuccess = function (event) {
-          var myResult = [];
-          myResult = getRequest.result;
-          var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          for (var i = 0; i < myResult.length; i++) {
-            if (myResult[i].userId == userId) {
-              var bytes = CryptoJS.AES.decrypt(myResult[i].CountryName, SECRET_KEY);
-              var CountryNameLabel = bytes.toString(CryptoJS.enc.Utf8);
-              var CountryJson = {
-                name: getLabelText(JSON.parse(CountryNameLabel), lan) + "~v" + myResult[i].version,
-                id: myResult[i].id
-              }
-              proList[i] = CountryJson
+    }
+    // this.filterData(this.state.rangeValue);
+  }
+  /**
+   * Retrieves the list of programs.
+   */
+  getPrograms = () => {
+      if (localStorage.getItem("sessionType") === 'Online' && !this.state.onlyDownloadedProgram) {
+          let countryIds = this.state.countryValues.map((ele) => ele.value);
+          let newCountryList = [...new Set(countryIds)];
+          let technicalAreaIds = this.state.technicalAreaValues.map((ele) => ele.value);
+          let newTechnicalAreaList = [...new Set(technicalAreaIds)];
+          let inputJson = {
+            "realmCountryIds": newCountryList,
+            "healthAreaIds": newTechnicalAreaList 
+          }
+          if (newCountryList.length > 0) {
+              DropdownService.getProgramListBasedOnRealmCountryIdsAndHealthAreaIds(inputJson)
+                  .then(response => {
+                      const newProgramList = response.data;
+                      const prevSelectedIds = this.state.programValues.map(p => p.value);
+                      const filteredProgramList = newProgramList
+                        .filter(p => prevSelectedIds.includes(p.id))
+                        .map(p => ({ label: p.code, value: p.id }));;
+                      var listArray = response.data;
+                      listArray.sort((a, b) => {
+                          var itemLabelA = a.code.toUpperCase();
+                          var itemLabelB = b.code.toUpperCase();
+                          return itemLabelA > itemLabelB ? 1 : -1;
+                      });
+                      this.setState({
+                          programValues: filteredProgramList,
+                          programLst: listArray, loading: false
+                      })
+                  }).catch(
+                      error => {
+                          this.setState({
+                              programLst: [], loading: false
+                          })
+                          if (error.message === "Network Error") {
+                              this.setState({
+                                  message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+                                  loading: false
+                              });
+                          } else {
+                              switch (error.response ? error.response.status : "") {
+                                  case 401:
+                                      this.props.history.push(`/login/static.message.sessionExpired`)
+                                      break;
+                                  case 409:
+                                      this.setState({
+                                          message: i18n.t('static.common.accessDenied'),
+                                          loading: false,
+                                          color: "#BA0C2F",
+                                      });
+                                      break;
+                                  case 403:
+                                      this.props.history.push(`/accessDenied`)
+                                      break;
+                                  case 500:
+                                  case 404:
+                                  case 406:
+                                      this.setState({
+                                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                          loading: false
+                                      });
+                                      break;
+                                  case 412:
+                                      this.setState({
+                                          message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }),
+                                          loading: false
+                                      });
+                                      break;
+                                  default:
+                                      this.setState({
+                                          message: 'static.unkownError',
+                                          loading: false
+                                      });
+                                      break;
+                              }
+                          }
+                      }
+                  );
+          }
+      } else {
+          this.consolidatedProgramList()
+      }
+  }
+  /**
+   * Consolidates the list of program obtained from Server and local programs.
+   */
+  consolidatedProgramList = () => {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+      this.setState({
+        message: i18n.t('static.program.errortext'),
+        color: '#BA0C2F'
+      })
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+      db1 = e.target.result;
+      var transaction = db1.transaction(['programQPLDetails'], 'readwrite');
+      var program = transaction.objectStore('programQPLDetails');
+      var getRequest = program.getAll();
+      var programList = this.state.programLst;
+      let tempProgramList = [];
+      getRequest.onerror = function (event) {
+        this.setState({
+          message: i18n.t('static.program.errortext'),
+          color: '#BA0C2F',
+          loading: false
+        })
+      }.bind(this);
+      getRequest.onsuccess = function (event) {
+        var myResult = [];
+        myResult = getRequest.result;
+        var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+        var userId = userBytes.toString(CryptoJS.enc.Utf8);
+        var filteredGetRequestList = myResult.filter(c => c.userId == userId);
+        for (var i = 0; i < filteredGetRequestList.length; i++) {
+          var f = 0
+          for (var k = 0; k < programList.length; k++) {
+            if (filteredGetRequestList[i].programId == programList[k].programId) {
+              f = 1;
             }
           }
-          proList.sort((a, b) => {
-            var itemLabelA = a.name.toUpperCase();
-            var itemLabelB = b.name.toUpperCase();
-            return itemLabelA > itemLabelB ? 1 : -1;
+          tempProgramList.push({
+            openCount: filteredGetRequestList[i].openCount,
+            addressedCount: filteredGetRequestList[i].addressedCount,
+            code: filteredGetRequestList[i].programCode + " ~v" + filteredGetRequestList[i].version + " (Local)",
+            programVersion: filteredGetRequestList[i].version,
+            programId: filteredGetRequestList[i].programId,
+            versionId: filteredGetRequestList[i].version,
+            id: filteredGetRequestList[i].id,
+            loading: false,
+            local: true,
+            cutOffDate: filteredGetRequestList[i].cutOffDate != undefined && filteredGetRequestList[i].cutOffDate != null && filteredGetRequestList[i].cutOffDate != "" ? filteredGetRequestList[i].cutOffDate : ""
           });
-          this.setState({
-            technicalAreas: proList,
-            loading: false
-          })
-        }.bind(this);
-      }
-    }
-    this.filterData(this.state.rangeValue);
+        }
+        tempProgramList.sort(function (a, b) {
+          a = a.code.toLowerCase();
+          b = b.code.toLowerCase();
+          return a < b ? -1 : a > b ? 1 : 0;
+        });
+        this.setState({
+          programLst: tempProgramList.concat(programList)
+        }, () => this.fetchData() )
+      }.bind(this);
+    }.bind(this)
+  }
+  toggleView = () => {
+    let viewBy = document.getElementById("viewById").value;
+    var viewByLabel = document.getElementById("viewById").selectedOptions[0].text.toString();
+    this.setState({
+        viewBy: viewBy,
+        viewByLabel: [viewByLabel]
+    });
+  }
+  toggleShowDetail = () => {
+    let showDetail = document.getElementById("showDetailId").value;
+    var showDetailLabel = document.getElementById("showDetailId").selectedOptions[0].text.toString();
+    this.setState({
+        showDetail: showDetail,
+        showDetailLabel: [showDetailLabel]
+    });
+  }
+  fetchData = () => {
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var ppuTransaction = db1.transaction(['programPlanningUnit'], 'readwrite');
+        var ppuObjectStore = ppuTransaction.objectStore('programPlanningUnit');
+        var ppuRequest = ppuObjectStore.getAll();
+        ppuRequest.onsuccess = function (event) {
+            var ppuList = ppuRequest.result;
+            var pdTransaction = db1.transaction(['programData'], 'readwrite');
+            var pdObjectStore = pdTransaction.objectStore('programData');
+            var pdRequest = pdObjectStore.get(this.state.programValues.map(p => p.value)[0]);
+            pdRequest.onsuccess = function (event) {
+                var programData = pdRequest.result;
+                var ppuListForProgram = ppuList.filter(c => c.program.id == programData.programId);
+                var programDataBytes = CryptoJS.AES.decrypt(programData.programData.generalData, SECRET_KEY);
+                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                var programJson = JSON.parse(programData);
+                var generalProgramJson = programJson;
+                var dashboardBottomData = {};
+                var dashboardData = generalProgramJson.dashboardData;
+                if (dashboardData != undefined) {
+                    var bottomPuData = dashboardData.bottomPuData;
+                    var stockOut = 0;
+                    var underStock = 0;
+                    var adequate = 0;
+                    var overStock = 0;
+                    var na = 0;
+                    var puStockOutList = [];
+                    var expiriesList = [];
+                    var shipmentDetailsList = [];
+                    var shipmentWithFundingSourceTbd = [];
+                    var forecastConsumptionQplCount = 0;
+                    var actualConsumptionQplCount = 0;
+                    var inventoryQplCount = 0;
+                    var shipmentQplCount = 0;
+                    var totalQpl = 0;
+                    var expiryTotal = 0;
+                    if (bottomPuData != "" && bottomPuData != undefined) {
+                        var puIds = ppuListForProgram.filter(c => c.active.toString() == "true")
+                        puIds.map(item => {
+                            var value = bottomPuData[item.planningUnit.id];
+                            if (value != undefined) {
+                                stockOut += Number(value.stockStatus.stockOut);
+                                underStock += Number(value.stockStatus.underStock);
+                                adequate += Number(value.stockStatus.adequate);
+                                overStock += Number(value.stockStatus.overStock);
+                                na += Number(value.stockStatus.na);
+                                if (Number(value.stockStatus.stockOut)) {
+                                    puStockOutList.push({
+                                        "planningUnit": item.planningUnit,
+                                        "count": Number(value.stockStatus.stockOut)
+                                    })
+                                }
+                                var expiryList = value.expiriesList;
+                                expiryList.forEach(expiry => {
+                                    expiry.planningUnit = item.planningUnit;
+                                    expiryTotal += Number(Math.round(expiry.expiryAmt));
+                                });
+                                expiriesList = expiriesList.concat(expiryList);
+                                // if (reportBy == 1) {
+                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByFundingSource)
+                                // } else if (reportBy == 2) {
+                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByProcurementAgent)
+                                // } else {
+                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByShipmentStatus)
+                                // }
+                                if (Number(value.countOfTbdFundingSource) > 0) {
+                                    shipmentWithFundingSourceTbd.push({
+                                        "planningUnit": item.planningUnit,
+                                        "count": Number(value.countOfTbdFundingSource)
+                                    })
+                                }
+                                totalQpl += 1;
+                                if (value.forecastConsumptionQplPassed.toString() == "true") {
+                                    forecastConsumptionQplCount += 1;
+                                }
+                                if (value.actualConsumptionQplPassed.toString() == "true") {
+                                    actualConsumptionQplCount += 1;
+                                }
+                                if (value.inventoryQplPassed.toString() == "true") {
+                                    inventoryQplCount += 1;
+                                }
+                                if (value.shipmentQplPassed.toString() == "true") {
+                                    shipmentQplCount += 1;
+                                }
+                            }
+                        });
+                        var totalStock = Number(stockOut) + Number(underStock) + Number(adequate) + Number(overStock) + Number(na);
+                        var shipmentTotal = 0;
+                        shipmentDetailsList.map(item => {
+                            shipmentTotal += Number(item.cost)
+                        })
+                        var flaggedCountForecastConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length;
+                        var flaggedCountActualConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length;
+                        var flaggedCountInventoryData = [...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length;
+                        var flaggedCountShipmentData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+console.log("StockStatusScore",Number(stockOut),Number(underStock),Number(adequate),Number(overStock))
+console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flaggedCountActualConsumptionData),Number(flaggedCountInventoryData),Number(flaggedCountShipmentData))
+                        dashboardBottomData = {
+                            "stockStatus": {
+                                "stockOut": stockOut,
+                                "underStock": underStock,
+                                "adequate": adequate,
+                                "overStock": overStock,
+                                "na": na,
+                                "total": totalStock,
+                                "puStockOutList": puStockOutList,
+                                "stockOutPerc": Number(stockOut) / Number(totalStock),
+                                "underStockPerc": Number(underStock) / Number(totalStock),
+                                "adequatePerc": Number(adequate) / Number(totalStock),
+                                "overStockPerc": Number(overStock) / Number(totalStock),
+                                "naPerc": Number(na) / Number(totalStock)
+                            },
+                            "expiriesList": expiriesList,
+                            "shipmentDetailsList": shipmentDetailsList,
+                            "shipmentWithFundingSourceTbd": shipmentWithFundingSourceTbd,
+                            "forecastErrorList": [],
+                            "forecastConsumptionQpl": {
+                                "puCount": totalQpl,
+                                "correctCount": totalQpl-flaggedCountForecastConsumptionData
+                            },
+                            "actualConsumptionQpl": {
+                                "puCount": totalQpl,
+                                "correctCount": totalQpl-flaggedCountActualConsumptionData
+                            },
+                            "inventoryQpl": {
+                                "puCount": totalQpl,
+                                "correctCount": totalQpl-flaggedCountInventoryData
+                            },
+                            "shipmentQpl": {
+                                "puCount": totalQpl,
+                                "correctCount": totalQpl-flaggedCountShipmentData
+                            },
+                            "expiryTotal": expiryTotal,
+                            "shipmentTotal": shipmentTotal,
+                            "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
+                            "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
+                        }
+                        // props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
+                        // props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
+                        // props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
+                        // props.updateStateDashboard("bottomSubmitLoader", false);
+                    } else {
+                        // props.updateStateDashboard("dashboardBottomData", "");
+                        // props.updateStateDashboard("bottomSubmitLoader", false);
+                    }
+                } else {
+                    // props.updateStateDashboard("dashboardBottomData", "");
+                    // props.updateStateDashboard("bottomSubmitLoader", false);
+                }
+            }.bind(this)
+        }.bind(this)
+    }.bind(this)
   }
   /**
    * Displays a loading indicator while data is being loaded.
@@ -394,9 +695,17 @@ class SupplyPlanScoreCard extends Component {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
     const { technicalAreas } = this.state;
-    let technicalAreaList = technicalAreaList.length > 0 && technicalAreaList.map((item, i) => {
+    let technicalAreaList = technicalAreas.length > 0 && technicalAreas.map((item, i) => {
       return ({ label: getLabelText(item.label, this.state.lang), value: item.id })
     }, this);
+    const { programLst } = this.state;
+    let programList = [];
+    programList = programLst.length > 0
+        && programLst.map((item, i) => {
+            return (
+                { label: (item.code), value: item.id }
+            )
+        }, this);
     const checkOnline = localStorage.getItem('sessionType');
     let defaultModuleId;
     if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != "") {
@@ -460,10 +769,39 @@ class SupplyPlanScoreCard extends Component {
         <div className='row pb-lg-2'>
             
             {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
-            <div class="card custom-card DashboardBg1 pb-lg-2">
+            <div class="card custom-card DashboardBg1">
                 <div class="card-body py-1">
                     <div className='row'>
-                        <FormGroup className="col-md-3">
+                        <FormGroup className='FormGroupD col-10' style={{ marginBottom: '0px'}}>
+                          <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px', marginBottom: '0px' }}>
+                            <FormGroup className='MarginTopCheckBox'>
+                              <div className="pl-lg-4">
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Input
+                                  className="form-check-input"
+                                  type="checkbox"
+                                  id="onlyDownloadedProgram"
+                                  name="onlyDownloadedProgram"
+                                  disabled={!(localStorage.getItem('sessionType') === 'Online')}
+                                  checked={this.state.onlyDownloadedProgram}
+                                  onClick={(e) => { this.changeOnlyDownloadedProgram(e); }}
+                                />}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
+                                  className="form-check-label"
+                                  check htmlFor="onlyDownloadedProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
+                                  {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                </Label>}
+                                {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
+                                  className="form-check-label"
+                                  check htmlFor="onlyDownloadedProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
+                                  {""}
+                                </Label>}
+                              </div>
+                            </FormGroup>
+                          </Label>
+                        </FormGroup>
+                      </div>
+                      <div className='row'>
+                        {!this.state.onlyDownloadedProgram && <FormGroup className="col-md-3">
                           <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
                           <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                           <div className="controls edit">
@@ -484,68 +822,82 @@ class SupplyPlanScoreCard extends Component {
                                 <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
                               )}
                           </div>
-                        </FormGroup>
-                          <FormGroup className='col-md-3 FormGroupD'>
-                          <Label htmlFor="topTechnicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
+                        </FormGroup>}
+                        {!this.state.onlyDownloadedProgram && <FormGroup className='col-md-3 FormGroupD'>
+                          <Label htmlFor="technicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
                           <MultiSelect
-                              name="topTechnicalAreaId"
-                              id="topTechnicalAreaId"
+                              name="technicalAreaId"
+                              id="technicalAreaId"
                               bsSize="sm"
-                              value={this.state.technicalAreaList}
+                              value={this.state.technicalAreaValues}
                               onChange={(e) => { this.handleTechnicalAreaIdChange(e) }}
                               options={technicalAreaList && technicalAreaList.length > 0 ? technicalAreaList : []}
                               labelledBy={i18n.t('static.common.regiontext')}
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                  allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                  selectSomeItems: i18n.t('static.common.select')
+                              }}
+                              filterOptions={filterOptions}
                           />
-                        </FormGroup>
+                        </FormGroup>}
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                          <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                          <div className="controls ">
+                              <MultiSelect
+                                  bsSize="sm"
+                                  name="programIds"
+                                  id="programIds"
+                                  value={this.state.programValues}
+                                  onChange={(e) => { this.handleChangeProgram(e) }}
+                                  options={programList && programList.length > 0 ? programList : []}
+                                  disabled={this.state.loading}
+                                  overrideStrings={{
+                                      allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                      selectSomeItems: i18n.t('static.common.select')
+                                  }}
+                              />
+                          </div>
+                      </FormGroup>
+                      <FormGroup className="col-md-3">
+                          <Label htmlFor="viewById">View By</Label>
+                          <div className="controls ">
+                              <InputGroup>
+                                  <Input
+                                      type="select"
+                                      name="viewById"
+                                      id="viewById"
+                                      bsSize="sm"
+                                      onChange={this.toggleView}
+                                  >
+                                      <option value="0">Program</option>
+                                      <option value="1">Country</option>
+                                      <option value="2">Country x Program</option>
+                                  </Input>
+                              </InputGroup>
+                          </div>
+                      </FormGroup>
+                      <FormGroup className="col-md-3">
+                          <Label htmlFor="showDetailId">Show Detail</Label>
+                          <div className="controls ">
+                              <InputGroup>
+                                  <Input
+                                      type="select"
+                                      name="showDetailId"
+                                      id="showDetailId"
+                                      bsSize="sm"
+                                      onChange={this.toggleShowDetail}
+                                  >
+                                      <option value="0">No</option>
+                                      <option value="1">Yes</option>
+                                  </Input>
+                              </InputGroup>
+                          </div>
+                      </FormGroup>
                     </div>
                 </div>
-                    <div class="row pt-lg-2">
-                        <div class="col-5 Topsectiondashboard">
-                        {/* <FormGroup className='FormGroupD col-10 px-0'>
-                            <h4 style={{ fontWeight: 900 }}>{i18n.t("static.dashboard.overview")}</h4>
-                            <Label htmlFor="topProgramId" style={{ display: 'flex', gap: '10px' }}>{i18n.t("static.dashboard.programheader")}
-                            <FormGroup className='MarginTopCheckBox'>
-                                <div className="pl-lg-4">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    id="onlyDownloadedTopProgram"
-                                    name="onlyDownloadedTopProgram"
-                                    disabled={!(localStorage.getItem('sessionType') === 'Online')}
-                                    checked={this.state.onlyDownloadedTopProgram}
-                                    onClick={(e) => { this.changeOnlyDownloadedTopProgram(e); }}
-                                />}
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
-                                    className="form-check-label"
-                                    check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                    {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
-                                </Label>}
-                                {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
-                                    className="form-check-label"
-                                    check htmlFor="onlyDownloadedTopProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
-                                    {""}
-                                </Label>}
-                                </div>
-                            </FormGroup>
-                            </Label>
-                            <MultiSelect
-                            className="MarginBtmformgroup"
-                            name="topProgramId"
-                            id="topProgramId"
-                            bsSize="sm"
-                            value={topProgramIdAvailable}
-                            onChange={(e) => { this.handleTopProgramIdChange(e) }}
-                            options={topProgramList && topProgramList.length > 0 ? topProgramList : []}
-                            labelledBy={i18n.t('static.common.regiontext')}
-                            filterOptions={filterOptions}
-                            />
-                        </FormGroup> */}
-                        <FormGroup className='col-1' style={{ marginTop: '58px', display: this.state.topProgramIdChange ? "block" : "none" }}>
-                            <Button color="success" size="md" className="float-right mr-1" style={{ display: this.state.topSubmitLoader ? "none" : "block" }} type="button" onClick={() => this.onTopSubmit()}> Go</Button>
-                        </FormGroup>
-                        </div>
-                    </div>
-                </div>    
+              </div>    
             </div>
         </div>
     );

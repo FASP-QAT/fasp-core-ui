@@ -97,6 +97,10 @@ class ProgramService {
         return axios.get(`${API_URL}/api/healthArea/realmCountryId/${json}`, {}
         );
     }
+    getHealthAreaListByRealmCountryIds(json) {
+        return axios.post(`${API_URL}/api/dropdown/healthArea/realmCountryIds`, json, {}
+        );
+    }
     getProblemStatusList() {
         return axios.get(`${API_URL}/api/problemStatus`, {}
         );
