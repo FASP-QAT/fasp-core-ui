@@ -8,7 +8,7 @@ import { MultiSelect } from 'react-multi-select-component';
 import Select from 'react-select';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
 // import 'chart.piecelabel.js';
-import { Doughnut, HorizontalBar, Pie } from 'react-chartjs-2';
+import { Doughnut, HorizontalBar, Pie, Bar } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
 import { confirmAlert } from 'react-confirm-alert';
 import jexcel from 'jspreadsheet';
@@ -494,7 +494,7 @@ class SupplyPlanScoreCard extends Component {
           return a < b ? -1 : a > b ? 1 : 0;
         });
         this.setState({
-          programLst: tempProgramList.concat(programList)
+          programLst: tempProgramList
         }, () => this.fetchData() )
       }.bind(this);
     }.bind(this)
@@ -656,6 +656,9 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
                             "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
                             "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
                         }
+                        this.setState({ dashboardBottomData }, () => {
+                            this.buildJexcel();
+                        });
                         // props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                         // props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
                         // props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
@@ -671,6 +674,154 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
             }.bind(this)
         }.bind(this)
     }.bind(this)
+  }
+
+  buildJexcel = () => {
+    if (this.el) {
+        jexcel.destroy(document.getElementById("scorecardTableDiv"), true);
+        this.el = null;
+    }
+
+    let data = [
+        ['FSP-ARV-MOH', 'v12 (Dec 12, 2025)', 10, 3, 2, 2, 4, '78%', '5,10,40,30,15', '16%', '43%', 'Approved (Nov 5, 2025)', 'xxxx'],
+        ['FSP-NUTR-MOH', 'v12 (Dec 12, 2025)', 12, 8, 3, 3, 11, '6%', '10,10,30,40,10', '69%', '62%', 'Rejected (Oct 10, 2025)', 'xxxx'],
+        ['FSP-MAL-MOH', 'v12 (Dec 12, 2025)', 20, 5, 13, 11, 20, '33%', '15,10,25,35,15', '60%', '35%', 'Approved (Nov 5, 2025)', 'xxxx'],
+        ['FSP-Lab-MOH', 'v12 (Dec 12, 2025)', 32, 18, 30, 13, 12, '32%', '20,15,30,25,10', '18%', '13%', 'Rejected (Oct 10, 2025)', 'xxxx'],
+        ['CTRY-ARV-MOH', 'v12 (Dec 12, 2025)', 11, 8, 4, 7, 1, '19%', '5,25,45,15,10', '8%', '46%', 'Approved (Nov 5, 2025)', 'xxxx'],
+        ['CTRY-NUTR-MOH', 'v12 (Dec 12, 2025)', 22, 19, 18, 8, 2, '74%', '10,20,50,15,5', '86%', '100%', 'Rejected (Oct 10, 2025)', 'xxxx'],
+        ['CTRY-MAL-MOH', 'v12 (Dec 12, 2025)', 34, 24, 29, 5, 19, '53%', '15,15,40,20,10', '89%', '74%', 'Approved (Nov 5, 2025)', 'xxxx'],
+        ['CTRY-Lab-MOH', 'v12 (Dec 12, 2025)', 13, 11, 3, 9, 10, '30%', '5,15,50,25,5', '21%', '61%', 'Rejected (Oct 10, 2025)', 'xxxx'],
+    ];
+
+    // Standalone formatting function — reads from data array, applies CSS to visible DOM rows
+    const reapplyFormatting = (instance) => {
+        if (!instance || !instance.tbody) return;
+        const rows = instance.tbody.children;
+        const allData = instance.options.data;
+
+        for (let r = 0; r < rows.length; r++) {
+            const tr = rows[r];
+            if (!tr || tr.style.display === 'none') continue;
+
+            // Get the data row index from the DOM row's data-y attribute
+            const dataY = parseInt(tr.getAttribute('data-y'), 10);
+            if (isNaN(dataY) || !allData[dataY]) continue;
+
+            const rowData = allData[dataY];
+            const activePUs = Number(rowData[2]) || 0;
+
+            // Cols 3-6: blue data bars (Forecasted, Actual Consumption, Inventory, Shipments)
+            for (let c = 3; c <= 6; c++) {
+                const cell = tr.querySelector(`td[data-x="${c}"]`);
+                if (!cell) continue;
+                const value = Number(rowData[c]);
+                if (!isNaN(value)) {
+                    let percentage = activePUs > 0 ? Math.min((value / activePUs) * 100, 100) : 0;
+                    cell.style.background = `linear-gradient(to right, #A9D1E5 ${percentage}%, transparent ${percentage}%)`;
+                    cell.style.backgroundClip = 'content-box';
+                    cell.style.padding = '0px 0px';
+                    cell.style.textAlign = 'right';
+                    cell.style.fontWeight = 'bold';
+                }
+            }
+
+            // Cols 7, 9, 10: colored dot with percentage
+            for (let c of [7, 9, 10]) {
+                const cell = tr.querySelector(`td[data-x="${c}"]`);
+                if (!cell) continue;
+                const raw = String(rowData[c] || '').replace(/%/g, '').trim();
+                const value = parseInt(raw, 10);
+                if (!isNaN(value)) {
+                    let color = value <= 35 ? '%23BA0C2F' : value <= 70 ? '%23f48521' : value <= 99 ? '%23edba26' : '%23118b70';
+                    cell.innerText = value + '%';
+                    cell.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='${color}'/%3E%3C/svg%3E")`;
+                    cell.style.backgroundRepeat = 'no-repeat';
+                    cell.style.backgroundPosition = 'center left 20%';
+                    cell.style.paddingLeft = '30px';
+                    cell.style.textAlign = 'left';
+                    cell.style.fontWeight = 'bold';
+                }
+            }
+
+            // Col 8: Stock Status stacked bar
+            const stockCell = tr.querySelector('td[data-x="8"]');
+            if (stockCell) {
+                const parts = String(rowData[8] || '').split(',');
+                if (parts.length === 5) {
+                    const c1 = Number(parts[0]);
+                    const c2 = c1 + Number(parts[1]);
+                    const c3 = c2 + Number(parts[2]);
+                    const c4 = c3 + Number(parts[3]);
+                    stockCell.style.background = `linear-gradient(to right, #BA0C2F 0%, #BA0C2F ${c1}%, #f48521 ${c1}%, #f48521 ${c2}%, #118b70 ${c2}%, #118b70 ${c3}%, #edb944 ${c3}%, #edb944 ${c4}%, #cfcdc9 ${c4}%, #cfcdc9 100%)`;
+                    stockCell.style.backgroundClip = 'content-box';
+                    stockCell.style.color = 'transparent';
+                    stockCell.style.fontSize = '0px';
+                    stockCell.style.padding = '8px 5px';
+                }
+            }
+        }
+    };
+
+    let options = {
+        data: data,
+        columnDrag: true,
+        columns: [
+            { title: 'Program', type: 'text', readOnly: true },
+            { title: 'Latest Version ', type: 'text', readOnly: true },
+            { title: 'Active PUs', type: 'numeric', readOnly: true },
+            { title: 'Forecasted Consumption ', type: 'numeric', readOnly: true },
+            { title: 'Actual Consumption ', type: 'numeric', readOnly: true },
+            { title: 'Actual Inventory ', type: 'numeric', readOnly: true },
+            { title: 'Shipments ', type: 'numeric', readOnly: true },
+            { title: 'Quality Score ', type: 'text', readOnly: true },
+            { title: 'Stock Status ', type: 'text', readOnly: true },
+            { title: 'Stock Status Score ', type: 'text', readOnly: true },
+            { title: 'Total Score ', type: 'text', readOnly: true },
+            { title: 'Review Status', type: 'text', readOnly: true },
+            { title: 'Version Notes', type: 'text', readOnly: true },
+        ],
+        editable: false,
+        onload: function (obj) {
+            jExcelLoadedFunction(obj);
+        },
+        onchangepage: function(obj) {
+            reapplyFormatting(obj);
+        },
+        onsort: function(obj) {
+            reapplyFormatting(obj);
+        },
+        onfilter: function(obj) {
+            reapplyFormatting(obj);
+        },
+        onsearch: function(obj) {
+            reapplyFormatting(obj);
+        },
+        search: true,
+        columnSorting: true,
+        wordWrap: true,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        allowExport: true,
+        allowInsertRow: false,
+        allowManualInsertRow: false,
+        copyCompatibility: true,
+        parseFormulas: true,
+        filters: true,
+        license: JEXCEL_PRO_KEY,
+        pagination: localStorage.getItem("sesRecordCount") || 10,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+    };
+
+    let scorecardTableDiv = document.getElementById("scorecardTableDiv");
+    if (scorecardTableDiv) {
+        this.el = jexcel(scorecardTableDiv, options);
+        // Apply formatting after browser finishes first paint
+        const el = this.el;
+        requestAnimationFrame(() => {
+            setTimeout(() => reapplyFormatting(el), 50);
+        });
+    }
   }
   /**
    * Displays a loading indicator while data is being loaded.
@@ -755,6 +906,88 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
         text: 'All', value: this.state.problemActionList.length
       }]
     }
+
+    let supplyPlanQualityScore = 0;
+    let stockStatusScore = 0;
+    let totalScore = 0;
+
+    if (this.state.dashboardBottomData != null && this.state.dashboardBottomData !== "") {
+        supplyPlanQualityScore = this.state.dashboardBottomData.supplyPlanQualityScore || 0;
+        stockStatusScore = this.state.dashboardBottomData.stockStatusScore || 0;
+        totalScore = (supplyPlanQualityScore + stockStatusScore) / 2;
+    }
+
+    const barData = {
+        labels: this.state.programValues.map(p => p.label),
+        datasets: [
+            {
+                type: 'line',
+                label: 'Total Score',
+                borderColor: '#99C1E8',
+                borderWidth: 3,
+                fill: false,
+                data: this.state.programValues.map(() => totalScore)
+            },
+            {
+                type: 'bar',
+                label: 'Quality Score',
+                backgroundColor: '#0F263F',
+                data: this.state.programValues.map(() => supplyPlanQualityScore)
+            },
+            {
+                type: 'bar',
+                label: 'Stock Status Score',
+                backgroundColor: '#C50000',
+                data: this.state.programValues.map(() => stockStatusScore)
+            },
+            {
+                type: 'line',
+                label: 'Target',
+                borderColor: 'black',
+                borderWidth: 4,
+                borderDash: [10, 5],
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 0,
+                data: this.state.programValues.map(() => 90)
+            }
+        ]
+    };
+
+    const barOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        tooltips: {
+            mode: 'index',
+            intersect: false,
+        },
+        legend: {
+            position: 'bottom',
+            labels: {
+                usePointStyle: false,
+                filter: function(item, chart) {
+                    return item.text !== 'Target';
+                }
+            }
+        },
+        scales: {
+            yAxes: [{
+                type: 'linear',
+                display: true,
+                position: 'left',
+                ticks: {
+                    min: 0,
+                    max: 120,
+                    callback: function(value) {
+                        return value + "%";
+                    }
+                }
+            }],
+            xAxes: [{
+                gridLines: { display: false }
+            }]
+        }
+    };
 
     return (
       <div className="animated fadeIn">
@@ -899,6 +1132,29 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
                 </div>
               </div>    
             </div>
+            
+            {this.state.programValues && this.state.programValues.length > 0 && this.state.dashboardBottomData && (
+              <>
+                <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
+                  <Card>
+                    <CardBody>
+                      <div className="chart-wrapper" style={{ height: '400px' }}>
+                        <Bar data={barData} options={barOptions} />
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+                <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
+                  <Card>
+                    <CardBody>
+                      <div className="table-responsive">
+                        <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+              </>
+            )}
         </div>
     );
   }
