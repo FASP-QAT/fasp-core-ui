@@ -401,7 +401,7 @@ class ShipmentGlobalDemandView extends Component {
                 tableHeadTemp.push(i18n.t('static.shipment.totalPUCost').replaceAll(' ', '%20'));
                 tableHeadTemp.push(i18n.t('static.shipment.totalFreightCost').replaceAll(' ', '%20'));
             }
-            tableHeadTemp.push(i18n.t('static.report.totalCost').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.shipment.totalCost').replaceAll(' ', '%20'));
             tableHeadTemp.push(i18n.t('static.shipment.totalCostPerc').replaceAll(' ', '%20'));
             A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
 
@@ -529,7 +529,7 @@ class ShipmentGlobalDemandView extends Component {
         var a = document.createElement("a")
         a.href = 'data:attachment/csv,' + csvString
         a.target = "_Blank"
-        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+        a.download = i18n.t('static.dashboard.shipmentByPlanningUnit') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
         document.body.appendChild(a)
         a.click()
     }
@@ -560,7 +560,7 @@ class ShipmentGlobalDemandView extends Component {
                 doc.setPage(i)
                 doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
                 doc.setTextColor("#002f6c");
-                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), doc.internal.pageSize.width / 2, 60, {
+                doc.text(i18n.t('static.dashboard.shipmentByPlanningUnit'), doc.internal.pageSize.width / 2, 60, {
                     align: 'center'
                 })
                 if (i == 1) {
@@ -742,7 +742,7 @@ class ShipmentGlobalDemandView extends Component {
         }
         addHeaders(doc)
         addFooters(doc)
-        doc.save(i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + ".pdf")
+        doc.save(i18n.t('static.dashboard.shipmentByPlanningUnit') + ".pdf")
     }
     /**
      * Fetches data based on selected filters.
@@ -1314,7 +1314,7 @@ class ShipmentGlobalDemandView extends Component {
             afterDraw: function (chart) {
                 if (chart.config.type === 'pie' && chart.canvas.id === 'cool-canvas2') {
                     const ctx = chart.chart.ctx;
-                    const total = chart.data.datasets[0].data.reduce((sum, value) => sum + value, 0);
+                    const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
                     chart.data.datasets.forEach((dataset, datasetIndex) => {
                         const meta = chart.getDatasetMeta(datasetIndex);
                         if (!meta.hidden) {
@@ -1323,6 +1323,7 @@ class ShipmentGlobalDemandView extends Component {
                                     // Draw the connecting lines
                                     ctx.save();
                                     const model = element._model;
+                                    const midRadius = model.innerRadius + (model.outerRadius - model.innerRadius) / 2;
                                     const startAngle = model.startAngle;
                                     const endAngle = model.endAngle;
                                     const midAngle = startAngle + (endAngle - startAngle) / 2;
@@ -1330,48 +1331,27 @@ class ShipmentGlobalDemandView extends Component {
                                     const x = Math.cos(midAngle);
                                     const y = Math.sin(midAngle);
 
-                                    // Calculate the points for the line
-                                    const lineStartX = model.x + x * model.outerRadius;
-                                    const lineStartY = model.y + y * model.outerRadius;
-                                    const labelX = model.x + x * (model.outerRadius + 15);
-                                    const labelY = model.y + y * (model.outerRadius + 15);
+                                    // Calculate the end point for the line
+                                    const lineX = model.x + x * model.outerRadius;
+                                    const lineY = model.y + y * model.outerRadius;
+                                    const labelX = model.x + x * (model.outerRadius + 10);
+                                    const labelY = model.y + y * (model.outerRadius + 10);
 
+                                    const label = chart.data.labels[index];
                                     const value = dataset.data[index];
-                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(0) + '%' : '0%';
-
-                                    if (total > 0 && ((value / total) * 100) >= 0.5) {
-                                        // Draw line
+                                    const percentage = ((value / total) * 100).toFixed(2) + '%';
+                                    if (((value / total) * 100).toFixed(2) > 2) {
                                         ctx.beginPath();
-                                        ctx.moveTo(lineStartX, lineStartY);
+                                        ctx.moveTo(model.x, model.y);
+                                        ctx.lineTo(lineX, lineY);
                                         ctx.lineTo(labelX, labelY);
-                                        ctx.strokeStyle = '#6c6463'; // USAID Dark Gray
-                                        ctx.lineWidth = 1;
+                                        ctx.strokeStyle = dataset.backgroundColor[index];
                                         ctx.stroke();
-
-                                        // Draw Box for text
-                                        ctx.font = '12px Arial';
-                                        const textWidth = ctx.measureText(percentage).width;
-                                        const padding = 4;
-                                        const boxWidth = textWidth + padding * 2;
-                                        const boxHeight = 16 + padding;
-
-                                        const boxX = x >= 0 ? labelX : labelX - boxWidth;
-                                        const boxY = labelY - boxHeight / 2;
-
-                                        ctx.fillStyle = '#ffffff';
-                                        ctx.shadowBlur = 2;
-                                        ctx.shadowColor = "rgba(0,0,0,0.2)";
-                                        ctx.fillRect(boxX, boxY, boxWidth, boxHeight);
-                                        ctx.shadowBlur = 0; // Reset shadow
-
-                                        ctx.strokeStyle = '#cfcdc9'; // USAID Light Gray border
-                                        ctx.strokeRect(boxX, boxY, boxWidth, boxHeight);
-
-                                        ctx.fillStyle = '#000000';
-                                        ctx.textAlign = 'center';
-                                        ctx.textBaseline = 'middle';
-                                        ctx.fillText(percentage, boxX + boxWidth / 2, boxY + boxHeight / 2);
-
+                                        ctx.textAlign = x >= 0 ? 'left' : 'right';
+                                        ctx.font = 'number 10px Arial';
+                                        // ctx.textBaseline = 'middle';
+                                        ctx.fillStyle = dataset.backgroundColor[index];
+                                        ctx.fillText(`${percentage}`, x < 0 ? x < -0.5 ? labelX : labelX + 8 : x < 0.5 ? labelX - 8 : labelX, y < 0 ? y < -0.5 ? labelY - 8 : labelY : y < 0.5 ? labelY : labelY + 8);
                                         ctx.restore();
                                     }
                                 }
@@ -1684,7 +1664,12 @@ class ShipmentGlobalDemandView extends Component {
                         return itemLabelA > itemLabelB ? 1 : -1;
                     });
                     this.setState({
-                        shipmentStatuses: listArray, loading: false
+                        shipmentStatuses: listArray,
+                        shipmentStatusValues: listArray.map(c => { return { value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) } }),
+                        shipmentStatusLabels: listArray.map(c => getLabelText(c.label, this.state.lang)),
+                        loading: false
+                    }, () => {
+                        this.fetchData();
                     })
                 }).catch(
                     error => {
@@ -1749,7 +1734,11 @@ class ShipmentGlobalDemandView extends Component {
                 }.bind(this);
                 sStatusRequest.onsuccess = function (event) {
                     sStatusResult = sStatusRequest.result;
-                    this.setState({ shipmentStatuses: sStatusResult });
+                    this.setState({
+                        shipmentStatuses: sStatusResult,
+                        shipmentStatusValues: sStatusResult.map(c => { return { value: c.shipmentStatusId, label: getLabelText(c.label, this.state.lang) } }),
+                        shipmentStatusLabels: sStatusResult.map(c => getLabelText(c.label, this.state.lang)),
+                    });
                 }.bind(this)
             }.bind(this)
         }
@@ -2690,11 +2679,11 @@ class ShipmentGlobalDemandView extends Component {
             });
         }
 
-        let fspasList = Object.values(grouping).sort((a, b) => a.code.localeCompare(b.code));
+        let fspasList = Object.values(grouping).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
         fspasList.forEach(f => {
-            f.programsList = Object.values(f.programs).sort((a, b) => a.code.localeCompare(b.code));
+            f.programsList = Object.values(f.programs).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
             f.programsList.forEach(p => {
-                p.pus.sort((a, b) => a.display.localeCompare(b.display));
+                p.pus.sort((a, b) => a.display.toString().toLowerCase().localeCompare(b.display.toString().toLowerCase()));
             });
         });
 
@@ -2777,6 +2766,10 @@ class ShipmentGlobalDemandView extends Component {
             tooltips: {
                 enabled: false,
                 custom: CustomTooltips,
+                filter: function (tooltipItem, data) {
+                    let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                    return value !== 0 && value !== '0' && value !== 0.0;
+                },
                 callbacks: {
                     label: function (tooltipItem, data) {
                         let label = data.labels[tooltipItem.index];
@@ -2954,6 +2947,11 @@ class ShipmentGlobalDemandView extends Component {
         ];
         const backgroundColor1 = isDarkMode ? darkModeColors1 : lightModeColors1;
         const planningUnitQuantity = this.state.data.planningUnitQuantity || [];
+        planningUnitQuantity.sort((a, b) => {
+            let labelA = getLabelText(a.planningUnit.label, this.state.lang) + " | " + a.planningUnit.id;
+            let labelB = getLabelText(b.planningUnit.label, this.state.lang) + " | " + b.planningUnit.id;
+            return labelA.toString().toLowerCase().localeCompare(labelB.toString().toLowerCase());
+        });
 
         /* 1️⃣ X-Axis Labels (Planning Units) */
         const labels = planningUnitQuantity.map(item =>
@@ -2967,7 +2965,7 @@ class ShipmentGlobalDemandView extends Component {
                     Object.keys(item.fspaQuantity || {})
                 )
             )
-        ];
+        ].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase()));
 
         /* 3️⃣ Build Dataset Per FSPA */
         const datasets = allFspaCodes.map((code, index) => ({
@@ -3010,7 +3008,13 @@ class ShipmentGlobalDemandView extends Component {
         ];
         const backgroundColor = isDarkMode ? darkModeColors : lightModeColors;
 
-        const pieLabels = [...new Set(this.state.data.fspaCostAndPerc.map(ele => ele.fspa.code))];
+        const fspaCostAndPercSorted = [...(this.state.data.fspaCostAndPerc || [])].sort((a, b) => {
+            let codeA = a.fspa ? a.fspa.code : "N/A";
+            let codeB = b.fspa ? b.fspa.code : "N/A";
+            return codeA.toString().toLowerCase().localeCompare(codeB.toString().toLowerCase());
+        });
+
+        const pieLabels = [...new Set(fspaCostAndPercSorted.map(ele => ele.fspa ? ele.fspa.code : "N/A"))];
         const usaidColors = [
             '#002F6C', // USAID Dark Blue
             '#BA0C2F', // USAID Red
@@ -3026,7 +3030,7 @@ class ShipmentGlobalDemandView extends Component {
         const chartDataForPie = {
             labels: pieLabels,
             datasets: [{
-                data: this.state.data.fspaCostAndPerc.map(ele => ele.cost),
+                data: fspaCostAndPercSorted.map(ele => ele.cost),
                 backgroundColor: usaidColors.slice(0, pieLabels.length),
                 borderWidth: 2,
                 borderColor: '#ffffff',
@@ -3302,6 +3306,7 @@ class ShipmentGlobalDemandView extends Component {
                                     </div>
                                 </div>
                             </Form>
+                            {this.state.data.planningUnitQuantity.length > 0 && <h5 className='red'>{i18n.t("static.shipment.note")}</h5>}
                             <div style={{ display: this.state.loading ? "none" : "block" }}>
                                 <Col md="12 pl-0  ">
                                     <div className="row grid-divider ">
@@ -3343,12 +3348,10 @@ class ShipmentGlobalDemandView extends Component {
                                                         <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="aggregateByCountry" name="aggregateByCountry" checked={this.state.aggregateByCountry} onChange={this.handleCheckboxChange} />
                                                         <Label className="form-check-label" check htmlFor="aggregateByCountry">{i18n.t('static.shipment.aggregateByCountry')}</Label>
                                                     </FormGroup>
-                                                    <br />
                                                     <FormGroup check inline style={{ paddingLeft: 0 }}>
                                                         <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="hideCalculations" name="hideCalculations" checked={this.state.hideCalculations} onChange={this.handleCheckboxChange} />
                                                         <Label className="form-check-label" check htmlFor="hideCalculations">{i18n.t('static.shipment.hideCalculations') || 'Hide Calculations'}</Label>
                                                     </FormGroup>
-                                                    <br />
                                                     <FormGroup check inline style={{ paddingLeft: 0 }}>
                                                         <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="collapsePlanningUnits" name="collapsePlanningUnits" checked={this.state.collapsePlanningUnits} onChange={this.handleCheckboxChange} />
                                                         <Label className="form-check-label" check htmlFor="collapsePlanningUnits">{i18n.t('static.shipment.collapsePlanningUnits') || 'Collapse Planning Units'}</Label>
@@ -3364,7 +3367,7 @@ class ShipmentGlobalDemandView extends Component {
                                                                 <th className="text-right">{i18n.t('static.shipment.qty')}</th>
                                                                 {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalPUCost')}</th>}
                                                                 {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalFreightCost')}</th>}
-                                                                <th className="text-right">{i18n.t('static.report.totalCost')}</th>
+                                                                <th className="text-right">{i18n.t('static.shipment.totalCost')}</th>
                                                                 <th className="text-right">{i18n.t('static.shipment.totalCostPerc')}</th>
                                                             </tr>
                                                         </thead>

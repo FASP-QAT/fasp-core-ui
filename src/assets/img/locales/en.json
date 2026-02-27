@@ -3651,7 +3651,9 @@
   "static.shipment.aggregateByCountry": "Aggregate by Country",
   "static.shipment.hideCalculations": "Hide Calculations",
   "static.shipment.collapsePlanningUnits": "Collapse Planning Units",
-  "static.shipment.totalPUCost":"Total Planning Unit Cost (USD)",
-  "static.shipment.totalFreightCost":"Total Freight Cost (USD)",
-  "static.shipment.totalCostPerc":"Total Cost (%)"
+  "static.shipment.totalPUCost":"Total Planning Unit Cost",
+  "static.shipment.totalFreightCost":"Total Freight Cost",
+  "static.shipment.totalCostPerc":"Total Cost (%)",
+  "static.dashboard.shipmentByPlanningUnit":"Shipments (by Planning Unit)",
+  "static.shipment.note":"Note: All cost calculations are displayed in USD."
 }

@@ -398,7 +398,7 @@ const routes = [
   { path: '/report/problemList', name: 'static.dashboard.qatProblemList', component: ProblemList },
   { path: '/report/procurementAgentExport', name: 'static.report.shipmentCostReport', component: ProcurementAgentExport },
   { path: '/report/supplierLeadTimes', name: 'static.dashboard.supplierLeadTimes', component: SupplierLeadTimes },
-  { path: '/report/shipmentGlobalDemandView', name: 'static.dashboard.shipmentGlobalDemandViewheader', component: ShipmentGlobalDemandView },
+  { path: '/report/shipmentGlobalDemandView', name: 'static.dashboard.shipmentByPlanningUnit', component: ShipmentGlobalDemandView },
   { path: '/report/shipmentGlobalView', name: 'static.dashboard.shipmentGlobalViewheader', component: ShipmentGlobalView },
   { path: '/report/annualShipmentCost', name: 'static.report.annualshipmentcost', component: AnnualShipmentCost },
   { path: '/report/supplyPlanVersionAndReview', exact: true, name: 'static.report.supplyplanversionandreviewReport', component: SupplyPlanVersionAndReview },
@@ -2066,7 +2066,7 @@ class DefaultLayout extends Component {
                                   }
                                 },
                                 {
-                                  name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                  name: i18n.t('static.dashboard.shipmentByPlanningUnit'),
                                   url: '/report/shipmentGlobalDemandView',
                                   icon: 'fa fa-pie-chart',
                                   attributes: {
@@ -2633,7 +2633,7 @@ class DefaultLayout extends Component {
                               attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SHIPMENT_COST_DETAILS_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_ANNUAL_SHIPMENT_COST_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_BUDGET_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_PROCUREMENT_AGENT_REPORT'))) && this.state.activeTab == 2) ? false : true) },
                               children: [
                                 {
-                                  name: i18n.t('static.dashboard.shipmentGlobalDemandViewheader'),
+                                  name: i18n.t('static.dashboard.shipmentByPlanningUnit'),
                                   url: '/report/shipmentGlobalDemandView',
                                   icon: 'fa fa-pie-chart',
                                   attributes: {
