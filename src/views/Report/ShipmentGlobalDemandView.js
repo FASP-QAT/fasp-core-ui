@@ -280,6 +280,7 @@ class ShipmentGlobalDemandView extends Component {
             aggregateByCountry: false,
             hideCalculations: false,
             collapsePlanningUnits: false,
+            collapseAll: false,
             collapsedRows: new Set()
         };
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -325,61 +326,37 @@ class ShipmentGlobalDemandView extends Component {
         var csvRow = [];
         csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
         csvRow.push('')
-        if (localStorage.getItem("sessionType") === 'Online') {
-            this.state.countryLabels.map(ele =>
+            ;[...this.state.countryLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
                 csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            this.state.programLabels.map(ele =>
+        csvRow.push('')
+            ;[...this.state.programLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
                 csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            this.state.planningUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
-            csvRow.push('')
-            if (this.state.viewById == 1) {
-                this.state.fundingSourceLabels.map(ele =>
-                    csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
-            } else {
-                this.state.procurementAgentLabels.map(ele =>
-                    csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
-            }
-            csvRow.push('')
-            this.state.shipmentStatusLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-        } else {
-            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
+        csvRow.push('')
+        if (this.state.programValues.length == 1) {
             csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
             csvRow.push('')
-            this.state.planningUnitLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
-            csvRow.push('')
-            if (this.state.viewById == 1) {
-                this.state.fundingSourceLabels.map(ele =>
-                    csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
-            } else {
-                this.state.procurementAgentLabels.map(ele =>
-                    csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
-            }
-            csvRow.push('')
-            this.state.shipmentStatusLabels.map(ele =>
-                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
-            csvRow.push('')
-            csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         }
+        ;[...this.state.planningUnitLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))).replaceAll(' ', '%20') + '"');
+        csvRow.push('')
+        if (this.state.viewById == 1) {
+            ;[...this.state.fundingSourceLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        } else {
+            ;[...this.state.procurementAgentLabels].sort((a, b) => a.toString().toLowerCase().localeCompare(b.toString().toLowerCase())).map(ele =>
+                csvRow.push('"' + (i18n.t('static.report.procurementAgentName') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        }
+        csvRow.push('')
+        this.state.shipmentStatusLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.shipment.aggregateByCountry') + ' : ' + (this.state.aggregateByCountry ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.shipment.hideCalculations') + ' : ' + (this.state.hideCalculations ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.shipment.collapsePlanningUnits') + ' : ' + (this.state.collapsePlanningUnits ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
         csvRow.push('')
         csvRow.push('')
         csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
@@ -393,10 +370,21 @@ class ShipmentGlobalDemandView extends Component {
 
             // CSV Headers
             let tableHeadTemp = [];
+            const isSingleProgramCsvHdr = this.state.programValues.length === 1;
             let fspaHeader = this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName');
             let progHeader = this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program');
-            tableHeadTemp.push(`${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`.replaceAll(' ', '%20'));
-            tableHeadTemp.push(i18n.t('static.shipment.qty').replaceAll(' ', '%20'));
+            const hidesPUs = this.state.collapsePlanningUnits || this.state.collapseAll;
+            let headerLabel = isSingleProgramCsvHdr
+                ? (hidesPUs
+                    ? `${fspaHeader}`
+                    : `${fspaHeader} / ${i18n.t('static.dashboard.planningunitheader')}`)
+                : (hidesPUs
+                    ? `${fspaHeader} / ${progHeader}`
+                    : `${fspaHeader} / ${progHeader} / ${i18n.t('static.dashboard.planningunitheader')}`);
+            tableHeadTemp.push(headerLabel.replaceAll(' ', '%20'));
+            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) {
+                tableHeadTemp.push(i18n.t('static.shipment.qty').replaceAll(' ', '%20'));
+            }
             if (!this.state.hideCalculations) {
                 tableHeadTemp.push(i18n.t('static.shipment.totalPUCost').replaceAll(' ', '%20'));
                 tableHeadTemp.push(i18n.t('static.shipment.totalFreightCost').replaceAll(' ', '%20'));
@@ -463,11 +451,11 @@ class ShipmentGlobalDemandView extends Component {
                 });
             });
 
-            let fspasList = Object.values(grouping).sort((a, b) => a.code.localeCompare(b.code));
+            let fspasList = Object.values(grouping).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
             fspasList.forEach(f => {
-                f.programsList = Object.values(f.programs).sort((a, b) => a.code.localeCompare(b.code));
+                f.programsList = Object.values(f.programs).sort((a, b) => a.code.toString().toLowerCase().localeCompare(b.code.toString().toLowerCase()));
                 f.programsList.forEach(p => {
-                    p.pus.sort((a, b) => a.display.localeCompare(b.display));
+                    p.pus.sort((a, b) => a.display.toString().toLowerCase().localeCompare(b.display.toString().toLowerCase()));
                 });
             });
 
@@ -476,8 +464,11 @@ class ShipmentGlobalDemandView extends Component {
             };
 
             // Build CSV rows
+            const isSingleProgramCsv = this.state.programValues.length === 1;
             fspasList.forEach(fspa => {
-                let row = [(fspa.code).replaceAll(',', ' ').replaceAll(' ', '%20'), '',];
+                let qtyPlaceholder = !this.state.collapsePlanningUnits ? '' : undefined;
+                let row = [(fspa.code).replaceAll(',', ' ').replaceAll(' ', '%20')];
+                if (!this.state.collapsePlanningUnits && !this.state.collapseAll) row.push(''); // qty col (empty for fspa level)
                 if (!this.state.hideCalculations) {
                     row.push(fspa.totalPuCost);
                     row.push(fspa.totalFreightCost);
@@ -486,33 +477,55 @@ class ShipmentGlobalDemandView extends Component {
                 row.push(grandTotalCost > 0 ? renderPerc(fspa.totalCost / grandTotalCost) : '0%');
                 A.push(addDoubleQuoteToRowContent(row));
 
-                fspa.programsList.forEach(prog => {
-                    let progRow = [("  " + prog.code).replaceAll(',', ' ').replaceAll(' ', '%20'), '',];
-                    if (!this.state.hideCalculations) {
-                        progRow.push(prog.totalPuCost);
-                        progRow.push(prog.totalFreightCost);
-                    }
-                    progRow.push(prog.totalCost);
-                    progRow.push(fspa.totalCost > 0 ? renderPerc(prog.totalCost / fspa.totalCost) : '0%');
-                    A.push(addDoubleQuoteToRowContent(progRow));
-
-                    if (!this.state.collapsePlanningUnits) {
-                        prog.pus.forEach(pu => {
-                            let puRow = [("    " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
+                if (!this.state.collapseAll) {
+                    if (isSingleProgramCsv) {
+                        // Single program: skip program row, show PUs directly under FSPA
+                        if (!this.state.collapsePlanningUnits) {
+                            fspa.programsList.forEach(prog => {
+                                prog.pus.forEach(pu => {
+                                    let puRow = [("  " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
+                                    if (!this.state.hideCalculations) {
+                                        puRow.push(pu.totalPuCost);
+                                        puRow.push(pu.totalFreightCost);
+                                    }
+                                    puRow.push(pu.totalCost);
+                                    puRow.push(fspa.totalCost > 0 ? renderPerc(pu.totalCost / fspa.totalCost) : '0%');
+                                    A.push(addDoubleQuoteToRowContent(puRow));
+                                });
+                            });
+                        }
+                    } else {
+                        fspa.programsList.forEach(prog => {
+                            let progRow = [("  " + prog.code).replaceAll(',', ' ').replaceAll(' ', '%20')];
+                            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) progRow.push(''); // qty col empty for prog level
                             if (!this.state.hideCalculations) {
-                                puRow.push(pu.totalPuCost);
-                                puRow.push(pu.totalFreightCost);
+                                progRow.push(prog.totalPuCost);
+                                progRow.push(prog.totalFreightCost);
                             }
-                            puRow.push(pu.totalCost);
-                            puRow.push(prog.totalCost > 0 ? renderPerc(pu.totalCost / prog.totalCost) : '0%');
-                            A.push(addDoubleQuoteToRowContent(puRow));
+                            progRow.push(prog.totalCost);
+                            progRow.push(fspa.totalCost > 0 ? renderPerc(prog.totalCost / fspa.totalCost) : '0%');
+                            A.push(addDoubleQuoteToRowContent(progRow));
+
+                            if (!this.state.collapsePlanningUnits) {
+                                prog.pus.forEach(pu => {
+                                    let puRow = [("    " + pu.display).replaceAll(',', ' ').replaceAll(' ', '%20'), pu.quantity];
+                                    if (!this.state.hideCalculations) {
+                                        puRow.push(pu.totalPuCost);
+                                        puRow.push(pu.totalFreightCost);
+                                    }
+                                    puRow.push(pu.totalCost);
+                                    puRow.push(prog.totalCost > 0 ? renderPerc(pu.totalCost / prog.totalCost) : '0%');
+                                    A.push(addDoubleQuoteToRowContent(puRow));
+                                });
+                            }
                         });
                     }
-                });
+                }
             });
 
             // Grand Total
-            let totalRow = [i18n.t('static.supplyPlan.total').replaceAll(' ', '%20'), ''];
+            let totalRow = [i18n.t('static.supplyPlan.total').replaceAll(' ', '%20')];
+            if (!this.state.collapsePlanningUnits && !this.state.collapseAll) totalRow.push(''); // qty col placeholder
             if (!this.state.hideCalculations) {
                 totalRow.push(grandPUCost);
                 totalRow.push(grandFreightCost);
@@ -580,26 +593,22 @@ class ShipmentGlobalDemandView extends Component {
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var len = 120
-        if (localStorage.getItem("sessionType") === 'Online') {
-            var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
-            len = len + countryLabelsText.length * 10
-            var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-            doc.text(doc.internal.pageSize.width / 8, len, planningText)
-            len = len + planningText.length * 10
-        } else {
-            doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
-                align: 'left'
-            })
+        var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
+        len = len + countryLabelsText.length * 10
+        var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        doc.text(doc.internal.pageSize.width / 8, len, planningText)
+        len = len + planningText.length * 10
+        if (this.state.programValues.length == 1) {
             doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
                 align: 'left'
             })
-            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+            len = len + 10
         }
         doc.setFontSize(8);
         doc.setTextColor("#002f6c");
         var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
-        let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
+        let y = len
 
         var viewByText = doc.splitTextToSize((i18n.t('static.common.display') + ' : ' + (this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName'))), doc.internal.pageSize.width * 3 / 4);
         for (var i = 0; i < viewByText.length; i++) {
@@ -3356,88 +3365,124 @@ class ShipmentGlobalDemandView extends Component {
                                                         <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="collapsePlanningUnits" name="collapsePlanningUnits" checked={this.state.collapsePlanningUnits} onChange={this.handleCheckboxChange} />
                                                         <Label className="form-check-label" check htmlFor="collapsePlanningUnits">{i18n.t('static.shipment.collapsePlanningUnits') || 'Collapse Planning Units'}</Label>
                                                     </FormGroup>
+                                                    <FormGroup check inline style={{ paddingLeft: 0 }}>
+                                                        <Input style={{ marginLeft: 0 }} className="form-check-input" type="checkbox" id="collapseAll" name="collapseAll" checked={this.state.collapseAll} onChange={this.handleCheckboxChange} />
+                                                        <Label className="form-check-label" check htmlFor="collapseAll">{'Collapse All'}</Label>
+                                                    </FormGroup>
                                                 </div>
 
-                                                <div className="fixTableHead mt-3">
-                                                    <Table id="mytable1" className="table-bordered text-center">
-                                                        <thead className='Theadtablesticky' style={{ backgroundColor: '#fff', color: '#000' }}>
-                                                            <tr>
-                                                                <th style={{ width: '2%' }}></th>
-                                                                <th className="text-left">{this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')} / {this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program')} / {i18n.t('static.dashboard.planningunitheader')}</th>
-                                                                <th className="text-right">{i18n.t('static.shipment.qty')}</th>
-                                                                {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalPUCost')}</th>}
-                                                                {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalFreightCost')}</th>}
-                                                                <th className="text-right">{i18n.t('static.shipment.totalCost')}</th>
-                                                                <th className="text-right">{i18n.t('static.shipment.totalCostPerc')}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody style={{ backgroundColor: '#fff', color: '#000' }}>
-                                                            {fspasList.map((fspa, fIndex) => {
-                                                                let isFspaCollapsed = this.state.collapsedRows.has(`fspa_${fspa.code}`);
-                                                                let fspaRows = [
-                                                                    <tr key={`fspa_${fspa.code}`} style={{ fontWeight: 'bold' }} >
-                                                                        <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(`fspa_${fspa.code}`)}>
-                                                                            <i className={"fa " + (isFspaCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
-                                                                        </td>
-                                                                        <td className="text-left">{fspa.code}</td>
-                                                                        <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
-                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalPuCost)}</td>}
-                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalFreightCost)}</td>}
-                                                                        <td className="text-right">{formatCurr(fspa.totalCost)}</td>
-                                                                        <td className="text-right">{grandTotalCost > 0 ? formatPerc(fspa.totalCost / grandTotalCost) : '0%'}</td>
+                                                {(() => {
+                                                    const isSingleProgram = this.state.programValues.length === 1;
+                                                    const showQtyCol = !this.state.collapsePlanningUnits && !this.state.collapseAll;
+                                                    return (
+                                                        <div className="fixTableHead mt-3">
+                                                            <Table id="mytable1" className="table-bordered text-center">
+                                                                <thead className='Theadtablesticky' style={{ backgroundColor: '#fff', color: '#000' }}>
+                                                                    <tr>
+                                                                        <th style={{ width: '2%' }}></th>
+                                                                        <th className="text-left">
+                                                                            {this.state.viewById == 1 ? i18n.t('static.fundingSourceHead.fundingSource') : i18n.t('static.report.procurementAgentName')}
+                                                                            {!isSingleProgram && ` / ${this.state.aggregateByCountry ? i18n.t('static.dashboard.country') : i18n.t('static.program.program')}`}
+                                                                            {showQtyCol && ` / ${i18n.t('static.dashboard.planningunitheader')}`}
+                                                                        </th>
+                                                                        {showQtyCol && <th className="text-right">{i18n.t('static.shipment.qty')}</th>}
+                                                                        {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalPUCost')}</th>}
+                                                                        {!this.state.hideCalculations && <th className="text-right">{i18n.t('static.shipment.totalFreightCost')}</th>}
+                                                                        <th className="text-right">{i18n.t('static.shipment.totalCost')}</th>
+                                                                        <th className="text-right">{i18n.t('static.shipment.totalCostPerc')}</th>
                                                                     </tr>
-                                                                ];
-
-                                                                if (!isFspaCollapsed) {
-                                                                    fspa.programsList.forEach((prog, pIndex) => {
-                                                                        let progKey = `prog_${fspa.code}_${prog.code}`;
-                                                                        let isProgCollapsed = this.state.collapsedRows.has(progKey);
-
-                                                                        fspaRows.push(
-                                                                            <tr key={progKey} style={{ fontWeight: 'bold' }} >
-                                                                                <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
-                                                                                    <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
+                                                                </thead>
+                                                                <tbody style={{ backgroundColor: '#fff', color: '#000' }}>
+                                                                    {fspasList.map((fspa, fIndex) => {
+                                                                        let isFspaCollapsed = this.state.collapseAll || this.state.collapsedRows.has(`fspa_${fspa.code}`);
+                                                                        let fspaRows = [
+                                                                            <tr key={`fspa_${fspa.code}`} style={{ fontWeight: 'bold' }} >
+                                                                                <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => !this.state.collapseAll && this.toggleCollapse(`fspa_${fspa.code}`)}>
+                                                                                    <i className={"fa " + (isFspaCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
                                                                                 </td>
-                                                                                <td className="text-left custom-padding-program" style={{ paddingLeft: '30px' }}>{prog.code}</td>
-                                                                                <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>
-                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
-                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
-                                                                                <td className="text-right">{formatCurr(prog.totalCost)}</td>
-                                                                                <td className="text-right">{fspa.totalCost > 0 ? formatPerc(prog.totalCost / fspa.totalCost) : '0%'}</td>
+                                                                                <td className="text-left">{fspa.code}</td>
+                                                                                {showQtyCol && <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>}
+                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalPuCost)}</td>}
+                                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(fspa.totalFreightCost)}</td>}
+                                                                                <td className="text-right">{formatCurr(fspa.totalCost)}</td>
+                                                                                <td className="text-right">{grandTotalCost > 0 ? formatPerc(fspa.totalCost / grandTotalCost) : '0%'}</td>
                                                                             </tr>
-                                                                        );
+                                                                        ];
 
-                                                                        if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
-                                                                            prog.pus.forEach((pu, puIndex) => {
-                                                                                fspaRows.push(
-                                                                                    <tr key={`${progKey}_pu_${pu.id}`}>
-                                                                                        <td></td>
-                                                                                        <td className="text-left custom-padding-pu" style={{ paddingLeft: '50px' }}>{pu.display}</td>
-                                                                                        <td className="text-right">{formatNum(pu.quantity)}</td>
-                                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
-                                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
-                                                                                        <td className="text-right">{formatCurr(pu.totalCost)}</td>
-                                                                                        <td className="text-right">{prog.totalCost > 0 ? formatPerc(pu.totalCost / prog.totalCost) : '0%'}</td>
-                                                                                    </tr>
-                                                                                );
-                                                                            });
+                                                                        if (!isFspaCollapsed) {
+                                                                            if (isSingleProgram) {
+                                                                                // Single program: skip program row, show PUs directly under FSPA
+                                                                                if (!this.state.collapsePlanningUnits) {
+                                                                                    fspa.programsList.forEach((prog, pIndex) => {
+                                                                                        prog.pus.forEach((pu, puIndex) => {
+                                                                                            fspaRows.push(
+                                                                                                <tr key={`fspa_${fspa.code}_pu_${pu.id}`}>
+                                                                                                    <td></td>
+                                                                                                    <td className="text-left custom-padding-pu" style={{ paddingLeft: '30px' }}>{pu.display}</td>
+                                                                                                    {showQtyCol && <td className="text-right">{formatNum(pu.quantity)}</td>}
+                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
+                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
+                                                                                                    <td className="text-right">{formatCurr(pu.totalCost)}</td>
+                                                                                                    <td className="text-right">{fspa.totalCost > 0 ? formatPerc(pu.totalCost / fspa.totalCost) : '0%'}</td>
+                                                                                                </tr>
+                                                                                            );
+                                                                                        });
+                                                                                    });
+                                                                                }
+                                                                            } else {
+                                                                                // Multi-program: show program rows with their own collapse
+                                                                                fspa.programsList.forEach((prog, pIndex) => {
+                                                                                    let progKey = `prog_${fspa.code}_${prog.code}`;
+                                                                                    let isProgCollapsed = this.state.collapsedRows.has(progKey);
+
+                                                                                    fspaRows.push(
+                                                                                        <tr key={progKey} style={{ fontWeight: 'bold' }} >
+                                                                                            <td className="text-left" style={{ cursor: 'pointer' }} onClick={() => this.toggleCollapse(progKey)}>
+                                                                                                <i className={"fa " + (isProgCollapsed ? "fa-plus-square-o" : "fa-minus-square-o") + " supplyPlanIcon"}></i>
+                                                                                            </td>
+                                                                                            <td className="text-left custom-padding-program" style={{ paddingLeft: '30px' }}>{prog.code}</td>
+                                                                                            {showQtyCol && <td className="text-right" style={{ backgroundColor: '#d3d3d3' }}></td>}
+                                                                                            {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalPuCost)}</td>}
+                                                                                            {!this.state.hideCalculations && <td className="text-right">{formatCurr(prog.totalFreightCost)}</td>}
+                                                                                            <td className="text-right">{formatCurr(prog.totalCost)}</td>
+                                                                                            <td className="text-right">{fspa.totalCost > 0 ? formatPerc(prog.totalCost / fspa.totalCost) : '0%'}</td>
+                                                                                        </tr>
+                                                                                    );
+
+                                                                                    if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
+                                                                                        prog.pus.forEach((pu, puIndex) => {
+                                                                                            fspaRows.push(
+                                                                                                <tr key={`${progKey}_pu_${pu.id}`}>
+                                                                                                    <td></td>
+                                                                                                    <td className="text-left custom-padding-pu" style={{ paddingLeft: '50px' }}>{pu.display}</td>
+                                                                                                    {showQtyCol && <td className="text-right">{formatNum(pu.quantity)}</td>}
+                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalPuCost)}</td>}
+                                                                                                    {!this.state.hideCalculations && <td className="text-right">{formatCurr(pu.totalFreightCost)}</td>}
+                                                                                                    <td className="text-right">{formatCurr(pu.totalCost)}</td>
+                                                                                                    <td className="text-right">{prog.totalCost > 0 ? formatPerc(pu.totalCost / prog.totalCost) : '0%'}</td>
+                                                                                                </tr>
+                                                                                            );
+                                                                                        });
+                                                                                    }
+                                                                                });
+                                                                            }
                                                                         }
-                                                                    });
-                                                                }
-                                                                return fspaRows;
-                                                            })}
-                                                            <tr style={{ fontWeight: 'bold', borderTop: '2px solid black', borderBottom: '2px solid black' }}>
-                                                                <td></td>
-                                                                <td className="text-left">{i18n.t('static.supplyPlan.total')}</td>
-                                                                <td className="text-right"></td>
-                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandPUCost)}</td>}
-                                                                {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandFreightCost)}</td>}
-                                                                <td className="text-right">{formatCurr(grandTotalCost)}</td>
-                                                                <td className="text-right"></td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </Table>
-                                                </div>
+                                                                        return fspaRows;
+                                                                    })}
+                                                                    <tr style={{ fontWeight: 'bold', borderTop: '2px solid black', borderBottom: '2px solid black' }}>
+                                                                        <td></td>
+                                                                        <td className="text-left">{i18n.t('static.supplyPlan.total')}</td>
+                                                                        {showQtyCol && <td className="text-right"></td>}
+                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandPUCost)}</td>}
+                                                                        {!this.state.hideCalculations && <td className="text-right">{formatCurr(grandFreightCost)}</td>}
+                                                                        <td className="text-right">{formatCurr(grandTotalCost)}</td>
+                                                                        <td className="text-right"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </Table>
+                                                        </div>
+                                                    );
+                                                })()}
                                             </div>}
                                         </div>
                                     </div>
