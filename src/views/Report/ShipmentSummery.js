@@ -226,7 +226,7 @@ class ShipmentSummery extends Component {
       versionId: [],
       planningUnitList: [],
       planningUnitListAll: [],
-      noData:false
+      noData: false
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -273,7 +273,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
-      procurementAgentValuesValues: [],
+      procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
       this.filterProgram();
@@ -548,7 +548,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
-      procurementAgentValuesValues: [],
+      procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
       this.filterVersion();
@@ -854,7 +854,7 @@ class ShipmentSummery extends Component {
           (getLabelText(re[item].planningUnit.label, this.state.lang) + " | " + re[item].planningUnit.id)
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
-          re[item].shipmentId!=0?re[item].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+re[item].tempShipmentId),
+          re[item].shipmentId != 0 ? re[item].shipmentId : (CONSTANT_FOR_TEMP_SHIPMENT + re[item].tempShipmentId),
           re[item].emergencyOrder,
           re[item].erpOrder == true ? true : false,
           re[item].localProcurement,
@@ -1143,7 +1143,7 @@ class ShipmentSummery extends Component {
     data = this.state.shipmentDetailsList.map((ele) => [
       ele.program.code,
       getLabelText(ele.planningUnit.label, this.state.lang) + " | " + ele.planningUnit.id,
-      ele.shipmentId!=0?ele.shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ele.tempShipmentId),
+      ele.shipmentId != 0 ? ele.shipmentId : (CONSTANT_FOR_TEMP_SHIPMENT + ele.tempShipmentId),
       ele.emergencyOrder,
       ele.erpOrder == true ? true : false,
       ele.localProcurement,
@@ -1175,7 +1175,7 @@ class ShipmentSummery extends Component {
       tableWidth: "auto",
       head: [headerTable2],
       body: data,
-      styles: { lineWidth: 1, fontSize: 8, halign: "center",overflow: "linebreak", },
+      styles: { lineWidth: 1, fontSize: 8, halign: "center", overflow: "linebreak", },
       columnStyles: {
         0: { cellWidth: 50 },
         1: { cellWidth: 70 },
@@ -1329,8 +1329,8 @@ class ShipmentSummery extends Component {
             {
               fundingSources: listArray,
               loading: false,
-              fundingSourceValues: listArray.map(c=>{return {value:c.id,label:c.code}}),
-              fundingSourceLabels: listArray.map(c=>c.code),
+              fundingSourceValues: listArray.map(c => { return { value: c.id, label: c.code } }),
+              fundingSourceLabels: listArray.map(c => c.code),
               filteredBudgetList: [],
             },
             () => {
@@ -1403,8 +1403,8 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
-              fundingSourceValues: fundingSource.map(c=>{return {value:c.id,label:c.code}}),
-              fundingSourceLabels: fundingSource.map(c=>c.code),
+              fundingSourceValues: fundingSource.map(c => { return { value: c.id, label: c.code } }),
+              fundingSourceLabels: fundingSource.map(c => c.code),
               filteredBudgetList: [],
             },
             () => {
@@ -1436,8 +1436,8 @@ class ShipmentSummery extends Component {
             {
               procurementAgents: listArray,
               loading: false,
-              procurementAgentValues: listArray.map(c=>{return {value:c.id,label:c.code}}),
-              procurementAgentLabels: listArray.map(c=>c.code),
+              procurementAgentValues: listArray.map(c => { return { value: c.id, label: c.code } }),
+              procurementAgentLabels: listArray.map(c => c.code),
               budgetValues: [],
               budgetLabels: [],
               filteredBudgetList: [],
@@ -1510,8 +1510,8 @@ class ShipmentSummery extends Component {
                 b = b.code.toLowerCase();
                 return a < b ? -1 : a > b ? 1 : 0;
               }),
-              procurementAgentValues: pa.map(c=>{return {value:c.id,label:c.code}}),
-              procurementAgentLabels: pa.map(c=>c.code),
+              procurementAgentValues: pa.map(c => { return { value: c.id, label: c.code } }),
+              procurementAgentLabels: pa.map(c => c.code),
               filteredBudgetList: [],
               budgetValues: [],
               budgetLabels: []
@@ -1562,8 +1562,8 @@ class ShipmentSummery extends Component {
             }
             this.setState(
               {
-                budgetValues: budgetValuesFromProps.length>0?budgetValuesFromProps:proList.map(item=>{return {label:getLabelText(item.label,this.state.lang),value:item.budgetId}}),
-                budgetLabels: budgetLabelsFromProps.length>0?budgetLabelsFromProps:proList.map(item=>getLabelText(item.label,this.state.lang)), 
+                budgetValues: budgetValuesFromProps.length > 0 ? budgetValuesFromProps : proList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
+                budgetLabels: budgetLabelsFromProps.length > 0 ? budgetLabelsFromProps : proList.map(item => getLabelText(item.label, this.state.lang)),
                 budgets: proList,
                 filteredBudgetList: proList,
               },
@@ -1706,7 +1706,7 @@ class ShipmentSummery extends Component {
             }
             this.setState(
               {
-                budgetValues: bList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }), 
+                budgetValues: bList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
                 budgetLabels: bList.map(item => getLabelText(item.label, this.state.lang)),
                 fundingSourceValues: fundingSourceIds.map((ele) => ele),
                 fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
@@ -1812,7 +1812,7 @@ class ShipmentSummery extends Component {
             );
             this.setState(
               {
-                budgetValues: fSourceResult.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }), 
+                budgetValues: fSourceResult.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
                 budgetLabels: fSourceResult.map(item => getLabelText(item.label, this.state.lang)),
                 fundingSourceValues: fundingSourceIds.map((ele) => ele),
                 fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
@@ -1848,7 +1848,7 @@ class ShipmentSummery extends Component {
   handleProcurementAgentChange = (procurementAgentIds) => {
     this.setState(
       {
-        procurementAgentValuesValues: procurementAgentIds.map((ele) => ele),
+        procurementAgentValues: procurementAgentIds.map((ele) => ele),
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
       },
       () => {
@@ -1878,179 +1878,194 @@ class ShipmentSummery extends Component {
    * Builds the jexcel table based on the shipment details list list.
    */
   buildJExcel() {
-    let shipmentDetailsList = this.state.shipmentDetailsList.sort((a, b) => { return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate); });
-    let shipmentDetailsListArray = [];
-    let count = 0;
-    for (var j = 0; j < shipmentDetailsList.length; j++) {
-      data = [];
-      data[0] =
-        shipmentDetailsList[j].program.code;
-      data[1] = getLabelText(
-        shipmentDetailsList[j].planningUnit.label,
-        this.state.lang
-      ) + " | " + shipmentDetailsList[j].planningUnit.id;
-      data[2] = shipmentDetailsList[j].shipmentId!=0?shipmentDetailsList[j].shipmentId:(CONSTANT_FOR_TEMP_SHIPMENT+ shipmentDetailsList[j].tempShipmentId);
-      data[3] = shipmentDetailsList[j].emergencyOrder;
-      data[4] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
+    if (!this.state.noData) {
+      let shipmentDetailsList = this.state.shipmentDetailsList.sort((a, b) => { return new Date(a.expectedDeliveryDate) - new Date(b.expectedDeliveryDate); });
+      let shipmentDetailsListArray = [];
+      let count = 0;
+      for (var j = 0; j < shipmentDetailsList.length; j++) {
+        data = [];
+        data[0] =
+          shipmentDetailsList[j].program.code;
+        data[1] = getLabelText(
+          shipmentDetailsList[j].planningUnit.label,
+          this.state.lang
+        ) + " | " + shipmentDetailsList[j].planningUnit.id;
+        data[2] = shipmentDetailsList[j].shipmentId != 0 ? shipmentDetailsList[j].shipmentId : (CONSTANT_FOR_TEMP_SHIPMENT + shipmentDetailsList[j].tempShipmentId);
+        data[3] = shipmentDetailsList[j].emergencyOrder;
+        data[4] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
             ${shipmentDetailsList[j].erpFlag ? "checked" : ""}>`;
 
-data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
+        data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;accent-color: grey;" 
             ${shipmentDetailsList[j].localProcurement ? "checked" : ""}>`;
-      data[6] =
-        shipmentDetailsList[j].orderNo != null
-          ? shipmentDetailsList[j].orderNo
-          : "";
-      data[7] = shipmentDetailsList[j].procurementAgent.code;
-      data[8] = shipmentDetailsList[j].fundingSource.code;
-      data[9] = shipmentDetailsList[j].budget.code;
-      data[10] = getLabelText(
-        shipmentDetailsList[j].shipmentStatus.label,
-        this.state.lang
+        data[6] =
+          shipmentDetailsList[j].orderNo != null
+            ? shipmentDetailsList[j].orderNo
+            : "";
+        data[7] = shipmentDetailsList[j].procurementAgent.code;
+        data[8] = shipmentDetailsList[j].fundingSource.code;
+        data[9] = shipmentDetailsList[j].budget.code;
+        data[10] = getLabelText(
+          shipmentDetailsList[j].shipmentStatus.label,
+          this.state.lang
+        );
+        data[11] = shipmentDetailsList[j].shipmentQty;
+        data[12] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
+          "YYYY-MM-DD"
+        );
+        data[13] = shipmentDetailsList[j].productCost.toFixed(2);
+        data[14] = shipmentDetailsList[j].freightCost.toFixed(2);
+        data[15] = shipmentDetailsList[j].totalCost.toFixed(2);
+        data[16] = shipmentDetailsList[j].notes;
+        data[17] = shipmentDetailsList[j].planningUnit.id;
+        shipmentDetailsListArray[count] = data;
+        count++;
+      }
+      this.el = jexcel(
+        document.getElementById("shipmentDetailsListTableDiv"),
+        ""
       );
-      data[11] = shipmentDetailsList[j].shipmentQty;
-      data[12] = moment(shipmentDetailsList[j].expectedDeliveryDate).format(
-        "YYYY-MM-DD"
+      jexcel.destroy(
+        document.getElementById("shipmentDetailsListTableDiv"),
+        true
       );
-      data[13] = shipmentDetailsList[j].productCost.toFixed(2);
-      data[14] = shipmentDetailsList[j].freightCost.toFixed(2);
-      data[15] = shipmentDetailsList[j].totalCost.toFixed(2);
-      data[16] = shipmentDetailsList[j].notes;
-      data[17] = shipmentDetailsList[j].planningUnit.id;
-      shipmentDetailsListArray[count] = data;
-      count++;
-    }
-    this.el = jexcel(
-      document.getElementById("shipmentDetailsListTableDiv"),
-      ""
-    );
-    jexcel.destroy(
-      document.getElementById("shipmentDetailsListTableDiv"),
-      true
-    );
-    var data = shipmentDetailsListArray;
-    var options = {
-      data: data,
-      columnDrag: false,
-      colWidths: [
-        150, 150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
-      ],
-      colHeaderClasses: ["Reqasterisk"],
-      columns: [
-        {
-          title: i18n.t("static.program.programMaster"),
-          type: "text",
-          width:100
-        },
-        {
-          title: i18n.t("static.report.planningUnit"),
-          type: "text",
-          width:150
-        },
-        {
-          title: i18n.t("static.report.id"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.supplyPlan.consideAsEmergencyOrder"),
-          type: "hidden",
-        },
-        {
-          title: i18n.t("static.shipmentDetails.erpLinkedShipments"),
-          type: "html",
-        },
-        {
-          title: i18n.t("static.report.localprocurement"),
-          type: "html",
-        },
-        {
-          title: i18n.t("static.report.orderNo"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.report.procurementAgentName"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.fundingSourceHead.fundingSource"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.dashboard.budget"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.common.status"),
-          type: "text",
-        },
-        {
-          title: i18n.t("static.report.qty"),
-          type: "numeric",
-          mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
-          decimal: ".",
-        },
-        {
-          title: i18n.t("static.report.expectedReceiveddate"),
-          type: "calendar",
-          options: {
-            format: JEXCEL_DATE_FORMAT,
+      var data = shipmentDetailsListArray;
+      var options = {
+        data: data,
+        columnDrag: false,
+        colWidths: [
+          150, 150, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 100,
+        ],
+        colHeaderClasses: ["Reqasterisk"],
+        columns: [
+          {
+            title: i18n.t("static.program.programMaster"),
+            type: "text",
+            width: 100
           },
-        },
-        {
-          title: i18n.t("static.report.productCost"),
-          type: "numeric",
-          mask: "#,##.00",
-          decimal: ".",
-        },
-        {
-          type: "numeric",
-          mask: "#,##.00",
-          decimal: ".",
-          title: i18n.t("static.report.freightCost"),
-        },
-        {
-          title: i18n.t("static.report.totalCost"),
-          type: "numeric",
-          mask: "#,##.00",
-          decimal: ".",
-        },
-        {
-          title: i18n.t("static.program.notes"),
-          type: "text",
-        },
-        {
-          title: "Planning Unit Id",
-          type: "hidden",
-        },
-      ],
-      editable: false,
-      license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
-      filters: true,
-      onload: this.loaded,
-      pagination: localStorage.getItem("sesRecordCount"),
-      search: true,
-      columnSorting: true,
-      wordWrap: true,
-      allowInsertColumn: false,
-      allowManualInsertColumn: false,
-      allowDeleteRow: false,
-      onselection: this.selected,
-      copyCompatibility: true,
-      allowExport: false,
-      paginationOptions: JEXCEL_PAGINATION_OPTION,
-      position: "top",
-      contextMenu: function (obj, x, y, e) {
-        return false;
-      }.bind(this),
-    };
-    var shipmentDetailsEl = jexcel(
-      document.getElementById("shipmentDetailsListTableDiv"),
-      options
-    );
-    this.el = shipmentDetailsEl;
-    this.setState({
-      shipmentDetailsEl: shipmentDetailsEl,
-      loading: false,
-    });
+          {
+            title: i18n.t("static.report.planningUnit"),
+            type: "text",
+            width: 150
+          },
+          {
+            title: i18n.t("static.report.id"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.supplyPlan.consideAsEmergencyOrder"),
+            type: "hidden",
+          },
+          {
+            title: i18n.t("static.shipmentDetails.erpLinkedShipments"),
+            type: "html",
+          },
+          {
+            title: i18n.t("static.report.localprocurement"),
+            type: "html",
+          },
+          {
+            title: i18n.t("static.report.orderNo"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.report.procurementAgentName"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.fundingSourceHead.fundingSource"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.dashboard.budget"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.common.status"),
+            type: "text",
+          },
+          {
+            title: i18n.t("static.report.qty"),
+            type: "numeric",
+            mask: (localStorage.getItem("roundingEnabled") != undefined && localStorage.getItem("roundingEnabled").toString() == "false") ? '#,##.000' : '#,##', decimal: '.',
+            decimal: ".",
+          },
+          {
+            title: i18n.t("static.report.expectedReceiveddate"),
+            type: "calendar",
+            options: {
+              format: JEXCEL_DATE_FORMAT,
+            },
+          },
+          {
+            title: i18n.t("static.report.productCost"),
+            type: "numeric",
+            mask: "#,##.00",
+            decimal: ".",
+          },
+          {
+            type: "numeric",
+            mask: "#,##.00",
+            decimal: ".",
+            title: i18n.t("static.report.freightCost"),
+          },
+          {
+            title: i18n.t("static.report.totalCost"),
+            type: "numeric",
+            mask: "#,##.00",
+            decimal: ".",
+          },
+          {
+            title: i18n.t("static.program.notes"),
+            type: "text",
+          },
+          {
+            title: "Planning Unit Id",
+            type: "hidden",
+          },
+        ],
+        editable: false,
+        license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter, allowRenameColumn: false,
+        filters: true,
+        onload: this.loaded,
+        pagination: localStorage.getItem("sesRecordCount"),
+        search: true,
+        columnSorting: true,
+        wordWrap: true,
+        allowInsertColumn: false,
+        allowManualInsertColumn: false,
+        allowDeleteRow: false,
+        onselection: this.selected,
+        copyCompatibility: true,
+        allowExport: false,
+        paginationOptions: JEXCEL_PAGINATION_OPTION,
+        position: "top",
+        contextMenu: function (obj, x, y, e) {
+          return false;
+        }.bind(this),
+      };
+      var shipmentDetailsEl = jexcel(
+        document.getElementById("shipmentDetailsListTableDiv"),
+        options
+      );
+      this.el = shipmentDetailsEl;
+      this.setState({
+        shipmentDetailsEl: shipmentDetailsEl,
+        loading: false,
+      });
+    } else {
+      try {
+        this.el = jexcel(
+          document.getElementById("shipmentDetailsListTableDiv"),
+          ""
+        );
+      } catch (err) { }
+      try {
+        jexcel.destroy(
+          document.getElementById("shipmentDetailsListTableDiv"),
+          true
+        );
+      } catch (err) { }
+    }
   }
   /**
    * Callback function triggered when the Jexcel instance is loaded to format the table.
@@ -2220,7 +2235,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
             message: i18n.t("static.program.validversion"),
             data: [],
             shipmentDetailsList: [],
-            noData:false,
+            noData: false,
             shipmentDetailsFundingSourceList: [],
             shipmentDetailsMonthList: [],
           });
@@ -3038,7 +3053,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
           loading: false,
-          noData:false
+          noData: false
         },
         () => {
           this.el = jexcel(
@@ -3061,7 +3076,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
           loading: false,
-          noData:false
+          noData: false
         },
         () => {
           this.el = jexcel(
@@ -3083,7 +3098,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
           loading: false,
-          noData:false
+          noData: false
         },
         () => {
           this.el = jexcel(
@@ -3105,7 +3120,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
           shipmentDetailsFundingSourceList: [],
           shipmentDetailsMonthList: [],
           loading: false,
-          noData:false
+          noData: false
         },
         () => {
           this.el = jexcel(
@@ -3737,7 +3752,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                   </div>
                 </Form>
                 <div style={{ display: this.state.loading ? "none" : "block" }}>
-                  <Col md="12 pl-0">
+                  {!this.state.noData && <Col md="12 pl-0">
                     <div className="row">
                       {this.state.shipmentDetailsMonthList.length > 0 && (
                         <div className="col-md-12 p-0">
@@ -3756,7 +3771,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                         </div>
                       )}
                     </div>
-                    <br/>
+                    <br />
                     <div className="row">
                       <div className="col-md-12 pl-0 pr-0">
                         {this.state.shipmentDetailsFundingSourceList.length >
@@ -3812,7 +3827,7 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                                         cursor: "pointer",
                                         "text-align": "center",
                                       }}
-                                      title={this.state.viewById==1?i18n.t("static.shipmentDetails.costUSDFS"):i18n.t("static.shipmentDetails.costUSDPA")}
+                                      title={this.state.viewById == 1 ? i18n.t("static.shipmentDetails.costUSDFS") : i18n.t("static.shipmentDetails.costUSDPA")}
                                     >
                                       {i18n.t("static.report.costUsd")}<i class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
                                     </th>
@@ -3821,7 +3836,9 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                                 <tbody>
                                   {this.state.shipmentDetailsFundingSourceList
                                     .length > 0 &&
-                                    this.state.shipmentDetailsFundingSourceList.map(
+                                    this.state.shipmentDetailsFundingSourceList.sort(
+                                      (a, b) => getLabelText(a.fspa.label, this.state.lang).localeCompare(getLabelText(b.fspa.label, this.state.lang))
+                                    ).map(
                                       (item, idx) => (
                                         <tr id="addr0" key={idx}>
                                           <td style={{ "text-align": "center" }}>
@@ -3880,8 +3897,8 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                           )}
                       </div>
                     </div>
-                  </Col>
-                  <Col md="12 pl-2">
+                  </Col>}
+                  {!this.state.noData && <Col md="12 pl-2">
                     <div className="row">
                       <FormGroup className="col-md-10 mt-3 ">
                         <ul className="legendcommitversion list-group">
@@ -3911,9 +3928,9 @@ data[5] = `<input type="checkbox" style="pointer-events: none; cursor: default;a
                           }
                         ></div>
                       </div>
-                      {this.state.noData && <h5 className="red">{i18n.t("static.shipmentDetails.noData")}</h5>}
                     </div>
-                  </Col>
+                  </Col>}
+                  {this.state.noData && <h5 className="red">{i18n.t("static.shipmentDetails.noData")}</h5>}
                 </div>
                 <div style={{ display: this.state.loading ? "block" : "none" }}>
                   <div

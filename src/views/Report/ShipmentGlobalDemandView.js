@@ -49,6 +49,7 @@ import {
 } from "reactstrap";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
+import "../../scss/shipmentsByCountry.scss"
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import MonthBox from "../../CommonComponent/MonthBox.js";
