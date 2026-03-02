@@ -7,6 +7,7 @@ import MonthBox from '../../CommonComponent/MonthBox.js';
 import { MultiSelect } from 'react-multi-select-component';
 import Select from 'react-select';
 import { Chart, ArcElement, Tooltip, Legend, Title } from 'chart.js';
+import "../../scss/shipmentsByCountry.scss"
 // import 'chart.piecelabel.js';
 import { Doughnut, HorizontalBar, Pie, Bar } from 'react-chartjs-2';
 import { Search } from 'react-bootstrap-table2-toolkit';
@@ -122,7 +123,8 @@ class SupplyPlanScoreCard extends Component {
       totalCount:0,
       initialCount:0,
       dashboardBottomDataList: [],
-      countryExpandedMap: {}
+      countryExpandedMap: {},
+      sortedLabels: []
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -506,7 +508,8 @@ class SupplyPlanScoreCard extends Component {
     var viewByLabel = document.getElementById("viewById").selectedOptions[0].text.toString();
     this.setState({
         viewBy: viewBy,
-        viewByLabel: [viewByLabel]
+        viewByLabel: [viewByLabel],
+        sortedLabels: []
     }, () => {
         this.buildJexcel();
     });
@@ -517,6 +520,8 @@ class SupplyPlanScoreCard extends Component {
     this.setState({
         showDetail: showDetail,
         showDetailLabel: [showDetailLabel]
+    }, () => {
+        this.buildJexcel();
     });
   }
   /**
@@ -562,6 +567,7 @@ class SupplyPlanScoreCard extends Component {
     var flaggedCountActual = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && (c.realmProblem.problem.problemId === 1 || c.realmProblem.problem.problemId === 25)).map(c => c.planningUnit.id))].length;
     var flaggedCountInventory = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && c.realmProblem.problem.problemId === 2).map(c => c.planningUnit.id))].length;
     var flaggedCountShipment = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && (c.realmProblem.problem.problemId === 3 || c.realmProblem.problem.problemId === 4)).map(c => c.planningUnit.id))].length;
+
     return {
         "program": { "id": programJson.programId, "label": programJson.label, "code": programJson.programCode, "version": programJson.currentVersion.versionId },
         "versionStatus": programJson.currentVersion.versionStatus,
@@ -588,6 +594,8 @@ class SupplyPlanScoreCard extends Component {
         "shipmentQpl": { "puCount": totalQpl, "correctCount": totalQpl - flaggedCountShipment },
         "expiryTotal": expiryTotal,
         "shipmentTotal": shipmentTotal,
+        "versionCreatedDate": programJson.currentVersion.createdDate,
+        "versionLastModifiedDate": programJson.currentVersion.lastModifiedDate,
         "supplyPlanQualityScore": totalQpl > 0 ? (((1 - flaggedCountForecast/totalQpl) + (1 - flaggedCountActual/totalQpl) + (1 - flaggedCountInventory/totalQpl) + (1 - flaggedCountShipment/totalQpl)) / 4) * 100 : 0,
         "stockStatusScore": (stockOut + underStock + adequate + overStock) > 0 ? (adequate / (stockOut + underStock + adequate + overStock)) * 100 : 0
     };
@@ -681,9 +689,9 @@ class SupplyPlanScoreCard extends Component {
         const countryList = Object.keys(countriesMap).sort();
         const healthAreaList = Object.keys(healthAreasMap).sort();
         
-        matrixCols = [{ title: 'Technical Area', type: 'text', readOnly: true }];
+        matrixCols = [{ title: 'Technical Area', type: 'text', readOnly: true, align: 'left' }];
         countryList.forEach(c => {
-            matrixCols.push({ title: c, type: 'text', readOnly: true });
+            matrixCols.push({ title: c, type: 'text', readOnly: true, align: 'center' });
         });
         matrixCols.push({ title: 'RowType', type: 'hidden' });
         matrixCols.push({ title: 'CountryKey', type: 'hidden' });
@@ -698,23 +706,7 @@ class SupplyPlanScoreCard extends Component {
             row.push('');
             data.push(row);
         });
-
-        const totalRow = ['Total'];
-        countryList.forEach(c => {
-            let countrySum = 0;
-            let countryCount = 0;
-            healthAreaList.forEach(ha => {
-                const s = scoresMap[ha][c];
-                if (s) {
-                    countrySum += (s.sum / s.count);
-                    countryCount += 1;
-                }
-            });
-            totalRow.push(countryCount > 0 ? `${Math.round(countrySum / countryCount)}%` : '');
-        });
-        totalRow.push('matrix_total');
-        totalRow.push('');
-        data.push(totalRow);
+        this.matrixCountryCount = countryList.length;
     } else if (isCountryView) {
         let countryGroupsMap = {};
         list.forEach(dbd => {
@@ -726,7 +718,8 @@ class SupplyPlanScoreCard extends Component {
             countryGroupsMap[cKey].programs.push(dbd);
         });
 
-        Object.values(countryGroupsMap).forEach(cg => {
+        Object.values(countryGroupsMap).sort((a,b) => a.label.localeCompare(b.label)).forEach(cg => {
+            cg.programs.sort((p1, p2) => (p1.program?.code || '').localeCompare(p2.program?.code || ''));
             const isExpanded = !!this.state.countryExpandedMap[cg.key];
             const toggleIcon = isExpanded ? '▼' : '▶';
             const n = cg.programs.length;
@@ -774,9 +767,10 @@ class SupplyPlanScoreCard extends Component {
                 cg.programs.forEach(dbd => {
                     let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
                     let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+                    reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
                     data.push([
                         `${dbd.program.code}`,
-                        `v${dbd.program.version}`,
+                        `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                         dbd.totalPus,
                         dbd.forecastConsumptionQpl?.correctCount || 0,
                         dbd.actualConsumptionQpl?.correctCount || 0,
@@ -795,13 +789,15 @@ class SupplyPlanScoreCard extends Component {
             }
         });
     } else {
-        list.forEach(dbd => {
+        const sortedList = [...list].sort((a, b) => (a.program?.code || '').localeCompare(b.program?.code || ''));
+        sortedList.forEach(dbd => {
             if (!dbd || !dbd.program) return;
             let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
             let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+            reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
             data.push([
                 dbd.program.code,
-                `v${dbd.program.version}`,
+                `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                 dbd.totalPus,
                 dbd.forecastConsumptionQpl?.correctCount || 0,
                 dbd.actualConsumptionQpl?.correctCount || 0,
@@ -821,6 +817,39 @@ class SupplyPlanScoreCard extends Component {
 
     const reapplyFormatting = (instance) => {
         if (!instance || !instance.tbody) return;
+        
+        // Align headers based on view
+        const headers = instance.thead.querySelectorAll('td');
+        const centerHeaders = [
+            'Active PUs', 'Forecasted Consumption', 'Actual Inventory', 
+            'Shipments', 'Quality Score', 'Stock Status', 
+            'Stock Status Score', 'Total Score'
+        ];
+        headers.forEach((h, idx) => {
+            const headTitle = (h.innerText || h.textContent || '').trim();
+            let align = 'left';
+            if (isMatrixView) {
+                if (headTitle === 'Technical Area') {
+                    align = 'left';
+                } else if (headTitle !== '' && idx > 0) {
+                    align = 'center';
+                } else {
+                    align = 'left';
+                }
+            } else {
+                if (centerHeaders.includes(headTitle)) {
+                    align = 'center';
+                } else {
+                    align = 'left';
+                }
+            }
+            h.style.textAlign = align;
+            h.style.setProperty('text-align', align, 'important');
+            if (align === 'left' && headTitle !== '') {
+                h.style.paddingLeft = '10px';
+            }
+        });
+
         const rows = instance.tbody.children;
         const allData = instance.options.data;
 
@@ -834,27 +863,44 @@ class SupplyPlanScoreCard extends Component {
             const rowType = rowData[rowData.length - 2];
             
             if (isMatrixView) {
+                const cell0Matrix = tr.querySelector(`td[data-x="0"]`);
+                if (cell0Matrix) {
+                    cell0Matrix.style.textAlign = 'left';
+                    cell0Matrix.style.setProperty('text-align', 'left', 'important');
+                    cell0Matrix.style.paddingLeft = '10px';
+                    if (rowType === 'matrix_total') cell0Matrix.style.textAlign = 'center';
+                }
+
                 if (rowType === 'matrix_total') {
                     tr.style.fontWeight = 'bold';
                     tr.style.backgroundColor = '#f4f4f4';
                 }
+
                 for (let c = 1; c < rowData.length - 2; c++) {
                     const cell = tr.querySelector(`td[data-x="${c}"]`);
                     if (!cell) continue;
                     const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                     const value = parseInt(raw, 10);
                     if (!isNaN(value)) {
-                        let color = value <= 35 ? '%23BA0C2F' : value <= 70 ? '%23f48521' : value <= 99 ? '%23edba26' : '%23118b70';
-                        cell.innerText = value + '%';
-                        cell.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='${color}'/%3E%3C/svg%3E")`;
-                        cell.style.backgroundRepeat = 'no-repeat';
-                        cell.style.backgroundPosition = 'center left 20%';
-                        cell.style.paddingLeft = '30px';
-                        cell.style.textAlign = 'left';
+                        let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                        cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
+                            <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
+                            <span>${value}%</span>
+                        </div>`;
+                        cell.style.backgroundImage = 'none';
+                        cell.style.paddingLeft = '0px';
+                        cell.style.textAlign = 'center';
+                        cell.style.setProperty('text-align', 'center', 'important');
                         cell.style.fontWeight = 'bold';
                     }
                 }
                 continue;
+            }
+
+            const cell0 = tr.querySelector(`td[data-x="0"]`);
+            if (cell0) {
+                cell0.style.textAlign = 'left';
+                cell0.style.setProperty('text-align', 'left', 'important');
             }
 
             if (rowType === 'row_parent') {
@@ -863,11 +909,23 @@ class SupplyPlanScoreCard extends Component {
                 for (let i = 0; i < tr.children.length; i++) {
                     tr.children[i].style.fontWeight = 'bold';
                 }
+                if (cell0) {
+                    cell0.style.paddingLeft = '10px';
+                }
             } else if (rowType === 'row_child') {
                 tr.style.backgroundColor = '#f7fbff';
-                const cell0 = tr.querySelector(`td[data-x="0"]`);
                 if (cell0) {
                     cell0.style.paddingLeft = '30px';
+                }
+            }
+
+            // Align Latest Version, Review Status, and Version Notes to left
+            for (let c of [1, 11, 12]) {
+                const cell = tr.querySelector(`td[data-x="${c}"]`);
+                if (cell) {
+                    cell.style.textAlign = 'left';
+                    cell.style.setProperty('text-align', 'left', 'important');
+                    cell.style.paddingLeft = '10px';
                 }
             }
 
@@ -909,10 +967,12 @@ class SupplyPlanScoreCard extends Component {
                     const c3 = c2 + Number(parts[2]);
                     const c4 = c3 + Number(parts[3]);
                     stockCell.style.background = `linear-gradient(to right, #BA0C2F 0%, #BA0C2F ${c1}%, #f48521 ${c1}%, #f48521 ${c2}%, #118b70 ${c2}%, #118b70 ${c3}%, #edb944 ${c3}%, #edb944 ${c4}%, #cfcdc9 ${c4}%, #cfcdc9 100%)`;
-                    stockCell.style.backgroundClip = 'content-box';
+                    stockCell.style.backgroundRepeat = 'no-repeat';
+                    stockCell.style.backgroundPosition = 'center';
+                    stockCell.style.backgroundSize = '95% 14px';
                     stockCell.style.color = 'transparent';
                     stockCell.style.fontSize = '0px';
-                    stockCell.style.padding = '8px 5px';
+                    stockCell.style.padding = '0px';
                 }
             }
         }
@@ -922,19 +982,19 @@ class SupplyPlanScoreCard extends Component {
         data: data,
         columnDrag: true,
         columns: isMatrixView ? matrixCols : [
-            { title: isCountryView ? 'Country' : 'Program', type: 'text', readOnly: true },
-            { title: isCountryView ? 'Programs' : 'Latest Version', type: 'text', readOnly: true },
-            { title: 'Active PUs', type: 'numeric', readOnly: true },
-            { title: 'Forecasted Consumption', type: 'numeric', readOnly: true },
-            { title: 'Actual Consumption', type: 'numeric', readOnly: true },
-            { title: 'Actual Inventory', type: 'numeric', readOnly: true },
-            { title: 'Shipments', type: 'numeric', readOnly: true },
-            { title: 'Quality Score', type: 'text', readOnly: true },
-            { title: 'Stock Status', type: 'text', readOnly: true },
-            { title: 'Stock Status Score', type: 'text', readOnly: true },
-            { title: 'Total Score', type: 'text', readOnly: true },
-            { title: 'Review Status', type: 'text', readOnly: true },
-            { title: 'Version Notes', type: 'text', readOnly: true },
+            { title: isCountryView ? 'Country' : 'Program', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Latest Version', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Active PUs', type: 'numeric', readOnly: true, align: 'left' },
+            { title: 'Forecasted Consumption', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: 'Actual Consumption', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: 'Actual Inventory', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: 'Shipments', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: 'Quality Score', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Stock Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
+            { title: 'Stock Status Score', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Total Score', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Review Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
+            { title: 'Version Notes', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
             { title: 'RowType', type: 'hidden' },
             { title: 'CountryKey', type: 'hidden' }
         ],
@@ -966,11 +1026,47 @@ class SupplyPlanScoreCard extends Component {
             }
         }.bind(this),
         onchangepage: function(obj) { reapplyFormatting(obj); },
-        onsort: function(obj) { reapplyFormatting(obj); },
-        onfilter: function(obj) { reapplyFormatting(obj); },
-        onsearch: function(obj) { reapplyFormatting(obj); },
+        onsort: function(instance, column, dir) { 
+            if (isMatrixView) {
+                setTimeout(() => { this.recalculateFooter(instance, this.matrixCountryCount); }, 0);
+            }
+            
+            const sortedData = instance.getJson();
+            let sortedLabels = [];
+            
+            if (isMatrixView) {
+                // First column is Technical Area
+                sortedLabels = sortedData.map(r => r[0]);
+            } else if (isCountryView) {
+                // First column is like "▶ Country (N programs)", only get parents
+                const parentRows = sortedData.filter(r => r[r.length-2] === 'row_parent');
+                sortedLabels = parentRows.map(r => {
+                    const match = r[0].match(/^[▶▼]\s+(.*?)\s+\(\d+\s+programs\)$/);
+                    return match ? match[1] : r[0];
+                });
+            } else {
+                // Program view: first column is Program Code
+                sortedLabels = sortedData.map(r => r[0]);
+            }
+            
+            this.setState({ sortedLabels });
+            reapplyFormatting(instance); 
+        }.bind(this),
+        onfilter: function(obj) { 
+            if (isMatrixView) {
+                this.recalculateFooter(obj, this.matrixCountryCount);
+            }
+            reapplyFormatting(obj); 
+        }.bind(this),
+        onsearch: function(obj) { 
+            if (isMatrixView) {
+                this.recalculateFooter(obj, this.matrixCountryCount);
+            }
+            reapplyFormatting(obj); 
+        }.bind(this),
         search: true,
         columnSorting: true,
+        footers: isMatrixView ? [this.calculateTotals(data, this.matrixCountryCount)] : [],
         wordWrap: true,
         allowInsertColumn: false,
         allowManualInsertColumn: false,
@@ -1024,6 +1120,105 @@ class SupplyPlanScoreCard extends Component {
         {pct}%
       </span>
     );
+  }
+
+  /**
+   * Helper function to calculate totals for Jexcel footer.
+   * Relies on the structure of the data: first column is label, subsequent are numeric percentages.
+   */
+  calculateTotals = (rows, countryCount) => {
+    if (!rows || rows.length === 0) return ["Total"];
+    let columnSums = new Array(countryCount).fill(0);
+    let columnCounts = new Array(countryCount).fill(0);
+
+    rows.forEach(row => {
+        for (let i = 0; i < countryCount; i++) {
+            const val = String(row[i + 1] || '').replace(/%/g, '').trim();
+            const numeric = parseInt(val, 10);
+            if (!isNaN(numeric)) {
+                columnSums[i] += numeric;
+                columnCounts[i] += 1;
+            }
+        }
+    });
+
+    const footer = ["Total"];
+    for (let i = 0; i < countryCount; i++) {
+        footer.push(columnCounts[i] > 0 ? `${Math.round(columnSums[i] / columnCounts[i])}%` : '');
+    }
+    // Fill hidden columns with empty strings
+    footer.push('matrix_total');
+    footer.push('');
+    return footer;
+  }
+
+  /**
+   * Method to recalculate Jexcel footer based on currently visible/filtered results.
+   */
+  recalculateFooter = (instance, countryCount) => {
+    const data = instance.getData();
+    // Get visible row indices from results (if filtered) or all rows
+    const visibleRows = instance.results && instance.results.length > 0 ? instance.results : data.map((_, idx) => idx);
+
+    if (!visibleRows || visibleRows.length === 0) {
+        instance.setFooter([["Total"]]);
+        return;
+    }
+
+    let columnSums = new Array(countryCount).fill(0);
+    let columnCounts = new Array(countryCount).fill(0);
+
+    visibleRows.forEach(rowIndex => {
+        const row = data[rowIndex];
+        // Skip rows that aren't matrix_row if applicable, but usually results only contains data rows
+        for (let col = 1; col <= countryCount; col++) {
+            const val = String(row[col] || '').replace(/%/g, '').trim();
+            const numeric = parseInt(val, 10);
+            if (!isNaN(numeric)) {
+                columnSums[col - 1] += numeric;
+                columnCounts[col - 1] += 1;
+            }
+        }
+    });
+
+    const footer = ["Total"];
+    for (let i = 0; i < countryCount; i++) {
+        footer.push(columnCounts[i] > 0 ? `${Math.round(columnSums[i] / columnCounts[i])}%` : '');
+    }
+    footer.push('matrix_total');
+    footer.push('');
+    instance.setFooter([footer]);
+
+    // Apply formatting to footer after update
+    setTimeout(() => {
+        if (instance.footer && instance.footer.children[0]) {
+            const tr = instance.footer.children[0];
+            tr.style.fontWeight = 'bold';
+            tr.style.backgroundColor = '#f4f4f4';
+            const cell0Footer = tr.children[0];
+            if (cell0Footer) {
+                cell0Footer.style.textAlign = 'center';
+            }
+            for (let c = 1; c <= countryCount; c++) {
+                const cell = tr.children[c];
+                if (!cell) continue;
+                const raw = String(cell.innerText || '').replace(/%/g, '').trim();
+                const value = parseInt(raw, 10);
+                if (!isNaN(value)) {
+                    let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                    cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
+                        <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
+                        <span>${value}%</span>
+                    </div>`;
+                    cell.style.backgroundImage = 'none';
+                    cell.style.paddingLeft = '0px';
+                    cell.style.textAlign = 'center';
+                    cell.style.setProperty('text-align', 'center', 'important');
+                    cell.style.fontWeight = 'bold';
+                }
+            }
+        }
+    }, 0);
   }
 
   /**
@@ -1150,12 +1345,20 @@ class SupplyPlanScoreCard extends Component {
     const countryGroups = Object.values(countryGroupsMap);
 
     // Aggregate per country: average quality/stock scores
-    const countryAggregates = countryGroups.map(cg => {
+    let countryAggregates = countryGroups.map(cg => {
         const n = cg.programs.length;
         const avgQuality = n > 0 ? cg.programs.reduce((s, d) => s + (d.supplyPlanQualityScore || 0), 0) / n : 0;
         const avgStock = n > 0 ? cg.programs.reduce((s, d) => s + (d.stockStatusScore || 0), 0) / n : 0;
         return { label: cg.label, avgQuality, avgStock, avgTotal: (avgQuality + avgStock) / 2 };
     });
+
+    if (viewBy === '1') {
+        if (this.state.sortedLabels && this.state.sortedLabels.length > 0) {
+            countryAggregates.sort((a, b) => this.state.sortedLabels.indexOf(a.label) - this.state.sortedLabels.indexOf(b.label));
+        } else {
+            countryAggregates.sort((a, b) => a.label.localeCompare(b.label));
+        }
+    }
 
     // ---- Bar chart data depending on viewBy ----
     let barData;
@@ -1191,8 +1394,15 @@ class SupplyPlanScoreCard extends Component {
             });
         });
         
+        
         const sortedCountries = Array.from(countriesSet).sort();
-        const sortedHAs = Array.from(haSet).sort();
+        let sortedHAs = Array.from(haSet).sort();
+
+        if (this.state.sortedLabels && this.state.sortedLabels.length > 0) {
+            sortedHAs = this.state.sortedLabels.filter(l => haSet.has(l));
+        } else {
+            sortedHAs.sort();
+        }
         
         const palette = ['#0F263F', '#C50000', '#118B70', '#802636', '#EDBA26', '#BD5E00'];
         
@@ -1223,13 +1433,23 @@ class SupplyPlanScoreCard extends Component {
         };
     } else {
         // Program view: one bar group per program
+        let displayList = [...dataList];
+        if (this.state.sortedLabels && this.state.sortedLabels.length > 0) {
+            displayList.sort((a, b) => {
+                const labelA = a.program ? a.program.code : '';
+                const labelB = b.program ? b.program.code : '';
+                return this.state.sortedLabels.indexOf(labelA) - this.state.sortedLabels.indexOf(labelB);
+            });
+        } else {
+            displayList.sort((a, b) => (a.program?.code || '').localeCompare(b.program?.code || ''));
+        }
         barData = {
-            labels: dataList.map(d => d.program ? d.program.code : ''),
+            labels: displayList.map(d => d.program ? d.program.code : ''),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: dataList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: dataList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: dataList.map(d => Math.round(d.stockStatusScore || 0)) },
-                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: dataList.map(() => 90) }
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
+                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: displayList.map(() => 90) }
             ]
         };
     }
