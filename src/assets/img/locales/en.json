@@ -3658,7 +3658,7 @@
   "static.shipment.note": "Note: All cost calculations are displayed in USD.",
   "static.tooltip.qtyMayRepresentMultipleShipments": "May represent one or multiple shipments",
   "static.tooltip.totalPlanningUnitCost": "Total Planning Unit Cost = Quantity * Planning Unit Cost (user-entered), at the shipment-level",
-  "static.tooltip.totalFreightCost": "Total Freight Cost is calculated based on Transportation Mode and Planning Unit Cost (automatic) or entered manually, at the shipment-level.",
+  "static.tooltip.totalFreightCost": "Total Freight Cost is calculated based on Transportation Mode and Planning Unit Cost (automatic or entered manually), at the shipment-level.",
   "static.tooltip.totalCostGlobalDemand": "Total Cost = Total Freight Cost + Total Planning Unit Cost",
   "static.tooltip.totalCostPercGlobalDemand": "For Procurement Agents/Funders, this is the percentage across all Procurement Agents/Funders. \n\nFor Programs/Countries, this is the percentage within the specific Procurement Agent/Funder. \n\nFor Planning Units, this is the percentage within the Program/Country"
 }
