@@ -204,5 +204,12 @@ class DropdownService {
       return axios.post(`${API_URL}/api/dropdown/program/realmCountryIds/healthAreaIds`, json, {}
       );
   }
+  getProgramListBasedOnRealmCountryIdsAndHealthAreaIds(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/program/realmCountryIds/healthAreaIds`,
+      json,
+      {}
+    );
+  }
 }
 export default new DropdownService();
