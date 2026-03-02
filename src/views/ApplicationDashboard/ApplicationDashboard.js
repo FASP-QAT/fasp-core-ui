@@ -2798,6 +2798,77 @@ class ApplicationDashboard extends Component {
       },
     };
 
+    const overallScoreValue = ((this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) : 0) + (this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.stockStatusScore) : 0)) / 2;
+    const overallScoreData = {
+      labels: ['Red', 'Yellow', 'Green'],
+      datasets: [{
+        data: [35, 35, 30],
+        backgroundColor: ['#BA0C2F', '#edba26', '#118b70'],
+        needleValue: overallScoreValue,
+        datalabels: {
+          display: false,
+          color: 'rgba(0,0,0,0)',
+          font: {
+            size: 0
+          },
+          formatter: () => ''
+        }
+      }]
+    };
+
+    const overallScoreOptions = {
+      rotation: -Math.PI,
+      circumference: Math.PI,
+      cutoutPercentage: 70,
+      legend: { display: false },
+      tooltips: { enabled: false },
+      aspectRatio: 2,
+      layout: {
+        padding: {
+          bottom: 25,
+          left: 10,
+          right: 10
+        }
+      },
+      plugins: {
+        datalabels: false
+      }
+    };
+
+    const gaugeNeedle = {
+      id: 'gaugeNeedle',
+      afterDatasetsDraw: (chart) => {
+        const { ctx, config, data } = chart;
+        const dataset = data.datasets[0];
+        const needleValue = dataset.needleValue;
+        const dataTotal = 100;
+        const angle = Math.PI + (1 / dataTotal * needleValue * Math.PI);
+        const meta = chart.getDatasetMeta(0);
+        if (!meta.data[0]) return;
+        const arc = meta.data[0];
+        const cx = arc._model.x;
+        const cy = arc._model.y;
+        const outerRadius = arc._model.outerRadius;
+        const needleLength = outerRadius - 5;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.lineTo(needleLength, 0); 
+        ctx.lineTo(0, 2);
+        ctx.fillStyle = '#444';
+        ctx.fill();
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#444';
+        ctx.fill();
+      }
+    };
+
     const forecastConsumptionData = {
       datasets: [{
         label: 'Forecast Consumption Dataset',
@@ -3803,9 +3874,15 @@ class ApplicationDashboard extends Component {
                     <div className={'col-md-3'}>
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> Overall Supply Plan Score <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
-                        <div class="card-body pt-lg-2 scrollable-content">
+                        <div class="card-body scrollable-content d-flex flex-column justify-content-center">
+                          <div className='row' style={{ height: '180px' }}>
+                            <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
+                          </div>
+                          <div className="text-center" style={{ marginTop: '10px' }}>
+                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: overallScoreValue <= 35 ? "#BA0C2F" : overallScoreValue <= 70 ? "#edba26" : "#118b70" }}>{Math.round(overallScoreValue)}%</h3>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -3813,7 +3890,7 @@ class ApplicationDashboard extends Component {
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalShipments")}: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{this.state.dashboardBottomData.stockStatusScore}{"%"}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>Score: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b></i></div>
                         </div>
                         <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
@@ -3882,7 +3959,7 @@ class ApplicationDashboard extends Component {
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>{i18n.t("static.dashboard.totalShipments")}: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{this.state.dashboardBottomData.supplyPlanQualityScore}{"%"}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>Score: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b></i></div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
