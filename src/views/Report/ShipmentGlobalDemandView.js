@@ -210,6 +210,11 @@ class ShipmentGlobalDemandView extends Component {
     // jspreadsheet instance
     this.el = null;
   }
+  handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.fetchData();
+    }
+  };
 
   // ------------------------------------------------------------------
   // handleCheckboxChange – same as original, but rebuilds the table
@@ -2530,7 +2535,7 @@ class ShipmentGlobalDemandView extends Component {
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -2558,7 +2563,7 @@ class ShipmentGlobalDemandView extends Component {
               loading: false,
             },
             () => {
-              this.fetchData();
+              // this.fetchData();
             }
           );
         })
@@ -2994,7 +2999,7 @@ class ShipmentGlobalDemandView extends Component {
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -3023,7 +3028,7 @@ class ShipmentGlobalDemandView extends Component {
         fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   }
@@ -3609,7 +3614,7 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <MultiSelect
+                        <div onBlur={this.handleBlur}><MultiSelect
                           name="planningUnitId"
                           id="planningUnitId"
                           bsSize="md"
@@ -3630,7 +3635,7 @@ class ShipmentGlobalDemandView extends Component {
                             selectSomeItems: i18n.t("static.common.select"),
                           }}
                           filterOptions={filterOptions}
-                        />
+                        /></div>
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -3665,7 +3670,7 @@ class ShipmentGlobalDemandView extends Component {
                         </Label>
                         <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
+                          <div onBlur={this.handleBlur}><MultiSelect
                             name="fundingSourceId"
                             id="fundingSourceId"
                             bsSize="sm"
@@ -3686,7 +3691,7 @@ class ShipmentGlobalDemandView extends Component {
                               selectSomeItems: i18n.t("static.common.select"),
                             }}
                             filterOptions={filterOptions}
-                          />
+                          /></div>
                         </div>
                       </FormGroup>
                     )}
@@ -3697,7 +3702,7 @@ class ShipmentGlobalDemandView extends Component {
                         </Label>
                         <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
+                          <div onBlur={this.handleBlur}><MultiSelect
                             name="procurementAgentId"
                             id="procurementAgentId"
                             bsSize="md"
@@ -3719,7 +3724,7 @@ class ShipmentGlobalDemandView extends Component {
                               ),
                               selectSomeItems: i18n.t("static.common.select"),
                             }}
-                          />
+                          /></div>
                         </div>
                       </FormGroup>
                     )}
@@ -3729,7 +3734,7 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <MultiSelect
+                        <div onBlur={this.handleBlur}><MultiSelect
                           name="shipmentStatusId"
                           id="shipmentStatusId"
                           bsSize="sm"
@@ -3750,7 +3755,7 @@ class ShipmentGlobalDemandView extends Component {
                             selectSomeItems: i18n.t("static.common.select"),
                           }}
                           filterOptions={filterOptions}
-                        />
+                        /></div>
                       </div>
                     </FormGroup>
                   </div>
