@@ -120,7 +120,9 @@ class SupplyPlanScoreCard extends Component {
       topProgramIdChange: false,
       multipleQPLRebuild: false,
       totalCount:0,
-      initialCount:0
+      initialCount:0,
+      dashboardBottomDataList: [],
+      countryExpandedMap: {}
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -505,6 +507,8 @@ class SupplyPlanScoreCard extends Component {
     this.setState({
         viewBy: viewBy,
         viewByLabel: [viewByLabel]
+    }, () => {
+        this.buildJexcel();
     });
   }
   toggleShowDetail = () => {
@@ -515,6 +519,80 @@ class SupplyPlanScoreCard extends Component {
         showDetailLabel: [showDetailLabel]
     });
   }
+  /**
+   * Builds a dashboardBottomData object from a programJson and ppuListForProgram.
+   */
+  buildDashboardBottomDataFromJson = (programJson, ppuListForProgram) => {
+    var dashboardData = programJson.dashboardData;
+    if (!dashboardData) return null;
+    var bottomPuData = dashboardData.bottomPuData;
+    var stockOut = 0, underStock = 0, adequate = 0, overStock = 0, na = 0;
+    var puStockOutList = [], expiriesList = [], shipmentDetailsList = [], shipmentWithFundingSourceTbd = [];
+    var totalQpl = 0, expiryTotal = 0;
+    if (bottomPuData && bottomPuData !== "") {
+        var puIds = ppuListForProgram.filter(c => c.active.toString() === "true");
+        puIds.forEach(item => {
+            var value = bottomPuData[item.planningUnit.id];
+            if (value != undefined) {
+                stockOut += Number(value.stockStatus.stockOut);
+                underStock += Number(value.stockStatus.underStock);
+                adequate += Number(value.stockStatus.adequate);
+                overStock += Number(value.stockStatus.overStock);
+                na += Number(value.stockStatus.na);
+                if (Number(value.stockStatus.stockOut)) {
+                    puStockOutList.push({ "planningUnit": item.planningUnit, "count": Number(value.stockStatus.stockOut) });
+                }
+                var expiryList = value.expiriesList;
+                expiryList.forEach(expiry => {
+                    expiry.planningUnit = item.planningUnit;
+                    expiryTotal += Number(Math.round(expiry.expiryAmt));
+                });
+                expiriesList = expiriesList.concat(expiryList);
+                if (Number(value.countOfTbdFundingSource) > 0) {
+                    shipmentWithFundingSourceTbd.push({ "planningUnit": item.planningUnit, "count": Number(value.countOfTbdFundingSource) });
+                }
+                totalQpl += 1;
+            }
+        });
+    }
+    var totalStock = stockOut + underStock + adequate + overStock + na;
+    var shipmentTotal = 0;
+    shipmentDetailsList.forEach(item => { shipmentTotal += Number(item.cost); });
+    var flaggedCountForecast = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && c.realmProblem.problem.problemId === 8).map(c => c.planningUnit.id))].length;
+    var flaggedCountActual = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && (c.realmProblem.problem.problemId === 1 || c.realmProblem.problem.problemId === 25)).map(c => c.planningUnit.id))].length;
+    var flaggedCountInventory = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && c.realmProblem.problem.problemId === 2).map(c => c.planningUnit.id))].length;
+    var flaggedCountShipment = [...new Set(programJson.problemReportList.filter(c => c.planningUnitActive !== false && c.problemStatus.id === 1 && (c.realmProblem.problem.problemId === 3 || c.realmProblem.problem.problemId === 4)).map(c => c.planningUnit.id))].length;
+    return {
+        "program": { "id": programJson.programId, "label": programJson.label, "code": programJson.programCode, "version": programJson.currentVersion.versionId },
+        "versionStatus": programJson.currentVersion.versionStatus,
+        "versionNotes": programJson.currentVersionNotes,
+        "realmCountry": { "realmCountryId": programJson.realmCountryId, "label": programJson.realmCountry.country.label },
+        "healthAreaList": programJson.healthAreaList,
+        "totalPus": totalQpl,
+        "stockStatus": {
+            "stockOut": stockOut, "underStock": underStock, "adequate": adequate, "overStock": overStock, "na": na, "total": totalStock,
+            "puStockOutList": puStockOutList,
+            "stockOutPerc": totalStock > 0 ? stockOut / totalStock : 0,
+            "underStockPerc": totalStock > 0 ? underStock / totalStock : 0,
+            "adequatePerc": totalStock > 0 ? adequate / totalStock : 0,
+            "overStockPerc": totalStock > 0 ? overStock / totalStock : 0,
+            "naPerc": totalStock > 0 ? na / totalStock : 0
+        },
+        "expiriesList": expiriesList,
+        "shipmentDetailsList": shipmentDetailsList,
+        "shipmentWithFundingSourceTbd": shipmentWithFundingSourceTbd,
+        "forecastErrorList": [],
+        "forecastConsumptionQpl": { "puCount": totalQpl, "correctCount": totalQpl - flaggedCountForecast },
+        "actualConsumptionQpl": { "puCount": totalQpl, "correctCount": totalQpl - flaggedCountActual },
+        "inventoryQpl": { "puCount": totalQpl, "correctCount": totalQpl - flaggedCountInventory },
+        "shipmentQpl": { "puCount": totalQpl, "correctCount": totalQpl - flaggedCountShipment },
+        "expiryTotal": expiryTotal,
+        "shipmentTotal": shipmentTotal,
+        "supplyPlanQualityScore": totalQpl > 0 ? (((1 - flaggedCountForecast/totalQpl) + (1 - flaggedCountActual/totalQpl) + (1 - flaggedCountInventory/totalQpl) + (1 - flaggedCountShipment/totalQpl)) / 4) * 100 : 0,
+        "stockStatusScore": (stockOut + underStock + adequate + overStock) > 0 ? (adequate / (stockOut + underStock + adequate + overStock)) * 100 : 0
+    };
+  }
+
   fetchData = () => {
     var db1;
     getDatabase();
@@ -528,172 +606,219 @@ class SupplyPlanScoreCard extends Component {
             var ppuList = ppuRequest.result;
             var pdTransaction = db1.transaction(['programData'], 'readwrite');
             var pdObjectStore = pdTransaction.objectStore('programData');
-            var pdRequest = pdObjectStore.get(this.state.programValues.map(p => p.value)[0]);
-            pdRequest.onsuccess = function (event) {
-                var programData = pdRequest.result;
-                var ppuListForProgram = ppuList.filter(c => c.program.id == programData.programId);
-                var programDataBytes = CryptoJS.AES.decrypt(programData.programData.generalData, SECRET_KEY);
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                var programJson = JSON.parse(programData);
-                var generalProgramJson = programJson;
-                var dashboardBottomData = {};
-                var dashboardData = generalProgramJson.dashboardData;
-                if (dashboardData != undefined) {
-                    var bottomPuData = dashboardData.bottomPuData;
-                    var stockOut = 0;
-                    var underStock = 0;
-                    var adequate = 0;
-                    var overStock = 0;
-                    var na = 0;
-                    var puStockOutList = [];
-                    var expiriesList = [];
-                    var shipmentDetailsList = [];
-                    var shipmentWithFundingSourceTbd = [];
-                    var forecastConsumptionQplCount = 0;
-                    var actualConsumptionQplCount = 0;
-                    var inventoryQplCount = 0;
-                    var shipmentQplCount = 0;
-                    var totalQpl = 0;
-                    var expiryTotal = 0;
-                    if (bottomPuData != "" && bottomPuData != undefined) {
-                        var puIds = ppuListForProgram.filter(c => c.active.toString() == "true")
-                        puIds.map(item => {
-                            var value = bottomPuData[item.planningUnit.id];
-                            if (value != undefined) {
-                                stockOut += Number(value.stockStatus.stockOut);
-                                underStock += Number(value.stockStatus.underStock);
-                                adequate += Number(value.stockStatus.adequate);
-                                overStock += Number(value.stockStatus.overStock);
-                                na += Number(value.stockStatus.na);
-                                if (Number(value.stockStatus.stockOut)) {
-                                    puStockOutList.push({
-                                        "planningUnit": item.planningUnit,
-                                        "count": Number(value.stockStatus.stockOut)
-                                    })
-                                }
-                                var expiryList = value.expiriesList;
-                                expiryList.forEach(expiry => {
-                                    expiry.planningUnit = item.planningUnit;
-                                    expiryTotal += Number(Math.round(expiry.expiryAmt));
-                                });
-                                expiriesList = expiriesList.concat(expiryList);
-                                // if (reportBy == 1) {
-                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByFundingSource)
-                                // } else if (reportBy == 2) {
-                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByProcurementAgent)
-                                // } else {
-                                //     shipmentDetailsList = shipmentDetailsList.concat(value.shipmentDetailsByShipmentStatus)
-                                // }
-                                if (Number(value.countOfTbdFundingSource) > 0) {
-                                    shipmentWithFundingSourceTbd.push({
-                                        "planningUnit": item.planningUnit,
-                                        "count": Number(value.countOfTbdFundingSource)
-                                    })
-                                }
-                                totalQpl += 1;
-                                if (value.forecastConsumptionQplPassed.toString() == "true") {
-                                    forecastConsumptionQplCount += 1;
-                                }
-                                if (value.actualConsumptionQplPassed.toString() == "true") {
-                                    actualConsumptionQplCount += 1;
-                                }
-                                if (value.inventoryQplPassed.toString() == "true") {
-                                    inventoryQplCount += 1;
-                                }
-                                if (value.shipmentQplPassed.toString() == "true") {
-                                    shipmentQplCount += 1;
-                                }
-                            }
-                        });
-                        var totalStock = Number(stockOut) + Number(underStock) + Number(adequate) + Number(overStock) + Number(na);
-                        var shipmentTotal = 0;
-                        shipmentDetailsList.map(item => {
-                            shipmentTotal += Number(item.cost)
-                        })
-                        var flaggedCountForecastConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length;
-                        var flaggedCountActualConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length;
-                        var flaggedCountInventoryData = [...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length;
-                        var flaggedCountShipmentData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
-console.log("StockStatusScore",Number(stockOut),Number(underStock),Number(adequate),Number(overStock))
-console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flaggedCountActualConsumptionData),Number(flaggedCountInventoryData),Number(flaggedCountShipmentData))
-                        dashboardBottomData = {
-                            "stockStatus": {
-                                "stockOut": stockOut,
-                                "underStock": underStock,
-                                "adequate": adequate,
-                                "overStock": overStock,
-                                "na": na,
-                                "total": totalStock,
-                                "puStockOutList": puStockOutList,
-                                "stockOutPerc": Number(stockOut) / Number(totalStock),
-                                "underStockPerc": Number(underStock) / Number(totalStock),
-                                "adequatePerc": Number(adequate) / Number(totalStock),
-                                "overStockPerc": Number(overStock) / Number(totalStock),
-                                "naPerc": Number(na) / Number(totalStock)
-                            },
-                            "expiriesList": expiriesList,
-                            "shipmentDetailsList": shipmentDetailsList,
-                            "shipmentWithFundingSourceTbd": shipmentWithFundingSourceTbd,
-                            "forecastErrorList": [],
-                            "forecastConsumptionQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": totalQpl-flaggedCountForecastConsumptionData
-                            },
-                            "actualConsumptionQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": totalQpl-flaggedCountActualConsumptionData
-                            },
-                            "inventoryQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": totalQpl-flaggedCountInventoryData
-                            },
-                            "shipmentQpl": {
-                                "puCount": totalQpl,
-                                "correctCount": totalQpl-flaggedCountShipmentData
-                            },
-                            "expiryTotal": expiryTotal,
-                            "shipmentTotal": shipmentTotal,
-                            "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
-                            "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
+            // Load ALL selected programs
+            var programIds = this.state.programValues.map(p => p.value);
+            var results = [];
+            var loaded = 0;
+            if (programIds.length === 0) return;
+            programIds.forEach(progId => {
+                var pdRequest = pdObjectStore.get(progId);
+                pdRequest.onsuccess = function (event) {
+                    var programData = pdRequest.result;
+                    if (programData) {
+                        try {
+                            var ppuListForProgram = ppuList.filter(c => c.program.id == programData.programId);
+                            var programDataBytes = CryptoJS.AES.decrypt(programData.programData.generalData, SECRET_KEY);
+                            var programDataStr = programDataBytes.toString(CryptoJS.enc.Utf8);
+                            var programJson = JSON.parse(programDataStr);
+                            var dbd = this.buildDashboardBottomDataFromJson(programJson, ppuListForProgram);
+                            if (dbd) results.push(dbd);
+                        } catch (err) {
+                            console.error('Error loading program', progId, err);
                         }
-                        this.setState({ dashboardBottomData }, () => {
+                    }
+                    loaded++;
+                    if (loaded === programIds.length) {
+                        // All programs loaded
+                        var firstDbd = results.length > 0 ? results[0] : {};
+                        this.setState({ dashboardBottomData: firstDbd, dashboardBottomDataList: results }, () => {
                             this.buildJexcel();
                         });
-                        // props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
-                        // props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
-                        // props.updateStateDashboard("dashboardBottomData", dashboardBottomData);
-                        // props.updateStateDashboard("bottomSubmitLoader", false);
-                    } else {
-                        // props.updateStateDashboard("dashboardBottomData", "");
-                        // props.updateStateDashboard("bottomSubmitLoader", false);
                     }
-                } else {
-                    // props.updateStateDashboard("dashboardBottomData", "");
-                    // props.updateStateDashboard("bottomSubmitLoader", false);
-                }
-            }.bind(this)
+                }.bind(this);
+            });
         }.bind(this)
     }.bind(this)
   }
 
   buildJexcel = () => {
     if (this.el) {
-        jexcel.destroy(document.getElementById("scorecardTableDiv"), true);
+        try { jexcel.destroy(document.getElementById("scorecardTableDiv"), true); } catch(e){}
         this.el = null;
     }
 
-    let data = [
-        ['FSP-ARV-MOH', 'v12 (Dec 12, 2025)', 10, 3, 2, 2, 4, '78%', '5,10,40,30,15', '16%', '43%', 'Approved (Nov 5, 2025)', 'xxxx'],
-        ['FSP-NUTR-MOH', 'v12 (Dec 12, 2025)', 12, 8, 3, 3, 11, '6%', '10,10,30,40,10', '69%', '62%', 'Rejected (Oct 10, 2025)', 'xxxx'],
-        ['FSP-MAL-MOH', 'v12 (Dec 12, 2025)', 20, 5, 13, 11, 20, '33%', '15,10,25,35,15', '60%', '35%', 'Approved (Nov 5, 2025)', 'xxxx'],
-        ['FSP-Lab-MOH', 'v12 (Dec 12, 2025)', 32, 18, 30, 13, 12, '32%', '20,15,30,25,10', '18%', '13%', 'Rejected (Oct 10, 2025)', 'xxxx'],
-        ['CTRY-ARV-MOH', 'v12 (Dec 12, 2025)', 11, 8, 4, 7, 1, '19%', '5,25,45,15,10', '8%', '46%', 'Approved (Nov 5, 2025)', 'xxxx'],
-        ['CTRY-NUTR-MOH', 'v12 (Dec 12, 2025)', 22, 19, 18, 8, 2, '74%', '10,20,50,15,5', '86%', '100%', 'Rejected (Oct 10, 2025)', 'xxxx'],
-        ['CTRY-MAL-MOH', 'v12 (Dec 12, 2025)', 34, 24, 29, 5, 19, '53%', '15,15,40,20,10', '89%', '74%', 'Approved (Nov 5, 2025)', 'xxxx'],
-        ['CTRY-Lab-MOH', 'v12 (Dec 12, 2025)', 13, 11, 3, 9, 10, '30%', '5,15,50,25,5', '21%', '61%', 'Rejected (Oct 10, 2025)', 'xxxx'],
-    ];
 
-    // Standalone formatting function — reads from data array, applies CSS to visible DOM rows
+    let isCountryView = String(this.state.viewBy) === '1';
+    let isMatrixView = String(this.state.viewBy) === '2';
+    let data = [];
+    const list = this.state.dashboardBottomDataList || [];
+
+    let matrixCols = [];
+    if (isMatrixView) {
+        const countriesMap = {}; 
+        const healthAreasMap = {}; 
+        const scoresMap = {}; 
+        
+        list.forEach(dbd => {
+            if (!dbd) return;
+            const countryLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const score = Math.round(((dbd.supplyPlanQualityScore || 0) + (dbd.stockStatusScore || 0)) / 2);
+            
+            if (!countriesMap[countryLabel]) countriesMap[countryLabel] = true;
+            
+            (dbd.healthAreaList || []).forEach(ha => {
+                const haLabel = getLabelText(ha.label, this.state.lang);
+                if (!healthAreasMap[haLabel]) healthAreasMap[haLabel] = true;
+                
+                if (!scoresMap[haLabel]) scoresMap[haLabel] = {};
+                if (!scoresMap[haLabel][countryLabel]) scoresMap[haLabel][countryLabel] = { sum: 0, count: 0 };
+                
+                scoresMap[haLabel][countryLabel].sum += score;
+                scoresMap[haLabel][countryLabel].count += 1;
+            });
+        });
+        
+        const countryList = Object.keys(countriesMap).sort();
+        const healthAreaList = Object.keys(healthAreasMap).sort();
+        
+        matrixCols = [{ title: 'Technical Area', type: 'text', readOnly: true }];
+        countryList.forEach(c => {
+            matrixCols.push({ title: c, type: 'text', readOnly: true });
+        });
+        matrixCols.push({ title: 'RowType', type: 'hidden' });
+        matrixCols.push({ title: 'CountryKey', type: 'hidden' });
+
+        healthAreaList.forEach(ha => {
+            const row = [ha];
+            countryList.forEach(c => {
+                const s = scoresMap[ha][c];
+                row.push(s ? `${Math.round(s.sum / s.count)}%` : '');
+            });
+            row.push('matrix_row');
+            row.push('');
+            data.push(row);
+        });
+
+        const totalRow = ['Total'];
+        countryList.forEach(c => {
+            let countrySum = 0;
+            let countryCount = 0;
+            healthAreaList.forEach(ha => {
+                const s = scoresMap[ha][c];
+                if (s) {
+                    countrySum += (s.sum / s.count);
+                    countryCount += 1;
+                }
+            });
+            totalRow.push(countryCount > 0 ? `${Math.round(countrySum / countryCount)}%` : '');
+        });
+        totalRow.push('matrix_total');
+        totalRow.push('');
+        data.push(totalRow);
+    } else if (isCountryView) {
+        let countryGroupsMap = {};
+        list.forEach(dbd => {
+            if (!dbd || !dbd.program) return;
+            const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
+            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const cKey = `${cId}_${cLabel}`;
+            if (!countryGroupsMap[cKey]) countryGroupsMap[cKey] = { label: cLabel, programs: [], key: cKey };
+            countryGroupsMap[cKey].programs.push(dbd);
+        });
+
+        Object.values(countryGroupsMap).forEach(cg => {
+            const isExpanded = !!this.state.countryExpandedMap[cg.key];
+            const toggleIcon = isExpanded ? '▼' : '▶';
+            const n = cg.programs.length;
+            const activePUs = cg.programs.reduce((s,d)=>s+(d.totalPus||0),0);
+            const sumForecast = cg.programs.reduce((s,d)=>s+(d.forecastConsumptionQpl?.correctCount||0),0);
+            const sumActual = cg.programs.reduce((s,d)=>s+(d.actualConsumptionQpl?.correctCount||0),0);
+            const sumInventory = cg.programs.reduce((s,d)=>s+(d.inventoryQpl?.correctCount||0),0);
+            const sumShipments = cg.programs.reduce((s,d)=>s+(d.shipmentQpl?.correctCount||0),0);
+            const avgQ = n > 0 ? cg.programs.reduce((s,d)=>s+(d.supplyPlanQualityScore||0),0)/n : 0;
+            const avgS = n > 0 ? cg.programs.reduce((s,d)=>s+(d.stockStatusScore||0),0)/n : 0;
+            const avgT = (avgQ + avgS) / 2;
+            
+            const totalSO = cg.programs.reduce((s,d)=>s+(d.stockStatus?.stockOut||0),0);
+            const totalUS = cg.programs.reduce((s,d)=>s+(d.stockStatus?.underStock||0),0);
+            const totalAd = cg.programs.reduce((s,d)=>s+(d.stockStatus?.adequate||0),0);
+            const totalOv = cg.programs.reduce((s,d)=>s+(d.stockStatus?.overStock||0),0);
+            const totalNA = cg.programs.reduce((s,d)=>s+(d.stockStatus?.na||0),0);
+            const totalSt = totalSO+totalUS+totalAd+totalOv+totalNA;
+            
+            const soPerc = totalSt>0 ? Math.round((totalSO/totalSt)*100) : 0;
+            const usPerc = totalSt>0 ? Math.round((totalUS/totalSt)*100) : 0;
+            const adPerc = totalSt>0 ? Math.round((totalAd/totalSt)*100) : 0;
+            const ovPerc = totalSt>0 ? Math.round((totalOv/totalSt)*100) : 0;
+            const naPerc = totalSt>0 ? Math.round((totalNA/totalSt)*100) : 0;
+
+            data.push([
+                `${toggleIcon} ${cg.label} (${n} programs)`,
+                '-',
+                activePUs,
+                sumForecast,
+                sumActual,
+                sumInventory,
+                sumShipments,
+                `${Math.round(avgQ)}%`,
+                `${soPerc},${usPerc},${adPerc},${ovPerc},${naPerc}`,
+                `${Math.round(avgS)}%`,
+                `${Math.round(avgT)}%`,
+                '-',
+                '-',
+                'row_parent',
+                cg.key
+            ]);
+
+            if (isExpanded) {
+                cg.programs.forEach(dbd => {
+                    let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
+                    let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+                    data.push([
+                        `${dbd.program.code}`,
+                        `v${dbd.program.version}`,
+                        dbd.totalPus,
+                        dbd.forecastConsumptionQpl?.correctCount || 0,
+                        dbd.actualConsumptionQpl?.correctCount || 0,
+                        dbd.inventoryQpl?.correctCount || 0,
+                        dbd.shipmentQpl?.correctCount || 0,
+                        `${Math.round(dbd.supplyPlanQualityScore || 0)}%`,
+                        `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
+                        `${Math.round(dbd.stockStatusScore || 0)}%`,
+                        `${totalScore}%`,
+                        reviewStatus,
+                        dbd.versionNotes || '',
+                        'row_child',
+                        cg.key
+                    ]);
+                });
+            }
+        });
+    } else {
+        list.forEach(dbd => {
+            if (!dbd || !dbd.program) return;
+            let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
+            let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+            data.push([
+                dbd.program.code,
+                `v${dbd.program.version}`,
+                dbd.totalPus,
+                dbd.forecastConsumptionQpl?.correctCount || 0,
+                dbd.actualConsumptionQpl?.correctCount || 0,
+                dbd.inventoryQpl?.correctCount || 0,
+                dbd.shipmentQpl?.correctCount || 0,
+                `${Math.round(dbd.supplyPlanQualityScore || 0)}%`,
+                `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
+                `${Math.round(dbd.stockStatusScore || 0)}%`,
+                `${totalScore}%`,
+                reviewStatus,
+                dbd.versionNotes || '',
+                'program',
+                ''
+            ]);
+        });
+    }
+
     const reapplyFormatting = (instance) => {
         if (!instance || !instance.tbody) return;
         const rows = instance.tbody.children;
@@ -702,15 +827,50 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
         for (let r = 0; r < rows.length; r++) {
             const tr = rows[r];
             if (!tr || tr.style.display === 'none') continue;
-
-            // Get the data row index from the DOM row's data-y attribute
             const dataY = parseInt(tr.getAttribute('data-y'), 10);
             if (isNaN(dataY) || !allData[dataY]) continue;
-
             const rowData = allData[dataY];
             const activePUs = Number(rowData[2]) || 0;
+            const rowType = rowData[rowData.length - 2];
+            
+            if (isMatrixView) {
+                if (rowType === 'matrix_total') {
+                    tr.style.fontWeight = 'bold';
+                    tr.style.backgroundColor = '#f4f4f4';
+                }
+                for (let c = 1; c < rowData.length - 2; c++) {
+                    const cell = tr.querySelector(`td[data-x="${c}"]`);
+                    if (!cell) continue;
+                    const raw = String(rowData[c] || '').replace(/%/g, '').trim();
+                    const value = parseInt(raw, 10);
+                    if (!isNaN(value)) {
+                        let color = value <= 35 ? '%23BA0C2F' : value <= 70 ? '%23f48521' : value <= 99 ? '%23edba26' : '%23118b70';
+                        cell.innerText = value + '%';
+                        cell.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='${color}'/%3E%3C/svg%3E")`;
+                        cell.style.backgroundRepeat = 'no-repeat';
+                        cell.style.backgroundPosition = 'center left 20%';
+                        cell.style.paddingLeft = '30px';
+                        cell.style.textAlign = 'left';
+                        cell.style.fontWeight = 'bold';
+                    }
+                }
+                continue;
+            }
 
-            // Cols 3-6: blue data bars (Forecasted, Actual Consumption, Inventory, Shipments)
+            if (rowType === 'row_parent') {
+                tr.style.backgroundColor = '#d0e4f7';
+                tr.style.cursor = 'pointer';
+                for (let i = 0; i < tr.children.length; i++) {
+                    tr.children[i].style.fontWeight = 'bold';
+                }
+            } else if (rowType === 'row_child') {
+                tr.style.backgroundColor = '#f7fbff';
+                const cell0 = tr.querySelector(`td[data-x="0"]`);
+                if (cell0) {
+                    cell0.style.paddingLeft = '30px';
+                }
+            }
+
             for (let c = 3; c <= 6; c++) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
@@ -724,8 +884,6 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
                     cell.style.fontWeight = 'bold';
                 }
             }
-
-            // Cols 7, 9, 10: colored dot with percentage
             for (let c of [7, 9, 10]) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
@@ -742,8 +900,6 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
                     cell.style.fontWeight = 'bold';
                 }
             }
-
-            // Col 8: Stock Status stacked bar
             const stockCell = tr.querySelector('td[data-x="8"]');
             if (stockCell) {
                 const parts = String(rowData[8] || '').split(',');
@@ -765,37 +921,54 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
     let options = {
         data: data,
         columnDrag: true,
-        columns: [
-            { title: 'Program', type: 'text', readOnly: true },
-            { title: 'Latest Version ', type: 'text', readOnly: true },
+        columns: isMatrixView ? matrixCols : [
+            { title: isCountryView ? 'Country' : 'Program', type: 'text', readOnly: true },
+            { title: isCountryView ? 'Programs' : 'Latest Version', type: 'text', readOnly: true },
             { title: 'Active PUs', type: 'numeric', readOnly: true },
-            { title: 'Forecasted Consumption ', type: 'numeric', readOnly: true },
-            { title: 'Actual Consumption ', type: 'numeric', readOnly: true },
-            { title: 'Actual Inventory ', type: 'numeric', readOnly: true },
-            { title: 'Shipments ', type: 'numeric', readOnly: true },
-            { title: 'Quality Score ', type: 'text', readOnly: true },
-            { title: 'Stock Status ', type: 'text', readOnly: true },
-            { title: 'Stock Status Score ', type: 'text', readOnly: true },
-            { title: 'Total Score ', type: 'text', readOnly: true },
+            { title: 'Forecasted Consumption', type: 'numeric', readOnly: true },
+            { title: 'Actual Consumption', type: 'numeric', readOnly: true },
+            { title: 'Actual Inventory', type: 'numeric', readOnly: true },
+            { title: 'Shipments', type: 'numeric', readOnly: true },
+            { title: 'Quality Score', type: 'text', readOnly: true },
+            { title: 'Stock Status', type: 'text', readOnly: true },
+            { title: 'Stock Status Score', type: 'text', readOnly: true },
+            { title: 'Total Score', type: 'text', readOnly: true },
             { title: 'Review Status', type: 'text', readOnly: true },
             { title: 'Version Notes', type: 'text', readOnly: true },
+            { title: 'RowType', type: 'hidden' },
+            { title: 'CountryKey', type: 'hidden' }
         ],
         editable: false,
-        onload: function (obj) {
-            jExcelLoadedFunction(obj);
-        },
-        onchangepage: function(obj) {
-            reapplyFormatting(obj);
-        },
-        onsort: function(obj) {
-            reapplyFormatting(obj);
-        },
-        onfilter: function(obj) {
-            reapplyFormatting(obj);
-        },
-        onsearch: function(obj) {
-            reapplyFormatting(obj);
-        },
+        onload: function (obj) { jExcelLoadedFunction(obj); },
+        onselection: function (instance, cell, x, y, value, e) {
+            if (!isCountryView || x === undefined || x === null) return;
+            let rowType = '';
+            let cKey = '';
+            try {
+                if (typeof instance.getRowData === 'function') {
+                    let rData = instance.getRowData(x);
+                    rowType = rData[13];
+                    cKey = rData[14];
+                } else if (instance.options && instance.options.data) {
+                    rowType = instance.options.data[x][13];
+                    cKey = instance.options.data[x][14];
+                }
+            } catch(err) { return; }
+
+            if (rowType === 'row_parent') {
+                setTimeout(() => {
+                    this.setState(prev => ({
+                        countryExpandedMap: { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] }
+                    }), () => {
+                        this.buildJexcel();
+                    });
+                }, 10);
+            }
+        }.bind(this),
+        onchangepage: function(obj) { reapplyFormatting(obj); },
+        onsort: function(obj) { reapplyFormatting(obj); },
+        onfilter: function(obj) { reapplyFormatting(obj); },
+        onsearch: function(obj) { reapplyFormatting(obj); },
         search: true,
         columnSorting: true,
         wordWrap: true,
@@ -816,12 +989,65 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
     let scorecardTableDiv = document.getElementById("scorecardTableDiv");
     if (scorecardTableDiv) {
         this.el = jexcel(scorecardTableDiv, options);
-        // Apply formatting after browser finishes first paint
         const el = this.el;
-        requestAnimationFrame(() => {
-            setTimeout(() => reapplyFormatting(el), 50);
-        });
+        requestAnimationFrame(() => { setTimeout(() => reapplyFormatting(el), 50); });
     }
+  }
+
+  /**
+   * Helper: renders an inline stacked bar for stock status.
+   */
+  renderStockBar = (ss) => {
+    if (!ss || ss.total === 0) return <span style={{color:'#999'}}>N/A</span>;
+    const c1 = Math.round((ss.stockOutPerc || 0) * 100);
+    const c2 = Math.round((ss.underStockPerc || 0) * 100);
+    const c3 = Math.round((ss.adequatePerc || 0) * 100);
+    const c4 = Math.round((ss.overStockPerc || 0) * 100);
+    const c5 = Math.round((ss.naPerc || 0) * 100);
+    const p1 = c1, p2 = p1+c2, p3 = p2+c3, p4 = p3+c4;
+    return (
+      <div style={{ width: '100%', height: '18px', borderRadius: '3px', overflow: 'hidden',
+        background: `linear-gradient(to right, #BA0C2F 0% ${p1}%, #f48521 ${p1}% ${p2}%, #118b70 ${p2}% ${p3}%, #edb944 ${p3}% ${p4}%, #cfcdc9 ${p4}% 100%)` }}
+        title={`StockOut:${c1}% Under:${c2}% Adequate:${c3}% Over:${c4}% NA:${c5}%`} />
+    );
+  }
+
+  /**
+   * Helper: renders a colored dot + percentage for score cells.
+   */
+  renderScoreDot = (val) => {
+    const pct = Math.round(val || 0);
+    const color = pct <= 35 ? '#BA0C2F' : pct <= 70 ? '#f48521' : pct <= 99 ? '#edba26' : '#118b70';
+    return (
+      <span>
+        <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', backgroundColor:color, marginRight:6, verticalAlign:'middle' }} />
+        {pct}%
+      </span>
+    );
+  }
+
+  /**
+   * Helper: renders a data bar for QPL counts.
+   */
+  renderDataBar = (value, total) => {
+    const pct = total > 0 ? Math.min((value / total) * 100, 100) : 0;
+    return (
+      <div style={{
+        background: `linear-gradient(to right, #A9D1E5 ${pct}%, transparent ${pct}%)`,
+        height: '100%', width: '100%', boxSizing: 'border-box',
+        padding: '2px 4px', textAlign: 'right', fontWeight: 'bold',
+        display: 'flex', alignItems: 'center', justifyContent: 'flex-end'
+      }}>
+        {value}
+      </div>
+    );
+  }
+
+  /** Toggle country expand/collapse in accordion */
+  toggleCountry = (countryId) => {
+    this.setState(prev => ({
+      countryExpandedMap: { ...prev.countryExpandedMap, [countryId]: !prev.countryExpandedMap[countryId] }
+    }));
   }
   /**
    * Displays a loading indicator while data is being loaded.
@@ -907,52 +1133,106 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
       }]
     }
 
-    let supplyPlanQualityScore = 0;
-    let stockStatusScore = 0;
-    let totalScore = 0;
+    const viewBy = String(this.state.viewBy);
+    const dataList = this.state.dashboardBottomDataList || [];
 
-    if (this.state.dashboardBottomData != null && this.state.dashboardBottomData !== "") {
-        supplyPlanQualityScore = this.state.dashboardBottomData.supplyPlanQualityScore || 0;
-        stockStatusScore = this.state.dashboardBottomData.stockStatusScore || 0;
-        totalScore = (supplyPlanQualityScore + stockStatusScore) / 2;
+    // ---- Build country groups for Country view ----
+    const countryGroupsMap = {};
+    dataList.forEach(dbd => {
+        if (!dbd || !dbd.realmCountry) return;
+        const cKey = dbd.realmCountry.realmCountryId || getLabelText(dbd.realmCountry.label, this.state.lang);
+        const cLabel = getLabelText(dbd.realmCountry.label, this.state.lang);
+        if (!countryGroupsMap[cKey]) {
+            countryGroupsMap[cKey] = { label: cLabel, programs: [], key: cKey };
+        }
+        countryGroupsMap[cKey].programs.push(dbd);
+    });
+    const countryGroups = Object.values(countryGroupsMap);
+
+    // Aggregate per country: average quality/stock scores
+    const countryAggregates = countryGroups.map(cg => {
+        const n = cg.programs.length;
+        const avgQuality = n > 0 ? cg.programs.reduce((s, d) => s + (d.supplyPlanQualityScore || 0), 0) / n : 0;
+        const avgStock = n > 0 ? cg.programs.reduce((s, d) => s + (d.stockStatusScore || 0), 0) / n : 0;
+        return { label: cg.label, avgQuality, avgStock, avgTotal: (avgQuality + avgStock) / 2 };
+    });
+
+    // ---- Bar chart data depending on viewBy ----
+    let barData;
+    if (viewBy === '1') {
+        // Country view: one bar group per country
+        barData = {
+            labels: countryAggregates.map(c => c.label),
+            datasets: [
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: countryAggregates.map(c => Math.round(c.avgQuality)) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: countryAggregates.map(c => Math.round(c.avgStock)) },
+                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: countryAggregates.map(() => 90) }
+            ]
+        };
+    } else if (viewBy === '2') {
+        // Country x Program (Technical Area) view
+        const countriesSet = new Set();
+        const haSet = new Set();
+        const scoreMatrix = {}; // country -> ha -> { sum, count }
+        
+        dataList.forEach(d => {
+            if (!d) return;
+            const cLabel = d.realmCountry ? getLabelText(d.realmCountry.label, this.state.lang) : 'Unknown';
+            const score = Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2);
+            countriesSet.add(cLabel);
+            (d.healthAreaList || []).forEach(ha => {
+                const haLabel = getLabelText(ha.label, this.state.lang);
+                haSet.add(haLabel);
+                if (!scoreMatrix[cLabel]) scoreMatrix[cLabel] = {};
+                if (!scoreMatrix[cLabel][haLabel]) scoreMatrix[cLabel][haLabel] = { sum: 0, count: 0 };
+                scoreMatrix[cLabel][haLabel].sum += score;
+                scoreMatrix[cLabel][haLabel].count += 1;
+            });
+        });
+        
+        const sortedCountries = Array.from(countriesSet).sort();
+        const sortedHAs = Array.from(haSet).sort();
+        
+        const palette = ['#0F263F', '#C50000', '#118B70', '#802636', '#EDBA26', '#BD5E00'];
+        
+        barData = {
+            labels: sortedCountries,
+            datasets: [
+                ...sortedHAs.map((ha, idx) => ({
+                    type: 'bar',
+                    label: ha,
+                    backgroundColor: palette[idx % palette.length],
+                    data: sortedCountries.map(c => {
+                        const s = scoreMatrix[c] && scoreMatrix[c][ha];
+                        return s ? Math.round(s.sum / s.count) : 0;
+                    })
+                })),
+                {
+                    type: 'line',
+                    label: 'Target',
+                    borderColor: 'black',
+                    borderWidth: 4,
+                    borderDash: [10, 5],
+                    fill: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    data: sortedCountries.map(() => 70)
+                }
+            ]
+        };
+    } else {
+        // Program view: one bar group per program
+        barData = {
+            labels: dataList.map(d => d.program ? d.program.code : ''),
+            datasets: [
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: dataList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: dataList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: dataList.map(d => Math.round(d.stockStatusScore || 0)) },
+                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: dataList.map(() => 90) }
+            ]
+        };
     }
-
-    const barData = {
-        labels: this.state.programValues.map(p => p.label),
-        datasets: [
-            {
-                type: 'line',
-                label: 'Total Score',
-                borderColor: '#99C1E8',
-                borderWidth: 3,
-                fill: false,
-                data: this.state.programValues.map(() => totalScore)
-            },
-            {
-                type: 'bar',
-                label: 'Quality Score',
-                backgroundColor: '#0F263F',
-                data: this.state.programValues.map(() => supplyPlanQualityScore)
-            },
-            {
-                type: 'bar',
-                label: 'Stock Status Score',
-                backgroundColor: '#C50000',
-                data: this.state.programValues.map(() => stockStatusScore)
-            },
-            {
-                type: 'line',
-                label: 'Target',
-                borderColor: 'black',
-                borderWidth: 4,
-                borderDash: [10, 5],
-                fill: false,
-                pointRadius: 0,
-                pointHoverRadius: 0,
-                data: this.state.programValues.map(() => 90)
-            }
-        ]
-    };
 
     const barOptions = {
         maintainAspectRatio: false,
@@ -1133,7 +1413,7 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
               </div>    
             </div>
             
-            {this.state.programValues && this.state.programValues.length > 0 && this.state.dashboardBottomData && (
+            {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
               <>
                 <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
                   <Card>
@@ -1148,7 +1428,7 @@ console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flagged
                   <Card>
                     <CardBody>
                       <div className="table-responsive">
-                        <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
+                          <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
                       </div>
                     </CardBody>
                   </Card>
