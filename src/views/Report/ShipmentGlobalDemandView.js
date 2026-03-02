@@ -3936,7 +3936,7 @@ class ShipmentGlobalDemandView extends Component {
                           <div
                             id="shipmentGlobalDemandTableDiv"
                             ref={this.tableDiv}
-                            className="jexcelremoveReadonlybackground TableWidth100"
+                            className="shipmentGlobalDemandTable jexcelremoveReadonlybackground TableWidth100"
                           />
                         </div>
                       </div>
