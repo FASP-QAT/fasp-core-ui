@@ -1,0 +1,500 @@
+import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
+import { getStyle } from '@coreui/coreui-pro/dist/js/coreui-utilities';
+import CryptoJS from 'crypto-js';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import moment from "moment";
+import React, { Component } from 'react';
+import { HorizontalBar, Pie } from 'react-chartjs-2';
+import Chart from 'chart.js';
+import Picker from 'react-month-picker';
+import { MultiSelect } from 'react-multi-select-component';
+import {
+    Card,
+    CardBody,
+    Col,
+    Form,
+    FormGroup, Input, InputGroup,
+    Label,
+    Table
+} from 'reactstrap';
+import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
+import { LOGO } from '../../CommonComponent/Logo.js';
+import MonthBox from '../../CommonComponent/MonthBox.js';
+import getLabelText from '../../CommonComponent/getLabelText';
+import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH, SECRET_KEY } from '../../Constants.js';
+import DropdownService from '../../api/DropdownService';
+import FundingSourceService from '../../api/FundingSourceService';
+import ProductService from '../../api/ProductService';
+import RealmService from '../../api/RealmService';
+import ReportService from '../../api/ReportService';
+import ShipmentStatusService from '../../api/ShipmentStatusService';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import i18n from '../../i18n';
+import AuthenticationService from '../Common/AuthenticationService.js';
+import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import { addDoubleQuoteToRowContent, filterOptions, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+const ref = React.createRef();
+const pickerLang = {
+    months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
+    from: 'From', to: 'To',
+}
+// const options = {
+//     plugins: {
+//         datalabels: {
+//             formatter: (value, context) => {
+//                 return ``;
+//             },
+//         },
+//     },
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product'),
+//             ticks: {
+//                 callback: function (value) {
+//                     return (value.length > 40) ? value.substr(0, 40) + "..." : value;
+//                 },
+//             }
+//         }],
+//     },
+//     tooltips: {
+//         enabled: false,
+//         custom: CustomTooltips,
+//         callbacks: {
+//             label: function (tooltipItem, data) {
+//                 let label = data.labels[tooltipItem.index];
+//                 let value = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+//                 var cell1 = value
+//                 cell1 += '';
+//                 var x = cell1.split('.');
+//                 var x1 = x[0];
+//                 var x2 = x.length > 1 ? '.' + x[1] : '';
+//                 var rgx = /(\d+)(\d{3})/;
+//                 while (rgx.test(x1)) {
+//                     x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                 }
+//                 return data.datasets[tooltipItem.datasetIndex].label + ' : ' + x1 + x2;
+//             }
+//         }
+//     },
+//     maintainAspectRatio: false
+//     ,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
+// const options1 = {
+//     plugins: {
+//         datalabels: {
+//             formatter: (value, context) => {
+//                 return ``;
+//             },
+//         },
+//     },
+//     title: {
+//         display: true,
+//         text: i18n.t('static.dashboard.shipmentGlobalViewheader'),
+//         fontColor: 'black'
+//     },
+//     scales: {
+//         xAxes: [{
+//             stacked: true,
+//             scaleLabel: {
+//                 display: true,
+//                 labelString: i18n.t('static.shipment.qty'),
+//                 fontColor: 'black',
+//                 fontStyle: "normal",
+//                 fontSize: "12"
+//             },
+//             ticks: {
+//                 beginAtZero: true,
+//                 fontColor: 'black',
+//                 callback: function (value) {
+//                     var cell1 = value
+//                     cell1 += '';
+//                     var x = cell1.split('.');
+//                     var x1 = x[0];
+//                     var x2 = x.length > 1 ? '.' + x[1] : '';
+//                     var rgx = /(\d+)(\d{3})/;
+//                     while (rgx.test(x1)) {
+//                         x1 = x1.replace(rgx, '$1' + ',' + '$2');
+//                     }
+//                     return x1 + x2;
+//                 }
+//             },
+//             gridLines: {
+//                 display: false
+//             }
+//         }],
+//         yAxes: [{
+//             stacked: true,
+//             labelString: i18n.t('static.common.product')
+//         }],
+//     },
+//     maintainAspectRatio: false,
+//     legend: {
+//         display: true,
+//         position: 'bottom',
+//         labels: {
+//             usePointStyle: true,
+//             fontColor: 'black'
+//         }
+//     }
+// }
+/*const optionsPie = {
+    title: {
+        display: true,
+        // text: document.getElementById("groupByFundingSourceType").value ? i18n.t('static.funderTypeHead.funderType') : i18n.t('static.fundingSourceHead.fundingSource'),
+        text: i18n.t('static.fundingSourceHead.fundingSource'),
+        fontColor: 'black',
+        padding: 30
+    },
+    legend: {
+        position: 'bottom',
+        labels: {
+            padding: 25
+        }
+    },
+    tooltips: {
+        callbacks: {
+            label: function (tooltipItems, data) {
+                return data.labels[tooltipItems.index] +
+                    " : " + " $ " +
+                    (data.datasets[tooltipItems.datasetIndex].data[tooltipItems.index]).toLocaleString();
+            }
+        }
+    },
+}*/
+/**
+ * Component for Shipment Global Demand View Report.
+ */
+class ShipmentGlobalDemandView extends Component {
+    constructor(props) {
+        super(props);
+        var dt = new Date();
+        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        var dt1 = new Date();
+        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        this.state = {
+            labels: ['PSM', 'GF', 'Local', 'Govt'],
+            datasets: [{
+                data: [5615266, 13824000, 0, 26849952],
+                backgroundColor: ['#4dbd74', '#f86c6b', '#8aa9e6', '#EDB944'],
+                legend: {
+                    position: 'bottom'
+                }
+            }],
+            isDarkMode: false,
+            dropdownOpen: false,
+            radioSelected: 2,
+            lang: localStorage.getItem('lang'),
+            countrys: [],
+            versions: [],
+            planningUnits: [],
+            consumptions: [],
+            productCategories: [],
+            planningUnitValues: [],
+            planningUnitLabels: [],
+            fundingSourceValues: [],
+            fundingSourceLabels: [],
+            shipmentStatusValues: [],
+            shipmentStatusLabels: [],
+            programValues: [],
+            shipmentStatuses: [],
+            fundingSources: [],
+            fundingSourcesOriginal: [],
+            programLabels: [],
+            programs: [],
+            countrys: [],
+            countryValues: [],
+            countryLabels: [],
+            data: [],
+            realmList: [],
+            fundingSourceSplit: [],
+            planningUnitSplit: [],
+            procurementAgentSplit: [],
+            table1Headers: [],
+            show: false,
+            message: '',
+            rangeValue: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } },
+            minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDate: { year: new Date().getFullYear() + MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS, month: new Date().getMonth() + 1 },
+            loading: true,
+            programLst: [],
+            procurementAgentTypeId: false,
+            fundingSourceTypes: [],
+            fundingSourceTypeValues: [],
+            fundingSourceTypeLabels: [],
+            groupByFundingSourceType: false,
+            groupBy: 1
+        };
+        this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
+        this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
+        this.getPrograms = this.getPrograms.bind(this)
+        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.getFundingSourceType = this.getFundingSourceType.bind(this);
+    }
+    /**
+     * Exports the data to a CSV file.
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        if (localStorage.getItem("sessionType") === 'Online') {
+            this.state.countryLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            this.state.programLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
+            // csvRow.push('')
+            // this.state.fundingSourceTypeLabels.map(ele =>
+            //     csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            // csvRow.push('')
+            // csvRow.push('"' + (i18n.t('static.shipment.groupByFundingSourceType') + ' : ' + (this.state.groupByFundingSourceType ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+        } else {
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        }
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        if (this.state.procurementAgentSplit.length > 0) {
+            var A = [];
+            let tableHead = this.state.table1Headers;
+            let tableHeadTemp = [];
+            tableHeadTemp.push(i18n.t('static.report.qatPID').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
+            for (var i = 0; i < tableHead.length; i++) {
+                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            }
+            tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
+            A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+            re = this.state.procurementAgentSplit;
+            for (var item = 0; item < re.length; item++) {
+                let item1 = Object.values(re[item].procurementAgentQty);
+                A.push([addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
+            }
+            for (var i = 0; i < A.length; i++) {
+                csvRow.push(A[i].join(","))
+            }
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+    /**
+     * Exports the data to a PDF file.
+     */
+    exportPDF = () => {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                }
+            }
+        }
+        const unit = "pt";
+        const size = "A4";
+        const orientation = "landscape";
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+        var len = 120
+        if (localStorage.getItem("sessionType") === 'Online') {
+            var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
+            len = len + countryLabelsText.length * 10
+            var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 8, len, planningText)
+            len = len + planningText.length * 10
+        } else {
+            doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                align: 'left'
+            })
+            doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                align: 'left'
+            })
+            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        }
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
+
+        // var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        // for (var i = 0; i < fundingSourceTypeText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
+        //     };
+        //     doc.text(doc.internal.pageSize.width / 8, y, fundingSourceTypeText[i]);
+        //     y = y + 10
+        // }
+
+        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < fundingSourceText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            };
+            doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+            y = y + 10
+        }
+        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < statusText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+            y = y + 10;
+        }
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, planningText[i]);
+            y = y + 10;
+        }
+        doc.text(i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text, doc.internal.pageSize.width / 8, y, {
+            align: 'left'
+        })
+        doc.setTextColor("#fff");
+        var canvas = document.getElementById("cool-canvas11");
+        var canvasImg = canvas.toDataURL("image/png", 1.0);
+        var height = doc.internal.pageSize.height;
+        var h1 = 50;
+        let startY = y + 10
+        let pages = Math.ceil(startY / height)
+        for (var j = 1; j < pages; j++) {
+            doc.addPage()
+        }
+        let startYtable = startY - ((height - h1) * (pages - 1))
+        if (startYtable > height - 500) {
+            doc.addPage()
+            startYtable = 80
+        }
+        doc.addImage(canvasImg, 'png', 10, startYtable, 500, 280, 'a', 'CANVAS');
+        canvas = document.getElementById("cool-canvas2");
+        canvasImg = canvas.toDataURL("image/png", 1.0);
+        doc.addImage(canvasImg, 'png', 500, startYtable, 340, 280, 'b', 'CANVAS');
+        let length = this.state.table1Headers.length + 3;
+        doc.addPage()
+        startYtable = 80
+        let content1 = {
+            margin: { top: 80, bottom: 70 },
+            startY: startYtable,
+            styles: { lineWidth: 1, fontSize: 8, halign: 'center' },
+            columnStyles: {
+                0: { cellWidth: 61.89 },
+            },
+            html: '#mytable1',
+            didDrawCell: function (data) {
+                if (data.column.index === length && data.cell.section === 'body') {
+                    var td = data.cell.raw;
+                    var img = td.getElementsByTagName('img')[0];
