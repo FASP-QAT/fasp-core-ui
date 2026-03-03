@@ -1575,7 +1575,7 @@ class ApplicationDashboard extends Component {
                   const labelY = model.y + y * (model.outerRadius + 10);
 
                   const value = dataset.data[index];
-                  if ((((value / total) * 100).toFixed(2) >= 0 && index == 0)) {
+                  if ((((value / total) * 100).toFixed(2) >= 0 && index == 0) && dataset.needleValue === undefined) {
                     ctx.beginPath();
                     ctx.moveTo(model.x, model.y);
                     ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
@@ -2802,8 +2802,8 @@ class ApplicationDashboard extends Component {
     const overallScoreData = {
       labels: ['Red', 'Yellow', 'Green'],
       datasets: [{
-        data: [35, 35, 30],
-        backgroundColor: ['#BA0C2F', '#edba26', '#118b70'],
+        data: [35, 35, 29, 1],
+        backgroundColor: ['#BA0C2F', '#f48521', '#edba26', '#118b70'],
         needleValue: overallScoreValue,
         datalabels: {
           display: false,
@@ -2831,7 +2831,9 @@ class ApplicationDashboard extends Component {
         }
       },
       plugins: {
-        datalabels: false
+        datalabels: {
+          display: false
+        }
       }
     };
 
@@ -3881,7 +3883,7 @@ class ApplicationDashboard extends Component {
                             <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
                           </div>
                           <div className="text-center" style={{ marginTop: '10px' }}>
-                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: overallScoreValue <= 35 ? "#BA0C2F" : overallScoreValue <= 70 ? "#edba26" : "#118b70" }}>{Math.round(overallScoreValue)}%</h3>
+                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: overallScoreValue <= 35 ? "#BA0C2F" : overallScoreValue <= 70 ? "#f48521" : overallScoreValue < 100 ? "#edba26" : "#118b70" }}>{Math.round(overallScoreValue)}%</h3>
                           </div>
                         </div>
                       </div>

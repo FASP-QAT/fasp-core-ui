@@ -60,6 +60,45 @@ import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
+
+const targetLinePlugin = {
+    afterDraw: function(chart) {
+        if (!chart.scales['x-axis-0'] || !chart.scales['y-axis-0']) return;
+        const ctx = chart.ctx;
+        const xAxis = chart.scales['x-axis-0'];
+        const yAxis = chart.scales['y-axis-0'];
+        const datasets = chart.data.datasets;
+        let targetDataset = null;
+        let targetIndex = -1;
+        for (let i = 0; i < datasets.length; i++) {
+            if (datasets[i].label === 'Target') {
+                targetDataset = datasets[i];
+                targetIndex = i;
+                break;
+            }
+        }
+        if (!targetDataset || targetIndex === -1) return;
+        const meta = chart.getDatasetMeta(targetIndex);
+        if (meta.hidden) return;
+        if (!targetDataset.data || targetDataset.data.length === 0) return;
+        const yValue = targetDataset.data[0];
+        const yPos = yAxis.getPixelForValue(yValue);
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(xAxis.left, yPos);
+        ctx.lineTo(xAxis.right, yPos);
+        ctx.lineWidth = targetDataset.borderWidth || 4;
+        ctx.strokeStyle = targetDataset.borderColor || 'black';
+        if (targetDataset.borderDash) {
+            ctx.setLineDash(targetDataset.borderDash);
+        } else {
+            ctx.setLineDash([]);
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+};
+
 /**
  * Component for showing the dashboard.
  */
@@ -124,7 +163,8 @@ class SupplyPlanScoreCard extends Component {
       initialCount:0,
       dashboardBottomDataList: [],
       countryExpandedMap: {},
-      sortedLabels: []
+      sortedLabels: [],
+      collapseAllChecked: false
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -158,6 +198,36 @@ class SupplyPlanScoreCard extends Component {
         this.getCountrys();
       })
     }
+  }
+
+  /**
+   * Toggles the expansion state of all country accordions in the summary table.
+   * @param {Object} event - The checkbox change event.
+   */
+  toggleCollapseExpandAll(event) {
+    const isChecked = event.target.checked;
+    this.setState({ collapseAllChecked: isChecked }, () => {
+      if (isChecked) {
+        // Collapse All
+        this.setState({ countryExpandedMap: {} }, () => {
+          this.buildJexcel();
+        });
+      } else {
+        // Expand All
+        const list = this.state.dashboardBottomDataList || [];
+        let newExpandedMap = {};
+        list.forEach(dbd => {
+          if (!dbd) return;
+          const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
+          const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+          const cKey = `${cId}_${cLabel}`;
+          newExpandedMap[cKey] = true;
+        });
+        this.setState({ countryExpandedMap: newExpandedMap }, () => {
+          this.buildJexcel();
+        });
+      }
+    });
   }
   /**
    * Handles the change event for countries.
@@ -639,7 +709,21 @@ class SupplyPlanScoreCard extends Component {
                     if (loaded === programIds.length) {
                         // All programs loaded
                         var firstDbd = results.length > 0 ? results[0] : {};
-                        this.setState({ dashboardBottomData: firstDbd, dashboardBottomDataList: results }, () => {
+                        let newExpandedMap = { ...this.state.countryExpandedMap };
+                        if (!this.state.collapseAllChecked) {
+                            results.forEach(dbd => {
+                                if (!dbd) return;
+                                const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
+                                const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+                                const cKey = `${cId}_${cLabel}`;
+                                newExpandedMap[cKey] = true;
+                            });
+                        }
+                        this.setState({ 
+                            dashboardBottomData: firstDbd, 
+                            dashboardBottomDataList: results,
+                            countryExpandedMap: newExpandedMap
+                        }, () => {
                             this.buildJexcel();
                         });
                     }
@@ -721,7 +805,7 @@ class SupplyPlanScoreCard extends Component {
         Object.values(countryGroupsMap).sort((a,b) => a.label.localeCompare(b.label)).forEach(cg => {
             cg.programs.sort((p1, p2) => (p1.program?.code || '').localeCompare(p2.program?.code || ''));
             const isExpanded = !!this.state.countryExpandedMap[cg.key];
-            const toggleIcon = isExpanded ? '▼' : '▶';
+            const toggleIcon = isExpanded ? '-' : '+';
             const n = cg.programs.length;
             const activePUs = cg.programs.reduce((s,d)=>s+(d.totalPus||0),0);
             const sumForecast = cg.programs.reduce((s,d)=>s+(d.forecastConsumptionQpl?.correctCount||0),0);
@@ -746,7 +830,7 @@ class SupplyPlanScoreCard extends Component {
             const naPerc = totalSt>0 ? Math.round((totalNA/totalSt)*100) : 0;
 
             data.push([
-                `${toggleIcon} ${cg.label} (${n} programs)`,
+                `${toggleIcon} ${cg.label}`,
                 '-',
                 activePUs,
                 sumForecast,
@@ -766,7 +850,7 @@ class SupplyPlanScoreCard extends Component {
             if (isExpanded) {
                 cg.programs.forEach(dbd => {
                     let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
-                    let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+                    let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
                     reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
                     data.push([
                         `${dbd.program.code}`,
@@ -793,7 +877,7 @@ class SupplyPlanScoreCard extends Component {
         sortedList.forEach(dbd => {
             if (!dbd || !dbd.program) return;
             let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
-            let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? getLabelText(dbd.versionStatus.label, this.state.lang) : dbd.versionStatus.id) : '';
+            let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
             reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
             data.push([
                 dbd.program.code,
@@ -820,33 +904,11 @@ class SupplyPlanScoreCard extends Component {
         
         // Align headers based on view
         const headers = instance.thead.querySelectorAll('td');
-        const centerHeaders = [
-            'Active PUs', 'Forecasted Consumption', 'Actual Inventory', 
-            'Shipments', 'Quality Score', 'Stock Status', 
-            'Stock Status Score', 'Total Score'
-        ];
         headers.forEach((h, idx) => {
             const headTitle = (h.innerText || h.textContent || '').trim();
-            let align = 'left';
-            if (isMatrixView) {
-                if (headTitle === 'Technical Area') {
-                    align = 'left';
-                } else if (headTitle !== '' && idx > 0) {
-                    align = 'center';
-                } else {
-                    align = 'left';
-                }
-            } else {
-                if (centerHeaders.includes(headTitle)) {
-                    align = 'center';
-                } else {
-                    align = 'left';
-                }
-            }
-            h.style.textAlign = align;
-            h.style.setProperty('text-align', align, 'important');
-            if (align === 'left' && headTitle !== '') {
-                h.style.paddingLeft = '10px';
+            if (headTitle !== '') {
+                h.style.textAlign = 'center';
+                h.style.setProperty('text-align', 'center', 'important');
             }
         });
 
@@ -1001,7 +1063,7 @@ class SupplyPlanScoreCard extends Component {
         editable: false,
         onload: function (obj) { jExcelLoadedFunction(obj); },
         onselection: function (instance, cell, x, y, value, e) {
-            if (!isCountryView || x === undefined || x === null) return;
+            if (!isCountryView || x === undefined || x === null || cell != 0) return;
             let rowType = '';
             let cKey = '';
             try {
@@ -1027,6 +1089,7 @@ class SupplyPlanScoreCard extends Component {
         }.bind(this),
         onchangepage: function(obj) { reapplyFormatting(obj); },
         onsort: function(instance, column, dir) { 
+            const scrollPos = window.scrollY;
             if (isMatrixView) {
                 setTimeout(() => { this.recalculateFooter(instance, this.matrixCountryCount); }, 0);
             }
@@ -1038,10 +1101,10 @@ class SupplyPlanScoreCard extends Component {
                 // First column is Technical Area
                 sortedLabels = sortedData.map(r => r[0]);
             } else if (isCountryView) {
-                // First column is like "▶ Country (N programs)", only get parents
+                // First column is like "+ Country", only get parents
                 const parentRows = sortedData.filter(r => r[r.length-2] === 'row_parent');
                 sortedLabels = parentRows.map(r => {
-                    const match = r[0].match(/^[▶▼]\s+(.*?)\s+\(\d+\s+programs\)$/);
+                    const match = r[0].match(/^[+-]\s+(.*?)$/);
                     return match ? match[1] : r[0];
                 });
             } else {
@@ -1049,8 +1112,14 @@ class SupplyPlanScoreCard extends Component {
                 sortedLabels = sortedData.map(r => r[0]);
             }
             
-            this.setState({ sortedLabels });
-            reapplyFormatting(instance); 
+            requestAnimationFrame(() => {
+                this.setState({ sortedLabels }, () => {
+                    setTimeout(() => {
+                        window.scrollTo(0, scrollPos);
+                        reapplyFormatting(instance);
+                    }, 0);
+                });
+            });
         }.bind(this),
         onfilter: function(obj) { 
             if (isMatrixView) {
@@ -1066,6 +1135,9 @@ class SupplyPlanScoreCard extends Component {
         }.bind(this),
         search: true,
         columnSorting: true,
+        contextMenu: function (obj, x, y, e) {
+          return false;
+        }.bind(this),
         footers: isMatrixView ? [this.calculateTotals(data, this.matrixCountryCount)] : [],
         wordWrap: true,
         allowInsertColumn: false,
@@ -1367,10 +1439,10 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: countryAggregates.map(c => c.label),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: countryAggregates.map(c => Math.round(c.avgQuality)) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: countryAggregates.map(c => Math.round(c.avgStock)) },
-                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: countryAggregates.map(() => 90) }
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', borderWidth: 3, fill: false, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgQuality)) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgStock)) },
+                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: countryAggregates.map(() => 90) }
             ]
         };
     } else if (viewBy === '2') {
@@ -1404,7 +1476,26 @@ class SupplyPlanScoreCard extends Component {
             sortedHAs.sort();
         }
         
-        const palette = ['#0F263F', '#C50000', '#118B70', '#802636', '#EDBA26', '#BD5E00'];
+        const darkModeColors = [
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#20a8d8', '#6C6463', '#F48521', '#49A4A1', '#cfcdc9',
+            '#A7C6ED', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+        ];
+        
+        const lightModeColors = [
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+            '#651D32', '#6C6463', '#F48521', '#49A4A1', '#212721',
+            '#002F6C', '#BA0C2F', '#118B70', '#EDB944', '#A7C6ED',
+        ];
+        const palette = isDarkMode ? darkModeColors : lightModeColors;
         
         barData = {
             labels: sortedCountries,
@@ -1413,6 +1504,8 @@ class SupplyPlanScoreCard extends Component {
                     type: 'bar',
                     label: ha,
                     backgroundColor: palette[idx % palette.length],
+                    borderColor: palette[idx % palette.length],
+                    borderWidth: 1,
                     data: sortedCountries.map(c => {
                         const s = scoreMatrix[c] && scoreMatrix[c][ha];
                         return s ? Math.round(s.sum / s.count) : 0;
@@ -1422,11 +1515,14 @@ class SupplyPlanScoreCard extends Component {
                     type: 'line',
                     label: 'Target',
                     borderColor: 'black',
+                    backgroundColor: 'black',
                     borderWidth: 4,
                     borderDash: [10, 5],
                     fill: false,
                     pointRadius: 0,
                     pointHoverRadius: 0,
+                    pointStyle: 'line',
+                    showLine: false,
                     data: sortedCountries.map(() => 70)
                 }
             ]
@@ -1446,10 +1542,10 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: displayList.map(d => d.program ? d.program.code : ''),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', borderWidth: 3, fill: false, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
-                { type: 'line', label: 'Target', borderColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, data: displayList.map(() => 90) }
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', borderWidth: 3, fill: false, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
+                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: displayList.map(() => 90) }
             ]
         };
     }
@@ -1464,10 +1560,7 @@ class SupplyPlanScoreCard extends Component {
         legend: {
             position: 'bottom',
             labels: {
-                usePointStyle: false,
-                filter: function(item, chart) {
-                    return item.text !== 'Target';
-                }
+                usePointStyle: true,
             }
         },
         scales: {
@@ -1629,9 +1722,9 @@ class SupplyPlanScoreCard extends Component {
                           </div>
                       </FormGroup>
                     </div>
-                </div>
-              </div>    
-            </div>
+                  </div>
+                </div>    
+              </div>
             
             {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
               <>
@@ -1639,7 +1732,7 @@ class SupplyPlanScoreCard extends Component {
                   <Card>
                     <CardBody>
                       <div className="chart-wrapper" style={{ height: '400px' }}>
-                        <Bar data={barData} options={barOptions} />
+                        <Bar data={barData} options={barOptions} plugins={[targetLinePlugin]} />
                       </div>
                     </CardBody>
                   </Card>
@@ -1647,6 +1740,40 @@ class SupplyPlanScoreCard extends Component {
                 <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
                   <Card>
                     <CardBody>
+                      <div className="mb-3">
+                        <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Stock Status:</span>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.stockOut')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.underStock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.adequate')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#edb944', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.overStock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#cfcdc9', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.na')}</span></div>
+                        </div>
+
+                        <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Scores:</span>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-35%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>36%-70%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>71%-99%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>100%</span></div>
+                        </div>
+
+                        {Number(this.state.viewBy) === 1 && (
+                          <div className="form-check d-flex align-items-center mt-2" style={{ paddingLeft: '20px' }}>
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="collapseAll"
+                              checked={this.state.collapseAllChecked}
+                              onChange={(e) => this.toggleCollapseExpandAll(e)}
+                              style={{ marginTop: '0px', position: 'relative' }}
+                            />
+                            <Label className="form-check-label ml-2" htmlFor="collapseAll" style={{ fontSize: '12px', cursor: 'pointer', marginBottom: '0px' }}>
+                              Collapse All
+                            </Label>
+                          </div>
+                        )}
+                      </div>
                       <div className="table-responsive">
                           <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
                       </div>
