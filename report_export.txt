@@ -1,0 +1,136 @@
+        this.handlePlanningUnitChange = this.handlePlanningUnitChange.bind(this)
+        this.handleChange = this.handleChange.bind(this)
+        this.getFundingSourceType = this.getFundingSourceType.bind(this);
+    }
+    /**
+     * Exports the data to a CSV file.
+     */
+    exportCSV() {
+        var csvRow = [];
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        if (localStorage.getItem("sessionType") === 'Online') {
+            this.state.countryLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + (ele.toString())).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            this.state.programLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll('#', '%23').replaceAll(' ', '%20') + '"'));
+            // csvRow.push('')
+            // this.state.fundingSourceTypeLabels.map(ele =>
+            //     csvRow.push('"' + (i18n.t('static.funderTypeHead.funderType') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.includeapproved') + ' : ' + document.getElementById("includeApprovedVersions").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.shipment.groupByProcurementAgentType') + ' : ' + (this.state.procurementAgentTypeId ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+            // csvRow.push('')
+            // csvRow.push('"' + (i18n.t('static.shipment.groupByFundingSourceType') + ' : ' + (this.state.groupByFundingSourceType ? "Yes" : "No")).replaceAll(' ', '%20') + '"')
+        } else {
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            csvRow.push('"' + (i18n.t('static.report.version') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+            csvRow.push('')
+            this.state.planningUnitLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.fundingSourceLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.budget.fundingsource') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('')
+            this.state.shipmentStatusLabels.map(ele =>
+                csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+        }
+        csvRow.push('')
+        csvRow.push('')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('')
+        var re;
+        if (this.state.procurementAgentSplit.length > 0) {
+            var A = [];
+            let tableHead = this.state.table1Headers;
+            let tableHeadTemp = [];
+            tableHeadTemp.push(i18n.t('static.report.qatPID').replaceAll(' ', '%20'));
+            tableHeadTemp.push(i18n.t('static.dashboard.product').replaceAll(' ', '%20'));
+            for (var i = 0; i < tableHead.length; i++) {
+                tableHeadTemp.push((tableHead[i].replaceAll(',', ' ')).replaceAll(' ', '%20'));
+            }
+            tableHeadTemp.push(i18n.t('static.report.totalUnit').replaceAll(' ', '%20'));
+            A[0] = addDoubleQuoteToRowContent(tableHeadTemp);
+            re = this.state.procurementAgentSplit;
+            for (var item = 0; item < re.length; item++) {
+                let item1 = Object.values(re[item].procurementAgentQty);
+                A.push([addDoubleQuoteToRowContent([re[item].planningUnit.id, (getLabelText(re[item].planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ...item1, re[item].total])])
+            }
+            for (var i = 0; i < A.length; i++) {
+                csvRow.push(A[i].join(","))
+            }
+        }
+        var csvString = csvRow.join("%0A")
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv,' + csvString
+        a.target = "_Blank"
+        a.download = i18n.t('static.dashboard.shipmentGlobalDemandViewheader') + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to) + ".csv"
+        document.body.appendChild(a)
+        a.click()
+    }
+    /**
+     * Exports the data to a PDF file.
+     */
+    exportPDF = () => {
+        const addFooters = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            doc.setFont('helvetica', 'bold')
+            doc.setFontSize(6)
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setPage(i)
+                doc.setPage(i)
+                doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+                doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                    align: 'center'
+                })
+            }
+        }
+        const addHeaders = doc => {
+            const pageCount = doc.internal.getNumberOfPages()
+            for (var i = 1; i <= pageCount; i++) {
+                doc.setFontSize(12)
+                doc.setFont('helvetica', 'bold')
+                doc.setPage(i)
+                doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+                doc.setTextColor("#002f6c");
+                doc.text(i18n.t('static.dashboard.shipmentGlobalDemandViewheader'), doc.internal.pageSize.width / 2, 60, {
+                    align: 'center'
+                })
+                if (i == 1) {
+                    doc.setFont('helvetica', 'normal')
+                    doc.setFontSize(8)
+                    doc.text(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to), doc.internal.pageSize.width / 8, 90, {
+                        align: 'left'
+                    })
+                }
+            }
+        }
+        const unit = "pt";
+        const size = "A4";
+        const orientation = "landscape";
+        const marginLeft = 10;
+        const doc = new jsPDF(orientation, unit, size, true);
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+        var len = 120
+        if (localStorage.getItem("sessionType") === 'Online') {
+            var countryLabelsText = doc.splitTextToSize(i18n.t('static.dashboard.country') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText)
+            len = len + countryLabelsText.length * 10
+            var planningText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+            doc.text(doc.internal.pageSize.width / 8, len, planningText)
+            len = len + planningText.length * 10

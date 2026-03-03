@@ -1174,8 +1174,26 @@ class ApplicationDashboard extends Component {
     if (localStorage.getItem('sessionType') === 'Online') {
       DashboardService.getDashboardBottom(inputJson)
         .then(response => {
+          var data = response.data;
+          // Compute supplyPlanQualityScore
+          var totalQpl = data.forecastConsumptionQpl ? data.forecastConsumptionQpl.puCount : 0;
+          var flaggedCountForecastConsumptionData = totalQpl - (data.forecastConsumptionQpl ? data.forecastConsumptionQpl.correctCount : 0);
+          var flaggedCountActualConsumptionData = totalQpl - (data.actualConsumptionQpl ? data.actualConsumptionQpl.correctCount : 0);
+          var flaggedCountInventoryData = totalQpl - (data.inventoryQpl ? data.inventoryQpl.correctCount : 0);
+          var flaggedCountShipmentData = totalQpl - (data.shipmentQpl ? data.shipmentQpl.correctCount : 0);
+          data.supplyPlanQualityScore = totalQpl > 0
+            ? (((1 - (flaggedCountForecastConsumptionData / totalQpl)) + (1 - (flaggedCountActualConsumptionData / totalQpl)) + (1 - (flaggedCountInventoryData / totalQpl)) + (1 - (flaggedCountShipmentData / totalQpl))) / 4) * 100
+            : 0;
+          // Compute stockStatusScore
+          var stockOut = data.stockStatus ? Number(data.stockStatus.stockOut) : 0;
+          var underStock = data.stockStatus ? Number(data.stockStatus.underStock) : 0;
+          var adequate = data.stockStatus ? Number(data.stockStatus.adequate) : 0;
+          var overStock = data.stockStatus ? Number(data.stockStatus.overStock) : 0;
+          var totalStockDenom = stockOut + underStock + adequate + overStock;
+          data.stockStatusScore = totalStockDenom > 0 ? (adequate / totalStockDenom) * 100 : 0;
+
           this.setState({
-            dashboardBottomData: response.data,
+            dashboardBottomData: data,
             rangeValue: this.state.rangeValue ? this.state.rangeValue : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
           }, () => {
             if (document.getElementById("shipmentsTBDJexcel")) {

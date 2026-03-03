@@ -1,0 +1,50 @@
+        } else {
+            doc.text(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 110, {
+                align: 'left'
+            })
+            doc.text(i18n.t('static.report.version') + ' : ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width / 8, 130, {
+                align: 'left'
+            })
+            var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        }
+        doc.setFontSize(8);
+        doc.setTextColor("#002f6c");
+        var planningText = doc.splitTextToSize((i18n.t('static.planningunit.planningunit') + ' : ' + this.state.planningUnitLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        let y = localStorage.getItem("sessionType") === 'Online' ? len : 150
+
+        // var fundingSourceTypeText = doc.splitTextToSize((i18n.t('static.funderTypeHead.funderType') + ' : ' + this.state.fundingSourceTypeLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        // for (var i = 0; i < fundingSourceTypeText.length; i++) {
+        //     if (y > doc.internal.pageSize.height - 100) {
+        //         doc.addPage();
+        //         y = 80;
+        //     };
+        //     doc.text(doc.internal.pageSize.width / 8, y, fundingSourceTypeText[i]);
+        //     y = y + 10
+        // }
+
+        var fundingSourceText = doc.splitTextToSize((i18n.t('static.budget.fundingsource') + ' : ' + this.state.fundingSourceLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < fundingSourceText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            };
+            doc.text(doc.internal.pageSize.width / 8, y, fundingSourceText[i]);
+            y = y + 10
+        }
+        var statusText = doc.splitTextToSize((i18n.t('static.common.status') + ' : ' + this.state.shipmentStatusLabels.join('; ')), doc.internal.pageSize.width * 3 / 4);
+        y = y + 10;
+        for (var i = 0; i < statusText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.text(doc.internal.pageSize.width / 8, y, statusText[i]);
+            y = y + 10;
+        }
+        y = y + 10;
+        for (var i = 0; i < planningText.length; i++) {
+            if (y > doc.internal.pageSize.height - 100) {
+                doc.addPage();
+                y = 80;
+            }
