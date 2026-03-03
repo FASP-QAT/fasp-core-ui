@@ -50,6 +50,11 @@ import {
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import QatProblemActionNew from '../../CommonComponent/QatProblemActionNew';
 import getLabelText from '../../CommonComponent/getLabelText';
+import csvicon from '../../assets/img/csv.png';
+import pdfIcon from '../../assets/img/pdf.png';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import { LOGO } from '../../CommonComponent/Logo.js';
 import { API_URL, INDEXED_DB_NAME, INDEXED_DB_VERSION, QAT_HELPDESK_CUSTOMER_PORTAL_URL, SECRET_KEY, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY, PROGRAM_TYPE_SUPPLY_PLAN, REPORT_DATEPICKER_END_MONTH, REPORT_DATEPICKER_START_MONTH } from '../../Constants.js';
 import DashboardService from "../../api/DashboardService";
 import ProgramService from "../../api/ProgramService";
@@ -58,7 +63,7 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, formatter } from '../../CommonComponent/JavascriptCommonFunctions';
+import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
 
 const targetLinePlugin = {
@@ -170,6 +175,8 @@ class SupplyPlanScoreCard extends Component {
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
     this.getPrograms = this.getPrograms.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.exportCSV = this.exportCSV.bind(this);
+    this.exportPDF = this.exportPDF.bind(this);
   }
   /**
    * Reterives dashboard data from server on component mount
@@ -1089,7 +1096,6 @@ class SupplyPlanScoreCard extends Component {
         }.bind(this),
         onchangepage: function(obj) { reapplyFormatting(obj); },
         onsort: function(instance, column, dir) { 
-            const scrollPos = window.scrollY;
             if (isMatrixView) {
                 setTimeout(() => { this.recalculateFooter(instance, this.matrixCountryCount); }, 0);
             }
@@ -1115,7 +1121,6 @@ class SupplyPlanScoreCard extends Component {
             requestAnimationFrame(() => {
                 this.setState({ sortedLabels }, () => {
                     setTimeout(() => {
-                        window.scrollTo(0, scrollPos);
                         reapplyFormatting(instance);
                     }, 0);
                 });
@@ -1324,6 +1329,345 @@ class SupplyPlanScoreCard extends Component {
    * Renders the application dashboard.
    * @returns {JSX.Element} - Application Dashboard.
    */
+
+  /**
+   * Exports the data to a CSV file including filters and table data.
+   */
+  exportCSV() {
+    if (!this.el) return;
+    var csvRow = [];
+    // Add filter info
+    if (this.state.countryLabels && this.state.countryLabels.length > 0) {
+        this.state.countryLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.program.realmcountry') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
+    }
+    if (this.state.technicalAreaLabels && this.state.technicalAreaLabels.length > 0) {
+        this.state.technicalAreaLabels.map(ele =>
+            csvRow.push('"' + ('Technical Area' + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
+    }
+    if (this.state.programLabels && this.state.programLabels.length > 0) {
+        this.state.programLabels.map(ele =>
+            csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+        csvRow.push('');
+    }
+    var viewByEl = document.getElementById("viewById");
+    if (viewByEl) {
+        csvRow.push('"' + ('View By' + ' : ' + viewByEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+    }
+    var showDetailEl = document.getElementById("showDetailId");
+    if (showDetailEl) {
+        csvRow.push('"' + ('Show Detail' + ' : ' + showDetailEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
+        csvRow.push('');
+    }
+    csvRow.push('');
+    csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"');
+    csvRow.push('');
+
+    // Add table headers
+    var headers = this.el.getHeaders().split(",");
+    // Filter out hidden columns (RowType, CountryKey)
+    var columns = this.el.options.columns || [];
+    var visibleIndexes = [];
+    for (var c = 0; c < columns.length; c++) {
+        if (columns[c].type !== 'hidden') {
+            visibleIndexes.push(c);
+        }
+    }
+    var headerRow = visibleIndexes.map(idx => '"' + (headers[idx] || '').replaceAll(' ', '%20') + '"');
+    csvRow.push(headerRow.join(","));
+
+    // Add table data
+    var data = this.el.getData();
+    for (var i = 0; i < data.length; i++) {
+        var row = visibleIndexes.map(idx => '"' + ((data[i][idx] !== null && data[i][idx] !== undefined ? data[i][idx].toString() : '').replaceAll(',', ' ').replaceAll(' ', '%20')) + '"');
+        csvRow.push(row.join(","));
+    }
+
+    var csvString = csvRow.join("%0A");
+    var a = document.createElement("a");
+    a.href = 'data:attachment/csv,' + csvString;
+    a.target = "_Blank";
+    a.download = "SupplyPlanScoreCard.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  /**
+   * Exports the data to a PDF file including filters, graph, legends and styled table.
+   */
+  exportPDF() {
+    if (!this.el) return;
+    const allData = this.el.options.data || [];
+    const columns = this.el.options.columns || [];
+    const isMatrixView = String(this.state.viewBy) === '2';
+
+    // Helper: get score color
+    const getScoreColor = (val) => {
+        const pct = parseInt(String(val || '').replace(/%/g, ''), 10);
+        if (isNaN(pct)) return null;
+        return pct <= 35 ? [186, 12, 47] : pct <= 70 ? [244, 133, 33] : pct <= 99 ? [237, 186, 38] : [17, 139, 112];
+    };
+
+    const addFooters = doc => {
+        const pageCount = doc.internal.getNumberOfPages();
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(6);
+        for (var i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.text('Page ' + String(i) + ' of ' + String(pageCount), doc.internal.pageSize.width / 9, doc.internal.pageSize.height - 30, {
+                align: 'center'
+            });
+            doc.text('Copyright © 2020 ' + i18n.t('static.footer'), doc.internal.pageSize.width * 6 / 7, doc.internal.pageSize.height - 30, {
+                align: 'center'
+            });
+        }
+    };
+    const addHeaders = doc => {
+        const pageCount = doc.internal.getNumberOfPages();
+        for (var i = 1; i <= pageCount; i++) {
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.setPage(i);
+            doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
+            doc.setTextColor("#002f6c");
+            doc.text('Supply Plan Score Card', doc.internal.pageSize.width / 2, 60, {
+                align: 'center'
+            });
+        }
+    };
+
+    const doc = new jsPDF('landscape', 'pt', 'A4', true);
+    doc.setFontSize(8);
+    doc.setTextColor("#002f6c");
+    var y = 90;
+
+    // Print filter values
+    if (this.state.countryLabels && this.state.countryLabels.length > 0) {
+        var countryText = doc.splitTextToSize(i18n.t('static.program.realmcountry') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        doc.text(doc.internal.pageSize.width / 8, y, countryText);
+        y = y + countryText.length * 10;
+    }
+    if (this.state.technicalAreaLabels && this.state.technicalAreaLabels.length > 0) {
+        var taText = doc.splitTextToSize('Technical Area : ' + this.state.technicalAreaLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        doc.text(doc.internal.pageSize.width / 8, y, taText);
+        y = y + taText.length * 10;
+    }
+    if (this.state.programLabels && this.state.programLabels.length > 0) {
+        var programText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        doc.text(doc.internal.pageSize.width / 8, y, programText);
+        y = y + programText.length * 10;
+    }
+    var viewByEl = document.getElementById("viewById");
+    if (viewByEl) {
+        doc.text('View By : ' + viewByEl.selectedOptions[0].text, doc.internal.pageSize.width / 8, y, { align: 'left' });
+        y = y + 15;
+    }
+    var showDetailEl = document.getElementById("showDetailId");
+    if (showDetailEl) {
+        doc.text('Show Detail : ' + showDetailEl.selectedOptions[0].text, doc.internal.pageSize.width / 8, y, { align: 'left' });
+        y = y + 15;
+    }
+
+    // Add chart image
+    try {
+        var chartWrapper = document.querySelector('.chart-wrapper canvas');
+        if (chartWrapper) {
+            var canvasImg = chartWrapper.toDataURL("image/png", 1.0);
+            var imgWidth = doc.internal.pageSize.width - 100;
+            var imgHeight = 250;
+            if (y + imgHeight > doc.internal.pageSize.height - 80) {
+                doc.addPage();
+                y = 80;
+            }
+            doc.addImage(canvasImg, 'png', 50, y, imgWidth, imgHeight, 'chart', 'FAST');
+            y = y + imgHeight + 20;
+        }
+    } catch (e) {
+        console.warn('Could not export chart to PDF:', e);
+    }
+
+    // Draw legends
+    if (y > doc.internal.pageSize.height - 120) {
+        doc.addPage();
+        y = 80;
+    }
+    var legendX = doc.internal.pageSize.width / 8;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor("#002f6c");
+    doc.text('Stock Status:', legendX, y);
+    var lx = legendX + 65;
+    var stockLegendItems = [
+        { label: i18n.t('static.report.stockOut'), color: [186, 12, 47] },
+        { label: i18n.t('static.report.underStock'), color: [244, 133, 33] },
+        { label: i18n.t('static.report.adequate'), color: [17, 139, 112] },
+        { label: i18n.t('static.report.overStock'), color: [237, 185, 68] },
+        { label: i18n.t('static.report.na'), color: [207, 205, 201] }
+    ];
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    stockLegendItems.forEach(item => {
+        doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+        doc.rect(lx, y - 8, 10, 10, 'F');
+        doc.setTextColor("#333");
+        doc.text(item.label, lx + 13, y);
+        lx = lx + doc.getTextWidth(item.label) + 22;
+    });
+    y = y + 18;
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor("#002f6c");
+    doc.text('Scores:', legendX, y);
+    lx = legendX + 45;
+    var scoreLegendItems = [
+        { label: '0%-35%', color: [186, 12, 47] },
+        { label: '36%-70%', color: [244, 133, 33] },
+        { label: '71%-99%', color: [237, 186, 38] },
+        { label: '100%', color: [17, 139, 112] }
+    ];
+    doc.setFont('helvetica', 'normal');
+    scoreLegendItems.forEach(item => {
+        doc.setFillColor(item.color[0], item.color[1], item.color[2]);
+        doc.circle(lx + 4, y - 3, 4, 'F');
+        doc.setTextColor("#333");
+        doc.text(item.label, lx + 11, y);
+        lx = lx + doc.getTextWidth(item.label) + 22;
+    });
+    y = y + 20;
+
+    // Add table with preserved colors and alignment
+    if (y > doc.internal.pageSize.height - 200) {
+        doc.addPage();
+        y = 80;
+    }
+
+    // Determine visible column indices for mapping
+    var visibleColIndexes = [];
+    for (var ci = 0; ci < columns.length; ci++) {
+        if (columns[ci].type !== 'hidden') {
+            visibleColIndexes.push(ci);
+        }
+    }
+
+    doc.autoTable({
+        html: '#scorecardTableDiv table',
+        startY: y,
+        margin: { top: 80, bottom: 70 },
+        styles: { lineWidth: 0.5, fontSize: 7, cellPadding: 3, overflow: 'linebreak', halign: 'center' },
+        headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+        theme: 'grid',
+        didParseCell: function (data) {
+            if (data.section !== 'body') return;
+            var rowIdx = data.row.index;
+            // Map visible column index back to original data column index
+            var origColIdx = visibleColIndexes[data.column.index];
+            if (origColIdx === undefined || !allData[rowIdx]) return;
+            var rowData = allData[rowIdx];
+            var rowType = rowData[rowData.length - 2];
+
+            // Row background colors
+            if (rowType === 'row_parent') {
+                data.cell.styles.fillColor = [208, 228, 247];
+                data.cell.styles.fontStyle = 'bold';
+            } else if (rowType === 'row_child') {
+                data.cell.styles.fillColor = [247, 251, 255];
+            } else if (rowType === 'matrix_total') {
+                data.cell.styles.fillColor = [244, 244, 244];
+                data.cell.styles.fontStyle = 'bold';
+            }
+
+            // Alignment: first column left
+            if (data.column.index === 0) {
+                data.cell.styles.halign = 'left';
+                if (rowType === 'row_child') {
+                    data.cell.styles.cellPadding = { top: 3, bottom: 3, left: 15, right: 3 };
+                }
+            }
+            // Latest Version (col idx 1), Review Status (11), Version Notes (12) -> left align
+            if (origColIdx === 1 || origColIdx === 11 || origColIdx === 12) {
+                data.cell.styles.halign = 'left';
+            }
+
+            // Score columns: set text color to match dot color
+            if (!isMatrixView && (origColIdx === 7 || origColIdx === 9 || origColIdx === 10)) {
+                var sc = getScoreColor(rowData[origColIdx]);
+                if (sc) {
+                    data.cell.styles.textColor = sc;
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+            // Matrix view: all data cells get score colors
+            if (isMatrixView && data.column.index > 0) {
+                var mc = getScoreColor(rowData[origColIdx]);
+                if (mc) {
+                    data.cell.styles.textColor = mc;
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+
+            // Stock Status column: clear text (will be drawn manually)
+            if (!isMatrixView && origColIdx === 8) {
+                data.cell.styles.textColor = [255, 255, 255];
+                data.cell.styles.fontSize = 1;
+            }
+        },
+        didDrawCell: function (data) {
+            if (data.section !== 'body') return;
+            var rowIdx = data.row.index;
+            var origColIdx = visibleColIndexes[data.column.index];
+            if (origColIdx === undefined || !allData[rowIdx]) return;
+            var rowData = allData[rowIdx];
+
+            // Draw score colored dot for score columns
+            if (!isMatrixView && (origColIdx === 7 || origColIdx === 9 || origColIdx === 10)) {
+                var sc = getScoreColor(rowData[origColIdx]);
+                if (sc) {
+                    doc.setFillColor(sc[0], sc[1], sc[2]);
+                    doc.circle(data.cell.x + 8, data.cell.y + data.cell.height / 2, 3, 'F');
+                }
+            }
+            // Draw score colored dots in matrix view
+            if (isMatrixView && data.column.index > 0) {
+                var mc = getScoreColor(rowData[origColIdx]);
+                if (mc) {
+                    doc.setFillColor(mc[0], mc[1], mc[2]);
+                    doc.circle(data.cell.x + 8, data.cell.y + data.cell.height / 2, 3, 'F');
+                }
+            }
+
+            // Draw stacked stock status bar
+            if (!isMatrixView && origColIdx === 8) {
+                var parts = String(rowData[8] || '').split(',');
+                if (parts.length === 5) {
+                    var barX = data.cell.x + 3;
+                    var barY = data.cell.y + data.cell.height / 2 - 5;
+                    var barW = data.cell.width - 6;
+                    var barH = 10;
+                    var stockColors = [[186,12,47],[244,133,33],[17,139,112],[237,185,68],[207,205,201]];
+                    var cumX = barX;
+                    for (var si = 0; si < 5; si++) {
+                        var pct = Number(parts[si]) || 0;
+                        var segW = (pct / 100) * barW;
+                        if (segW > 0) {
+                            doc.setFillColor(stockColors[si][0], stockColors[si][1], stockColors[si][2]);
+                            doc.rect(cumX, barY, segW, barH, 'F');
+                        }
+                        cumX += segW;
+                    }
+                }
+            }
+        }
+    });
+
+    addHeaders(doc);
+    addFooters(doc);
+    doc.save("SupplyPlanScoreCard.pdf");
+  }
+
   render() {
     jexcel.setDictionary({
       Show: " ",
@@ -1596,6 +1940,16 @@ class SupplyPlanScoreCard extends Component {
             
             {/* <div class="col-xl-12 pl-lg-2 pr-lg-2"> */}
             <div class="card custom-card DashboardBg1">
+                <div className="Card-header-reporticon">
+                    {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 &&
+                        <div className="card-header-actions">
+                            <a className="card-header-action">
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={pdfIcon} title={i18n.t('static.report.exportPdf')} onClick={() => this.exportPDF()} />
+                                <img style={{ height: '25px', width: '25px', cursor: 'pointer' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.exportCSV()} />
+                            </a>
+                        </div>
+                    }
+                </div>
                 <div class="card-body py-1">
                     <div className='row'>
                         <FormGroup className='FormGroupD col-10' style={{ marginBottom: '0px'}}>
@@ -1722,9 +2076,7 @@ class SupplyPlanScoreCard extends Component {
                           </div>
                       </FormGroup>
                     </div>
-                  </div>
-                </div>    
-              </div>
+                  
             
             {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
               <>
@@ -1741,6 +2093,7 @@ class SupplyPlanScoreCard extends Component {
                   <Card>
                     <CardBody>
                       <div className="mb-3">
+
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Stock Status:</span>
                           <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.stockOut')}</span></div>
@@ -1782,6 +2135,9 @@ class SupplyPlanScoreCard extends Component {
                 </div>
               </>
             )}
+            </div>
+                </div>    
+              </div>
         </div>
     );
   }
