@@ -4610,7 +4610,7 @@ class EditSupplyPlanStatus extends Component {
                 var rowData = elInstance.getRowData(y);
                 var criticalityId = rowData[17];
                 if (criticalityId == 4) {
-                    var cell = elInstance.getCell(("U").concat(parseInt(j) + 1))
+                    var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
                     cell.classList.add('criticalCriticality');
                 } else if (criticalityId == 3) {
                     var cell = elInstance.getCell(("U").concat(parseInt(y) + 1))
