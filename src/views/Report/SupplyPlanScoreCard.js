@@ -1224,12 +1224,13 @@ class SupplyPlanScoreCard extends Component {
                 const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                 const value = parseInt(raw, 10);
                 if (!isNaN(value)) {
-                    let color = value <= 35 ? '%23BA0C2F' : value <= 70 ? '%23f48521' : value <= 99 ? '%23edba26' : '%23118b70';
-                    cell.innerText = value + '%';
-                    cell.style.backgroundImage = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Ccircle cx='8' cy='8' r='6' fill='${color}'/%3E%3C/svg%3E")`;
-                    cell.style.backgroundRepeat = 'no-repeat';
-                    cell.style.backgroundPosition = 'center left 20%';
-                    cell.style.paddingLeft = '30px';
+                    let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                    cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: flex-start; padding-left: 5px;">
+                            <span style="min-width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
+                            <span>${value}%</span>
+                        </div>`;
+                    cell.style.backgroundImage = 'none';
+                    cell.style.paddingLeft = '0px';
                     cell.style.textAlign = 'left';
                     cell.style.fontWeight = 'bold';
                 }
@@ -1272,7 +1273,7 @@ class SupplyPlanScoreCard extends Component {
             { title: 'Stock Status Score', type: 'text', readOnly: true, align: 'left' },
             { title: 'Total Score', type: 'text', readOnly: true, align: 'left' },
             { title: 'Review Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
-            { title: 'Version Notes', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
+            { title: 'Version Notes', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 150 },
             { title: 'RowType', type: 'hidden' },
             { title: 'CountryKey', type: 'hidden' },
             { title: 'ProgramId', type: 'hidden' }
@@ -1837,28 +1838,38 @@ class SupplyPlanScoreCard extends Component {
         }
     }
 
+    // Initialize autoTable rendering
+
     doc.autoTable({
         html: '#scorecardTableDiv table',
         startY: y,
         margin: { top: 80, bottom: 70 },
-        styles: { lineWidth: 0.5, fontSize: 7, cellPadding: 3, overflow: 'linebreak', halign: 'center' },
+        styles: { lineWidth: 0.5, fontSize: 7, cellPadding: 3, overflow: 'linebreak', halign: 'center', valign: 'middle' },
         headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
         theme: 'grid',
         didParseCell: function (data) {
             if (data.section !== 'body') return;
-            var rowIdx = data.row.index;
+            var tr = data.row.raw;
+            var dataY;
+            if (tr && typeof tr.getAttribute === 'function') {
+                dataY = parseInt(tr.getAttribute('data-y'), 10);
+            } else {
+                dataY = data.row.index;
+            }
+            if (isNaN(dataY) || !allData[dataY]) return;
+            
             // Map visible column index back to original data column index
             var origColIdx = visibleColIndexes[data.column.index];
-            if (origColIdx === undefined || !allData[rowIdx]) return;
-            var rowData = allData[rowIdx];
-            var rowType = rowData[rowData.length - 2];
+            if (origColIdx === undefined) return;
+            var rowData = allData[dataY];
+            var rowType = isMatrixView ? rowData[rowData.length - 2] : rowData[14];
 
             // Row background colors
             if (rowType === 'row_parent') {
-                data.cell.styles.fillColor = [208, 228, 247];
+                data.cell.styles.fillColor = [244, 244, 244];
                 data.cell.styles.fontStyle = 'bold';
-            } else if (rowType === 'row_child') {
-                data.cell.styles.fillColor = [247, 251, 255];
+            } else if (rowType === 'row_child' || rowType === 'program') {
+                data.cell.styles.fillColor = (data.row.index % 2 !== 0) ? [255, 255, 255] : [235, 243, 250];
             } else if (rowType === 'matrix_total') {
                 data.cell.styles.fillColor = [244, 244, 244];
                 data.cell.styles.fontStyle = 'bold';
@@ -1871,19 +1882,33 @@ class SupplyPlanScoreCard extends Component {
                     data.cell.styles.cellPadding = { top: 3, bottom: 3, left: 15, right: 3 };
                 }
             }
-            // Latest Version (col idx 1), Review Status (11), Version Notes (12) -> left align
-            if (origColIdx === 1 || origColIdx === 11 || origColIdx === 12) {
+            // Latest Version (col idx 2), Review Status (12), Version Notes (13) -> left align
+            if (origColIdx === 2 || origColIdx === 12 || origColIdx === 13) {
                 data.cell.styles.halign = 'left';
             }
 
             // Score columns: set text color to match dot color
-            if (!isMatrixView && (origColIdx === 7 || origColIdx === 9 || origColIdx === 10)) {
+            if (!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) {
                 var sc = getScoreColor(rowData[origColIdx]);
                 if (sc) {
-                    data.cell.styles.textColor = sc;
+                    data.cell.text = [(rowData[origColIdx] === null || rowData[origColIdx] === undefined) ? '' : String(rowData[origColIdx])];
+                    data.cell.styles.textColor = [50, 50, 50]; // Dark text
+                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.halign = 'left';
+                    data.cell.styles.cellPadding = { left: 16, right: 3, top: 3, bottom: 3 };
+                }
+            }
+
+            // Numeric columns (4, 5, 6, 7): apply red text if value is 0
+            if (!isMatrixView && origColIdx >= 4 && origColIdx <= 7) {
+                var cellVal = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || rowData[origColIdx] === '') ? 0 : Number(rowData[origColIdx]);
+                data.cell.text = [String(cellVal)];
+                if (!isNaN(cellVal) && cellVal === 0) {
+                    data.cell.styles.textColor = [186, 12, 47]; // #BA0C2F
                     data.cell.styles.fontStyle = 'bold';
                 }
             }
+            
             // Matrix view: all data cells get score colors
             if (isMatrixView && data.column.index > 0) {
                 var mc = getScoreColor(rowData[origColIdx]);
@@ -1894,20 +1919,28 @@ class SupplyPlanScoreCard extends Component {
             }
 
             // Stock Status column: clear text (will be drawn manually)
-            if (!isMatrixView && origColIdx === 8) {
+            if (!isMatrixView && origColIdx === 9) {
                 data.cell.styles.textColor = [255, 255, 255];
                 data.cell.styles.fontSize = 1;
+                data.cell.styles.minCellWidth = 100; // Increased width for the drawing
             }
         },
         didDrawCell: function (data) {
             if (data.section !== 'body') return;
-            var rowIdx = data.row.index;
+            var tr = data.row.raw;
+            var dataY;
+            if (tr && typeof tr.getAttribute === 'function') {
+                dataY = parseInt(tr.getAttribute('data-y'), 10);
+            } else {
+                dataY = data.row.index;
+            }
+            if (isNaN(dataY) || !allData[dataY]) return;
             var origColIdx = visibleColIndexes[data.column.index];
-            if (origColIdx === undefined || !allData[rowIdx]) return;
-            var rowData = allData[rowIdx];
+            if (origColIdx === undefined) return;
+            var rowData = allData[dataY];
 
             // Draw score colored dot for score columns
-            if (!isMatrixView && (origColIdx === 7 || origColIdx === 9 || origColIdx === 10)) {
+            if (!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) {
                 var sc = getScoreColor(rowData[origColIdx]);
                 if (sc) {
                     doc.setFillColor(sc[0], sc[1], sc[2]);
@@ -1915,17 +1948,17 @@ class SupplyPlanScoreCard extends Component {
                 }
             }
             // Draw score colored dots in matrix view
-            if (isMatrixView && data.column.index > 0) {
+            if (isMatrixView && data.column.index > 0 && rowData[rowData.length - 2] !== 'matrix_total') {
                 var mc = getScoreColor(rowData[origColIdx]);
                 if (mc) {
                     doc.setFillColor(mc[0], mc[1], mc[2]);
-                    doc.circle(data.cell.x + 8, data.cell.y + data.cell.height / 2, 3, 'F');
+                    doc.circle(data.cell.x + 10, data.cell.y + data.cell.height / 2, 3, 'F');
                 }
             }
 
             // Draw stacked stock status bar
-            if (!isMatrixView && origColIdx === 8) {
-                var parts = String(rowData[8] || '').split(',');
+            if (!isMatrixView && origColIdx === 9) {
+                var parts = String(rowData[9] || '').split(',');
                 if (parts.length === 5) {
                     var barX = data.cell.x + 3;
                     var barY = data.cell.y + data.cell.height / 2 - 5;
