@@ -1,35 +1,12 @@
-// ============================================================
-// CHANGES FROM ORIGINAL:
-// 1. Added jspreadsheet (v8) imports and CSS
-// 2. Added `tableDiv` ref for jspreadsheet mount point
-// 3. Added `buildJExcel()` method to build/rebuild the jspreadsheet
-//    with nested rows (FSPA → Program → PU hierarchy)
-// 4. Row-level collapse is handled by toggling `hidden` on jspreadsheet
-//    row elements after render, mirroring the original `collapsedRows` Set logic
-// 5. Checkbox columns (aggregateByCountry, hideCalculations,
-//    collapsePlanningUnits, collapseAll) still call `handleCheckboxChange`
-//    and then call `buildJExcel()` to rebuild the table
-// 6. `fetchData` setState callback now calls `buildJExcel()`
-// 7. `toggleCollapse` now calls `buildJExcel()` after state update
-// 8. The original <Table id="mytable1"> block is REPLACED by
-//    <div id="shipmentGlobalDemandTableDiv"> which jspreadsheet mounts into
-// 9. PDF export still clones #mytable1_clone logic – replaced with
-//    reading jspreadsheet data directly for PDF generation
-// 10. All other logic (filters, CSV export, charts, etc.) is UNCHANGED
-// ============================================================
-
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
-import { getStyle } from "@coreui/coreui-pro/dist/js/coreui-utilities";
 import CryptoJS from "crypto-js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 import jexcel from "jspreadsheet";
 import {
-  jExcelLoadedFunctionForErp,
   jExcelLoadedFunctionWithoutPagination,
   onOpenFilter,
 } from "../../CommonComponent/JExcelCommonFunctions.js";
-import { jExcelLoadedFunction } from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React, { Component } from "react";
 import { HorizontalBar, Pie } from "react-chartjs-2";
@@ -45,11 +22,10 @@ import {
   Input,
   InputGroup,
   Label,
-  Table,
 } from "reactstrap";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
-import "../../scss/shipmentsByCountry.scss"
+import "../../scss/shipmentsByCountry.scss";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import MonthBox from "../../CommonComponent/MonthBox.js";
@@ -58,18 +34,14 @@ import {
   API_URL,
   INDEXED_DB_NAME,
   INDEXED_DB_VERSION,
-  JEXCEL_PAGINATION_OPTION,
   JEXCEL_PRO_KEY,
   MONTHS_IN_FUTURE_FOR_DATE_PICKER_FOR_SHIPMENTS,
-  PROGRAM_TYPE_SUPPLY_PLAN,
   REPORT_DATEPICKER_END_MONTH,
   REPORT_DATEPICKER_START_MONTH,
   SECRET_KEY,
 } from "../../Constants.js";
 import DropdownService from "../../api/DropdownService";
 import FundingSourceService from "../../api/FundingSourceService";
-import ProductService from "../../api/ProductService";
-import RealmService from "../../api/RealmService";
 import ReportService from "../../api/ReportService";
 import ShipmentStatusService from "../../api/ShipmentStatusService";
 import csvicon from "../../assets/img/csv.png";
@@ -193,6 +165,7 @@ class ShipmentGlobalDemandView extends Component {
       collapsePlanningUnits: false,
       collapseAll: false,
       collapsedRows: new Set(),
+      sortConfig: { col: null, dir: "asc" }, // tracks active column sort
     };
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -206,9 +179,7 @@ class ShipmentGlobalDemandView extends Component {
     this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
     this.toggleCollapse = this.toggleCollapse.bind(this);
     this.buildJExcel = this.buildJExcel.bind(this);
-    // ref for the jspreadsheet container div
     this.tableDiv = React.createRef();
-    // jspreadsheet instance
     this.el = null;
   }
   handleBlur = (e) => {
@@ -217,12 +188,28 @@ class ShipmentGlobalDemandView extends Component {
     }
   };
 
-  // ------------------------------------------------------------------
-  // handleCheckboxChange – same as original, but rebuilds the table
-  // ------------------------------------------------------------------
+  handleBlurCountry = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.getPrograms();
+      this.fetchData();
+    }
+  };
+
+  handleBlurProgram = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.filterVersion();
+      this.getFundingSource();
+      this.fetchData();
+      this.getPlanningUnit();
+      this.getProcurementAgentList();
+    }
+  };
+
   handleCheckboxChange(e) {
     const { name, checked } = e.target;
-    this.setState({ [name]: checked }, () => {
+    const extra =
+      name === "collapseAll" && !checked ? { collapsedRows: new Set() } : {};
+    this.setState({ [name]: checked, ...extra }, () => {
       this.buildJExcel();
     });
   }
@@ -296,6 +283,13 @@ class ShipmentGlobalDemandView extends Component {
   //                                built-in search:true option
   // ------------------------------------------------------------------
   buildJExcel() {
+    // ── Save scroll position so sorting / rebuild doesn't jump to top ──
+    // const scrollContainer = document.querySelector(".globalviwe-scroll") ||
+    //   document.querySelector(".app-body") ||
+    //   document.documentElement;
+    // const savedScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+    // const savedWindowScrollY = window.scrollY;
+
     // Destroy any previous instance
     if (this.tableDiv && this.tableDiv.current) {
       try {
@@ -428,6 +422,42 @@ class ShipmentGlobalDemandView extends Component {
     // rows array entries: { data: [...], rowType, indentPx }
     const rows = [];
 
+    // ---------------------------------------------------------------
+    // Sort helpers – must be defined before fspasList.forEach so they
+    // are in scope when sortedPus() is called while building rows.
+    // ---------------------------------------------------------------
+    const { col: sortColIdx, dir: sortDir } = this.state.sortConfig;
+
+    const getSortVal = (pu, colIdx) => {
+      if (colIdx === null || colIdx <= 0)
+        return (pu.display || "").toUpperCase();
+      if (colIdx === 1) return (pu.display || "").toUpperCase();
+      let offset = colIdx - 2;
+      if (showQtyCol) {
+        if (offset === 0) return pu.quantity || 0;
+        offset--;
+      }
+      if (!this.state.hideCalculations) {
+        if (offset === 0) return pu.totalPuCost || 0;
+        if (offset === 1) return pu.totalFreightCost || 0;
+        offset -= 2;
+      }
+      if (offset === 0) return pu.totalCost || 0;
+      if (offset === 1) return pu.totalCost || 0; // % col – same order as totalCost
+      return (pu.display || "").toUpperCase();
+    };
+
+    const sortedPus = (pus) => {
+      if (sortColIdx === null) return pus;
+      return [...pus].sort((a, b) => {
+        const av = getSortVal(a, sortColIdx);
+        const bv = getSortVal(b, sortColIdx);
+        const cmp =
+          typeof av === "string" ? (av < bv ? -1 : av > bv ? 1 : 0) : av - bv;
+        return sortDir === "desc" ? -cmp : cmp;
+      });
+    };
+
     const pushRow = (
       expandHtml,
       labelText,
@@ -443,8 +473,17 @@ class ShipmentGlobalDemandView extends Component {
       indentPx
     ) => {
       const row = [expandHtml, labelText];
-      if (showQtyCol)
-        row.push(qty !== undefined && qty !== null ? formatNum(qty) : "");
+      if (showQtyCol) {
+        // For header rows (fspa / program), show "-" instead of a grey cell
+        const isHeaderRow = rowType === "fspa" || rowType === "program";
+        row.push(
+          isHeaderRow
+            ? "-"
+            : qty !== undefined && qty !== null
+            ? formatNum(qty)
+            : ""
+        );
+      }
       if (!this.state.hideCalculations) {
         row.push(
           puCost !== "" && puCost !== undefined ? formatCurr(puCost) : ""
@@ -492,7 +531,7 @@ class ShipmentGlobalDemandView extends Component {
           // Single-program mode: PUs appear directly under FSPA
           if (!this.state.collapsePlanningUnits) {
             fspa.programsList.forEach((prog) => {
-              prog.pus.forEach((pu) => {
+              sortedPus(prog.pus).forEach((pu) => {
                 pushRow(
                   "",
                   pu.display,
@@ -536,7 +575,7 @@ class ShipmentGlobalDemandView extends Component {
             );
 
             if (!isProgCollapsed && !this.state.collapsePlanningUnits) {
-              prog.pus.forEach((pu) => {
+              sortedPus(prog.pus).forEach((pu) => {
                 pushRow(
                   "",
                   pu.display,
@@ -603,6 +642,18 @@ class ShipmentGlobalDemandView extends Component {
     if (showQtyCol)
       labelColHeader += ` / ${i18n.t("static.dashboard.planningunitheader")}`;
 
+    // ── Dynamic label column width ──────────────────────────────────────
+    // collapseAll      → only short FSPA/PA codes visible       → narrow
+    // collapsePlanUnits→ FSPA + Program/Country rows visible     → medium
+    // neither          → full Planning Unit names visible         → wide
+    const labelColWidth =
+      this.state.collapseAll ||
+      (this.state.collapsePlanningUnits && this.state.programValues.length == 1)
+        ? 120
+        : this.state.collapsePlanningUnits
+        ? 180
+        : 300;
+
     const columns = [
       // [0] accordion / toggle column – NO sort, NO filter, blank title
       {
@@ -613,11 +664,11 @@ class ShipmentGlobalDemandView extends Component {
         sort: false, // disable sort arrow on this column
         filter: false, // disable filter dropdown on this column
       },
-      // [1] label column – sort + filter enabled so user can search names
+      // [1] label column – width adapts to what rows are visible
       {
         title: labelColHeader,
         type: "text",
-        width: 300,
+        width: labelColWidth,
         readOnly: true,
         sort: true,
         filter: true,
@@ -631,7 +682,8 @@ class ShipmentGlobalDemandView extends Component {
         )} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t(
           "static.tooltip.qtyMayRepresentMultipleShipments"
         )}"></i>`,
-        type: "text",
+        type: "numeric",
+        mask: "#,##0",
         width: 120,
         readOnly: true,
         sort: true,
@@ -646,7 +698,8 @@ class ShipmentGlobalDemandView extends Component {
         )} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t(
           "static.tooltip.totalPlanningUnitCost"
         )}"></i>`,
-        type: "text",
+        type: "numeric",
+        mask: "$#,##0.00",
         width: 140,
         readOnly: true,
         sort: true,
@@ -659,7 +712,8 @@ class ShipmentGlobalDemandView extends Component {
         )} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t(
           "static.tooltip.totalFreightCost"
         )}"></i>`,
-        type: "text",
+        type: "numeric",
+        mask: "$#,##0.00",
         width: 140,
         readOnly: true,
         sort: true,
@@ -673,7 +727,8 @@ class ShipmentGlobalDemandView extends Component {
       )} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t(
         "static.tooltip.totalCostGlobalDemand"
       )}"></i>`,
-      type: "text",
+      type: "numeric",
+      mask: "$#,##0.00",
       width: 140,
       readOnly: true,
       sort: true,
@@ -686,7 +741,8 @@ class ShipmentGlobalDemandView extends Component {
       )} <i class="fa fa-info-circle icons ToltipInfoicon" title="${i18n.t(
         "static.tooltip.totalCostPercGlobalDemand"
       )}"></i>`,
-      type: "text",
+      type: "numeric",
+      mask: "0.00%",
       width: 110,
       readOnly: true,
       sort: true,
@@ -720,8 +776,100 @@ class ShipmentGlobalDemandView extends Component {
       allowInsertColumn: false,
       allowDeleteColumn: false,
       columnDrag: false,
-      columnSorting: true, // ← enable global sort (per-column controlled above)
-      search: true, // ← enable built-in search box
+      columnSorting: true, // ← sort arrows still show; actual sort done via onsort rebuild
+      search: true, // ← use jspreadsheet's native fast search,
+      onbeforesearch: function (worksheet, term) {
+        const tbody = worksheet.tbody;
+        if (!tbody) return false;
+
+        const trs = tbody.querySelectorAll("tr");
+        const rowsMeta = self._rowsMeta || [];
+        const lowerTerm = (term || "")
+          .toLowerCase()
+          .trim()
+          .replace(/[$,]/g, "");
+
+        const displayValues = new Array(rowsMeta.length);
+        const metaColCount = 4;
+
+        if (!lowerTerm) {
+          // No search term — show everything
+          for (let i = 0; i < rowsMeta.length; i++) {
+            displayValues[i] = "";
+          }
+        } else {
+          // ── Pass 1: find which PU rows match ──────────────────────────
+          // Also track which fspa/program parents have matching children
+          const visibleFspas = new Set();
+          const visibleProgs = new Set(); // "fspaCode|||progCode"
+
+          for (let i = 0; i < rowsMeta.length; i++) {
+            const rt = rowsMeta[i].rowType;
+            if (rt !== "pu") continue;
+
+            const visibleColCount = rowsMeta[i].data.length - metaColCount;
+            let matched = false;
+            for (let j = 1; j < visibleColCount; j++) {
+              const cellVal = (rowsMeta[i].data[j] || "")
+                .toString()
+                .toLowerCase()
+                .replace(/[$,]/g, "");
+              if (cellVal.includes(lowerTerm)) {
+                matched = true;
+                break;
+              }
+            }
+
+            displayValues[i] = matched ? "" : "none";
+
+            if (matched) {
+              // data layout: [..., _rowType, _collapseKey, _fspaCode, _progCode]
+              const fspaCode =
+                rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+              const progCode =
+                rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+              visibleFspas.add(fspaCode);
+              visibleProgs.add(fspaCode + "|||" + progCode);
+            }
+          }
+
+          // ── Pass 2: show/hide parent rows based on whether they have
+          //           at least one matching PU child ────────────────────
+          const anyMatch = visibleFspas.size > 0;
+
+          for (let i = 0; i < rowsMeta.length; i++) {
+            const rt = rowsMeta[i].rowType;
+            if (rt === "pu") continue; // already handled in pass 1
+
+            const fspaCode =
+              rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+            const progCode =
+              rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+
+            if (rt === "fspa") {
+              displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
+            } else if (rt === "program") {
+              displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
+                ? ""
+                : "none";
+            } else if (rt === "total") {
+              displayValues[i] = anyMatch ? "" : "none";
+            }
+          }
+        }
+
+        // ── Batch all DOM writes in one rAF ───────────────────────────
+        requestAnimationFrame(() => {
+          for (let i = 0; i < rowsMeta.length; i++) {
+            const tr = trs[i];
+            if (tr && tr.style.display !== displayValues[i]) {
+              tr.style.display = displayValues[i];
+            }
+          }
+        });
+
+        return false;
+      },
       filters: true, // ← enable column filter dropdowns
       pagination: false,
       allowRenameColumn: false,
@@ -730,16 +878,76 @@ class ShipmentGlobalDemandView extends Component {
       onopenfilter: onOpenFilter,
 
       // -----------------------------------------------------------
+      // onsort – fires AFTER jspreadsheet completes its native flat sort.
+      // We rebuild immediately with our group-aware sort so FSPA, Program,
+      // and Total rows are never moved; only PU rows are reordered.
+      // -----------------------------------------------------------
+      onsort: function (worksheet, column, order) {
+        // jspreadsheet passes order as 0 (asc) or 1 (desc) in v8
+        const dir = order === 1 || order === "desc" ? "desc" : "asc";
+        self.setState({ sortConfig: { col: column, dir } }, () =>
+          self.buildJExcel()
+        );
+      },
+
+      // -----------------------------------------------------------
+      // onsearch – fires AFTER jspreadsheet has hidden non-matching rows.
+      // We re-show any fspa/program/total rows whose children are visible.
+      // -----------------------------------------------------------
+      onsearch: function (worksheet, terms) {
+        if (!terms || (typeof terms === "string" && terms.trim() === ""))
+          return;
+        const tbody = worksheet.tbody;
+        if (!tbody) return;
+        const colLen = columns.length;
+
+        // First pass: collect which fspa/prog codes have at least one visible PU
+        const visibleFspas = new Set();
+        const visibleProgs = new Set(); // "fspaCode|||progCode"
+        let anyPuVisible = false;
+        rows.forEach((rowMeta, idx) => {
+          if (rowMeta.rowType !== "pu") return;
+          const trEl = tbody.children[idx];
+          if (!trEl || trEl.style.display === "none") return;
+          const fspa = rowMeta.data[colLen - 2] || "";
+          const prog = rowMeta.data[colLen - 1] || "";
+          visibleFspas.add(fspa);
+          visibleProgs.add(fspa + "|||" + prog);
+          anyPuVisible = true;
+        });
+
+        // Second pass: un-hide parent rows whose children are visible
+        rows.forEach((rowMeta, idx) => {
+          const t = rowMeta.rowType;
+          if (t !== "fspa" && t !== "program" && t !== "total") return;
+          const trEl = tbody.children[idx];
+          if (!trEl) return;
+          const fspa = rowMeta.data[colLen - 2] || "";
+          const prog = rowMeta.data[colLen - 1] || "";
+          if (
+            (t === "fspa" && visibleFspas.has(fspa)) ||
+            (t === "program" && visibleProgs.has(fspa + "|||" + prog)) ||
+            (t === "total" && anyPuVisible)
+          ) {
+            trEl.style.display = "";
+          }
+        });
+      },
+
+      // -----------------------------------------------------------
       // onload: apply styles + indentation + click handler
       // -----------------------------------------------------------
       onload: function (instance) {
         jExcelLoadedFunctionWithoutPagination(instance);
 
         const worksheet = instance.worksheets[0];
-        // worksheet.hideIndex(0);
-        const tbody = worksheet.tbody;
+        // Store worksheet reference so custom search can call worksheet.search()
+        self._worksheet = worksheet;
 
-        rows.forEach((rowMeta, rowIdx) => {
+        const tbody = worksheet.tbody;
+        const rowsForOnload = rows;
+
+        rowsForOnload.forEach((rowMeta, rowIdx) => {
           const trEl = tbody.children[rowIdx];
           if (!trEl) return;
 
@@ -789,18 +997,26 @@ class ShipmentGlobalDemandView extends Component {
               if (hasIcon) td.style.cursor = "pointer";
             }
 
-            // ── Grey background on qty cell for header rows ──
+            // ── For header rows qty cell: show "-" dash ──
+            // Numeric type renders empty string as "0"; we override the
+            // rendered HTML in-place so the stored value stays empty
+            // (empty sorts correctly relative to real numbers).
             if (
               showQtyCol &&
               cIdx === FIRST_DATA_COL &&
               (rowType === "fspa" || rowType === "program")
             ) {
-              // Apply with !important so jspreadsheet doesn't override it easily
-              td.style.setProperty(
-                "background-color",
-                "rgb(211, 211, 211)",
-                "important"
-              );
+              td.style.textAlign = "center";
+              td.style.color = "#999";
+              // Replace whatever jspreadsheet rendered ("0") with a dash.
+              // The <span> is jspreadsheet's inner value node; fall back to
+              // directly setting textContent on the td if no span is found.
+              const inner = td.querySelector("span.jss_view, span, div");
+              if (inner) {
+                inner.textContent = "-";
+              } else {
+                td.textContent = "-";
+              }
             }
           });
         });
@@ -853,12 +1069,37 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
+
+        // ── Prevent scroll jump when clicking a column header to sort ──
+        // jspreadsheet resets scroll internally after sort; capture the
+        // scroll position on mousedown and restore it at multiple delays
+        // to reliably catch both sync and async scroll resets.
+        // if (worksheet.thead) {
+        //   worksheet.thead.addEventListener("mousedown", function () {
+        //     const snapScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+        //     const snapWindowY = window.scrollY;
+        //     const restore = function () {
+        //       if (scrollContainer) scrollContainer.scrollTop = snapScrollTop;
+        //       window.scrollTo(0, snapWindowY);
+        //     };
+        //     setTimeout(restore, 0);
+        //     setTimeout(restore, 50);
+        //     setTimeout(restore, 150);
+        //   });
+        // }
+
+        // ── Restore scroll position after initial rebuild ──
+        // requestAnimationFrame(() => {
+        //   if (scrollContainer) scrollContainer.scrollTop = savedScrollTop;
+        //   window.scrollTo(0, savedWindowScrollY);
+        // });
       },
     };
 
     // ---------------------------------------------------------------
     // 8. Mount jspreadsheet
     // ---------------------------------------------------------------
+    this._rowsMeta = rows;
     if (this.tableDiv && this.tableDiv.current) {
       this.el = jexcel(this.tableDiv.current, options);
     }
@@ -1642,7 +1883,7 @@ class ShipmentGlobalDemandView extends Component {
                 data.column.index === 1 &&
                 (rowType === "fspa" || rowType === "program")
               ) {
-                data.cell.styles.fillColor = [211, 211, 211];
+                // data.cell.styles.fillColor = [211, 211, 211];
                 data.cell.styles.textColor = [0, 0, 0];
               }
             }
@@ -2436,10 +2677,7 @@ class ShipmentGlobalDemandView extends Component {
         procurementAgentValues: [],
         procurementAgentLabels: [],
       },
-      () => {
-        this.getPrograms();
-        this.fetchData();
-      }
+      () => {}
     );
   };
 
@@ -2457,13 +2695,7 @@ class ShipmentGlobalDemandView extends Component {
         planningUnitValues: [],
         planningUnitLabels: [],
       },
-      () => {
-        this.filterVersion();
-        this.getFundingSource();
-        this.fetchData();
-        this.getPlanningUnit();
-        this.getProcurementAgentList();
-      }
+      () => {}
     );
   };
 
@@ -3155,6 +3387,9 @@ class ShipmentGlobalDemandView extends Component {
             fontColor,
             ticks: {
               fontColor,
+              fontSize: 11,
+              autoSkip: false, // never omit a label
+              maxTicksLimit: 9999, // show all ticks regardless of height
               callback: function (value) {
                 return value.length > 40 ? value.substr(0, 40) + "..." : value;
               },
@@ -3529,28 +3764,30 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <MultiSelect
-                          bsSize="sm"
-                          name="countryIds"
-                          id="countryIds"
-                          value={this.state.countryValues}
-                          onChange={(e) => {
-                            this.handleChange(e);
-                          }}
-                          options={
-                            countryList && countryList.length > 0
-                              ? countryList
-                              : []
-                          }
-                          disabled={this.state.loading}
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t(
-                              "static.common.allitemsselected"
-                            ),
-                            selectSomeItems: i18n.t("static.common.select"),
-                          }}
-                          filterOptions={filterOptions}
-                        />
+                        <div onBlur={this.handleBlurCountry}>
+                          <MultiSelect
+                            bsSize="sm"
+                            name="countryIds"
+                            id="countryIds"
+                            value={this.state.countryValues}
+                            onChange={(e) => {
+                              this.handleChange(e);
+                            }}
+                            options={
+                              countryList && countryList.length > 0
+                                ? countryList
+                                : []
+                            }
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t(
+                                "static.common.allitemsselected"
+                              ),
+                              selectSomeItems: i18n.t("static.common.select"),
+                            }}
+                            filterOptions={filterOptions}
+                          />
+                        </div>
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -3559,28 +3796,30 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <MultiSelect
-                          bsSize="sm"
-                          name="programIds"
-                          id="programIds"
-                          value={this.state.programValues}
-                          onChange={(e) => {
-                            this.handleChangeProgram(e);
-                          }}
-                          options={
-                            programList && programList.length > 0
-                              ? programList
-                              : []
-                          }
-                          disabled={this.state.loading}
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t(
-                              "static.common.allitemsselected"
-                            ),
-                            selectSomeItems: i18n.t("static.common.select"),
-                          }}
-                          filterOptions={filterOptions}
-                        />
+                        <div onBlur={this.handleBlurProgram}>
+                          <MultiSelect
+                            bsSize="sm"
+                            name="programIds"
+                            id="programIds"
+                            value={this.state.programValues}
+                            onChange={(e) => {
+                              this.handleChangeProgram(e);
+                            }}
+                            options={
+                              programList && programList.length > 0
+                                ? programList
+                                : []
+                            }
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t(
+                                "static.common.allitemsselected"
+                              ),
+                              selectSomeItems: i18n.t("static.common.select"),
+                            }}
+                            filterOptions={filterOptions}
+                          />
+                        </div>
                       </div>
                     </FormGroup>
                     {this.state.programValues.length == 1 && (
@@ -3615,28 +3854,30 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <div onBlur={this.handleBlur}><MultiSelect
-                          name="planningUnitId"
-                          id="planningUnitId"
-                          bsSize="md"
-                          value={this.state.planningUnitValues}
-                          onChange={(e) => {
-                            this.handlePlanningUnitChange(e);
-                          }}
-                          options={
-                            planningUnitList && planningUnitList.length > 0
-                              ? planningUnitList
-                              : []
-                          }
-                          disabled={this.state.loading}
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t(
-                              "static.common.allitemsselected"
-                            ),
-                            selectSomeItems: i18n.t("static.common.select"),
-                          }}
-                          filterOptions={filterOptions}
-                        /></div>
+                        <div onBlur={this.handleBlur}>
+                          <MultiSelect
+                            name="planningUnitId"
+                            id="planningUnitId"
+                            bsSize="md"
+                            value={this.state.planningUnitValues}
+                            onChange={(e) => {
+                              this.handlePlanningUnitChange(e);
+                            }}
+                            options={
+                              planningUnitList && planningUnitList.length > 0
+                                ? planningUnitList
+                                : []
+                            }
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t(
+                                "static.common.allitemsselected"
+                              ),
+                              selectSomeItems: i18n.t("static.common.select"),
+                            }}
+                            filterOptions={filterOptions}
+                          />
+                        </div>
                       </div>
                     </FormGroup>
                     <FormGroup className="col-md-3">
@@ -3671,28 +3912,31 @@ class ShipmentGlobalDemandView extends Component {
                         </Label>
                         <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <div onBlur={this.handleBlur}><MultiSelect
-                            name="fundingSourceId"
-                            id="fundingSourceId"
-                            bsSize="sm"
-                            value={this.state.fundingSourceValues}
-                            onChange={(e) => {
-                              this.handleFundingSourceChange(e);
-                            }}
-                            options={
-                              fundingSourceList && fundingSourceList.length > 0
-                                ? fundingSourceList
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t(
-                                "static.common.allitemsselected"
-                              ),
-                              selectSomeItems: i18n.t("static.common.select"),
-                            }}
-                            filterOptions={filterOptions}
-                          /></div>
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="fundingSourceId"
+                              id="fundingSourceId"
+                              bsSize="sm"
+                              value={this.state.fundingSourceValues}
+                              onChange={(e) => {
+                                this.handleFundingSourceChange(e);
+                              }}
+                              options={
+                                fundingSourceList &&
+                                fundingSourceList.length > 0
+                                  ? fundingSourceList
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t(
+                                  "static.common.allitemsselected"
+                                ),
+                                selectSomeItems: i18n.t("static.common.select"),
+                              }}
+                              filterOptions={filterOptions}
+                            />
+                          </div>
                         </div>
                       </FormGroup>
                     )}
@@ -3703,29 +3947,31 @@ class ShipmentGlobalDemandView extends Component {
                         </Label>
                         <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <div onBlur={this.handleBlur}><MultiSelect
-                            name="procurementAgentId"
-                            id="procurementAgentId"
-                            bsSize="md"
-                            value={this.state.procurementAgentValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handleProcurementAgentChange(e);
-                            }}
-                            options={
-                              procurementAgentListDD &&
-                              procurementAgentListDD.length > 0
-                                ? procurementAgentListDD
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t(
-                                "static.common.allitemsselected"
-                              ),
-                              selectSomeItems: i18n.t("static.common.select"),
-                            }}
-                          /></div>
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="procurementAgentId"
+                              id="procurementAgentId"
+                              bsSize="md"
+                              value={this.state.procurementAgentValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handleProcurementAgentChange(e);
+                              }}
+                              options={
+                                procurementAgentListDD &&
+                                procurementAgentListDD.length > 0
+                                  ? procurementAgentListDD
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t(
+                                  "static.common.allitemsselected"
+                                ),
+                                selectSomeItems: i18n.t("static.common.select"),
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>
                     )}
@@ -3735,28 +3981,31 @@ class ShipmentGlobalDemandView extends Component {
                       </Label>
                       <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                       <div className="controls">
-                        <div onBlur={this.handleBlur}><MultiSelect
-                          name="shipmentStatusId"
-                          id="shipmentStatusId"
-                          bsSize="sm"
-                          value={this.state.shipmentStatusValues}
-                          onChange={(e) => {
-                            this.handleShipmentStatusChange(e);
-                          }}
-                          options={
-                            shipmentStatusList && shipmentStatusList.length > 0
-                              ? shipmentStatusList
-                              : []
-                          }
-                          disabled={this.state.loading}
-                          overrideStrings={{
-                            allItemsAreSelected: i18n.t(
-                              "static.common.allitemsselected"
-                            ),
-                            selectSomeItems: i18n.t("static.common.select"),
-                          }}
-                          filterOptions={filterOptions}
-                        /></div>
+                        <div onBlur={this.handleBlur}>
+                          <MultiSelect
+                            name="shipmentStatusId"
+                            id="shipmentStatusId"
+                            bsSize="sm"
+                            value={this.state.shipmentStatusValues}
+                            onChange={(e) => {
+                              this.handleShipmentStatusChange(e);
+                            }}
+                            options={
+                              shipmentStatusList &&
+                              shipmentStatusList.length > 0
+                                ? shipmentStatusList
+                                : []
+                            }
+                            disabled={this.state.loading}
+                            overrideStrings={{
+                              allItemsAreSelected: i18n.t(
+                                "static.common.allitemsselected"
+                              ),
+                              selectSomeItems: i18n.t("static.common.select"),
+                            }}
+                            filterOptions={filterOptions}
+                          />
+                        </div>
                       </div>
                     </FormGroup>
                   </div>
@@ -3764,9 +4013,9 @@ class ShipmentGlobalDemandView extends Component {
               </Form>
 
               {this.state.data.planningUnitQuantity.length > 0 && (
-                <h5>
+                <span>
                   <i>{i18n.t("static.shipment.note")}</i>
-                </h5>
+                </span>
               )}
 
               <div style={{ display: this.state.loading ? "none" : "block" }}>
@@ -3774,7 +4023,20 @@ class ShipmentGlobalDemandView extends Component {
                   <div className="row grid-divider">
                     {this.state.data.planningUnitQuantity.length > 0 && (
                       <Col md="8 pl-0">
-                        <div className="chart-wrapper shipmentOverviewgraphheight">
+                        {/* Dynamic bar chart height: 60px per PU, min 200px, max 800px */}
+                        <div
+                          className="chart-wrapper"
+                          style={{
+                            // 90px per planning unit, no upper cap – the page
+                            // scroll handles any overflow.
+                            height:
+                              Math.max(
+                                300,
+                                (this.state.planningUnitValues.length ||
+                                  planningUnitQuantity.length) * 15
+                              ) + "px",
+                          }}
+                        >
                           <HorizontalBar
                             key={`bar-${
                               this.state.viewById
@@ -3799,12 +4061,12 @@ class ShipmentGlobalDemandView extends Component {
                             height={300}
                           />
                         </div>
-                        <h5 className="text-center">
+                        <span className="text-center">
                           <i>
                             &nbsp;&nbsp;
                             {i18n.t("static.shipmentOverview.pieChartNote")}
                           </i>
-                        </h5>
+                        </span>
                         {/* <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5> */}
                       </Col>
                     )}
@@ -3815,7 +4077,7 @@ class ShipmentGlobalDemandView extends Component {
                   <div className="globalviwe-scroll">
                     {tableDataAvailable && (
                       <div className="col-md-12 mt-2">
-                        {/* Toolbar row: checkboxes on left, jspreadsheet search on right */}
+                        {/* Toolbar row: checkboxes on left, custom search on right */}
                         <div
                           className="d-flex align-items-center flex-wrap mb-1"
                           style={{ columnGap: "16px" }}
@@ -3915,13 +4177,8 @@ class ShipmentGlobalDemandView extends Component {
                           </FormGroup>
                         </div>
 
-                        {/*
-                                              The jspreadsheet search box (.jss_search) renders as the first child
-                                              inside the table div. The CSS below floats it up into the toolbar row
-                                              by using negative margin so it visually sits beside the checkboxes.
-                                            */}
                         <div
-                          className={`consumptionDataEntryTable ${
+                          className={`${
                             this.state.collapseAll
                               ? "Width40"
                               : this.state.collapsePlanningUnits
@@ -3931,7 +4188,7 @@ class ShipmentGlobalDemandView extends Component {
                           style={{
                             overflow: "visible",
                             position: "relative",
-                          }} /* position:relative so the absolute search anchors here */
+                          }}
                         >
                           <div
                             id="shipmentGlobalDemandTableDiv"
