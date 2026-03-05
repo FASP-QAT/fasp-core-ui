@@ -3718,7 +3718,7 @@ class ApplicationDashboard extends Component {
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                             {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
                             <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? ("v"+d.program.version+" - "+getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? ("v"+d.versionId+" - "+getLabelText(d.latestFinalVersionStatus.label, this.state.lang)) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
                               {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                             </td>
                           </tr>)
@@ -3910,7 +3910,12 @@ class ApplicationDashboard extends Component {
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>Score: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
+                            <i class="mb-2 fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b>
+                            </i>
+                          </div>
                         </div>
                         <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
@@ -3979,7 +3984,12 @@ class ApplicationDashboard extends Component {
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
-                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end' }}> <i class="mb-2 fs-10" style={{ color: '#000' }}>Score: <b className='h3 DarkFontbold' style={{ fontSize: '14px' }}>{Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
+                            <i class="mb-2 fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b>
+                            </i>
+                          </div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
