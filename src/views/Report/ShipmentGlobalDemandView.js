@@ -870,6 +870,106 @@ class ShipmentGlobalDemandView extends Component {
 
         return false;
       },
+      onbeforefilter: function(worksheet, filters, filteredRows) {
+        const tbody = worksheet.tbody;
+        if (!tbody) return false;
+      
+        const trs = tbody.querySelectorAll("tr");
+        const rowsMeta = self._rowsMeta || [];
+      
+        // ── If no filters active, show everything ────────────────────
+        const hasActiveFilter = filters && Object.values(filters).some(
+          (f) => f && f.length > 0
+        );
+      
+        if (!hasActiveFilter) {
+          requestAnimationFrame(() => {
+            for (let i = 0; i < rowsMeta.length; i++) {
+              const tr = trs[i];
+              if (tr) tr.style.display = "";
+            }
+          });
+          return false;
+        }
+      
+        const displayValues = new Array(rowsMeta.length);
+        const metaColCount = 4;
+      
+        // ── Pass 1: determine which PU rows pass ALL active filters ──
+        const visibleFspas = new Set();
+        const visibleProgs = new Set();
+      
+        for (let i = 0; i < rowsMeta.length; i++) {
+          const rt = rowsMeta[i].rowType;
+          if (rt !== "pu") continue;
+      
+          const visibleColCount = rowsMeta[i].data.length - metaColCount;
+          let matched = true;
+      
+          // Check every active filter column
+          for (const [colIdx, filterValues] of Object.entries(filters)) {
+            const col = parseInt(colIdx);
+            if (!filterValues || filterValues.length === 0) continue;
+            if (col >= visibleColCount) continue;
+      
+            const cellVal = (rowsMeta[i].data[col] || "").toString()
+              .toLowerCase().replace(/[$,]/g, "").trim();
+      
+            // filterValues is an array of selected filter options
+            const filterMatch = filterValues.some((fv) => {
+              const fvStr = (fv || "").toString().toLowerCase()
+                .replace(/[$,]/g, "").trim();
+              return cellVal === fvStr || cellVal.includes(fvStr);
+            });
+      
+            if (!filterMatch) {
+              matched = false;
+              break;
+            }
+          }
+      
+          displayValues[i] = matched ? "" : "none";
+      
+          if (matched) {
+            const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+            const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+            visibleFspas.add(fspaCode);
+            visibleProgs.add(fspaCode + "|||" + progCode);
+          }
+        }
+      
+        // ── Pass 2: show/hide parent rows based on matching children ─
+        const anyMatch = visibleFspas.size > 0;
+      
+        for (let i = 0; i < rowsMeta.length; i++) {
+          const rt = rowsMeta[i].rowType;
+          if (rt === "pu") continue;
+      
+          const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+          const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+      
+          if (rt === "fspa") {
+            displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
+          } else if (rt === "program") {
+            displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
+              ? "" : "none";
+          } else if (rt === "total") {
+            displayValues[i] = anyMatch ? "" : "none";
+          }
+        }
+      
+        // ── Batch all DOM writes in one rAF ──────────────────────────
+        requestAnimationFrame(() => {
+          for (let i = 0; i < rowsMeta.length; i++) {
+            const tr = trs[i];
+            if (tr && tr.style.display !== displayValues[i]) {
+              tr.style.display = displayValues[i];
+            }
+          }
+        });
+      
+        return false;
+      },
       filters: true, // ← enable column filter dropdowns
       pagination: false,
       allowRenameColumn: false,
@@ -3276,7 +3376,7 @@ class ShipmentGlobalDemandView extends Component {
         shipmentStatusLabels: shipmentStatusIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   }
