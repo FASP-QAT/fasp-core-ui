@@ -374,7 +374,7 @@ class ShipmentGlobalDemandView extends Component {
       f.programsList.forEach((p) => {
         p.pus.sort((a, b) =>
           a.display.toString().toUpperCase() >
-          b.display.toString().toUpperCase()
+            b.display.toString().toUpperCase()
             ? 1
             : -1
         );
@@ -405,8 +405,7 @@ class ShipmentGlobalDemandView extends Component {
     //    The data-key attribute drives toggleCollapse().
     // ---------------------------------------------------------------
     const makeToggleBtn = (collapseKey, isCollapsed) =>
-      `<i class="jss-accordion-btn fa ${
-        isCollapsed ? "fa-plus-square-o" : "fa-minus-square-o"
+      `<i class="jss-accordion-btn fa ${isCollapsed ? "fa-plus-square-o" : "fa-minus-square-o"
       } supplyPlanIcon" data-key="${collapseKey}" style="cursor:pointer;font-size:16px;"></i>`;
 
     // ---------------------------------------------------------------
@@ -480,8 +479,8 @@ class ShipmentGlobalDemandView extends Component {
           isHeaderRow
             ? "-"
             : qty !== undefined && qty !== null
-            ? formatNum(qty)
-            : ""
+              ? formatNum(qty)
+              : ""
         );
       }
       if (!this.state.hideCalculations) {
@@ -648,11 +647,11 @@ class ShipmentGlobalDemandView extends Component {
     // neither          → full Planning Unit names visible         → wide
     const labelColWidth =
       this.state.collapseAll ||
-      (this.state.collapsePlanningUnits && this.state.programValues.length == 1)
+        (this.state.collapsePlanningUnits && this.state.programValues.length == 1)
         ? 120
         : this.state.collapsePlanningUnits
-        ? 180
-        : 300;
+          ? 180
+          : 300;
 
     const columns = [
       // [0] accordion / toggle column – NO sort, NO filter, blank title
@@ -870,18 +869,17 @@ class ShipmentGlobalDemandView extends Component {
 
         return false;
       },
-      onbeforefilter: function(worksheet, filters, filteredRows) {
+      onbeforefilter: function (worksheet, filters, filteredRows) {
         const tbody = worksheet.tbody;
         if (!tbody) return false;
-      
+
         const trs = tbody.querySelectorAll("tr");
         const rowsMeta = self._rowsMeta || [];
-      
+
         // ── If no filters active, show everything ────────────────────
-        const hasActiveFilter = filters && Object.values(filters).some(
-          (f) => f && f.length > 0
-        );
-      
+        const hasActiveFilter =
+          filters && Object.values(filters).some((f) => f && f.length > 0);
+
         if (!hasActiveFilter) {
           requestAnimationFrame(() => {
             for (let i = 0; i < rowsMeta.length; i++) {
@@ -891,73 +889,82 @@ class ShipmentGlobalDemandView extends Component {
           });
           return false;
         }
-      
+
         const displayValues = new Array(rowsMeta.length);
         const metaColCount = 4;
-      
+
         // ── Pass 1: determine which PU rows pass ALL active filters ──
         const visibleFspas = new Set();
         const visibleProgs = new Set();
-      
+
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
           if (rt !== "pu") continue;
-      
+
           const visibleColCount = rowsMeta[i].data.length - metaColCount;
           let matched = true;
-      
+
           // Check every active filter column
           for (const [colIdx, filterValues] of Object.entries(filters)) {
             const col = parseInt(colIdx);
             if (!filterValues || filterValues.length === 0) continue;
             if (col >= visibleColCount) continue;
-      
-            const cellVal = (rowsMeta[i].data[col] || "").toString()
-              .toLowerCase().replace(/[$,]/g, "").trim();
-      
+
+            const cellVal = (rowsMeta[i].data[col] || "")
+              .toString()
+              .toLowerCase()
+              .replace(/[$,]/g, "")
+              .trim();
+
             // filterValues is an array of selected filter options
             const filterMatch = filterValues.some((fv) => {
-              const fvStr = (fv || "").toString().toLowerCase()
-                .replace(/[$,]/g, "").trim();
+              const fvStr = (fv || "")
+                .toString()
+                .toLowerCase()
+                .replace(/[$,]/g, "")
+                .trim();
               return cellVal === fvStr || cellVal.includes(fvStr);
             });
-      
+
             if (!filterMatch) {
               matched = false;
               break;
             }
           }
-      
+
           displayValues[i] = matched ? "" : "none";
-      
+
           if (matched) {
-            const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
-            const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+            const fspaCode =
+              rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+            const progCode =
+              rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
             visibleFspas.add(fspaCode);
             visibleProgs.add(fspaCode + "|||" + progCode);
           }
         }
-      
+
         // ── Pass 2: show/hide parent rows based on matching children ─
         const anyMatch = visibleFspas.size > 0;
-      
+
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
           if (rt === "pu") continue;
-      
+
           const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
           const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
-      
+
           if (rt === "fspa") {
             displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
           } else if (rt === "program") {
             displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
-              ? "" : "none";
+              ? ""
+              : "none";
           } else if (rt === "total") {
             displayValues[i] = anyMatch ? "" : "none";
           }
         }
-      
+
         // ── Batch all DOM writes in one rAF ──────────────────────────
         requestAnimationFrame(() => {
           for (let i = 0; i < rowsMeta.length; i++) {
@@ -967,7 +974,7 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
-      
+
         return false;
       },
       filters: true, // ← enable column filter dropdowns
@@ -1212,14 +1219,14 @@ class ShipmentGlobalDemandView extends Component {
     var csvRow = [];
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.dateRange") +
-          " : " +
-          makeText(this.state.rangeValue.from) +
-          " ~ " +
-          makeText(this.state.rangeValue.to)
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.dateRange") +
+        " : " +
+        makeText(this.state.rangeValue.from) +
+        " ~ " +
+        makeText(this.state.rangeValue.to)
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     [...this.state.countryLabels]
@@ -1231,12 +1238,12 @@ class ShipmentGlobalDemandView extends Component {
       .map((ele) =>
         csvRow.push(
           '"' +
-            (
-              i18n.t("static.dashboard.country") +
-              " : " +
-              ele.toString()
-            ).replaceAll(" ", "%20") +
-            '"'
+          (
+            i18n.t("static.dashboard.country") +
+            " : " +
+            ele.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
         )
       );
     csvRow.push("");
@@ -1249,24 +1256,24 @@ class ShipmentGlobalDemandView extends Component {
       .map((ele) =>
         csvRow.push(
           '"' +
-            (
-              i18n.t("static.program.program") +
-              " : " +
-              ele.toString()
-            ).replaceAll(" ", "%20") +
-            '"'
+          (
+            i18n.t("static.program.program") +
+            " : " +
+            ele.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
         )
       );
     csvRow.push("");
     if (this.state.programValues.length == 1) {
       csvRow.push(
         '"' +
-          (
-            i18n.t("static.report.version") +
-            "  :  " +
-            document.getElementById("versionId").selectedOptions[0].text
-          ).replaceAll(" ", "%20") +
-          '"'
+        (
+          i18n.t("static.report.version") +
+          "  :  " +
+          document.getElementById("versionId").selectedOptions[0].text
+        ).replaceAll(" ", "%20") +
+        '"'
       );
       csvRow.push("");
     }
@@ -1279,27 +1286,27 @@ class ShipmentGlobalDemandView extends Component {
       .map((ele) =>
         csvRow.push(
           '"' +
-            (
-              i18n.t("static.planningunit.planningunit") +
-              " : " +
-              ele.toString()
-            )
-              .replaceAll("#", "%23")
-              .replaceAll(" ", "%20") +
-            '"'
+          (
+            i18n.t("static.planningunit.planningunit") +
+            " : " +
+            ele.toString()
+          )
+            .replaceAll("#", "%23")
+            .replaceAll(" ", "%20") +
+          '"'
         )
       );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.common.display") +
-          " : " +
-          (this.state.viewById == 1
-            ? i18n.t("static.fundingSourceHead.fundingSource")
-            : i18n.t("static.report.procurementAgentName"))
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.common.display") +
+        " : " +
+        (this.state.viewById == 1
+          ? i18n.t("static.fundingSourceHead.fundingSource")
+          : i18n.t("static.report.procurementAgentName"))
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     if (this.state.viewById == 1) {
@@ -1312,12 +1319,12 @@ class ShipmentGlobalDemandView extends Component {
         .map((ele) =>
           csvRow.push(
             '"' +
-              (
-                i18n.t("static.budget.fundingsource") +
-                " : " +
-                ele.toString()
-              ).replaceAll(" ", "%20") +
-              '"'
+            (
+              i18n.t("static.budget.fundingsource") +
+              " : " +
+              ele.toString()
+            ).replaceAll(" ", "%20") +
+            '"'
           )
         );
     } else {
@@ -1330,12 +1337,12 @@ class ShipmentGlobalDemandView extends Component {
         .map((ele) =>
           csvRow.push(
             '"' +
-              (
-                i18n.t("static.report.procurementAgentName") +
-                " : " +
-                ele.toString()
-              ).replaceAll(" ", "%20") +
-              '"'
+            (
+              i18n.t("static.report.procurementAgentName") +
+              " : " +
+              ele.toString()
+            ).replaceAll(" ", "%20") +
+            '"'
           )
         );
     }
@@ -1343,42 +1350,42 @@ class ShipmentGlobalDemandView extends Component {
     this.state.shipmentStatusLabels.map((ele) =>
       csvRow.push(
         '"' +
-          (i18n.t("static.common.status") + " : " + ele.toString()).replaceAll(
-            " ",
-            "%20"
-          ) +
-          '"'
+        (i18n.t("static.common.status") + " : " + ele.toString()).replaceAll(
+          " ",
+          "%20"
+        ) +
+        '"'
       )
     );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.shipment.aggregateByCountry") +
-          " : " +
-          (this.state.aggregateByCountry ? "Yes" : "No")
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.shipment.aggregateByCountry") +
+        " : " +
+        (this.state.aggregateByCountry ? "Yes" : "No")
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.shipment.hideCalculations") +
-          " : " +
-          (this.state.hideCalculations ? "Yes" : "No")
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.shipment.hideCalculations") +
+        " : " +
+        (this.state.hideCalculations ? "Yes" : "No")
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.shipment.collapsePlanningUnits") +
-          " : " +
-          (this.state.collapsePlanningUnits ? "Yes" : "No")
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.shipment.collapsePlanningUnits") +
+        " : " +
+        (this.state.collapsePlanningUnits ? "Yes" : "No")
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push("");
@@ -1409,8 +1416,8 @@ class ShipmentGlobalDemandView extends Component {
           ? `${fspaHeader}`
           : `${fspaHeader} / ${i18n.t("static.dashboard.planningunitheader")}`
         : hidesPUs
-        ? `${fspaHeader} / ${progHeader}`
-        : `${fspaHeader} / ${progHeader} / ${i18n.t(
+          ? `${fspaHeader} / ${progHeader}`
+          : `${fspaHeader} / ${progHeader} / ${i18n.t(
             "static.dashboard.planningunitheader"
           )}`;
       tableHeadTemp.push(headerLabel.replaceAll(" ", "%20"));
@@ -1666,10 +1673,10 @@ class ShipmentGlobalDemandView extends Component {
           doc.setFontSize(8);
           doc.text(
             i18n.t("static.report.dateRange") +
-              " : " +
-              makeText(this.state.rangeValue.from) +
-              " ~ " +
-              makeText(this.state.rangeValue.to),
+            " : " +
+            makeText(this.state.rangeValue.from) +
+            " ~ " +
+            makeText(this.state.rangeValue.to),
             doc.internal.pageSize.width / 8,
             90,
             { align: "left" }
@@ -1688,8 +1695,8 @@ class ShipmentGlobalDemandView extends Component {
     var len = 120;
     var countryLabelsText = doc.splitTextToSize(
       i18n.t("static.dashboard.country") +
-        " : " +
-        this.state.countryLabels.join("; "),
+      " : " +
+      this.state.countryLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
     doc.text(doc.internal.pageSize.width / 8, 110, countryLabelsText);
@@ -1697,8 +1704,8 @@ class ShipmentGlobalDemandView extends Component {
 
     var planningText = doc.splitTextToSize(
       i18n.t("static.program.program") +
-        " : " +
-        this.state.programLabels.join("; "),
+      " : " +
+      this.state.programLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
     doc.text(doc.internal.pageSize.width / 8, len, planningText);
@@ -1707,8 +1714,8 @@ class ShipmentGlobalDemandView extends Component {
       len += 10;
       doc.text(
         i18n.t("static.report.version") +
-          " : " +
-          document.getElementById("versionId").selectedOptions[0].text,
+        " : " +
+        document.getElementById("versionId").selectedOptions[0].text,
         doc.internal.pageSize.width / 8,
         len,
         { align: "left" }
@@ -1720,17 +1727,17 @@ class ShipmentGlobalDemandView extends Component {
     doc.setTextColor("#002f6c");
     var puText = doc.splitTextToSize(
       i18n.t("static.planningunit.planningunit") +
-        " : " +
-        this.state.planningUnitLabels.join("; "),
+      " : " +
+      this.state.planningUnitLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
     let y = len + 10;
     var viewByText = doc.splitTextToSize(
       i18n.t("static.common.display") +
-        " : " +
-        (this.state.viewById == 1
-          ? i18n.t("static.fundingSourceHead.fundingSource")
-          : i18n.t("static.report.procurementAgentName")),
+      " : " +
+      (this.state.viewById == 1
+        ? i18n.t("static.fundingSourceHead.fundingSource")
+        : i18n.t("static.report.procurementAgentName")),
       (doc.internal.pageSize.width * 3) / 4
     );
     for (var i = 0; i < viewByText.length; i++) {
@@ -1745,17 +1752,17 @@ class ShipmentGlobalDemandView extends Component {
     var sourceOrAgentText =
       this.state.viewById == 1
         ? doc.splitTextToSize(
-            i18n.t("static.budget.fundingsource") +
-              " : " +
-              this.state.fundingSourceLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          )
+          i18n.t("static.budget.fundingsource") +
+          " : " +
+          this.state.fundingSourceLabels.join("; "),
+          (doc.internal.pageSize.width * 3) / 4
+        )
         : doc.splitTextToSize(
-            i18n.t("static.report.procurementAgentName") +
-              " : " +
-              this.state.procurementAgentLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
+          i18n.t("static.report.procurementAgentName") +
+          " : " +
+          this.state.procurementAgentLabels.join("; "),
+          (doc.internal.pageSize.width * 3) / 4
+        );
     y = y + 10;
     for (var i = 0; i < sourceOrAgentText.length; i++) {
       if (y > doc.internal.pageSize.height - 100) {
@@ -1768,8 +1775,8 @@ class ShipmentGlobalDemandView extends Component {
 
     var statusText = doc.splitTextToSize(
       i18n.t("static.common.status") +
-        " : " +
-        this.state.shipmentStatusLabels.join("; "),
+      " : " +
+      this.state.shipmentStatusLabels.join("; "),
       (doc.internal.pageSize.width * 3) / 4
     );
     y = y + 10;
@@ -1795,14 +1802,14 @@ class ShipmentGlobalDemandView extends Component {
     y = y + 10;
     var filterProps = [
       i18n.t("static.shipment.aggregateByCountry") +
-        " : " +
-        (this.state.aggregateByCountry ? "Yes" : "No"),
+      " : " +
+      (this.state.aggregateByCountry ? "Yes" : "No"),
       i18n.t("static.shipment.hideCalculations") +
-        " : " +
-        (this.state.hideCalculations ? "Yes" : "No"),
+      " : " +
+      (this.state.hideCalculations ? "Yes" : "No"),
       i18n.t("static.shipment.collapsePlanningUnits") +
-        " : " +
-        (this.state.collapsePlanningUnits ? "Yes" : "No"),
+      " : " +
+      (this.state.collapsePlanningUnits ? "Yes" : "No"),
     ];
     for (var i = 0; i < filterProps.length; i++) {
       var propText = doc.splitTextToSize(
@@ -1908,8 +1915,8 @@ class ShipmentGlobalDemandView extends Component {
             ? `${fspaHeader}`
             : `${fspaHeader} / ${i18n.t("static.dashboard.planningunitheader")}`
           : hidesPUs
-          ? `${fspaHeader} / ${progHeader}`
-          : `${fspaHeader} / ${progHeader} / ${i18n.t(
+            ? `${fspaHeader} / ${progHeader}`
+            : `${fspaHeader} / ${progHeader} / ${i18n.t(
               "static.dashboard.planningunitheader"
             )}`;
 
@@ -2189,12 +2196,12 @@ class ShipmentGlobalDemandView extends Component {
               };
               let countryInfo =
                 this.state.countryValues &&
-                this.state.countryValues.length === 1
+                  this.state.countryValues.length === 1
                   ? {
-                      id: this.state.countryValues[0].value,
-                      label: { label_en: this.state.countryValues[0].label },
-                      code: this.state.countryValues[0].label,
-                    }
+                    id: this.state.countryValues[0].value,
+                    label: { label_en: this.state.countryValues[0].label },
+                    code: this.state.countryValues[0].label,
+                  }
                   : programInfo;
 
               shipmentStatusFilter.forEach((item) => {
@@ -2373,19 +2380,19 @@ class ShipmentGlobalDemandView extends Component {
           : this.state.planningUnitValues.map((ele) => ele.value.toString());
       let fundingSourceIds =
         this.state.fundingSourceValues.length ==
-        this.state.fundingSources.length
+          this.state.fundingSources.length
           ? []
           : this.state.fundingSourceValues.map((ele) => ele.value.toString());
       let procurementAgentIds =
         this.state.procurementAgentValues.length ==
-        this.state.procurementAgentValues.length
+          this.state.procurementAgentValues.length
           ? []
           : this.state.procurementAgentValues.map((ele) =>
-              ele.value.toString()
-            );
+            ele.value.toString()
+          );
       let shipmentStatusIds =
         this.state.shipmentStatusValues.length ==
-        this.state.shipmentStatuses.length
+          this.state.shipmentStatuses.length
           ? []
           : this.state.shipmentStatusValues.map((ele) => ele.value.toString());
       let realmId = AuthenticationService.getRealmId();
@@ -2456,8 +2463,8 @@ class ShipmentGlobalDemandView extends Component {
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
                 loading: false,
               });
             } else {
@@ -2642,15 +2649,15 @@ class ShipmentGlobalDemandView extends Component {
                           ? labelX
                           : labelX + 8
                         : x < 0.5
-                        ? labelX - 8
-                        : labelX,
+                          ? labelX - 8
+                          : labelX,
                       y < 0
                         ? y < -0.5
                           ? labelY - 8
                           : labelY
                         : y < 0.5
-                        ? labelY
-                        : labelY + 8
+                          ? labelY
+                          : labelY + 8
                     );
                     ctx.restore();
                   }
@@ -2698,8 +2705,8 @@ class ShipmentGlobalDemandView extends Component {
               message: API_URL.includes("uat")
                 ? i18n.t("static.common.uatNetworkErrorMessage")
                 : API_URL.includes("demo")
-                ? i18n.t("static.common.demoNetworkErrorMessage")
-                : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               loading: false,
             });
           } else {
@@ -2777,7 +2784,7 @@ class ShipmentGlobalDemandView extends Component {
         procurementAgentValues: [],
         procurementAgentLabels: [],
       },
-      () => {}
+      () => { }
     );
   };
 
@@ -2795,7 +2802,7 @@ class ShipmentGlobalDemandView extends Component {
         planningUnitValues: [],
         planningUnitLabels: [],
       },
-      () => {}
+      () => { }
     );
   };
 
@@ -2879,7 +2886,7 @@ class ShipmentGlobalDemandView extends Component {
         .then((response) => {
           var listArray = response.data.sort((a, b) =>
             getLabelText(a.label, this.state.lang).toUpperCase() >
-            getLabelText(b.label, this.state.lang).toUpperCase()
+              getLabelText(b.label, this.state.lang).toUpperCase()
               ? 1
               : -1
           );
@@ -2939,7 +2946,7 @@ class ShipmentGlobalDemandView extends Component {
           if (response.status == 200) {
             var fundingSourceTypes = response.data.sort((a, b) =>
               a.fundingSourceTypeCode.toLowerCase() <
-              b.fundingSourceTypeCode.toLowerCase()
+                b.fundingSourceTypeCode.toLowerCase()
                 ? -1
                 : 1
             );
@@ -2992,7 +2999,7 @@ class ShipmentGlobalDemandView extends Component {
         this.setState({
           fundingSourceTypes: fstList.sort((a, b) =>
             a.fundingSourceTypeCode.toLowerCase() <
-            b.fundingSourceTypeCode.toLowerCase()
+              b.fundingSourceTypeCode.toLowerCase()
               ? -1
               : 1
           ),
@@ -3303,7 +3310,7 @@ class ShipmentGlobalDemandView extends Component {
                   .then((response) => {
                     var listArray = response.data.sort((a, b) =>
                       getLabelText(a.label, this.state.lang).toUpperCase() >
-                      getLabelText(b.label, this.state.lang).toUpperCase()
+                        getLabelText(b.label, this.state.lang).toUpperCase()
                         ? 1
                         : -1
                     );
@@ -3672,7 +3679,14 @@ class ShipmentGlobalDemandView extends Component {
     };
 
     const optionsPie = {
-      layout: { padding: 10 },
+      layout: {
+        padding: {
+          left: 50,
+          right: 50,
+          top: 0,
+          bottom: 0,
+        },
+      },
       title: {
         display: true,
         text:
@@ -3682,11 +3696,10 @@ class ShipmentGlobalDemandView extends Component {
             ? i18n.t("static.fundingSourceHead.fundingSource")
             : i18n.t("static.report.procurementAgentName")),
         fontColor,
-        padding: 30,
       },
       legend: {
         position: "bottom",
-        labels: { padding: 25, fontColor, usePointStyle: true },
+        labels: { fontColor, usePointStyle: true },
       },
       tooltips: {
         callbacks: {
@@ -4023,7 +4036,7 @@ class ShipmentGlobalDemandView extends Component {
                               }}
                               options={
                                 fundingSourceList &&
-                                fundingSourceList.length > 0
+                                  fundingSourceList.length > 0
                                   ? fundingSourceList
                                   : []
                               }
@@ -4059,7 +4072,7 @@ class ShipmentGlobalDemandView extends Component {
                               }}
                               options={
                                 procurementAgentListDD &&
-                                procurementAgentListDD.length > 0
+                                  procurementAgentListDD.length > 0
                                   ? procurementAgentListDD
                                   : []
                               }
@@ -4092,7 +4105,7 @@ class ShipmentGlobalDemandView extends Component {
                             }}
                             options={
                               shipmentStatusList &&
-                              shipmentStatusList.length > 0
+                                shipmentStatusList.length > 0
                                 ? shipmentStatusList
                                 : []
                             }
@@ -4117,30 +4130,19 @@ class ShipmentGlobalDemandView extends Component {
                   <i>{i18n.t("static.shipment.note")}</i>
                 </span>
               )}
-
+<br/>
               <div style={{ display: this.state.loading ? "none" : "block" }}>
                 <Col md="12 pl-0">
-                  <div className="row grid-divider">
+                  <div
+                    className="row grid-divider"
+                    style={{ display: "flex", alignItems: "stretch" }}
+                  >
                     {this.state.data.planningUnitQuantity.length > 0 && (
-                      <Col md="8 pl-0">
-                        {/* Dynamic bar chart height: 60px per PU, min 200px, max 800px */}
-                        <div
-                          className="chart-wrapper"
-                          style={{
-                            // 90px per planning unit, no upper cap – the page
-                            // scroll handles any overflow.
-                            height:
-                              Math.max(
-                                300,
-                                (this.state.planningUnitValues.length ||
-                                  planningUnitQuantity.length) * 15
-                              ) + "px",
-                          }}
-                        >
+                      <Col md="8 pl-0" style={{ padding: "0" }}>
+                        <div className="chart-wrapper shipmentOverviewgraphheight">
                           <HorizontalBar
-                            key={`bar-${
-                              this.state.viewById
-                            }-${allFspaCodes.join(",")}`}
+                            key={`bar-${this.state.viewById
+                              }-${allFspaCodes.join(",")}`}
                             id="cool-canvas1"
                             data={chartData}
                             options={options}
@@ -4149,25 +4151,23 @@ class ShipmentGlobalDemandView extends Component {
                       </Col>
                     )}
                     {this.state.data.fspaCostAndPerc.length > 0 && (
-                      <Col md="4 pl-0">
-                        <div className="chart-wrapper">
+                      <Col md="4 pl-0" style={{ padding: "0" }}>
+                        <div
+                          className="chart-wrapper shipmentOverviewgraphheight"
+                          style={{ width: "100%", position: "relative" }}
+                        >
                           <Pie
                             key={`pie-${this.state.viewById}-${pieLabels.join(
                               ","
                             )}`}
                             id="cool-canvas2"
                             data={chartDataForPie}
-                            options={optionsPie}
-                            height={300}
+                            options={{
+                              ...optionsPie,
+                              maintainAspectRatio: false,
+                            }}
                           />
                         </div>
-                        <span className="text-center">
-                          <i>
-                            &nbsp;&nbsp;
-                            {i18n.t("static.shipmentOverview.pieChartNote")}
-                          </i>
-                        </span>
-                        {/* <h5 className="red text-center">{this.state.groupByFundingSourceType ? i18n.t('static.report.fundingSourceTypeUsdAmount') : i18n.t('static.report.fundingSourceUsdAmount')}</h5> */}
                       </Col>
                     )}
                   </div>
@@ -4278,13 +4278,12 @@ class ShipmentGlobalDemandView extends Component {
                         </div>
 
                         <div
-                          className={`${
-                            this.state.collapseAll
-                              ? "Width40"
-                              : this.state.collapsePlanningUnits
+                          className={`${this.state.collapseAll
+                            ? "Width40"
+                            : this.state.collapsePlanningUnits
                               ? "Width60"
                               : "TableWidth100"
-                          }`}
+                            }`}
                           style={{
                             overflow: "visible",
                             position: "relative",
