@@ -169,7 +169,10 @@ class SupplyPlanScoreCard extends Component {
       dashboardBottomDataList: [],
       countryExpandedMap: {},
       sortedLabels: [],
-      collapseAllChecked: false
+      collapseAllChecked: false,
+      large: false,
+      loadingForNotes: false,
+      notesTransTableEl: ""
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -177,6 +180,9 @@ class SupplyPlanScoreCard extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.exportCSV = this.exportCSV.bind(this);
     this.exportPDF = this.exportPDF.bind(this);
+    this.toggleLarge = this.toggleLarge.bind(this);
+    this.getNotes = this.getNotes.bind(this);
+    this.redirectToSPVR = this.redirectToSPVR.bind(this);
   }
   /**
    * Reterives dashboard data from server on component mount
@@ -250,6 +256,115 @@ class SupplyPlanScoreCard extends Component {
     }, () => {
       this.getHealthAreaList();
     })
+  }
+  /**
+   * Redirects to the Supply Plan Version and Review report for the specified program.
+   * @param {number|string} programId - The ID of the program.
+   */
+  redirectToSPVR(programId) {
+    localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId);
+    this.props.history.push('/report/supplyPlanVersionAndReview/1');
+  }
+  /**
+   * Toggles the visibility of the large modal.
+   */
+  toggleLarge() {
+    this.setState({
+      large: !this.state.large,
+    });
+  }
+  /**
+   * Fetches version notes history for a specific program and displays them in a Jexcel table modal.
+   * @param {number} programId - The ID of the program to fetch notes for.
+   */
+  getNotes(programId) {
+    this.toggleLarge();
+    this.setState({
+      loadingForNotes: true
+    })
+    ProgramService.getNotesHistory(programId)
+      .then(response => {
+        var data = response.data;
+        const listArray = [];
+        const grouped = data.reduce((acc, item) => {
+          acc[item.versionId] = acc[item.versionId] || [];
+          acc[item.versionId].push(item);
+          return acc;
+        }, {});
+
+        Object.values(grouped).forEach(entries => {
+          const pendingEntries = entries.filter(e => e.versionStatus.id === 1);
+          if (pendingEntries.length) {
+            listArray.push(pendingEntries[0]);
+            if (pendingEntries.length > 1) {
+              listArray.push(pendingEntries[pendingEntries.length - 1]);
+            }
+          }
+          listArray.push(...entries.filter(e => e.versionStatus.id !== 1));
+        });
+
+        if (this.state.notesTransTableEl != "" && this.state.notesTransTableEl != undefined) {
+          jexcel.destroy(document.getElementById("notesTransTable"), true);
+        }
+        var json = [];
+        for (var sb = listArray.length - 1; sb >= 0; sb--) {
+          var data = [];
+          data[0] = listArray[sb].versionId;
+          data[1] = getLabelText(listArray[sb].versionType.label, this.state.lang);
+          data[2] = listArray[sb].versionType.id == 1 ? "" : getLabelText(listArray[sb].versionStatus.label, this.state.lang);
+          data[3] = listArray[sb].notes;
+          data[4] = listArray[sb].lastModifiedBy.username;
+          data[5] = moment(listArray[sb].lastModifiedDate).format("YYYY-MM-DD HH:mm:ss");
+          json.push(data);
+        }
+        var options = {
+          data: json,
+          columnDrag: false,
+          columns: [
+            { title: i18n.t('static.report.version'), type: 'text', width: 50 },
+            { title: i18n.t('static.report.versiontype'), type: 'text', width: 100 },
+            { title: i18n.t('static.report.issupplyplanapprove'), type: 'text', width: 120 },
+            { title: i18n.t('static.program.notes'), type: 'text', width: 300 },
+            { title: i18n.t("static.common.lastModifiedBy"), type: "text", width: 120 },
+            { title: i18n.t("static.common.lastModifiedDate"), type: "calendar", width: 150, options: { isTime: 1, format: "DD-Mon-YY HH24:MI" } },
+          ],
+          editable: false,
+          onload: function (instance, cell) {
+            jExcelLoadedFunctionForNotes(instance, 1);
+          }.bind(this),
+          pagination: localStorage.getItem("sesRecordCount") || 10,
+          search: true,
+          columnSorting: true,
+          wordWrap: true,
+          allowInsertColumn: false,
+          allowManualInsertColumn: false,
+          allowDeleteRow: false,
+          copyCompatibility: true,
+          allowExport: false,
+          paginationOptions: JEXCEL_PAGINATION_OPTION,
+          position: "top",
+          filters: true,
+          license: JEXCEL_PRO_KEY,
+          onopenfilter: onOpenFilter,
+          allowRenameColumn: false,
+          contextMenu: function (obj, x, y, e) {
+            return false;
+          }.bind(this),
+        };
+        var scorecardTableDiv = document.getElementById("scorecardTableDiv"); // Dummy check
+        setTimeout(() => {
+          var elVar = jexcel(document.getElementById("notesTransTable"), options);
+          this.setState({ notesTransTableEl: elVar, loadingForNotes: false });
+        }, 100);
+
+      }).catch(
+        error => {
+          this.setState({
+            loadingForNotes: false
+          })
+          console.error(error);
+        }
+      );
   }
   /**
    * Handles the change event for program selection.
@@ -591,9 +706,10 @@ class SupplyPlanScoreCard extends Component {
         this.buildJexcel();
     });
   }
-  toggleShowDetail = () => {
-    let showDetail = document.getElementById("showDetailId").value;
-    var showDetailLabel = document.getElementById("showDetailId").selectedOptions[0].text.toString();
+  toggleShowDetail = (e) => {
+    const checked = e && e.target ? e.target.checked : false;
+    const showDetail = checked ? '1' : '0';
+    const showDetailLabel = checked ? 'Yes' : 'No';
     this.setState({
         showDetail: showDetail,
         showDetailLabel: [showDetailLabel]
@@ -674,7 +790,8 @@ class SupplyPlanScoreCard extends Component {
         "versionCreatedDate": programJson.currentVersion.createdDate,
         "versionLastModifiedDate": programJson.currentVersion.lastModifiedDate,
         "supplyPlanQualityScore": totalQpl > 0 ? (((1 - flaggedCountForecast/totalQpl) + (1 - flaggedCountActual/totalQpl) + (1 - flaggedCountInventory/totalQpl) + (1 - flaggedCountShipment/totalQpl)) / 4) * 100 : 0,
-        "stockStatusScore": (stockOut + underStock + adequate + overStock) > 0 ? (adequate / (stockOut + underStock + adequate + overStock)) * 100 : 0
+        "stockStatusScore": (stockOut + underStock + adequate + overStock) > 0 ? (adequate / (stockOut + underStock + adequate + overStock)) * 100 : 0,
+        "programId": programJson.programId
     };
   }
 
@@ -741,8 +858,18 @@ class SupplyPlanScoreCard extends Component {
   }
 
   buildJexcel = () => {
+    let scorecardTableDiv = document.getElementById("scorecardTableDiv");
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (scorecardTableDiv) {
+        const currentHeight = scorecardTableDiv.offsetHeight;
+        if (currentHeight > 0) {
+            scorecardTableDiv.style.minHeight = currentHeight + 'px';
+        }
+    }
+
     if (this.el) {
-        try { jexcel.destroy(document.getElementById("scorecardTableDiv"), true); } catch(e){}
+        try { jexcel.destroy(scorecardTableDiv, true); } catch(e){}
         this.el = null;
     }
 
@@ -837,7 +964,8 @@ class SupplyPlanScoreCard extends Component {
             const naPerc = totalSt>0 ? Math.round((totalNA/totalSt)*100) : 0;
 
             data.push([
-                `${toggleIcon} ${cg.label}`,
+                toggleIcon,
+                cg.label,
                 '-',
                 activePUs,
                 sumForecast,
@@ -851,7 +979,8 @@ class SupplyPlanScoreCard extends Component {
                 '-',
                 '-',
                 'row_parent',
-                cg.key
+                cg.key,
+                ''
             ]);
 
             if (isExpanded) {
@@ -860,6 +989,7 @@ class SupplyPlanScoreCard extends Component {
                     let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
                     reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
                     data.push([
+                        '',
                         `${dbd.program.code}`,
                         `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                         dbd.totalPus,
@@ -874,7 +1004,8 @@ class SupplyPlanScoreCard extends Component {
                         reviewStatus,
                         dbd.versionNotes || '',
                         'row_child',
-                        cg.key
+                        cg.key,
+                        dbd.programId
                     ]);
                 });
             }
@@ -887,6 +1018,7 @@ class SupplyPlanScoreCard extends Component {
             let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
             reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
             data.push([
+                '',
                 dbd.program.code,
                 `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                 dbd.totalPus,
@@ -901,13 +1033,27 @@ class SupplyPlanScoreCard extends Component {
                 reviewStatus,
                 dbd.versionNotes || '',
                 'program',
-                ''
+                '',
+                dbd.programId
             ]);
         });
     }
 
     const reapplyFormatting = (instance) => {
         if (!instance || !instance.tbody) return;
+
+        // Hide filter and text for the collapse column
+        if (isCountryView && instance.thead) {
+            const filterRow = instance.thead.querySelector('.jexcel_filter') || instance.thead.querySelector('.jss_filter');
+            if (filterRow && filterRow.children[1]) {
+                const filterCell = filterRow.children[1];
+                filterCell.innerHTML = '';
+                filterCell.innerText = '';
+                filterCell.style.setProperty('background', 'none', 'important');
+                filterCell.style.setProperty('background-image', 'none', 'important');
+                filterCell.style.setProperty('pointer-events', 'none', 'important');
+            }
+        }
         
         // Align headers based on view
         const headers = instance.thead.querySelectorAll('td');
@@ -922,6 +1068,7 @@ class SupplyPlanScoreCard extends Component {
         const rows = instance.tbody.children;
         const allData = instance.options.data;
 
+        let childRowIndex = 0;
         for (let r = 0; r < rows.length; r++) {
             const tr = rows[r];
             if (!tr || tr.style.display === 'none') continue;
@@ -929,7 +1076,7 @@ class SupplyPlanScoreCard extends Component {
             if (isNaN(dataY) || !allData[dataY]) continue;
             const rowData = allData[dataY];
             const activePUs = Number(rowData[2]) || 0;
-            const rowType = rowData[rowData.length - 2];
+            const rowType = isMatrixView ? rowData[rowData.length - 2] : rowData[14];
             
             if (isMatrixView) {
                 const cell0Matrix = tr.querySelector(`td[data-x="0"]`);
@@ -968,50 +1115,110 @@ class SupplyPlanScoreCard extends Component {
 
             const cell0 = tr.querySelector(`td[data-x="0"]`);
             if (cell0) {
-                cell0.style.textAlign = 'left';
-                cell0.style.setProperty('text-align', 'left', 'important');
+                let txt = rowData[0];
+                if (txt === '+') {
+                    cell0.innerHTML = `<i class="fa fa-plus-square-o" style="color: #2baae2; font-size: 14px;"></i>`;
+                    cell0.style.textAlign = 'center';
+                    cell0.style.setProperty('text-align', 'center', 'important');
+                } else if (txt === '-') {
+                    cell0.innerHTML = `<i class="fa fa-minus-square-o" style="color: #2baae2; font-size: 14px;"></i>`;
+                    cell0.style.textAlign = 'center';
+                    cell0.style.setProperty('text-align', 'center', 'important');
+                }
+            }
+
+            const cell1 = tr.querySelector(`td[data-x="1"]`);
+            if (cell1) {
+                cell1.style.textAlign = 'left';
+                cell1.style.setProperty('text-align', 'left', 'important');
             }
 
             if (rowType === 'row_parent') {
-                tr.style.backgroundColor = '#d0e4f7';
+                childRowIndex = 0;
+                tr.style.backgroundColor = '#f4f4f4';
                 tr.style.cursor = 'pointer';
                 for (let i = 0; i < tr.children.length; i++) {
                     tr.children[i].style.fontWeight = 'bold';
                 }
-                if (cell0) {
-                    cell0.style.paddingLeft = '10px';
+                if (cell1) {
+                    cell1.style.paddingLeft = '5px';
                 }
             } else if (rowType === 'row_child') {
-                tr.style.backgroundColor = '#f7fbff';
-                if (cell0) {
-                    cell0.style.paddingLeft = '30px';
+                childRowIndex++;
+                tr.style.backgroundColor = childRowIndex % 2 === 0 ? '#ffffff' : '#dce8f4';
+                if (cell1) {
+                    cell1.style.paddingLeft = '30px';
                 }
             }
 
             // Align Latest Version, Review Status, and Version Notes to left
-            for (let c of [1, 11, 12]) {
+            for (let c of [2, 12, 13]) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (cell) {
                     cell.style.textAlign = 'left';
                     cell.style.setProperty('text-align', 'left', 'important');
                     cell.style.paddingLeft = '10px';
+
+                    // Reset link styles and handlers
+                    cell.style.removeProperty('color');
+                    cell.style.removeProperty('text-decoration');
+                    cell.style.removeProperty('cursor');
+                    cell.style.setProperty('background-image', 'none', 'important');
+                    cell.removeAttribute('title');
+                    cell.onclick = null;
+                    cell.classList.remove('jss_comment');
+                    cell.classList.remove('jss_notes');
+
+                    if ((c === 12 || c === 13) && (rowType === 'row_child' || rowType === 'program')) {
+                        const programId = rowData[rowData.length - 1];
+                        if (programId) {
+                            const val = rowData[c];
+                            if (val && val !== '-' && val.trim() !== '') {
+                                if (c === 13) {
+                                    const iconHtml = `<i class="fa fa-book" style="color: #002f6c; vertical-align: middle; margin-left: 5px;"></i>`;
+                                    cell.innerHTML = `${val} ${iconHtml}`;
+                                }
+                                cell.style.setProperty('color', '#002f6c', 'important');
+                                cell.style.setProperty('text-decoration', 'none', 'important');
+                                cell.style.setProperty('cursor', 'pointer', 'important');
+                                cell.onclick = (e) => {
+                                    e.stopPropagation();
+                                    if (c === 12) {
+                                        this.redirectToSPVR(programId);
+                                    } else {
+                                        this.getNotes(programId);
+                                    }
+                                };
+                            }
+                        }
+                    }
                 }
             }
 
-            for (let c = 3; c <= 6; c++) {
+            for (let c = 4; c <= 7; c++) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
-                const value = Number(rowData[c]);
+                const value = (rowData[c] === null || rowData[c] === undefined || rowData[c] === '') ? 0 : Number(rowData[c]);
                 if (!isNaN(value)) {
-                    let percentage = activePUs > 0 ? Math.min((value / activePUs) * 100, 100) : 0;
-                    cell.style.background = `linear-gradient(to right, #A9D1E5 ${percentage}%, transparent ${percentage}%)`;
-                    cell.style.backgroundClip = 'content-box';
-                    cell.style.padding = '0px 0px';
-                    cell.style.textAlign = 'right';
-                    cell.style.fontWeight = 'bold';
+                    if (value === 0) {
+                        cell.style.setProperty('color', '#BA0C2F', 'important');
+                        cell.style.fontWeight = 'bold';
+                        cell.style.background = 'none';
+                        cell.style.textAlign = 'right';
+                        cell.innerText = '0';
+                    } else {
+                        cell.style.color = '';
+                        cell.style.removeProperty('color');
+                        let percentage = activePUs > 0 ? Math.min((value / activePUs) * 100, 100) : 0;
+                        cell.style.background = `linear-gradient(to right, #A9D1E5 ${percentage}%, transparent ${percentage}%)`;
+                        cell.style.backgroundClip = 'content-box';
+                        cell.style.padding = '0px 0px';
+                        cell.style.textAlign = 'right';
+                        cell.style.fontWeight = 'bold';
+                    }
                 }
             }
-            for (let c of [7, 9, 10]) {
+            for (let c of [8, 10, 11]) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
                 const raw = String(rowData[c] || '').replace(/%/g, '').trim();
@@ -1027,15 +1234,16 @@ class SupplyPlanScoreCard extends Component {
                     cell.style.fontWeight = 'bold';
                 }
             }
-            const stockCell = tr.querySelector('td[data-x="8"]');
+            const stockCell = tr.querySelector('td[data-x="9"]');
             if (stockCell) {
-                const parts = String(rowData[8] || '').split(',');
+                const parts = String(rowData[9] || '').split(',');
                 if (parts.length === 5) {
                     const c1 = Number(parts[0]);
                     const c2 = c1 + Number(parts[1]);
                     const c3 = c2 + Number(parts[2]);
                     const c4 = c3 + Number(parts[3]);
                     stockCell.style.background = `linear-gradient(to right, #BA0C2F 0%, #BA0C2F ${c1}%, #f48521 ${c1}%, #f48521 ${c2}%, #118b70 ${c2}%, #118b70 ${c3}%, #edb944 ${c3}%, #edb944 ${c4}%, #cfcdc9 ${c4}%, #cfcdc9 100%)`;
+                    stockCell.title = `🟥 Stock Out: ${parts[0]}%\n🟧 Understock: ${parts[1]}%\n🟩 Adequate: ${parts[2]}%\n🟨 Overstock: ${parts[3]}%\n⬜ N/A: ${parts[4]}%`;
                     stockCell.style.backgroundRepeat = 'no-repeat';
                     stockCell.style.backgroundPosition = 'center';
                     stockCell.style.backgroundSize = '95% 14px';
@@ -1051,6 +1259,7 @@ class SupplyPlanScoreCard extends Component {
         data: data,
         columnDrag: true,
         columns: isMatrixView ? matrixCols : [
+            { title: ' ', type: isCountryView ? 'text' : 'hidden', readOnly: true, align: 'center', width: 25, filter: false },
             { title: isCountryView ? 'Country' : 'Program', type: 'text', readOnly: true, align: 'left' },
             { title: 'Latest Version', type: 'text', readOnly: true, align: 'left' },
             { title: 'Active PUs', type: 'numeric', readOnly: true, align: 'left' },
@@ -1065,30 +1274,36 @@ class SupplyPlanScoreCard extends Component {
             { title: 'Review Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
             { title: 'Version Notes', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
             { title: 'RowType', type: 'hidden' },
-            { title: 'CountryKey', type: 'hidden' }
+            { title: 'CountryKey', type: 'hidden' },
+            { title: 'ProgramId', type: 'hidden' }
         ],
         editable: false,
         onload: function (obj) { jExcelLoadedFunction(obj); },
         onselection: function (instance, cell, x, y, value, e) {
-            if (!isCountryView || x === undefined || x === null || cell != 0) return;
+            if (!isCountryView || x === undefined || x === null || (cell != 0 && cell != 1)) return;
             let rowType = '';
             let cKey = '';
             try {
                 if (typeof instance.getRowData === 'function') {
                     let rData = instance.getRowData(x);
-                    rowType = rData[13];
-                    cKey = rData[14];
+                    rowType = rData[14];
+                    cKey = rData[15];
                 } else if (instance.options && instance.options.data) {
-                    rowType = instance.options.data[x][13];
-                    cKey = instance.options.data[x][14];
+                    rowType = instance.options.data[x][14];
+                    cKey = instance.options.data[x][15];
                 }
             } catch(err) { return; }
 
             if (rowType === 'row_parent') {
                 setTimeout(() => {
-                    this.setState(prev => ({
-                        countryExpandedMap: { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] }
-                    }), () => {
+                    this.setState(prev => {
+                        const newMap = { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] };
+                        const anyExpanded = Object.values(newMap).some(v => v === true);
+                        return {
+                            countryExpandedMap: newMap,
+                            collapseAllChecked: !anyExpanded
+                        };
+                    }, () => {
                         this.buildJexcel();
                     });
                 }, 10);
@@ -1107,15 +1322,12 @@ class SupplyPlanScoreCard extends Component {
                 // First column is Technical Area
                 sortedLabels = sortedData.map(r => r[0]);
             } else if (isCountryView) {
-                // First column is like "+ Country", only get parents
-                const parentRows = sortedData.filter(r => r[r.length-2] === 'row_parent');
-                sortedLabels = parentRows.map(r => {
-                    const match = r[0].match(/^[+-]\s+(.*?)$/);
-                    return match ? match[1] : r[0];
-                });
+                // First column is icon, second is like "Country", only get parents
+                const parentRows = sortedData.filter(r => r[14] === 'row_parent');
+                sortedLabels = parentRows.map(r => r[1]);
             } else {
-                // Program view: first column is Program Code
-                sortedLabels = sortedData.map(r => r[0]);
+                // Program view: first column is icon (empty), second is Program Code
+                sortedLabels = sortedData.map(r => r[1]);
             }
             
             requestAnimationFrame(() => {
@@ -1159,11 +1371,87 @@ class SupplyPlanScoreCard extends Component {
         paginationOptions: JEXCEL_PAGINATION_OPTION,
     };
 
-    let scorecardTableDiv = document.getElementById("scorecardTableDiv");
     if (scorecardTableDiv) {
         this.el = jexcel(scorecardTableDiv, options);
+        if (scrollY > 0) {
+            window.scrollTo(0, scrollY);
+        }
         const el = this.el;
-        requestAnimationFrame(() => { setTimeout(() => reapplyFormatting(el), 50); });
+        requestAnimationFrame(() => { 
+            setTimeout(() => {
+                reapplyFormatting(el);
+                scorecardTableDiv.style.minHeight = '';
+                if (scrollY > 0) {
+                    window.scrollTo(0, scrollY);
+                }
+            }, 50); 
+        });
+
+        // Inject "Collapse All" and "Show Detail" checkboxes into the Jexcel toolbar row (same line as search bar)
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                const toolbarRow = scorecardTableDiv.querySelector('.jexcel_filter') || scorecardTableDiv.querySelector('.jss_search_container');
+                if (toolbarRow) {
+                    // Remove any previously injected container
+                    const existing = toolbarRow.querySelector('#collapseAllContainer');
+                    if (existing) existing.remove();
+
+                    const container = document.createElement('div');
+                    container.id = 'collapseAllContainer';
+                    container.style.cssText = 'display:flex;align-items:center;margin-left:0 !important;margin-right:auto;padding-left:5px;gap:15px;';
+
+                    // Show Detail checkbox
+                    const detailDiv = document.createElement('div');
+                    detailDiv.style.cssText = 'display:flex;align-items:center;';
+
+                    const detailCheckbox = document.createElement('input');
+                    detailCheckbox.type = 'checkbox';
+                    detailCheckbox.id = 'showDetailInline';
+                    detailCheckbox.checked = String(this.state.showDetail) === '1';
+                    detailCheckbox.style.cssText = 'margin:0;cursor:pointer;';
+                    detailCheckbox.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        this.toggleShowDetail(e);
+                    });
+
+                    const detailLabel = document.createElement('label');
+                    detailLabel.htmlFor = 'showDetailInline';
+                    detailLabel.textContent = 'Show Detail';
+                    detailLabel.style.cssText = 'font-size:12px;cursor:pointer;margin:0 0 0 5px;';
+
+                    detailDiv.appendChild(detailCheckbox);
+                    detailDiv.appendChild(detailLabel);
+                    container.appendChild(detailDiv);
+
+                    // Collapse All checkbox (only for Country view)
+                    if (isCountryView) {
+                        const collapseDiv = document.createElement('div');
+                        collapseDiv.style.cssText = 'display:flex;align-items:center;';
+
+                        const collapseCheckbox = document.createElement('input');
+                        collapseCheckbox.type = 'checkbox';
+                        collapseCheckbox.id = 'collapseAllInline';
+                        collapseCheckbox.checked = this.state.collapseAllChecked || false;
+                        collapseCheckbox.style.cssText = 'margin:0;cursor:pointer;';
+                        collapseCheckbox.addEventListener('change', (e) => {
+                            e.stopPropagation();
+                            this.toggleCollapseExpandAll(e);
+                        });
+
+                        const collapseLabel = document.createElement('label');
+                        collapseLabel.htmlFor = 'collapseAllInline';
+                        collapseLabel.textContent = 'Collapse All';
+                        collapseLabel.style.cssText = 'font-size:12px;cursor:pointer;margin:0 0 0 5px;';
+
+                        collapseDiv.appendChild(collapseCheckbox);
+                        collapseDiv.appendChild(collapseLabel);
+                        container.appendChild(collapseDiv);
+                    }
+
+                    toolbarRow.insertBefore(container, toolbarRow.firstChild);
+                }
+            }, 100);
+        });
     }
   }
 
@@ -1357,11 +1645,9 @@ class SupplyPlanScoreCard extends Component {
         csvRow.push('"' + ('View By' + ' : ' + viewByEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
         csvRow.push('');
     }
-    var showDetailEl = document.getElementById("showDetailId");
-    if (showDetailEl) {
-        csvRow.push('"' + ('Show Detail' + ' : ' + showDetailEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
-        csvRow.push('');
-    }
+    var showDetailVal = String(this.state.showDetail) === '1' ? 'Yes' : 'No';
+    csvRow.push('"' + ('Show Detail' + ' : ' + showDetailVal).replaceAll(' ', '%20') + '"');
+    csvRow.push('');
     csvRow.push('');
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"');
     csvRow.push('');
@@ -1466,11 +1752,9 @@ class SupplyPlanScoreCard extends Component {
         doc.text('View By : ' + viewByEl.selectedOptions[0].text, doc.internal.pageSize.width / 8, y, { align: 'left' });
         y = y + 15;
     }
-    var showDetailEl = document.getElementById("showDetailId");
-    if (showDetailEl) {
-        doc.text('Show Detail : ' + showDetailEl.selectedOptions[0].text, doc.internal.pageSize.width / 8, y, { align: 'left' });
-        y = y + 15;
-    }
+    var showDetailPdfVal = String(this.state.showDetail) === '1' ? 'Yes' : 'No';
+    doc.text('Show Detail : ' + showDetailPdfVal, doc.internal.pageSize.width / 8, y, { align: 'left' });
+    y = y + 15;
 
     // Add chart image
     try {
@@ -1502,11 +1786,11 @@ class SupplyPlanScoreCard extends Component {
     doc.text('Stock Status:', legendX, y);
     var lx = legendX + 65;
     var stockLegendItems = [
-        { label: i18n.t('static.report.stockOut'), color: [186, 12, 47] },
-        { label: i18n.t('static.report.underStock'), color: [244, 133, 33] },
-        { label: i18n.t('static.report.adequate'), color: [17, 139, 112] },
-        { label: i18n.t('static.report.overStock'), color: [237, 185, 68] },
-        { label: i18n.t('static.report.na'), color: [207, 205, 201] }
+        { label: i18n.t('static.supplyPlan.stockOut'), color: [186, 12, 47] },
+        { label: i18n.t('static.report.lowstock'), color: [244, 133, 33] },
+        { label: i18n.t('static.report.okaystock'), color: [17, 139, 112] },
+        { label: i18n.t('static.report.overstock'), color: [237, 185, 68] },
+        { label: i18n.t('static.supplyPlanFormula.na'), color: [207, 205, 201] }
     ];
     doc.setFontSize(8);
     doc.setFont('helvetica', 'normal');
@@ -1900,6 +2184,10 @@ class SupplyPlanScoreCard extends Component {
         tooltips: {
             mode: 'index',
             intersect: false,
+            filter: function(tooltipItem, data) {
+                const val = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index];
+                return val !== null && val !== undefined && val !== 0;
+            }
         },
         legend: {
             position: 'bottom',
@@ -1914,7 +2202,7 @@ class SupplyPlanScoreCard extends Component {
                 position: 'left',
                 ticks: {
                     min: 0,
-                    max: 120,
+                    max: 100,
                     callback: function(value) {
                         return value + "%";
                     }
@@ -2058,23 +2346,7 @@ class SupplyPlanScoreCard extends Component {
                               </InputGroup>
                           </div>
                       </FormGroup>
-                      <FormGroup className="col-md-3">
-                          <Label htmlFor="showDetailId">Show Detail</Label>
-                          <div className="controls ">
-                              <InputGroup>
-                                  <Input
-                                      type="select"
-                                      name="showDetailId"
-                                      id="showDetailId"
-                                      bsSize="sm"
-                                      onChange={this.toggleShowDetail}
-                                  >
-                                      <option value="0">No</option>
-                                      <option value="1">Yes</option>
-                                  </Input>
-                              </InputGroup>
-                          </div>
-                      </FormGroup>
+
                     </div>
                   
             
@@ -2092,15 +2364,15 @@ class SupplyPlanScoreCard extends Component {
                 <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
                   <Card>
                     <CardBody>
-                      <div className="mb-3">
+                      <div>
 
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Stock Status:</span>
-                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.stockOut')}</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.underStock')}</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.adequate')}</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#edb944', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.overStock')}</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#cfcdc9', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.na')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.supplyPlan.stockOut')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.lowstock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.okaystock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#edb944', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.overstock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#cfcdc9', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.supplyPlanFormula.na')}</span></div>
                         </div>
 
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
@@ -2111,23 +2383,8 @@ class SupplyPlanScoreCard extends Component {
                           <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>100%</span></div>
                         </div>
 
-                        {Number(this.state.viewBy) === 1 && (
-                          <div className="form-check d-flex align-items-center mt-2" style={{ paddingLeft: '20px' }}>
-                            <Input
-                              className="form-check-input"
-                              type="checkbox"
-                              id="collapseAll"
-                              checked={this.state.collapseAllChecked}
-                              onChange={(e) => this.toggleCollapseExpandAll(e)}
-                              style={{ marginTop: '0px', position: 'relative' }}
-                            />
-                            <Label className="form-check-label ml-2" htmlFor="collapseAll" style={{ fontSize: '12px', cursor: 'pointer', marginBottom: '0px' }}>
-                              Collapse All
-                            </Label>
-                          </div>
-                        )}
                       </div>
-                      <div className="table-responsive">
+                      <div className="table-responsive" style={{ marginTop: '0px' }}>
                           <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
                       </div>
                     </CardBody>
@@ -2135,6 +2392,18 @@ class SupplyPlanScoreCard extends Component {
                 </div>
               </>
             )}
+            <Modal isOpen={this.state.large} toggle={this.toggleLarge} className={'modal-xl ' + this.props.className}>
+              <ModalHeader toggle={this.toggleLarge}>{i18n.t('static.program.noteshistory')}</ModalHeader>
+              <ModalBody>
+                <div className="table-responsive">
+                  {this.state.loadingForNotes && <div className="loader"></div>}
+                  <div id="notesTransTable" className="DashboardreadonlyBg" style={{ display: this.state.loadingForNotes ? "none" : "block" }}></div>
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="secondary" onClick={this.toggleLarge}>{i18n.t('static.common.close')}</Button>
+              </ModalFooter>
+            </Modal>
             </div>
                 </div>    
               </div>
