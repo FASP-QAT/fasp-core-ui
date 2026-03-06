@@ -315,7 +315,7 @@ class ShipmentGlobalDemandView extends Component {
 
     dataSource.forEach((d) => {
       const fspaCode = d.fspa.code;
-      const programCode = d.programCountry ? d.programCountry.code : "N/A";
+      const programCode = d.programCountry ? (this.state.aggregateByCountry?getLabelText(d.programCountry.label,this.state.lang):d.programCountry.code) : "N/A";
 
       if (!grouping[fspaCode]) {
         grouping[fspaCode] = {
@@ -780,33 +780,35 @@ class ShipmentGlobalDemandView extends Component {
       onbeforesearch: function (worksheet, term) {
         const tbody = worksheet.tbody;
         if (!tbody) return false;
-
+      
         const trs = tbody.querySelectorAll("tr");
         const rowsMeta = self._rowsMeta || [];
         const lowerTerm = (term || "")
           .toLowerCase()
           .trim()
           .replace(/[$,]/g, "");
-
+      
         const displayValues = new Array(rowsMeta.length);
         const metaColCount = 4;
-
+      
         if (!lowerTerm) {
           // No search term — show everything
           for (let i = 0; i < rowsMeta.length; i++) {
             displayValues[i] = "";
           }
         } else {
-          // ── Pass 1: find which PU rows match ──────────────────────────
-          // Also track which fspa/program parents have matching children
+          // ── Pass 1: find which rows match directly ────────────────────────
+          // Matching a parent row (fspa/program) shows ONLY that row itself,
+          // not its children. Children only appear if they match directly.
           const visibleFspas = new Set();
           const visibleProgs = new Set(); // "fspaCode|||progCode"
-
+      
           for (let i = 0; i < rowsMeta.length; i++) {
             const rt = rowsMeta[i].rowType;
-            if (rt !== "pu") continue;
-
             const visibleColCount = rowsMeta[i].data.length - metaColCount;
+            const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+            const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+      
             let matched = false;
             for (let j = 1; j < visibleColCount; j++) {
               const cellVal = (rowsMeta[i].data[j] || "")
@@ -818,45 +820,49 @@ class ShipmentGlobalDemandView extends Component {
                 break;
               }
             }
-
-            displayValues[i] = matched ? "" : "none";
-
+      
+            // Set display for pu and total rows directly
+            if (rt === "pu" || rt === "total") {
+              displayValues[i] = matched ? "" : "none";
+            }
+      
             if (matched) {
-              // data layout: [..., _rowType, _collapseKey, _fspaCode, _progCode]
-              const fspaCode =
-                rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
-              const progCode =
-                rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
-              visibleFspas.add(fspaCode);
-              visibleProgs.add(fspaCode + "|||" + progCode);
+              if (rt === "fspa") {
+                // FSPA matched — show it, but do NOT add to visibleProgs
+                // so its child programs and PUs stay hidden
+                visibleFspas.add(fspaCode);
+              } else if (rt === "program") {
+                // Program matched — show it and its parent fspa,
+                // but do NOT cascade down to PU children
+                visibleFspas.add(fspaCode);
+                visibleProgs.add(fspaCode + "|||" + progCode);
+              } else if (rt === "pu") {
+                // PU matched — bubble up to show parent program and fspa
+                visibleFspas.add(fspaCode);
+                visibleProgs.add(fspaCode + "|||" + progCode);
+              }
+              // total row: already set displayValues[i] = "" above
             }
           }
-
-          // ── Pass 2: show/hide parent rows based on whether they have
-          //           at least one matching PU child ────────────────────
-          const anyMatch = visibleFspas.size > 0;
-
+      
+          // ── Pass 2: resolve fspa and program row visibility ───────────────
           for (let i = 0; i < rowsMeta.length; i++) {
             const rt = rowsMeta[i].rowType;
-            if (rt === "pu") continue; // already handled in pass 1
-
-            const fspaCode =
-              rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
-            const progCode =
-              rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
-
+            if (rt === "pu" || rt === "total") continue;
+      
+            const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+            const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+      
             if (rt === "fspa") {
               displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
             } else if (rt === "program") {
               displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
                 ? ""
                 : "none";
-            } else if (rt === "total") {
-              displayValues[i] = anyMatch ? "" : "none";
             }
           }
         }
-
+      
         // ── Batch all DOM writes in one rAF ───────────────────────────
         requestAnimationFrame(() => {
           for (let i = 0; i < rowsMeta.length; i++) {
@@ -866,20 +872,21 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
-
+      
         return false;
       },
+      
       onbeforefilter: function (worksheet, filters, filteredRows) {
         const tbody = worksheet.tbody;
         if (!tbody) return false;
-
+      
         const trs = tbody.querySelectorAll("tr");
         const rowsMeta = self._rowsMeta || [];
-
+      
         // ── If no filters active, show everything ────────────────────
         const hasActiveFilter =
           filters && Object.values(filters).some((f) => f && f.length > 0);
-
+      
         if (!hasActiveFilter) {
           requestAnimationFrame(() => {
             for (let i = 0; i < rowsMeta.length; i++) {
@@ -889,34 +896,36 @@ class ShipmentGlobalDemandView extends Component {
           });
           return false;
         }
-
+      
         const displayValues = new Array(rowsMeta.length);
         const metaColCount = 4;
-
-        // ── Pass 1: determine which PU rows pass ALL active filters ──
+      
+        // ── Pass 1: determine which rows pass ALL active filters ─────
+        // Matching a parent row (fspa/program) shows ONLY that row itself,
+        // not its children. Children only appear if they match directly.
         const visibleFspas = new Set();
         const visibleProgs = new Set();
-
+      
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
-          if (rt !== "pu") continue;
-
           const visibleColCount = rowsMeta[i].data.length - metaColCount;
+          const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
+          const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+      
           let matched = true;
-
+      
           // Check every active filter column
           for (const [colIdx, filterValues] of Object.entries(filters)) {
             const col = parseInt(colIdx);
             if (!filterValues || filterValues.length === 0) continue;
             if (col >= visibleColCount) continue;
-
+      
             const cellVal = (rowsMeta[i].data[col] || "")
               .toString()
               .toLowerCase()
               .replace(/[$,]/g, "")
               .trim();
-
-            // filterValues is an array of selected filter options
+      
             const filterMatch = filterValues.some((fv) => {
               const fvStr = (fv || "")
                 .toString()
@@ -925,46 +934,53 @@ class ShipmentGlobalDemandView extends Component {
                 .trim();
               return cellVal === fvStr || cellVal.includes(fvStr);
             });
-
+      
             if (!filterMatch) {
               matched = false;
               break;
             }
           }
-
-          displayValues[i] = matched ? "" : "none";
-
+      
+          // Set display for pu and total rows directly
+          if (rt === "pu" || rt === "total") {
+            displayValues[i] = matched ? "" : "none";
+          }
+      
           if (matched) {
-            const fspaCode =
-              rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
-            const progCode =
-              rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
-            visibleFspas.add(fspaCode);
-            visibleProgs.add(fspaCode + "|||" + progCode);
+            if (rt === "fspa") {
+              // FSPA matched — show it, but do NOT cascade to child programs/PUs
+              visibleFspas.add(fspaCode);
+            } else if (rt === "program") {
+              // Program matched — show it and its parent fspa,
+              // but do NOT cascade down to PU children
+              visibleFspas.add(fspaCode);
+              visibleProgs.add(fspaCode + "|||" + progCode);
+            } else if (rt === "pu") {
+              // PU matched — bubble up to show parent program and fspa
+              visibleFspas.add(fspaCode);
+              visibleProgs.add(fspaCode + "|||" + progCode);
+            }
+            // total row: already set displayValues[i] = "" above
           }
         }
-
-        // ── Pass 2: show/hide parent rows based on matching children ─
-        const anyMatch = visibleFspas.size > 0;
-
+      
+        // ── Pass 2: resolve fspa and program row visibility ───────────
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
-          if (rt === "pu") continue;
-
+          if (rt === "pu" || rt === "total") continue;
+      
           const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
           const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
-
+      
           if (rt === "fspa") {
             displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
           } else if (rt === "program") {
             displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
               ? ""
               : "none";
-          } else if (rt === "total") {
-            displayValues[i] = anyMatch ? "" : "none";
           }
         }
-
+      
         // ── Batch all DOM writes in one rAF ──────────────────────────
         requestAnimationFrame(() => {
           for (let i = 0; i < rowsMeta.length; i++) {
@@ -974,7 +990,7 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
-
+      
         return false;
       },
       filters: true, // ← enable column filter dropdowns
@@ -990,12 +1006,15 @@ class ShipmentGlobalDemandView extends Component {
       // and Total rows are never moved; only PU rows are reordered.
       // -----------------------------------------------------------
       onsort: function (worksheet, column, order) {
-        // jspreadsheet passes order as 0 (asc) or 1 (desc) in v8
-        const dir = order === 1 || order === "desc" ? "desc" : "asc";
+        const currentDir = self.state.sortConfig?.col === column 
+            ? self.state.sortConfig.dir 
+            : "desc";
+        const dir = currentDir === "asc" ? "desc" : "asc";
+        
         self.setState({ sortConfig: { col: column, dir } }, () =>
-          self.buildJExcel()
+            self.buildJExcel()
         );
-      },
+    },
 
       // -----------------------------------------------------------
       // onsearch – fires AFTER jspreadsheet has hidden non-matching rows.
@@ -2010,6 +2029,15 @@ class ShipmentGlobalDemandView extends Component {
   // fetchData – same as original, but setState callback calls buildJExcel
   // ------------------------------------------------------------------
   fetchData = () => {
+    this.setState({
+      sortConfig: { col: null, dir: "asc" },
+      data: {
+        planningUnitQuantity: [],
+        fspaCostAndPerc: [],
+        fspaProgramSplit: [],
+        fspaCountrySplit: [],
+      },
+    })
     console.log("Procurement agent values ", this.state.procurementAgentValues);
     let versionId =
       this.state.programValues.length == 1
@@ -2801,6 +2829,12 @@ class ShipmentGlobalDemandView extends Component {
         procurementAgentLabels: [],
         planningUnitValues: [],
         planningUnitLabels: [],
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => { }
     );
@@ -2873,6 +2907,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         procurementAgentValues: procurementAgentIds.map((ele) => ele),
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3337,6 +3377,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         planningUnitValues: planningUnitIds.map((ele) => ele),
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3366,6 +3412,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         fundingSourceValues: fundingSourceIds.map((ele) => ele),
         fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3381,6 +3433,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         shipmentStatusValues: shipmentStatusIds.map((ele) => ele),
         shipmentStatusLabels: shipmentStatusIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3495,8 +3553,6 @@ class ShipmentGlobalDemandView extends Component {
             ticks: {
               fontColor,
               fontSize: 11,
-              autoSkip: false, // never omit a label
-              maxTicksLimit: 9999, // show all ticks regardless of height
               callback: function (value) {
                 return value.length > 40 ? value.substr(0, 40) + "..." : value;
               },
