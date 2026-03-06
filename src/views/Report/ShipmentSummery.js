@@ -243,6 +243,11 @@ class ShipmentSummery extends Component {
     this.handleChangeProgram = this.handleChangeProgram.bind(this);
     this.setViewById = this.setViewById.bind(this);
   }
+  handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.fetchData();
+    }
+  };
   setViewById(e) {
     this.setState({
       viewById: e.target.value
@@ -1712,7 +1717,7 @@ class ShipmentSummery extends Component {
                 filteredBudgetList: bList,
               },
               () => {
-                this.fetchData();
+                // this.fetchData();
               }
             );
           })
@@ -1851,7 +1856,7 @@ class ShipmentSummery extends Component {
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -1869,7 +1874,7 @@ class ShipmentSummery extends Component {
         budgetLabels: budgetIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -2384,7 +2389,7 @@ class ShipmentSummery extends Component {
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -3591,26 +3596,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="planningUnitId"
-                            id="planningUnitId"
-                            bsSize="md"
-                            value={this.state.planningUnitValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handlePlanningUnitChange(e);
-                            }}
-                            options={
-                              planningUnits && planningUnits.length > 0
-                                ? planningUnits
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="planningUnitId"
+                              id="planningUnitId"
+                              bsSize="md"
+                              value={this.state.planningUnitValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handlePlanningUnitChange(e);
+                              }}
+                              options={
+                                planningUnits && planningUnits.length > 0
+                                  ? planningUnits
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
@@ -3663,26 +3670,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="fundingSourceId"
-                            id="fundingSourceId"
-                            bsSize="md"
-                            value={this.state.fundingSourceValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handleFundingSourceChange(e);
-                            }}
-                            options={
-                              fundingSourceListDD && fundingSourceListDD.length > 0
-                                ? fundingSourceListDD
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="fundingSourceId"
+                              id="fundingSourceId"
+                              bsSize="md"
+                              value={this.state.fundingSourceValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handleFundingSourceChange(e);
+                              }}
+                              options={
+                                fundingSourceListDD && fundingSourceListDD.length > 0
+                                  ? fundingSourceListDD
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>}
                       {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
@@ -3691,26 +3700,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="procurementAgentId"
-                            id="procurementAgentId"
-                            bsSize="md"
-                            value={this.state.procurementAgentValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handleProcurementAgentChange(e);
-                            }}
-                            options={
-                              procurementAgentListDD && procurementAgentListDD.length > 0
-                                ? procurementAgentListDD
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="procurementAgentId"
+                              id="procurementAgentId"
+                              bsSize="md"
+                              value={this.state.procurementAgentValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handleProcurementAgentChange(e);
+                              }}
+                              options={
+                                procurementAgentListDD && procurementAgentListDD.length > 0
+                                  ? procurementAgentListDD
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>}
                       {this.state.viewById == 1 && this.state.filteredBudgetList.length > 0 && (
@@ -3720,29 +3731,31 @@ class ShipmentSummery extends Component {
                           </Label>
                           <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                           <div className="controls">
-                            <MultiSelect
-                              name="budgetId"
-                              id="budgetId"
-                              bsSize="md"
-                              value={this.state.budgetValues}
-                              filterOptions={filterOptions}
-                              onChange={(e) => {
-                                this.handleBudgetChange(e);
-                              }}
-                              options={
-                                filteredBudgetList.length > 0 &&
-                                filteredBudgetList.map((item, i) => {
-                                  return {
-                                    label: item.budgetCode,
-                                    value: item.budgetId,
-                                  };
-                                }, this)
-                              }
-                              overrideStrings={{
-                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                selectSomeItems: i18n.t('static.common.select')
-                              }}
-                            />
+                            <div onBlur={this.handleBlur}>
+                              <MultiSelect
+                                name="budgetId"
+                                id="budgetId"
+                                bsSize="md"
+                                value={this.state.budgetValues}
+                                filterOptions={filterOptions}
+                                onChange={(e) => {
+                                  this.handleBudgetChange(e);
+                                }}
+                                options={
+                                  filteredBudgetList.length > 0 &&
+                                  filteredBudgetList.map((item, i) => {
+                                    return {
+                                      label: item.budgetCode,
+                                      value: item.budgetId,
+                                    };
+                                  }, this)
+                                }
+                                overrideStrings={{
+                                  allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                  selectSomeItems: i18n.t('static.common.select')
+                                }}
+                              />
+                            </div>
                           </div>
                         </FormGroup>
                       )}
