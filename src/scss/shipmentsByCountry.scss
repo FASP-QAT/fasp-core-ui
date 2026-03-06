@@ -21,11 +21,6 @@
 .shipmentJexcel>div .jss_filters {
   top: -60px !important;
 }
-
-.shipmentGlobalDemandTable {
-  overflow: visible !important;
-}
-
-.shipmentGlobalDemandTable>div .jss_filters {
-  top: -120px !important;
+#shipmentGlobalDemandTableDiv .jss_filters {
+  transform: translateY(-100%);
 }
