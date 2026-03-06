@@ -2829,6 +2829,12 @@ class ShipmentGlobalDemandView extends Component {
         procurementAgentLabels: [],
         planningUnitValues: [],
         planningUnitLabels: [],
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => { }
     );
@@ -2901,6 +2907,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         procurementAgentValues: procurementAgentIds.map((ele) => ele),
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3365,6 +3377,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         planningUnitValues: planningUnitIds.map((ele) => ele),
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3394,6 +3412,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         fundingSourceValues: fundingSourceIds.map((ele) => ele),
         fundingSourceLabels: fundingSourceIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
@@ -3409,6 +3433,12 @@ class ShipmentGlobalDemandView extends Component {
       {
         shipmentStatusValues: shipmentStatusIds.map((ele) => ele),
         shipmentStatusLabels: shipmentStatusIds.map((ele) => ele.label),
+        data: {
+          planningUnitQuantity: [],
+          fspaCostAndPerc: [],
+          fspaProgramSplit: [],
+          fspaCountrySplit: [],
+        },
       },
       () => {
         // this.fetchData();
