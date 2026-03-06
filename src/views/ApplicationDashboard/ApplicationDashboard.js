@@ -3706,13 +3706,16 @@ class ApplicationDashboard extends Component {
                               </div>
                             </td>
                             <td>
-                              0
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(d.stockStatusScore) <= 70 ? '#f48521' : Math.round(d.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(d.stockStatusScore)}{"%"}</b>
                             </td>
                             <td>
-                              0
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(d.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(d.supplyPlanQualityScore)}{"%"}</b>
                             </td>
                             <td>
-                              0
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 35 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 70 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
                             </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
