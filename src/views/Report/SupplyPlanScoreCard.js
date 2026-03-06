@@ -1090,6 +1090,9 @@ class SupplyPlanScoreCard extends Component {
                 if (rowType === 'matrix_total') {
                     tr.style.fontWeight = 'bold';
                     tr.style.backgroundColor = '#f4f4f4';
+                    for (let i = 0; i < tr.children.length; i++) {
+                        tr.children[i].style.setProperty('border-right', '1px solid #999', 'important');
+                    }
                 }
 
                 for (let c = 1; c < rowData.length - 2; c++) {
@@ -1136,12 +1139,31 @@ class SupplyPlanScoreCard extends Component {
             if (rowType === 'row_parent') {
                 childRowIndex = 0;
                 tr.style.backgroundColor = '#f4f4f4';
-                tr.style.cursor = 'pointer';
+                tr.onclick = null;
                 for (let i = 0; i < tr.children.length; i++) {
                     tr.children[i].style.fontWeight = 'bold';
+                    tr.children[i].onclick = null;
+                    tr.children[i].style.cursor = 'default';
                 }
                 if (cell1) {
                     cell1.style.paddingLeft = '5px';
+                }
+                if (cell0) {
+                    cell0.style.cursor = 'pointer';
+                    cell0.onclick = (e) => {
+                        e.stopPropagation();
+                        const cKey = rowData[15];
+                        this.setState(prev => {
+                            const newMap = { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] };
+                            const anyExpanded = Object.values(newMap).some(v => v === true);
+                            return {
+                                countryExpandedMap: newMap,
+                                collapseAllChecked: !anyExpanded
+                            };
+                        }, () => {
+                            this.buildJexcel();
+                        });
+                    };
                 }
             } else if (rowType === 'row_child') {
                 childRowIndex++;
@@ -1225,13 +1247,14 @@ class SupplyPlanScoreCard extends Component {
                 const value = parseInt(raw, 10);
                 if (!isNaN(value)) {
                     let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
-                    cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: flex-start; padding-left: 5px;">
+                    cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                             <span style="min-width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
                             <span>${value}%</span>
                         </div>`;
                     cell.style.backgroundImage = 'none';
                     cell.style.paddingLeft = '0px';
-                    cell.style.textAlign = 'left';
+                    cell.style.textAlign = 'center';
+                    cell.style.setProperty('text-align', 'center', 'important');
                     cell.style.fontWeight = 'bold';
                 }
             }
@@ -1281,34 +1304,7 @@ class SupplyPlanScoreCard extends Component {
         editable: false,
         onload: function (obj) { jExcelLoadedFunction(obj); },
         onselection: function (instance, cell, x, y, value, e) {
-            if (!isCountryView || x === undefined || x === null || (cell != 0 && cell != 1)) return;
-            let rowType = '';
-            let cKey = '';
-            try {
-                if (typeof instance.getRowData === 'function') {
-                    let rData = instance.getRowData(x);
-                    rowType = rData[14];
-                    cKey = rData[15];
-                } else if (instance.options && instance.options.data) {
-                    rowType = instance.options.data[x][14];
-                    cKey = instance.options.data[x][15];
-                }
-            } catch(err) { return; }
-
-            if (rowType === 'row_parent') {
-                setTimeout(() => {
-                    this.setState(prev => {
-                        const newMap = { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] };
-                        const anyExpanded = Object.values(newMap).some(v => v === true);
-                        return {
-                            countryExpandedMap: newMap,
-                            collapseAllChecked: !anyExpanded
-                        };
-                    }, () => {
-                        this.buildJexcel();
-                    });
-                }, 10);
-            }
+            // accordion logic moved to td.onclick in reapplyFormatting 
         }.bind(this),
         onchangepage: function(obj) { reapplyFormatting(obj); },
         onsort: function(instance, column, dir) { 
@@ -1370,6 +1366,24 @@ class SupplyPlanScoreCard extends Component {
         license: JEXCEL_PRO_KEY,
         pagination: localStorage.getItem("sesRecordCount") || 10,
         paginationOptions: JEXCEL_PAGINATION_OPTION,
+        onopenfilter: (instance, col) => {
+            setTimeout(() => {
+                const dropdown = document.querySelector('.jss_filters_options');
+                if (dropdown) {
+                    const options = Array.from(dropdown.querySelectorAll('label'));
+                    const actualOptions = options.filter(l => l.querySelector('input'));
+                    actualOptions.sort((a, b) => {
+                        const valA = a.textContent.trim();
+                        const valB = b.textContent.trim();
+                        const numA = parseFloat(valA);
+                        const numB = parseFloat(valB);
+                        if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
+                        return valA.localeCompare(valB, undefined, {numeric: true, sensitivity: 'base'});
+                    });
+                    actualOptions.forEach(opt => dropdown.appendChild(opt));
+                }
+            }, 50);
+        }
     };
 
     if (scorecardTableDiv) {
@@ -1402,27 +1416,29 @@ class SupplyPlanScoreCard extends Component {
                     container.style.cssText = 'display:flex;align-items:center;margin-left:0 !important;margin-right:auto;padding-left:5px;gap:15px;';
 
                     // Show Detail checkbox
-                    const detailDiv = document.createElement('div');
-                    detailDiv.style.cssText = 'display:flex;align-items:center;';
+                    if (!isMatrixView) {
+                        const detailDiv = document.createElement('div');
+                        detailDiv.style.cssText = 'display:flex;align-items:center;';
 
-                    const detailCheckbox = document.createElement('input');
-                    detailCheckbox.type = 'checkbox';
-                    detailCheckbox.id = 'showDetailInline';
-                    detailCheckbox.checked = String(this.state.showDetail) === '1';
-                    detailCheckbox.style.cssText = 'margin:0;cursor:pointer;';
-                    detailCheckbox.addEventListener('change', (e) => {
-                        e.stopPropagation();
-                        this.toggleShowDetail(e);
-                    });
+                        const detailCheckbox = document.createElement('input');
+                        detailCheckbox.type = 'checkbox';
+                        detailCheckbox.id = 'showDetailInline';
+                        detailCheckbox.checked = String(this.state.showDetail) === '1';
+                        detailCheckbox.style.cssText = 'margin:0;cursor:pointer;';
+                        detailCheckbox.addEventListener('change', (e) => {
+                            e.stopPropagation();
+                            this.toggleShowDetail(e);
+                        });
 
-                    const detailLabel = document.createElement('label');
-                    detailLabel.htmlFor = 'showDetailInline';
-                    detailLabel.textContent = 'Show Detail';
-                    detailLabel.style.cssText = 'font-size:12px;cursor:pointer;margin:0 0 0 5px;';
+                        const detailLabel = document.createElement('label');
+                        detailLabel.htmlFor = 'showDetailInline';
+                        detailLabel.textContent = 'Show Detail';
+                        detailLabel.style.cssText = 'font-size:12px;cursor:pointer;margin:0 0 0 5px;';
 
-                    detailDiv.appendChild(detailCheckbox);
-                    detailDiv.appendChild(detailLabel);
-                    container.appendChild(detailDiv);
+                        detailDiv.appendChild(detailCheckbox);
+                        detailDiv.appendChild(detailLabel);
+                        container.appendChild(detailDiv);
+                    }
 
                     // Collapse All checkbox (only for Country view)
                     if (isCountryView) {
@@ -1565,6 +1581,9 @@ class SupplyPlanScoreCard extends Component {
             if (cell0Footer) {
                 cell0Footer.style.textAlign = 'center';
             }
+            for (let i = 0; i < tr.children.length; i++) {
+                tr.children[i].style.setProperty('border-right', '1px solid #999', 'important');
+            }
             for (let c = 1; c <= countryCount; c++) {
                 const cell = tr.children[c];
                 if (!cell) continue;
@@ -1654,16 +1673,16 @@ class SupplyPlanScoreCard extends Component {
     csvRow.push('');
 
     // Add table headers
-    var headers = this.el.getHeaders().split(",");
-    // Filter out hidden columns (RowType, CountryKey)
     var columns = this.el.options.columns || [];
     var visibleIndexes = [];
     for (var c = 0; c < columns.length; c++) {
         if (columns[c].type !== 'hidden') {
+            // Skip the first column (toggle icon) in Country view as it's not needed in CSV
+            if (String(this.state.viewBy) === '1' && c === 0) continue;
             visibleIndexes.push(c);
         }
     }
-    var headerRow = visibleIndexes.map(idx => '"' + (headers[idx] || '').replaceAll(' ', '%20') + '"');
+    var headerRow = visibleIndexes.map(idx => '"' + (columns[idx].title || '').toString().replaceAll(' ', '%20') + '"');
     csvRow.push(headerRow.join(","));
 
     // Add table data
@@ -1671,6 +1690,26 @@ class SupplyPlanScoreCard extends Component {
     for (var i = 0; i < data.length; i++) {
         var row = visibleIndexes.map(idx => '"' + ((data[i][idx] !== null && data[i][idx] !== undefined ? data[i][idx].toString() : '').replaceAll(',', ' ').replaceAll(' ', '%20')) + '"');
         csvRow.push(row.join(","));
+    }
+
+    // Add table footers (Total row)
+    var footers = [];
+    try {
+        if (typeof this.el.getFooter === 'function') {
+            footers = this.el.getFooter();
+        } else if (this.el.options && this.el.options.footers) {
+            footers = this.el.options.footers;
+        }
+    } catch (e) { }
+
+    if (footers && footers.length > 0) {
+        for (var f = 0; f < footers.length; f++) {
+            var fRowData = footers[f];
+            if (fRowData && fRowData.length > 0) {
+                var fRow = visibleIndexes.map(idx => '"' + ((fRowData[idx] !== null && fRowData[idx] !== undefined ? fRowData[idx].toString() : '').replaceAll(',', ' ').replaceAll(' ', '%20')) + '"');
+                csvRow.push(fRow.join(","));
+            }
+        }
     }
 
     var csvString = csvRow.join("%0A");
@@ -2418,6 +2457,27 @@ class SupplyPlanScoreCard extends Component {
 
                       </div>
                       <div className="table-responsive" style={{ marginTop: '0px' }}>
+                          <style>{`
+                            .jss_filters_options span[style*="border-radius"] {
+                                display: none !important;
+                            }
+                            .jss_filters_options label {
+                                display: flex !important;
+                                align-items: center !important;
+                                white-space: nowrap !important;
+                                padding: 2px 5px !important;
+                            }
+                            .jss_filters_options input[type="checkbox"] {
+                                margin-right: 8px !important;
+                                vertical-align: middle !important;
+                            }
+                            .jss_footer tr td {
+                                border-right: 1px solid #999 !important;
+                            }
+                            .jss_footer tr td:first-child {
+                                border-left: 1px solid #999 !important;
+                            }
+                          `}</style>
                           <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
                       </div>
                     </CardBody>
@@ -2426,7 +2486,7 @@ class SupplyPlanScoreCard extends Component {
               </>
             )}
             <Modal isOpen={this.state.large} toggle={this.toggleLarge} className={'modal-xl ' + this.props.className}>
-              <ModalHeader toggle={this.toggleLarge}>{i18n.t('static.program.noteshistory')}</ModalHeader>
+              <ModalHeader toggle={this.toggleLarge}>{i18n.t('static.problemContext.transDetails')}</ModalHeader>
               <ModalBody>
                 <div className="table-responsive">
                   {this.state.loadingForNotes && <div className="loader"></div>}
