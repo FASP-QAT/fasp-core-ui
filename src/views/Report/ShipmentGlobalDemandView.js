@@ -782,28 +782,25 @@ class ShipmentGlobalDemandView extends Component {
       onbeforesearch: function (worksheet, term) {
         const tbody = worksheet.tbody;
         if (!tbody) return false;
-
         const trs = tbody.querySelectorAll("tr");
         const rowsMeta = self._rowsMeta || [];
         const lowerTerm = (term || "")
           .toLowerCase()
           .trim()
           .replace(/[$,]/g, "");
-
         const metaColCount = 4;
 
-        // Default everything to hidden; we'll explicitly show what matches
         const displayValues = new Array(rowsMeta.length).fill("none");
 
         if (!lowerTerm) {
-          // No search term — show everything
           displayValues.fill("");
         } else {
-          const directFspas = new Set(); // fspas that matched directly
-          const visibleFspas = new Set(); // fspas to show (direct match OR PU child matched)
-          const visibleProgs = new Set(); // "fspaCode|||progCode" to show
+          const visibleFspas = new Set(); // FSPA codes to show header for
+          const visibleProgs = new Set(); // "fspaCode|||progCode" to show header for
+          const directFspas = new Set(); // FSPAs matched directly → cascade ALL children
+          const directProgs = new Set(); // Programs matched directly → cascade ALL PUs
 
-          // ── Pass 1: evaluate every non-total row ─────────────────────────
+          // ── Pass 1: find direct matches ────────────────────────────────
           for (let i = 0; i < rowsMeta.length; i++) {
             const rt = rowsMeta[i].rowType;
             if (rt === "total") continue;
@@ -813,6 +810,7 @@ class ShipmentGlobalDemandView extends Component {
               rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
             const progCode =
               rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+            const progKey = fspaCode + "|||" + progCode;
 
             let matched = false;
             for (let j = 1; j < visibleColCount; j++) {
@@ -828,23 +826,24 @@ class ShipmentGlobalDemandView extends Component {
 
             if (matched) {
               if (rt === "fspa") {
-                // FSPA matched — show it + retain its parent FSPA row
+                // FSPA matched → show it + ALL child programs + ALL their PUs
                 directFspas.add(fspaCode);
                 visibleFspas.add(fspaCode);
               } else if (rt === "program") {
-                // Program matched — show it + parent FSPA + child PUs
+                // Program matched → show it + parent FSPA header + ALL child PUs
+                directProgs.add(progKey);
+                visibleProgs.add(progKey);
                 visibleFspas.add(fspaCode);
-                visibleProgs.add(fspaCode + "|||" + progCode);
               } else if (rt === "pu") {
-                // PU matched — bubble up to show parent program + parent FSPA
+                // PU matched → show ONLY this PU + parent program header + parent FSPA header
+                displayValues[i] = "";
+                visibleProgs.add(progKey);
                 visibleFspas.add(fspaCode);
-                visibleProgs.add(fspaCode + "|||" + progCode);
-                displayValues[i] = ""; // show this PU directly
               }
             }
           }
 
-          // ── Pass 1b: for directly-matched FSPAs, show all their child programs ──
+          // ── Pass 1b: FSPA direct match → all its child programs become direct ──
           for (let i = 0; i < rowsMeta.length; i++) {
             const rt = rowsMeta[i].rowType;
             if (rt !== "program") continue;
@@ -852,42 +851,44 @@ class ShipmentGlobalDemandView extends Component {
               rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
             const progCode =
               rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+            const progKey = fspaCode + "|||" + progCode;
             if (directFspas.has(fspaCode)) {
-              visibleProgs.add(fspaCode + "|||" + progCode);
+              directProgs.add(progKey);
+              visibleProgs.add(progKey);
             }
           }
 
-          // ── Pass 2: apply visibility to fspa, program, pu, and total rows ──
+          // ── Pass 2: apply visibility ────────────────────────────────────
           const anyMatch = visibleFspas.size > 0 || visibleProgs.size > 0;
-
           for (let i = 0; i < rowsMeta.length; i++) {
             const rt = rowsMeta[i].rowType;
             const fspaCode =
               rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
             const progCode =
               rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+            const progKey = fspaCode + "|||" + progCode;
 
             if (rt === "fspa") {
+              // Show FSPA header if it (or any descendant) matched
               displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
             } else if (rt === "program") {
-              displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
-                ? ""
-                : "none";
+              // Show program header if it (or any descendant) matched
+              displayValues[i] = visibleProgs.has(progKey) ? "" : "none";
             } else if (rt === "total") {
-              // Total row always shown when any result exists; never a filter option
               displayValues[i] = anyMatch ? "" : "none";
             } else if (rt === "pu") {
-              // Show PU children of any visible program (cascades from fspa/program match)
-              // displayValues[i] may already be "" if the PU matched directly in pass 1
-              if (displayValues[i] !== "") {
-                const progKey = fspaCode + "|||" + progCode;
-                displayValues[i] = visibleProgs.has(progKey) ? "" : "none";
+              if (displayValues[i] === "") {
+                // Already marked visible by a direct PU match in Pass 1 — keep it
+              } else {
+                // Show all PUs only when their parent program was a DIRECT match
+                // (program row itself matched, or parent FSPA matched)
+                displayValues[i] = directProgs.has(progKey) ? "" : "none";
               }
             }
           }
         }
 
-        // ── Batch all DOM writes in one rAF ───────────────────────────
+        // ── Batch DOM writes ──────────────────────────────────────────────
         requestAnimationFrame(() => {
           for (let i = 0; i < rowsMeta.length; i++) {
             const tr = trs[i];
@@ -896,21 +897,18 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
-
         return false;
       },
 
       onbeforefilter: function (worksheet, filters, filteredRows) {
         const tbody = worksheet.tbody;
         if (!tbody) return false;
-
         const trs = tbody.querySelectorAll("tr");
         const rowsMeta = self._rowsMeta || [];
 
-        // ── If no filters active, show everything ────────────────────
+        // ── No active filters → show everything ──────────────────────────
         const hasActiveFilter =
           filters && Object.values(filters).some((f) => f && f.length > 0);
-
         if (!hasActiveFilter) {
           requestAnimationFrame(() => {
             for (let i = 0; i < rowsMeta.length; i++) {
@@ -922,15 +920,14 @@ class ShipmentGlobalDemandView extends Component {
         }
 
         const metaColCount = 4;
-
-        // Default everything to hidden; we'll explicitly show what matches
         const displayValues = new Array(rowsMeta.length).fill("none");
 
-        const directFspas = new Set(); // fspas that matched directly
-        const visibleFspas = new Set(); // fspas to show (direct match OR PU child matched)
-        const visibleProgs = new Set(); // "fspaCode|||progCode" to show
+        const visibleFspas = new Set(); // FSPA codes to show header for
+        const visibleProgs = new Set(); // "fspaCode|||progCode" to show header for
+        const directFspas = new Set(); // FSPAs matched directly → cascade ALL children
+        const directProgs = new Set(); // Programs matched directly → cascade ALL PUs
 
-        // ── Pass 1: evaluate every non-total row against all active filters ──
+        // ── Pass 1: find direct matches ────────────────────────────────
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
           if (rt === "total") continue;
@@ -938,20 +935,18 @@ class ShipmentGlobalDemandView extends Component {
           const visibleColCount = rowsMeta[i].data.length - metaColCount;
           const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
           const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+          const progKey = fspaCode + "|||" + progCode;
 
           let matched = true;
-
           for (const [colIdx, filterValues] of Object.entries(filters)) {
             const col = parseInt(colIdx);
             if (!filterValues || filterValues.length === 0) continue;
             if (col >= visibleColCount) continue;
-
             const cellVal = (rowsMeta[i].data[col] || "")
               .toString()
               .toLowerCase()
               .replace(/[$,]/g, "")
               .trim();
-
             const filterMatch = filterValues.some((fv) => {
               const fvStr = (fv || "")
                 .toString()
@@ -960,7 +955,6 @@ class ShipmentGlobalDemandView extends Component {
                 .trim();
               return cellVal === fvStr || cellVal.includes(fvStr);
             });
-
             if (!filterMatch) {
               matched = false;
               break;
@@ -969,61 +963,64 @@ class ShipmentGlobalDemandView extends Component {
 
           if (matched) {
             if (rt === "fspa") {
-              // FSPA matched — show it + all child programs + all PUs
+              // FSPA matched → show it + ALL child programs + ALL their PUs
               directFspas.add(fspaCode);
               visibleFspas.add(fspaCode);
             } else if (rt === "program") {
-              // Program matched — show it + parent FSPA + child PUs
+              // Program matched → show it + parent FSPA header + ALL child PUs
+              directProgs.add(progKey);
+              visibleProgs.add(progKey);
               visibleFspas.add(fspaCode);
-              visibleProgs.add(fspaCode + "|||" + progCode);
             } else if (rt === "pu") {
-              // PU matched — bubble up to show parent program + parent FSPA
+              // PU matched → show ONLY this PU + parent program header + parent FSPA header
+              displayValues[i] = "";
+              visibleProgs.add(progKey);
               visibleFspas.add(fspaCode);
-              visibleProgs.add(fspaCode + "|||" + progCode);
-              displayValues[i] = ""; // show this PU directly
             }
           }
         }
 
-        // ── Pass 1b: for directly-matched FSPAs, show all their child programs ──
+        // ── Pass 1b: FSPA direct match → all its child programs become direct ──
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
           if (rt !== "program") continue;
           const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
           const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+          const progKey = fspaCode + "|||" + progCode;
           if (directFspas.has(fspaCode)) {
-            visibleProgs.add(fspaCode + "|||" + progCode);
+            directProgs.add(progKey);
+            visibleProgs.add(progKey);
           }
         }
 
-        // ── Pass 2: apply visibility to fspa, program, pu, and total rows ──
+        // ── Pass 2: apply visibility ────────────────────────────────────
         const anyMatch = visibleFspas.size > 0 || visibleProgs.size > 0;
-
         for (let i = 0; i < rowsMeta.length; i++) {
           const rt = rowsMeta[i].rowType;
           const fspaCode = rowsMeta[i].data[rowsMeta[i].data.length - 2] || "";
           const progCode = rowsMeta[i].data[rowsMeta[i].data.length - 1] || "";
+          const progKey = fspaCode + "|||" + progCode;
 
           if (rt === "fspa") {
+            // Show FSPA header if it (or any descendant) matched
             displayValues[i] = visibleFspas.has(fspaCode) ? "" : "none";
           } else if (rt === "program") {
-            displayValues[i] = visibleProgs.has(fspaCode + "|||" + progCode)
-              ? ""
-              : "none";
+            // Show program header if it (or any descendant) matched
+            displayValues[i] = visibleProgs.has(progKey) ? "" : "none";
           } else if (rt === "total") {
-            // Total row always shown when any result exists; never a filter option
             displayValues[i] = anyMatch ? "" : "none";
           } else if (rt === "pu") {
-            // Show PU children of any visible program (cascades from fspa/program match)
-            // displayValues[i] may already be "" if the PU matched directly in pass 1
-            if (displayValues[i] !== "") {
-              const progKey = fspaCode + "|||" + progCode;
-              displayValues[i] = visibleProgs.has(progKey) ? "" : "none";
+            if (displayValues[i] === "") {
+              // Already marked visible by a direct PU match in Pass 1 — keep it
+            } else {
+              // Show all PUs only when their parent program was a DIRECT match
+              // (program row itself matched, or parent FSPA matched)
+              displayValues[i] = directProgs.has(progKey) ? "" : "none";
             }
           }
         }
 
-        // ── Batch all DOM writes in one rAF ──────────────────────────
+        // ── Batch DOM writes ──────────────────────────────────────────────
         requestAnimationFrame(() => {
           for (let i = 0; i < rowsMeta.length; i++) {
             const tr = trs[i];
@@ -1032,7 +1029,6 @@ class ShipmentGlobalDemandView extends Component {
             }
           }
         });
-
         return false;
       },
       filters: true, // ← enable column filter dropdowns
@@ -2093,16 +2089,14 @@ class ShipmentGlobalDemandView extends Component {
         "-" +
         this.state.rangeValue.from.month +
         "-01";
-      let endDate =
+      let endDate = moment(
         this.state.rangeValue.to.year +
-        "-" +
-        this.state.rangeValue.to.month +
-        "-" +
-        new Date(
-          this.state.rangeValue.to.year,
-          this.state.rangeValue.to.month + 1,
-          0
-        ).getDate();
+          "-" +
+          this.state.rangeValue.to.month +
+          "-" +
+          "01"
+      ).endOf("month");
+      console.log("ENd Date Test@123", endDate);
       let planningUnitIds = this.state.planningUnitValues.map((ele) =>
         ele.value.toString()
       );
