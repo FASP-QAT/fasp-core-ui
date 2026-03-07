@@ -1539,14 +1539,20 @@ class ShipmentSummery extends Component {
           .then((response) => {
             var listArray = response.data;
             var proList = [];
+            var groupedBudgets = {};
             for (var i = 0; i < listArray.length; i++) {
-              var programJson = {
-                budgetId: listArray[i].budgetId,
-                label: listArray[i].label,
-                budgetCode: listArray[i].budgetCode,
-              };
-              proList[i] = programJson;
+              var budgetCode = listArray[i].budgetCode;
+              if (!groupedBudgets[budgetCode]) {
+                groupedBudgets[budgetCode] = {
+                  budgetId: listArray[i].budgetId,
+                  label: listArray[i].label,
+                  budgetCode: listArray[i].budgetCode,
+                };
+              } else {
+                groupedBudgets[budgetCode].budgetId = groupedBudgets[budgetCode].budgetId + "," + listArray[i].budgetId;
+              }
             }
+            proList = Object.values(groupedBudgets);
             proList.sort((a, b) => {
               var itemLabelA = a.budgetCode.toUpperCase();
               var itemLabelB = b.budgetCode.toUpperCase();
@@ -1635,6 +1641,19 @@ class ShipmentSummery extends Component {
             fSourceResult = fSourceRequest.result.filter(
               (b) => [...new Set(b.programs.map(ele => ele.id.toString()))].includes(programId.toString())
             );
+            var groupedBudgetsOffline = {};
+            for (var i = 0; i < fSourceResult.length; i++) {
+              var budgetCode = fSourceResult[i].budgetCode;
+              if (!groupedBudgetsOffline[budgetCode]) {
+                groupedBudgetsOffline[budgetCode] = fSourceResult[i];
+              } else {
+                groupedBudgetsOffline[budgetCode] = {
+                  ...groupedBudgetsOffline[budgetCode],
+                  budgetId: groupedBudgetsOffline[budgetCode].budgetId + "," + fSourceResult[i].budgetId
+                };
+              }
+            }
+            fSourceResult = Object.values(groupedBudgetsOffline);
             this.setState(
               {
                 budgetValues: budgetValuesFromProps,
@@ -1698,16 +1717,22 @@ class ShipmentSummery extends Component {
           .then((response) => {
             var budgetList = response.data;
             var bList = [];
+            var groupedBudgetsFilter = {};
             for (var i = 0; i < budgetList.length; i++) {
-              if (this.state.filteredBudgetList.some(c => c.budgetId == budgetList[i].id)) {
-                var budgetJson = {
-                  budgetId: budgetList[i].id,
-                  label: budgetList[i].label,
-                  budgetCode: budgetList[i].code,
-                };
-                bList.push(budgetJson);
+              if (this.state.filteredBudgetList.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
+                var budgetCode = budgetList[i].code;
+                if (!groupedBudgetsFilter[budgetCode]) {
+                  groupedBudgetsFilter[budgetCode] = {
+                    budgetId: budgetList[i].id,
+                    label: budgetList[i].label,
+                    budgetCode: budgetList[i].code,
+                  };
+                } else {
+                  groupedBudgetsFilter[budgetCode].budgetId = groupedBudgetsFilter[budgetCode].budgetId + "," + budgetList[i].id;
+                }
               }
             }
+            bList = Object.values(groupedBudgetsFilter);
             this.setState(
               {
                 budgetValues: bList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
@@ -1814,6 +1839,19 @@ class ShipmentSummery extends Component {
             fSourceResult = fSourceRequest.result.filter(
               (b) => [...new Set(b.programs.map(ele => ele.id))].includes(Number(programId)) && newFundingSourceList.includes(b.fundingSource.fundingSourceId)
             );
+            var groupedBudgetsFilterOffline = {};
+            for (var i = 0; i < fSourceResult.length; i++) {
+              var budgetCode = fSourceResult[i].budgetCode;
+              if (!groupedBudgetsFilterOffline[budgetCode]) {
+                groupedBudgetsFilterOffline[budgetCode] = fSourceResult[i];
+              } else {
+                groupedBudgetsFilterOffline[budgetCode] = {
+                  ...groupedBudgetsFilterOffline[budgetCode],
+                  budgetId: groupedBudgetsFilterOffline[budgetCode].budgetId + "," + fSourceResult[i].budgetId
+                };
+              }
+            }
+            fSourceResult = Object.values(groupedBudgetsFilterOffline);
             this.setState(
               {
                 budgetValues: fSourceResult.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
@@ -2470,7 +2508,7 @@ class ShipmentSummery extends Component {
     let myBudgetIds =
       this.state.budgetValues.length == this.state.budgets.length
         ? []
-        : this.state.budgetValues.map((ele) => ele.value);
+        : (this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : []);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.map(ele => (ele.value).toString());
     if (
@@ -2486,7 +2524,7 @@ class ShipmentSummery extends Component {
         myProcurementAgentIds = this.state.procurementAgentValues.map(
           (ele) => ele.value
         );
-        myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
+        myBudgetIds = this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : [];
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
