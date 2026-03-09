@@ -18427,3 +18427,51 @@ label.arrow_label:before {
   top: 0px !important;
   right: 0;
 }
+.table td.custom-padding-program {
+  padding-left: 15px !important;
+}
+
+.table td.custom-padding-pu {
+  padding-left: 25px !important;
+}
+#shipmentGlobalDemandTableDiv .jss>tbody>tr>td:nth-child(3) {
+  text-align: left !important;
+}
+
+#shipmentGlobalDemandTableDiv .jss>thead>tr>td:nth-child(3) {
+  text-align: left !important;
+}
+
+/* Data columns (4th td onwards = col index 3+) → right align */
+#shipmentGlobalDemandTableDiv .jss>tbody>tr>td:nth-child(n+4) {
+  text-align: right !important;
+}
+
+#shipmentGlobalDemandTableDiv .jss>thead>tr>td:nth-child(n+4) {
+  text-align: right !important;
+}
+#shipmentGlobalDemandTableDiv .jss_search_container {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+}
+#shipmentGlobalDemandTableDiv .jss_search_container > div:first-child {
+  display: none;
+}
+#shipmentGlobalDemandTableDiv .jss_search_container input.jss_search {
+  height: 28px;
+  margin: 0;
+}
+#shipmentGlobalDemandTableDiv .jss_search_container .jexcel_clear_btn {
+  height: 28px;
+  margin: 0;
+  white-space: nowrap;
+}
+// #shipmentGlobalDemandTableDiv .jss_filters{
+//   transform: translateY(-100%);
+// }

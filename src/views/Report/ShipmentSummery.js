@@ -244,6 +244,11 @@ class ShipmentSummery extends Component {
     this.handleChangeProgram = this.handleChangeProgram.bind(this);
     this.setViewById = this.setViewById.bind(this);
   }
+  handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.fetchData();
+    }
+  };
   setViewById(e) {
     this.setState({
       viewById: e.target.value
@@ -1535,14 +1540,20 @@ class ShipmentSummery extends Component {
           .then((response) => {
             var listArray = response.data;
             var proList = [];
+            var groupedBudgets = {};
             for (var i = 0; i < listArray.length; i++) {
-              var programJson = {
-                budgetId: listArray[i].budgetId,
-                label: listArray[i].label,
-                budgetCode: listArray[i].budgetCode,
-              };
-              proList[i] = programJson;
+              var budgetCode = listArray[i].budgetCode;
+              if (!groupedBudgets[budgetCode]) {
+                groupedBudgets[budgetCode] = {
+                  budgetId: listArray[i].budgetId,
+                  label: listArray[i].label,
+                  budgetCode: listArray[i].budgetCode,
+                };
+              } else {
+                groupedBudgets[budgetCode].budgetId = groupedBudgets[budgetCode].budgetId + "," + listArray[i].budgetId;
+              }
             }
+            proList = Object.values(groupedBudgets);
             proList.sort((a, b) => {
               var itemLabelA = a.budgetCode.toUpperCase();
               var itemLabelB = b.budgetCode.toUpperCase();
@@ -1631,6 +1642,19 @@ class ShipmentSummery extends Component {
             fSourceResult = fSourceRequest.result.filter(
               (b) => [...new Set(b.programs.map(ele => ele.id.toString()))].includes(programId.toString())
             );
+            var groupedBudgetsOffline = {};
+            for (var i = 0; i < fSourceResult.length; i++) {
+              var budgetCode = fSourceResult[i].budgetCode;
+              if (!groupedBudgetsOffline[budgetCode]) {
+                groupedBudgetsOffline[budgetCode] = fSourceResult[i];
+              } else {
+                groupedBudgetsOffline[budgetCode] = {
+                  ...groupedBudgetsOffline[budgetCode],
+                  budgetId: groupedBudgetsOffline[budgetCode].budgetId + "," + fSourceResult[i].budgetId
+                };
+              }
+            }
+            fSourceResult = Object.values(groupedBudgetsOffline);
             this.setState(
               {
                 budgetValues: budgetValuesFromProps,
@@ -1694,16 +1718,22 @@ class ShipmentSummery extends Component {
           .then((response) => {
             var budgetList = response.data;
             var bList = [];
+            var groupedBudgetsFilter = {};
             for (var i = 0; i < budgetList.length; i++) {
-              if (this.state.filteredBudgetList.some(c => c.budgetId == budgetList[i].id)) {
-                var budgetJson = {
-                  budgetId: budgetList[i].id,
-                  label: budgetList[i].label,
-                  budgetCode: budgetList[i].code,
-                };
-                bList.push(budgetJson);
+              if (this.state.filteredBudgetList.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
+                var budgetCode = budgetList[i].code;
+                if (!groupedBudgetsFilter[budgetCode]) {
+                  groupedBudgetsFilter[budgetCode] = {
+                    budgetId: budgetList[i].id,
+                    label: budgetList[i].label,
+                    budgetCode: budgetList[i].code,
+                  };
+                } else {
+                  groupedBudgetsFilter[budgetCode].budgetId = groupedBudgetsFilter[budgetCode].budgetId + "," + budgetList[i].id;
+                }
               }
             }
+            bList = Object.values(groupedBudgetsFilter);
             this.setState(
               {
                 budgetValues: bList.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
@@ -1713,7 +1743,7 @@ class ShipmentSummery extends Component {
                 filteredBudgetList: bList,
               },
               () => {
-                this.fetchData();
+                // this.fetchData();
               }
             );
           })
@@ -1810,6 +1840,19 @@ class ShipmentSummery extends Component {
             fSourceResult = fSourceRequest.result.filter(
               (b) => [...new Set(b.programs.map(ele => ele.id))].includes(Number(programId)) && newFundingSourceList.includes(b.fundingSource.fundingSourceId)
             );
+            var groupedBudgetsFilterOffline = {};
+            for (var i = 0; i < fSourceResult.length; i++) {
+              var budgetCode = fSourceResult[i].budgetCode;
+              if (!groupedBudgetsFilterOffline[budgetCode]) {
+                groupedBudgetsFilterOffline[budgetCode] = fSourceResult[i];
+              } else {
+                groupedBudgetsFilterOffline[budgetCode] = {
+                  ...groupedBudgetsFilterOffline[budgetCode],
+                  budgetId: groupedBudgetsFilterOffline[budgetCode].budgetId + "," + fSourceResult[i].budgetId
+                };
+              }
+            }
+            fSourceResult = Object.values(groupedBudgetsFilterOffline);
             this.setState(
               {
                 budgetValues: fSourceResult.map(item => { return { label: getLabelText(item.label, this.state.lang), value: item.budgetId } }),
@@ -1852,7 +1895,7 @@ class ShipmentSummery extends Component {
         procurementAgentLabels: procurementAgentIds.map((ele) => ele.label)
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -1870,7 +1913,7 @@ class ShipmentSummery extends Component {
         budgetLabels: budgetIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -2385,7 +2428,7 @@ class ShipmentSummery extends Component {
         planningUnitLabels: planningUnitIds.map((ele) => ele.label),
       },
       () => {
-        this.fetchData();
+        // this.fetchData();
       }
     );
   };
@@ -2466,7 +2509,7 @@ class ShipmentSummery extends Component {
     let myBudgetIds =
       this.state.budgetValues.length == this.state.budgets.length
         ? []
-        : this.state.budgetValues.map((ele) => ele.value);
+        : (this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : []);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
     let programIds = this.state.programValues.map(ele => (ele.value).toString());
     if (
@@ -2482,7 +2525,7 @@ class ShipmentSummery extends Component {
         myProcurementAgentIds = this.state.procurementAgentValues.map(
           (ele) => ele.value
         );
-        myBudgetIds = this.state.budgetValues.map((ele) => ele.value);
+        myBudgetIds = this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : [];
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -3593,26 +3636,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="planningUnitId"
-                            id="planningUnitId"
-                            bsSize="md"
-                            value={this.state.planningUnitValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handlePlanningUnitChange(e);
-                            }}
-                            options={
-                              planningUnits && planningUnits.length > 0
-                                ? planningUnits
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="planningUnitId"
+                              id="planningUnitId"
+                              bsSize="md"
+                              value={this.state.planningUnitValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handlePlanningUnitChange(e);
+                              }}
+                              options={
+                                planningUnits && planningUnits.length > 0
+                                  ? planningUnits
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
@@ -3665,26 +3710,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="fundingSourceId"
-                            id="fundingSourceId"
-                            bsSize="md"
-                            value={this.state.fundingSourceValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handleFundingSourceChange(e);
-                            }}
-                            options={
-                              fundingSourceListDD && fundingSourceListDD.length > 0
-                                ? fundingSourceListDD
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="fundingSourceId"
+                              id="fundingSourceId"
+                              bsSize="md"
+                              value={this.state.fundingSourceValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handleFundingSourceChange(e);
+                              }}
+                              options={
+                                fundingSourceListDD && fundingSourceListDD.length > 0
+                                  ? fundingSourceListDD
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>}
                       {this.state.viewById == 2 && <FormGroup className="col-md-3" id="paDiv">
@@ -3693,26 +3740,28 @@ class ShipmentSummery extends Component {
                         </Label>
                         <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                         <div className="controls">
-                          <MultiSelect
-                            name="procurementAgentId"
-                            id="procurementAgentId"
-                            bsSize="md"
-                            value={this.state.procurementAgentValues}
-                            filterOptions={filterOptions}
-                            onChange={(e) => {
-                              this.handleProcurementAgentChange(e);
-                            }}
-                            options={
-                              procurementAgentListDD && procurementAgentListDD.length > 0
-                                ? procurementAgentListDD
-                                : []
-                            }
-                            disabled={this.state.loading}
-                            overrideStrings={{
-                              allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                              selectSomeItems: i18n.t('static.common.select')
-                            }}
-                          />
+                          <div onBlur={this.handleBlur}>
+                            <MultiSelect
+                              name="procurementAgentId"
+                              id="procurementAgentId"
+                              bsSize="md"
+                              value={this.state.procurementAgentValues}
+                              filterOptions={filterOptions}
+                              onChange={(e) => {
+                                this.handleProcurementAgentChange(e);
+                              }}
+                              options={
+                                procurementAgentListDD && procurementAgentListDD.length > 0
+                                  ? procurementAgentListDD
+                                  : []
+                              }
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                selectSomeItems: i18n.t('static.common.select')
+                              }}
+                            />
+                          </div>
                         </div>
                       </FormGroup>}
                       {this.state.viewById == 1 && this.state.filteredBudgetList.length > 0 && (
@@ -3722,29 +3771,31 @@ class ShipmentSummery extends Component {
                           </Label>
                           <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                           <div className="controls">
-                            <MultiSelect
-                              name="budgetId"
-                              id="budgetId"
-                              bsSize="md"
-                              value={this.state.budgetValues}
-                              filterOptions={filterOptions}
-                              onChange={(e) => {
-                                this.handleBudgetChange(e);
-                              }}
-                              options={
-                                filteredBudgetList.length > 0 &&
-                                filteredBudgetList.map((item, i) => {
-                                  return {
-                                    label: item.budgetCode,
-                                    value: item.budgetId,
-                                  };
-                                }, this)
-                              }
-                              overrideStrings={{
-                                allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                selectSomeItems: i18n.t('static.common.select')
-                              }}
-                            />
+                            <div onBlur={this.handleBlur}>
+                              <MultiSelect
+                                name="budgetId"
+                                id="budgetId"
+                                bsSize="md"
+                                value={this.state.budgetValues}
+                                filterOptions={filterOptions}
+                                onChange={(e) => {
+                                  this.handleBudgetChange(e);
+                                }}
+                                options={
+                                  filteredBudgetList.length > 0 &&
+                                  filteredBudgetList.map((item, i) => {
+                                    return {
+                                      label: item.budgetCode,
+                                      value: item.budgetId,
+                                    };
+                                  }, this)
+                                }
+                                overrideStrings={{
+                                  allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                  selectSomeItems: i18n.t('static.common.select')
+                                }}
+                              />
+                            </div>
                           </div>
                         </FormGroup>
                       )}

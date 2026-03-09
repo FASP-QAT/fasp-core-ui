@@ -74,7 +74,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>}
           <DefaultHeaderDropdown mssgs />
-          {checkOnline==='Online' && this.props.activeModule == 2 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.openIssues}</span>}
+          {checkOnline==='Online' && this.props.activeModule == 2 && this.props.openIssues > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.openIssues}</span>}
           {checkOnline === 'Online' && this.props.activeModule == 2 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') &&
             <NavItem className="">
@@ -86,7 +86,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
-          {checkOnline === 'Online' && this.props.activeModule == 2 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestProgram") ? localStorage.getItem("sesLatestProgram") : 0}</span>}
+          {checkOnline === 'Online' && this.props.activeModule == 2 && (localStorage.getItem("sesLatestProgram") ? localStorage.getItem("sesLatestProgram") : 0) > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestProgram") ? localStorage.getItem("sesLatestProgram") : 0}</span>}
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_VERSION') && this.props.activeModule == 2 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -99,8 +99,8 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
-          {checkOnline==='Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.openIssues}</span>}
-          {checkOnline === 'Online' && this.props.activeModule == 2 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.programModifiedCount}</span>}
+          {checkOnline==='Online' && this.props.activeModule == 1 && this.props.openIssues > 0 &&  <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.openIssues}</span>}
+          {checkOnline === 'Online' && this.props.activeModule == 2 && this.props.programModifiedCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.programModifiedCount}</span>}
           {checkOnline === 'Online' && this.props.activeModule == 1 &&
             AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_LOAD_DELETE_DATASET') &&
             <NavItem className="">
@@ -112,7 +112,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
-          {checkOnline === 'Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestDataset") ? localStorage.getItem("sesLatestDataset") : 0}</span>}
+          {checkOnline === 'Online' && this.props.activeModule == 1 && (localStorage.getItem("sesLatestDataset") ? localStorage.getItem("sesLatestDataset") : 0) > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-15px' }}>{localStorage.getItem("sesLatestDataset") ? localStorage.getItem("sesLatestDataset") : 0}</span>}
           {checkOnline === 'Online' && AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_COMMIT_DATASET') && this.props.activeModule == 1 &&
             <NavItem className="">
               <NavLink to="#" className="nav-link">
@@ -125,7 +125,7 @@ class DefaultHeader extends Component {
               </NavLink>
             </NavItem>
           }
-          {checkOnline === 'Online' && this.props.activeModule == 1 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.programDatasetModifiedCount}</span>}
+          {checkOnline === 'Online' && this.props.activeModule == 1 && this.props.programDatasetModifiedCount > 0 && <span class="badge badge-danger" style={{ 'zIndex': '6', marginTop: '-17px', marginLeft: '-13px' }}>{this.props.programDatasetModifiedCount}</span>}
           {this.props.activeModule == 1 && <NavItem className="">
             <span className="nav-link">
               <a href={localStorage.getItem('lang') == 'en' ?
