@@ -549,7 +549,7 @@ class ApplicationDashboard extends Component {
       localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
       if (localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
           stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
           displayShipmentsBy: this.state.displayBy
@@ -1009,7 +1009,7 @@ class ApplicationDashboard extends Component {
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM") + "-01",
           stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM") + "-" + moment(endDate).endOf('month').format("DD"),
           displayShipmentsBy: this.state.displayBy
@@ -1098,7 +1098,7 @@ class ApplicationDashboard extends Component {
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
           stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
           displayShipmentsBy: this.state.displayBy
@@ -3706,15 +3706,15 @@ class ApplicationDashboard extends Component {
                             </td>
                             <td>
                               <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(d.stockStatusScore) <= 70 ? '#f48521' : Math.round(d.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(d.stockStatusScore)}{"%"}</b>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round(d.stockStatusScore)}{"%"}</b>
                             </td>
                             <td>
                               <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(d.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(d.supplyPlanQualityScore)}{"%"}</b>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round(d.supplyPlanQualityScore)}{"%"}</b>
                             </td>
                             <td>
                               <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 35 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 70 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
                             </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
@@ -3913,7 +3913,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
-                            <i class="mb-2 fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                            <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
                               Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
                               <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b>
                             </i>
@@ -3987,7 +3987,7 @@ class ApplicationDashboard extends Component {
                         <div class="card-header justify-content-between">
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
-                            <i class="mb-2 fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                            <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
                               Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
                               <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b>
                             </i>
