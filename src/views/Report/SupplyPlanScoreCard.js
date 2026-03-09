@@ -796,6 +796,57 @@ class SupplyPlanScoreCard extends Component {
   }
 
   fetchData = () => {
+    if (localStorage.getItem("sessionType") === 'Online' && !this.state.onlyDownloadedProgram) {
+      var dt = new Date();
+      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+      var dt1 = new Date();
+      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+      var inputJson = {
+        programIds: this.state.programValues.map(p => p.value),
+        startDate: dt.getFullYear() + "-" + dt.getMonth() + "-01",
+        stopDate: dt1.getFullYear() + "-" + dt1.getMonth() + "-01",
+        displayShipmentsBy: 1
+      }
+      DashboardService.getDashboardBottom(inputJson)
+        .then(response => {
+          var data = response.data;
+          this.setState({
+            dashboardBottomDataList: data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }))
+          }, () => {
+            this.buildJexcel();
+          })
+        }
+        ).catch(
+          error => {
+            this.setState({
+              bottomSubmitLoader: true,
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
+            }
+          }
+        );
+          
+    } else {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -855,6 +906,7 @@ class SupplyPlanScoreCard extends Component {
             });
         }.bind(this)
     }.bind(this)
+    }
   }
 
   buildJexcel = () => {
@@ -991,7 +1043,8 @@ class SupplyPlanScoreCard extends Component {
                     data.push([
                         '',
                         `${dbd.program.code}`,
-                        `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                        this.state.onlyDownloadedProgram ? `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`
+                        : `v${dbd.versionId}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                         dbd.totalPus,
                         dbd.forecastConsumptionQpl?.correctCount || 0,
                         dbd.actualConsumptionQpl?.correctCount || 0,
@@ -1005,7 +1058,7 @@ class SupplyPlanScoreCard extends Component {
                         dbd.versionNotes || '',
                         'row_child',
                         cg.key,
-                        dbd.programId
+                        this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
                     ]);
                 });
             }
@@ -1020,7 +1073,8 @@ class SupplyPlanScoreCard extends Component {
             data.push([
                 '',
                 dbd.program.code,
-                `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                this.state.onlyDownloadedProgram ? `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`
+                : `v${dbd.versionId}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                 dbd.totalPus,
                 dbd.forecastConsumptionQpl?.correctCount || 0,
                 dbd.actualConsumptionQpl?.correctCount || 0,
@@ -1034,7 +1088,7 @@ class SupplyPlanScoreCard extends Component {
                 dbd.versionNotes || '',
                 'program',
                 '',
-                dbd.programId
+                this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
             ]);
         });
     }
@@ -1062,6 +1116,8 @@ class SupplyPlanScoreCard extends Component {
             if (headTitle !== '') {
                 h.style.textAlign = 'center';
                 h.style.setProperty('text-align', 'center', 'important');
+                h.style.verticalAlign = 'middle';
+                h.style.setProperty('vertical-align', 'middle', 'important');
             }
         });
 
@@ -1174,7 +1230,7 @@ class SupplyPlanScoreCard extends Component {
             }
 
             // Align Latest Version, Review Status, and Version Notes to left
-            for (let c of [2, 12, 13]) {
+            for (let c of [2, 12]) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (cell) {
                     cell.style.textAlign = 'left';
@@ -1191,24 +1247,26 @@ class SupplyPlanScoreCard extends Component {
                     cell.classList.remove('jss_comment');
                     cell.classList.remove('jss_notes');
 
-                    if ((c === 12 || c === 13) && (rowType === 'row_child' || rowType === 'program')) {
+                    if (c === 12 && (rowType === 'row_child' || rowType === 'program')) {
                         const programId = rowData[rowData.length - 1];
                         if (programId) {
-                            const val = rowData[c];
+                            const val = rowData[12];
+                            const notes = rowData[13];
                             if (val && val !== '-' && val.trim() !== '') {
-                                if (c === 13) {
-                                    const iconHtml = `<i class="fa fa-book" style="color: #002f6c; vertical-align: middle; margin-left: 5px;"></i>`;
-                                    cell.innerHTML = `${val} ${iconHtml}`;
+                                let iconHtml = '';
+                                if (notes && notes.trim() !== '' && notes !== '-') {
+                                    iconHtml = `<i class="fa fa-book notes-icon icons IconColorD" title="${notes}" aria-hidden="true" style="color: #002f6c; vertical-align: middle; margin-left: 5px; cursor: pointer;"></i>`;
                                 }
+                                cell.innerHTML = `<span>${val}</span> ${iconHtml}`;
                                 cell.style.setProperty('color', '#002f6c', 'important');
                                 cell.style.setProperty('text-decoration', 'none', 'important');
                                 cell.style.setProperty('cursor', 'pointer', 'important');
                                 cell.onclick = (e) => {
                                     e.stopPropagation();
-                                    if (c === 12) {
-                                        this.redirectToSPVR(programId);
-                                    } else {
+                                    if (e.target.classList.contains('notes-icon')) {
                                         this.getNotes(programId);
+                                    } else {
+                                        this.redirectToSPVR(programId);
                                     }
                                 };
                             }
@@ -1217,26 +1275,27 @@ class SupplyPlanScoreCard extends Component {
                 }
             }
 
+            const activePUsValue = Number(rowData[3]) || 0;
             for (let c = 4; c <= 7; c++) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
                 const value = (rowData[c] === null || rowData[c] === undefined || rowData[c] === '') ? 0 : Number(rowData[c]);
                 if (!isNaN(value)) {
                     if (value === 0) {
-                        cell.style.setProperty('color', '#BA0C2F', 'important');
-                        cell.style.fontWeight = 'bold';
+                        cell.style.setProperty('color', '#FF0000', 'important');
+                        cell.style.fontWeight = (rowType === 'row_parent') ? 'bold' : 'normal';
                         cell.style.background = 'none';
                         cell.style.textAlign = 'right';
                         cell.innerText = '0';
                     } else {
                         cell.style.color = '';
                         cell.style.removeProperty('color');
-                        let percentage = activePUs > 0 ? Math.min((value / activePUs) * 100, 100) : 0;
-                        cell.style.background = `linear-gradient(to right, #A9D1E5 ${percentage}%, transparent ${percentage}%)`;
+                        let percentage = activePUsValue > 0 ? Math.min((value / activePUsValue) * 100, 100) : 0;
+                        cell.style.setProperty('background', `linear-gradient(to right, #A9D1E5 ${percentage}%, transparent ${percentage}%)`, 'important');
                         cell.style.backgroundClip = 'content-box';
                         cell.style.padding = '0px 0px';
                         cell.style.textAlign = 'right';
-                        cell.style.fontWeight = 'bold';
+                        cell.style.fontWeight = (rowType === 'row_parent') ? 'bold' : 'normal';
                     }
                 }
             }
@@ -1267,7 +1326,7 @@ class SupplyPlanScoreCard extends Component {
                     const c3 = c2 + Number(parts[2]);
                     const c4 = c3 + Number(parts[3]);
                     stockCell.style.background = `linear-gradient(to right, #BA0C2F 0%, #BA0C2F ${c1}%, #f48521 ${c1}%, #f48521 ${c2}%, #118b70 ${c2}%, #118b70 ${c3}%, #edb944 ${c3}%, #edb944 ${c4}%, #cfcdc9 ${c4}%, #cfcdc9 100%)`;
-                    stockCell.title = `🟥 Stock Out: ${parts[0]}%\n🟧 Understock: ${parts[1]}%\n🟩 Adequate: ${parts[2]}%\n🟨 Overstock: ${parts[3]}%\n⬜ N/A: ${parts[4]}%`;
+                    stockCell.title = `🟥 Stock Out: ${parts[0]}%\n🟧 Below Min: ${parts[1]}%\n🟩 Stocked to Plan: ${parts[2]}%\n🟨 Above Max: ${parts[3]}%\n⬜ N/A: ${parts[4]}%`;
                     stockCell.style.backgroundRepeat = 'no-repeat';
                     stockCell.style.backgroundPosition = 'center';
                     stockCell.style.backgroundSize = '95% 14px';
@@ -1295,8 +1354,8 @@ class SupplyPlanScoreCard extends Component {
             { title: 'Stock Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
             { title: 'Stock Status Score', type: 'text', readOnly: true, align: 'left' },
             { title: 'Total Score', type: 'text', readOnly: true, align: 'left' },
-            { title: 'Review Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
-            { title: 'Version Notes', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 150 },
+            { title: 'Review Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 200 },
+            { title: 'Version Notes', type: 'hidden', readOnly: true, align: 'left', width: 150 },
             { title: 'RowType', type: 'hidden' },
             { title: 'CountryKey', type: 'hidden' },
             { title: 'ProgramId', type: 'hidden' }
@@ -1884,7 +1943,7 @@ class SupplyPlanScoreCard extends Component {
         startY: y,
         margin: { top: 80, bottom: 70 },
         styles: { lineWidth: 0.5, fontSize: 7, cellPadding: 3, overflow: 'linebreak', halign: 'center', valign: 'middle' },
-        headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+        headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', valign: 'middle' },
         theme: 'grid',
         didParseCell: function (data) {
             if (data.section !== 'body') return;
@@ -1938,14 +1997,13 @@ class SupplyPlanScoreCard extends Component {
                 }
             }
 
-            // Numeric columns (4, 5, 6, 7): apply red text if value is 0
+            // Numeric columns (4, 5, 6, 7): apply centered alignment and hide default rendering for manual redrawing
             if (!isMatrixView && origColIdx >= 4 && origColIdx <= 7) {
                 var cellVal = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || rowData[origColIdx] === '') ? 0 : Number(rowData[origColIdx]);
                 data.cell.text = [String(cellVal)];
-                if (!isNaN(cellVal) && cellVal === 0) {
-                    data.cell.styles.textColor = [186, 12, 47]; // #BA0C2F
-                    data.cell.styles.fontStyle = 'bold';
-                }
+                data.cell.styles.fontStyle = (rowType === 'row_parent') ? 'bold' : 'normal';
+                data.cell.styles.halign = 'center';
+                data.cell.styles.fontSize = 0; // Hide default to avoid double numbers
             }
             
             // Matrix view: all data cells get score colors
@@ -1993,6 +2051,31 @@ class SupplyPlanScoreCard extends Component {
                     doc.setFillColor(mc[0], mc[1], mc[2]);
                     doc.circle(data.cell.x + 10, data.cell.y + data.cell.height / 2, 3, 'F');
                 }
+            }
+            
+            // Draw data bars and centered text for numeric columns 4-7
+            if (!isMatrixView && origColIdx >= 4 && origColIdx <= 7) {
+                var activePUsVal = Number(rowData[3]) || 0;
+                var cellValNum = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || rowData[origColIdx] === '') ? 0 : Number(rowData[origColIdx]);
+                
+                // Draw bar background if value > 0
+                if (activePUsVal > 0 && cellValNum > 0) {
+                    var barPercentage = Math.min((cellValNum / activePUsVal), 1);
+                    doc.setFillColor(169, 209, 229); // #A9D1E5
+                    doc.rect(data.cell.x + 0.5, data.cell.y + 0.5, (data.cell.width - 1) * barPercentage, data.cell.height - 1, 'F');
+                }
+                
+                // Centered redraw on top with correct color
+                doc.setFont(data.cell.styles.font, data.cell.styles.fontStyle);
+                doc.setFontSize(7);
+                if (cellValNum === 0) {
+                    doc.setTextColor(255, 0, 0);
+                } else {
+                    doc.setTextColor(0, 0, 0);
+                }
+                let txCenter = data.cell.x + data.cell.width / 2;
+                let tyCenter = data.cell.y + (data.cell.height / 2) + (7 / 3);
+                doc.text(String(cellValNum), txCenter, tyCenter, { align: 'center' });
             }
 
             // Draw stacked stock status bar
