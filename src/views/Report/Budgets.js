@@ -991,6 +991,7 @@ class Budgets extends Component {
                                 </div>
                                 {
                                     <div className="dataEnteredTable">
+                                        {this.state.selBudget.length > 0 && <><br/><h5 className='red'>{i18n.t('static.budgetReport.budgetForMultiProgram')}</h5><br/></>}
                                         <div id="budgetTable" className='TableWidth100'>
                                         </div>
                                     </div>
