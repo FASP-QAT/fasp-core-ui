@@ -2222,7 +2222,7 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: countryAggregates.map(c => c.label),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', borderWidth: 3, fill: false, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', fill: false, showLine: false, pointRadius: 45, pointHoverRadius: 45, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgQuality)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgStock)) },
                 { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: countryAggregates.map(() => 90) }
@@ -2325,7 +2325,7 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: displayList.map(d => d.program ? d.program.code : ''),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', borderWidth: 3, fill: false, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
+                { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', fill: false, showLine: false, pointRadius: 45, pointHoverRadius: 45, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
                 { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: displayList.map(() => 90) }
