@@ -1174,7 +1174,7 @@ class ApplicationDashboard extends Component {
     if (localStorage.getItem('sessionType') === 'Online') {
       DashboardService.getDashboardBottom(inputJson)
         .then(response => {
-          var data = response.data;
+          var data = response.data[0];
           // Compute supplyPlanQualityScore
           var totalQpl = data.forecastConsumptionQpl ? data.forecastConsumptionQpl.puCount : 0;
           var flaggedCountForecastConsumptionData = totalQpl - (data.forecastConsumptionQpl ? data.forecastConsumptionQpl.correctCount : 0);
@@ -1457,7 +1457,7 @@ class ApplicationDashboard extends Component {
           if (!localStorage.getItem("bottomReportPeriod"))
             localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
           var inputJson = {
-            programId: this.state.bottomProgramId,
+            programIds: [this.state.bottomProgramId],
             startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
             stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
             displayShipmentsBy: this.state.displayBy
@@ -1481,7 +1481,6 @@ class ApplicationDashboard extends Component {
           var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
           DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
             localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
-            console.log("Hello ",response.data);
             this.setState({
               dashboardTopList: (response.data).sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();

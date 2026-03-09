@@ -796,6 +796,57 @@ class SupplyPlanScoreCard extends Component {
   }
 
   fetchData = () => {
+    if (localStorage.getItem("sessionType") === 'Online' && !this.state.onlyDownloadedProgram) {
+      var dt = new Date();
+      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+      var dt1 = new Date();
+      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+      var inputJson = {
+        programIds: this.state.programValues.map(p => p.value),
+        startDate: dt.getFullYear() + "-" + dt.getMonth() + "-01",
+        stopDate: dt1.getFullYear() + "-" + dt1.getMonth() + "-01",
+        displayShipmentsBy: 1
+      }
+      DashboardService.getDashboardBottom(inputJson)
+        .then(response => {
+          var data = response.data;
+          this.setState({
+            dashboardBottomDataList: data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }))
+          }, () => {
+            this.buildJexcel();
+          })
+        }
+        ).catch(
+          error => {
+            this.setState({
+              bottomSubmitLoader: true,
+            })
+            if (error.message === "Network Error") {
+              this.setState({
+                message: API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage")),
+              });
+            } else {
+              switch (error.response ? error.response.status : "") {
+                case 500:
+                case 401:
+                case 404:
+                case 406:
+                case 412:
+                  this.setState({ message: i18n.t(error.response.data.messageCode, { entityname: i18n.t('static.dashboard.program') }) });
+                  break;
+                default:
+                  this.setState({ message: 'static.unkownError' });
+                  break;
+              }
+            }
+          }
+        );
+          
+    } else {
     var db1;
     getDatabase();
     var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
@@ -855,6 +906,7 @@ class SupplyPlanScoreCard extends Component {
             });
         }.bind(this)
     }.bind(this)
+    }
   }
 
   buildJexcel = () => {
@@ -991,7 +1043,8 @@ class SupplyPlanScoreCard extends Component {
                     data.push([
                         '',
                         `${dbd.program.code}`,
-                        `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                        this.state.onlyDownloadedProgram ? `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`
+                        : `v${dbd.versionId}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                         dbd.totalPus,
                         dbd.forecastConsumptionQpl?.correctCount || 0,
                         dbd.actualConsumptionQpl?.correctCount || 0,
@@ -1005,7 +1058,7 @@ class SupplyPlanScoreCard extends Component {
                         dbd.versionNotes || '',
                         'row_child',
                         cg.key,
-                        dbd.programId
+                        this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
                     ]);
                 });
             }
@@ -1020,7 +1073,8 @@ class SupplyPlanScoreCard extends Component {
             data.push([
                 '',
                 dbd.program.code,
-                `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                this.state.onlyDownloadedProgram ? `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`
+                : `v${dbd.versionId}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
                 dbd.totalPus,
                 dbd.forecastConsumptionQpl?.correctCount || 0,
                 dbd.actualConsumptionQpl?.correctCount || 0,
@@ -1034,7 +1088,7 @@ class SupplyPlanScoreCard extends Component {
                 dbd.versionNotes || '',
                 'program',
                 '',
-                dbd.programId
+                this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
             ]);
         });
     }
