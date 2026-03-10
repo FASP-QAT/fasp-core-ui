@@ -5661,7 +5661,7 @@ export default class BuildTree extends Component {
                 data[11] = 0
                 data[12] = 0
                 data[13] = {
-                    firstMonthOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.firstMonthOfTarget : moment(moment(this.state.currentScenario.annualTargetCalculator.firstMonthOfTarget, "YYYY-MM")).format("YYYY-MM-DD"),
+                    firstMonthOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? ((scalingList[j].startDate!=null && scalingList[j].startDate != "Invalid date" && scalingList[j].startDate != "")?scalingList[j].startDate:this.state.firstMonthOfTarget) : moment(moment(this.state.currentScenario.annualTargetCalculator.firstMonthOfTarget, "YYYY-MM")).format("YYYY-MM-DD"),
                     yearsOfTarget: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.yearsOfTarget : this.state.currentScenario.annualTargetCalculator.yearsOfTarget,
                     actualOrTargetValueList: this.state.currentScenario.annualTargetCalculator == undefined ? this.state.actualOrTargetValueList : this.state.currentScenario.annualTargetCalculator.actualOrTargetValueList
                 }
