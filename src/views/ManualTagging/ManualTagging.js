@@ -696,7 +696,7 @@ export default class ManualTagging extends Component {
                     this.el.setComments(col, "");
                 }
                 var col = ("J").concat(parseInt(y) + 1);
-                if (this.el.getValueFromCoords(10, y)) {
+                if (this.el.getValueFromCoords(0, y)) {
                     var value = this.el.getValue(`J${parseInt(y) + 1}`, true).toString().replaceAll(",", "");
                     if (value == "") {
                         this.el.setStyle(col, "background-color", "transparent");
