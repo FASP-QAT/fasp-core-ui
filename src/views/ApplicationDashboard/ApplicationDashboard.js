@@ -1065,9 +1065,14 @@ class ApplicationDashboard extends Component {
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
-          localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+          const data = response.data.map(item => ({
+            ...item,
+            stockStatusScore: item.stockStatusScore * 100,
+            supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+          }));
+          localStorage.setItem("dashboardTopList", JSON.stringify(data))
           this.setState({
-            dashboardTopList: (response.data).sort((a, b) => {
+            dashboardTopList: data.sort((a, b) => {
               var itemLabelA = a.program.code.toUpperCase();
               var itemLabelB = b.program.code.toUpperCase();
               return itemLabelA > itemLabelB ? 1 : -1;
@@ -1403,8 +1408,13 @@ class ApplicationDashboard extends Component {
             );
         } else {
           DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+            const data = response.data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }));
             this.setState({
-              dashboardTopList: (response.data).sort((a, b) => {
+              dashboardTopList: data.sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();
                 var itemLabelB = b.program.code.toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
@@ -1480,9 +1490,14 @@ class ApplicationDashboard extends Component {
           })
           var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
           DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
-            localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+            const data = response.data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }));
+            localStorage.setItem("dashboardTopList", JSON.stringify(data))
             this.setState({
-              dashboardTopList: (response.data).sort((a, b) => {
+              dashboardTopList: data.sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();
                 var itemLabelB = b.program.code.toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
