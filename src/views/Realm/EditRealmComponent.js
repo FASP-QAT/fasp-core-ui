@@ -108,7 +108,12 @@ const validationSchema = function (values) {
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard')),
+        supplyPlanScoreThresholdPerc: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .required(i18n.t('static.validated.minPercForMode'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -143,6 +148,7 @@ export default class UpdateDataSourceComponent extends Component {
                 noOfMonthsInPastForBottomDashboard: '',
                 noOfMonthsInPastForTopDashboard: '',
                 noOfMonthsInFutureForBottomDashboard: '',
+                supplyPlanScoreThresholdPerc: ''
             },
             lang: localStorage.getItem('lang'),
             message: '',
@@ -218,6 +224,9 @@ export default class UpdateDataSourceComponent extends Component {
         if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
             realm.noOfMonthsInFutureForBottomDashboard = event.target.value
         }
+        if (event.target.name === "supplyPlanScoreThresholdPerc") {
+            realm.supplyPlanScoreThresholdPerc = event.target.value
+        }
         this.setState(
             {
                 realm
@@ -230,6 +239,7 @@ export default class UpdateDataSourceComponent extends Component {
     componentDidMount(str) {
         RealmService.getRealmById(this.props.match.params.realmId).then(response => {
             if (response.status == 200) {
+                response.data.supplyPlanScoreThresholdPerc *= 100;
                 this.setState({
                     realm: response.data, loading: false,
                     originalNoOfMonthsInFutureForTopDashboard: response.data.noOfMonthsInFutureForTopDashboard,
@@ -332,7 +342,8 @@ export default class UpdateDataSourceComponent extends Component {
                                     noOfMonthsInFutureForTopDashboard: this.state.realm.noOfMonthsInFutureForTopDashboard,
                                     noOfMonthsInPastForBottomDashboard: this.state.realm.noOfMonthsInPastForBottomDashboard,
                                     noOfMonthsInPastForTopDashboard: this.state.realm.noOfMonthsInPastForTopDashboard,
-                                    noOfMonthsInFutureForBottomDashboard: this.state.realm.noOfMonthsInFutureForBottomDashboard
+                                    noOfMonthsInFutureForBottomDashboard: this.state.realm.noOfMonthsInFutureForBottomDashboard,
+                                    supplyPlanScoreThresholdPerc: this.state.realm.supplyPlanScoreThresholdPerc
                                 }}
                                 validationSchema={validationSchema}
                                 onSubmit={(values, { setSubmitting, setErrors }) => {
@@ -342,7 +353,9 @@ export default class UpdateDataSourceComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    RealmService.updateRealm(this.state.realm)
+                                    var inputJson = this.state.realm;
+                                    inputJson.supplyPlanScoreThresholdPerc /= 100;
+                                    RealmService.updateRealm(inputJson)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -661,6 +674,21 @@ export default class UpdateDataSourceComponent extends Component {
                                                         value={this.state.realm.noOfMonthsInFutureForBottomDashboard}
                                                         required />
                                                     <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="supplyPlanScoreThresholdPerc">{i18n.t('static.realm.supplyPlanScoreThresholdPerc')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        min="0"
+                                                        name="supplyPlanScoreThresholdPerc"
+                                                        id="supplyPlanScoreThresholdPerc"
+                                                        bsSize="sm"
+                                                        valid={!errors.supplyPlanScoreThresholdPerc && this.state.realm.supplyPlanScoreThresholdPerc != ''}
+                                                        invalid={touched.supplyPlanScoreThresholdPerc && !!errors.supplyPlanScoreThresholdPerc}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.supplyPlanScoreThresholdPerc}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.supplyPlanScoreThresholdPerc}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>

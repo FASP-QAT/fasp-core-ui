@@ -288,7 +288,7 @@ const routes = [
   { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
-  { path: '/report/supplyPlanScoreCard', exact: true, name: 'static.dashboard.supplyplan', component: SupplyPlanScoreCard },
+  { path: '/report/supplyPlanScoreCard', exact: true, name: 'Supply Plan Scorecard', component: SupplyPlanScoreCard },
   { path: '/shipmentLinkingNotification', exact: true, name: 'static.mt.shipmentLinkingNotification', component: ShipmentLinkingNotifications },
   { path: '/procurementAgent/addProcurementAgent', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementagentheader', component: AddProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },

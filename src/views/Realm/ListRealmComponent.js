@@ -73,9 +73,10 @@ export default class ReactListComponent extends Component {
                             data[15] = realmList[j].noOfMonthsInFutureForTopDashboard;
                             data[16] = realmList[j].noOfMonthsInPastForBottomDashboard;
                             data[17] = realmList[j].noOfMonthsInFutureForBottomDashboard;
-                            data[18] = realmList[j].lastModifiedBy.username;
-                            data[19] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[20] = realmList[j].active;
+                            data[18] = realmList[j].supplyPlanScoreThresholdPerc * 100;
+                            data[19] = realmList[j].lastModifiedBy.username;
+                            data[20] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[21] = realmList[j].active;
                             realmArray[count] = data;
                             count++;
                         }
@@ -159,6 +160,10 @@ export default class ReactListComponent extends Component {
                                 {
                                     title: i18n.t('static.realm.noOfMonthsInFutureForBottomDashboard'),
                                     type: 'numeric', mask: '#,##'
+                                },
+                                {
+                                    title: "Supply Plan Score Threshold",
+                                    type: 'numeric', mask: '#,##.00', decimal: '.'
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),

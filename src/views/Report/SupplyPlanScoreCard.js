@@ -172,7 +172,8 @@ class SupplyPlanScoreCard extends Component {
       collapseAllChecked: false,
       large: false,
       loadingForNotes: false,
-      notesTransTableEl: ""
+      notesTransTableEl: "",
+      supplyPlanScoreThresholdPerc: 0
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -188,6 +189,29 @@ class SupplyPlanScoreCard extends Component {
    * Reterives dashboard data from server on component mount
    */
   componentDidMount() {
+    var realmId = AuthenticationService.getRealmId();
+    var db1;
+    getDatabase();
+    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    openRequest.onerror = function (event) {
+        this.setState({
+            message: i18n.t('static.program.errortext'),
+            color: '#BA0C2F'
+        })
+        this.hideFirstComponent()
+    }.bind(this);
+    openRequest.onsuccess = function (e) {
+        db1 = e.target.result;
+        var realmTransaction = db1.transaction(['realm'], 'readwrite');
+        var realmOS = realmTransaction.objectStore('realm');
+        var realmRequest = realmOS.get(realmId);
+        realmRequest.onsuccess = function (event) {
+            var realm = realmRequest.result;
+            this.setState({
+              supplyPlanScoreThresholdPerc: realm.supplyPlanScoreThresholdPerc * 100
+            })
+        }.bind(this)
+    }.bind(this);
     this.getCountrys();
   }
   /**
@@ -2225,7 +2249,7 @@ class SupplyPlanScoreCard extends Component {
                 { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', fill: false, showLine: false, pointRadius: 45, pointHoverRadius: 45, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgQuality)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgStock)) },
-                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: countryAggregates.map(() => 90) }
+                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
             ]
         };
     } else if (viewBy === '2') {
@@ -2306,7 +2330,7 @@ class SupplyPlanScoreCard extends Component {
                     pointHoverRadius: 0,
                     pointStyle: 'line',
                     showLine: false,
-                    data: sortedCountries.map(() => 70)
+                    data: sortedCountries.map(() => this.state.supplyPlanScoreThresholdPerc)
                 }
             ]
         };
@@ -2328,7 +2352,7 @@ class SupplyPlanScoreCard extends Component {
                 { type: 'line', label: 'Total Score', borderColor: '#99C1E8', backgroundColor: '#99C1E8', fill: false, showLine: false, pointRadius: 45, pointHoverRadius: 45, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#0F263F', borderColor: '#0F263F', borderWidth: 1, data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#C50000', borderColor: '#C50000', borderWidth: 1, data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
-                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: displayList.map(() => 90) }
+                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', showLine: false, data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
             ]
         };
     }
