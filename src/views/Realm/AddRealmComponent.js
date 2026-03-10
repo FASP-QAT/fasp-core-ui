@@ -28,7 +28,8 @@ const initialValues = {
     noOfMonthsInPastForBottomDashboard: 6,
     noOfMonthsInFutureForBottomDashboard: 18,
     noOfMonthsInPastForTopDashboard: 0,
-    noOfMonthsInFutureForTopDashboard: 18
+    noOfMonthsInFutureForTopDashboard: 18,
+    supplyPlanScoreThresholdPerc: 70
 }
 /**
  * Defines the validation schema for realm details.
@@ -125,7 +126,12 @@ const validationSchema = function (values) {
             .typeError(i18n.t('static.procurementUnit.validNumberText'))
             .min(0, i18n.t('static.realm.negativeNumberNotAllowed'))
             .integer(i18n.t('static.realm.decimalNotAllow'))
-            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard'))
+            .required(i18n.t('static.validated.restrictionNoOfMonthsInFutureForBottomDashboard')),
+        supplyPlanScoreThresholdPerc: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .required(i18n.t('static.validated.minPercForMode'))
+            .min(0, i18n.t('static.program.validvaluetext')),
     })
 }
 /**
@@ -159,7 +165,8 @@ export default class AddRealmComponent extends Component {
                 noOfMonthsInPastForBottomDashboard: 6,
                 noOfMonthsInFutureForBottomDashboard: 18,
                 noOfMonthsInPastForTopDashboard: 0,
-                noOfMonthsInFutureForTopDashboard: 18
+                noOfMonthsInFutureForTopDashboard: 18,
+                supplyPlanScoreThresholdPerc: 70
             },
             message: ''
         }
@@ -227,6 +234,9 @@ export default class AddRealmComponent extends Component {
         if (event.target.name === "noOfMonthsInFutureForBottomDashboard") {
             realm.noOfMonthsInFutureForBottomDashboard = event.target.value
         }
+        if (event.target.name === "supplyPlanScoreThresholdPerc") {
+            realm.supplyPlanScoreThresholdPerc = event.target.value
+        }
         this.setState(
             {
                 realm
@@ -275,7 +285,9 @@ export default class AddRealmComponent extends Component {
                                     this.setState({
                                         loading: true
                                     })
-                                    RealmService.addRealm(this.state.realm)
+                                    var inputJson = this.state.realm;
+                                    inputJson.supplyPlanScoreThresholdPerc /= 100;
+                                    RealmService.addRealm(inputJson)
                                         .then(response => {
                                             if (response.status == 200) {
                                                 this.props.history.push(`/realm/listRealm/` + 'green/' + i18n.t(response.data.messageCode, { entityname }))
@@ -589,6 +601,20 @@ export default class AddRealmComponent extends Component {
                                                     <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
+                                                    <Label for="supplyPlanScoreThresholdPerc">{i18n.t('static.realm.supplyPlanScoreThresholdPerc')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        name="supplyPlanScoreThresholdPerc"
+                                                        id="supplyPlanScoreThresholdPerc"
+                                                        bsSize="sm"
+                                                        valid={!errors.supplyPlanScoreThresholdPerc && this.state.realm.supplyPlanScoreThresholdPerc != ''}
+                                                        invalid={touched.supplyPlanScoreThresholdPerc && !!errors.supplyPlanScoreThresholdPerc}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.supplyPlanScoreThresholdPerc}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.supplyPlanScoreThresholdPerc}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
                                                     <FormGroup className='form-check form-check-inline' style={{ paddingLeft: '13%' }}>
                                                         <Input
@@ -674,6 +700,7 @@ export default class AddRealmComponent extends Component {
         realm.minCountForMode = ''
         realm.minPercForMode = ''
         realm.defaultRealm = true
+        realm.supplyPlanScoreThresholdPerc = ''
         this.setState(
             {
                 realm
