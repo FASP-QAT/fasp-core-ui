@@ -2670,7 +2670,7 @@ class ShipmentGlobalDemandView extends Component {
     });
 
     Chart.plugins.register({
-      afterDraw: function (chart) {
+      afterDatasetsDraw: function (chart) {
         if (chart.config.type === "pie" && chart.canvas.id === "cool-canvas2") {
           const ctx = chart.chart.ctx;
           const total = chart.data.datasets[0].data.reduce(
