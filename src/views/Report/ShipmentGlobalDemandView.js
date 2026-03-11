@@ -3773,7 +3773,7 @@ class ShipmentGlobalDemandView extends Component {
         padding: {
           left: 50,
           right: 50,
-          top: 0,
+          top: -20,
           bottom: 0,
         },
       },
@@ -3786,6 +3786,7 @@ class ShipmentGlobalDemandView extends Component {
             ? i18n.t("static.fundingSourceHead.fundingSource")
             : i18n.t("static.report.procurementAgentName")),
         fontColor,
+        padding: 20,
       },
       legend: {
         position: "bottom",
