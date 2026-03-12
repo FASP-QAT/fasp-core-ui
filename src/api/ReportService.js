@@ -119,5 +119,9 @@ class ReportService {
     getPlanningUnitByProgramIdAndPlanningUnitId(programId, planningUnitId) {
         return axios.get(`${API_URL}/api/program/${programId}/planningUnit/${planningUnitId}`, {});
     }
+    stockStatusMatrixGlobal(json) {
+        return axios.post(`${API_URL}/api/report/stockStatusMatrixGlobal`, json, {}
+        );
+    }
 }
 export default new ReportService();

@@ -21,6 +21,16 @@
 .shipmentJexcel>div .jss_filters {
   top: -60px !important;
 }
+
 #shipmentGlobalDemandTableDiv .jss_filters {
   transform: translateY(-85%);
+}
+
+.shipmentGlobalSearchRight .jss_search_container {
+  justify-content: flex-end !important;
+}
+
+.shipmentGlobalSearchRight .jss_search_container>div {
+  margin-left: 0;
+  margin-right: 2px;
 }

@@ -1054,6 +1054,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/report/stockStatusMatrixGlobal":
+                        if (bfunction.includes("ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT")) {
+                            return true;
+                        }
+                        break;
                     case "/report/stockAdjustment":
                         if (bfunction.includes("ROLE_BF_STOCK_ADJUSTMENT_REPORT")) {
                             return true;
