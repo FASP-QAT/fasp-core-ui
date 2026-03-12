@@ -108,8 +108,10 @@ class StockStatus extends Component {
       graphAggregatedBy: 1,
       versionId: "",
       planningUnitDetails: "",
-      planningUnitDetailsExport: ""
+      planningUnitDetailsExport: "",
+      matrixPayload: localStorage.getItem("stockStatusMatrixPayload") ? JSON.parse(localStorage.getItem("stockStatusMatrixPayload")) : null
     };
+    localStorage.removeItem("stockStatusMatrixPayload");
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
     this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
@@ -286,10 +288,14 @@ class StockStatus extends Component {
                   realmCountryPlanningUnitListAll: realmCountryPlanningUnitListAll,
                   planningUnitList: planningUnitListAll,
                   realmCountryPlanningUnitList: realmCountryPlanningUnitListAll,
-                  planningUnitId: [],
+                  planningUnitId: (this.state.matrixPayload && this.state.matrixPayload.planningUnitId) ? [{ value: Number(this.state.matrixPayload.planningUnitId), label: getLabelText((planningUnitListAll.find(c => String(c.id) === String(this.state.matrixPayload.planningUnitId)) || {}).label, this.state.lang) }] : [],
+                  planningUnitIdExport: (this.state.matrixPayload && this.state.matrixPayload.planningUnitId) ? [{ value: Number(this.state.matrixPayload.planningUnitId), label: getLabelText((planningUnitListAll.find(c => String(c.id) === String(this.state.matrixPayload.planningUnitId)) || {}).label, this.state.lang) }] : [],
                   realmCountryPlanningUnitId: [],
                   stockStatusList: []
                 }, () => {
+                  if (this.state.matrixPayload && this.state.planningUnitId.length > 0) {
+                    this.setState({ matrixPayload: null }, () => this.fetchData());
+                  }
                   if (this.state.yaxisEquUnit != -1) {
                     var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
                     var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
@@ -313,10 +319,14 @@ class StockStatus extends Component {
           realmCountryPlanningUnitListAll: response.data.realmCountryPlanningUnitList,
           planningUnitList: response.data.planningUnitList,
           realmCountryPlanningUnitList: response.data.realmCountryPlanningUnitList,
-          planningUnitId: [],
+          planningUnitId: (this.state.matrixPayload && this.state.matrixPayload.planningUnitId) ? [{ value: Number(this.state.matrixPayload.planningUnitId), label: getLabelText((response.data.planningUnitList.find(c => String(c.id) === String(this.state.matrixPayload.planningUnitId)) || {}).label, this.state.lang) }] : [],
+          planningUnitIdExport: (this.state.matrixPayload && this.state.matrixPayload.planningUnitId) ? [{ value: Number(this.state.matrixPayload.planningUnitId), label: getLabelText((response.data.planningUnitList.find(c => String(c.id) === String(this.state.matrixPayload.planningUnitId)) || {}).label, this.state.lang) }] : [],
           realmCountryPlanningUnitId: [],
           stockStatusList: []
         }, () => {
+          if (this.state.matrixPayload && this.state.planningUnitId.length > 0) {
+            this.setState({ matrixPayload: null }, () => this.fetchData());
+          }
           if (this.state.yaxisEquUnit != -1) {
             var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
             var planningUnitList = this.state.planningUnitList.filter(x => validFu.includes(x.forecastingUnitId.toString()));
@@ -476,7 +486,7 @@ class StockStatus extends Component {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += this.state.programId.length==1?item.split(":").slice(1).join(':'):item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
+              finalNotes += this.state.programId.length == 1 ? item.split(":").slice(1).join(':') : item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
             })
             csvRow.push('"' + (i18n.t('static.program.notes').replaceAll(' ', '%20') + (': ').replaceAll(' ', '%20') + (finalNotes).replaceAll(' ', '%20') + '"'))
           }
@@ -765,7 +775,7 @@ class StockStatus extends Component {
               if (index != 0) {
                 finalNotes += ", ";
               }
-              finalNotes += this.state.programId.length==1?item.split(":").slice(1).join(':'):item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
+              finalNotes += this.state.programId.length == 1 ? item.split(":").slice(1).join(':') : item.split(":")[0] + ": " + item.split(":").slice(1).join(':');
             })
             var planningText = doc.splitTextToSize(i18n.t('static.program.notes') + ': ' + finalNotes, doc.internal.pageSize.width * 3 / 4);
             doc.text(doc.internal.pageSize.width / 10, y, planningText)
@@ -2808,10 +2818,16 @@ class StockStatus extends Component {
             }
           }
         }
+        let pId = [];
+        if (this.state.matrixPayload && this.state.matrixPayload.programId) {
+          let pLabel = (programs.find(p => String(p.programId) === String(this.state.matrixPayload.programId)) || {}).programCode || "";
+          if (pLabel) pId = [{ value: Number(this.state.matrixPayload.programId), label: pLabel }];
+        }
         this.setState({
           programs: programs, message: '',
+          programId: pId,
           loading: false
-        })
+        }, () => { if (pId.length > 0) this.filterVersion(); })
       }.bind(this);
     }.bind(this);
   };
@@ -2988,10 +3004,10 @@ class StockStatus extends Component {
         this.setState(
           {
             versions: versionList,
-            versionId: versionList[0].versionId,
+            versionId: (this.state.matrixPayload && this.state.matrixPayload.versionId) ? this.state.matrixPayload.versionId : (versionList[0] ? versionList[0].versionId : ""),
           },
           () => {
-            this.getDropdownLists();
+            if (this.state.versionId) this.getDropdownLists();
           }
         );
       }.bind(this);
@@ -4493,25 +4509,25 @@ class StockStatus extends Component {
                             labelledBy={i18n.t('static.common.select')}
                           />}
                           {localStorage.getItem("sessionType") != 'Online' && <InputGroup>
-                              <Input
-                                type="select"
-                                name="programId"
-                                id="programId"
-                                value={this.state.programId.length > 0 ? this.state.programId[0].value : ""}
-                                onChange={(e) => { this.programChange(e); }}
-                                bsSize="sm"
-                              >
-                                <option value="">{i18n.t('static.common.select')}</option>
-                                {programList.length > 0
-                                  && programList.map((item, i) => {
-                                    return (
-                                      <option key={i} value={item.value}>
-                                        {item.label}
-                                      </option>
-                                    )
-                                  }, this)}
-                              </Input>
-                            </InputGroup>}
+                            <Input
+                              type="select"
+                              name="programId"
+                              id="programId"
+                              value={this.state.programId.length > 0 ? this.state.programId[0].value : ""}
+                              onChange={(e) => { this.programChange(e); }}
+                              bsSize="sm"
+                            >
+                              <option value="">{i18n.t('static.common.select')}</option>
+                              {programList.length > 0
+                                && programList.map((item, i) => {
+                                  return (
+                                    <option key={i} value={item.value}>
+                                      {item.label}
+                                    </option>
+                                  )
+                                }, this)}
+                            </Input>
+                          </InputGroup>}
                         </div>
                       </FormGroup>
                       {this.state.programId.length == 1 && <FormGroup className="col-md-3">
@@ -4761,9 +4777,9 @@ class StockStatus extends Component {
                             </ul>
                             {this.state.stockStatusList[0].ppuNotes != undefined && this.state.stockStatusList[0].ppuNotes != null && this.state.stockStatusList[0].ppuNotes.length > 0 &&
                               <span style={{ "marginTop": "10px" }} className="legendcommitversionText"><b>{i18n.t("static.program.notes")}</b> : {this.state.stockStatusList[0].ppuNotes.toString().split("~").map((item, index) => {
-                                if(this.state.programId.length==1){
+                                if (this.state.programId.length == 1) {
                                   return (<>{(index != 0 ? ", " : "")}{item.toString().split(":").slice(1).join(':')}</>)
-                                }else{
+                                } else {
                                   return (<>{(index != 0 ? ", " : "")}<b>{item.toString().split(":")[0]}</b>&nbsp;{": " + item.toString().split(":").slice(1).join(':')}</>)
                                 }
                               })}</span>
