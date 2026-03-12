@@ -410,7 +410,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message', exact: true, name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
-  { path: '/report/stockStatusMatrixGlobal', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusMatrixGlobal },
+  { path: '/report/stockStatusMatrixGlobal', name: 'Stock Status Matrix (Global)', component: StockStatusMatrixGlobal },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
   { path: '/shipment/shipmentDetails', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList, exact: true },
@@ -1988,9 +1988,9 @@ class DefaultLayout extends Component {
                                   }
                                 },
                                 {
-                                  name: i18n.t('static.dashboard.stockstatusacrossplanningunit'),
+                                  name: 'Stock Status Matrix (Global)',
                                   url: '/report/stockStatusMatrixGlobal',
-                                  icon: 'fa fa-camera',
+                                  icon: 'fa fa-globe',
                                   attributes: {
                                     hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2) ? false : true),
                                     onClick: e => {

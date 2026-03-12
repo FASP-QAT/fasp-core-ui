@@ -52,6 +52,39 @@ const legendcolor = [
   { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: 4 },
 ];
 
+// ─── PDF Icon Helpers ─────────────────────────────────────────────────────────
+/**
+ * Renders a FontAwesome glyph to a PNG data URL via an offscreen canvas.
+ */
+function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width  = sizePx;
+    canvas.height = sizePx;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, sizePx, sizePx);
+    ctx.font = `900 ${sizePx * 0.85}px "Font Awesome 5 Free", "FontAwesome"`;
+    ctx.fillStyle = color;
+    ctx.textAlign  = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(glyphChar, sizePx / 2, sizePx / 2);
+    return { dataUrl: canvas.toDataURL("image/png"), widthPt: 10 };
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * Pre-renders truck and warning icons once for the export duration.
+ */
+function buildPdfIconCache() {
+  return {
+    truck:   renderFaIconToDataUrl("\uf0d1", "#BA0C2F", 28),
+    warning: renderFaIconToDataUrl("\uf071", "#ED8944", 28),
+  };
+}
+
+
 /**
  * Component for Shipment Global View Report.
  */
@@ -158,31 +191,47 @@ class StockStatusMatrixGlobal extends Component {
         let sortedDates = Array.from(allDates).sort();
 
         let csvRow = [];
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.dashboard.stockstatusmatrix') + " (Global)"]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.dateRange') + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.realmcountry') + " : " + this.state.countryLabels.join("; ")]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.program') + " : " + this.state.programLabels.join("; ")]));
+        if (this.state.programValues.length == 1) {
+            csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.version') + " : " + this.state.versionLabel]));
+        }
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.planningUnit') + " : " + this.state.planningUnitLabels.join("; ")]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + " : " + this.state.stockStatusValues.map(ele => ele.label).join("; ")]));
+        csvRow.push(addDoubleQuoteToRowContent(["Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTbdFundingSource') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.aggregateCountries') + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.hideIcons') + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent(["Hide Icons" + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
+            ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
+            : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
         csvRow.push("");
-        csvRow.push(addDoubleQuoteToRowContent([
-            this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'),
-            i18n.t('static.modelingValidation.puLevel'),
-            ...sortedDates.map(date => moment(date).format('MMM YY'))
-        ]));
+        csvRow.push(addDoubleQuoteToRowContent([reportTitle]));
+        csvRow.push("");
+        let isEquUnitMode = this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1";
+        let headerRow = [this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program')];
+        if (isEquUnitMode) {
+            headerRow.push(i18n.t('static.modelingValidation.puLevel'));
+        }
+        headerRow.push(...sortedDates.map(date => moment(date).format('MMM YY')));
+        csvRow.push(addDoubleQuoteToRowContent(headerRow));
 
         dataList.forEach(item => {
             let row = [];
             row.push(getLabelText(item.programOrCountry.label, this.state.lang));
-            let puIds = new Set();
-            sortedDates.forEach(date => {
-                if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
-                    item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
-                }
-            });
-            row.push(Array.from(puIds).join(', '));
+            if (isEquUnitMode) {
+                let puIds = new Set();
+                sortedDates.forEach(date => {
+                    if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
+                        item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
+                    }
+                });
+                row.push(Array.from(puIds).join(', '));
+            }
             sortedDates.forEach(date => {
                 let dataEntry = item.dataMap[date];
                 if (dataEntry) {
@@ -195,11 +244,35 @@ class StockStatusMatrixGlobal extends Component {
             csvRow.push(addDoubleQuoteToRowContent(row));
         });
 
+        csvRow.push("");
+        let uniquePUs = new Set();
+        dataList.forEach(item => {
+            Object.values(item.dataMap).forEach(dataEntry => {
+                if (dataEntry.planningUnitIds) {
+                    dataEntry.planningUnitIds.split(',').forEach(pu => {
+                        let trimmed = pu.trim();
+                        if (trimmed) uniquePUs.add(trimmed);
+                    });
+                }
+            });
+        });
+        Array.from(uniquePUs).sort().forEach(puId => {
+            let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
+            if (puObj) {
+                let labelText = getLabelText(puObj.label, this.state.lang);
+                csvRow.push(addDoubleQuoteToRowContent([puObj.id + " " + labelText]));
+            } else {
+                let parts = puId.split(' | ');
+                let formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
+                csvRow.push(addDoubleQuoteToRowContent([formattedStr]));
+            }
+        });
+
         let csvString = csvRow.join("\r\n");
         let a = document.createElement("a");
         a.href = "data:attachment/csv," + encodeURIComponent(csvString);
         a.target = "_Blank";
-        a.download = i18n.t('static.report.shipmentGlobalView') + ".csv";
+        a.download = i18n.t('static.dashboard.stockstatusmatrix') + " (Global)" + ".csv";
         document.body.appendChild(a);
         a.click();
         a.remove();
@@ -208,23 +281,9 @@ class StockStatusMatrixGlobal extends Component {
      * Exports the data to a PDF file.
      */
     exportPDF = async () => {
-        const drawTruck = (doc, x, y) => {
-            doc.setFillColor('#BA0C2F');
-            doc.rect(x, y + 1, 7, 4, 'F');
-            doc.rect(x + 7, y + 2, 2, 3, 'F');
-            doc.setFillColor(0, 0, 0);
-            doc.circle(x + 2, y + 5, 0.8, 'F');
-            doc.circle(x + 7, y + 5, 0.8, 'F');
-        };
-
-        const drawWarning = (doc, x, y) => {
-            doc.setFillColor('#ED8944');
-            doc.triangle(x + 4, y, x, y + 7, x + 8, y + 7, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(5);
-            doc.setFont("helvetica", "bold");
-            doc.text('!', x + 3.2, y + 5.5);
-        };
+        const iconCache = buildPdfIconCache();
+        const ICON_PT = 8;
+        const ICON_GAP = 2;
 
         const addFooters = (doc) => {
             const pageCount = doc.internal.getNumberOfPages();
@@ -260,9 +319,9 @@ class StockStatusMatrixGlobal extends Component {
                 doc.addImage(LOGO, "png", 0, 10, 180, 50, "FAST");
                 doc.setTextColor("#002f6c");
                 doc.text(
-                    i18n.t("static.dashboard.stockstatusmatrix"),
+                    i18n.t("static.dashboard.stockstatusmatrix") + " (Global)",
                     doc.internal.pageSize.width / 2,
-                    60,
+                    75,
                     {
                         align: "center",
                     }
@@ -275,7 +334,7 @@ class StockStatusMatrixGlobal extends Component {
                         " : " +
                         makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to),
                         doc.internal.pageSize.width / 8,
-                        90,
+                        105,
                         {
                             align: "left",
                         }
@@ -285,7 +344,7 @@ class StockStatusMatrixGlobal extends Component {
                         " : " +
                         this.state.countryLabels.join("; "),
                         doc.internal.pageSize.width / 8,
-                        105,
+                        120,
                         {
                             align: "left",
                         }
@@ -295,47 +354,84 @@ class StockStatusMatrixGlobal extends Component {
                         " : " +
                         this.state.programLabels.join("; "),
                         doc.internal.pageSize.width / 8,
-                        120,
-                        {
-                            align: "left",
-                        }
-                    );
-                    doc.text(
-                        i18n.t("static.report.planningUnit") +
-                        " : " +
-                        this.state.planningUnitLabels.join("; "),
-                        doc.internal.pageSize.width / 8,
                         135,
                         {
                             align: "left",
                         }
                     );
+                    if (this.state.programValues.length == 1) {
+                        doc.text(
+                            i18n.t("static.report.version") + " : " + this.state.versionLabel,
+                            doc.internal.pageSize.width / 8,
+                            150,
+                            { align: "left" }
+                        );
+                    }
                     doc.text(
-                        i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
-                        doc.internal.pageSize.width / 8,
-                        150,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        i18n.t('static.report.removeTbdFundingSource') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')),
                         doc.internal.pageSize.width / 8,
                         165,
                         { align: "left" }
                     );
                     doc.text(
-                        i18n.t('static.report.aggregateCountries') + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        i18n.t("static.report.planningUnit") + " : " + this.state.planningUnitLabels.join("; "),
                         doc.internal.pageSize.width / 8,
                         180,
                         { align: "left" }
                     );
                     doc.text(
-                        i18n.t('static.report.hideIcons') + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        i18n.t("static.report.withinstock") + " : " + this.state.stockStatusValues.map(ele => ele.label).join("; "),
                         doc.internal.pageSize.width / 8,
                         195,
                         { align: "left" }
                     );
+                    doc.text(
+                        "Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity')),
+                        doc.internal.pageSize.width / 8,
+                        210,
+                        { align: "left" }
+                    );
+                    doc.text(
+                        i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        doc.internal.pageSize.width / 8,
+                        225,
+                        { align: "left" }
+                    );
+                    doc.text(
+                        i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        doc.internal.pageSize.width / 8,
+                        240,
+                        { align: "left" }
+                    );
+                    doc.text(
+                        "Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        doc.internal.pageSize.width / 8,
+                        255,
+                        { align: "left" }
+                    );
+                    doc.text(
+                        "Hide Icons" + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
+                        doc.internal.pageSize.width / 8,
+                        270,
+                        { align: "left" }
+                    );
 
-                    let y = 215;
+                    const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
+                        ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
+                        : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
+
+                    doc.setFont("helvetica", "bold");
+                    doc.setTextColor("#002f6c");
+                    doc.text(
+                        reportTitle,
+                        doc.internal.pageSize.width / 8,
+                        290,
+                        { align: "left" }
+                    );
+                    doc.setFont("helvetica", "normal");
+                    doc.setTextColor(0);
+
+                    let y = 315;
                     legendcolor.forEach((item, index) => {
                         doc.setDrawColor(0);
                         doc.setFillColor(item.color);
@@ -346,13 +442,17 @@ class StockStatusMatrixGlobal extends Component {
                         doc.text(item.text, doc.internal.pageSize.width / 8 + (index * 90) + 15, y + 10);
                     });
                     
-                    drawTruck(doc, doc.internal.pageSize.width / 8 + (5 * 90) - 15, y + 2);
+                    if (iconCache.truck) {
+                        doc.addImage(iconCache.truck.dataUrl, 'PNG', doc.internal.pageSize.width / 8 + (5 * 90) - 15, y + 2, ICON_PT, ICON_PT);
+                    }
                     doc.setTextColor(0);
                     doc.setFont("helvetica", "normal");
                     doc.setFontSize(8);
                     doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8 + (5 * 90), y + 10);
                     
-                    drawWarning(doc, doc.internal.pageSize.width / 8 + (5 * 90) + 95, y + 2);
+                    if (iconCache.warning) {
+                        doc.addImage(iconCache.warning.dataUrl, 'PNG', doc.internal.pageSize.width / 8 + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
+                    }
                     doc.setTextColor(0);
                     doc.setFont("helvetica", "normal");
                     doc.setFontSize(8);
@@ -376,13 +476,16 @@ class StockStatusMatrixGlobal extends Component {
         });
         let sortedDates = Array.from(allDates).sort();
 
-        let header = [
-            [
-                { content: this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'), styles: { halign: 'center' } },
-                { content: i18n.t('static.modelingValidation.puLevel'), styles: { halign: 'center' } },
-                ...sortedDates.map(date => ({ content: moment(date).format('MMM YY'), styles: { halign: 'center' } }))
-            ]
+        let isEquUnitMode = this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1";
+        const colOffset = isEquUnitMode ? 2 : 1;
+        let headerCols = [
+            { content: this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'), styles: { halign: 'center' } }
         ];
+        if (isEquUnitMode) {
+            headerCols.push({ content: i18n.t('static.modelingValidation.puLevel'), styles: { halign: 'center' } });
+        }
+        headerCols.push(...sortedDates.map(date => ({ content: moment(date).format('MMM YY'), styles: { halign: 'center' } })));
+        let header = [headerCols];
 
         let dataIcons = dataList.map(item => {
             return sortedDates.map(date => {
@@ -400,13 +503,15 @@ class StockStatusMatrixGlobal extends Component {
         let data = dataList.map(item => {
             let row = [];
             row.push(getLabelText(item.programOrCountry.label, this.state.lang));
-            let puIds = new Set();
-            sortedDates.forEach(date => {
-                if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
-                    item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
-                }
-            });
-            row.push(Array.from(puIds).join(', '));
+            if (isEquUnitMode) {
+                let puIds = new Set();
+                sortedDates.forEach(date => {
+                    if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
+                        item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
+                    }
+                });
+                row.push(Array.from(puIds).join(', '));
+            }
             sortedDates.forEach(date => {
                 let dataEntry = item.dataMap[date];
                 if (dataEntry) {
@@ -438,39 +543,90 @@ class StockStatusMatrixGlobal extends Component {
 
         doc.autoTable({
             margin: { top: 80, bottom: 50 },
-            startY: 240,
+            startY: 360,
             head: header,
             body: data,
-            styles: { lineWidth: 0.1, fontSize: 7, halign: 'center' },
+            styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
             columnStyles: {
                 0: { halign: 'left' },
                 1: { halign: 'left' },
             },
             didParseCell: function (data) {
-                if (data.section === 'body' && data.column.index >= 2) {
-                    let color = dataColor[data.row.index][data.column.index - 2];
+                if (data.section === 'body' && data.column.index >= colOffset) {
+                    let color = dataColor[data.row.index][data.column.index - colOffset];
                     data.cell.styles.fillColor = color;
                     data.cell.styles.textColor = '#000';
+
+                    let icons = dataIcons[data.row.index][data.column.index - colOffset];
+                    let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                    let rightPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
+                    data.cell.styles.halign = 'right';
+                    data.cell.styles.cellPadding = { left: 2, right: rightPad, top: 2, bottom: 2 };
                 }
             },
             didDrawCell: function (data) {
-                if (data.section === 'body' && data.column.index >= 2) {
-                    let icons = dataIcons[data.row.index][data.column.index - 2];
+                if (data.section === 'body' && data.column.index >= colOffset) {
+                    let icons = dataIcons[data.row.index][data.column.index - colOffset];
                     if (icons.hasShipment || icons.hasExpiry) {
-                        if (icons.hasShipment) {
-                            drawTruck(doc, data.cell.x + data.cell.width - 18, data.cell.y + 1);
+                        let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                        let totalIconWidth = iconCount * (ICON_PT + ICON_GAP) - ICON_GAP;
+                        let iconX = data.cell.x + data.cell.width - totalIconWidth - 3;
+                        const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
+
+                        if (icons.hasShipment && iconCache.truck) {
+                            doc.addImage(iconCache.truck.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
+                            iconX += ICON_PT + ICON_GAP;
                         }
-                        if (icons.hasExpiry) {
-                            drawWarning(doc, data.cell.x + data.cell.width - 9, data.cell.y + 1);
+                        if (icons.hasExpiry && iconCache.warning) {
+                            doc.addImage(iconCache.warning.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
                         }
                     }
                 }
             }
         });
 
+        let finalY = doc.lastAutoTable.finalY + 20;
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor("#002f6c");
+        
+        let uniquePUs = new Set();
+        dataList.forEach(item => {
+            Object.values(item.dataMap).forEach(dataEntry => {
+                if (dataEntry.planningUnitIds) {
+                    dataEntry.planningUnitIds.split(',').forEach(pu => {
+                        let trimmed = pu.trim();
+                        if (trimmed) uniquePUs.add(trimmed);
+                    });
+                }
+            });
+        });
+
+        Array.from(uniquePUs).sort().forEach((puId, index) => {
+            let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
+            let formattedStr = "";
+            if (puObj) {
+                formattedStr = puObj.id + " " + getLabelText(puObj.label, this.state.lang);
+            } else {
+                let parts = puId.split(' | ');
+                formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
+            }
+            
+            // Check for page overflow
+            if (finalY > doc.internal.pageSize.height - 50) {
+                doc.addPage();
+                finalY = 50;
+            }
+            
+            doc.text(formattedStr, doc.internal.pageSize.width / 8, finalY);
+            finalY += 15;
+        });
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(0);
+
         addHeaders(doc);
         addFooters(doc);
-        doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
+        doc.save(i18n.t("static.dashboard.stockstatusmatrix") + " (Global)" + ".pdf");
     }
     /**
      * Handles the change event for program selection.
@@ -594,6 +750,7 @@ class StockStatusMatrixGlobal extends Component {
                 planningUnitList: newPlanningUnitList,
                 planningUnits: newPlanningUnitList,
                 planningUnitId: [],
+                planningUnitLabels: [],
                 consumptions: []
             }, () => {
                 if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0 && this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit).length > 0) {
@@ -668,6 +825,7 @@ class StockStatusMatrixGlobal extends Component {
             planningUnitList: planningUnitList,
             yaxisEquUnitLabel: [yaxisEquUnitLabel],
             planningUnitId: [],
+            planningUnitLabels: [],
             consumptions: [],
             onlyShowAllPUs: false
         }, () => {
@@ -826,6 +984,11 @@ class StockStatusMatrixGlobal extends Component {
             ReportService.stockStatusMatrixGlobal(inputjson)
                 .then(response => {
                     if (response.data.dataList.length != 0) {
+                        response.data.dataList.sort((a, b) => {
+                            let labelA = getLabelText(a.programOrCountry.label, this.state.lang).toLowerCase();
+                            let labelB = getLabelText(b.programOrCountry.label, this.state.lang).toLowerCase();
+                            return labelA.localeCompare(labelB);
+                        });
                         this.setState({
                             data: response.data,
                             table1Body: response.data.dataList,
@@ -926,20 +1089,23 @@ class StockStatusMatrixGlobal extends Component {
             Object.keys(item.dataMap).forEach(date => allDates.add(date));
         });
         let sortedDates = Array.from(allDates).sort();
+        let isEquUnitMode = this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1";
         let columns = [
             {
                 title: this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'),
                 type: 'text',
                 width: 200,
                 filter: true
-            },
-            {
+            }
+        ];
+        if (isEquUnitMode) {
+            columns.push({
                 title: i18n.t('static.modelingValidation.puLevel'),
                 type: 'text',
                 width: 100,
                 filter: true
-            },
-        ];
+            });
+        }
         sortedDates.forEach(date => {
             columns.push({
                 title: moment(date).format('MMM YY'),
@@ -953,13 +1119,15 @@ class StockStatusMatrixGlobal extends Component {
         dataList.forEach(item => {
             let row = [];
             row.push(getLabelText(item.programOrCountry.label, this.state.lang));
-            let puIds = new Set();
-            sortedDates.forEach(date => {
-                if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
-                    item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
-                }
-            });
-            row.push(Array.from(puIds).join(', '));
+            if (isEquUnitMode) {
+                let puIds = new Set();
+                sortedDates.forEach(date => {
+                    if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
+                        item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
+                    }
+                });
+                row.push(Array.from(puIds).join(', '));
+            }
             sortedDates.forEach(date => {
                 let dataEntry = item.dataMap[date];
                 if (dataEntry) {
@@ -972,6 +1140,7 @@ class StockStatusMatrixGlobal extends Component {
             jexcelData.push(row);
         });
         jexcel.destroy(document.getElementById("shipmentJexcel"), true);
+        const colOffset = isEquUnitMode ? 2 : 1;
         var options = {
             data: jexcelData,
             columnDrag: false,
@@ -990,8 +1159,8 @@ class StockStatusMatrixGlobal extends Component {
             },
             onfilter: onOpenFilter,
             updateTable: function (instance, cell, col, row, val, label, cellName) {
-                if (col >= 2) {
-                    let date = sortedDates[col - 2];
+                if (col >= colOffset) {
+                    let date = sortedDates[col - colOffset];
                     let dataEntry = (dataList[row] && dataList[row].dataMap) ? dataList[row].dataMap[date] : null;
                     if (val == i18n.t("static.supplyPlanFormula.na")) {
                         cell.style.backgroundColor = '#cfcdc9';
@@ -1361,6 +1530,29 @@ class StockStatusMatrixGlobal extends Component {
         const fontColor = isDarkMode ? '#fff' : '#212721';
         const gridLineColor = isDarkMode ? '#444' : '#e0e0e0';
 
+        let uniquePUs = new Set();
+        (this.state.table1Body || []).forEach(item => {
+            Object.values(item.dataMap || {}).forEach(dataEntry => {
+                if (dataEntry.planningUnitIds) {
+                    dataEntry.planningUnitIds.split(',').forEach(pu => {
+                        let trimmed = pu.trim();
+                        if (trimmed) uniquePUs.add(trimmed);
+                    });
+                }
+            });
+        });
+        let sortedPUs = Array.from(uniquePUs).sort().map(puId => {
+            let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
+            if (puObj) {
+                return { id: puObj.id, label: puObj.label };
+            }
+            let parts = puId.split(' | ');
+            if (parts.length > 1) {
+                return { id: parts[1], label: { label_en: parts[0], label_fr: parts[0], label_sp: parts[0], label_pr: parts[0] } };
+            }
+            return { id: puId, label: { label_en: '', label_fr: '', label_sp: '', label_pr: '' } };
+        });
+
         const pickerLang = {
             months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             from: 'From', to: 'To',
@@ -1606,7 +1798,7 @@ class StockStatusMatrixGlobal extends Component {
                                              </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.showBy')}</Label>
+                                            <Label htmlFor="appendedInputButton">Show by</Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1653,7 +1845,7 @@ class StockStatusMatrixGlobal extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    {i18n.t('static.report.removeTbdFundingSource')}
+                                                    {i18n.t('static.report.removeTBDFundingSourceShipments')}
                                                 </Label>
                                             </div>
                                             <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
@@ -1669,7 +1861,7 @@ class StockStatusMatrixGlobal extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    {i18n.t('static.report.aggregateCountries')}
+                                                    {"Aggregate Countries"}
                                                 </Label>
                                             </div>
                                             <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
@@ -1685,7 +1877,7 @@ class StockStatusMatrixGlobal extends Component {
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    {i18n.t('static.report.hideIcons')}
+                                                    Hide Icons
                                                 </Label>
                                             </div>
                                         </FormGroup>
@@ -1699,6 +1891,13 @@ class StockStatusMatrixGlobal extends Component {
                                             <div className="col-md-12">
                                                 {this.state.table1Body.length > 0 &&
                                                 <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
+                                                    <div className="d-flex justify-content-start ml-2 p-1">
+                                                        <b style={{ color: '#002f6c' }}>
+                                                            {this.state.yaxisEquUnit != -1
+                                                                ? i18n.t("static.equivalancyUnit.equivalancyUnits") + ": " + this.state.yaxisEquUnitLabel
+                                                                : i18n.t("static.report.planningUnit") + ": " + this.state.planningUnitLabels.join(", ")}
+                                                        </b>
+                                                    </div>
                                                     <div style={{ position: 'relative' }}>
                                                         <div className="d-flex justify-content-start" style={{ position: 'absolute', left: '10px', top: '13px', zIndex: 100 }}>
                                                             <ul className="legendcommitversion list-group mb-0">
@@ -1732,6 +1931,13 @@ class StockStatusMatrixGlobal extends Component {
                                                             </ul>
                                                         </div>
                                                         <div id="shipmentJexcel" className='jexcelremoveReadonlybackground shipmentJexcel shipmentGlobalSearchRight' style={{ padding: '2px 8px' }}></div>
+                                                    </div>
+                                                    <div className="mt-3 ml-2">
+                                                        <ul style={{ listStyleType: 'none', paddingLeft: 0, fontSize: '13px', color: '#002f6c' }}>
+                                                            {sortedPUs.map((pu, index) => (
+                                                                <li key={index}><b>{pu.id}</b> {getLabelText(pu.label, this.state.lang)}</li>
+                                                            ))}
+                                                        </ul>
                                                     </div>
                                                 </CardBody>
                                                 }

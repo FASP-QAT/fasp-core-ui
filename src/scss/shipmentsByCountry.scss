@@ -34,3 +34,28 @@
   margin-left: 0;
   margin-right: 2px;
 }
+
+/* Fix for translucency and z-index conflict with legends */
+.month-picker>.rmp-container .rmp-popup,
+.rmsc .dropdown-content,
+.Select-menu-outer {
+  z-index: 1000 !important;
+}
+
+.month-picker>.rmp-container .rmp-popup .rmp-pad,
+.rmsc .dropdown-content,
+.Select-menu-outer {
+  background-color: #fff !important;
+  opacity: 1 !important;
+}
+
+[data-theme="dark"] {
+
+  .month-picker>.rmp-container .rmp-popup .rmp-pad,
+  .rmsc .dropdown-content,
+  .Select-menu-outer,
+  .Select-control {
+    background-color: #212631 !important;
+    opacity: 1 !important;
+  }
+}
