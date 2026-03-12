@@ -162,6 +162,7 @@ const WarehouseCapacity = React.lazy(() => import('../../views/Report/WarehouseC
 const StockStatusAccrossPlanningUnitGlobalView = React.lazy(() => import('../../views/Report/StockStatusAccrossPlanningUnitGlobalView'));
 const StockAdjustment = React.lazy(() => import('../../views/Report/StockAdjustment'));
 const StockStatusReportAcrossPlanningUnits = React.lazy(() => import('../../views/Report/StockStatusAcrossPlanningUnits'));
+const StockStatusMatrixGlobal = React.lazy(() => import('../../views/Report/StockStatusMatrixGlobal'));
 const ExpiredInventory = React.lazy(() => import('../../views/Report/ExpiredInventory'));
 const Budgets = React.lazy(() => import('../../views/Report/Budgets'));
 const QuantimedImport = React.lazy(() => import('../../views/Quantimed/QuantimedImportOnboarding'));
@@ -411,6 +412,7 @@ const routes = [
   { path: '/report/shipmentSummery/:message', exact: true, name: 'static.report.shipmentSummeryReport', component: ShipmentSummery },
   { path: '/report/shipmentSummery/:budgetId/:budgetCode', name: 'static.report.shipmentDetailReport', component: ShipmentSummery },
   { path: '/report/stockStatusAcrossPlanningUnits', name: 'static.dashboard.stockstatusacrossplanningunit', component: StockStatusReportAcrossPlanningUnits },
+  { path: '/report/stockStatusMatrixGlobal', name: 'Stock Status Matrix (Global)', component: StockStatusMatrixGlobal },
   { path: '/report/budgets', name: 'static.budgetHead.budget', component: Budgets },
   { path: '/userManual/uploadUserManual', exact: true, entityname: 'static.dashboard.uploadUserManual', name: 'static.dashboard.uploadUserManual', component: UploadUserManual },
   { path: '/shipment/shipmentDetails', name: 'static.shipmentDetailHead.shipmentDetail', component: ShipmentList, exact: true },
@@ -1982,6 +1984,17 @@ class DefaultLayout extends Component {
                                   icon: 'fa fa-globe',
                                   attributes: {
                                     hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT') && this.state.activeTab == 2) ? false : true),
+                                    onClick: e => {
+                                      this.refreshPage();
+                                    }
+                                  }
+                                },
+                                {
+                                  name: 'Stock Status Matrix (Global)',
+                                  url: '/report/stockStatusMatrixGlobal',
+                                  icon: 'fa fa-globe',
+                                  attributes: {
+                                    hidden: ((this.state.businessFunctions.includes('ROLE_BF_STOCK_STATUS_REPORT') && this.state.activeTab == 2) ? false : true),
                                     onClick: e => {
                                       this.refreshPage();
                                     }
