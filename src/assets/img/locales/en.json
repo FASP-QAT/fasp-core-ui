@@ -3673,5 +3673,12 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.report.removePlannedShipments": "Remove Planned Shipments?",
+  "static.report.removeTBDFundingSourceShipments": "Remove TBD Funding Source Shipments",
+  "static.report.showQuantity": "Show Quantity",
+  "static.report.showIcon": "Show Icon",
+  "static.stockStatusMatrix.minMax":"Min / Max",
+  "static.stockStatusMatrix.selectStockStatus": "Select Stock Status",
+  "static.stockStatusMatrix.totalShipmentQty": "Total Shipment Qty"
 }
