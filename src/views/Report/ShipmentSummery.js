@@ -215,6 +215,7 @@ class ShipmentSummery extends Component {
       budgetValues: [],
       budgetLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       lang: localStorage.getItem("lang"),
       fundingSourceTypes: [],
       fundingSourceTypeValues: [],
@@ -278,6 +279,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
@@ -553,6 +555,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
@@ -1337,6 +1340,7 @@ class ShipmentSummery extends Component {
               fundingSourceValues: listArray.map(c => { return { value: c.id, label: c.code } }),
               fundingSourceLabels: listArray.map(c => c.code),
               filteredBudgetList: [],
+              filteredBudgetListProgram: [],
             },
             () => {
               this.getBudgetList();
@@ -1411,6 +1415,7 @@ class ShipmentSummery extends Component {
               fundingSourceValues: fundingSource.map(c => { return { value: c.id, label: c.code } }),
               fundingSourceLabels: fundingSource.map(c => c.code),
               filteredBudgetList: [],
+              filteredBudgetListProgram: [],
             },
             () => {
               this.getBudgetList();
@@ -1577,6 +1582,7 @@ class ShipmentSummery extends Component {
                 budgetLabels: budgetLabelsFromProps.length > 0 ? budgetLabelsFromProps : proList.map(item => getLabelText(item.label, this.state.lang)),
                 budgets: proList,
                 filteredBudgetList: proList,
+                filteredBudgetListProgram: proList,
               },
               () => {
                 this.fetchData();
@@ -1669,6 +1675,11 @@ class ShipmentSummery extends Component {
                   b = b.budgetCode.toLowerCase();
                   return a < b ? -1 : a > b ? 1 : 0;
                 }),
+                filteredBudgetListProgram: fSourceResult.sort(function (a, b) {
+                  a = a.budgetCode.toLowerCase();
+                  b = b.budgetCode.toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
               },
               () => {
                 this.fetchData();
@@ -1696,6 +1707,7 @@ class ShipmentSummery extends Component {
           budgetLabels: budgetLabelsFromProps,
           budgets: [],
           filteredBudgetList: [],
+          filteredBudgetListProgram: []
         },
         () => {
           this.fetchData();
@@ -1720,7 +1732,7 @@ class ShipmentSummery extends Component {
             var bList = [];
             var groupedBudgetsFilter = {};
             for (var i = 0; i < budgetList.length; i++) {
-              if (this.state.filteredBudgetList.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
+              if (this.state.filteredBudgetListProgram.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
                 var budgetCode = budgetList[i].code;
                 if (!groupedBudgetsFilter[budgetCode]) {
                   groupedBudgetsFilter[budgetCode] = {
