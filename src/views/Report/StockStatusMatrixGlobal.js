@@ -33,7 +33,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText, formatter } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import WorldMap from '../../CommonComponent/WorldMap.js';
 const ref = React.createRef();
 function getColumnLetter(index) {
@@ -94,9 +94,9 @@ class StockStatusMatrixGlobal extends Component {
     constructor(props) {
         super(props);
         var dt = new Date();
-        dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+        dt.setMonth(dt.getMonth() - 3);
         var dt1 = new Date();
-        dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+        dt1.setMonth(dt1.getMonth() + 14);
         this.state = {
             isDarkMode: false,
             labels: ['GF', 'Govt', 'Local', 'PSM'],
@@ -153,7 +153,7 @@ class StockStatusMatrixGlobal extends Component {
             planningUnitListAll: [],
             planningUnitId: [],
             shipmentJexcel: '',
-            hideIcons: false,
+            showIcons: true,
             yaxisEquUnitLabel: [i18n.t('static.program.no')],
             noData: false,
             removePlannedShipments: false,
@@ -203,11 +203,11 @@ class StockStatusMatrixGlobal extends Component {
         csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.planningUnit') + " : " + this.state.planningUnitLabels.join("; ")]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + " : " + this.state.stockStatusValues.map(ele => ele.label).join("; ")]));
-        csvRow.push(addDoubleQuoteToRowContent(["Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity'))]));
+        csvRow.push(addDoubleQuoteToRowContent(["Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent(["Hide Icons" + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.showIcon') + " : " + (this.state.showIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
             ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
             : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
@@ -344,11 +344,11 @@ class StockStatusMatrixGlobal extends Component {
             writeWrappedText(i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')));
             writeWrappedText(i18n.t("static.report.planningUnit") + " : " + (this.state.planningUnitLabels ? this.state.planningUnitLabels.join("; ") : ""));
             writeWrappedText(i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : ""));
-            writeWrappedText("Show by : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity')));
+            writeWrappedText("Show by : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty')));
             writeWrappedText(i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
             writeWrappedText(i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
             writeWrappedText("Aggregate Countries : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
-            writeWrappedText("Hide Icons : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeWrappedText(i18n.t('static.report.showIcon') + " : " + (this.state.showIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
 
             y += 5;
             const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
@@ -440,101 +440,113 @@ class StockStatusMatrixGlobal extends Component {
             headerCols.push({ content: i18n.t('static.modelingValidation.puLevel'), styles: { halign: 'center' } });
         }
         headerCols.push(...sortedDates.map(date => ({ content: moment(date).format('MMM YY'), styles: { halign: 'center' } })));
-        let header = [headerCols];
 
-        let dataIcons = dataList.map(item => {
-            return sortedDates.map(date => {
-                let dataEntry = item.dataMap[date];
-                if (dataEntry && !this.state.hideIcons) {
-                    return {
-                        hasShipment: dataEntry.shipmentQty > 0,
-                        hasExpiry: dataEntry.expiredQty > 0
-                    };
-                }
-                return { hasShipment: false, hasExpiry: false };
+
+        // ─── CHUNKING LOGIC ───
+        const maxColsPerPage = 12;
+        const dateChunks = [];
+        for (let i = 0; i < sortedDates.length; i += maxColsPerPage) {
+            dateChunks.push({
+                dates: sortedDates.slice(i, i + maxColsPerPage),
+                startIndex: i
             });
-        });
+        }
 
-        let data = dataList.map(item => {
-            let row = [];
-            row.push(getLabelText(item.programOrCountry.label, this.state.lang));
+        dateChunks.forEach((chunk, cIdx) => {
+            if (cIdx > 0) doc.addPage();
+            
+            let startY = 80;
+            if (cIdx === 0) {
+                const { y, page } = drawFirstPageFilterInfo(doc, 105, true);
+                doc.setPage(page);
+                startY = y;
+            } else {
+                // For subsequent pages, simplified header or filter info if needed
+                // For now, let's just start high
+                startY = 100;
+            }
+
+            let chunkHeaderCols = [
+                { content: this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'), styles: { halign: 'center' } }
+            ];
             if (isEquUnitMode) {
-                let puIds = new Set();
-                sortedDates.forEach(date => {
-                    if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
-                        item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
+                chunkHeaderCols.push({ content: i18n.t('static.modelingValidation.puLevel'), styles: { halign: 'center' } });
+            }
+            chunkHeaderCols.push(...chunk.dates.map(date => ({ content: moment(date).format('MMM YY'), styles: { halign: 'center' } })));
+
+            let chunkData = dataList.map(item => {
+                let row = [];
+                row.push(getLabelText(item.programOrCountry.label, this.state.lang));
+                if (isEquUnitMode) {
+                    let puIds = new Set();
+                    sortedDates.forEach(date => {
+                        if (item.dataMap[date] && item.dataMap[date].planningUnitIds) {
+                            item.dataMap[date].planningUnitIds.split(',').forEach(id => puIds.add(id));
+                        }
+                    });
+                    row.push(Array.from(puIds).join(', '));
+                }
+                chunk.dates.forEach(date => {
+                    let dataEntry = item.dataMap[date];
+                    if (dataEntry) {
+                        let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
+                        row.push(val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : i18n.t("static.supplyPlanFormula.na"));
+                    } else {
+                        row.push(i18n.t("static.supplyPlanFormula.na"));
                     }
                 });
-                row.push(Array.from(puIds).join(', '));
-            }
-            sortedDates.forEach(date => {
-                let dataEntry = item.dataMap[date];
-                if (dataEntry) {
-                    let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
-                    row.push(val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : i18n.t("static.supplyPlanFormula.na"));
-                } else {
-                    row.push(i18n.t("static.supplyPlanFormula.na"));
-                }
+                return row;
             });
-            return row;
-        });
 
-        let dataColor = dataList.map(item => {
-            return sortedDates.map(date => {
-                let dataEntry = item.dataMap[date];
-                if (dataEntry) {
-                    let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
-                    if (val === null || val === undefined) {
-                        return '#cfcdc9';
-                    }
-                    let stockStatusId = dataEntry.stockStatusId;
-                    let colorEntry = legendcolor.find(c => c.value === stockStatusId);
-                    return colorEntry ? colorEntry.color : '#cfcdc9';
-                } else {
-                    return '#cfcdc9';
-                }
-            });
-        });
-
-        const { y: dynamicStartY, page: dynamicStartPage } = drawFirstPageFilterInfo(doc, 105, true);
-        doc.setPage(dynamicStartPage);
-        doc.autoTable({
-            margin: { top: 80, bottom: 50 },
-            startY: dynamicStartY,
-            head: header,
-            body: data,
-            styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
-            columnStyles: {
-                0: { halign: 'left' },
-                1: { halign: 'left' },
-            },
-            didParseCell: function (data) {
-                if (data.section === 'body' && data.column.index >= colOffset) {
-                    if (dataColor && dataColor[data.row.index] && dataIcons && dataIcons[data.row.index]) {
-                        const colIdx = data.column.index - colOffset;
-                        let color = dataColor[data.row.index][colIdx];
+            doc.autoTable({
+                margin: { top: 80, bottom: 50 },
+                startY: startY,
+                head: [chunkHeaderCols],
+                body: chunkData,
+                styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
+                columnStyles: {
+                    0: { halign: 'left' },
+                    1: { halign: 'left' },
+                },
+                didParseCell: function (data) {
+                    if (data.section === 'body' && data.column.index >= colOffset) {
+                        const colIdxInChunk = data.column.index - colOffset;
+                        const overallDateIdx = chunk.startIndex + colIdxInChunk;
+                        
+                        // Extract color
+                        let dataEntry = dataList[data.row.index].dataMap[sortedDates[overallDateIdx]];
+                        let color = '#cfcdc9';
+                        if (dataEntry) {
+                            let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
+                            if (val !== null && val !== undefined) {
+                                let stockStatusId = dataEntry.stockStatusId;
+                                let colorEntry = legendcolor.find(c => c.value === stockStatusId);
+                                color = colorEntry ? colorEntry.color : '#cfcdc9';
+                            }
+                        }
+                        
                         if (color) {
                             data.cell.styles.fillColor = color;
                             data.cell.styles.textColor = (color === '#BA0C2F' || color === '#118b70') ? '#fff' : '#000';
                         }
 
-                        let icons = dataIcons[data.row.index][colIdx];
-                        if (icons) {
-                            let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                        // Icons padding
+                        if (dataEntry && this.state.showIcons) {
+                            let iconCount = (dataEntry.shipmentQty > 0 ? 1 : 0) + (dataEntry.expiredQty > 0 ? 1 : 0);
                             let rightPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
                             data.cell.styles.halign = 'right';
                             data.cell.styles.cellPadding = { left: 2, right: rightPad, top: 2, bottom: 2 };
                         }
                     }
-                }
-            },
-            didDrawCell: function (data) {
-                if (data.section === 'body' && data.column.index >= colOffset) {
-                    if (dataIcons && dataIcons[data.row.index]) {
-                        const colIdx = data.column.index - colOffset;
-                        let icons = dataIcons[data.row.index][colIdx];
-                        if (icons && (icons.hasShipment || icons.hasExpiry)) {
-                            let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                }.bind(this),
+                didDrawCell: function (data) {
+                    if (data.section === 'body' && data.column.index >= colOffset) {
+                        const colIdxInChunk = data.column.index - colOffset;
+                        const overallDateIdx = chunk.startIndex + colIdxInChunk;
+                        let dataEntry = dataList[data.row.index].dataMap[sortedDates[overallDateIdx]];
+
+                        if (dataEntry && this.state.showIcons && (dataEntry.shipmentQty > 0 || dataEntry.expiredQty > 0)) {
+                            let iconCount = (dataEntry.shipmentQty > 0 ? 1 : 0) + (dataEntry.expiredQty > 0 ? 1 : 0);
                             let totalIconWidth = iconCount * (ICON_PT + ICON_GAP) - ICON_GAP;
                             let iconX = data.cell.x + data.cell.width - totalIconWidth - 3;
                             const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
@@ -542,14 +554,14 @@ class StockStatusMatrixGlobal extends Component {
                             const bgColor = data.cell.styles.fillColor;
                             const useWhite = (bgColor === '#BA0C2F' || bgColor === '#118b70');
 
-                            if (icons.hasShipment) {
+                            if (dataEntry.shipmentQty > 0) {
                                 const truckIcon = useWhite ? iconCache.truckWhite : iconCache.truckBlack;
                                 if (truckIcon) {
                                     doc.addImage(truckIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
                                 }
                                 iconX += ICON_PT + ICON_GAP;
                             }
-                            if (icons.hasExpiry) {
+                            if (dataEntry.expiredQty > 0) {
                                 const warningIcon = useWhite ? iconCache.warningWhite : iconCache.warningBlack;
                                 if (warningIcon) {
                                     doc.addImage(warningIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
@@ -557,8 +569,8 @@ class StockStatusMatrixGlobal extends Component {
                             }
                         }
                     }
-                }
-            }
+                }.bind(this)
+            });
         });
 
         let finalY = doc.lastAutoTable.finalY + 20;
@@ -603,7 +615,7 @@ class StockStatusMatrixGlobal extends Component {
         addHeaders(doc);
         addFooters(doc);
         doc.save(i18n.t("static.dashboard.stockstatusmatrix") + " (Global)" + ".pdf");
-    }
+    };
     /**
      * Handles the change event for program selection.
      * @param {array} programIds - The array of selected program IDs.
@@ -618,7 +630,7 @@ class StockStatusMatrixGlobal extends Component {
         }, () => {
             this.filterVersion();
             this.getDropdownLists();
-            this.fetchData()
+            this.fetchData();
         })
     }
     /**
@@ -840,10 +852,10 @@ class StockStatusMatrixGlobal extends Component {
             this.fetchData();
         })
     }
-    setHideIcons(e) {
+    setShowIcons(e) {
         var checked = e.target.checked;
         this.setState({
-            hideIcons: checked,
+            showIcons: checked,
         }, () => {
             this.buildShipmentJexcel();
         })
@@ -1137,6 +1149,17 @@ class StockStatusMatrixGlobal extends Component {
             license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter,
             onload: function (instance) {
                 jExcelLoadedFunction(instance);
+                try {
+                    const currentMonthLabel = moment().format("MMM YY");
+                    const table = instance.element || instance;
+                    const ths = table.querySelectorAll("thead tr td");
+                    ths.forEach((th) => {
+                        if ((th.innerText || th.textContent || "").trim() == currentMonthLabel) {
+                            th.classList.add("supplyplan-Thead");
+                            th.style.cssText += "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
+                        }
+                    });
+                } catch (_) { }
             },
             onfilter: function (instance) {
                 this.refreshJexcel(instance);
@@ -1150,6 +1173,9 @@ class StockStatusMatrixGlobal extends Component {
                 this.refreshJexcel(instance, pageNo);
             }.bind(this),
             updateTable: function (instance, cell, col, row, val, label, cellName) {
+                if (cell && col < colOffset) {
+                    cell.style.setProperty("text-align", "left", "important");
+                }
                 if (cell && col >= colOffset && col < columns.length - 1) {
                     let date = sortedDates[col - colOffset];
                     var rowData = instance.getRowData(row);
@@ -1172,7 +1198,7 @@ class StockStatusMatrixGlobal extends Component {
 
                     if (dataEntry) {
                         let innerHTML = val;
-                        if (!this.state.hideIcons) {
+                        if (this.state.showIcons) {
                             if (dataEntry.shipmentQty > 0) {
                                 innerHTML += ' <i class="fa fa-truck" aria-hidden="true" style="color: ' + textColor + ';" title="' + i18n.t('static.shipment.shipment') + ': ' + dataEntry.shipmentQty + '"></i>';
                             }
@@ -1361,10 +1387,11 @@ class StockStatusMatrixGlobal extends Component {
                 {
                     versions: versionList,
                     versionId: versionList[0].versionId,
-                    versionLabel: [versionList[0].versionStatus.id == 2 && versionList[0].versionType.id == 2
+                    versionLabel: [(versionList[0].versionStatus.id == 2 && versionList[0].versionType.id == 2
+                    ? versionList[0].versionId + "**"
+                    : versionList[0].versionType.id == 2
                     ? versionList[0].versionId + "*"
-                    : versionList[0].versionId + " " + "("+
-                    (moment(versionList[0].createdDate).format(`MMM DD YYYY`)) + ")"]
+                    : versionList[0].versionId) + " (" + moment(versionList[0].createdDate).format(`MMM DD YYYY`) + ")"]
                 },
                 () => {
                     // this.filterData(this.state.rangeValue);
@@ -1542,6 +1569,8 @@ class StockStatusMatrixGlobal extends Component {
             return (
             <option key={i} value={item.versionId}>
                 {item.versionStatus.id == 2 && item.versionType.id == 2
+                ? item.versionId + "**"
+                : item.versionType.id == 2
                 ? item.versionId + "*"
                 : item.versionId}{" "}
                 ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
@@ -1659,7 +1688,7 @@ class StockStatusMatrixGlobal extends Component {
                                 <div className="pl-0">
                                     <div className="row">
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.dateRange')}<i className="fa fa-info-circle icons" title={i18n.t('static.report.reportPeriodTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i><span className="stock-box-icon  fa fa-sort-desc ml-1"></span></Label>
                                             <div className="controls edit">
                                                 <Picker
                                                     ref="pickRange"
@@ -1713,7 +1742,7 @@ class StockStatusMatrixGlobal extends Component {
                                                 )}
                                         </FormGroup>
                                         {this.state.programValues.length == 1 && <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}<i className="fa fa-info-circle icons" title={i18n.t('static.report.versionTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                 <Input
@@ -1821,7 +1850,7 @@ class StockStatusMatrixGlobal extends Component {
                                              </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Show by</Label>
+                                            <Label htmlFor="appendedInputButton">Show by<i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
                                             <div className="controls">
                                                 <InputGroup>
                                                     <Input
@@ -1833,7 +1862,7 @@ class StockStatusMatrixGlobal extends Component {
                                                         value={this.state.viewBy}
                                                     >
                                                         <option value="1">{i18n.t('static.report.mos')}</option>
-                                                        <option value="2">{i18n.t('static.report.quantity')}</option>
+                                                        <option value="2">{i18n.t('static.report.qty')}</option>
                                                     </Input>
                                                 </InputGroup>
                                             </div>
@@ -1853,6 +1882,7 @@ class StockStatusMatrixGlobal extends Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removePlannedShipments')}
+                                                    <i className="fa fa-info-circle icons" title={i18n.t('static.report.removePlannedShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
                                             <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
@@ -1869,6 +1899,7 @@ class StockStatusMatrixGlobal extends Component {
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removeTBDFundingSourceShipments')}
+                                                    <i className="fa fa-info-circle icons" title={i18n.t('static.report.removeTBDFundingSourceShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
                                             <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
@@ -1891,16 +1922,17 @@ class StockStatusMatrixGlobal extends Component {
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
-                                                    id="hideIcons"
-                                                    name="hideIcons"
-                                                    checked={this.state.hideIcons}
-                                                    onClick={(e) => { this.setHideIcons(e); }}
+                                                    id="showIcons"
+                                                    name="showIcons"
+                                                    checked={this.state.showIcons}
+                                                    onClick={(e) => { this.setShowIcons(e); }}
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
                                                     className="form-check-label"
                                                     check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    Hide Icons
+                                                    {i18n.t('static.report.showIcon')}
+                                                    <i className="fa fa-info-circle icons" title={i18n.t('static.report.showIconTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
                                         </FormGroup>
