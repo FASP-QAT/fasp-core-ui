@@ -200,9 +200,9 @@ function colorForStatus(statusId) {
 
 // Returns raw number or null (null → shown as N/A via render callback on numeric col)
 function cellDisplayValue(dataEntry, showQuantity, planBasedOn) {
-  if (!dataEntry || dataEntry.stockStatusId === -1) return null;
+  if (!dataEntry || dataEntry.stockStatusId == -1) return null;
   const { mos, closingBalance } = dataEntry;
-  if (showQuantity || planBasedOn === 2) {
+  if (showQuantity || planBasedOn == 2) {
     return closingBalance != null ? Math.round(closingBalance) : null;
   }
   return mos != null ? roundAMC(mos) : null;
@@ -212,7 +212,7 @@ function cellDisplayValue(dataEntry, showQuantity, planBasedOn) {
 function calcStatusIdLocal(mos, minMos, reorderFrequency) {
   if (mos == null) return -1;
   const v = roundAMC(mos);
-  if (v === 0) return 0;
+  if (v == 0) return 0;
   if (v < minMos) return 1;
   if (v > minMos + reorderFrequency) return 3;
   return 2;
@@ -226,7 +226,7 @@ function calcAverageMaxStock(supplyPlanEntries, minStock, reorderFrequency) {
     .filter((sp) => sp.amc != null && sp.amc > 0)
     .map((sp) => minStock + reorderFrequency * sp.amc);
 
-  if (monthlyMaxValues.length === 0) return 0;
+  if (monthlyMaxValues.length == 0) return 0;
   const sum = monthlyMaxValues.reduce((acc, v) => acc + v, 0);
   return sum / monthlyMaxValues.length;
 }
@@ -247,7 +247,7 @@ function calcAverageMaxStock(supplyPlanEntries, minStock, reorderFrequency) {
 function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
   try {
     const canvas = document.createElement("canvas");
-    canvas.width  = sizePx;
+    canvas.width = sizePx;
     canvas.height = sizePx;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, sizePx, sizePx);
@@ -255,7 +255,7 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
     // We try both so it works regardless of which version the project uses.
     ctx.font = `900 ${sizePx * 0.85}px "Font Awesome 5 Free", "FontAwesome"`;
     ctx.fillStyle = color;
-    ctx.textAlign  = "center";
+    ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.fillText(glyphChar, sizePx / 2, sizePx / 2);
     return { dataUrl: canvas.toDataURL("image/png"), widthPt: 10 };
@@ -268,8 +268,14 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
 // Called just before exportPDFFromModal builds the autoTable.
 function buildPdfIconCache() {
   return {
-    truck:   renderFaIconToDataUrl("\uf0d1", "#BA0C2F", 28),
-    warning: renderFaIconToDataUrl("\uf071", "#ED8944", 28),
+    truck: {
+      light: renderFaIconToDataUrl("\uf0d1", "#ffffff", 28),
+      dark: renderFaIconToDataUrl("\uf0d1", "#333333", 28),
+    },
+    warning: {
+      light: renderFaIconToDataUrl("\uf071", "#ffffff", 28),
+      dark: renderFaIconToDataUrl("\uf071", "#333333", 28),
+    },
   };
 }
 
@@ -351,7 +357,7 @@ export default class StockStatusMatrix extends React.Component {
       this.fetchProgramsForExport();
     }
     const programsForExport = this.state.programs
-      .filter((p) => String(p.programId) === String(this.state.programId))
+      .filter((p) => String(p.programId) == String(this.state.programId))
       .map((p) => ({
         label: p.programCode,
         value: p.programId,
@@ -362,28 +368,31 @@ export default class StockStatusMatrix extends React.Component {
     // per-program PU map immediately — even before the async
     // fetchVersionsAndPlanningUnits() call completes.
     const syncPuByProgram = {};
-    if (programsForExport.length === 1) {
+    if (programsForExport.length == 1) {
       const pid = String(programsForExport[0].value);
-      syncPuByProgram[pid] = (this.state.planningUnits || []).map(p => ({
+      syncPuByProgram[pid] = (this.state.planningUnits || []).map((p) => ({
         ...p,
         id: p.id || p.value,
         value: p.id || p.value,
       }));
     }
 
-    this.setState({
-      exportModal: !this.state.exportModal,
-      exportType: type,
-      exportProgramIds: programsForExport,
-      exportVersionId: this.state.versionId,
-      exportPlanningUnitIds: this.state.planningUnitValues,
-      onlyDownloadedPrograms: false,
-      puByProgramForExport: syncPuByProgram,
-    }, () => {
-      if (this.state.exportModal && programsForExport.length > 0) {
-        this.fetchVersionsAndPlanningUnits(false); // will overwrite puByProgramForExport with full data when ready
+    this.setState(
+      {
+        exportModal: !this.state.exportModal,
+        exportType: type,
+        exportProgramIds: programsForExport,
+        exportVersionId: this.state.versionId,
+        exportPlanningUnitIds: this.state.planningUnitValues,
+        onlyDownloadedPrograms: false,
+        puByProgramForExport: syncPuByProgram,
+      },
+      () => {
+        if (this.state.exportModal && programsForExport.length > 0) {
+          this.fetchVersionsAndPlanningUnits(false); // will overwrite puByProgramForExport with full data when ready
+        }
       }
-    });
+    );
   };
 
   /**
@@ -433,8 +442,18 @@ export default class StockStatusMatrix extends React.Component {
           }
         });
 
-        const sortedDownloaded = downloadedPrograms.sort((a, b) => (a.displayLabel || "").toUpperCase() > (b.displayLabel || "").toUpperCase() ? 1 : -1);
-        const sortedAll = allPrograms.sort((a, b) => (a.programCode || "").toUpperCase() > (b.programCode || "").toUpperCase() ? 1 : -1);
+        const sortedDownloaded = downloadedPrograms.sort((a, b) =>
+          (a.displayLabel || "").toUpperCase() >
+          (b.displayLabel || "").toUpperCase()
+            ? 1
+            : -1
+        );
+        const sortedAll = allPrograms.sort((a, b) =>
+          (a.programCode || "").toUpperCase() >
+          (b.programCode || "").toUpperCase()
+            ? 1
+            : -1
+        );
 
         this.setState({
           downloadedPrograms: sortedDownloaded,
@@ -463,142 +482,242 @@ export default class StockStatusMatrix extends React.Component {
    * Handle program selection change
    */
   handleExportProgramChange = (selectedPrograms) => {
-    this.setState({
-      exportProgramIds: selectedPrograms,
-      exportVersionId: "",
-      exportPlanningUnitIds: [],
-      planningUnitsForExport: [],
-      puByProgramForExport: {},
-    }, () => {
-      if (selectedPrograms.length > 0) {
-        this.fetchVersionsAndPlanningUnits();
+    this.setState(
+      {
+        exportProgramIds: selectedPrograms,
+        exportVersionId: "",
+        exportPlanningUnitIds: [],
+        planningUnitsForExport: [],
+        puByProgramForExport: {},
+      },
+      () => {
+        if (selectedPrograms.length > 0) {
+          this.fetchVersionsAndPlanningUnits();
+        }
       }
-    });
+    );
   };
 
   /**
    * Fetch versions and planning units based on selected programs
    */
   fetchVersionsAndPlanningUnits = (resetSelections = true) => {
-    const { exportProgramIds, onlyDownloadedPrograms } = this.state;
+    const { exportProgramIds, onlyDownloadedPrograms, exportVersionId } =
+      this.state;
     const lang = this.state.lang;
-
-    if (onlyDownloadedPrograms) {
-      const selectedProgramIds = exportProgramIds.map(p => p.value);
+    const vId = onlyDownloadedPrograms
+      ? null
+      : exportProgramIds.length > 1
+      ? null
+      : exportVersionId || null;
+    if (onlyDownloadedPrograms || String(vId).includes("Local")) {
+      const selectedProgramIds = exportProgramIds.map((p) => p.value);
       getDatabase();
       const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
       req.onsuccess = (e) => {
         const db = e.target.result;
-        const ppuGet = db.transaction(["programPlanningUnit"], "readwrite").objectStore("programPlanningUnit").getAll();
+        const ppuGet = db
+          .transaction(["programPlanningUnit"], "readwrite")
+          .objectStore("programPlanningUnit")
+          .getAll();
         ppuGet.onsuccess = () => {
           // Build per-program PU map
           const puByProgram = {};
           (ppuGet.result || [])
-            .filter((r) => selectedProgramIds.map(id => String(id)).includes(String(r.program.id)) && r.active)
+            .filter(
+              (r) =>
+                selectedProgramIds
+                  .map((id) => String(id))
+                  .includes(String(r.program.id)) && r.active
+            )
             .forEach((r) => {
               const pid = String(r.program.id);
               if (!puByProgram[pid]) puByProgram[pid] = [];
-              puByProgram[pid].push({ label: r.planningUnit.label, value: r.planningUnit.id, json: r });
+              puByProgram[pid].push({
+                label: r.planningUnit.label,
+                value: r.planningUnit.id,
+                json: r,
+              });
             });
 
           // Deduplicate and sort within each program
-          Object.keys(puByProgram).forEach(pid => {
+          Object.keys(puByProgram).forEach((pid) => {
             const seen = new Map();
-            puByProgram[pid].forEach(p => seen.set(p.value, p));
+            puByProgram[pid].forEach((p) => seen.set(p.value, p));
             puByProgram[pid] = [...seen.values()].sort((a, b) =>
-              getLabelText(a.label, lang).toUpperCase() > getLabelText(b.label, lang).toUpperCase() ? 1 : -1
+              getLabelText(a.label, lang).toUpperCase() >
+              getLabelText(b.label, lang).toUpperCase()
+                ? 1
+                : -1
             );
           });
 
           // Flat union for the dropdown display (deduplicated by PU id)
           const flatUnion = [];
           const seenIds = new Set();
-          Object.values(puByProgram).flat().forEach(p => {
-            if (!seenIds.has(p.value)) { seenIds.add(p.value); flatUnion.push(p); }
-          });
-          flatUnion.sort((a, b) => getLabelText(a.label, lang).toUpperCase() > getLabelText(b.label, lang).toUpperCase() ? 1 : -1);
+          Object.values(puByProgram)
+            .flat()
+            .forEach((p) => {
+              if (!seenIds.has(p.value)) {
+                seenIds.add(p.value);
+                flatUnion.push(p);
+              }
+            });
+          flatUnion.sort((a, b) =>
+            getLabelText(a.label, lang).toUpperCase() >
+            getLabelText(b.label, lang).toUpperCase()
+              ? 1
+              : -1
+          );
 
           this.setState({
             planningUnitsForExport: flatUnion,
             puByProgramForExport: puByProgram, // keyed map for per-program filtering
             exportPlanningUnitIds: resetSelections
-              ? flatUnion.map(p => ({ label: getLabelText(p.label, lang) + " | " + p.value, value: p.value }))
-              : this.state.exportPlanningUnitIds
+              ? flatUnion.map((p) => ({
+                  label: getLabelText(p.label, lang) + " | " + p.value,
+                  value: p.value,
+                }))
+              : this.state.exportPlanningUnitIds,
           });
         };
       };
-    } else {
-      if (exportProgramIds.length === 1) {
+    }
+    if (!onlyDownloadedPrograms) {
+      if (exportProgramIds.length == 1) {
         const selectedProgramId = exportProgramIds[0].value;
-        DropdownService.getVersionListForSPProgram(selectedProgramId).then((res) => {
-          let verList = [...(res.data || [])];
-          getDatabase();
-          const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-          req.onsuccess = (e) => {
-            const db = e.target.result;
-            const get = db.transaction(["programData"], "readwrite").objectStore("programData").getAll();
-            get.onsuccess = () => {
-              const userId = CryptoJS.AES.decrypt(localStorage.getItem("curUser"), SECRET_KEY).toString(CryptoJS.enc.Utf8);
-              get.result.forEach((r) => {
-                if (r.userId == userId && String(r.programId) === String(selectedProgramId)) {
-                  const pd = JSON.parse(CryptoJS.AES.decrypt(r.programData.generalData, SECRET_KEY).toString(CryptoJS.enc.Utf8));
-                  if (pd.currentVersion) {
-                    pd.currentVersion.versionId = `${pd.currentVersion.versionId} (Local)`;
-                    verList.push(pd.currentVersion);
+        DropdownService.getVersionListForSPProgram(selectedProgramId)
+          .then((res) => {
+            let verList = [...(res.data || [])];
+            getDatabase();
+            const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            req.onsuccess = (e) => {
+              const db = e.target.result;
+              const get = db
+                .transaction(["programData"], "readwrite")
+                .objectStore("programData")
+                .getAll();
+              get.onsuccess = () => {
+                const userId = CryptoJS.AES.decrypt(
+                  localStorage.getItem("curUser"),
+                  SECRET_KEY
+                ).toString(CryptoJS.enc.Utf8);
+                get.result.forEach((r) => {
+                  if (
+                    r.userId == userId &&
+                    String(r.programId) == String(selectedProgramId)
+                  ) {
+                    const pd = JSON.parse(
+                      CryptoJS.AES.decrypt(
+                        r.programData.generalData,
+                        SECRET_KEY
+                      ).toString(CryptoJS.enc.Utf8)
+                    );
+                    if (pd.currentVersion) {
+                      pd.currentVersion.versionId = `${pd.currentVersion.versionId} (Local)`;
+                      verList.push(pd.currentVersion);
+                    }
                   }
-                }
-              });
-              const unique = [...new Map(verList.map((v) => [v.versionId, v])).values()];
-              const versionList = unique.sort((a, b) => {
-                const aLocal = String(a.versionId).includes("Local");
-                const bLocal = String(b.versionId).includes("Local");
-                if (aLocal && !bLocal) return -1;
-                if (!aLocal && bLocal) return 1;
-                const aNum = parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) || 0;
-                const bNum = parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) || 0;
-                return bNum - aNum;
-              });
-              const localVer = versionList.find(v => String(v.versionId).includes("Local"));
-              this.setState({
-                versionsForExport: versionList,
-                exportVersionId: resetSelections ? (localVer ? localVer.versionId : (versionList.length > 0 ? versionList[0].versionId : "")) : this.state.exportVersionId
-              }, () => {
-                this.fetchPlanningUnitsForExportProgram(selectedProgramId, resetSelections);
-              });
+                });
+                const unique = [
+                  ...new Map(verList.map((v) => [v.versionId, v])).values(),
+                ];
+                const versionList = unique.sort((a, b) => {
+                  const aLocal = String(a.versionId).includes("Local");
+                  const bLocal = String(b.versionId).includes("Local");
+                  if (aLocal && !bLocal) return -1;
+                  if (!aLocal && bLocal) return 1;
+                  const aNum =
+                    parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  const bNum =
+                    parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  return bNum - aNum;
+                });
+                const localVer = versionList.find((v) =>
+                  String(v.versionId).includes("Local")
+                );
+                this.setState(
+                  {
+                    versionsForExport: versionList,
+                    exportVersionId: resetSelections
+                      ? localVer
+                        ? localVer.versionId
+                        : versionList.length > 0
+                        ? versionList[0].versionId
+                        : ""
+                      : this.state.exportVersionId,
+                  },
+                  () => {
+                    if (!String(vId).includes("Local")) {
+                      this.fetchPlanningUnitsForExportProgram(
+                        selectedProgramId,
+                        resetSelections
+                      );
+                    }
+                  }
+                );
+              };
             };
-          };
-        }).catch(() => this.setState({ versionsForExport: [] }));
+          })
+          .catch(() => this.setState({ versionsForExport: [] }));
       } else {
         // Multiple programs: fetch PUs per-program separately and store the map
         const programIds = exportProgramIds.map((p) => p.value);
         Promise.all(
-          programIds.map(pid =>
-            ReportService.getDropdownListByProgramIds({ programIds: [pid], onlyAllowPuPresentAcrossAllPrograms: false })
-              .then(res => ({ pid: String(pid), puList: res.data.planningUnitList || [] }))
+          programIds.map((pid) =>
+            ReportService.getDropdownListByProgramIds({
+              programIds: [pid],
+              onlyAllowPuPresentAcrossAllPrograms: false,
+            })
+              .then((res) => ({
+                pid: String(pid),
+                puList: res.data.planningUnitList || [],
+              }))
               .catch(() => ({ pid: String(pid), puList: [] }))
           )
-        ).then(results => {
+        ).then((results) => {
           const puByProgram = {};
           results.forEach(({ pid, puList }) => {
             puByProgram[pid] = puList
-              .map(p => ({ ...p, value: p.id }))
-              .sort((a, b) => getLabelText(a.label, lang).toUpperCase() > getLabelText(b.label, lang).toUpperCase() ? 1 : -1);
+              .map((p) => ({ ...p, value: p.id, json: p }))
+              .sort((a, b) =>
+                getLabelText(a.label, lang).toUpperCase() >
+                getLabelText(b.label, lang).toUpperCase()
+                  ? 1
+                  : -1
+              );
           });
 
           // Flat union for the dropdown (deduplicated by PU id)
           const flatUnion = [];
           const seenIds = new Set();
-          Object.values(puByProgram).flat().forEach(p => {
-            if (!seenIds.has(p.id || p.value)) { seenIds.add(p.id || p.value); flatUnion.push(p); }
-          });
-          flatUnion.sort((a, b) => getLabelText(a.label, lang).toUpperCase() > getLabelText(b.label, lang).toUpperCase() ? 1 : -1);
+          Object.values(puByProgram)
+            .flat()
+            .forEach((p) => {
+              if (!seenIds.has(p.id || p.value)) {
+                seenIds.add(p.id || p.value);
+                flatUnion.push(p);
+              }
+            });
+          flatUnion.sort((a, b) =>
+            getLabelText(a.label, lang).toUpperCase() >
+            getLabelText(b.label, lang).toUpperCase()
+              ? 1
+              : -1
+          );
 
           this.setState({
             planningUnitsForExport: flatUnion,
             puByProgramForExport: puByProgram,
             exportPlanningUnitIds: resetSelections
-              ? flatUnion.map(p => ({ label: getLabelText(p.label, lang) + " | " + (p.id || p.value), value: p.id || p.value }))
-              : this.state.exportPlanningUnitIds
+              ? flatUnion.map((p) => ({
+                  label:
+                    getLabelText(p.label, lang) + " | " + (p.id || p.value),
+                  value: p.id || p.value,
+                }))
+              : this.state.exportPlanningUnitIds,
           });
         });
       }
@@ -610,35 +729,55 @@ export default class StockStatusMatrix extends React.Component {
     ReportService.getDropdownListByProgramIds({
       programIds: [programId],
       onlyAllowPuPresentAcrossAllPrograms: false,
-    }).then((res) => {
-      const puList = (res.data.planningUnitList || []).sort((a, b) =>
-        getLabelText(a.label, lang).toUpperCase() > getLabelText(b.label, lang).toUpperCase() ? 1 : -1
+    })
+      .then((res) => {
+        const puList = (res.data.planningUnitList || []).sort((a, b) =>
+          getLabelText(a.label, lang).toUpperCase() >
+          getLabelText(b.label, lang).toUpperCase()
+            ? 1
+            : -1
+        );
+        // Store both the flat list for the dropdown and the per-program map
+        const puByProgram = {
+          [String(programId)]: puList.map((p) => ({
+            ...p,
+            value: p.id,
+            json: p,
+          })),
+        };
+        this.setState({
+          planningUnitsForExport: puList,
+          puByProgramForExport: puByProgram,
+          exportPlanningUnitIds: resetSelections
+            ? puList.map((p) => ({
+                label: getLabelText(p.label, lang) + " | " + p.id,
+                value: p.id,
+              }))
+            : this.state.exportPlanningUnitIds,
+        });
+      })
+      .catch(() =>
+        this.setState({ planningUnitsForExport: [], puByProgramForExport: {} })
       );
-      // Store both the flat list for the dropdown and the per-program map
-      const puByProgram = { [String(programId)]: puList.map(p => ({ ...p, value: p.id })) };
-      this.setState({
-        planningUnitsForExport: puList,
-        puByProgramForExport: puByProgram,
-        exportPlanningUnitIds: resetSelections ? puList.map(p => ({
-          label: getLabelText(p.label, lang) + " | " + p.id,
-          value: p.id
-        })) : this.state.exportPlanningUnitIds
-      });
-    }).catch(() => this.setState({ planningUnitsForExport: [], puByProgramForExport: {} }));
   };
 
   /**
    * Handle version selection change
    */
   handleExportVersionChange = (e) => {
-    this.setState({
-      exportVersionId: e.target.value,
-      exportPlanningUnitIds: [],
-    }, () => {
-      if (this.state.exportVersionId) {
-        this.fetchPlanningUnitsForExportProgram(this.state.exportProgramIds[0].value);
+    this.setState(
+      {
+        exportVersionId: e.target.value,
+        exportPlanningUnitIds: [],
+      },
+      () => {
+        if (this.state.exportVersionId) {
+          this.fetchPlanningUnitsForExportProgram(
+            this.state.exportProgramIds[0].value
+          );
+        }
       }
-    });
+    );
   };
 
   /**
@@ -685,8 +824,10 @@ export default class StockStatusMatrix extends React.Component {
 
     const fetchProgramData = (pId) => {
       const vId = onlyDownloadedPrograms
-        ? exportProgramIds.find(p => p.value === pId)?.versionId
-        : (programIds.length > 1 ? null : (exportVersionId || null));
+        ? exportProgramIds.find((p) => p.value == pId)?.versionId
+        : programIds.length > 1
+        ? null
+        : exportVersionId || null;
 
       // Derive a clean numeric versionId:
       // - null / undefined / "" / -1  → send -1 (server treats as "latest")
@@ -694,7 +835,7 @@ export default class StockStatusMatrix extends React.Component {
       // - "123"                        → parseInt
       // - NaN guard: if parseInt fails, fall back to -1
       let cleanVersionId;
-      if (vId == null || vId === "" || vId === -1) {
+      if (vId == null || vId == "" || vId == -1) {
         cleanVersionId = -1;
       } else if (String(vId).includes("Local")) {
         const parsed = parseInt(String(vId).split("(")[0].trim(), 10);
@@ -706,13 +847,12 @@ export default class StockStatusMatrix extends React.Component {
 
       // ── Fix 2 & 3: only pass PUs that belong to THIS program ──
       const programPuIds = ((puByProgramForExport || {})[String(pId)] || [])
-        .map(p => String(p.id || p.value))
-        .filter(id => selectedPuIds.has(id));
+        .map((p) => Number(p.id || p.value))
+        .filter((id) => selectedPuIds.has(id));
 
       // Fallback: if no per-program map available, use full selected list
-      const planningUnitIds = programPuIds.length > 0
-        ? programPuIds
-        : [...selectedPuIds];
+      const planningUnitIds =
+        programPuIds.length > 0 ? programPuIds : [...selectedPuIds];
 
       const inputjson = {
         programId: pId,
@@ -721,8 +861,14 @@ export default class StockStatusMatrix extends React.Component {
         startDate: startDate,
         stopDate: endDate,
         planningUnitIds: planningUnitIds,
-        stockStatusConditions: this.state.stockStatusValues.map((e) => String(e.value)),
-        removePlannedShipments: this.state.removePlannedShipments ? 1 : this.state.removeTBDFundingSourceShipments ? 2 : 0,
+        stockStatusConditions: this.state.stockStatusValues.map((e) =>
+          Number(e.value)
+        ),
+        removePlannedShipments: this.state.removePlannedShipments
+          ? 1
+          : this.state.removeTBDFundingSourceShipments
+          ? 2
+          : 0,
         fundingSourceIds: [],
         procurementAgentIds: [],
         showByQty: this.state.showQuantity,
@@ -730,33 +876,65 @@ export default class StockStatusMatrix extends React.Component {
 
       if (onlyDownloadedPrograms || String(vId).includes("Local")) {
         return new Promise((resolve) => {
-          this.fetchExportDataFromIndexedDB(pId, vId, planningUnitIds, startDate, endDate, resolve);
+          this.fetchExportDataFromIndexedDB(
+            pId,
+            vId,
+            planningUnitIds,
+            startDate,
+            endDate,
+            resolve
+          );
         });
       } else {
-        return ProductService.getStockStatusMatrixData(inputjson).then(response => {
-          const matrix = (response.data.stockStatusMatrix || []).map(r => ({ ...r, programId: pId }));
-          const details = (response.data.stockStatusDetails || []).map(r => ({ ...r, programId: pId }));
-          return { matrix, details };
-        });
+        return ProductService.getStockStatusMatrixData(inputjson).then(
+          (response) => {
+            const matrix = (response.data.stockStatusMatrix || []).map((r) => ({
+              ...r,
+              programId: pId,
+              planBasedOn: r.planBasedOn ?? r.planningUnit?.planBasedOn ?? 1,
+            }));
+            const details = (response.data.stockStatusDetails || []).map(
+              (r) => ({
+                ...r,
+                programId: pId,
+              })
+            );
+            return { matrix, details };
+          }
+        );
       }
     };
 
-    Promise.all(programIds.map(id => fetchProgramData(id))).then(allResults => {
-      const combinedMatrix = allResults.flatMap(r => r.matrix || []);
-      const combinedDetails = allResults.flatMap(r => r.details || []);
+    Promise.all(programIds.map((id) => fetchProgramData(id)))
+      .then((allResults) => {
+        const combinedMatrix = allResults.flatMap((r) => r.matrix || []);
+        const combinedDetails = allResults.flatMap((r) => r.details || []);
 
-      this.prepareExportData(combinedMatrix, combinedDetails, startDate, endDate, () => {
-        this.setState({ exportModal: false, onlyDownloadedPrograms: false });
-        if (this.state.exportType === 1) {
-          this.exportPDFFromModal();
-        } else {
-          this.exportCSVFromModal();
-        }
+        this.prepareExportData(
+          combinedMatrix,
+          combinedDetails,
+          startDate,
+          endDate,
+          () => {
+            this.setState({
+              exportModal: false,
+              onlyDownloadedPrograms: false,
+            });
+            if (this.state.exportType == 1) {
+              this.exportPDFFromModal();
+            } else {
+              this.exportCSVFromModal();
+            }
+          }
+        );
+      })
+      .catch((err) => {
+        console.error("Export Error:", err);
+        this.setState({
+          exportLoading: false,
+          exportMessage: i18n.t("static.common.error"),
+        });
       });
-    }).catch(err => {
-      console.error("Export Error:", err);
-      this.setState({ exportLoading: false, exportMessage: i18n.t("static.common.error") });
-    });
   };
   /**
    * Fetch export data from IndexedDB for downloaded programs
@@ -807,7 +985,7 @@ export default class StockStatusMatrix extends React.Component {
 
         planningUnitIds.forEach((puId) => {
           const puItem = this.state.planningUnitsForExport.find(
-            (p) => String(p.id || p.value) === String(puId)
+            (p) => String(p.id || p.value) == String(puId)
           );
           const puActualLabel = puItem
             ? puItem.label
@@ -815,13 +993,20 @@ export default class StockStatusMatrix extends React.Component {
 
           const puSettings =
             this.state.planningUnitsForExport.find(
-              (p) => String(p.value) === String(puId)
+              (p) => String(p.value || p.id) == String(puId)
             ) || {};
-          const minMos = puSettings.json?.minMonthsOfStock || 5;
-          const reorderFreq = puSettings.json?.reorderFrequencyInMonths || 5;
-          const planBasedOn = puSettings.json?.planBasedOn || 1;
-          const minStock = puSettings.json?.minQty || 0;
-          const notes = puSettings.json?.notes || "";
+          const minMos =
+            puSettings.json?.minMonthsOfStock ??
+            puSettings.minMonthsOfStock ??
+            5;
+          const reorderFreq =
+            puSettings.json?.reorderFrequencyInMonths ??
+            puSettings.reorderFrequencyInMonths ??
+            5;
+          const planBasedOn =
+            puSettings.json?.planBasedOn ?? puSettings.planBasedOn ?? 1;
+          const minStock = puSettings.json?.minQty ?? puSettings.minQty ?? 0;
+          const notes = puSettings.json?.notes ?? puSettings.notes ?? "";
 
           const puDataIdx = puDataList.findIndex(
             (p) => p.planningUnitId == puId
@@ -843,7 +1028,7 @@ export default class StockStatusMatrix extends React.Component {
           );
 
           let maxStock;
-          if (planBasedOn === 2) {
+          if (planBasedOn == 2) {
             maxStock = calcAverageMaxStock(
               inRangeEntries,
               minStock,
@@ -862,12 +1047,12 @@ export default class StockStatusMatrix extends React.Component {
             const cb = useWps
               ? sp.closingBalanceWps
               : useWtbd
-                ? sp.closingBalanceWtbdps
-                : sp.closingBalance;
+              ? sp.closingBalanceWtbdps
+              : sp.closingBalance;
             const amc = sp.amc;
 
             let statusId;
-            if (planBasedOn === 1) {
+            if (planBasedOn == 1) {
               statusId = calcStatusIdLocal(mos, minMos, reorderFreq);
             } else {
               const dynamicMax =
@@ -875,25 +1060,25 @@ export default class StockStatusMatrix extends React.Component {
               statusId =
                 cb == null
                   ? -1
-                  : cb === 0
-                    ? 0
-                    : cb < minStock
-                      ? 1
-                      : cb > dynamicMax
-                        ? 3
-                        : 2;
+                  : cb == 0
+                  ? 0
+                  : cb < minStock
+                  ? 1
+                  : cb > dynamicMax
+                  ? 3
+                  : 2;
             }
 
             const shipmentQty = useWps
               ? sp.shipmentTotalQtyWps
               : useWtbd
-                ? sp.shipmentTotalQtyWtbdps
-                : sp.shipmentTotalQty;
+              ? sp.shipmentTotalQtyWtbdps
+              : sp.shipmentTotalQty;
             const expiredQty = useWps
               ? sp.expiredStockWps
               : useWtbd
-                ? sp.expiredStockWtbdps
-                : sp.expiredStock;
+              ? sp.expiredStockWtbdps
+              : sp.expiredStock;
 
             dataMap[sp.transDate] = {
               mos,
@@ -962,13 +1147,13 @@ export default class StockStatusMatrix extends React.Component {
         const statusId =
           cb == null
             ? -1
-            : cb === 0
-              ? 0
-              : cb < minStock
-                ? 1
-                : cb > dynamicMax
-                  ? 3
-                  : 2;
+            : cb == 0
+            ? 0
+            : cb < minStock
+            ? 1
+            : cb > dynamicMax
+            ? 3
+            : 2;
         updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
       });
 
@@ -988,11 +1173,17 @@ export default class StockStatusMatrix extends React.Component {
   ) => {
     const { from, to } = this.state.rangeValue;
 
+    const recalculatedMatrix = this.applyStatusRecalculation(
+      stockStatusMatrix,
+      startDate,
+      endDate
+    );
+
     const rangeFilteredDetails = (stockStatusDetails || []).filter(
       (d) => d.month >= startDate && d.month <= endDate
     );
     const monthColumns = deriveMonthColumns(
-      stockStatusMatrix,
+      recalculatedMatrix,
       startDate,
       endDate
     );
@@ -1000,7 +1191,7 @@ export default class StockStatusMatrix extends React.Component {
     const selectedIds = this.state.stockStatusValues.map((v) =>
       Number(v.value)
     );
-    let filteredMatrix = stockStatusMatrix;
+    let filteredMatrix = recalculatedMatrix;
     let filteredDetails = rangeFilteredDetails;
 
     if (selectedIds.length > 0) {
@@ -1022,6 +1213,8 @@ export default class StockStatusMatrix extends React.Component {
           monthColumns: monthColumns,
           startDate: startDate,
           endDate: endDate,
+          showQuantity: this.state.showQuantity,
+          lang: this.state.lang,
         },
       },
       () => {
@@ -1030,7 +1223,7 @@ export default class StockStatusMatrix extends React.Component {
           if (callback) {
             callback();
           } else {
-            if (this.state.exportType === 1) {
+            if (this.state.exportType == 1) {
               this.exportPDFFromModal();
             } else {
               this.exportCSVFromModal();
@@ -1055,7 +1248,7 @@ export default class StockStatusMatrix extends React.Component {
       endDate,
     } = this.state.PlanningUnitDataForExport || {};
     const doc = new jsPDF("landscape", "pt", "A4");
-
+    console.log("PlanningUnitDataForExport Test@123",this.state.planningUnitsForExport)
     // Pre-render FA icons from the browser's loaded FontAwesome font once,
     // so didDrawCell can stamp them synchronously without re-creating canvases.
     const iconCache = buildPdfIconCache();
@@ -1089,11 +1282,7 @@ export default class StockStatusMatrix extends React.Component {
       d.setFontSize(7);
       for (let i = 1; i <= n; i++) {
         d.setPage(i);
-        d.text(
-          `Page ${i} of ${n}`,
-          40,
-          d.internal.pageSize.height - 30
-        );
+        d.text(`Page ${i} of ${n}`, 40, d.internal.pageSize.height - 30);
         d.text(
           `Copyright © 2020 ${i18n.t("static.footer")}`,
           d.internal.pageSize.width - 40,
@@ -1103,49 +1292,125 @@ export default class StockStatusMatrix extends React.Component {
       }
     };
 
-    const renderFilterSummary = (currentY, showAll = true, progLabel = null, puLabel = null) => {
+    const renderBoldLine = (label, value, x, y, maxWidth) => {
+      doc.setFont("helvetica", "bold");
+      const fullLabel = label + ": ";
+      doc.text(fullLabel, x, y);
+      const labelWidth = doc.getTextWidth(fullLabel);
+      doc.setFont("helvetica", "normal");
+      if (maxWidth) {
+        const lines = doc.splitTextToSize(String(value), maxWidth - labelWidth);
+        doc.text(lines, x + labelWidth, y);
+        return lines.length * 11 + 4;
+      } else {
+        doc.text(String(value), x + labelWidth, y);
+        return 15;
+      }
+    };
+
+    const renderFilterSummary = (
+      currentY,
+      showAll = true,
+      progLabel = null,
+      puLabel = null,
+      versionText = null,
+      onlyProgram = false
+    ) => {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(8);
       doc.setTextColor("#002f6c");
 
       if (showAll) {
-        doc.text(`${i18n.t("static.report.dateRange")}: ${moment(startDate).format("MMM YYYY")} ~ ${moment(endDate).format("MMM YYYY")}`, 40, currentY);
-        currentY += 15;
+        currentY += renderBoldLine(
+          i18n.t("static.report.dateRange"),
+          `${moment(startDate).format("MMM YYYY")} ~ ${moment(endDate).format(
+            "MMM YYYY"
+          )}`,
+          40,
+          currentY
+        );
 
-        const programNames = (this.state.exportProgramIds || []).map((p) => p.label).join(", ");
-        doc.text(`${i18n.t("static.program.program")}: ${programNames}`, 40, currentY);
-        currentY += 15;
+        const programNames = (this.state.exportProgramIds || [])
+          .map((p) => p.label.split("~v")[0])
+          .join(", ");
+        currentY += renderBoldLine(
+          i18n.t("static.program.program"),
+          programNames,
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
 
-        if (!this.state.onlyDownloadedPrograms && this.state.exportProgramIds.length === 1) {
-          doc.text(`${i18n.t("static.report.version")}: ${this.state.exportVersionId}`, 40, currentY);
-          currentY += 15;
+        if (this.state.exportProgramIds.length == 1) {
+          const rawLabel = this.state.exportProgramIds[0].label;
+          const vFromLabel = rawLabel.includes("~v")
+            ? rawLabel.split("~v")[1]+" (Local)"
+            : null;
+          const vText =
+            vFromLabel ||
+            (this.state.onlyDownloadedPrograms
+              ? this.state.exportProgramIds[0].versionId ||
+                i18n.t("static.report.latest")
+              : this.state.exportVersionId);
+          currentY += renderBoldLine(
+            i18n.t("static.report.version"),
+            vText,
+            40,
+            currentY
+          );
         }
 
-        const puNames = (this.state.exportPlanningUnitIds || []).map((p) => p.label).join(", ");
-        const puLines = doc.splitTextToSize(`${i18n.t("static.planningunit.planningunit")}: ${puNames}`, doc.internal.pageSize.width - 80);
-        doc.text(puLines, 40, currentY);
-        currentY += puLines.length * 11 + 4;
+        const puNames = (this.state.exportPlanningUnitIds || [])
+          .map((p) => p.label)
+          .join(", ");
+        currentY += renderBoldLine(
+          i18n.t("static.planningunit.planningunit"),
+          puNames,
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
 
-        doc.text(`${i18n.t("static.report.withinstock")}: ${(this.state.stockStatusValues || []).map((v) => v.label).join(", ")}`, 40, currentY);
-        currentY += 15;
-
-        doc.text(`${i18n.t("static.report.showQuantity")}: ${this.state.showQuantity ? i18n.t("static.program.yes") : i18n.t("static.program.no")}`, 40, currentY);
-        currentY += 15;
-
-        doc.text(`${i18n.t("static.report.removePlannedShipments")}: ${this.state.removePlannedShipments ? i18n.t("static.program.yes") : i18n.t("static.program.no")}`, 40, currentY);
-        currentY += 15;
-
-        doc.text(`${i18n.t("static.report.removeTBDFundingSourceShipments")}: ${this.state.removeTBDFundingSourceShipments ? i18n.t("static.program.yes") : i18n.t("static.program.no")}`, 40, currentY);
-        currentY += 15;
+        currentY += renderBoldLine(
+          i18n.t("static.report.withinstock"),
+          (this.state.stockStatusValues || []).map((v) => v.label).join(", "),
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.showQuantity"),
+          showQuantity
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.removePlannedShipments"),
+          this.state.removePlannedShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.removeTBDFundingSourceShipments"),
+          this.state.removeTBDFundingSourceShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
       } else {
-        doc.setFont("helvetica", "normal");
-        doc.text(`${i18n.t("static.program.program")}: ${progLabel}`, 40, currentY);
-        currentY += 15;
-
-        doc.setFont("helvetica", "normal");
-        const puLines = doc.splitTextToSize(`${i18n.t("static.planningunit.planningunit")}: ${puLabel}`, doc.internal.pageSize.width - 80);
-        doc.text(puLines, 40, currentY);
-        currentY += puLines.length * 11 + 4;
+        const [cleanProg, vFromProg] = (progLabel || "").split("~v");
+        currentY += renderBoldLine(
+          i18n.t("static.program.program"),
+          cleanProg,
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
       }
       return currentY;
     };
@@ -1156,184 +1421,363 @@ export default class StockStatusMatrix extends React.Component {
     const uniquePrograms = this.state.exportProgramIds;
     uniquePrograms.forEach((prog) => {
       const progId = prog.value;
-      const progLabel = prog.label;
-
       const programFilteredMatrix = (stockStatusMatrix || []).filter(
-        (m) => String(m.programId) === String(progId)
+        (m) => String(m.programId) == String(progId)
       );
-      if (programFilteredMatrix.length === 0) return;
+      const progPUIds = (this.state.exportPlanningUnitIds || [])
+        .filter((p) =>
+          programFilteredMatrix.some((m) => m.planningUnit.id == p.value)
+        )
+        .map((p) => p.label);
+      if (progPUIds.length > 0) {
+        const progLabel = prog.label;
 
-      const programFilteredDetails = (stockStatusDetails || []).filter(
-        (d) => String(d.programId) === String(progId)
-      );
+        if (programFilteredMatrix.length == 0) return;
 
-      const progPUIdsLabel = (this.state.exportPlanningUnitIds || [])
-        .filter((p) => programFilteredMatrix.some((m) => m.planningUnit.id == p.value))
-        .map((p) => p.label)
-        .join(", ");
+        const programFilteredDetails = (stockStatusDetails || []).filter(
+          (d) => String(d.programId) == String(progId)
+        );
 
-      // Section 1: Matrix Table (with horizontal chunking)
-      const maxColsPerPage = 15;
-      const chunks = [];
-      for (let i = 0; i < monthColumns.length; i += maxColsPerPage) {
-        chunks.push(monthColumns.slice(i, i + maxColsPerPage));
-      }
+        const progPUIdsLabel = (this.state.exportPlanningUnitIds || [])
+          .filter((p) =>
+            programFilteredMatrix.some((m) => m.planningUnit.id == p.value)
+          )
+          .map((p) => p.label)
+          .join(", ");
 
-      chunks.forEach((chunkMonths, cIdx) => {
-        doc.addPage();
-        let y = 80;
-        if (cIdx === 0) {
-          y = renderFilterSummary(y, false, progLabel, progPUIdsLabel);
-        } else {
-          y += 10;
+        // Section 1: Matrix Table (with horizontal chunking)
+        const maxColsPerPage = 15;
+        const chunks = [];
+        for (let i = 0; i < monthColumns.length; i += maxColsPerPage) {
+          chunks.push(monthColumns.slice(i, i + maxColsPerPage));
         }
 
-        const head = [[
-          i18n.t("static.planningunit.planningunit"),
-          i18n.t("static.stockStatus.plannedBy"),
-          i18n.t("static.stockStatusMatrix.minMax"),
-          ...chunkMonths.map((d) => moment(d).format("MMM YY")),
-          i18n.t("static.program.notes"),
-        ]];
+        chunks.forEach((chunkMonths, cIdx) => {
+          doc.addPage();
+          let y = 80;
+          const versionText = this.state.onlyDownloadedPrograms
+            ? prog.versionId || i18n.t("static.report.latest")
+            : uniquePrograms.length == 1
+            ? this.state.exportVersionId
+            : i18n.t("static.report.latest");
 
-        const body = programFilteredMatrix.map((row) => {
-          const minMax = row.planBasedOn === 1
-            ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(Number(row.minMonthsOfStock) + Number(row.reorderFrequency), 0)}`
-            : `${formatter(Math.round(row.minStock || 0))} / ${formatter(Math.round(row.maxStock || 0))}`;
+          if (cIdx == 0) {
+            y = renderFilterSummary(
+              y,
+              false,
+              progLabel,
+              progPUIdsLabel,
+              versionText,
+              false
+            );
+          } else {
+            y = renderFilterSummary(
+              y,
+              false,
+              progLabel,
+              progPUIdsLabel,
+              versionText,
+              true
+            );
+          }
 
+          const head = [
+            [
+              i18n.t("static.planningunit.planningunit"),
+              i18n.t("static.stockStatus.plannedBy"),
+              i18n.t("static.stockStatusMatrix.minMax"),
+              ...chunkMonths.map((d) => moment(d).format("MMM YY")),
+              i18n.t("static.program.notes"),
+            ],
+          ];
+          const body = programFilteredMatrix.map((row) => {
+            const minMax =
+              row.planBasedOn == 1
+                ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
+                    Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+                    0
+                  )}`
+                : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
+                    Math.round(row.maxStock || 0)
+                  )}`;
+
+            return [
+              getLabelText(row.planningUnit.label, this.state.lang) +
+                " | " +
+                row.planningUnit.id,
+              row.planBasedOn == 1
+                ? i18n.t("static.report.mos")
+                : i18n.t("static.report.qty"),
+              minMax,
+              ...chunkMonths.map((dateKey) => {
+                const entry = (row.dataMap || {})[dateKey];
+                const raw = entry
+                  ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+                  : null;
+                if (raw == null) return i18n.t("static.supplyPlanFormula.na");
+                const formatted =
+                  showQuantity || row.planBasedOn == 2
+                    ? formatter(raw)
+                    : formatterMOS(raw, 2);
+                return formatted !== i18n.t("static.supplyPlanFormula.na")
+                  ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : formatted;
+              }),
+              row.notes || "",
+            ];
+          });
+
+          doc.autoTable({
+            startY: y + 10,
+            head: head,
+            body: body,
+            margin: { top: 120 },
+            // ── FIX 1 & 2: dynamic left padding based on which icons are present ──
+            // We pre-compute per-cell icon widths so text never overlaps icons.
+            // The didParseCell hook sets left padding to accommodate 0, 1, or 2 icons.
+            styles: {
+              lineWidth: 1,
+              fontSize: 6,
+              halign: "center",
+              valign: "middle",
+              overflow: "linebreak",
+            },
+            columnStyles: {
+              0: { cellWidth: 100, halign: "left" },
+              [3 + chunkMonths.length]: { halign: "left" },
+            },
+            didDrawPage(data) {
+              if (data.pageNumber > 1) {
+                renderFilterSummary(
+                  80,
+                  false,
+                  progLabel,
+                  progPUIdsLabel,
+                  versionText,
+                  true
+                );
+              }
+            },
+            didParseCell(data) {
+              if (
+                data.section == "body" &&
+                data.column.index >= 3 &&
+                data.column.index < 3 + chunkMonths.length
+              ) {
+                const dateKey = chunkMonths[data.column.index - 3];
+                const rowData = programFilteredMatrix[data.row.index];
+                const entry = (rowData.dataMap || {})[dateKey];
+                const bgColor = entry
+                  ? colorForStatus(entry.stockStatusId)
+                  : "#cfcdc9";
+                data.cell.styles.fillColor = bgColor;
+                if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
+                  data.cell.styles.textColor = "#ffffff";
+                }
+
+                // Reserve left padding for however many icons will be drawn:
+                // each icon is ICON_PT wide + ICON_GAP, plus a 2pt left buffer.
+                const hasTruck = entry && entry.shipmentQty > 0;
+                const hasWarning = entry && entry.expiredQty > 0;
+                const iconCount = (hasTruck ? 1 : 0) + (hasWarning ? 1 : 0);
+                const leftPad =
+                  iconCount > 0 ? 2 + iconCount * (ICON_PT + ICON_GAP) : 4;
+                data.cell.styles.halign = "center";
+                data.cell.styles.cellPadding = {
+                  left: leftPad,
+                  right: 2,
+                  top: 2,
+                  bottom: 2,
+                };
+              }
+            },
+            didDrawCell(data) {
+              if (
+                data.section == "body" &&
+                data.column.index >= 3 &&
+                data.column.index < 3 + chunkMonths.length && data.row.index!=-1
+              ) {
+                const dateKey = chunkMonths[data.column.index - 3];
+                console.log("programFilteredMatrix Test@123",data.row.index);
+                const rowData = programFilteredMatrix[data.row.index];
+                const entry = (rowData.dataMap || {})[dateKey];
+                if (!entry) return;
+
+                // Stamp FA icons as tiny PNG images, advancing x after each one.
+                // Icons are vertically centred within the cell.
+                let iconX = data.cell.x + 2;
+                const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
+
+                const bgColor = entry
+                  ? colorForStatus(entry.stockStatusId)
+                  : "#cfcdc9";
+                const isLight = bgColor == "#BA0C2F" || bgColor == "#118b70";
+                const version = isLight ? "light" : "dark";
+
+                if (entry.shipmentQty > 0 && iconCache.truck[version]) {
+                  doc.addImage(
+                    iconCache.truck[version].dataUrl,
+                    "PNG",
+                    iconX,
+                    iconY,
+                    ICON_PT,
+                    ICON_PT
+                  );
+                  iconX += ICON_PT + ICON_GAP;
+                }
+
+                if (entry.expiredQty > 0 && iconCache.warning[version]) {
+                  doc.addImage(
+                    iconCache.warning[version].dataUrl,
+                    "PNG",
+                    iconX,
+                    iconY,
+                    ICON_PT,
+                    ICON_PT
+                  );
+                }
+              }
+            },
+          });
+        });
+
+        // Section 2: Graph
+        const canvas = document.getElementById(`export-chart-${progId}`);
+        if (canvas && typeof canvas.toDataURL == "function") {
+          const canvasImg = canvas.toDataURL("image/png", 1.0);
+          if (
+            canvasImg &&
+            canvasImg.length > 100 &&
+            canvasImg.startsWith("data:image")
+          ) {
+            doc.addPage();
+            renderFilterSummary(
+              80,
+              false,
+              progLabel,
+              progPUIdsLabel,
+              versionText,
+              true
+            );
+            doc.addImage(canvasImg, "png", 40, 120, 750, 420);
+          }
+        }
+
+        // Section 3: Details Table
+        doc.addPage();
+        const headDet = [
+          [
+            i18n.t("static.common.month"),
+            i18n.t("static.planningunit.planningunit"),
+            i18n.t("static.supplyPlan.consumption"),
+            i18n.t("static.report.amc"),
+            i18n.t("static.report.stock"),
+            i18n.t("static.report.mos"),
+            i18n.t("static.dashboard.stockstatusmain"),
+          ],
+        ];
+
+        const bodyDet = programFilteredDetails.map((row) => {
+          const matrixRow = programFilteredMatrix.find(
+            (m) => String(m.planningUnit.id) == String(row.planningUnit.id)
+          );
+          const planBasedOn = matrixRow
+            ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
+            : row.planningUnit?.planBasedOn ?? 1;
+          const statusLabel = (
+            STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
+          ).label;
           return [
-            getLabelText(row.planningUnit.label, this.state.lang) + " | " + row.planningUnit.id,
-            row.planBasedOn === 1 ? i18n.t("static.report.mos") : i18n.t("static.report.qty"),
-            minMax,
-            ...chunkMonths.map((dateKey) => {
-              const entry = (row.dataMap || {})[dateKey];
-              const raw = entry ? cellDisplayValue(entry, showQuantity, row.planBasedOn) : null;
-              if (raw == null) return i18n.t("static.supplyPlanFormula.na");
-              return showQuantity || row.planBasedOn === 2 ? formatter(raw) : formatterMOS(raw, 2);
-            }),
-            row.notes || "",
+            moment(row.month).format("MMM YY"),
+            getLabelText(row.planningUnit.label, this.state.lang) +
+              " | " +
+              row.planningUnit.id,
+            row.consumptionQty != null
+              ? formatter(Math.round(row.consumptionQty))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "",
+            row.amc != null
+              ? formatter(Math.round(row.amc))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "",
+            row.closingBalance != null
+              ? formatter(Math.round(row.closingBalance))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : "",
+            planBasedOn == 2
+              ? "-"
+              : row.mos != null
+              ? formatterMOS(roundAMC(row.mos), 1)
+              : i18n.t("static.supplyPlanFormula.na"),
+            statusLabel,
           ];
         });
+        let y = 80;
+        const versionText = this.state.onlyDownloadedPrograms
+          ? prog.versionId || i18n.t("static.report.latest")
+          : uniquePrograms.length == 1
+          ? this.state.exportVersionId
+          : i18n.t("static.report.latest");
 
         doc.autoTable({
-          startY: y + 10,
-          head: head,
-          body: body,
-          margin: { top: 80 },
-          // ── FIX 1 & 2: dynamic left padding based on which icons are present ──
-          // We pre-compute per-cell icon widths so text never overlaps icons.
-          // The didParseCell hook sets left padding to accommodate 0, 1, or 2 icons.
-          styles: { lineWidth: 1, fontSize: 6, halign: "center", valign: "middle", overflow: "linebreak" },
-          columnStyles: { 0: { cellWidth: 100 } },
-          didParseCell(data) {
-            if (data.section === "body" && data.column.index >= 3 && data.column.index < 3 + chunkMonths.length) {
-              const dateKey = chunkMonths[data.column.index - 3];
-              const rowData = programFilteredMatrix[data.row.index];
-              const entry = (rowData.dataMap || {})[dateKey];
-              const bgColor = entry ? colorForStatus(entry.stockStatusId) : "#cfcdc9";
-              data.cell.styles.fillColor = bgColor;
-              if (bgColor === "#BA0C2F" || bgColor === "#118b70") {
-                data.cell.styles.textColor = "#ffffff";
-              }
-
-              // Reserve left padding for however many icons will be drawn:
-              // each icon is ICON_PT wide + ICON_GAP, plus a 2pt left buffer.
-              const hasTruck   = entry && entry.shipmentQty > 0;
-              const hasWarning = entry && entry.expiredQty > 0;
-              const iconCount  = (hasTruck ? 1 : 0) + (hasWarning ? 1 : 0);
-              const leftPad    = iconCount > 0 ? 2 + iconCount * (ICON_PT + ICON_GAP) : 4;
-              data.cell.styles.halign = "left";
-              data.cell.styles.cellPadding = { left: leftPad, right: 2, top: 2, bottom: 2 };
+          startY:
+            renderFilterSummary(
+              y,
+              false,
+              progLabel,
+              progPUIdsLabel,
+              versionText
+            ) + 10,
+          head: headDet,
+          body: bodyDet,
+          margin: { top: 120 },
+          styles: {
+            lineWidth: 1,
+            fontSize: 6,
+            halign: "center",
+            valign: "middle",
+            overflow: "linebreak",
+          },
+          columnStyles: {
+            1: { cellWidth: 150, halign: "left" },
+            6: { halign: "left" },
+          },
+          didDrawPage(data) {
+            if (data.pageNumber > 1) {
+              renderFilterSummary(
+                80,
+                false,
+                progLabel,
+                progPUIdsLabel,
+                versionText,
+                true
+              );
             }
           },
-          didDrawCell(data) {
-            if (data.section === "body" && data.column.index >= 3 && data.column.index < 3 + chunkMonths.length) {
-              const dateKey = chunkMonths[data.column.index - 3];
-              const rowData = programFilteredMatrix[data.row.index];
-              const entry = (rowData.dataMap || {})[dateKey];
-              if (!entry) return;
-
-              // Stamp FA icons as tiny PNG images, advancing x after each one.
-              // Icons are vertically centred within the cell.
-              let iconX = data.cell.x + 2;
-              const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
-
-              if (entry.shipmentQty > 0 && iconCache.truck) {
-                doc.addImage(
-                  iconCache.truck.dataUrl, "PNG",
-                  iconX, iconY, ICON_PT, ICON_PT
-                );
-                iconX += ICON_PT + ICON_GAP;
-              }
-
-              if (entry.expiredQty > 0 && iconCache.warning) {
-                doc.addImage(
-                  iconCache.warning.dataUrl, "PNG",
-                  iconX, iconY, ICON_PT, ICON_PT
-                );
+          didParseCell(data) {
+            if (data.section == "body") {
+              const rowData = programFilteredDetails[data.row.index];
+              const matrixRow = programFilteredMatrix.find(
+                (m) =>
+                  String(m.planningUnit.id) == String(rowData.planningUnit.id)
+              );
+              const pbo = matrixRow ? matrixRow.planBasedOn : 1;
+              const bg = colorForStatus(rowData.stockStatusId);
+              if (
+                data.column.index == 6 ||
+                (data.column.index == 5 && pbo !== 2)
+              ) {
+                data.cell.styles.fillColor = bg;
+                if (bg == "#BA0C2F" || bg == "#118b70")
+                  data.cell.styles.textColor = "#ffffff";
               }
             }
-          }
+          },
         });
-      });
-
-      // Section 2: Graph
-      const canvas = document.getElementById(`export-chart-${progId}`);
-      if (canvas && typeof canvas.toDataURL === "function") {
-        const canvasImg = canvas.toDataURL("image/png", 1.0);
-        if (canvasImg && canvasImg.length > 100 && canvasImg.startsWith("data:image")) {
-          doc.addPage();
-          doc.addImage(canvasImg, "png", 40, 80, 750, 420);
-        }
       }
-
-      // Section 3: Details Table
-      doc.addPage();
-      const headDet = [[
-        i18n.t("static.common.month"),
-        i18n.t("static.planningunit.planningunit"),
-        i18n.t("static.supplyPlan.consumption"),
-        i18n.t("static.report.amc"),
-        i18n.t("static.report.stock"),
-        i18n.t("static.report.mos"),
-        i18n.t("static.dashboard.stockstatusmain"),
-      ]];
-
-      const bodyDet = programFilteredDetails.map((row) => {
-        const matrixRow = programFilteredMatrix.find((m) => String(m.planningUnit.id) === String(row.planningUnit.id));
-        const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
-        const statusLabel = (STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]).label;
-        return [
-          moment(row.month).format("MMM YYYY"),
-          getLabelText(row.planningUnit.label, this.state.lang) + " | " + row.planningUnit.id,
-          row.consumptionQty != null ? formatter(Math.round(row.consumptionQty)) : "",
-          row.amc != null ? formatter(Math.round(row.amc)) : "",
-          row.closingBalance != null ? formatter(Math.round(row.closingBalance)) : "",
-          planBasedOn === 2 ? "" : (row.mos != null ? formatterMOS(roundAMC(row.mos), 1) : i18n.t("static.supplyPlanFormula.na")),
-          statusLabel,
-        ];
-      });
-      let y = 80;
-      doc.autoTable({
-        startY: y + 10,
-        head: headDet,
-        body: bodyDet,
-        margin: { top: 80 },
-        styles: { lineWidth: 1, fontSize: 7, halign: "center", valign: "middle", overflow: "linebreak" },
-        columnStyles: { 1: { cellWidth: 150 } },
-        didParseCell(data) {
-          if (data.section === "body") {
-            const rowData = programFilteredDetails[data.row.index];
-            const matrixRow = programFilteredMatrix.find((m) => String(m.planningUnit.id) === String(rowData.planningUnit.id));
-            const pbo = matrixRow ? matrixRow.planBasedOn : 1;
-            const bg = colorForStatus(rowData.stockStatusId);
-            if (data.column.index === 6 || (data.column.index === 5 && pbo !== 2)) {
-              data.cell.styles.fillColor = bg;
-              if (bg === "#BA0C2F" || bg === "#118b70") data.cell.styles.textColor = "#ffffff";
-            }
-          }
-        }
-      });
     });
 
     addHeaders(doc);
@@ -1359,44 +1803,121 @@ export default class StockStatusMatrix extends React.Component {
     const csvRow = [];
 
     // ── Date range ──
-    csvRow.push('"' + (i18n.t('static.report.dateRange') + ': ' + moment(startDate).format("MMM YYYY") + ' ~ ' + moment(endDate).format("MMM YYYY")).replaceAll(' ', '%20') + '"');
-    csvRow.push('');
+    csvRow.push(
+      '"' +
+        (
+          i18n.t("static.report.dateRange") +
+          ": " +
+          moment(startDate).format("MMM YYYY") +
+          " ~ " +
+          moment(endDate).format("MMM YYYY")
+        ).replaceAll(" ", "%20") +
+        '"'
+    );
+    csvRow.push("");
 
     // ── Programs ──
-    this.state.exportProgramIds.forEach(ele =>
-      csvRow.push('"' + (i18n.t('static.program.program') + ': ' + ele.label.toString()).replaceAll(' ', '%20') + '"')
+    this.state.exportProgramIds.forEach((ele) =>
+      csvRow.push(
+        '"' +
+          (
+            i18n.t("static.program.program") +
+            ": " +
+            ele.label.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
+      )
     );
-    csvRow.push('');
+    csvRow.push("");
 
     // ── Version (single program, non-downloaded only) ──
-    if (!this.state.onlyDownloadedPrograms && this.state.exportProgramIds.length === 1) {
-      csvRow.push('"' + (i18n.t('static.report.version') + ': ' + this.state.exportVersionId).replaceAll(' ', '%20') + '"');
-      csvRow.push('');
+    if (
+      !this.state.onlyDownloadedPrograms &&
+      this.state.exportProgramIds.length == 1
+    ) {
+      csvRow.push(
+        '"' +
+          (
+            i18n.t("static.report.version") +
+            ": " +
+            this.state.exportVersionId
+          ).replaceAll(" ", "%20") +
+          '"'
+      );
+      csvRow.push("");
     }
 
     // ── Planning units ──
-    this.state.exportPlanningUnitIds.forEach(ele =>
-      csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ': ' + ele.label.toString()).replaceAll(' ', '%20') + '"')
+    this.state.exportPlanningUnitIds.forEach((ele) =>
+      csvRow.push(
+        '"' +
+          (
+            i18n.t("static.planningunit.planningunit") +
+            ": " +
+            ele.label.toString()
+          ).replaceAll(" ", "%20") +
+          '"'
+      )
     );
-    csvRow.push('');
+    csvRow.push("");
 
     // ── FIX 3: Stock status filter ──
-    const stockStatusLabels = (this.state.stockStatusValues || []).map((v) => v.label).join(', ');
-    csvRow.push('"' + (i18n.t('static.report.withinstock') + ': ' + stockStatusLabels).replaceAll(' ', '%20') + '"');
-    csvRow.push('');
+    const stockStatusLabels = (this.state.stockStatusValues || [])
+      .map((v) => v.label)
+      .join(", ");
+    csvRow.push(
+      '"' +
+        (
+          i18n.t("static.report.withinstock") +
+          ": " +
+          stockStatusLabels
+        ).replaceAll(" ", "%20") +
+        '"'
+    );
+    csvRow.push("");
 
     // ── FIX 3: Show Quantity ──
-    csvRow.push('"' + (i18n.t('static.report.showQuantity') + ': ' + (this.state.showQuantity ? i18n.t('static.program.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"');
-    csvRow.push('');
+    csvRow.push(
+      '"' +
+        (
+          i18n.t("static.report.showQuantity") +
+          ": " +
+          (this.state.showQuantity
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"))
+        ).replaceAll(" ", "%20") +
+        '"'
+    );
+    csvRow.push("");
 
     // ── FIX 3: Remove Planned Shipments ──
-    csvRow.push('"' + (i18n.t('static.report.removePlannedShipments') + ': ' + (this.state.removePlannedShipments ? i18n.t('static.program.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"');
-    csvRow.push('');
+    csvRow.push(
+      '"' +
+        (
+          i18n.t("static.report.removePlannedShipments") +
+          ": " +
+          (this.state.removePlannedShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"))
+        ).replaceAll(" ", "%20") +
+        '"'
+    );
+    csvRow.push("");
 
     // ── FIX 3: Remove TBD Funding Source Shipments ──
-    csvRow.push('"' + (i18n.t('static.report.removeTBDFundingSourceShipments') + ': ' + (this.state.removeTBDFundingSourceShipments ? i18n.t('static.program.yes') : i18n.t('static.program.no'))).replaceAll(' ', '%20') + '"');
-    csvRow.push('');
-    csvRow.push('');
+    csvRow.push(
+      '"' +
+        (
+          i18n.t("static.report.removeTBDFundingSourceShipments") +
+          ": " +
+          (this.state.removeTBDFundingSourceShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"))
+        ).replaceAll(" ", "%20") +
+        '"'
+    );
+    csvRow.push("");
+    csvRow.push("");
 
     const uniquePrograms = this.state.exportProgramIds;
 
@@ -1405,15 +1926,20 @@ export default class StockStatusMatrix extends React.Component {
       const progLabel = prog.label;
 
       const programFilteredMatrix = (stockStatusMatrix || []).filter(
-        (m) => String(m.programId) === String(progId)
+        (m) => String(m.programId) == String(progId)
       );
-      if (programFilteredMatrix.length === 0) return;
+      if (programFilteredMatrix.length == 0) return;
 
       const programFilteredDetails = (stockStatusDetails || []).filter(
-        (d) => String(d.programId) === String(progId)
+        (d) => String(d.programId) == String(progId)
       );
 
-      csvRow.push(`${i18n.t("static.dashboard.programheader")}: ${progLabel.replaceAll(" ", "%20")}`);
+      csvRow.push(
+        `${i18n.t("static.dashboard.programheader")}: ${progLabel.replaceAll(
+          " ",
+          "%20"
+        )}`
+      );
       csvRow.push("");
       csvRow.push("");
 
@@ -1421,7 +1947,7 @@ export default class StockStatusMatrix extends React.Component {
         i18n.t("static.planningunit.planningunit"),
         i18n.t("static.stockStatus.plannedBy"),
         i18n.t("static.stockStatusMatrix.minMax"),
-        ...monthColumns.map((d) => moment(d).format("MMM YYYY")),
+        ...monthColumns.map((d) => moment(d).format("MMM YY")),
         i18n.t("static.program.notes"),
       ];
 
@@ -1432,14 +1958,14 @@ export default class StockStatusMatrix extends React.Component {
       ];
       programFilteredMatrix.forEach((row) => {
         const minMax =
-          row.planBasedOn === 1
+          row.planBasedOn == 1
             ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-              0
-            )}`
+                Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+                0
+              )}`
             : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-              Math.round(row.maxStock || 0)
-            )}`;
+                Math.round(row.maxStock || 0)
+              )}`;
         A.push(
           addDoubleQuoteToRowContent([
             (
@@ -1449,7 +1975,7 @@ export default class StockStatusMatrix extends React.Component {
             )
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
-            row.planBasedOn === 1
+            row.planBasedOn == 1
               ? i18n.t("static.report.mos")
               : i18n.t("static.report.qty"),
             minMax,
@@ -1459,7 +1985,7 @@ export default class StockStatusMatrix extends React.Component {
                 ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
                 : null;
               if (raw == null) return i18n.t("static.supplyPlanFormula.na");
-              return showQuantity || row.planBasedOn === 2
+              return showQuantity || row.planBasedOn == 2
                 ? formatter(raw)
                 : formatterMOS(raw, 2);
             }),
@@ -1491,19 +2017,21 @@ export default class StockStatusMatrix extends React.Component {
           STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
         ).label;
         const matrixRow = programFilteredMatrix.find(
-          (r) => String(r.planningUnit.id) === String(row.planningUnit.id)
+          (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
         );
-        const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+        const planBasedOn = matrixRow
+          ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
+          : row.planningUnit?.planBasedOn ?? 1;
         const mosDisplay =
-          planBasedOn === 2
-            ? ""
+          planBasedOn == 2
+            ? "-"
             : row.mos != null
-              ? formatterMOS(roundAMC(row.mos), 1)
-              : i18n.t("static.supplyPlanFormula.na");
+            ? formatterMOS(roundAMC(row.mos), 1)
+            : i18n.t("static.supplyPlanFormula.na");
 
         B.push(
           addDoubleQuoteToRowContent([
-            moment(row.month).format("MMM YYYY").replaceAll(" ", "%20"),
+            moment(row.month).format("MMM YY").replaceAll(" ", "%20"),
             (
               getLabelText(row.planningUnit.label, this.state.lang) +
               " | " +
@@ -1538,12 +2066,12 @@ export default class StockStatusMatrix extends React.Component {
    * Get error message from error response
    */
   getErrorMessage = (error) => {
-    if (error.message === "Network Error") {
+    if (error.message == "Network Error") {
       return API_URL.includes("uat")
         ? i18n.t("static.common.uatNetworkErrorMessage")
         : API_URL.includes("demo")
-          ? i18n.t("static.common.demoNetworkErrorMessage")
-          : i18n.t("static.common.prodNetworkErrorMessage");
+        ? i18n.t("static.common.demoNetworkErrorMessage")
+        : i18n.t("static.common.prodNetworkErrorMessage");
     }
     switch (error.response?.status) {
       case 401:
@@ -1564,10 +2092,10 @@ export default class StockStatusMatrix extends React.Component {
   destroyJExcel(divId) {
     try {
       jexcel(document.getElementById(divId), "");
-    } catch (_) { }
+    } catch (_) {}
     try {
       jexcel.destroy(document.getElementById(divId), true);
-    } catch (_) { }
+    } catch (_) {}
   }
 
   processApiData(stockStatusMatrix, stockStatusDetails) {
@@ -1649,18 +2177,18 @@ export default class StockStatusMatrix extends React.Component {
         row.planningUnit.id;
       const puId = row.planningUnit.id;
       const planBy =
-        row.planBasedOn === 1
+        row.planBasedOn == 1
           ? i18n.t("static.report.mos")
           : i18n.t("static.report.qty");
       const minMax =
-        row.planBasedOn === 1
+        row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
-            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-            0
-          )}`
+              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+              0
+            )}`
           : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
-            Math.round(row.maxStock || 0)
-          )}`;
+              Math.round(row.maxStock || 0)
+            )}`;
 
       const dataCells = monthColumns.map((dateKey) => {
         const entry = (row.dataMap || {})[dateKey];
@@ -1680,8 +2208,9 @@ export default class StockStatusMatrix extends React.Component {
     });
 
     const monthCols = monthColumns.map((dateKey) => ({
-      title: moment(dateKey).format("MMM YYYY"),
+      title: moment(dateKey).format("MMM YY"),
       type: "numeric",
+      mask: "#,##0",
       width: 72,
       readOnly: true,
       align: "center",
@@ -1693,6 +2222,7 @@ export default class StockStatusMatrix extends React.Component {
         type: "text",
         width: 230,
         readOnly: true,
+        align: "left",
       },
       {
         title: i18n.t("static.stockStatus.plannedBy"),
@@ -1712,6 +2242,7 @@ export default class StockStatusMatrix extends React.Component {
         type: "text",
         width: 140,
         readOnly: true,
+        align: "left",
       },
       { title: "puId", type: "hidden" },
     ];
@@ -1743,7 +2274,7 @@ export default class StockStatusMatrix extends React.Component {
           (r) => r[col] !== null && r[col] !== "" && r[col] !== undefined
         );
         const na = rows.filter(
-          (r) => r[col] === null || r[col] === "" || r[col] === undefined
+          (r) => r[col] == null || r[col] == "" || r[col] == undefined
         );
         if (na.length > 0) worksheet.setData([...nonNa, ...na]);
       },
@@ -1755,7 +2286,7 @@ export default class StockStatusMatrix extends React.Component {
       allowExport: false,
       position: "top",
       onclick: (worksheet, section, x, y) => {
-        if (section === "cell" && x === 0) {
+        if (section == "cell" && x == 0) {
           const rowData = tableRows[y] || [];
           const puId = rowData[rowData.length - 1];
           if (puId) {
@@ -1777,8 +2308,14 @@ export default class StockStatusMatrix extends React.Component {
         const td = cell && cell.element ? cell.element : cell;
         if (!td || !td.style) return;
 
-        if (col === 0 && row >= 0) {
+        if (col == 0 && row >= 0) {
           td.style.cursor = "pointer";
+          td.style.setProperty("text-align", "left", "important");
+          return;
+        }
+
+        if (col == monthEndIdx + 1 && row >= 0) {
+          td.style.setProperty("text-align", "left", "important");
           return;
         }
 
@@ -1794,10 +2331,10 @@ export default class StockStatusMatrix extends React.Component {
         const bgColor = colorForStatus(statusId);
 
         const textColor =
-          bgColor === "#BA0C2F" || bgColor === "#118b70" ? "#fff" : "#333";
+          bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#333";
         const fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
-        if (value === null || value === "" || value === undefined) {
+        if (value == null || value == "" || value == undefined) {
           td.innerHTML = "N/A";
         }
 
@@ -1811,7 +2348,7 @@ export default class StockStatusMatrix extends React.Component {
           ) {
             const warningIcon = document.createElement("i");
             warningIcon.className = "fa fa-exclamation-triangle warning-icon";
-            warningIcon.style.color = "#ED8944";
+            warningIcon.style.color = textColor;
             warningIcon.style.marginRight = "5px";
             td.prepend(warningIcon);
           }
@@ -1822,7 +2359,7 @@ export default class StockStatusMatrix extends React.Component {
           ) {
             const truckIcon = document.createElement("i");
             truckIcon.className = "fa fa-truck truck-icon";
-            truckIcon.style.color = "#ba0c2f";
+            truckIcon.style.color = textColor;
             truckIcon.style.marginRight = "5px";
             td.prepend(truckIcon);
           }
@@ -1831,17 +2368,20 @@ export default class StockStatusMatrix extends React.Component {
         if (entry) {
           const tips = [];
           tips.push(
-            `${i18n.t("static.report.stock")}: ${entry.closingBalance != null
-              ? formatter(Math.round(entry.closingBalance))
-              : 0
+            `${i18n.t("static.report.stock")}: ${
+              entry.closingBalance != null
+                ? formatter(Math.round(entry.closingBalance))
+                : 0
             }`
           );
           tips.push(
-            `${i18n.t("static.stockStatusMatrix.totalShipmentQty")}: ${entry.shipmentQty != null ? formatter(entry.shipmentQty) : 0
+            `${i18n.t("static.stockStatusMatrix.totalShipmentQty")}: ${
+              entry.shipmentQty != null ? formatter(entry.shipmentQty) : 0
             }`
           );
           tips.push(
-            `${i18n.t("static.supplyPlan.expiredQty")}: ${entry.expiredQty != null ? formatter(entry.expiredQty) : 0
+            `${i18n.t("static.supplyPlan.expiredQty")}: ${
+              entry.expiredQty != null ? formatter(entry.expiredQty) : 0
             }`
           );
           td.title = tips.join(" | ");
@@ -1859,19 +2399,19 @@ export default class StockStatusMatrix extends React.Component {
   loadedMatrix(instance) {
     jExcelLoadedFunctionWithoutPagination(instance);
     try {
-      const currentMonthLabel = moment().format("MMM YYYY");
+      const currentMonthLabel = moment().format("MMM YY");
       const table = instance.element || instance;
       const ths = table.querySelectorAll("thead tr td");
       ths.forEach((th) => {
         if (
-          (th.innerText || th.textContent || "").trim() === currentMonthLabel
+          (th.innerText || th.textContent || "").trim() == currentMonthLabel
         ) {
           th.classList.add("supplyplan-Thead");
           th.style.cssText +=
             "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
         }
       });
-    } catch (_) { }
+    } catch (_) {}
   }
 
   // ─── Table 2: Stock Status Detail ────────────────────────────────────────────
@@ -1894,18 +2434,18 @@ export default class StockStatusMatrix extends React.Component {
         STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
       ).label;
       const matrixRow = this.state.filteredMatrix.find(
-        (r) => String(r.planningUnit.id) === String(row.planningUnit.id)
+        (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
 
       const mosValue =
-        planBasedOn === 2 ? "" : row.mos != null ? roundAMC(row.mos) : null;
+        planBasedOn == 2 ? "" : row.mos != null ? roundAMC(row.mos) : null;
 
       return [
-        moment(row.month).format("MMM YYYY"),
+        moment(row.month).format("MMM YY"),
         getLabelText(row.planningUnit.label, lang) +
-        " | " +
-        row.planningUnit.id,
+          " | " +
+          row.planningUnit.id,
         row.consumptionQty != null ? Math.round(row.consumptionQty) : null,
         row.amc != null ? Math.round(row.amc) : null,
         row.closingBalance != null ? Math.round(row.closingBalance) : null,
@@ -1977,26 +2517,25 @@ export default class StockStatusMatrix extends React.Component {
       const tbody = el.querySelector && el.querySelector("tbody");
       if (!tbody) return;
       const trs = tbody.querySelectorAll("tr");
-      console.log("Trs Test@123", trs);
       trs.forEach((tr, visibleRowOffset) => {
         const absoluteRowIdx = pageIndex * pageSize + visibleRowOffset;
         const rowData = tableRows[absoluteRowIdx];
         if (!rowData) return;
 
-        const isActualStock = rowData[8] === "1";
-        const isActualConsumption = rowData[9] === "1";
+        const isActualStock = rowData[8] == "1";
+        const isActualConsumption = rowData[9] == "1";
         const planBasedOn = Number(rowData[10]);
         const statusId = Number(rowData[7]);
         const bgColor = colorForStatus(statusId);
         const textColor =
-          bgColor === "#BA0C2F" || bgColor === "#118b70" ? "#fff" : "#000";
+          bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#000";
 
         const tds = tr.querySelectorAll("td");
         tds.forEach((td) => {
           const col = Number(td.getAttribute("data-x"));
           if (isNaN(col)) return;
 
-          if (col === 2) {
+          if (col == 2) {
             if (!td.textContent.trim()) td.innerHTML = "N/A";
             td.setAttribute(
               "style",
@@ -2007,21 +2546,21 @@ export default class StockStatusMatrix extends React.Component {
             return;
           }
 
-          if (col === 3) {
+          if (col == 3) {
             if (!td.textContent.trim()) td.innerHTML = "N/A";
             return;
           }
 
-          if (col === 4) {
+          if (col == 4) {
             if (!td.textContent.trim()) td.innerHTML = "N/A";
             if (isActualStock)
               td.setAttribute("style", "font-weight: bold !important;");
             return;
           }
 
-          if (col === 5) {
-            if (planBasedOn === 2) {
-              td.innerHTML = "";
+          if (col == 5) {
+            if (planBasedOn == 2) {
+              td.innerHTML = "-";
               td.style.cssText = "";
               return;
             }
@@ -2031,7 +2570,7 @@ export default class StockStatusMatrix extends React.Component {
             return;
           }
 
-          if (col === 6) {
+          if (col == 6) {
             td.setAttribute(
               "style",
               `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important;`
@@ -2100,15 +2639,17 @@ export default class StockStatusMatrix extends React.Component {
     lang
   ) => {
     const progDetails = (filteredDetails || []).filter(
-      (d) => String(d.programId) === String(progId)
+      (d) => String(d.programId) == String(progId)
     );
     if (!progDetails.length) return null;
 
     const isDarkMode = document.body.classList.contains("dark-mode");
     const backgroundColor1 = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
 
-    const allMonths = [...new Set((progDetails || []).map((d) => d.month))].sort();
-    const labels = allMonths.map((m) => moment(m).format("MMM YYYY"));
+    const allMonths = [
+      ...new Set((progDetails || []).map((d) => d.month)),
+    ].sort();
+    const labels = allMonths.map((m) => moment(m).format("MMM YY"));
 
     const byPU = {};
     progDetails.forEach((d) => {
@@ -2120,29 +2661,29 @@ export default class StockStatusMatrix extends React.Component {
         };
 
       const matrixRow = filteredMatrix.find(
-        (r) => String(r.planningUnit.id) === String(id)
+        (r) => String(r.planningUnit.id) == String(id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
-      const isQty = showQuantity || planBasedOn === 2;
+      const isQty = showQuantity || planBasedOn == 2;
 
       const val = isQty
         ? d.closingBalance != null
           ? Math.round(d.closingBalance)
           : null
         : d.mos != null
-          ? roundAMC(d.mos)
-          : null;
+        ? roundAMC(d.mos)
+        : null;
       byPU[id].data[d.month] = val;
     });
 
     const puKeys = Object.keys(byPU);
     const datasets = puKeys.map((id, index) => {
       const matrixRow = (filteredMatrix || []).find(
-        (r) => String(r.planningUnit.id) === String(id)
+        (r) => String(r.planningUnit.id) == String(id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
       const yAxisID =
-        showQuantity || planBasedOn === 1 ? "y-axis-1" : "y-axis-2";
+        showQuantity || planBasedOn == 1 ? "y-axis-1" : "y-axis-2";
 
       return {
         type: "line",
@@ -2152,6 +2693,7 @@ export default class StockStatusMatrix extends React.Component {
         label: byPU[id].label,
         data: allMonths.map((m) => byPU[id].data[m] ?? null),
         borderColor: backgroundColor1[index % backgroundColor1.length],
+        borderWidth: 4,
         spanGaps: false,
         yAxisID: yAxisID,
       };
@@ -2169,8 +2711,10 @@ export default class StockStatusMatrix extends React.Component {
     const isDarkMode = document.body.classList.contains("dark-mode");
     const backgroundColor1 = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
 
-    const allMonths = [...new Set((filteredDetails || []).map((d) => d.month))].sort();
-    const labels = allMonths.map((m) => moment(m).format("MMM YYYY"));
+    const allMonths = [
+      ...new Set((filteredDetails || []).map((d) => d.month)),
+    ].sort();
+    const labels = allMonths.map((m) => moment(m).format("MMM YY"));
 
     const byPU = {};
     filteredDetails.forEach((d) => {
@@ -2182,32 +2726,32 @@ export default class StockStatusMatrix extends React.Component {
         };
 
       const matrixRow = filteredMatrix.find(
-        (r) => String(r.planningUnit.id) === String(id)
+        (r) => String(r.planningUnit.id) == String(id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
-      const isQty = showQuantity || planBasedOn === 2;
+      const isQty = showQuantity || planBasedOn == 2;
 
       const val = isQty
         ? d.closingBalance != null
           ? Math.round(d.closingBalance)
           : null
         : d.mos != null
-          ? roundAMC(d.mos)
-          : null;
+        ? roundAMC(d.mos)
+        : null;
       byPU[id].data[d.month] = val;
     });
 
     const puKeys = Object.keys(byPU);
     const datasets = puKeys.map((id, index) => {
       const matrixRow = filteredMatrix.find(
-        (r) => String(r.planningUnit.id) === String(id)
+        (r) => String(r.planningUnit.id) == String(id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
       const yAxisID = showQuantity
         ? "y-axis-1"
-        : planBasedOn === 2
-          ? "y-axis-2"
-          : "y-axis-1";
+        : planBasedOn == 2
+        ? "y-axis-2"
+        : "y-axis-1";
 
       return {
         type: "line",
@@ -2217,6 +2761,7 @@ export default class StockStatusMatrix extends React.Component {
         label: byPU[id].label,
         data: allMonths.map((m) => byPU[id].data[m] ?? null),
         borderColor: backgroundColor1[index % backgroundColor1.length],
+        borderWidth: 4,
         spanGaps: false,
         yAxisID: yAxisID,
       };
@@ -2248,7 +2793,7 @@ export default class StockStatusMatrix extends React.Component {
       `${i18n.t("static.report.minMosOrQty")}/${i18n.t(
         "static.report.maxMosOrQty"
       )}`,
-      ...monthColumns.map((d) => moment(d).format("MMM YYYY")),
+      ...monthColumns.map((d) => moment(d).format("MMM YY")),
       i18n.t("static.program.notes"),
     ];
     const A = [
@@ -2258,14 +2803,14 @@ export default class StockStatusMatrix extends React.Component {
     ];
     filteredMatrix.forEach((row) => {
       const minMax =
-        row.planBasedOn === 1
+        row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-            0
-          )}`
+              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+              0
+            )}`
           : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-            Math.round(row.maxStock || 0)
-          )}`;
+              Math.round(row.maxStock || 0)
+            )}`;
       A.push(
         addDoubleQuoteToRowContent([
           (
@@ -2275,7 +2820,7 @@ export default class StockStatusMatrix extends React.Component {
           )
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
-          row.planBasedOn === 1
+          row.planBasedOn == 1
             ? i18n.t("static.report.mos")
             : i18n.t("static.report.qty"),
           minMax,
@@ -2285,7 +2830,7 @@ export default class StockStatusMatrix extends React.Component {
               ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
               : null;
             if (raw == null) return i18n.t("static.supplyPlanFormula.na");
-            return showQuantity || row.planBasedOn === 2
+            return showQuantity || row.planBasedOn == 2
               ? formatter(raw)
               : formatterMOS(raw, 2);
           }),
@@ -2320,20 +2865,20 @@ export default class StockStatusMatrix extends React.Component {
         STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
       ).label;
       const matrixRow = this.state.filteredMatrix.find(
-        (r) => String(r.planningUnit.id) === String(row.planningUnit.id)
+        (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
 
       const mosDisplay =
-        planBasedOn === 2
+        planBasedOn == 2
           ? ""
           : row.mos != null
-            ? formatterMOS(roundAMC(row.mos), 1)
-            : i18n.t("static.supplyPlanFormula.na");
+          ? formatterMOS(roundAMC(row.mos), 1)
+          : i18n.t("static.supplyPlanFormula.na");
 
       B.push(
         addDoubleQuoteToRowContent([
-          moment(row.month).format("MMM YYYY").replaceAll(" ", "%20"),
+          moment(row.month).format("MMM YY").replaceAll(" ", "%20"),
           (
             getLabelText(row.planningUnit.label, lang) +
             " | " +
@@ -2428,19 +2973,19 @@ export default class StockStatusMatrix extends React.Component {
     );
     const body1 = filteredMatrix.map((row) => {
       const minMax =
-        row.planBasedOn === 1
+        row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
-            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-            0
-          )}`
+              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+              0
+            )}`
           : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
-            Math.round(row.maxStock || 0)
-          )}`;
+              Math.round(row.maxStock || 0)
+            )}`;
       return [
         getLabelText(row.planningUnit.label, lang) +
-        " | " +
-        row.planningUnit.id,
-        row.planBasedOn === 1
+          " | " +
+          row.planningUnit.id,
+        row.planBasedOn == 1
           ? i18n.t("static.report.mos")
           : i18n.t("static.report.qty"),
         minMax,
@@ -2450,7 +2995,7 @@ export default class StockStatusMatrix extends React.Component {
             ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
             : null;
           if (raw == null) return i18n.t("static.supplyPlanFormula.na");
-          return showQuantity || row.planBasedOn === 2
+          return showQuantity || row.planBasedOn == 2
             ? formatter(raw)
             : formatterMOS(raw, 2);
         }),
@@ -2471,7 +3016,7 @@ export default class StockStatusMatrix extends React.Component {
       columnStyles: { 0: { cellWidth: 100 } },
       didParseCell(data) {
         if (
-          data.section === "body" &&
+          data.section == "body" &&
           data.column.index >= 3 &&
           data.column.index < 3 + monthColumns.length
         ) {
@@ -2494,7 +3039,7 @@ export default class StockStatusMatrix extends React.Component {
     ];
     const colorMap2 = filteredDetails.map((r) => {
       const matrixRow = this.state.filteredMatrix.find(
-        (m) => String(m.planningUnit.id) === String(r.planningUnit.id)
+        (m) => String(m.planningUnit.id) == String(r.planningUnit.id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
       return { bgColor: colorForStatus(r.stockStatusId), planBasedOn };
@@ -2505,17 +3050,17 @@ export default class StockStatusMatrix extends React.Component {
       ).label;
       const planBasedOn = colorMap2[idx].planBasedOn;
       const mosDisplay =
-        planBasedOn === 2
+        planBasedOn == 2
           ? ""
           : row.mos != null
-            ? formatterMOS(roundAMC(row.mos), 1)
-            : i18n.t("static.supplyPlanFormula.na");
+          ? formatterMOS(roundAMC(row.mos), 1)
+          : i18n.t("static.supplyPlanFormula.na");
 
       return [
-        moment(row.month).format("MMM YYYY"),
+        moment(row.month).format("MMM YY"),
         getLabelText(row.planningUnit.label, lang) +
-        " | " +
-        row.planningUnit.id,
+          " | " +
+          row.planningUnit.id,
         row.consumptionQty != null
           ? formatter(Math.round(row.consumptionQty))
           : "",
@@ -2540,13 +3085,13 @@ export default class StockStatusMatrix extends React.Component {
       },
       columnStyles: { 1: { cellWidth: 130 } },
       didParseCell(data) {
-        if (data.section === "body") {
-          if (data.column.index === 6) {
+        if (data.section == "body") {
+          if (data.column.index == 6) {
             data.cell.styles.fillColor =
               colorMap2[data.row.index]?.bgColor || "#cfcdc9";
           }
           if (
-            data.column.index === 5 &&
+            data.column.index == 5 &&
             colorMap2[data.row.index]?.planBasedOn !== 2
           ) {
             data.cell.styles.fillColor =
@@ -2588,7 +3133,7 @@ export default class StockStatusMatrix extends React.Component {
             }))
             .sort((a, b) =>
               getLabelText(a.label, lang).toUpperCase() >
-                getLabelText(b.label, lang).toUpperCase()
+              getLabelText(b.label, lang).toUpperCase()
                 ? 1
                 : -1
             );
@@ -2613,7 +3158,7 @@ export default class StockStatusMatrix extends React.Component {
           const lang = this.state.lang;
           const list = (res.data.planningUnitList || []).sort((a, b) =>
             getLabelText(a.label, lang).toUpperCase() >
-              getLabelText(b.label, lang).toUpperCase()
+            getLabelText(b.label, lang).toUpperCase()
               ? 1
               : -1
           );
@@ -2659,7 +3204,7 @@ export default class StockStatusMatrix extends React.Component {
     const programId = document.getElementById("programId").value;
     const versionId = document.getElementById("versionId")?.value ?? "0";
     const planningUnitIds = this.state.planningUnitValues.map((e) =>
-      e.value.toString()
+      Number(e.value)
     );
     const { from, to } = this.state.rangeValue;
     const startDate = `${from.year}-${String(from.month).padStart(2, "0")}-01`;
@@ -2716,15 +3261,16 @@ export default class StockStatusMatrix extends React.Component {
 
             (planningUnitIds || []).forEach((puId) => {
               const puItem = (this.state.planningUnits || []).find(
-                (p) => String(p.id || p.value) === puId
+                (p) => String(p.id || p.value) == puId
               );
+              console.log("this.state.planningUnits", this.state.planningUnits);
               const puActualLabel = puItem
                 ? puItem.label
                 : { label_en: String(puId) };
 
               const puSettings =
                 (this.state.planningUnits || []).find(
-                  (p) => String(p.value) === puId
+                  (p) => String(p.value) == puId
                 ) || {};
               const minMos = puSettings.json?.minMonthsOfStock || 5;
               const reorderFreq =
@@ -2753,7 +3299,7 @@ export default class StockStatusMatrix extends React.Component {
               );
 
               let maxStock;
-              if (planBasedOn === 2) {
+              if (planBasedOn == 2) {
                 maxStock = calcAverageMaxStock(
                   inRangeEntries,
                   minStock,
@@ -2771,17 +3317,17 @@ export default class StockStatusMatrix extends React.Component {
                 const mos = useWps
                   ? sp.mosWps
                   : useWtbd
-                    ? sp.mosWtbdps
-                    : sp.mos;
+                  ? sp.mosWtbdps
+                  : sp.mos;
                 const cb = useWps
                   ? sp.closingBalanceWps
                   : useWtbd
-                    ? sp.closingBalanceWtbdps
-                    : sp.closingBalance;
+                  ? sp.closingBalanceWtbdps
+                  : sp.closingBalance;
                 const amc = sp.amc;
 
                 let statusId;
-                if (planBasedOn === 1) {
+                if (planBasedOn == 1) {
                   statusId = calcStatusIdLocal(mos, minMos, reorderFreq);
                 } else {
                   const dynamicMax =
@@ -2789,25 +3335,25 @@ export default class StockStatusMatrix extends React.Component {
                   statusId =
                     cb == null
                       ? -1
-                      : cb === 0
-                        ? 0
-                        : cb < minStock
-                          ? 1
-                          : cb > dynamicMax
-                            ? 3
-                            : 2;
+                      : cb == 0
+                      ? 0
+                      : cb < minStock
+                      ? 1
+                      : cb > dynamicMax
+                      ? 3
+                      : 2;
                 }
 
                 const shipmentQty = useWps
                   ? sp.shipmentTotalQtyWps
                   : useWtbd
-                    ? sp.shipmentTotalQtyWtbdps
-                    : sp.shipmentTotalQty;
+                  ? sp.shipmentTotalQtyWtbdps
+                  : sp.shipmentTotalQty;
                 const expiredQty = useWps
                   ? sp.expiredStockWps
                   : useWtbd
-                    ? sp.expiredStockWtbdps
-                    : sp.expiredStock;
+                  ? sp.expiredStockWtbdps
+                  : sp.expiredStock;
 
                 dataMap[sp.transDate] = {
                   mos,
@@ -2856,13 +3402,13 @@ export default class StockStatusMatrix extends React.Component {
           stopDate: endDate,
           planningUnitIds,
           stockStatusConditions: this.state.stockStatusValues.map((e) =>
-            String(e.value)
+            Number(e.value)
           ),
           removePlannedShipments: this.state.removePlannedShipments
             ? 1
             : this.state.removeTBDFundingSourceShipments
-              ? 2
-              : 0,
+            ? 2
+            : 0,
           fundingSourceIds: [],
           procurementAgentIds: [],
           showByQty: this.state.showQuantity,
@@ -2896,13 +3442,13 @@ export default class StockStatusMatrix extends React.Component {
                 const statusId =
                   cb == null
                     ? -1
-                    : cb === 0
-                      ? 0
-                      : cb < minStock
-                        ? 1
-                        : cb > dynamicMax
-                          ? 3
-                          : 2;
+                    : cb == 0
+                    ? 0
+                    : cb < minStock
+                    ? 1
+                    : cb > dynamicMax
+                    ? 3
+                    : 2;
                 updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
               });
 
@@ -2933,13 +3479,13 @@ export default class StockStatusMatrix extends React.Component {
               filteredDetails: [],
               loading: false,
             });
-            if (error.message === "Network Error") {
+            if (error.message == "Network Error") {
               this.setState({
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                    ? i18n.t("static.common.demoNetworkErrorMessage")
-                    : i18n.t("static.common.prodNetworkErrorMessage"),
+                  ? i18n.t("static.common.demoNetworkErrorMessage")
+                  : i18n.t("static.common.prodNetworkErrorMessage"),
               });
             } else {
               switch (error.response?.status) {
@@ -2976,7 +3522,7 @@ export default class StockStatusMatrix extends React.Component {
         filteredDetails: [],
         loading: false,
       });
-    } else if (planningUnitIds.length === 0) {
+    } else if (planningUnitIds.length == 0) {
       this.setState({
         message: i18n.t("static.procurementUnit.validPlanningUnitText"),
         filteredMatrix: [],
@@ -2996,7 +3542,7 @@ export default class StockStatusMatrix extends React.Component {
   // ─── Program / version loading ────────────────────────────────────────────────
 
   getPrograms = () => {
-    if (localStorage.getItem("sessionType") === "Online") {
+    if (localStorage.getItem("sessionType") == "Online") {
       DropdownService.getSPProgramBasedOnRealmId(
         AuthenticationService.getRealmId()
       )
@@ -3075,7 +3621,7 @@ export default class StockStatusMatrix extends React.Component {
       this.setState({ versions: [] });
       return;
     }
-    if (localStorage.getItem("sessionType") === "Online") {
+    if (localStorage.getItem("sessionType") == "Online") {
       this.setState({ versions: [] }, () => {
         DropdownService.getVersionListForSPProgram(programId)
           .then((res) =>
@@ -3204,13 +3750,13 @@ export default class StockStatusMatrix extends React.Component {
         {item.versionStatus?.id == 2 && item.versionType?.id == 2
           ? item.versionId + "**"
           : item.versionType?.id == 2
-            ? item.versionId + "*"
-            : item.versionId}{" "}
+          ? item.versionId + "*"
+          : item.versionId}{" "}
         ({moment(item.createdDate).format("MMM DD YYYY")})
         {item.cutOffDate
           ? ` (${i18n.t("static.supplyPlan.start")} ${moment(
-            item.cutOffDate
-          ).format("MMM YYYY")})`
+              item.cutOffDate
+            ).format("MMM YYYY")})`
           : ""}
       </option>
     ));
@@ -3227,8 +3773,8 @@ export default class StockStatusMatrix extends React.Component {
       hasQty = false;
     } else {
       if (filteredMatrix) {
-        hasQty = filteredMatrix.some((r) => r.planBasedOn === 2);
-        hasMOS = filteredMatrix.some((r) => r.planBasedOn === 1);
+        hasQty = filteredMatrix.some((r) => r.planBasedOn == 2);
+        hasMOS = filteredMatrix.some((r) => r.planBasedOn == 1);
       }
     }
 
@@ -3341,8 +3887,8 @@ export default class StockStatusMatrix extends React.Component {
           usePointStyle: true,
           fontColor,
           fontSize: 12,
-          boxWidth: 9,
-          boxHeight: 2,
+          boxWidth: 15,
+          boxHeight: 4,
         },
       },
     };
@@ -3396,6 +3942,16 @@ export default class StockStatusMatrix extends React.Component {
                 <FormGroup className="col-md-3">
                   <Label>
                     {i18n.t("static.report.dateRange")}
+                    <i
+                      className="fa fa-info-circle icons"
+                      title={i18n.t("static.report.reportPeriodTooltip")}
+                      aria-hidden="true"
+                      style={{
+                        color: "#002f6c",
+                        cursor: "pointer",
+                        marginLeft: "5px",
+                      }}
+                    ></i>
                     <span className="stock-box-icon fa fa-sort-desc ml-1"></span>
                   </Label>
                   <div className="controls edit">
@@ -3448,7 +4004,19 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
-                  <Label>{i18n.t("static.report.versionFinal*")}</Label>
+                  <Label>
+                    {i18n.t("static.report.versionFinal*")}{" "}
+                    <i
+                      className="fa fa-info-circle icons"
+                      title={i18n.t("static.report.versionTooltip")}
+                      aria-hidden="true"
+                      style={{
+                        color: "#002f6c",
+                        cursor: "pointer",
+                        marginLeft: "5px",
+                      }}
+                    ></i>
+                  </Label>
                   <div className="controls">
                     <InputGroup>
                       <Input
@@ -3522,7 +4090,7 @@ export default class StockStatusMatrix extends React.Component {
                   </div>
                 </FormGroup>
 
-                <FormGroup className="col-md-3">
+                <FormGroup className="col-md-3 mt-3">
                   <div className="controls form-check">
                     <Input
                       className="form-check-input"
@@ -3541,6 +4109,18 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removePlannedShipments"
                     >
                       {i18n.t("static.report.removePlannedShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removePlannedShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -3561,11 +4141,23 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removeTBDFundingSourceShipments"
                     >
                       {i18n.t("static.report.removeTBDFundingSourceShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removeTBDFundingSourceShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
 
-                <FormGroup className="col-md-3">
+                <FormGroup className="col-md-3 mt-3">
                   <div className="controls form-check">
                     <Input
                       className="form-check-input"
@@ -3585,6 +4177,16 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showQuantity">
                       {i18n.t("static.report.showQuantity")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showQuantityTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -3601,6 +4203,16 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showIcon">
                       {i18n.t("static.report.showIcon")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showIconTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
@@ -3626,18 +4238,18 @@ export default class StockStatusMatrix extends React.Component {
                         <li>
                           <span
                             className="fa fa-truck legendcolor"
-                            style={{ color: "#ba0c2f" }}
+                            style={{ color: "#000" }}
                           ></span>
-                          <span className="legendcommitversionText">
+                          <span className="">
                             {i18n.t("static.shipment.shipment")}
                           </span>
                         </li>
                         <li>
                           <span
                             className="fa fa-exclamation-triangle legendcolor"
-                            style={{ color: "#ED8944" }}
+                            style={{ color: "#000" }}
                           ></span>
-                          <span className="legendcommitversionText">
+                          <span className="">
                             {i18n.t("static.supplyplan.exipredStock")}
                           </span>
                         </li>
@@ -3732,7 +4344,7 @@ export default class StockStatusMatrix extends React.Component {
                   !this.state.loading &&
                   this.state.planningUnitValues.length > 0 && (
                     <h5 className="red mt-3">
-                      {i18n.t("static.shipmentDetails.noData")}
+                      {i18n.t("static.stockStatusMatrix.noData")}
                     </h5>
                   )}
               </div>
@@ -3742,7 +4354,7 @@ export default class StockStatusMatrix extends React.Component {
                   className="modalHeaderSupplyPlan"
                 >
                   <strong>
-                    {this.state.exportType === 1
+                    {this.state.exportType == 1
                       ? i18n.t("static.supplyPlan.exportAsPDF")
                       : i18n.t("static.supplyPlan.exportAsCsv")}
                   </strong>
@@ -3750,7 +4362,9 @@ export default class StockStatusMatrix extends React.Component {
                 <ModalBody>
                   <div className="row mb-1">
                     <div className="col-md-4">
-                      <Label className="mb-0">{i18n.t("static.program.program")}</Label>
+                      <Label className="mb-0">
+                        {i18n.t("static.program.program")}
+                      </Label>
                     </div>
                     <div className="col-md-8 text-right">
                       <FormGroup check inline className="mb-0">
@@ -3773,14 +4387,14 @@ export default class StockStatusMatrix extends React.Component {
                       options={
                         this.state.onlyDownloadedPrograms
                           ? this.state.downloadedPrograms.map((p) => ({
-                            value: p.programId,
-                            label: p.displayLabel,
-                            versionId: p.versionId,
-                          }))
+                              value: p.programId,
+                              label: p.displayLabel,
+                              versionId: p.versionId,
+                            }))
                           : this.state.allProgramsForExport.map((p) => ({
-                            value: p.programId,
-                            label: p.programCode,
-                          }))
+                              value: p.programId,
+                              label: p.programCode,
+                            }))
                       }
                       value={this.state.exportProgramIds}
                       onChange={this.handleExportProgramChange}
@@ -3795,7 +4409,7 @@ export default class StockStatusMatrix extends React.Component {
                   </FormGroup>
 
                   {!this.state.onlyDownloadedPrograms &&
-                    this.state.exportProgramIds.length === 1 && (
+                    this.state.exportProgramIds.length == 1 && (
                       <FormGroup>
                         <Label>{i18n.t("static.report.version")}</Label>
                         <Input
@@ -3824,13 +4438,15 @@ export default class StockStatusMatrix extends React.Component {
                     <MultiSelect
                       name="exportPlanningUnitIds"
                       id="exportPlanningUnitIds"
-                      options={(this.state.planningUnitsForExport || []).map((p) => ({
-                        value: p.value || p.id,
-                        label:
-                          getLabelText(p.label, this.state.lang) +
-                          " | " +
-                          (p.value || p.id),
-                      }))}
+                      options={(this.state.planningUnitsForExport || []).map(
+                        (p) => ({
+                          value: p.value || p.id,
+                          label:
+                            getLabelText(p.label, this.state.lang) +
+                            " | " +
+                            (p.value || p.id),
+                        })
+                      )}
                       value={this.state.exportPlanningUnitIds}
                       onChange={this.handleExportPlanningUnitChange}
                       filterOptions={filterOptions}
@@ -3847,7 +4463,7 @@ export default class StockStatusMatrix extends React.Component {
                   {this.state.exportProgramIds.length > 0 &&
                     this.state.exportPlanningUnitIds.length > 0 &&
                     (!this.state.onlyDownloadedPrograms &&
-                      this.state.exportProgramIds.length === 1
+                    this.state.exportProgramIds.length == 1
                       ? this.state.exportVersionId
                       : true) && (
                       <Button
@@ -3905,10 +4521,7 @@ export default class StockStatusMatrix extends React.Component {
                   );
                   if (!cData) return null;
                   return (
-                    <div
-                      key={idx}
-                      style={{ width: "800px", height: "400px" }}
-                    >
+                    <div key={idx} style={{ width: "800px", height: "400px" }}>
                       <Line
                         id={`export-chart-${prog.value}`}
                         data={cData}
