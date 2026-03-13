@@ -3680,14 +3680,14 @@ class ApplicationDashboard extends Component {
                     <thead>
                       {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">{i18n.t("static.common.action")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                       <th scope="col">{i18n.t("static.common.programAndProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope='col'>Latest Version <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.activePlanningUnits")}</th>
                       <th scope="col">{i18n.t("static.dashboard.stockoutPUs")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
-                      <th scope="col" width="125px">Stock Status Score</th>
-                      <th scope="col" width="125px">Quality Score</th>
-                      <th scope="col" width="125px">Overall Score</th>
+                      <th scope="col" width="125px">Quality Score <i class="fa fa-info-circle icons" title="This score represents the average percent compliance across all data quality metrics - forecasted consumption, actual consumption, actual inventory, and shipments. Supply plans that are more complete and up‑to‑date earn higher scores." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">Stock Status Score <i class="fa fa-info-circle icons" title="This score reflects the average number of months in which all planning units are Stocked to Plan. Supply plans that adhere to MIN/MAX parameters and remain Stocked to Plan earn higher scores." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">Overall Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.totalExpiriesCost")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope='col' width="125px">{i18n.t("static.dashboard.openQATProblems")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
-                      <th scope='col'>{i18n.t("static.dashboard.uploadedDate")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope='col'>{i18n.t("static.dashboard.reviewStatus")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                     </thead>
                     <tbody>
@@ -3700,8 +3700,9 @@ class ApplicationDashboard extends Component {
                               {localStorage.getItem('sessionType') === 'Online' && <><i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;</>}
                               {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                             </td>}
-                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
-                            {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
+                            <td scope="row">{d.program.code}​</td>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{"v" + d.program.version}{d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​ {"(" + moment(d.commitDate).format('MMM DD, YYYY') + ")"}</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{"v" + d.versionId}{d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​ {"(" + moment(d.commitDate).format('MMM DD, YYYY') + ")"}</td>}
                             <td>
                               {d.activePlanningUnits}
                             </td>
@@ -3720,22 +3721,21 @@ class ApplicationDashboard extends Component {
                               </div>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(d.stockStatusScore) <= 70 ? '#f48521' : Math.round(d.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round(d.stockStatusScore)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.supplyPlanQualityScore) ? '#999' : Math.round(d.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(d.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.supplyPlanQualityScore) ? "NaN" : Math.round(d.supplyPlanQualityScore)}{"%"}</b>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(d.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(d.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round(d.supplyPlanQualityScore)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.stockStatusScore) ? '#999' : Math.round(d.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(d.stockStatusScore) <= 70 ? '#f48521' : Math.round(d.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.stockStatusScore) ? "NaN" : Math.round(d.stockStatusScore)}{"%"}</b>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 35 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 70 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? '#999' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 35 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 70 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? "NaN" : Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
                             </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                             {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
-                            <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? ("v"+d.program.version+" - "+getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? ("v"+d.versionId+" - "+getLabelText(d.latestFinalVersionStatus.label, this.state.lang)) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? ("v"+d.program.version+" - "+getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? ("v"+d.versionId+" - "+getLabelText(d.latestFinalVersionStatus.label, this.state.lang)) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('MMM DD, YYYY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('MMM DD, YYYY') + ") " : "")}</a>
                               {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                             </td>
                           </tr>)
@@ -3911,14 +3911,14 @@ class ApplicationDashboard extends Component {
                     <div className={'col-md-3'}>
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> Overall Supply Plan Score <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> Overall Supply Plan Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
                         <div class="card-body scrollable-content d-flex flex-column justify-content-center">
                           <div className='row' style={{ height: '180px' }}>
                             <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
                           </div>
                           <div className="text-center" style={{ marginTop: '10px' }}>
-                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: overallScoreValue <= 35 ? "#BA0C2F" : overallScoreValue <= 70 ? "#f48521" : overallScoreValue < 100 ? "#edba26" : "#118b70" }}>{Math.round(overallScoreValue)}%</h3>
+                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: isNaN(overallScoreValue) ? "#999" : overallScoreValue <= 35 ? "#BA0C2F" : overallScoreValue <= 70 ? "#f48521" : overallScoreValue < 100 ? "#edba26" : "#118b70" }}>{isNaN(overallScoreValue) ? "NaN" : Math.round(overallScoreValue)}%</h3>
                           </div>
                         </div>
                       </div>
@@ -3929,8 +3929,8 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
                             <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
-                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.stockStatusScore) ? '#999' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.stockStatusScore) ? "NaN" : Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b>
                             </i>
                           </div>
                         </div>
@@ -4003,8 +4003,8 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
                             <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
-                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? '#999' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 35 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 70 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 99 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? "NaN" : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b>
                             </i>
                           </div>
                         </div>

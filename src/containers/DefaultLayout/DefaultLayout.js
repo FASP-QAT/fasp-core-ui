@@ -1904,6 +1904,17 @@ class DefaultLayout extends Component {
                                 }
                               }
                             },
+                            {
+                              name: "Supply Plan Scorecard",
+                              url: '/report/supplyPlanScorecard',
+                              icon: 'fa fa-file-text',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
                           ]
                         },
                         {
