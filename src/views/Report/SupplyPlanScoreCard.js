@@ -231,7 +231,8 @@ class SupplyPlanScoreCard extends Component {
       large: false,
       loadingForNotes: false,
       notesTransTableEl: "",
-      supplyPlanScoreThresholdPerc: 0
+      supplyPlanScoreThresholdPerc: 0,
+      loading: false
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -479,7 +480,6 @@ class SupplyPlanScoreCard extends Component {
    * Retrieves the list of countries based on the realm ID and updates the state with the list.
    */
   getCountrys() {
-    this.setState({ loading: true })
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       DropdownService.getRealmCountryDropdownList(realmId)
@@ -555,7 +555,6 @@ class SupplyPlanScoreCard extends Component {
   }
   
   getHealthAreaList() {
-    this.setState({ loading: true })
     if (localStorage.getItem("sessionType") === 'Online') {
       let realmId = AuthenticationService.getRealmId();
       ProgramService.getHealthAreaListByRealmCountryIds(this.state.countrys.map(ele => (ele.id).toString()))
@@ -878,6 +877,7 @@ class SupplyPlanScoreCard extends Component {
   }
 
   fetchData = () => {
+    this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online' && !this.state.onlyDownloadedProgram) {
       var dt = new Date();
       dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
@@ -897,7 +897,8 @@ class SupplyPlanScoreCard extends Component {
               ...item,
               stockStatusScore: item.stockStatusScore * 100,
               supplyPlanQualityScore: item.supplyPlanQualityScore * 100
-            }))
+            })),
+            loading: false
           }, () => {
             this.buildJexcel();
           })
@@ -905,7 +906,7 @@ class SupplyPlanScoreCard extends Component {
         ).catch(
           error => {
             this.setState({
-              bottomSubmitLoader: true,
+              loading: false,
             })
             if (error.message === "Network Error") {
               this.setState({
@@ -979,7 +980,8 @@ class SupplyPlanScoreCard extends Component {
                         this.setState({ 
                             dashboardBottomData: firstDbd, 
                             dashboardBottomDataList: results,
-                            countryExpandedMap: newExpandedMap
+                            countryExpandedMap: newExpandedMap,
+                            loading: false
                         }, () => {
                             this.buildJexcel();
                         });
@@ -988,10 +990,12 @@ class SupplyPlanScoreCard extends Component {
             });
         }.bind(this)
     }.bind(this)
+    this.setState({ loading: false });
     }
   }
 
   buildJexcel = () => {
+    this.setState({ loading: true });
     let scorecardTableDiv = document.getElementById("scorecardTableDiv");
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
     
@@ -1011,6 +1015,8 @@ class SupplyPlanScoreCard extends Component {
     let isCountryView = String(this.state.viewBy) === '1';
     let isMatrixView = String(this.state.viewBy) === '2';
     let data = [];
+    var userBytes = CryptoJS.AES.decrypt(localStorage.getItem('curUser'), SECRET_KEY);
+    var userId = userBytes.toString(CryptoJS.enc.Utf8);
     const list = this.state.dashboardBottomDataList || [];
 
     let matrixCols = [];
@@ -1140,11 +1146,12 @@ class SupplyPlanScoreCard extends Component {
                         dbd.versionNotes || '',
                         'row_child',
                         cg.key,
-                        this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
+                        this.state.onlyDownloadedProgram ? (dbd.program.id + "_v" + (dbd.versionId ? dbd.versionId : (dbd.program.version ? dbd.program.version : '0')) + "_uId_" + userId) : dbd.program.id
                     ]);
                 });
             }
         });
+        this.setState({ loading: false });
     } else {
         const sortedList = [...list].sort((a, b) => (a.program?.code || '').localeCompare(b.program?.code || ''));
         sortedList.forEach(dbd => {
@@ -1170,9 +1177,10 @@ class SupplyPlanScoreCard extends Component {
                 dbd.versionNotes || '',
                 'program',
                 '',
-                this.state.onlyDownloadedProgram ? dbd.programId : dbd.program.id
+                this.state.onlyDownloadedProgram ? (dbd.program.id + "_v" + (dbd.versionId ? dbd.versionId : (dbd.program.version ? dbd.program.version : '0')) + "_uId_" + userId) : dbd.program.id
             ]);
         });
+        this.setState({ loading: false });
     }
 
     const reapplyFormatting = (instance) => {
@@ -1358,6 +1366,60 @@ class SupplyPlanScoreCard extends Component {
             }
 
             const activePUsValue = Number(rowData[3]) || 0;
+
+            // Add clickable links to scorecard columns
+            const clickableCols = [3, 4, 5, 6, 7, 8, 9, 10, 11];
+            for (let c of clickableCols) {
+                const cell = tr.querySelector(`td[data-x="${c}"]`);
+                if (!cell) continue;
+
+                if (rowType === 'row_child' || rowType === 'program') {
+                    const programId = rowData[rowData.length - 1]; // ProgramId is always the last item
+                    if (programId) {
+                        cell.style.setProperty('cursor', 'pointer', 'important');
+                        cell.onclick = (e) => {
+                            e.stopPropagation();
+                            const cleanProgramId = programId.toString().split("_")[0];
+                            localStorage.setItem("sesProgramId", programId);
+                            localStorage.setItem("sesProgramIdReport", cleanProgramId);
+                            localStorage.setItem("sesVersionIdReport", -1);
+                            localStorage.setItem("sesVersionId", -1);
+                            
+                            const roleList = AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole().map(r => r.roleId) : [];
+                            const isReportViewer = roleList.includes('ROLE_REPORT_VIEWER') || roleList.includes('ROLE_REPORTS_VIEWER');
+
+                            switch (c) {
+                                case 3: // Active PUs
+                                    localStorage.setItem("sesForecastProgramIdReport", cleanProgramId);
+                                    localStorage.setItem("sesForecastVersionIdReport", -1);
+                                    this.props.history.push(`/programProduct/addProgramProduct/${cleanProgramId}/''/''`);
+                                    break;
+                                case 4: // Forecasted Consumption
+                                case 5: // Actual Consumption
+                                    this.props.history.push('/report/consumptionForecastErrorSupplyPlan');
+                                    break;
+                                case 6: // Actual Inventory
+                                case 9: // Stock Status
+                                    this.props.history.push('/report/stockStatusMatrix');
+                                    break;
+                                case 7: // Shipments
+                                    this.props.history.push('/shipment/shipmentDetails');
+                                    break;
+                                case 8: // Quality Score
+                                case 10: // Stock Status Score
+                                case 11: // Total Score
+                                    if (!isReportViewer) {
+                                        this.props.history.push(`/report/problemList/1/${programId}/false`);
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        };
+                    }
+                }
+            }
+
             for (let c = 4; c <= 7; c++) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
@@ -1608,6 +1670,7 @@ class SupplyPlanScoreCard extends Component {
 
                     toolbarRow.insertBefore(container, toolbarRow.firstChild);
                 }
+                this.setState({ loading: false });
             }, 100);
         });
     }
@@ -2575,7 +2638,7 @@ class SupplyPlanScoreCard extends Component {
                           </div>
                         </FormGroup>}
                         {!this.state.onlyDownloadedProgram && <FormGroup className='col-md-3 FormGroupD'>
-                          <Label htmlFor="technicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
+                          <Label htmlFor="technicalAreaId">Technical Area</Label>
                           <MultiSelect
                               name="technicalAreaId"
                               id="technicalAreaId"
@@ -2633,7 +2696,7 @@ class SupplyPlanScoreCard extends Component {
                     </div>
                   
             
-            {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
+            {!this.state.loading && this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
               <>
                 <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
                   <Card>
@@ -2696,6 +2759,15 @@ class SupplyPlanScoreCard extends Component {
                 </div>
               </>
             )}
+            <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }} >
+                    <div class="align-items-center">
+                        <div ><h4> <strong>{i18n.t('static.loading.loading')}</strong></h4></div>
+                        <div class="spinner-border blue ml-4" role="status">
+                        </div>
+                    </div>
+                </div>
+            </div>
             <Modal isOpen={this.state.large} toggle={this.toggleLarge} className={'modal-xl ' + this.props.className}>
               <ModalHeader toggle={this.toggleLarge}>{i18n.t('static.problemContext.transDetails')}</ModalHeader>
               <ModalBody>
