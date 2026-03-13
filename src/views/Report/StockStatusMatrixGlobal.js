@@ -79,8 +79,10 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
  */
 function buildPdfIconCache() {
   return {
-    truck:   renderFaIconToDataUrl("\uf0d1", "#BA0C2F", 28),
-    warning: renderFaIconToDataUrl("\uf071", "#ED8944", 28),
+    truckBlack:   renderFaIconToDataUrl("\uf0d1", "#000", 28),
+    truckWhite:   renderFaIconToDataUrl("\uf0d1", "#fff", 28),
+    warningBlack: renderFaIconToDataUrl("\uf071", "#000", 28),
+    warningWhite: renderFaIconToDataUrl("\uf071", "#fff", 28),
   };
 }
 
@@ -310,6 +312,88 @@ class StockStatusMatrixGlobal extends Component {
                 );
             }
         };
+        const drawFirstPageFilterInfo = (doc, startY, isDrawing) => {
+            let y = startY;
+            let leftMargin = doc.internal.pageSize.width / 8;
+            let contentWidth = doc.internal.pageSize.width * 3 / 4;
+            let pageHeight = doc.internal.pageSize.height;
+            const writeWrappedText = (text) => {
+                let lines = doc.splitTextToSize(text, contentWidth);
+                lines.forEach(line => {
+                    if (y + 15 > pageHeight - 60) {
+                        if (isDrawing) doc.addPage();
+                        y = 100;
+                    }
+                    if (isDrawing) {
+                        doc.text(line, leftMargin, y);
+                    }
+                    y += 15;
+                });
+            };
+
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "normal");
+            if (isDrawing) doc.setTextColor(0);
+
+            writeWrappedText(i18n.t("static.report.dateRange") + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to));
+            writeWrappedText(i18n.t("static.program.realmcountry") + " : " + (this.state.countryLabels ? this.state.countryLabels.join("; ") : ""));
+            writeWrappedText(i18n.t("static.program.program") + " : " + (this.state.programLabels ? this.state.programLabels.join("; ") : ""));
+            if (this.state.programValues.length == 1) {
+                writeWrappedText(i18n.t("static.report.version") + " : " + this.state.versionLabel);
+            }
+            writeWrappedText(i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')));
+            writeWrappedText(i18n.t("static.report.planningUnit") + " : " + (this.state.planningUnitLabels ? this.state.planningUnitLabels.join("; ") : ""));
+            writeWrappedText(i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : ""));
+            writeWrappedText("Show by : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity')));
+            writeWrappedText(i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeWrappedText(i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeWrappedText("Aggregate Countries : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeWrappedText("Hide Icons : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+
+            y += 5;
+            const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
+                ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
+                : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
+
+            doc.setFont("helvetica", "bold");
+            if (isDrawing) doc.setTextColor("#002f6c");
+            writeWrappedText(reportTitle);
+
+            y += 10;
+            if (isDrawing) {
+                if (y + 20 > pageHeight - 60) {
+                    doc.addPage();
+                    y = 100;
+                }
+                legendcolor.forEach((item, index) => {
+                    doc.setDrawColor(0);
+                    doc.setFillColor(item.color);
+                    doc.rect(leftMargin + (index * 90), y, 12, 12, "F");
+                    doc.setTextColor(0);
+                    doc.setFont("helvetica", "normal");
+                    doc.setFontSize(8);
+                    doc.text(item.text, leftMargin + (index * 90) + 15, y + 10);
+                });
+                
+                if (iconCache.truckBlack) {
+                    doc.addImage(iconCache.truckBlack.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 2, ICON_PT, ICON_PT);
+                }
+                doc.setTextColor(0);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 90), y + 10);
+                
+                if (iconCache.warningBlack) {
+                    doc.addImage(iconCache.warningBlack.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
+                }
+                doc.setTextColor(0);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.text(i18n.t('static.supplyPlan.expiry'), leftMargin + (5 * 90) + 106, y + 10);
+            }
+            return { y: y + 25, page: doc.internal.getNumberOfPages() };
+        };
+
         const addHeaders = (doc) => {
             const pageCount = doc.internal.getNumberOfPages();
             for (var i = 1; i <= pageCount; i++) {
@@ -327,136 +411,7 @@ class StockStatusMatrixGlobal extends Component {
                     }
                 );
                 if (i == 1) {
-                    doc.setFontSize(8);
-                    doc.setFont("helvetica", "normal");
-                    doc.text(
-                        i18n.t("static.report.dateRange") +
-                        " : " +
-                        makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to),
-                        doc.internal.pageSize.width / 8,
-                        105,
-                        {
-                            align: "left",
-                        }
-                    );
-                    doc.text(
-                        i18n.t("static.program.realmcountry") +
-                        " : " +
-                        this.state.countryLabels.join("; "),
-                        doc.internal.pageSize.width / 8,
-                        120,
-                        {
-                            align: "left",
-                        }
-                    );
-                    doc.text(
-                        i18n.t("static.program.program") +
-                        " : " +
-                        this.state.programLabels.join("; "),
-                        doc.internal.pageSize.width / 8,
-                        135,
-                        {
-                            align: "left",
-                        }
-                    );
-                    if (this.state.programValues.length == 1) {
-                        doc.text(
-                            i18n.t("static.report.version") + " : " + this.state.versionLabel,
-                            doc.internal.pageSize.width / 8,
-                            150,
-                            { align: "left" }
-                        );
-                    }
-                    doc.text(
-                        i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')),
-                        doc.internal.pageSize.width / 8,
-                        165,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        i18n.t("static.report.planningUnit") + " : " + this.state.planningUnitLabels.join("; "),
-                        doc.internal.pageSize.width / 8,
-                        180,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        i18n.t("static.report.withinstock") + " : " + this.state.stockStatusValues.map(ele => ele.label).join("; "),
-                        doc.internal.pageSize.width / 8,
-                        195,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        "Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.quantity')),
-                        doc.internal.pageSize.width / 8,
-                        210,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
-                        doc.internal.pageSize.width / 8,
-                        225,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
-                        doc.internal.pageSize.width / 8,
-                        240,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        "Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
-                        doc.internal.pageSize.width / 8,
-                        255,
-                        { align: "left" }
-                    );
-                    doc.text(
-                        "Hide Icons" + " : " + (this.state.hideIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')),
-                        doc.internal.pageSize.width / 8,
-                        270,
-                        { align: "left" }
-                    );
-
-                    const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
-                        ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
-                        : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
-
-                    doc.setFont("helvetica", "bold");
-                    doc.setTextColor("#002f6c");
-                    doc.text(
-                        reportTitle,
-                        doc.internal.pageSize.width / 8,
-                        290,
-                        { align: "left" }
-                    );
-                    doc.setFont("helvetica", "normal");
-                    doc.setTextColor(0);
-
-                    let y = 315;
-                    legendcolor.forEach((item, index) => {
-                        doc.setDrawColor(0);
-                        doc.setFillColor(item.color);
-                        doc.rect(doc.internal.pageSize.width / 8 + (index * 90), y, 12, 12, "F");
-                        doc.setTextColor(0);
-                        doc.setFont("helvetica", "normal");
-                        doc.setFontSize(8);
-                        doc.text(item.text, doc.internal.pageSize.width / 8 + (index * 90) + 15, y + 10);
-                    });
-                    
-                    if (iconCache.truck) {
-                        doc.addImage(iconCache.truck.dataUrl, 'PNG', doc.internal.pageSize.width / 8 + (5 * 90) - 15, y + 2, ICON_PT, ICON_PT);
-                    }
-                    doc.setTextColor(0);
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(8);
-                    doc.text(i18n.t('static.shipment.shipment'), doc.internal.pageSize.width / 8 + (5 * 90), y + 10);
-                    
-                    if (iconCache.warning) {
-                        doc.addImage(iconCache.warning.dataUrl, 'PNG', doc.internal.pageSize.width / 8 + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
-                    }
-                    doc.setTextColor(0);
-                    doc.setFont("helvetica", "normal");
-                    doc.setFontSize(8);
-                    doc.text(i18n.t('static.supplyPlan.expiry'), doc.internal.pageSize.width / 8 + (5 * 90) + 110, y + 10);
+                    // drawFirstPageFilterInfo is now called before autoTable to ensure correct page sequence
                 }
             }
         };
@@ -541,9 +496,11 @@ class StockStatusMatrixGlobal extends Component {
             });
         });
 
+        const { y: dynamicStartY, page: dynamicStartPage } = drawFirstPageFilterInfo(doc, 105, true);
+        doc.setPage(dynamicStartPage);
         doc.autoTable({
             margin: { top: 80, bottom: 50 },
-            startY: 360,
+            startY: dynamicStartY,
             head: header,
             body: data,
             styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
@@ -553,32 +510,51 @@ class StockStatusMatrixGlobal extends Component {
             },
             didParseCell: function (data) {
                 if (data.section === 'body' && data.column.index >= colOffset) {
-                    let color = dataColor[data.row.index][data.column.index - colOffset];
-                    data.cell.styles.fillColor = color;
-                    data.cell.styles.textColor = '#000';
+                    if (dataColor && dataColor[data.row.index] && dataIcons && dataIcons[data.row.index]) {
+                        const colIdx = data.column.index - colOffset;
+                        let color = dataColor[data.row.index][colIdx];
+                        if (color) {
+                            data.cell.styles.fillColor = color;
+                            data.cell.styles.textColor = (color === '#BA0C2F' || color === '#118b70') ? '#fff' : '#000';
+                        }
 
-                    let icons = dataIcons[data.row.index][data.column.index - colOffset];
-                    let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
-                    let rightPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
-                    data.cell.styles.halign = 'right';
-                    data.cell.styles.cellPadding = { left: 2, right: rightPad, top: 2, bottom: 2 };
+                        let icons = dataIcons[data.row.index][colIdx];
+                        if (icons) {
+                            let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                            let rightPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
+                            data.cell.styles.halign = 'right';
+                            data.cell.styles.cellPadding = { left: 2, right: rightPad, top: 2, bottom: 2 };
+                        }
+                    }
                 }
             },
             didDrawCell: function (data) {
                 if (data.section === 'body' && data.column.index >= colOffset) {
-                    let icons = dataIcons[data.row.index][data.column.index - colOffset];
-                    if (icons.hasShipment || icons.hasExpiry) {
-                        let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
-                        let totalIconWidth = iconCount * (ICON_PT + ICON_GAP) - ICON_GAP;
-                        let iconX = data.cell.x + data.cell.width - totalIconWidth - 3;
-                        const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
+                    if (dataIcons && dataIcons[data.row.index]) {
+                        const colIdx = data.column.index - colOffset;
+                        let icons = dataIcons[data.row.index][colIdx];
+                        if (icons && (icons.hasShipment || icons.hasExpiry)) {
+                            let iconCount = (icons.hasShipment ? 1 : 0) + (icons.hasExpiry ? 1 : 0);
+                            let totalIconWidth = iconCount * (ICON_PT + ICON_GAP) - ICON_GAP;
+                            let iconX = data.cell.x + data.cell.width - totalIconWidth - 3;
+                            const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
 
-                        if (icons.hasShipment && iconCache.truck) {
-                            doc.addImage(iconCache.truck.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
-                            iconX += ICON_PT + ICON_GAP;
-                        }
-                        if (icons.hasExpiry && iconCache.warning) {
-                            doc.addImage(iconCache.warning.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
+                            const bgColor = data.cell.styles.fillColor;
+                            const useWhite = (bgColor === '#BA0C2F' || bgColor === '#118b70');
+
+                            if (icons.hasShipment) {
+                                const truckIcon = useWhite ? iconCache.truckWhite : iconCache.truckBlack;
+                                if (truckIcon) {
+                                    doc.addImage(truckIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
+                                }
+                                iconX += ICON_PT + ICON_GAP;
+                            }
+                            if (icons.hasExpiry) {
+                                const warningIcon = useWhite ? iconCache.warningWhite : iconCache.warningBlack;
+                                if (warningIcon) {
+                                    doc.addImage(warningIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
+                                }
+                            }
                         }
                     }
                 }
@@ -1115,8 +1091,12 @@ class StockStatusMatrixGlobal extends Component {
                 filter: true
             });
         });
+        columns.push({
+            type: 'hidden',
+            title: 'rowIndex'
+        });
         let jexcelData = [];
-        dataList.forEach(item => {
+        dataList.forEach((item, index) => {
             let row = [];
             row.push(getLabelText(item.programOrCountry.label, this.state.lang));
             if (isEquUnitMode) {
@@ -1137,6 +1117,7 @@ class StockStatusMatrixGlobal extends Component {
                     row.push(i18n.t("static.supplyPlanFormula.na"));
                 }
             });
+            row.push(index);
             jexcelData.push(row);
         });
         jexcel.destroy(document.getElementById("shipmentJexcel"), true);
@@ -1153,24 +1134,39 @@ class StockStatusMatrixGlobal extends Component {
             allowExport: false,
             pagination: localStorage.getItem("sesRecordCount"),
             paginationOptions: JEXCEL_PAGINATION_OPTION,
-            license: JEXCEL_PRO_KEY,
+            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter,
             onload: function (instance) {
                 jExcelLoadedFunction(instance);
             },
-            onfilter: onOpenFilter,
+            onfilter: function (instance) {
+                this.refreshJexcel(instance);
+            }.bind(this),
+            onsort: function (instance) {
+                setTimeout(() => {
+                    this.refreshJexcel(instance);
+                }, 0);
+            }.bind(this),
+            onchangepage: function (instance, pageNo, oldPageNo) {
+                this.refreshJexcel(instance, pageNo);
+            }.bind(this),
             updateTable: function (instance, cell, col, row, val, label, cellName) {
-                if (col >= colOffset) {
+                if (cell && col >= colOffset && col < columns.length - 1) {
                     let date = sortedDates[col - colOffset];
-                    let dataEntry = (dataList[row] && dataList[row].dataMap) ? dataList[row].dataMap[date] : null;
+                    var rowData = instance.getRowData(row);
+                    var rowIndex = rowData[columns.length - 1];
+                    let dataEntry = (dataList[rowIndex] && dataList[rowIndex].dataMap) ? dataList[rowIndex].dataMap[date] : null;
+                    let textColor = '#000';
                     if (val == i18n.t("static.supplyPlanFormula.na")) {
                         cell.style.backgroundColor = '#cfcdc9';
                         cell.style.color = '#000';
+                        textColor = '#000';
                     } else if (dataEntry) {
                         let stockStatusId = dataEntry.stockStatusId;
                         let colorEntry = legendcolor.find(c => c.value === stockStatusId);
                         if (colorEntry) {
                             cell.style.backgroundColor = colorEntry.color;
-                            cell.style.color = '#000';
+                            textColor = (colorEntry.color === '#BA0C2F' || colorEntry.color === '#118b70') ? '#fff' : '#000';
+                            cell.style.color = textColor;
                         }
                     }
 
@@ -1178,10 +1174,10 @@ class StockStatusMatrixGlobal extends Component {
                         let innerHTML = val;
                         if (!this.state.hideIcons) {
                             if (dataEntry.shipmentQty > 0) {
-                                innerHTML += ' <i class="fa fa-truck" aria-hidden="true" style="color: #BA0C2F;" title="' + i18n.t('static.shipment.shipment') + ': ' + dataEntry.shipmentQty + '"></i>';
+                                innerHTML += ' <i class="fa fa-truck" aria-hidden="true" style="color: ' + textColor + ';" title="' + i18n.t('static.shipment.shipment') + ': ' + dataEntry.shipmentQty + '"></i>';
                             }
                             if (dataEntry.expiredQty > 0) {
-                                innerHTML += ' <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: #ED8944;" title="' + i18n.t('static.supplyPlan.expiry') + ': ' + dataEntry.expiredQty + '"></i>';
+                                innerHTML += ' <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: ' + textColor + ';" title="' + i18n.t('static.supplyPlan.expiry') + ': ' + dataEntry.expiredQty + '"></i>';
                             }
                         }
                         cell.innerHTML = innerHTML;
@@ -1189,6 +1185,33 @@ class StockStatusMatrixGlobal extends Component {
                 }
             }.bind(this)
         };
+        options.refreshJexcel = function (instance, pageNo) {
+            var elInstance = instance.worksheets ? instance.worksheets[0] : instance;
+            if (!elInstance || typeof elInstance.getJson !== 'function') return;
+            var json = elInstance.getJson(null, false);
+            var paginationDropdown = document.getElementsByClassName("jss_pagination_dropdown")[0];
+            var recordCount = paginationDropdown ? paginationDropdown.value : (localStorage.getItem("sesRecordCount") ? localStorage.getItem("sesRecordCount") : 15);
+            if (pageNo === undefined) {
+                pageNo = elInstance.page || 0;
+            }
+            var start = parseInt(pageNo) * parseInt(recordCount);
+            var end = start + parseInt(recordCount);
+            if (end > json.length) {
+                end = json.length;
+            }
+            var updateTableFunc = options.updateTable || (elInstance.config ? elInstance.config.updateTable : null);
+            if (typeof updateTableFunc !== 'function') return;
+            for (var y = start; y < end; y++) {
+                for (var x = colOffset; x < columns.length - 1; x++) {
+                    var cell = elInstance.getCell(x, y);
+                    if (cell) {
+                        var val = elInstance.getValueFromCoords(x, y);
+                        updateTableFunc(elInstance, cell, x, y, val);
+                    }
+                }
+            }
+        }.bind(this);
+        this.refreshJexcel = options.refreshJexcel;
         var shipmentJexcel = jexcel(document.getElementById("shipmentJexcel"), options);
         this.setState({ shipmentJexcel });
     }
@@ -1914,7 +1937,7 @@ class StockStatusMatrixGlobal extends Component {
                                                                 ))}
                                                                 <li>
                                                                     <span className="legendcolor" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                        <i className="fa fa-truck" aria-hidden="true" style={{ fontSize: '12px', color: '#BA0C2F' }}></i>
+                                                                        <i className="fa fa-truck" aria-hidden="true" style={{ fontSize: '12px', color: '#000' }}></i>
                                                                     </span>
                                                                     <span className="legendcommitversionText">
                                                                         {i18n.t('static.shipment.shipment')}
@@ -1922,7 +1945,7 @@ class StockStatusMatrixGlobal extends Component {
                                                                 </li>
                                                                 <li>
                                                                     <span className="legendcolor" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                                        <i className="fa fa-exclamation-triangle" aria-hidden="true" style={{ fontSize: '12px', color: '#ED8944' }}></i>
+                                                                        <i className="fa fa-exclamation-triangle" aria-hidden="true" style={{ fontSize: '12px', color: '#000' }}></i>
                                                                     </span>
                                                                     <span className="legendcommitversionText">
                                                                         {i18n.t('static.supplyPlan.expiry')}
