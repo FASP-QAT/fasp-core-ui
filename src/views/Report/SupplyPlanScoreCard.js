@@ -67,14 +67,14 @@ import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, forma
 import { Dashboard } from '../Dashboard/Dashboard.js';
 
 const targetLinePlugin = {
-    afterDraw: function(chart) {
+    beforeDatasetsDraw: function(chart) {
         if (!chart.scales['x-axis-0'] || !chart.scales['y-axis-0']) return;
         const ctx = chart.ctx;
         const xAxis = chart.scales['x-axis-0'];
         const yAxis = chart.scales['y-axis-0'];
         const datasets = chart.data.datasets;
 
-        // 1. Draw Target Line (Full width across chart)
+        // Draw Target Line (Full width across chart) - PRE-DATASET DRAW
         let targetDataset = null;
         let targetIndex = -1;
         for (let i = 0; i < datasets.length; i++) {
@@ -104,8 +104,14 @@ const targetLinePlugin = {
                 ctx.restore();
             }
         }
+    },
+    afterDatasetsDraw: function(chart) {
+        if (!chart.scales['x-axis-0'] || !chart.scales['y-axis-0']) return;
+        const ctx = chart.ctx;
+        const yAxis = chart.scales['y-axis-0'];
+        const datasets = chart.data.datasets;
 
-        // 2. Draw Total Score segments (Spanning the width of bars in each category)
+        // Draw Total Score segments (Spanning the width of bars in each category) - AFTER DRAW
         let totalDataset = null;
         let totalIndex = -1;
         for (let i = 0; i < datasets.length; i++) {
@@ -346,7 +352,7 @@ class SupplyPlanScoreCard extends Component {
    */
   redirectToSPVR(programId) {
     localStorage.setItem("sesProgramIdSPVR", programId.toString().split("_").length > 0 ? programId.toString().split("_")[0] : programId);
-    this.props.history.push('/report/supplyPlanVersionAndReview/1');
+    window.open(window.location.origin + "/#/report/supplyPlanVersionAndReview/1", '_blank');
   }
   /**
    * Toggles the visibility of the large modal.
@@ -1247,7 +1253,7 @@ class SupplyPlanScoreCard extends Component {
                     const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                     const value = parseInt(raw, 10);
                     if (!isNaN(value)) {
-                        let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                        let color = value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70';
                         cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                             <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
                             <span>${value}%</span>
@@ -1392,24 +1398,24 @@ class SupplyPlanScoreCard extends Component {
                                 case 3: // Active PUs
                                     localStorage.setItem("sesForecastProgramIdReport", cleanProgramId);
                                     localStorage.setItem("sesForecastVersionIdReport", -1);
-                                    this.props.history.push(`/programProduct/addProgramProduct/${cleanProgramId}/''/''`);
+                                    window.open(window.location.origin + `/#/programProduct/addProgramProduct/${cleanProgramId}/''/''`, '_blank');
                                     break;
                                 case 4: // Forecasted Consumption
                                 case 5: // Actual Consumption
-                                    this.props.history.push('/report/consumptionForecastErrorSupplyPlan');
+                                    window.open(window.location.origin + '/#/report/consumptionForecastErrorSupplyPlan', '_blank');
                                     break;
                                 case 6: // Actual Inventory
                                 case 9: // Stock Status
-                                    this.props.history.push('/report/stockStatusMatrix');
+                                    window.open(window.location.origin + '/#/report/stockStatusMatrix', '_blank');
                                     break;
                                 case 7: // Shipments
-                                    this.props.history.push('/shipment/shipmentDetails');
+                                    window.open(window.location.origin + '/#/shipment/shipmentDetails', '_blank');
                                     break;
                                 case 8: // Quality Score
                                 case 10: // Stock Status Score
                                 case 11: // Total Score
                                     if (!isReportViewer) {
-                                        this.props.history.push(`/report/problemList/1/${programId}/false`);
+                                        window.open(window.location.origin + `/#/report/problemList/1/${programId}/false`, '_blank');
                                     }
                                     break;
                                 default:
@@ -1449,7 +1455,7 @@ class SupplyPlanScoreCard extends Component {
                 const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                 const value = parseInt(raw, 10);
                 if (!isNaN(value)) {
-                    let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                    let color = value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70';
                     cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                             <span style="min-width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
                             <span>${value}%</span>
@@ -1699,7 +1705,7 @@ class SupplyPlanScoreCard extends Component {
    */
   renderScoreDot = (val) => {
     const pct = Math.round(val || 0);
-    const color = pct <= 35 ? '#BA0C2F' : pct <= 70 ? '#f48521' : pct <= 99 ? '#edba26' : '#118b70';
+    const color = pct <= 60 ? '#BA0C2F' : pct <= 75 ? '#f48521' : pct <= 90 ? '#edba26' : '#118b70';
     return (
       <span>
         <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', backgroundColor:color, marginRight:6, verticalAlign:'middle' }} />
@@ -1794,7 +1800,7 @@ class SupplyPlanScoreCard extends Component {
                 const raw = String(cell.innerText || '').replace(/%/g, '').trim();
                 const value = parseInt(raw, 10);
                 if (!isNaN(value)) {
-                    let color = value <= 35 ? '#BA0C2F' : value <= 70 ? '#f48521' : value <= 99 ? '#edba26' : '#118b70';
+                    let color = value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70';
                     cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                         <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
                         <span>${value}%</span>
@@ -1939,7 +1945,7 @@ class SupplyPlanScoreCard extends Component {
     const getScoreColor = (val) => {
         const pct = parseInt(String(val || '').replace(/%/g, ''), 10);
         if (isNaN(pct)) return null;
-        return pct <= 35 ? [186, 12, 47] : pct <= 70 ? [244, 133, 33] : pct <= 99 ? [237, 186, 38] : [17, 139, 112];
+        return pct <= 60 ? [186, 12, 47] : pct <= 75 ? [244, 133, 33] : pct <= 90 ? [237, 186, 38] : [17, 139, 112];
     };
 
     const addFooters = doc => {
@@ -2052,10 +2058,10 @@ class SupplyPlanScoreCard extends Component {
     doc.text('Scores:', legendX, y);
     lx = legendX + 45;
     var scoreLegendItems = [
-        { label: '0%-35%', color: [186, 12, 47] },
-        { label: '36%-70%', color: [244, 133, 33] },
-        { label: '71%-99%', color: [237, 186, 38] },
-        { label: '100%', color: [17, 139, 112] }
+        { label: '0%-60%', color: [186, 12, 47] },
+        { label: '61%-75%', color: [244, 133, 33] },
+        { label: '76%-90%', color: [237, 186, 38] },
+        { label: '91%-100%', color: [17, 139, 112] }
     ];
     doc.setFont('helvetica', 'normal');
     scoreLegendItems.forEach(item => {
@@ -2383,7 +2389,7 @@ class SupplyPlanScoreCard extends Component {
                 { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgQuality)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgStock)) },
-                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
+                { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
             ]
         };
     } else if (viewBy === '2') {
@@ -2480,8 +2486,8 @@ class SupplyPlanScoreCard extends Component {
                 {
                     type: 'line',
                     label: 'Target',
-                    borderColor: 'black',
-                    backgroundColor: 'black',
+                    borderColor: '#6C6463',
+                    backgroundColor: '#6C6463',
                     borderWidth: 4,
                     borderDash: [10, 5],
                     fill: false,
@@ -2511,7 +2517,7 @@ class SupplyPlanScoreCard extends Component {
                 { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: displayList.map(d => Math.round(((d.supplyPlanQualityScore || 0) + (d.stockStatusScore || 0)) / 2)) },
                 { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: displayList.map(d => Math.round(d.supplyPlanQualityScore || 0)) },
                 { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: displayList.map(d => Math.round(d.stockStatusScore || 0)) },
-                { type: 'line', label: 'Target', borderColor: 'black', backgroundColor: 'black', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
+                { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
             ]
         };
     }
@@ -2723,10 +2729,10 @@ class SupplyPlanScoreCard extends Component {
 
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Scores:</span>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-35%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>36%-70%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>71%-99%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>100%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-60%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>61%-75%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>76%-90%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>91%-100%</span></div>
                         </div>
 
                       </div>
