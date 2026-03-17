@@ -676,7 +676,7 @@ export default class UpdateDataSourceComponent extends Component {
                                                     <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="supplyPlanScoreThresholdPerc">{i18n.t('static.realm.supplyPlanScoreThresholdPerc')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="supplyPlanScoreThresholdPerc">Supply Plan Score Threshold (%)<span className="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
                                                         min="0"
                                                         name="supplyPlanScoreThresholdPerc"

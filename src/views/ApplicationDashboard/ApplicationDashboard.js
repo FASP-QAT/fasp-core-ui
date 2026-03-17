@@ -2857,7 +2857,7 @@ class ApplicationDashboard extends Component {
       aspectRatio: 2,
       layout: {
         padding: {
-          bottom: 25,
+          bottom: 10,
           left: 10,
           right: 10
         }
@@ -3914,13 +3914,13 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> Overall Supply Plan Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
                         <div class="card-body scrollable-content d-flex flex-column justify-content-center">
-                          <div className='row' style={{ height: '180px' }}>
+                          <div className='row'>
                             <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
                           </div>
-                          <div className="text-center" style={{ marginTop: '25px' }}>
+                          <div className="text-center" style={{ marginTop: '10px' }}>
                             <div style={{ fontSize: '13px', color: '#000', fontWeight: 'bold' }}>Overall Supply Plan Score:</div>
                             <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: isNaN(overallScoreValue) ? "#999" : overallScoreValue <= 60 ? "#BA0C2F" : overallScoreValue <= 75 ? "#f48521" : overallScoreValue <= 90 ? "#edba26" : "#118b70" }}>{isNaN(overallScoreValue) ? "NaN" : Math.round(overallScoreValue)}%</h3>
-                            <div className="d-flex justify-content-center flex-wrap" style={{ gap: '12px', marginTop: '8px' }}>
+                            <div className="d-flex justify-content-center flex-wrap" style={{ gap: '4px', marginTop: '8px' }}>
                               <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>0%-60%</span></div>
                               <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>61%-75%</span></div>
                               <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>76%-90%</span></div>
