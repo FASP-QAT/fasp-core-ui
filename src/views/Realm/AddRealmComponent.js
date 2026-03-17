@@ -601,7 +601,7 @@ export default class AddRealmComponent extends Component {
                                                     <FormFeedback className="red">{errors.noOfMonthsInFutureForBottomDashboard}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
-                                                    <Label for="supplyPlanScoreThresholdPerc">{i18n.t('static.realm.supplyPlanScoreThresholdPerc')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Label for="supplyPlanScoreThresholdPerc">Supply Plan Score Threshold (%)<span className="red Reqasterisk">*</span></Label>
                                                     <Input type="number"
                                                         name="supplyPlanScoreThresholdPerc"
                                                         id="supplyPlanScoreThresholdPerc"

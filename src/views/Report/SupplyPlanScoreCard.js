@@ -1408,7 +1408,7 @@ class SupplyPlanScoreCard extends Component {
                                     window.open(window.location.origin + '/#/report/stockStatusMatrix', '_blank');
                                     break;
                                 case 7: // Shipments
-                                    window.open(window.location.origin + '/#/shipment/shipmentDetails', '_blank');
+                                    window.open(window.location.origin + '/#/report/shipmentSummery', '_blank');
                                     break;
                                 case 8: // Quality Score
                                 case 10: // Stock Status Score
@@ -1884,6 +1884,8 @@ class SupplyPlanScoreCard extends Component {
         if (columns[c].type !== 'hidden') {
             // Skip the first column (toggle icon) in Country view as it's not needed in CSV
             if (String(this.state.viewBy) === '1' && c === 0) continue;
+            // Skip Stock Status column as it's visual and not useful in CSV
+            if ((columns[c].title || '').toString().replace(/<[^>]*>?/gm, '').trim() === 'Stock Status') continue;
             visibleIndexes.push(c);
         }
     }
@@ -1938,8 +1940,10 @@ class SupplyPlanScoreCard extends Component {
 
     // Helper: get score color
     const getScoreColor = (val) => {
-        const pct = parseInt(String(val || '').replace(/%/g, ''), 10);
-        if (isNaN(pct)) return null;
+        const strVal = String(val || '').replace(/%/g, '').trim();
+        if (strVal === '' || strVal.toLowerCase() === 'nan') return [207, 205, 201];
+        const pct = parseInt(strVal, 10);
+        if (isNaN(pct)) return [207, 205, 201];
         return pct <= 60 ? [186, 12, 47] : pct <= 75 ? [244, 133, 33] : pct <= 90 ? [237, 186, 38] : [17, 139, 112];
     };
 
@@ -2019,11 +2023,10 @@ class SupplyPlanScoreCard extends Component {
         console.warn('Could not export chart to PDF:', e);
     }
 
+    doc.addPage();
+    y = 80;
+
     // Draw legends
-    if (y > doc.internal.pageSize.height - 120) {
-        doc.addPage();
-        y = 80;
-    }
     var legendX = doc.internal.pageSize.width / 8;
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
@@ -2083,7 +2086,7 @@ class SupplyPlanScoreCard extends Component {
     }
 
     // Initialize autoTable rendering
-    const head = [visibleColIndexes.map(ci => (columns[ci].title || '').toString().replace(/<[^>]*>?/gm, ''))];
+    const head = [visibleColIndexes.map(ci => (columns[ci].title || '').toString().replace(/<[^>]*>?/gm, '').trim())];
     const body = allData.map(rowData => visibleColIndexes.map(ci => rowData[ci]));
     let foot = [];
     try {
@@ -2100,11 +2103,20 @@ class SupplyPlanScoreCard extends Component {
         startY: y,
         margin: { top: 80, bottom: 70 },
         styles: { lineWidth: 0.5, fontSize: 7, cellPadding: 3, overflow: 'linebreak', halign: 'center', valign: 'middle' },
-        headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', valign: 'middle' },
-        footStyles: { fillColor: [244, 244, 244], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center' },
+        headStyles: { fillColor: [0, 47, 108], textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center', valign: 'middle', minCellHeight: 20 },
+        footStyles: { fillColor: [244, 244, 244], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', valign: 'middle' },
         theme: 'grid',
         didParseCell: function (data) {
+            // Map visible column index back to original data column index
+            var origColIdx = visibleColIndexes[data.column.index];
+
+            // Left align specific columns: Technical Area/Toggle (0), Country/Program (1), Latest Version (2), Review Status (12), Version Notes (13)
+            if (origColIdx === 0 || origColIdx === 1 || origColIdx === 2 || origColIdx === 12 || origColIdx === 13) {
+                data.cell.styles.halign = 'left';
+            }
+
             if (data.section !== 'body') return;
+
             var tr = data.row.raw;
             var dataY;
             if (tr && typeof tr.getAttribute === 'function') {
@@ -2114,9 +2126,6 @@ class SupplyPlanScoreCard extends Component {
             }
             if (isNaN(dataY) || !allData[dataY]) return;
             
-            // Map visible column index back to original data column index
-            var origColIdx = visibleColIndexes[data.column.index];
-            if (origColIdx === undefined) return;
             var rowData = allData[dataY];
             var rowType = isMatrixView ? rowData[rowData.length - 2] : rowData[14];
 
@@ -2130,27 +2139,22 @@ class SupplyPlanScoreCard extends Component {
                 data.cell.styles.fillColor = [244, 244, 244];
                 data.cell.styles.fontStyle = 'bold';
             }
-
-            // Alignment: first column left
-            if (data.column.index === 0) {
-                data.cell.styles.halign = 'left';
-                if (rowType === 'row_child') {
-                    data.cell.styles.cellPadding = { top: 3, bottom: 3, left: 15, right: 3 };
-                }
-            }
-            // Latest Version (col idx 2), Review Status (12), Version Notes (13) -> left align
-            if (origColIdx === 2 || origColIdx === 12 || origColIdx === 13) {
-                data.cell.styles.halign = 'left';
+            
+            // Indent child programs in Country view
+            if (rowType === 'row_child' && origColIdx === 1) {
+                data.cell.styles.cellPadding = { top: 3, bottom: 3, left: 15, right: 3 };
             }
 
             // Score columns: set text color to match dot color
             if (!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) {
                 var sc = getScoreColor(rowData[origColIdx]);
                 if (sc) {
-                    data.cell.text = [(rowData[origColIdx] === null || rowData[origColIdx] === undefined) ? '' : String(rowData[origColIdx])];
+                    let cellTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'NaN%' : String(rowData[origColIdx]);
+                    if (!cellTxt.includes('%') && !cellTxt.toLowerCase().includes('nan')) cellTxt += '%';
+                    data.cell.text = [cellTxt];
                     data.cell.styles.textColor = [50, 50, 50]; // Dark text
                     data.cell.styles.fontStyle = 'bold';
-                    data.cell.styles.halign = 'left';
+                    data.cell.styles.halign = 'center';
                     data.cell.styles.cellPadding = { left: 16, right: 3, top: 3, bottom: 3 };
                 }
             }
@@ -2168,8 +2172,13 @@ class SupplyPlanScoreCard extends Component {
             if (isMatrixView && data.column.index > 0) {
                 var mc = getScoreColor(rowData[origColIdx]);
                 if (mc) {
-                    data.cell.styles.textColor = mc;
+                    let mTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'NaN%' : String(rowData[origColIdx]);
+                    if (!mTxt.includes('%') && !mTxt.toLowerCase().includes('nan')) mTxt += '%';
+                    data.cell.text = [mTxt];
+                    data.cell.styles.textColor = [50, 50, 50]; // Dark text
                     data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.halign = 'center';
+                    data.cell.styles.cellPadding = { left: 16, right: 3, top: 3, bottom: 3 };
                 }
             }
 
