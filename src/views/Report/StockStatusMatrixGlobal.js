@@ -258,17 +258,19 @@ class StockStatusMatrixGlobal extends Component {
                 }
             });
         });
-        Array.from(uniquePUs).sort().forEach(puId => {
-            let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
-            if (puObj) {
-                let labelText = getLabelText(puObj.label, this.state.lang);
-                csvRow.push(addDoubleQuoteToRowContent([puObj.id + " " + labelText]));
-            } else {
-                let parts = puId.split(' | ');
-                let formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
-                csvRow.push(addDoubleQuoteToRowContent([formattedStr]));
-            }
-        });
+        if(this.state.yaxisEquUnit != -1) {
+            Array.from(uniquePUs).sort().forEach(puId => {
+                let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
+                if (puObj) {
+                    let labelText = getLabelText(puObj.label, this.state.lang);
+                    csvRow.push(addDoubleQuoteToRowContent([puObj.id + " " + labelText]));
+                } else {
+                    let parts = puId.split(' | ');
+                    let formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
+                    csvRow.push(addDoubleQuoteToRowContent([formattedStr]));
+                }
+            });
+        }
 
         let csvString = csvRow.join("\r\n");
         let a = document.createElement("a");
@@ -351,14 +353,30 @@ class StockStatusMatrixGlobal extends Component {
             writeWrappedText(i18n.t('static.report.showIcon') + " : " + (this.state.showIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
 
             y += 5;
-            const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
-                ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
-                : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
+            let titleLabelText = "";
+            let titleValueText = "";
 
+            if (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1") {
+                titleLabelText = i18n.t("static.equivalancyUnit.equivalancyUnits") + " : ";
+                titleValueText = Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel;
+            } else {
+                titleLabelText = i18n.t("static.report.planningUnit") + " : ";
+                titleValueText = Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels;
+            }
+
+            // 2. Set font to bold and draw the label
             doc.setFont("helvetica", "bold");
             if (isDrawing) doc.setTextColor("#002f6c");
-            writeWrappedText(reportTitle);
+            doc.text(titleLabelText, leftMargin, y);
 
+            // 3. Calculate exactly how wide the bold label is
+            const labelWidth = doc.getTextWidth(titleLabelText);
+
+            // 4. Set font to normal and draw the value right next to the label
+            doc.setFont("helvetica", "normal");
+            if (isDrawing) doc.setTextColor("#002f6c");
+            doc.text(titleValueText, leftMargin + labelWidth, y);
+            
             y += 10;
             if (isDrawing) {
                 if (y + 20 > pageHeight - 60) {
@@ -589,26 +607,27 @@ class StockStatusMatrixGlobal extends Component {
                 }
             });
         });
-
-        Array.from(uniquePUs).sort().forEach((puId, index) => {
-            let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
-            let formattedStr = "";
-            if (puObj) {
-                formattedStr = puObj.id + " " + getLabelText(puObj.label, this.state.lang);
-            } else {
-                let parts = puId.split(' | ');
-                formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
-            }
-            
-            // Check for page overflow
-            if (finalY > doc.internal.pageSize.height - 50) {
-                doc.addPage();
-                finalY = 50;
-            }
-            
-            doc.text(formattedStr, doc.internal.pageSize.width / 8, finalY);
-            finalY += 15;
-        });
+        if(this.state.yaxisEquUnit != -1) {
+            Array.from(uniquePUs).sort().forEach((puId, index) => {
+                let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
+                let formattedStr = "";
+                if (puObj) {
+                    formattedStr = puObj.id + " " + getLabelText(puObj.label, this.state.lang);
+                } else {
+                    let parts = puId.split(' | ');
+                    formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
+                }
+                
+                // Check for page overflow
+                if (finalY > doc.internal.pageSize.height - 50) {
+                    doc.addPage();
+                    finalY = 50;
+                }
+                
+                doc.text(formattedStr, doc.internal.pageSize.width / 8, finalY);
+                finalY += 15;
+            });
+        }
         doc.setFont("helvetica", "normal");
         doc.setTextColor(0);
 
@@ -1078,12 +1097,29 @@ class StockStatusMatrixGlobal extends Component {
         });
         let sortedDates = Array.from(allDates).sort();
         let isEquUnitMode = this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1";
+        let maxCharLength = 0;
+        dataList.forEach(item => {
+            let label = getLabelText(item.programOrCountry.label, this.state.lang);
+            if (label && label.length > maxCharLength) {
+                maxCharLength = label.length;
+            }
+        });
+        let title = this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program');
+        if (title.length > maxCharLength) {
+            maxCharLength = title.length;
+        }
+
+        let dynamicWidth = maxCharLength * 8;
+        if (dynamicWidth < 100) dynamicWidth = 100;
+        if (dynamicWidth > 400) dynamicWidth = 400;
+
         let columns = [
             {
-                title: this.state.aggregateCountries ? i18n.t('static.dashboard.country') : i18n.t('static.dashboard.program'),
+                title: title,
                 type: 'text',
-                width: 200,
-                filter: true
+                width: dynamicWidth,
+                filter: true,
+                align: 'left'
             }
         ];
         if (isEquUnitMode) {
@@ -1153,7 +1189,10 @@ class StockStatusMatrixGlobal extends Component {
                     const currentMonthLabel = moment().format("MMM YY");
                     const table = instance.element || instance;
                     const ths = table.querySelectorAll("thead tr td");
-                    ths.forEach((th) => {
+                    ths.forEach((th, idx) => {
+                        if (idx == 1) {
+                            th.style.setProperty("text-align", "left", "important");
+                        }
                         if ((th.innerText || th.textContent || "").trim() == currentMonthLabel) {
                             th.classList.add("supplyplan-Thead");
                             th.style.cssText += "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
@@ -1947,11 +1986,17 @@ class StockStatusMatrixGlobal extends Component {
                                                 {this.state.table1Body.length > 0 &&
                                                 <CardBody className="pl-lg-1 pr-lg-1 pt-lg-0">
                                                     <div className="d-flex justify-content-start ml-2 p-1">
-                                                        <b style={{ color: '#002f6c' }}>
-                                                            {this.state.yaxisEquUnit != -1
-                                                                ? i18n.t("static.equivalancyUnit.equivalancyUnits") + ": " + this.state.yaxisEquUnitLabel
-                                                                : i18n.t("static.report.planningUnit") + ": " + this.state.planningUnitLabels.join(", ")}
-                                                        </b>
+                                                        <span style={{ color: '#002f6c' }}>
+                                                            {this.state.yaxisEquUnit != -1 ? (
+                                                                <>
+                                                                    <b>{i18n.t("static.equivalancyUnit.equivalancyUnits")}</b>: {this.state.yaxisEquUnitLabel}
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <b>{i18n.t("static.report.planningUnit")}</b>: {this.state.planningUnitLabels.join(", ")}
+                                                                </>
+                                                            )}
+                                                        </span>
                                                     </div>
                                                     <div style={{ position: 'relative' }}>
                                                         <div className="d-flex justify-content-start" style={{ position: 'absolute', left: '10px', top: '13px', zIndex: 100 }}>
@@ -1987,13 +2032,13 @@ class StockStatusMatrixGlobal extends Component {
                                                         </div>
                                                         <div id="shipmentJexcel" className='jexcelremoveReadonlybackground shipmentJexcel shipmentGlobalSearchRight' style={{ padding: '2px 8px' }}></div>
                                                     </div>
-                                                    <div className="mt-3 ml-2">
+                                                    {this.state.yaxisEquUnit != -1 && <div className="mt-3 ml-2">
                                                         <ul style={{ listStyleType: 'none', paddingLeft: 0, fontSize: '13px', color: '#002f6c' }}>
                                                             {sortedPUs.map((pu, index) => (
                                                                 <li key={index}><b>{pu.id}</b> {getLabelText(pu.label, this.state.lang)}</li>
                                                             ))}
                                                         </ul>
-                                                    </div>
+                                                    </div>}
                                                 </CardBody>
                                                 }
                                                 {this.state.noData && this.state.planningUnitId.length > 0 &&
