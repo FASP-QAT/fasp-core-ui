@@ -1887,7 +1887,7 @@ class SupplyPlanScoreCard extends Component {
             visibleIndexes.push(c);
         }
     }
-    var headerRow = visibleIndexes.map(idx => '"' + (columns[idx].title || '').toString().replaceAll(' ', '%20') + '"');
+    var headerRow = visibleIndexes.map(idx => '"' + (columns[idx].title || '').toString().replace(/<[^>]*>?/gm, '').replaceAll(' ', '%20') + '"');
     csvRow.push(headerRow.join(","));
 
     // Add table data
@@ -2083,7 +2083,7 @@ class SupplyPlanScoreCard extends Component {
     }
 
     // Initialize autoTable rendering
-    const head = [visibleColIndexes.map(ci => columns[ci].title)];
+    const head = [visibleColIndexes.map(ci => (columns[ci].title || '').toString().replace(/<[^>]*>?/gm, ''))];
     const body = allData.map(rowData => visibleColIndexes.map(ci => rowData[ci]));
     let foot = [];
     try {
