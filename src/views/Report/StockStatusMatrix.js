@@ -2402,7 +2402,7 @@ export default class StockStatusMatrix extends React.Component {
       const currentMonthLabel = moment().format("MMM YY");
       const table = instance.element || instance;
       const ths = table.querySelectorAll("thead tr td");
-      ths.forEach((th, idx) => {
+      ths.forEach((th) => {
         if (
           (th.innerText || th.textContent || "").trim() == currentMonthLabel
         ) {
