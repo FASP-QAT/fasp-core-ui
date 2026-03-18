@@ -1064,7 +1064,7 @@ class SupplyPlanScoreCard extends Component {
             const row = [ha];
             countryList.forEach(c => {
                 const s = scoresMap[ha][c];
-                row.push(s ? (!isNaN(s.sum / s.count) ? `${Math.round(s.sum / s.count)}%` : 'NaN%') : '');
+                row.push(s ? (!isNaN(s.sum / s.count) ? `${Math.round(s.sum / s.count)}%` : 'N/A') : '');
             });
             row.push('matrix_row');
             row.push('');
@@ -1093,9 +1093,18 @@ class SupplyPlanScoreCard extends Component {
             const sumActual = cg.programs.reduce((s,d)=>s+(d.actualConsumptionQpl?.correctCount||0),0);
             const sumInventory = cg.programs.reduce((s,d)=>s+(d.inventoryQpl?.correctCount||0),0);
             const sumShipments = cg.programs.reduce((s,d)=>s+(d.shipmentQpl?.correctCount||0),0);
-            const avgQ = n > 0 ? cg.programs.reduce((s,d)=>s+(d.supplyPlanQualityScore),0)/n : NaN;
-            const avgS = n > 0 ? cg.programs.reduce((s,d)=>s+(d.stockStatusScore),0)/n : NaN;
-            const avgT = (avgQ + avgS) / 2;
+            const qPrograms = cg.programs.filter(d => !isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null);
+            const avgQ = qPrograms.length > 0 ? qPrograms.reduce((s, d) => s + (d.supplyPlanQualityScore), 0) / qPrograms.length : NaN;
+            const sPrograms = cg.programs.filter(d => !isNaN(d.stockStatusScore) && d.stockStatusScore !== null);
+            const avgS = sPrograms.length > 0 ? sPrograms.reduce((s, d) => s + (d.stockStatusScore), 0) / sPrograms.length : NaN;
+            let avgT = NaN;
+            if (!isNaN(avgQ) && !isNaN(avgS)) {
+                avgT = (avgQ + avgS) / 2;
+            } else if (!isNaN(avgQ)) {
+                avgT = avgQ;
+            } else if (!isNaN(avgS)) {
+                avgT = avgS;
+            }
             
             const totalSO = cg.programs.reduce((s,d)=>s+(d.stockStatus?.stockOut||0),0);
             const totalUS = cg.programs.reduce((s,d)=>s+(d.stockStatus?.underStock||0),0);
@@ -1119,10 +1128,10 @@ class SupplyPlanScoreCard extends Component {
                 sumActual,
                 sumInventory,
                 sumShipments,
-                !isNaN(avgQ) ? `${Math.round(avgQ)}%` : 'NaN%',
+                !isNaN(avgQ) ? `${Math.round(avgQ)}%` : 'N/A',
                 `${soPerc},${usPerc},${adPerc},${ovPerc},${naPerc}`,
-                !isNaN(avgS) ? `${Math.round(avgS)}%` : 'NaN%',
-                !isNaN(avgT) ? `${Math.round(avgT)}%` : 'NaN%',
+                !isNaN(avgS) ? `${Math.round(avgS)}%` : 'N/A',
+                !isNaN(avgT) ? `${Math.round(avgT)}%` : 'N/A',
                 '-',
                 '-',
                 'row_parent',
@@ -1145,10 +1154,10 @@ class SupplyPlanScoreCard extends Component {
                         dbd.actualConsumptionQpl?.correctCount || 0,
                         dbd.inventoryQpl?.correctCount || 0,
                         dbd.shipmentQpl?.correctCount || 0,
-                        !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'NaN%',
+                        !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'N/A',
                         `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
-                        !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'NaN%',
-                        !isNaN(totalScore) ? `${totalScore}%` : 'NaN%',
+                        !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'N/A',
+                        !isNaN(totalScore) ? `${totalScore}%` : 'N/A',
                         reviewStatus,
                         dbd.versionNotes || '',
                         'row_child',
@@ -1176,10 +1185,10 @@ class SupplyPlanScoreCard extends Component {
                 dbd.actualConsumptionQpl?.correctCount || 0,
                 dbd.inventoryQpl?.correctCount || 0,
                 dbd.shipmentQpl?.correctCount || 0,
-                !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'NaN%',
+                !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'N/A',
                 `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
-                !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'NaN%',
-                !isNaN(totalScore) ? `${totalScore}%` : 'NaN%',
+                !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'N/A',
+                !isNaN(totalScore) ? `${totalScore}%` : 'N/A',
                 reviewStatus,
                 dbd.versionNotes || '',
                 'program',
@@ -1253,10 +1262,10 @@ class SupplyPlanScoreCard extends Component {
                     if (!cell) continue;
                     const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                     const value = parseInt(raw, 10);
-                    let color = isNaN(value) ? '#999' : (value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70');
+                let color = isNaN(value) ? '#999' : (value < 60 ? '#BA0C2F' : value < 75 ? '#f48521' : value < 90 ? '#edba26' : '#118b70');
                     cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                         <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
-                        <span>${isNaN(value) ? 'NaN%' : value + '%'}</span>
+                        <span>${isNaN(value) ? 'N/A' : value + '%'}</span>
                     </div>`;
                     cell.style.backgroundImage = 'none';
                     cell.style.paddingLeft = '0px';
@@ -1453,10 +1462,10 @@ class SupplyPlanScoreCard extends Component {
                 if (!cell) continue;
                 const raw = String(rowData[c] || '').replace(/%/g, '').trim();
                 const value = parseInt(raw, 10);
-                let color = isNaN(value) ? '#999' : (value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70');
+                let color = isNaN(value) ? '#999' : (value < 60 ? '#BA0C2F' : value < 75 ? '#f48521' : value < 90 ? '#edba26' : '#118b70');
                 cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                         <span style="min-width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
-                        <span>${isNaN(value) ? 'NaN%' : value + '%'}</span>
+                        <span>${isNaN(value) ? 'N/A' : value + '%'}</span>
                     </div>`;
                 cell.style.backgroundImage = 'none';
                 cell.style.paddingLeft = '0px';
@@ -1702,7 +1711,7 @@ class SupplyPlanScoreCard extends Component {
    */
   renderScoreDot = (val) => {
     const pct = Math.round(val || 0);
-    const color = pct <= 60 ? '#BA0C2F' : pct <= 75 ? '#f48521' : pct <= 90 ? '#edba26' : '#118b70';
+    const color = pct < 60 ? '#BA0C2F' : pct < 75 ? '#f48521' : pct < 90 ? '#edba26' : '#118b70';
     return (
       <span>
         <span style={{ display:'inline-block', width:10, height:10, borderRadius:'50%', backgroundColor:color, marginRight:6, verticalAlign:'middle' }} />
@@ -1796,10 +1805,10 @@ class SupplyPlanScoreCard extends Component {
                 if (!cell) continue;
                 const raw = String(cell.innerText || '').replace(/%/g, '').trim();
                 const value = parseInt(raw, 10);
-                let color = isNaN(value) ? '#999' : (value <= 60 ? '#BA0C2F' : value <= 75 ? '#f48521' : value <= 90 ? '#edba26' : '#118b70');
+                let color = isNaN(value) ? '#999' : (value < 60 ? '#BA0C2F' : value < 75 ? '#f48521' : value < 90 ? '#edba26' : '#118b70');
                 cell.innerHTML = `<div style="display: flex; align-items: center; justify-content: center;">
                     <span style="width: 10px; height: 10px; border-radius: 50%; background-color: ${color}; margin-right: 5px; flex-shrink: 0;"></span>
-                    <span>${isNaN(value) ? 'NaN%' : value + '%'}</span>
+                    <span>${isNaN(value) ? 'N/A' : value + '%'}</span>
                 </div>`;
                     cell.style.backgroundImage = 'none';
                     cell.style.paddingLeft = '0px';
@@ -1944,7 +1953,7 @@ class SupplyPlanScoreCard extends Component {
         if (strVal === '' || strVal.toLowerCase() === 'nan') return [207, 205, 201];
         const pct = parseInt(strVal, 10);
         if (isNaN(pct)) return [207, 205, 201];
-        return pct <= 60 ? [186, 12, 47] : pct <= 75 ? [244, 133, 33] : pct <= 90 ? [237, 186, 38] : [17, 139, 112];
+        return pct < 60 ? [186, 12, 47] : pct < 75 ? [244, 133, 33] : pct < 90 ? [237, 186, 38] : [17, 139, 112];
     };
 
     const addFooters = doc => {
@@ -1981,28 +1990,29 @@ class SupplyPlanScoreCard extends Component {
     var y = 90;
 
     // Print filter values
+    var leftMargin = 40;
     if (this.state.countryLabels && this.state.countryLabels.length > 0) {
         var countryText = doc.splitTextToSize(i18n.t('static.program.realmcountry') + ' : ' + this.state.countryLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-        doc.text(doc.internal.pageSize.width / 8, y, countryText);
+        doc.text(leftMargin, y, countryText);
         y = y + countryText.length * 10;
     }
     if (this.state.technicalAreaLabels && this.state.technicalAreaLabels.length > 0) {
         var taText = doc.splitTextToSize('Technical Area : ' + this.state.technicalAreaLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-        doc.text(doc.internal.pageSize.width / 8, y, taText);
+        doc.text(leftMargin, y, taText);
         y = y + taText.length * 10;
     }
     if (this.state.programLabels && this.state.programLabels.length > 0) {
         var programText = doc.splitTextToSize(i18n.t('static.program.program') + ' : ' + this.state.programLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
-        doc.text(doc.internal.pageSize.width / 8, y, programText);
+        doc.text(leftMargin, y, programText);
         y = y + programText.length * 10;
     }
     var viewByEl = document.getElementById("viewById");
     if (viewByEl) {
-        doc.text('View By : ' + viewByEl.selectedOptions[0].text, doc.internal.pageSize.width / 8, y, { align: 'left' });
+        doc.text('View By : ' + viewByEl.selectedOptions[0].text, leftMargin, y, { align: 'left' });
         y = y + 15;
     }
     var showDetailPdfVal = String(this.state.showDetail) === '1' ? 'Yes' : 'No';
-    doc.text('Show Detail : ' + showDetailPdfVal, doc.internal.pageSize.width / 8, y, { align: 'left' });
+    doc.text('Show Detail : ' + showDetailPdfVal, leftMargin, y, { align: 'left' });
     y = y + 15;
 
     // Add chart image
@@ -2027,7 +2037,7 @@ class SupplyPlanScoreCard extends Component {
     y = 80;
 
     // Draw legends
-    var legendX = doc.internal.pageSize.width / 8;
+    var legendX = leftMargin;
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor("#002f6c");
@@ -2056,10 +2066,11 @@ class SupplyPlanScoreCard extends Component {
     doc.text('Scores:', legendX, y);
     lx = legendX + 45;
     var scoreLegendItems = [
-        { label: '0%-60%', color: [186, 12, 47] },
-        { label: '61%-75%', color: [244, 133, 33] },
-        { label: '76%-90%', color: [237, 186, 38] },
-        { label: '91%-100%', color: [17, 139, 112] }
+        { label: '0%-59%', color: [186, 12, 47] },
+        { label: '60%-74%', color: [244, 133, 33] },
+        { label: '75%-89%', color: [237, 186, 38] },
+        { label: '90%-100%', color: [17, 139, 112] },
+        { label: i18n.t('static.supplyPlanFormula.na'), color: [207, 205, 201] }
     ];
     doc.setFont('helvetica', 'normal');
     scoreLegendItems.forEach(item => {
@@ -2089,12 +2100,10 @@ class SupplyPlanScoreCard extends Component {
     const head = [visibleColIndexes.map(ci => (columns[ci].title || '').toString().replace(/<[^>]*>?/gm, '').trim())];
     const body = allData.map(rowData => visibleColIndexes.map(ci => rowData[ci]));
     let foot = [];
-    try {
-        const footers = (typeof this.el.getFooter === 'function') ? this.el.getFooter() : (this.el.options.footers || []);
-        if (footers && footers.length > 0) {
-            foot = footers.map(fRow => visibleColIndexes.map(ci => fRow[ci]));
-        }
-    } catch (e) { }
+    const footersRaw = (typeof this.el.getFooter === 'function') ? this.el.getFooter() : (this.el.options.footers || []);
+    if (footersRaw && footersRaw.length > 0) {
+        foot = footersRaw.map(fRow => visibleColIndexes.map(ci => fRow[ci]));
+    }
 
     doc.autoTable({
         head: head,
@@ -2115,19 +2124,21 @@ class SupplyPlanScoreCard extends Component {
                 data.cell.styles.halign = 'left';
             }
 
-            if (data.section !== 'body') return;
+            if (data.section !== 'body' && data.section !== 'foot') return;
 
             var tr = data.row.raw;
-            var dataY;
-            if (tr && typeof tr.getAttribute === 'function') {
-                dataY = parseInt(tr.getAttribute('data-y'), 10);
-            } else {
-                dataY = data.row.index;
+            var dataY = data.row.index;
+            if (data.section === 'body') {
+                if (tr && typeof tr.getAttribute === 'function') {
+                    dataY = parseInt(tr.getAttribute('data-y'), 10);
+                }
             }
-            if (isNaN(dataY) || !allData[dataY]) return;
             
-            var rowData = allData[dataY];
+            var rowData = (data.section === 'foot') ? footersRaw[dataY] : allData[dataY];
+            if (!rowData) return;
+
             var rowType = isMatrixView ? rowData[rowData.length - 2] : rowData[14];
+            if (data.section === 'foot') rowType = 'matrix_total';
 
             // Row background colors
             if (rowType === 'row_parent') {
@@ -2145,17 +2156,16 @@ class SupplyPlanScoreCard extends Component {
                 data.cell.styles.cellPadding = { top: 3, bottom: 3, left: 15, right: 3 };
             }
 
-            // Score columns: set text color to match dot color
+            // Score columns: set text color to match dot color and hide default for manual drawing
             if (!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) {
                 var sc = getScoreColor(rowData[origColIdx]);
                 if (sc) {
-                    let cellTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'NaN%' : String(rowData[origColIdx]);
-                    if (!cellTxt.includes('%') && !cellTxt.toLowerCase().includes('nan')) cellTxt += '%';
+                    let cellTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'N/A' : String(rowData[origColIdx]);
+                    if (!cellTxt.includes('%') && !cellTxt.toLowerCase().includes('nan') && !cellTxt.toLowerCase().includes('n/a')) cellTxt += '%';
                     data.cell.text = [cellTxt];
-                    data.cell.styles.textColor = [50, 50, 50]; // Dark text
-                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.fontSize = 0.0001;
+                    data.cell.styles.textColor = data.cell.styles.fillColor || [255, 255, 255];
                     data.cell.styles.halign = 'center';
-                    data.cell.styles.cellPadding = { left: 16, right: 3, top: 3, bottom: 3 };
                 }
             }
 
@@ -2165,20 +2175,20 @@ class SupplyPlanScoreCard extends Component {
                 data.cell.text = [String(cellVal)];
                 data.cell.styles.fontStyle = (rowType === 'row_parent') ? 'bold' : 'normal';
                 data.cell.styles.halign = 'center';
-                data.cell.styles.fontSize = 0; // Hide default to avoid double numbers
+                data.cell.styles.fontSize = 0.0001;
+                data.cell.styles.textColor = data.cell.styles.fillColor || [255, 255, 255];
             }
             
             // Matrix view: all data cells get score colors
             if (isMatrixView && data.column.index > 0) {
                 var mc = getScoreColor(rowData[origColIdx]);
                 if (mc) {
-                    let mTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'NaN%' : String(rowData[origColIdx]);
-                    if (!mTxt.includes('%') && !mTxt.toLowerCase().includes('nan')) mTxt += '%';
+                    let mTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'N/A' : String(rowData[origColIdx]);
+                    if (!mTxt.includes('%') && !mTxt.toLowerCase().includes('nan') && !mTxt.toLowerCase().includes('n/a')) mTxt += '%';
                     data.cell.text = [mTxt];
-                    data.cell.styles.textColor = [50, 50, 50]; // Dark text
-                    data.cell.styles.fontStyle = 'bold';
+                    data.cell.styles.fontSize = 0.0001;
+                    data.cell.styles.textColor = data.cell.styles.fillColor || [255, 255, 255];
                     data.cell.styles.halign = 'center';
-                    data.cell.styles.cellPadding = { left: 16, right: 3, top: 3, bottom: 3 };
                 }
             }
 
@@ -2190,33 +2200,43 @@ class SupplyPlanScoreCard extends Component {
             }
         },
         didDrawCell: function (data) {
-            if (data.section !== 'body') return;
+            if (data.section !== 'body' && data.section !== 'foot') return;
             var tr = data.row.raw;
-            var dataY;
-            if (tr && typeof tr.getAttribute === 'function') {
-                dataY = parseInt(tr.getAttribute('data-y'), 10);
-            } else {
-                dataY = data.row.index;
-            }
-            if (isNaN(dataY) || !allData[dataY]) return;
-            var origColIdx = visibleColIndexes[data.column.index];
-            if (origColIdx === undefined) return;
-            var rowData = allData[dataY];
-
-            // Draw score colored dot for score columns
-            if (!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) {
-                var sc = getScoreColor(rowData[origColIdx]);
-                if (sc) {
-                    doc.setFillColor(sc[0], sc[1], sc[2]);
-                    doc.circle(data.cell.x + 8, data.cell.y + data.cell.height / 2, 3, 'F');
+            var dataY = data.row.index;
+            if (data.section === 'body') {
+                if (tr && typeof tr.getAttribute === 'function') {
+                    dataY = parseInt(tr.getAttribute('data-y'), 10);
                 }
             }
-            // Draw score colored dots in matrix view
-            if (isMatrixView && data.column.index > 0 && rowData[rowData.length - 2] !== 'matrix_total') {
-                var mc = getScoreColor(rowData[origColIdx]);
-                if (mc) {
-                    doc.setFillColor(mc[0], mc[1], mc[2]);
-                    doc.circle(data.cell.x + 10, data.cell.y + data.cell.height / 2, 3, 'F');
+            
+            var origColIdx = visibleColIndexes[data.column.index];
+            if (origColIdx === undefined) return;
+            var rowData = (data.section === 'foot') ? footersRaw[dataY] : allData[dataY];
+            if (!rowData) return;
+
+            // Draw score colored dot and text centered for score columns
+            if ((!isMatrixView && (origColIdx === 8 || origColIdx === 10 || origColIdx === 11)) || (isMatrixView && data.column.index > 0)) {
+                var sc = getScoreColor(rowData[origColIdx]);
+                if (sc) {
+                    let cellTxt = (rowData[origColIdx] === null || rowData[origColIdx] === undefined || String(rowData[origColIdx]).trim() === '') ? 'N/A' : String(rowData[origColIdx]);
+                    if (!cellTxt.includes('%') && !cellTxt.toLowerCase().includes('nan') && !cellTxt.toLowerCase().includes('n/a')) cellTxt += '%';
+                    
+                    doc.setFontSize(7);
+                    doc.setFont(data.cell.styles.font, 'bold');
+                    const textWidth = doc.getTextWidth(cellTxt);
+                    const dotRadius = 3;
+                    const gap = 4;
+                    const totalWidth = (dotRadius * 2) + gap + textWidth;
+                    const startX = data.cell.x + (data.cell.width - totalWidth) / 2;
+                    const centerY = data.cell.y + (data.cell.height / 2);
+
+                    // Draw Dot
+                    doc.setFillColor(sc[0], sc[1], sc[2]);
+                    doc.circle(startX + dotRadius, centerY, dotRadius, 'F');
+
+                    // Draw Text
+                    doc.setTextColor(50, 50, 50);
+                    doc.text(cellTxt, startX + (dotRadius * 2) + gap, centerY + (7 / 3), { align: 'left' });
                 }
             }
             
@@ -2374,10 +2394,19 @@ class SupplyPlanScoreCard extends Component {
 
     // Aggregate per country: average quality/stock scores
     let countryAggregates = countryGroups.map(cg => {
-        const n = cg.programs.length;
-        const avgQuality = n > 0 ? cg.programs.reduce((s, d) => s + (d.supplyPlanQualityScore), 0) / n : NaN;
-        const avgStock = n > 0 ? cg.programs.reduce((s, d) => s + (d.stockStatusScore), 0) / n : NaN;
-        return { label: cg.label, avgQuality, avgStock, avgTotal: (avgQuality + avgStock) / 2 };
+        const qPrograms = cg.programs.filter(d => !isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null);
+        const avgQuality = qPrograms.length > 0 ? qPrograms.reduce((s, d) => s + (d.supplyPlanQualityScore), 0) / qPrograms.length : NaN;
+        const sPrograms = cg.programs.filter(d => !isNaN(d.stockStatusScore) && d.stockStatusScore !== null);
+        const avgStock = sPrograms.length > 0 ? sPrograms.reduce((s, d) => s + (d.stockStatusScore), 0) / sPrograms.length : NaN;
+        let avgTotal = NaN;
+        if (!isNaN(avgQuality) && !isNaN(avgStock)) {
+            avgTotal = (avgQuality + avgStock) / 2;
+        } else if (!isNaN(avgQuality)) {
+            avgTotal = avgQuality;
+        } else if (!isNaN(avgStock)) {
+            avgTotal = avgStock;
+        }
+        return { label: cg.label, avgQuality, avgStock, avgTotal };
     });
 
     if (viewBy === '1') {
@@ -2739,10 +2768,11 @@ class SupplyPlanScoreCard extends Component {
 
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
                           <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Scores:</span>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-60%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>61%-75%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>76%-90%</span></div>
-                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>91%-100%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-59%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>60%-74%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>75%-89%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>90%-100%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#cfcdc9', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.supplyPlanFormula.na')}</span></div>
                         </div>
 
                       </div>

@@ -11150,7 +11150,8 @@ label.arrow_label:before {
   background-color: #FFFF65 !important;
   color: #000000 !important;
 }
-.lowCriticality{
+
+.lowCriticality {
   background-color: #A7C6ED !important;
   color: #000000 !important;
 }
@@ -17992,7 +17993,7 @@ label.arrow_label:before {
 }
 
 .boxHeightBottom {
-  height: 203px !important;
+  height: 230px !important;
 }
 
 @media (min-width: 1720px) {
@@ -18008,11 +18009,11 @@ label.arrow_label:before {
 
 @media (min-width: 1860px) {
   .boxHeightBottom {
-    height: 220px !important;
+    height: 230px !important;
   }
 
   .scrollable-content {
-    height: 220px;
+    height: 230px;
     overflow-y: scroll;
   }
 }
