@@ -444,13 +444,13 @@ export default class StockStatusMatrix extends React.Component {
 
         const sortedDownloaded = downloadedPrograms.sort((a, b) =>
           (a.displayLabel || "").toUpperCase() >
-          (b.displayLabel || "").toUpperCase()
+            (b.displayLabel || "").toUpperCase()
             ? 1
             : -1
         );
         const sortedAll = allPrograms.sort((a, b) =>
           (a.programCode || "").toUpperCase() >
-          (b.programCode || "").toUpperCase()
+            (b.programCode || "").toUpperCase()
             ? 1
             : -1
         );
@@ -508,8 +508,8 @@ export default class StockStatusMatrix extends React.Component {
     const vId = onlyDownloadedPrograms
       ? null
       : exportProgramIds.length > 1
-      ? null
-      : exportVersionId || null;
+        ? null
+        : exportVersionId || null;
     if (onlyDownloadedPrograms || String(vId).includes("Local")) {
       const selectedProgramIds = exportProgramIds.map((p) => p.value);
       getDatabase();
@@ -546,7 +546,7 @@ export default class StockStatusMatrix extends React.Component {
             puByProgram[pid].forEach((p) => seen.set(p.value, p));
             puByProgram[pid] = [...seen.values()].sort((a, b) =>
               getLabelText(a.label, lang).toUpperCase() >
-              getLabelText(b.label, lang).toUpperCase()
+                getLabelText(b.label, lang).toUpperCase()
                 ? 1
                 : -1
             );
@@ -565,7 +565,7 @@ export default class StockStatusMatrix extends React.Component {
             });
           flatUnion.sort((a, b) =>
             getLabelText(a.label, lang).toUpperCase() >
-            getLabelText(b.label, lang).toUpperCase()
+              getLabelText(b.label, lang).toUpperCase()
               ? 1
               : -1
           );
@@ -575,9 +575,9 @@ export default class StockStatusMatrix extends React.Component {
             puByProgramForExport: puByProgram, // keyed map for per-program filtering
             exportPlanningUnitIds: resetSelections
               ? flatUnion.map((p) => ({
-                  label: getLabelText(p.label, lang) + " | " + p.value,
-                  value: p.value,
-                }))
+                label: getLabelText(p.label, lang) + " | " + p.value,
+                value: p.value,
+              }))
               : this.state.exportPlanningUnitIds,
           });
         };
@@ -645,8 +645,8 @@ export default class StockStatusMatrix extends React.Component {
                       ? localVer
                         ? localVer.versionId
                         : versionList.length > 0
-                        ? versionList[0].versionId
-                        : ""
+                          ? versionList[0].versionId
+                          : ""
                       : this.state.exportVersionId,
                   },
                   () => {
@@ -684,7 +684,7 @@ export default class StockStatusMatrix extends React.Component {
               .map((p) => ({ ...p, value: p.id, json: p }))
               .sort((a, b) =>
                 getLabelText(a.label, lang).toUpperCase() >
-                getLabelText(b.label, lang).toUpperCase()
+                  getLabelText(b.label, lang).toUpperCase()
                   ? 1
                   : -1
               );
@@ -703,7 +703,7 @@ export default class StockStatusMatrix extends React.Component {
             });
           flatUnion.sort((a, b) =>
             getLabelText(a.label, lang).toUpperCase() >
-            getLabelText(b.label, lang).toUpperCase()
+              getLabelText(b.label, lang).toUpperCase()
               ? 1
               : -1
           );
@@ -713,10 +713,10 @@ export default class StockStatusMatrix extends React.Component {
             puByProgramForExport: puByProgram,
             exportPlanningUnitIds: resetSelections
               ? flatUnion.map((p) => ({
-                  label:
-                    getLabelText(p.label, lang) + " | " + (p.id || p.value),
-                  value: p.id || p.value,
-                }))
+                label:
+                  getLabelText(p.label, lang) + " | " + (p.id || p.value),
+                value: p.id || p.value,
+              }))
               : this.state.exportPlanningUnitIds,
           });
         });
@@ -733,7 +733,7 @@ export default class StockStatusMatrix extends React.Component {
       .then((res) => {
         const puList = (res.data.planningUnitList || []).sort((a, b) =>
           getLabelText(a.label, lang).toUpperCase() >
-          getLabelText(b.label, lang).toUpperCase()
+            getLabelText(b.label, lang).toUpperCase()
             ? 1
             : -1
         );
@@ -750,9 +750,9 @@ export default class StockStatusMatrix extends React.Component {
           puByProgramForExport: puByProgram,
           exportPlanningUnitIds: resetSelections
             ? puList.map((p) => ({
-                label: getLabelText(p.label, lang) + " | " + p.id,
-                value: p.id,
-              }))
+              label: getLabelText(p.label, lang) + " | " + p.id,
+              value: p.id,
+            }))
             : this.state.exportPlanningUnitIds,
         });
       })
@@ -826,8 +826,8 @@ export default class StockStatusMatrix extends React.Component {
       const vId = onlyDownloadedPrograms
         ? exportProgramIds.find((p) => p.value == pId)?.versionId
         : programIds.length > 1
-        ? null
-        : exportVersionId || null;
+          ? null
+          : exportVersionId || null;
 
       // Derive a clean numeric versionId:
       // - null / undefined / "" / -1  → send -1 (server treats as "latest")
@@ -867,8 +867,8 @@ export default class StockStatusMatrix extends React.Component {
         removePlannedShipments: this.state.removePlannedShipments
           ? 1
           : this.state.removeTBDFundingSourceShipments
-          ? 2
-          : 0,
+            ? 2
+            : 0,
         fundingSourceIds: [],
         procurementAgentIds: [],
         showByQty: this.state.showQuantity,
@@ -1047,8 +1047,8 @@ export default class StockStatusMatrix extends React.Component {
             const cb = useWps
               ? sp.closingBalanceWps
               : useWtbd
-              ? sp.closingBalanceWtbdps
-              : sp.closingBalance;
+                ? sp.closingBalanceWtbdps
+                : sp.closingBalance;
             const amc = sp.amc;
 
             let statusId;
@@ -1061,31 +1061,31 @@ export default class StockStatusMatrix extends React.Component {
                 cb == null
                   ? -1
                   : cb == 0
-                  ? 0
-                  : cb < minStock
-                  ? 1
-                  : cb > dynamicMax
-                  ? 3
-                  : 2;
+                    ? 0
+                    : cb < minStock
+                      ? 1
+                      : cb > dynamicMax
+                        ? 3
+                        : 2;
             }
 
             const shipmentQty = useWps
               ? sp.shipmentTotalQtyWps
               : useWtbd
-              ? sp.shipmentTotalQtyWtbdps
-              : sp.shipmentTotalQty;
+                ? sp.shipmentTotalQtyWtbdps
+                : sp.shipmentTotalQty;
             const expiredQty = useWps
               ? sp.expiredStockWps
               : useWtbd
-              ? sp.expiredStockWtbdps
-              : sp.expiredStock;
+                ? sp.expiredStockWtbdps
+                : sp.expiredStock;
 
             dataMap[sp.transDate] = {
               mos,
               closingBalance: cb,
               amc,
               stockStatusId: statusId,
-              actualStock: !!sp.actualStock,
+              actualStock: sp.regionCountForStock == sp.regionCount,
               shipmentQty,
               expiredQty,
             };
@@ -1093,13 +1093,15 @@ export default class StockStatusMatrix extends React.Component {
               programId: programId, // Added
               month: sp.transDate,
               planningUnit: { id: Number(puId), label: puActualLabel },
-              consumptionQty: sp.consumption || 0,
-              actualConsumption: !!sp.actualConsumption,
+              consumptionQty: sp.consumptionQty || 0,
+              actualConsumption: sp.actualFlag,
               amc,
               closingBalance: cb,
-              actualStock: !!sp.actualStock,
+              actualStock: sp.regionCountForStock == sp.regionCount,
               mos,
               stockStatusId: statusId,
+              shipmentQty,
+              expiredQty,
             });
           });
 
@@ -1148,12 +1150,12 @@ export default class StockStatusMatrix extends React.Component {
           cb == null
             ? -1
             : cb == 0
-            ? 0
-            : cb < minStock
-            ? 1
-            : cb > dynamicMax
-            ? 3
-            : 2;
+              ? 0
+              : cb < minStock
+                ? 1
+                : cb > dynamicMax
+                  ? 3
+                  : 2;
         updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
       });
 
@@ -1353,7 +1355,7 @@ export default class StockStatusMatrix extends React.Component {
             vFromLabel ||
             (this.state.onlyDownloadedPrograms
               ? this.state.exportProgramIds[0].versionId ||
-                i18n.t("static.report.latest")
+              i18n.t("static.report.latest")
               : this.state.exportVersionId);
           currentY += renderBoldLine(
             i18n.t("static.report.version"),
@@ -1461,8 +1463,8 @@ export default class StockStatusMatrix extends React.Component {
           const versionText = this.state.onlyDownloadedPrograms
             ? prog.versionId || i18n.t("static.report.latest")
             : uniquePrograms.length == 1
-            ? this.state.exportVersionId
-            : i18n.t("static.report.latest");
+              ? this.state.exportVersionId
+              : i18n.t("static.report.latest");
 
           if (cIdx == 0) {
             y = renderFilterSummary(
@@ -1509,17 +1511,17 @@ export default class StockStatusMatrix extends React.Component {
             const minMax =
               row.planBasedOn == 1
                 ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
-                    Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-                    0
-                  )}`
+                  Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+                  0
+                )}`
                 : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
-                    Math.round(row.maxStock || 0)
-                  )}`;
+                  Math.round(row.maxStock || 0)
+                )}`;
 
             return [
               getLabelText(row.planningUnit.label, this.state.lang) +
-                " | " +
-                row.planningUnit.id,
+              " | " +
+              row.planningUnit.id,
               row.planBasedOn == 1
                 ? i18n.t("static.report.mos")
                 : i18n.t("static.report.qty"),
@@ -1688,27 +1690,6 @@ export default class StockStatusMatrix extends React.Component {
           }
         });
 
-        // Section 2: Graph
-        const canvas = document.getElementById(`export-chart-${progId}`);
-        if (canvas && typeof canvas.toDataURL == "function") {
-          const canvasImg = canvas.toDataURL("image/png", 1.0);
-          if (
-            canvasImg &&
-            canvasImg.length > 100 &&
-            canvasImg.startsWith("data:image")
-          ) {
-            doc.addPage();
-            renderFilterSummary(
-              80,
-              false,
-              progLabel,
-              progPUIdsLabel,
-              versionText,
-              true
-            );
-            doc.addImage(canvasImg, "png", 40, 120, 750, 420);
-          }
-        }
 
         // Section 3: Details Table
         doc.addPage();
@@ -1737,28 +1718,28 @@ export default class StockStatusMatrix extends React.Component {
           return [
             moment(row.month).format("MMM YY"),
             getLabelText(row.planningUnit.label, this.state.lang) +
-              " | " +
-              row.planningUnit.id,
+            " | " +
+            row.planningUnit.id,
             row.consumptionQty != null
               ? formatter(Math.round(row.consumptionQty))
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "",
             row.amc != null
               ? formatter(Math.round(row.amc))
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "",
             row.closingBalance != null
               ? formatter(Math.round(row.closingBalance))
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "",
             planBasedOn == 2
               ? "-"
               : row.mos != null
-              ? formatterMOS(roundAMC(row.mos), 1)
-              : i18n.t("static.supplyPlanFormula.na"),
+                ? formatterMOS(roundAMC(row.mos), 1)
+                : i18n.t("static.supplyPlanFormula.na"),
             statusLabel,
           ];
         });
@@ -1766,8 +1747,8 @@ export default class StockStatusMatrix extends React.Component {
         const versionText = this.state.onlyDownloadedPrograms
           ? prog.versionId || i18n.t("static.report.latest")
           : uniquePrograms.length == 1
-          ? this.state.exportVersionId
-          : i18n.t("static.report.latest");
+            ? this.state.exportVersionId
+            : i18n.t("static.report.latest");
 
         doc.autoTable({
           startY:
@@ -1852,14 +1833,14 @@ export default class StockStatusMatrix extends React.Component {
     // ── Date range ──
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.dateRange") +
-          ": " +
-          moment(startDate).format("MMM YYYY") +
-          " ~ " +
-          moment(endDate).format("MMM YYYY")
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.dateRange") +
+        ": " +
+        moment(startDate).format("MMM YYYY") +
+        " ~ " +
+        moment(endDate).format("MMM YYYY")
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
 
@@ -1867,12 +1848,12 @@ export default class StockStatusMatrix extends React.Component {
     this.state.exportProgramIds.forEach((ele) =>
       csvRow.push(
         '"' +
-          (
-            i18n.t("static.program.program") +
-            ": " +
-            ele.label.toString()
-          ).replaceAll(" ", "%20") +
-          '"'
+        (
+          i18n.t("static.program.program") +
+          ": " +
+          ele.label.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
       )
     );
     csvRow.push("");
@@ -1884,12 +1865,12 @@ export default class StockStatusMatrix extends React.Component {
     ) {
       csvRow.push(
         '"' +
-          (
-            i18n.t("static.report.version") +
-            ": " +
-            this.state.exportVersionId
-          ).replaceAll(" ", "%20") +
-          '"'
+        (
+          i18n.t("static.report.version") +
+          ": " +
+          this.state.exportVersionId
+        ).replaceAll(" ", "%20") +
+        '"'
       );
       csvRow.push("");
     }
@@ -1898,12 +1879,12 @@ export default class StockStatusMatrix extends React.Component {
     this.state.exportPlanningUnitIds.forEach((ele) =>
       csvRow.push(
         '"' +
-          (
-            i18n.t("static.planningunit.planningunit") +
-            ": " +
-            ele.label.toString()
-          ).replaceAll(" ", "%20") +
-          '"'
+        (
+          i18n.t("static.planningunit.planningunit") +
+          ": " +
+          ele.label.toString()
+        ).replaceAll(" ", "%20") +
+        '"'
       )
     );
     csvRow.push("");
@@ -1914,54 +1895,54 @@ export default class StockStatusMatrix extends React.Component {
       .join(", ");
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.withinstock") +
-          ": " +
-          stockStatusLabels
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.withinstock") +
+        ": " +
+        stockStatusLabels
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
 
     // ── FIX 3: Show Quantity ──
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.showQuantity") +
-          ": " +
-          (this.state.showQuantity
-            ? i18n.t("static.program.yes")
-            : i18n.t("static.program.no"))
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.showQuantity") +
+        ": " +
+        (this.state.showQuantity
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
 
     // ── FIX 3: Remove Planned Shipments ──
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.removePlannedShipments") +
-          ": " +
-          (this.state.removePlannedShipments
-            ? i18n.t("static.program.yes")
-            : i18n.t("static.program.no"))
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.removePlannedShipments") +
+        ": " +
+        (this.state.removePlannedShipments
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
 
     // ── FIX 3: Remove TBD Funding Source Shipments ──
     csvRow.push(
       '"' +
-        (
-          i18n.t("static.report.removeTBDFundingSourceShipments") +
-          ": " +
-          (this.state.removeTBDFundingSourceShipments
-            ? i18n.t("static.program.yes")
-            : i18n.t("static.program.no"))
-        ).replaceAll(" ", "%20") +
-        '"'
+      (
+        i18n.t("static.report.removeTBDFundingSourceShipments") +
+        ": " +
+        (this.state.removeTBDFundingSourceShipments
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
     );
     csvRow.push("");
     csvRow.push("");
@@ -2019,12 +2000,12 @@ export default class StockStatusMatrix extends React.Component {
         const minMax =
           row.planBasedOn == 1
             ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-                Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-                0
-              )}`
+              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+              0
+            )}`
             : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-                Math.round(row.maxStock || 0)
-              )}`;
+              Math.round(row.maxStock || 0)
+            )}`;
         A.push(
           addDoubleQuoteToRowContent([
             (
@@ -2085,8 +2066,8 @@ export default class StockStatusMatrix extends React.Component {
           planBasedOn == 2
             ? "-"
             : row.mos != null
-            ? formatterMOS(roundAMC(row.mos), 1)
-            : i18n.t("static.supplyPlanFormula.na");
+              ? formatterMOS(roundAMC(row.mos), 1)
+              : i18n.t("static.supplyPlanFormula.na");
 
         B.push(
           addDoubleQuoteToRowContent([
@@ -2129,8 +2110,8 @@ export default class StockStatusMatrix extends React.Component {
       return API_URL.includes("uat")
         ? i18n.t("static.common.uatNetworkErrorMessage")
         : API_URL.includes("demo")
-        ? i18n.t("static.common.demoNetworkErrorMessage")
-        : i18n.t("static.common.prodNetworkErrorMessage");
+          ? i18n.t("static.common.demoNetworkErrorMessage")
+          : i18n.t("static.common.prodNetworkErrorMessage");
     }
     switch (error.response?.status) {
       case 401:
@@ -2151,10 +2132,10 @@ export default class StockStatusMatrix extends React.Component {
   destroyJExcel(divId) {
     try {
       jexcel(document.getElementById(divId), "");
-    } catch (_) {}
+    } catch (_) { }
     try {
       jexcel.destroy(document.getElementById(divId), true);
-    } catch (_) {}
+    } catch (_) { }
   }
 
   processApiData(stockStatusMatrix, stockStatusDetails) {
@@ -2250,12 +2231,12 @@ export default class StockStatusMatrix extends React.Component {
       const minMax =
         row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
-              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-              0
-            )}`
+            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+            0
+          )}`
           : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
-              Math.round(row.maxStock || 0)
-            )}`;
+            Math.round(row.maxStock || 0)
+          )}`;
 
       const dataCells = monthColumns.map((dateKey) => {
         const entry = (row.dataMap || {})[dateKey];
@@ -2348,30 +2329,30 @@ export default class StockStatusMatrix extends React.Component {
         setTimeout(() => {
           const container = document.querySelector(".jss_filters_options");
           if (!container) return;
-      
+
           // Get all labels except "(Select all)"
           const labels = Array.from(container.querySelectorAll("label"))
             .filter(l => !l.innerText.includes("(Select all)"));
-      
+
           // Extract value + element
           const items = labels.map(label => {
             const text = label.innerText.trim();
-      
+
             // Remove icons / symbols if any
             const clean = text.replace(/[^\d.\-]/g, "");
-      
+
             return {
               value: parseFloat(clean) || 0,
               element: label
             };
           });
-      
+
           // 🔥 Sort numerically (ascending)
           items.sort((a, b) => a.value - b.value);
-      
+
           // Clear and re-append
           items.forEach(item => container.appendChild(item.element));
-      
+
         }, 0);
       },
       allowRenameColumn: false,
@@ -2422,6 +2403,8 @@ export default class StockStatusMatrix extends React.Component {
                 programId: self.state.programId,
                 versionId: self.state.versionId,
                 planningUnitId: puId,
+                startDate: self.state.rangeValue.from,
+                endDate: self.state.rangeValue.to,
               })
             );
             let url =
@@ -2494,21 +2477,25 @@ export default class StockStatusMatrix extends React.Component {
 
         if (entry) {
           const tips = [];
-          tips.push(
-            `${i18n.t("static.report.stock")}: ${
-              entry.closingBalance != null
+          if (!showQuantity) {
+            tips.push(
+              `${i18n.t("static.report.stock")}: ${entry.closingBalance != null
                 ? formatter(Math.round(entry.closingBalance))
                 : 0
+              }`
+            );
+          }
+          if (showQuantity && entry.mos != null) {
+            tips.push(
+              `${i18n.t("static.report.mos")}: ${formatterMOS(entry.mos, 0)}`
+            );
+          }
+          tips.push(
+            `${i18n.t("static.stockStatusMatrix.totalShipmentQty")}: ${entry.shipmentQty != null ? formatter(entry.shipmentQty) : 0
             }`
           );
           tips.push(
-            `${i18n.t("static.stockStatusMatrix.totalShipmentQty")}: ${
-              entry.shipmentQty != null ? formatter(entry.shipmentQty) : 0
-            }`
-          );
-          tips.push(
-            `${i18n.t("static.supplyPlan.expiredQty")}: ${
-              entry.expiredQty != null ? formatter(entry.expiredQty) : 0
+            `${i18n.t("static.supplyPlan.expiredQty")}: ${entry.expiredQty != null ? formatter(entry.expiredQty) : 0
             }`
           );
           td.title = tips.join(" | ");
@@ -2626,6 +2613,14 @@ export default class StockStatusMatrix extends React.Component {
       const currentMonthLabel = moment().format("MMM YY");
       const table = instance.element || instance;
       const ths = table.querySelectorAll("thead tr td");
+      if (ths.length > 1) {
+        ths[1].classList.add('InfoTr');
+        ths[2].classList.add('InfoTr');
+        ths[3].classList.add('InfoTr');
+        ths[1].title = i18n.t("static.stockStatusMatrix.planningUnitTooltip");
+        ths[2].title = i18n.t("static.stockStatusMatrix.planByTooltip");
+        ths[3].title = i18n.t("static.stockStatusMatrix.minMaxTooltip");
+      }
       ths.forEach((th) => {
         if (
           (th.innerText || th.textContent || "").trim() == currentMonthLabel
@@ -2635,7 +2630,7 @@ export default class StockStatusMatrix extends React.Component {
             "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
         }
       });
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // ─── Table 2: Stock Status Detail ────────────────────────────────────────────
@@ -2668,9 +2663,11 @@ export default class StockStatusMatrix extends React.Component {
       return [
         moment(row.month).format("MMM YY"),
         getLabelText(row.planningUnit.label, lang) +
-          " | " +
-          row.planningUnit.id,
+        " | " +
+        row.planningUnit.id,
         row.consumptionQty != null ? Math.round(row.consumptionQty) : null,
+        row.shipmentQty != null ? Math.round(row.shipmentQty) : 0,
+        row.expiredQty != null ? Math.round(row.expiredQty) : 0,
         row.amc != null ? Math.round(row.amc) : null,
         row.closingBalance != null ? Math.round(row.closingBalance) : null,
         mosValue,
@@ -2681,6 +2678,8 @@ export default class StockStatusMatrix extends React.Component {
         String(planBasedOn),
       ];
     });
+
+    console.log("Table Rows Test@123",tableRows)
 
     const columns = [
       {
@@ -2694,9 +2693,24 @@ export default class StockStatusMatrix extends React.Component {
         type: "text",
         width: 270,
         readOnly: true,
+        align: "left",
       },
       {
         title: i18n.t("static.supplyPlan.consumption"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.supplyPlan.expiredQty"),
         type: "numeric",
         mask: "#,##0",
         width: 105,
@@ -2737,19 +2751,23 @@ export default class StockStatusMatrix extends React.Component {
     ];
 
     const applyDetailColours = (el, pageSize, pageIndex) => {
+      console.log("page size Test@123",pageSize)
+      console.log("Page Index Test@123",pageIndex)
       if (!el) return;
       const tbody = el.querySelector && el.querySelector("tbody");
       if (!tbody) return;
       const trs = tbody.querySelectorAll("tr");
+      console.log("Table Rows in apply details colour Test@123",tableRows);
       trs.forEach((tr, visibleRowOffset) => {
-        const absoluteRowIdx = pageIndex * pageSize + visibleRowOffset;
+        const absoluteRowIdx = pageIndex * pageSize+visibleRowOffset;
         const rowData = tableRows[absoluteRowIdx];
+        console.log("Row Data Test@123",rowData);
         if (!rowData) return;
 
-        const isActualStock = rowData[8] == "1";
-        const isActualConsumption = rowData[9] == "1";
-        const planBasedOn = Number(rowData[10]);
-        const statusId = Number(rowData[7]);
+        const isActualStock = rowData[10] == "1";
+        const isActualConsumption = rowData[11] == "1";
+        const planBasedOn = Number(rowData[12]);
+        const statusId = Number(rowData[9]);
         const bgColor = colorForStatus(statusId);
         const textColor =
           bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#000";
@@ -2759,42 +2777,53 @@ export default class StockStatusMatrix extends React.Component {
           const col = Number(td.getAttribute("data-x"));
           if (isNaN(col)) return;
 
+          if (col == 1) {
+            td.style.setProperty("text-align", "left", "important");
+            return;
+          }
+
           if (col == 2) {
             if (!td.textContent.trim()) td.innerHTML = "N/A";
             td.setAttribute(
               "style",
               isActualConsumption
-                ? "color: #000 !important; font-weight: bold !important;"
+                ? "color: #000 !important; font-weight: normal !important;"
                 : "color: rgb(170,85,161) !important; font-style: italic !important;"
             );
             return;
           }
 
-          if (col == 3) {
-            if (!td.textContent.trim()) td.innerHTML = "N/A";
-            return;
-          }
-
-          if (col == 4) {
-            if (!td.textContent.trim()) td.innerHTML = "N/A";
-            if (isActualStock)
-              td.setAttribute("style", "font-weight: bold !important;");
+          if (col == 3 || col == 4) {
+            if (!td.textContent.trim()) td.innerHTML = "0";
             return;
           }
 
           if (col == 5) {
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            return;
+          }
+
+          if (col == 6) {
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            if (isActualStock)
+              td.style.setProperty("font-weight", "bold", "important");
+            else
+              td.style.setProperty("font-weight", "normal", "important");
+            return;
+          }
+
+          if (col == 7) {
             if (planBasedOn == 2) {
               td.innerHTML = "-";
               td.style.cssText = "";
               return;
             }
             if (!td.textContent.trim()) td.innerHTML = "N/A";
-            const fontWeight = isActualStock ? "bold" : "normal";
-            td.style.cssText = `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important; font-weight: ${fontWeight} !important;`;
+            td.style.cssText = `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important; font-weight: normal !important;`;
             return;
           }
 
-          if (col == 6) {
+          if (col == 8) {
             td.setAttribute(
               "style",
               `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important;`
@@ -2807,7 +2836,7 @@ export default class StockStatusMatrix extends React.Component {
 
     jexcel.setDictionary({ Show: " ", entries: " " });
 
-    const pageSize = Number(localStorage.getItem("sesRecordCount")) || 10;
+    const pageSize = Number(localStorage.getItem("sesRecordCount")) || 15;
     let currentPage = 0;
 
     const options = {
@@ -2820,7 +2849,7 @@ export default class StockStatusMatrix extends React.Component {
       allowRenameColumn: false,
       filters: true,
       onload: (instance) => {
-        jExcelLoadedFunctionStockStatusMatrix(instance, 1);
+        this.loadedDetail(instance);
         const el = instance.element || instance;
         applyDetailColours(el, pageSize, 0);
       },
@@ -2839,7 +2868,7 @@ export default class StockStatusMatrix extends React.Component {
         const zeroBasedPage = Math.max(0, Number(page) - 1);
         currentPage = zeroBasedPage;
         const el = instance.element || instance;
-        applyDetailColours(el, pageSize, currentPage);
+        applyDetailColours(el, pageSize, page);
       },
       oncopy: (worksheet, selection, str) => {
         try {
@@ -2918,6 +2947,20 @@ export default class StockStatusMatrix extends React.Component {
 
   loadedDetail(instance) {
     jExcelLoadedFunctionStockStatusMatrix(instance, 1);
+    try {
+      const table = instance.element || instance;
+      const ths = table.querySelectorAll("thead tr td");
+      if (ths.length > 9) {
+        ths[3].classList.add('InfoTr');
+        ths[6].classList.add('InfoTr');
+        ths[8].classList.add('InfoTr');
+        ths[9].classList.add('InfoTr');
+        ths[3].title = i18n.t("static.stockStatusMatrix.consumptionTooltip");
+        ths[6].title = i18n.t("static.stockStatusMatrix.amcTooltip");
+        ths[8].title = i18n.t("static.stockStatusMatrix.mosTooltip");
+        ths[9].title = i18n.t("static.stockStatusMatrix.statusTooltip");
+      }
+    } catch (_) { }
   }
 
   // Helper for export charts
@@ -2961,8 +3004,8 @@ export default class StockStatusMatrix extends React.Component {
           ? Math.round(d.closingBalance)
           : null
         : d.mos != null
-        ? roundAMC(d.mos)
-        : null;
+          ? roundAMC(d.mos)
+          : null;
       byPU[id].data[d.month] = val;
     });
 
@@ -3026,8 +3069,8 @@ export default class StockStatusMatrix extends React.Component {
           ? Math.round(d.closingBalance)
           : null
         : d.mos != null
-        ? roundAMC(d.mos)
-        : null;
+          ? roundAMC(d.mos)
+          : null;
       byPU[id].data[d.month] = val;
     });
 
@@ -3040,8 +3083,8 @@ export default class StockStatusMatrix extends React.Component {
       const yAxisID = showQuantity
         ? "y-axis-1"
         : planBasedOn == 2
-        ? "y-axis-2"
-        : "y-axis-1";
+          ? "y-axis-2"
+          : "y-axis-1";
 
       return {
         type: "line",
@@ -3101,12 +3144,12 @@ export default class StockStatusMatrix extends React.Component {
       const minMax =
         row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-              0
-            )}`
+            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+            0
+          )}`
           : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-              Math.round(row.maxStock || 0)
-            )}`;
+            Math.round(row.maxStock || 0)
+          )}`;
       A.push(
         addDoubleQuoteToRowContent([
           (
@@ -3146,6 +3189,8 @@ export default class StockStatusMatrix extends React.Component {
       i18n.t("static.common.month"),
       i18n.t("static.planningunit.planningunit"),
       i18n.t("static.supplyPlan.consumption"),
+      i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+      i18n.t("static.supplyPlan.expiredQty"),
       i18n.t("static.report.amc"),
       i18n.t("static.report.stock"),
       i18n.t("static.report.mos"),
@@ -3169,8 +3214,8 @@ export default class StockStatusMatrix extends React.Component {
         planBasedOn == 2
           ? ""
           : row.mos != null
-          ? formatterMOS(roundAMC(row.mos), 1)
-          : i18n.t("static.supplyPlanFormula.na");
+            ? formatterMOS(roundAMC(row.mos), 1)
+            : i18n.t("static.supplyPlanFormula.na");
 
       B.push(
         addDoubleQuoteToRowContent([
@@ -3183,6 +3228,8 @@ export default class StockStatusMatrix extends React.Component {
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
           row.consumptionQty != null ? Math.round(row.consumptionQty) : "",
+          row.shipmentQty != null ? Math.round(row.shipmentQty) : 0,
+          row.expiredQty != null ? Math.round(row.expiredQty) : 0,
           row.amc != null ? Math.round(row.amc) : "",
           row.closingBalance != null ? Math.round(row.closingBalance) : "",
           mosDisplay,
@@ -3277,16 +3324,16 @@ export default class StockStatusMatrix extends React.Component {
       const minMax =
         row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
-              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-              0
-            )}`
+            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+            0
+          )}`
           : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
-              Math.round(row.maxStock || 0)
-            )}`;
+            Math.round(row.maxStock || 0)
+          )}`;
       return [
         getLabelText(row.planningUnit.label, lang) +
-          " | " +
-          row.planningUnit.id,
+        " | " +
+        row.planningUnit.id,
         row.planBasedOn == 1
           ? i18n.t("static.report.mos")
           : i18n.t("static.report.qty"),
@@ -3370,6 +3417,8 @@ export default class StockStatusMatrix extends React.Component {
         i18n.t("static.common.month"),
         i18n.t("static.planningunit.planningunit"),
         i18n.t("static.supplyPlan.consumption"),
+        i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+        i18n.t("static.supplyPlan.expiredQty"),
         i18n.t("static.report.amc"),
         i18n.t("static.report.stock"),
         i18n.t("static.report.mos"),
@@ -3392,17 +3441,19 @@ export default class StockStatusMatrix extends React.Component {
         planBasedOn == 2
           ? ""
           : row.mos != null
-          ? formatterMOS(roundAMC(row.mos), 1)
-          : i18n.t("static.supplyPlanFormula.na");
+            ? formatterMOS(roundAMC(row.mos), 1)
+            : i18n.t("static.supplyPlanFormula.na");
 
       return [
         moment(row.month).format("MMM YY"),
         getLabelText(row.planningUnit.label, lang) +
-          " | " +
-          row.planningUnit.id,
+        " | " +
+        row.planningUnit.id,
         row.consumptionQty != null
           ? formatter(Math.round(row.consumptionQty))
           : "",
+        row.shipmentQty != null ? formatter(Math.round(row.shipmentQty)) : 0,
+        row.expiredQty != null ? formatter(Math.round(row.expiredQty)) : 0,
         row.amc != null ? formatter(Math.round(row.amc)) : "",
         row.closingBalance != null
           ? formatter(Math.round(row.closingBalance))
@@ -3425,12 +3476,12 @@ export default class StockStatusMatrix extends React.Component {
       columnStyles: { 1: { cellWidth: 130 } },
       didParseCell(data) {
         if (data.section == "body") {
-          if (data.column.index == 6) {
+          if (data.column.index == 8) {
             data.cell.styles.fillColor =
               colorMap2[data.row.index]?.bgColor || "#cfcdc9";
           }
           if (
-            data.column.index == 5 &&
+            data.column.index == 7 &&
             colorMap2[data.row.index]?.planBasedOn !== 2
           ) {
             data.cell.styles.fillColor =
@@ -3472,7 +3523,7 @@ export default class StockStatusMatrix extends React.Component {
             }))
             .sort((a, b) =>
               getLabelText(a.label, lang).toUpperCase() >
-              getLabelText(b.label, lang).toUpperCase()
+                getLabelText(b.label, lang).toUpperCase()
                 ? 1
                 : -1
             );
@@ -3497,7 +3548,7 @@ export default class StockStatusMatrix extends React.Component {
           const lang = this.state.lang;
           const list = (res.data.planningUnitList || []).sort((a, b) =>
             getLabelText(a.label, lang).toUpperCase() >
-            getLabelText(b.label, lang).toUpperCase()
+              getLabelText(b.label, lang).toUpperCase()
               ? 1
               : -1
           );
@@ -3656,13 +3707,13 @@ export default class StockStatusMatrix extends React.Component {
                 const mos = useWps
                   ? sp.mosWps
                   : useWtbd
-                  ? sp.mosWtbdps
-                  : sp.mos;
+                    ? sp.mosWtbdps
+                    : sp.mos;
                 const cb = useWps
                   ? sp.closingBalanceWps
                   : useWtbd
-                  ? sp.closingBalanceWtbdps
-                  : sp.closingBalance;
+                    ? sp.closingBalanceWtbdps
+                    : sp.closingBalance;
                 const amc = sp.amc;
 
                 let statusId;
@@ -3675,31 +3726,31 @@ export default class StockStatusMatrix extends React.Component {
                     cb == null
                       ? -1
                       : cb == 0
-                      ? 0
-                      : cb < minStock
-                      ? 1
-                      : cb > dynamicMax
-                      ? 3
-                      : 2;
+                        ? 0
+                        : cb < minStock
+                          ? 1
+                          : cb > dynamicMax
+                            ? 3
+                            : 2;
                 }
 
                 const shipmentQty = useWps
                   ? sp.shipmentTotalQtyWps
                   : useWtbd
-                  ? sp.shipmentTotalQtyWtbdps
-                  : sp.shipmentTotalQty;
+                    ? sp.shipmentTotalQtyWtbdps
+                    : sp.shipmentTotalQty;
                 const expiredQty = useWps
                   ? sp.expiredStockWps
                   : useWtbd
-                  ? sp.expiredStockWtbdps
-                  : sp.expiredStock;
+                    ? sp.expiredStockWtbdps
+                    : sp.expiredStock;
 
                 dataMap[sp.transDate] = {
                   mos,
                   closingBalance: cb,
                   amc,
                   stockStatusId: statusId,
-                  actualStock: !!sp.actualStock,
+                  actualStock: sp.regionCountForStock == sp.regionCount,
                   shipmentQty,
                   expiredQty,
                   planningUnitIds: null,
@@ -3707,13 +3758,15 @@ export default class StockStatusMatrix extends React.Component {
                 details.push({
                   month: sp.transDate,
                   planningUnit: { id: Number(puId), label: puActualLabel },
-                  consumptionQty: sp.consumption || 0,
-                  actualConsumption: !!sp.actualConsumption,
+                  consumptionQty: sp.consumptionQty || 0,
+                  actualConsumption: sp.actualFlag,
                   amc,
                   closingBalance: cb,
-                  actualStock: !!sp.actualStock,
+                  actualStock: sp.regionCountForStock == sp.regionCount,
                   mos,
                   stockStatusId: statusId,
+                  shipmentQty,
+                  expiredQty,
                 });
               });
 
@@ -3746,8 +3799,8 @@ export default class StockStatusMatrix extends React.Component {
           removePlannedShipments: this.state.removePlannedShipments
             ? 1
             : this.state.removeTBDFundingSourceShipments
-            ? 2
-            : 0,
+              ? 2
+              : 0,
           fundingSourceIds: [],
           procurementAgentIds: [],
           showByQty: this.state.showQuantity,
@@ -3756,7 +3809,7 @@ export default class StockStatusMatrix extends React.Component {
           .then((response) => {
             let { stockStatusMatrix = [], stockStatusDetails = [] } =
               response.data;
-
+            stockStatusMatrix = stockStatusMatrix.filter(c => c.planningUnit.id != 0);
             stockStatusMatrix = stockStatusMatrix.map((row) => {
               if (row.planBasedOn !== 2) return row;
 
@@ -3782,12 +3835,12 @@ export default class StockStatusMatrix extends React.Component {
                   cb == null
                     ? -1
                     : cb == 0
-                    ? 0
-                    : cb < minStock
-                    ? 1
-                    : cb > dynamicMax
-                    ? 3
-                    : 2;
+                      ? 0
+                      : cb < minStock
+                        ? 1
+                        : cb > dynamicMax
+                          ? 3
+                          : 2;
                 updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
               });
 
@@ -3823,8 +3876,8 @@ export default class StockStatusMatrix extends React.Component {
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
+                    ? i18n.t("static.common.demoNetworkErrorMessage")
+                    : i18n.t("static.common.prodNetworkErrorMessage"),
               });
             } else {
               switch (error.response?.status) {
@@ -4089,13 +4142,13 @@ export default class StockStatusMatrix extends React.Component {
         {item.versionStatus?.id == 2 && item.versionType?.id == 2
           ? item.versionId + "**"
           : item.versionType?.id == 2
-          ? item.versionId + "*"
-          : item.versionId}{" "}
+            ? item.versionId + "*"
+            : item.versionId}{" "}
         ({moment(item.createdDate).format("MMM DD YYYY")})
         {item.cutOffDate
           ? ` (${i18n.t("static.supplyPlan.start")} ${moment(
-              item.cutOffDate
-            ).format("MMM YYYY")})`
+            item.cutOffDate
+          ).format("MMM YYYY")})`
           : ""}
       </option>
     ));
@@ -4279,7 +4332,16 @@ export default class StockStatusMatrix extends React.Component {
               {/* ── Filter row 1 ── */}
               <div className="row">
                 <FormGroup className="col-md-3">
-                  <Label>{i18n.t("static.report.dateRange")}</Label>
+                  <Label>{i18n.t("static.report.dateRange")}<i
+                    className="fa fa-info-circle icons"
+                    title={i18n.t("static.report.reportPeriodTooltip")}
+                    aria-hidden="true"
+                    style={{
+                      color: "#002f6c",
+                      cursor: "pointer",
+                      marginLeft: "5px",
+                    }}
+                  ></i></Label>
                   <div className="controls edit">
                     <Picker
                       ref="pickRange"
@@ -4330,7 +4392,16 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
-                  <Label>{i18n.t("static.report.versionFinal*")}</Label>
+                  <Label>{i18n.t("static.report.versionFinal*")}<i
+                    className="fa fa-info-circle icons"
+                    title={i18n.t("static.report.versionTooltip")}
+                    aria-hidden="true"
+                    style={{
+                      color: "#002f6c",
+                      cursor: "pointer",
+                      marginLeft: "5px",
+                    }}
+                  ></i></Label>
                   <div className="controls">
                     <InputGroup>
                       <Input
@@ -4422,6 +4493,18 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removePlannedShipments"
                     >
                       {i18n.t("static.report.removePlannedShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removePlannedShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -4442,6 +4525,18 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removeTBDFundingSourceShipments"
                     >
                       {i18n.t("static.report.removeTBDFundingSourceShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removeTBDFundingSourceShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
@@ -4466,6 +4561,16 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showQuantity">
                       {i18n.t("static.report.showQuantity")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showQuantityTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -4482,6 +4587,16 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showIcon">
                       {i18n.t("static.report.showIcon")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showIconTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
@@ -4595,12 +4710,7 @@ export default class StockStatusMatrix extends React.Component {
 
                 {showDetailData && (
                   <>
-                    {chartData && (
-                      <div className="mt-4 mb-2" style={{ height: "450px" }}>
-                        <Line data={chartData} options={chartOptions} />
-                      </div>
-                    )}
-
+                    <br /><br /><br />
                     {hasDetails && (
                       <div className="row">
                         <FormGroup className="col-md-10 mt-3">
@@ -4692,14 +4802,14 @@ export default class StockStatusMatrix extends React.Component {
                       options={
                         this.state.onlyDownloadedPrograms
                           ? this.state.downloadedPrograms.map((p) => ({
-                              value: p.programId,
-                              label: p.displayLabel,
-                              versionId: p.versionId,
-                            }))
+                            value: p.programId,
+                            label: p.displayLabel,
+                            versionId: p.versionId,
+                          }))
                           : this.state.allProgramsForExport.map((p) => ({
-                              value: p.programId,
-                              label: p.programCode,
-                            }))
+                            value: p.programId,
+                            label: p.programCode,
+                          }))
                       }
                       value={this.state.exportProgramIds}
                       onChange={this.handleExportProgramChange}
@@ -4768,7 +4878,7 @@ export default class StockStatusMatrix extends React.Component {
                   {this.state.exportProgramIds.length > 0 &&
                     this.state.exportPlanningUnitIds.length > 0 &&
                     (!this.state.onlyDownloadedPrograms &&
-                    this.state.exportProgramIds.length == 1
+                      this.state.exportProgramIds.length == 1
                       ? this.state.exportVersionId
                       : true) && (
                       <Button
