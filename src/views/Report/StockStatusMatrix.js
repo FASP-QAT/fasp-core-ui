@@ -1248,7 +1248,10 @@ export default class StockStatusMatrix extends React.Component {
       endDate,
     } = this.state.PlanningUnitDataForExport || {};
     const doc = new jsPDF("landscape", "pt", "A4");
-    console.log("PlanningUnitDataForExport Test@123",this.state.planningUnitsForExport)
+    console.log(
+      "PlanningUnitDataForExport Test@123",
+      this.state.planningUnitsForExport
+    );
     // Pre-render FA icons from the browser's loaded FontAwesome font once,
     // so didDrawCell can stamp them synchronously without re-creating canvases.
     const iconCache = buildPdfIconCache();
@@ -1344,7 +1347,7 @@ export default class StockStatusMatrix extends React.Component {
         if (this.state.exportProgramIds.length == 1) {
           const rawLabel = this.state.exportProgramIds[0].label;
           const vFromLabel = rawLabel.includes("~v")
-            ? rawLabel.split("~v")[1]+" (Local)"
+            ? rawLabel.split("~v")[1] + " (Local)"
             : null;
           const vText =
             vFromLabel ||
@@ -1481,16 +1484,28 @@ export default class StockStatusMatrix extends React.Component {
             );
           }
 
+          // Sort matrix rows by planning unit display name for PDF
+          const sortedPFM = programFilteredMatrix.slice().sort((a, b) => {
+            const la = getLabelText(
+              a.planningUnit.label,
+              this.state.lang
+            ).toUpperCase();
+            const lb = getLabelText(
+              b.planningUnit.label,
+              this.state.lang
+            ).toUpperCase();
+            return la < lb ? -1 : la > lb ? 1 : 0;
+          });
+
           const head = [
             [
               i18n.t("static.planningunit.planningunit"),
               i18n.t("static.stockStatus.plannedBy"),
               i18n.t("static.stockStatusMatrix.minMax"),
               ...chunkMonths.map((d) => moment(d).format("MMM YY")),
-              i18n.t("static.program.notes"),
             ],
           ];
-          const body = programFilteredMatrix.map((row) => {
+          const body = sortedPFM.map((row) => {
             const minMax =
               row.planBasedOn == 1
                 ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
@@ -1523,7 +1538,6 @@ export default class StockStatusMatrix extends React.Component {
                   ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : formatted;
               }),
-              row.notes || "",
             ];
           });
 
@@ -1532,9 +1546,6 @@ export default class StockStatusMatrix extends React.Component {
             head: head,
             body: body,
             margin: { top: 120 },
-            // ── FIX 1 & 2: dynamic left padding based on which icons are present ──
-            // We pre-compute per-cell icon widths so text never overlaps icons.
-            // The didParseCell hook sets left padding to accommodate 0, 1, or 2 icons.
             styles: {
               lineWidth: 1,
               fontSize: 6,
@@ -1544,7 +1555,6 @@ export default class StockStatusMatrix extends React.Component {
             },
             columnStyles: {
               0: { cellWidth: 100, halign: "left" },
-              [3 + chunkMonths.length]: { halign: "left" },
             },
             didDrawPage(data) {
               if (data.pageNumber > 1) {
@@ -1565,7 +1575,7 @@ export default class StockStatusMatrix extends React.Component {
                 data.column.index < 3 + chunkMonths.length
               ) {
                 const dateKey = chunkMonths[data.column.index - 3];
-                const rowData = programFilteredMatrix[data.row.index];
+                const rowData = sortedPFM[data.row.index];
                 const entry = (rowData.dataMap || {})[dateKey];
                 const bgColor = entry
                   ? colorForStatus(entry.stockStatusId)
@@ -1576,7 +1586,6 @@ export default class StockStatusMatrix extends React.Component {
                 }
 
                 // Reserve left padding for however many icons will be drawn:
-                // each icon is ICON_PT wide + ICON_GAP, plus a 2pt left buffer.
                 const hasTruck = entry && entry.shipmentQty > 0;
                 const hasWarning = entry && entry.expiredQty > 0;
                 const iconCount = (hasTruck ? 1 : 0) + (hasWarning ? 1 : 0);
@@ -1595,16 +1604,14 @@ export default class StockStatusMatrix extends React.Component {
               if (
                 data.section == "body" &&
                 data.column.index >= 3 &&
-                data.column.index < 3 + chunkMonths.length && data.row.index!=-1
+                data.column.index < 3 + chunkMonths.length &&
+                data.row.index != -1
               ) {
                 const dateKey = chunkMonths[data.column.index - 3];
-                console.log("programFilteredMatrix Test@123",data.row.index);
-                const rowData = programFilteredMatrix[data.row.index];
+                const rowData = sortedPFM[data.row.index];
                 const entry = (rowData.dataMap || {})[dateKey];
                 if (!entry) return;
 
-                // Stamp FA icons as tiny PNG images, advancing x after each one.
-                // Icons are vertically centred within the cell.
                 let iconX = data.cell.x + 2;
                 const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
 
@@ -1639,6 +1646,46 @@ export default class StockStatusMatrix extends React.Component {
               }
             },
           });
+
+          // ── Notes as footnotes below the matrix table (first chunk only) ──
+          if (cIdx === chunks.length - 1) {
+            const notedRows = sortedPFM.filter((row) => row.notes);
+            if (notedRows.length > 0) {
+              let fnY = doc.lastAutoTable.finalY + 15;
+              if (fnY > doc.internal.pageSize.height - 90) {
+                doc.addPage();
+                fnY = 80;
+              }
+              doc.setFont("helvetica", "bold");
+              doc.setFontSize(8);
+              doc.setTextColor("#000000");
+              doc.text(i18n.t("static.program.notes") + ":", 40, fnY);
+              fnY += 12;
+
+              doc.setFont("helvetica", "normal");
+              notedRows.forEach((row, idx) => {
+                const puName =
+                  getLabelText(row.planningUnit.label, this.state.lang) +
+                  " | " +
+                  row.planningUnit.id;
+                const fnText = `${idx + 1}. ${puName}: ${row.notes}`;
+                const lines = doc.splitTextToSize(
+                  fnText,
+                  doc.internal.pageSize.width - 80
+                );
+                lines.forEach((line) => {
+                  if (fnY > doc.internal.pageSize.height - 90) {
+                    doc.addPage();
+                    fnY = 80;
+                  }
+                  doc.text(line, 40, fnY);
+                  fnY += 10;
+                });
+                fnY += 4;
+              });
+              doc.lastAutoTable.finalY = fnY;
+            }
+          }
         });
 
         // Section 2: Graph
@@ -1956,7 +2003,19 @@ export default class StockStatusMatrix extends React.Component {
           t1Headers.map((h) => h.replaceAll(" ", "%20"))
         ),
       ];
-      programFilteredMatrix.forEach((row) => {
+      // Sort by planning unit display name for CSV
+      const sortedPFMcsv = programFilteredMatrix.slice().sort((a, b) => {
+        const la = getLabelText(
+          a.planningUnit.label,
+          this.state.lang
+        ).toUpperCase();
+        const lb = getLabelText(
+          b.planningUnit.label,
+          this.state.lang
+        ).toUpperCase();
+        return la < lb ? -1 : la > lb ? 1 : 0;
+      });
+      sortedPFMcsv.forEach((row) => {
         const minMax =
           row.planBasedOn == 1
             ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
@@ -2146,6 +2205,14 @@ export default class StockStatusMatrix extends React.Component {
       );
     }
 
+    // Sort filteredMatrix by planning unit display name (ascending)
+    const lang = this.state.lang;
+    filteredMatrix = filteredMatrix.slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+
     this.setState({ filteredMatrix, filteredDetails }, () => {
       this.buildMatrixJExcel();
       if (this.state.showDetailData) this.buildDetailJExcel();
@@ -2197,12 +2264,14 @@ export default class StockStatusMatrix extends React.Component {
           : null;
       });
 
+      // Notes are stored as a hidden column (last-1) for hover logic;
+      // puId is the very last element used as lookup key.
       return [
         puLabel,
         planBy,
         minMax,
         ...dataCells,
-        row.notes || "",
+        row.notes || "", // notes hidden slot (not a visible column)
         String(puId),
       ];
     });
@@ -2210,7 +2279,8 @@ export default class StockStatusMatrix extends React.Component {
     const monthCols = monthColumns.map((dateKey) => ({
       title: moment(dateKey).format("MMM YY"),
       type: "numeric",
-      mask: "#,##0",
+      mask: "#,##.000",
+      decimal: ".",
       width: 72,
       readOnly: true,
       align: "center",
@@ -2237,13 +2307,7 @@ export default class StockStatusMatrix extends React.Component {
         readOnly: true,
       },
       ...monthCols,
-      {
-        title: i18n.t("static.program.notes"),
-        type: "text",
-        width: 140,
-        readOnly: true,
-        align: "left",
-      },
+      { title: "notes", type: "hidden" },
       { title: "puId", type: "hidden" },
     ];
 
@@ -2260,10 +2324,72 @@ export default class StockStatusMatrix extends React.Component {
       columnDrag: false,
       editable: false,
       license: JEXCEL_PRO_KEY,
-      onopenfilter: onOpenFilter,
+      onopenfilter: (worksheets, columnNumber, options) => {
+        var type = worksheets.getConfig().columns[columnNumber].type;
+        if (type == "dropdown" || type == "autocomplete") {
+          setTimeout(() => {
+            const dropdown = document.querySelector(".jss_filters_options");
+            if (dropdown) {
+              const options = Array.from(
+                dropdown.querySelectorAll("label")
+              ).slice(1);
+              const sorted = options.sort((a, b) =>
+                a.textContent.localeCompare(b.textContent)
+              );
+              sorted.forEach((option) => dropdown.appendChild(option));
+            }
+          }, 50);
+        }
+        setTimeout(() => {
+          document
+            .querySelectorAll(".jss_filters_options i")
+            .forEach((icon) => icon.remove());
+        }, 0);
+        setTimeout(() => {
+          const container = document.querySelector(".jss_filters_options");
+          if (!container) return;
+      
+          // Get all labels except "(Select all)"
+          const labels = Array.from(container.querySelectorAll("label"))
+            .filter(l => !l.innerText.includes("(Select all)"));
+      
+          // Extract value + element
+          const items = labels.map(label => {
+            const text = label.innerText.trim();
+      
+            // Remove icons / symbols if any
+            const clean = text.replace(/[^\d.\-]/g, "");
+      
+            return {
+              value: parseFloat(clean) || 0,
+              element: label
+            };
+          });
+      
+          // 🔥 Sort numerically (ascending)
+          items.sort((a, b) => a.value - b.value);
+      
+          // Clear and re-append
+          items.forEach(item => container.appendChild(item.element));
+      
+        }, 0);
+      },
       allowRenameColumn: false,
       filters: true,
-      onload: this.loadedMatrix,
+      onload: (instance) => {
+        this.loadedMatrix(instance);
+        // Hide filter icons from column headers as requested
+        const el = instance.element || instance;
+        const filterIcons = el.querySelectorAll(".jss_column_filter");
+        filterIcons.forEach((icon) => {
+          icon.style.display = "none";
+        });
+        document
+          .querySelectorAll(".jss_filters_options i, .jexcel_filter svg")
+          .forEach((icon) => {
+            icon.style.display = "none";
+          });
+      },
       pagination: false,
       search: true,
       columnSorting: true,
@@ -2311,11 +2437,12 @@ export default class StockStatusMatrix extends React.Component {
         if (col == 0 && row >= 0) {
           td.style.cursor = "pointer";
           td.style.setProperty("text-align", "left", "important");
-          return;
-        }
-
-        if (col == monthEndIdx + 1 && row >= 0) {
-          td.style.setProperty("text-align", "left", "important");
+          // Add hover-over tooltip for notes (stored at index monthEndIdx+1)
+          const rowData = tableRows[row];
+          if (rowData) {
+            const noteVal = rowData[monthEndIdx + 1] || "";
+            if (noteVal) td.title = noteVal;
+          }
           return;
         }
 
@@ -2334,7 +2461,7 @@ export default class StockStatusMatrix extends React.Component {
           bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#333";
         const fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
-        if (value == null || value == "" || value == undefined) {
+        if (value === null || value === "" || value == undefined) {
           td.innerHTML = "N/A";
         }
 
@@ -2388,6 +2515,103 @@ export default class StockStatusMatrix extends React.Component {
         }
       },
       contextMenu: () => false,
+      oncopy: (worksheet, selection, str) => {
+        try {
+          const [x1, y1, x2, y2] = selection;
+          const currentTableData = worksheet.getData();
+          const lines = [];
+
+          let html = '<table border="1">';
+          for (let r = y1; r <= y2; r++) {
+            const cols = [];
+            html += "<tr>";
+            for (let c = x1; c <= x2; c++) {
+              const rowData = currentTableData[r];
+              if (!rowData) {
+                cols.push("");
+                html += "<td></td>";
+                continue;
+              }
+
+              let val = rowData[c];
+              if (val == null || val === "") val = "N/A";
+              let bgColor = "";
+              let textColor = "";
+              let fontWeight = "normal";
+
+              if (c >= monthStartIdx && c <= monthEndIdx) {
+                const raw = rowData[c];
+
+                const puId = rowData[rowData.length - 1];
+                const dateKey = monthColumns[c - monthStartIdx];
+                const lookupKey = `${puId}|${dateKey}`;
+                const entry = entryLookup[lookupKey];
+                const statusId = entry != null ? entry.stockStatusId : -1;
+                bgColor = colorForStatus(statusId);
+                textColor =
+                  bgColor == "#BA0C2F" || bgColor == "#118b70"
+                    ? "#fff"
+                    : "#333";
+                fontWeight = entry && entry.actualStock ? "bold" : "normal";
+
+                // Exact icons in HTML clipboard using Data URLs
+                let htmlIcons = "";
+                let prefixIcons = "";
+                if (self.state.showIcon && entry) {
+                  if (entry.shipmentQty && entry.shipmentQty > 0) {
+                    prefixIcons += "\uD83D\uDE9A ";
+                    const truck = renderFaIconToDataUrl(
+                      "\uf0d1",
+                      textColor,
+                      32
+                    );
+                    if (truck)
+                      htmlIcons += `<img src="${truck.dataUrl}" style="width:12px; height:12px; margin-right:4px; vertical-align:middle;">`;
+                  }
+                  if (entry.expiredQty && entry.expiredQty > 0) {
+                    prefixIcons += "\u26A0\uFE0F ";
+                    const warn = renderFaIconToDataUrl("\uf071", textColor, 32);
+                    if (warn)
+                      htmlIcons += `<img src="${warn.dataUrl}" style="width:12px; height:12px; margin-right:4px; vertical-align:middle;">`;
+                  }
+                }
+                cols.push(prefixIcons + val);
+                html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight}; vertical-align:middle;">${htmlIcons}${val}</td>`;
+              } else {
+                const v = rowData[c];
+                val = v != null ? String(v) : "";
+                cols.push(val);
+                html += `<td style="vertical-align:middle;">${val}</td>`;
+              }
+            }
+            lines.push(cols.join("\t"));
+            html += "</tr>";
+          }
+          html += "</table>";
+
+          const text = lines.join("\n");
+
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.write &&
+            typeof window.ClipboardItem !== "undefined"
+          ) {
+            const textBlob = new Blob([text], { type: "text/plain" });
+            const htmlBlob = new Blob([html], { type: "text/html" });
+            const clipboardItem = new ClipboardItem({
+              "text/plain": textBlob,
+              "text/html": htmlBlob,
+            });
+            navigator.clipboard.write([clipboardItem]).catch(() => {
+              // fallback if failed
+            });
+          }
+          return text;
+        } catch (e) {
+          console.warn("oncopy override failed", e);
+          return str;
+        }
+      },
     };
 
     this.matrixEl = jexcel(
@@ -2617,6 +2841,72 @@ export default class StockStatusMatrix extends React.Component {
         const el = instance.element || instance;
         applyDetailColours(el, pageSize, currentPage);
       },
+      oncopy: (worksheet, selection, str) => {
+        try {
+          const [x1, y1, x2, y2] = selection;
+          const currentTableData = worksheet.getData();
+          const lines = [];
+
+          let html = '<table border="1">';
+          for (let r = y1; r <= y2; r++) {
+            const cols = [];
+            html += "<tr>";
+            for (let c = x1; c <= x2; c++) {
+              const rowData = currentTableData[r];
+              if (!rowData) {
+                cols.push("");
+                html += "<td></td>";
+                continue;
+              }
+
+              let val = rowData[c];
+              let bgColor = "";
+              let textColor = "";
+              let fontWeight = "normal";
+
+              if (c == 5 || c == 6) {
+                const statusId = Number(rowData[7]);
+                const isActualStock = rowData[8] == "1";
+                bgColor = colorForStatus(statusId);
+                textColor =
+                  bgColor == "#BA0C2F" || bgColor == "#118b70"
+                    ? "#fff"
+                    : "#000";
+                if (c == 5) fontWeight = isActualStock ? "bold" : "normal";
+              }
+
+              val = val != null ? String(val) : "";
+              cols.push(val);
+              html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight};">${val}</td>`;
+            }
+            lines.push(cols.join("\t"));
+            html += "</tr>";
+          }
+          html += "</table>";
+
+          const text = lines.join("\n");
+
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.write &&
+            typeof window.ClipboardItem !== "undefined"
+          ) {
+            const textBlob = new Blob([text], { type: "text/plain" });
+            const htmlBlob = new Blob([html], { type: "text/html" });
+            const clipboardItem = new ClipboardItem({
+              "text/plain": textBlob,
+              "text/html": htmlBlob,
+            });
+            navigator.clipboard.write([clipboardItem]).catch(() => {
+              // fallback if failed
+            });
+          }
+          return text;
+        } catch (e) {
+          console.warn("oncopy override failed", e);
+          return str;
+        }
+      },
       contextMenu: () => false,
     };
 
@@ -2801,7 +3091,13 @@ export default class StockStatusMatrix extends React.Component {
         t1Headers.map((h) => h.replaceAll(" ", "%20"))
       ),
     ];
-    filteredMatrix.forEach((row) => {
+    // Sort by planning unit display name for CSV
+    const sortedMatrix = filteredMatrix.slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+    sortedMatrix.forEach((row) => {
       const minMax =
         row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
@@ -2954,6 +3250,13 @@ export default class StockStatusMatrix extends React.Component {
       }
     };
 
+    // Sort matrix by planning unit display name for PDF
+    const sortedMatrix1 = filteredMatrix.slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+
     const head1 = [
       [
         i18n.t("static.planningunit.planningunit"),
@@ -2962,16 +3265,15 @@ export default class StockStatusMatrix extends React.Component {
           "static.report.maxMosOrQty"
         )}`,
         ...monthColumns.map((d) => moment(d).format("MMM YY")),
-        i18n.t("static.program.notes"),
       ],
     ];
-    const colorMap1 = filteredMatrix.map((row) =>
+    const colorMap1 = sortedMatrix1.map((row) =>
       monthColumns.map((dateKey) => {
         const entry = (row.dataMap || {})[dateKey];
         return entry ? colorForStatus(entry.stockStatusId) : "#cfcdc9";
       })
     );
-    const body1 = filteredMatrix.map((row) => {
+    const body1 = sortedMatrix1.map((row) => {
       const minMax =
         row.planBasedOn == 1
           ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
@@ -2999,7 +3301,6 @@ export default class StockStatusMatrix extends React.Component {
             ? formatter(raw)
             : formatterMOS(raw, 2);
         }),
-        row.notes || "",
       ];
     });
     doc.autoTable({
@@ -3025,6 +3326,44 @@ export default class StockStatusMatrix extends React.Component {
         }
       },
     });
+
+    // ── Notes as footnotes below the first table ──
+    const notedRows1 = sortedMatrix1.filter((row) => row.notes);
+    if (notedRows1.length > 0) {
+      let fnY = doc.lastAutoTable.finalY + 15;
+      if (fnY > doc.internal.pageSize.height - 90) {
+        doc.addPage();
+        fnY = 80;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor("#000000");
+      doc.text(i18n.t("static.program.notes") + ":", 40, fnY);
+      fnY += 12;
+
+      doc.setFont("helvetica", "normal");
+      notedRows1.forEach((row, idx) => {
+        const puName =
+          getLabelText(row.planningUnit.label, lang) +
+          " | " +
+          row.planningUnit.id;
+        const fnText = `${idx + 1}. ${puName}: ${row.notes}`;
+        const lines = doc.splitTextToSize(
+          fnText,
+          doc.internal.pageSize.width - 80
+        );
+        lines.forEach((line) => {
+          if (fnY > doc.internal.pageSize.height - 90) {
+            doc.addPage();
+            fnY = 80;
+          }
+          doc.text(line, 40, fnY);
+          fnY += 10;
+        });
+        fnY += 4;
+      });
+      doc.lastAutoTable.finalY = fnY;
+    }
 
     const head2 = [
       [
@@ -3940,20 +4279,7 @@ export default class StockStatusMatrix extends React.Component {
               {/* ── Filter row 1 ── */}
               <div className="row">
                 <FormGroup className="col-md-3">
-                  <Label>
-                    {i18n.t("static.report.dateRange")}
-                    <i
-                      className="fa fa-info-circle icons"
-                      title={i18n.t("static.report.reportPeriodTooltip")}
-                      aria-hidden="true"
-                      style={{
-                        color: "#002f6c",
-                        cursor: "pointer",
-                        marginLeft: "5px",
-                      }}
-                    ></i>
-                    <span className="stock-box-icon fa fa-sort-desc ml-1"></span>
-                  </Label>
+                  <Label>{i18n.t("static.report.dateRange")}</Label>
                   <div className="controls edit">
                     <Picker
                       ref="pickRange"
@@ -4004,19 +4330,7 @@ export default class StockStatusMatrix extends React.Component {
                 </FormGroup>
 
                 <FormGroup className="col-md-3">
-                  <Label>
-                    {i18n.t("static.report.versionFinal*")}{" "}
-                    <i
-                      className="fa fa-info-circle icons"
-                      title={i18n.t("static.report.versionTooltip")}
-                      aria-hidden="true"
-                      style={{
-                        color: "#002f6c",
-                        cursor: "pointer",
-                        marginLeft: "5px",
-                      }}
-                    ></i>
-                  </Label>
+                  <Label>{i18n.t("static.report.versionFinal*")}</Label>
                   <div className="controls">
                     <InputGroup>
                       <Input
@@ -4038,7 +4352,6 @@ export default class StockStatusMatrix extends React.Component {
 
                 <FormGroup className="col-md-3">
                   <Label>{i18n.t("static.planningunit.planningunit")}</Label>
-                  <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                   <div onBlur={this.handleBlur}>
                     <MultiSelect
                       name="planningUnitId"
@@ -4109,18 +4422,6 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removePlannedShipments"
                     >
                       {i18n.t("static.report.removePlannedShipments")}
-                      <i
-                        className="fa fa-info-circle icons"
-                        title={i18n.t(
-                          "static.report.removePlannedShipmentsTooltip"
-                        )}
-                        aria-hidden="true"
-                        style={{
-                          color: "#002f6c",
-                          cursor: "pointer",
-                          marginLeft: "5px",
-                        }}
-                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -4141,18 +4442,6 @@ export default class StockStatusMatrix extends React.Component {
                       htmlFor="removeTBDFundingSourceShipments"
                     >
                       {i18n.t("static.report.removeTBDFundingSourceShipments")}
-                      <i
-                        className="fa fa-info-circle icons"
-                        title={i18n.t(
-                          "static.report.removeTBDFundingSourceShipmentsTooltip"
-                        )}
-                        aria-hidden="true"
-                        style={{
-                          color: "#002f6c",
-                          cursor: "pointer",
-                          marginLeft: "5px",
-                        }}
-                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
@@ -4177,16 +4466,6 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showQuantity">
                       {i18n.t("static.report.showQuantity")}
-                      <i
-                        className="fa fa-info-circle icons"
-                        title={i18n.t("static.report.showQuantityTooltip")}
-                        aria-hidden="true"
-                        style={{
-                          color: "#002f6c",
-                          cursor: "pointer",
-                          marginLeft: "5px",
-                        }}
-                      ></i>
                     </Label>
                   </div>
                   <div className="controls form-check mt-1">
@@ -4203,16 +4482,6 @@ export default class StockStatusMatrix extends React.Component {
                     />
                     <Label className="form-check-label" htmlFor="showIcon">
                       {i18n.t("static.report.showIcon")}
-                      <i
-                        className="fa fa-info-circle icons"
-                        title={i18n.t("static.report.showIconTooltip")}
-                        aria-hidden="true"
-                        style={{
-                          color: "#002f6c",
-                          cursor: "pointer",
-                          marginLeft: "5px",
-                        }}
-                      ></i>
                     </Label>
                   </div>
                 </FormGroup>
@@ -4235,33 +4504,69 @@ export default class StockStatusMatrix extends React.Component {
                             </span>
                           </li>
                         ))}
-                        <li>
+                        <li
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
                           <span
-                            className="fa fa-truck legendcolor"
-                            style={{ color: "#000" }}
+                            className="fa fa-truck"
+                            style={{
+                              color: "#000",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "14px",
+                              height: "14px",
+                              fontSize: "14px",
+                              lineHeight: 1,
+                              verticalAlign: "middle",
+                            }}
                           ></span>
-                          <span className="">
+                          <span style={{ verticalAlign: "middle" }}>
                             {i18n.t("static.shipment.shipment")}
                           </span>
                         </li>
-                        <li>
+
+                        <li
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
                           <span
-                            className="fa fa-exclamation-triangle legendcolor"
-                            style={{ color: "#000" }}
+                            className="fa fa-exclamation-triangle"
+                            style={{
+                              color: "#000",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "14px",
+                              height: "14px",
+                              fontSize: "14px",
+                              lineHeight: 1,
+                              verticalAlign: "middle",
+                            }}
                           ></span>
-                          <span className="">
+                          <span style={{ verticalAlign: "middle" }}>
                             {i18n.t("static.supplyplan.exipredStock")}
                           </span>
                         </li>
                         <li>
-                          <span className="legendcommitversionText">
+                          <span
+                            className="legendcommitversionText"
+                            style={{ verticalAlign: "middle" }}
+                          >
                             <b>{i18n.t("static.supplyPlan.actualBalance")}</b>
                           </span>
                         </li>
                       </ul>
                     </FormGroup>
 
-                    <div className="ReportSearchMarginTop TableWidth100">
+                    <div className="ReportSearchMarginTop TableWidth100 consumptionDataEntryTable">
                       <div
                         className="jexcelremoveReadonlybackground TableWidth100"
                         id="stockMatrixTableDiv"

@@ -3683,9 +3683,9 @@
   "static.stockStatusMatrix.totalShipmentQty": "Total Shipment Qty",
   "static.report.reportPeriodTooltip": "Default: 3 months past + 15 months in future. Please select the period you would like to view.",
   "static.report.versionTooltip": "* for final, ** for final approved, Default = latest version",
-  "static.report.showQuantityTooltip": "By default, months of stock (MOS) are shown. If you would like to see the stock balances instead, check this box.",
-  "static.report.showIconTooltip": "When checked, this displays the shipment and expiry icons. There is a shipment icon for every month with shipment(s), including all shipment statuses except cancelled, on-hold and any inactive shipments. There is an expiry icon for every month with a projected expiry.",
-  "static.report.removePlannedShipmentsTooltip": "This shows the resulting stock (status) if shipments with status = planned are removed. Note that by definition, this removes all TBD shipments since TBD shipments are not allowed past planned status.",
-  "static.report.removeTBDFundingSourceShipmentsTooltip": "This shows the resulting stock (status) if shipments with funding source = TBD are removed.",
+  "static.report.showQuantityTooltip": "If unchecked, stock is represented by months of stock (MOS) (default). If checked, stock is represented by quantity.",
+  "static.report.showIconTooltip": "If checked, this displays the shipment and expiry icons. There is a shipment icon for every month with shipment(s), including all shipment statuses except cancelled, on-hold and any inactive shipments. There is an expiry icon for every month with a projected expiry.",
+  "static.report.removePlannedShipmentsTooltip": "If checked, this shows the resulting stock (status) if shipments with status = planned are removed. Note that by definition, this removes all TBD shipments since TBD shipments are not allowed past planned status. ",
+  "static.report.removeTBDFundingSourceShipmentsTooltip": "If checked, this shows the resulting stock (status) if shipments with funding source = TBD are removed. ",
   "static.stockStatusMatrix.noData": "There is no available data for the planning unit(s) during the selected report period"
 }
