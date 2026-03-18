@@ -2857,9 +2857,10 @@ class ApplicationDashboard extends Component {
       aspectRatio: 2,
       layout: {
         padding: {
-          bottom: 10,
-          left: 10,
-          right: 10
+          top: 25,
+          bottom: 15,
+          left: 15,
+          right: 15
         }
       },
       plugins: {
@@ -3721,16 +3722,16 @@ class ApplicationDashboard extends Component {
                               </div>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.supplyPlanQualityScore) ? '#999' : Math.round(d.supplyPlanQualityScore) <= 60 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) <= 75 ? '#f48521' : Math.round(d.supplyPlanQualityScore) <= 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.supplyPlanQualityScore) ? "NaN" : Math.round(d.supplyPlanQualityScore)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.supplyPlanQualityScore) ? '#999' : Math.round(d.supplyPlanQualityScore) < 60 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) < 75 ? '#f48521' : Math.round(d.supplyPlanQualityScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.supplyPlanQualityScore) ? "N/A" : Math.round(d.supplyPlanQualityScore) + "%"}</b>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.stockStatusScore) ? '#999' : Math.round(d.stockStatusScore) <= 60 ? '#BA0C2F' : Math.round(d.stockStatusScore) <= 75 ? '#f48521' : Math.round(d.stockStatusScore) <= 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.stockStatusScore) ? "NaN" : Math.round(d.stockStatusScore)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.stockStatusScore) ? '#999' : Math.round(d.stockStatusScore) < 60 ? '#BA0C2F' : Math.round(d.stockStatusScore) < 75 ? '#f48521' : Math.round(d.stockStatusScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.stockStatusScore) ? "N/A" : Math.round(d.stockStatusScore) + "%"}</b>
                             </td>
                             <td>
-                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? '#999' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 60 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 75 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) <= 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? "NaN" : Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)}{"%"}</b>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? '#999' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 60 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 75 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? "N/A" : Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) + "%"}</b>
                             </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
@@ -3914,17 +3915,17 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> Overall Supply Plan Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                         </div>
                         <div class="card-body scrollable-content d-flex flex-column justify-content-center">
-                          <div className='row'>
+                          <div className='row px-4'>
                             <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
                           </div>
-                          <div className="text-center" style={{ marginTop: '10px' }}>
+                          <div className="text-center" style={{ marginTop: '15px' }}>
                             <div style={{ fontSize: '13px', color: '#000', fontWeight: 'bold' }}>Overall Supply Plan Score:</div>
-                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: isNaN(overallScoreValue) ? "#999" : overallScoreValue <= 60 ? "#BA0C2F" : overallScoreValue <= 75 ? "#f48521" : overallScoreValue <= 90 ? "#edba26" : "#118b70" }}>{isNaN(overallScoreValue) ? "NaN" : Math.round(overallScoreValue)}%</h3>
+                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: isNaN(overallScoreValue) ? "#999" : overallScoreValue < 60 ? "#BA0C2F" : overallScoreValue < 75 ? "#f48521" : overallScoreValue < 90 ? "#edba26" : "#118b70" }}>{isNaN(overallScoreValue) ? "N/A" : Math.round(overallScoreValue) + "%"}</h3>
                             <div className="d-flex justify-content-center flex-wrap" style={{ gap: '4px', marginTop: '8px' }}>
-                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>0%-60%</span></div>
-                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>61%-75%</span></div>
-                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>76%-90%</span></div>
-                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>91%-100%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>0%-59%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>60%-74%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>75%-89%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>90%-100%</span></div>
                             </div>
                           </div>
                         </div>
@@ -3936,8 +3937,8 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
                             <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
-                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.stockStatusScore) ? '#999' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) <= 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.stockStatusScore) ? "NaN" : Math.round(this.state.dashboardBottomData.stockStatusScore)}{"%"}</b>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.stockStatusScore) ? '#999' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.stockStatusScore) ? "N/A" : Math.round(this.state.dashboardBottomData.stockStatusScore) + "%"}</b>
                             </i>
                           </div>
                         </div>
@@ -4010,8 +4011,8 @@ class ApplicationDashboard extends Component {
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
                           <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
                             <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
-                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? '#999' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) <= 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
-                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? "NaN" : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore)}{"%"}</b>
+                              Score: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? '#999' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? "N/A" : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) + "%"}</b>
                             </i>
                           </div>
                         </div>
