@@ -298,7 +298,21 @@ class ShipmentSummery extends Component {
             this.setState({
               countrys: listArray,
               loading: false
-            }, () => { })
+            }, () => {
+              const sesRealmCountryId = localStorage.getItem("sesRealmCountryId");
+              if (sesRealmCountryId && sesRealmCountryId !== "" && sesRealmCountryId !== "undefined") {
+                const country = listArray.find(c => c.id == sesRealmCountryId);
+                if (country) {
+                  let countryValues = [{
+                    label: getLabelText(country.label, this.state.lang),
+                    value: Number(country.id)
+                  }];
+                  this.setState({ countryValues }, () => {
+                    this.filterProgram();
+                  });
+                }
+              }
+            })
           } else {
             this.setState({ message: response.data.messageCode, loading: false },
               () => { this.hideSecondComponent(); })
@@ -415,7 +429,23 @@ class ShipmentSummery extends Component {
                 this.setState({
                   programLst: listArray
                 }, () => {
-                  this.fetchData()
+                  const sesProgramIdReport = localStorage.getItem("sesProgramIdReport");
+                  if (sesProgramIdReport && sesProgramIdReport !== "" && sesProgramIdReport !== "undefined") {
+                    const prog = listArray.find(p => p.id == sesProgramIdReport);
+                    if (prog) {
+                      const progVal = { label: prog.code, value: prog.id };
+                      this.setState({
+                        programValues: [progVal],
+                        programLabels: [progVal.label]
+                      }, () => {
+                        this.handleChangeProgram([progVal]);
+                      });
+                    } else {
+                      this.fetchData();
+                    }
+                  } else {
+                    this.fetchData();
+                  }
                 });
               } else {
                 this.setState({
@@ -513,7 +543,22 @@ class ShipmentSummery extends Component {
                 programLst: proList,
                 loading: false
               }, () => {
-                this.fetchData()
+                if (localStorage.getItem("sesProgramIdReport") != "" && localStorage.getItem("sesProgramIdReport") != undefined) {
+                  const prog = proList.find(p => p.id == localStorage.getItem("sesProgramIdReport"));
+                  if (prog) {
+                    const progVal = { label: prog.code, value: prog.id };
+                    this.setState({
+                      programValues: [progVal],
+                      programLabels: [progVal.label]
+                    }, () => {
+                      this.handleChangeProgram([progVal]);
+                    });
+                  } else {
+                    this.fetchData();
+                  }
+                } else {
+                  this.fetchData();
+                }
               })
             }.bind(this);
           }.bind(this)

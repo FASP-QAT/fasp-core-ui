@@ -1076,7 +1076,12 @@ class SupplyPlanScoreCard extends Component {
         let countryGroupsMap = {};
         list.forEach(dbd => {
             if (!dbd || !dbd.program) return;
-            const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
+            let cId = 0;
+            if (dbd.realmCountry) {
+                cId = dbd.realmCountry.realmCountryId || dbd.realmCountry.id || 0;
+            } else {
+                cId = dbd.realmCountryId || 0;
+            }
             const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
             const cKey = `${cId}_${cLabel}`;
             if (!countryGroupsMap[cKey]) countryGroupsMap[cKey] = { label: cLabel, programs: [], key: cKey };
@@ -1141,6 +1146,14 @@ class SupplyPlanScoreCard extends Component {
 
             if (isExpanded) {
                 cg.programs.forEach(dbd => {
+                    let cId = 0;
+                    if (dbd.realmCountry) {
+                        cId = dbd.realmCountry.realmCountryId || dbd.realmCountry.id || 0;
+                    } else {
+                        cId = dbd.realmCountryId || 0;
+                    }
+                    const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+                    const cKey = `${cId}_${cLabel}`;
                     let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2);
                     let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
                     reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
@@ -1172,6 +1185,14 @@ class SupplyPlanScoreCard extends Component {
         const sortedList = [...list].sort((a, b) => (a.program?.code || '').localeCompare(b.program?.code || ''));
         sortedList.forEach(dbd => {
             if (!dbd || !dbd.program) return;
+            let cId = 0;
+            if (dbd.realmCountry) {
+                cId = dbd.realmCountry.realmCountryId || dbd.realmCountry.id || 0;
+            } else {
+                cId = dbd.realmCountryId || 0;
+            }
+            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const cKey = `${cId}_${cLabel}`;
             let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2);
             let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
             reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
@@ -1192,7 +1213,7 @@ class SupplyPlanScoreCard extends Component {
                 reviewStatus,
                 dbd.versionNotes || '',
                 'program',
-                '',
+                cKey,
                 this.state.onlyDownloadedProgram ? (dbd.program.id + "_v" + (dbd.versionId ? dbd.versionId : (dbd.program.version ? dbd.program.version : '0')) + "_uId_" + userId) : dbd.program.id
             ]);
         });
@@ -1399,24 +1420,46 @@ class SupplyPlanScoreCard extends Component {
                             localStorage.setItem("sesVersionIdReport", -1);
                             localStorage.setItem("sesVersionId", -1);
                             
+                            const setStoreFilters = () => {
+                                const rowDataReal = instance.getRowData(dataY);
+                                const cKey = rowDataReal[15];
+                                if (cKey && cKey !== "" && cKey !== "undefined" && String(cKey).includes('_')) {
+                                    const parts = String(cKey).split('_');
+                                    const realmCountryId = parts[0];
+                                    const realmCountryLabel = parts.slice(1).join('_');
+                                    if (realmCountryId && realmCountryId !== "undefined" && realmCountryId !== "0") {
+                                        localStorage.setItem("sesRealmCountryId", realmCountryId);
+                                        localStorage.setItem("sesRealmCountryLabel", realmCountryLabel);
+                                    }
+                                }
+                                localStorage.setItem("sesProgramId", programId);
+                                localStorage.setItem("sesProgramIdReport", cleanProgramId);
+                                localStorage.setItem("sesVersionIdReport", -1);
+                                localStorage.setItem("sesVersionId", -1);
+                            };
+                            
                             const roleList = AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole().map(r => r.roleId) : [];
                             const isReportViewer = roleList.includes('ROLE_REPORT_VIEWER') || roleList.includes('ROLE_REPORTS_VIEWER');
 
                             switch (c) {
                                 case 3: // Active PUs
+                                    setStoreFilters();
                                     localStorage.setItem("sesForecastProgramIdReport", cleanProgramId);
                                     localStorage.setItem("sesForecastVersionIdReport", -1);
                                     window.open(window.location.origin + `/#/programProduct/addProgramProduct/${cleanProgramId}/''/''`, '_blank');
                                     break;
                                 case 4: // Forecasted Consumption
                                 case 5: // Actual Consumption
+                                    setStoreFilters();
                                     window.open(window.location.origin + '/#/report/consumptionForecastErrorSupplyPlan', '_blank');
                                     break;
                                 case 6: // Actual Inventory
                                 case 9: // Stock Status
+                                    setStoreFilters();
                                     window.open(window.location.origin + '/#/report/stockStatusMatrix', '_blank');
                                     break;
                                 case 7: // Shipments
+                                    setStoreFilters();
                                     window.open(window.location.origin + '/#/report/shipmentSummery', '_blank');
                                     break;
                                 case 8: // Quality Score
