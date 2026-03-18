@@ -269,12 +269,12 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
 function buildPdfIconCache() {
   return {
     truck: {
-      light: renderFaIconToDataUrl("\uf0d1", "#ffffff", 28),
-      dark: renderFaIconToDataUrl("\uf0d1", "#333333", 28),
+      light: renderFaIconToDataUrl("\uf0d1", "#2B2B2B", 28),
+      dark: renderFaIconToDataUrl("\uf0d1", "#2B2B2B", 28),
     },
     warning: {
-      light: renderFaIconToDataUrl("\uf071", "#ffffff", 28),
-      dark: renderFaIconToDataUrl("\uf071", "#333333", 28),
+      light: renderFaIconToDataUrl("\uf071", "#2B2B2B", 28),
+      dark: renderFaIconToDataUrl("\uf071", "#2B2B2B", 28),
     },
   };
 }
@@ -1690,9 +1690,9 @@ export default class StockStatusMatrix extends React.Component {
                   ? colorForStatus(entry.stockStatusId)
                   : "#cfcdc9";
                 data.cell.styles.fillColor = bgColor;
-                if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
-                  data.cell.styles.textColor = "#ffffff";
-                }
+                // if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
+                  data.cell.styles.textColor = "#2B2B2B";
+                // }
 
                 // Reserve left padding for however many icons will be drawn:
                 const hasTruck = entry && entry.shipmentQty > 0;
@@ -1908,8 +1908,7 @@ export default class StockStatusMatrix extends React.Component {
                   (data.column.index == 5 && pbo !== 2)
                 ) {
                   data.cell.styles.fillColor = bg;
-                  if (bg == "#BA0C2F" || bg == "#118b70")
-                    data.cell.styles.textColor = "#ffffff";
+                    data.cell.styles.textColor = "#2B2B2B";
                 }
               }
             },
@@ -2535,8 +2534,7 @@ export default class StockStatusMatrix extends React.Component {
         const statusId = entry != null ? entry.stockStatusId : -1;
         const bgColor = colorForStatus(statusId);
 
-        const textColor =
-          bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#333";
+        const textColor ="#2B2B2B";
         const fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
         if (value === null || value === "" || value == undefined) {
@@ -2630,10 +2628,7 @@ export default class StockStatusMatrix extends React.Component {
                 const entry = entryLookup[lookupKey];
                 const statusId = entry != null ? entry.stockStatusId : -1;
                 bgColor = colorForStatus(statusId);
-                textColor =
-                  bgColor == "#BA0C2F" || bgColor == "#118b70"
-                    ? "#fff"
-                    : "#333";
+                textColor ="#2B2B2B";
                 fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
                 // Exact icons in HTML clipboard using Data URLs
