@@ -2032,7 +2032,7 @@ export default class StockStatusMatrix extends React.Component {
     );
     csvRow.push(`'+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
     csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
-csvRow.push("");
+    csvRow.push("");
     const uniquePrograms = this.state.exportProgramIds;
 
     uniquePrograms.forEach((prog) => {
@@ -2510,7 +2510,7 @@ csvRow.push("");
       position: "top",
       onclick: (worksheet, section, x, y) => {
         if (section == "cell" && x == 0) {
-          const rowData = tableRows[y] || [];
+          const rowData = worksheet.getRowData(y) || [];
           const puId = rowData[rowData.length - 1];
           if (puId) {
             localStorage.setItem(
@@ -2537,7 +2537,7 @@ csvRow.push("");
           td.style.cursor = "pointer";
           td.style.setProperty("text-align", "left", "important");
           // Add hover-over tooltip for notes (stored at index monthEndIdx+1)
-          const rowData = tableRows[row];
+          const rowData = worksheet.getRowData(row);
           if (rowData) {
             const noteVal = rowData[monthEndIdx + 1] || "";
             if (noteVal) td.title = noteVal;
@@ -2547,7 +2547,7 @@ csvRow.push("");
 
         if (col < monthStartIdx || col > monthEndIdx) return;
 
-        const rowData = tableRows[row];
+        const rowData = worksheet.getRowData(row);
         if (!rowData) return;
         const puId = rowData[rowData.length - 1];
         const dateKey = monthColumns[col - monthStartIdx];
@@ -2561,6 +2561,8 @@ csvRow.push("");
 
         if (value === null || value === "" || value == undefined) {
           td.innerHTML = "N/A";
+        } else {
+          td.innerHTML = formatter(value);
         }
 
         td.style.cssText = `background-color: ${bgColor} !important; color: ${textColor} !important; font-weight: ${fontWeight} !important;`;
@@ -2674,8 +2676,9 @@ csvRow.push("");
                       htmlIcons += `<img src="${warn.dataUrl}" style="width:12px; height:12px; margin-right:4px; vertical-align:middle;">`;
                   }
                 }
-                cols.push(prefixIcons + val);
-                html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight}; vertical-align:middle;">${htmlIcons}${val}</td>`;
+                const formattedVal = val === "N/A" ? val : formatter(val);
+                cols.push(prefixIcons + formattedVal);
+                html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight}; vertical-align:middle;">${htmlIcons}${formattedVal}</td>`;
               } else {
                 const v = rowData[c];
                 val = v != null ? String(v) : "";
@@ -2877,11 +2880,17 @@ csvRow.push("");
       const tbody = el.querySelector && el.querySelector("tbody");
       if (!tbody) return;
       const trs = tbody.querySelectorAll("tr");
-      const currentData = sheet.getJson ? sheet.getJson(null, false) : (sheet.getData ? sheet.getData() : []);
-      trs.forEach((tr, visibleRowOffset) => {
-        const absoluteRowIdx = pageIndex * pageSize + visibleRowOffset;
-        const rowData = currentData[absoluteRowIdx];
-        console.log("Row Data Test@123", rowData);
+
+      trs.forEach((tr) => {
+        // Read the row index from the first cell's data-y attribute
+        const firstTd = tr.querySelector("td[data-y]");
+        if (!firstTd) return;
+        const absoluteRowIdx = Number(firstTd.getAttribute("data-y"));
+
+        // Use getRowData with the absolute row index jExcel stamped on the cell
+        const rowData = sheet.getRowData
+          ? sheet.getRowData(absoluteRowIdx)
+          : null;
         if (!rowData) return;
 
         const isActualStock = rowData[10] == "1";
@@ -2984,15 +2993,17 @@ csvRow.push("");
       paginationOptions: JEXCEL_PAGINATION_OPTION,
       position: "top",
       onchangepage: (instance, page) => {
-        const zeroBasedPage = Math.max(0, Number(page) - 1);
+        const zeroBasedPage = Number(page);
         currentPage = zeroBasedPage;
         applyDetailColours(instance, pageSize, zeroBasedPage);
       },
       onfilter: (instance) => {
-        applyDetailColours(instance, pageSize, currentPage);
+        currentPage = 0;
+        applyDetailColours(instance, pageSize, 0);
       },
       onsearch: (instance) => {
-        applyDetailColours(instance, pageSize, currentPage);
+        currentPage = 0;
+        applyDetailColours(instance, pageSize, 0);
       },
       oncopy: (worksheet, selection, str) => {
         try {
@@ -3840,6 +3851,7 @@ csvRow.push("");
                   sp.transDate >= startDate &&
                   sp.transDate <= endDate
               );
+              console.log("In Range Entries Test@123", inRangeEntries);
 
               let maxStock;
               if (planBasedOn == 2) {
