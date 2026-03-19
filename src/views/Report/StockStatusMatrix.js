@@ -1355,9 +1355,9 @@ export default class StockStatusMatrix extends React.Component {
     // so didDrawCell can stamp them synchronously without re-creating canvases.
     const iconCache = buildPdfIconCache();
     // iconPt: the pt size we stamp each icon at inside the cell
-    const ICON_PT = 8;
+    const ICON_PT = 6;
     // gap between icons and between last icon and the value text
-    const ICON_GAP = 2;
+    const ICON_GAP = 1;
 
     const addHeaders = (d) => {
       const n = d.internal.getNumberOfPages();
@@ -1403,10 +1403,10 @@ export default class StockStatusMatrix extends React.Component {
       if (maxWidth) {
         const lines = doc.splitTextToSize(String(value), maxWidth - labelWidth);
         doc.text(lines, x + labelWidth, y);
-        return lines.length * 11 + 4;
+        return lines.length * 10 + 2;
       } else {
         doc.text(String(value), x + labelWidth, y);
-        return 15;
+        return 12;
       }
     };
 
@@ -1431,40 +1431,6 @@ export default class StockStatusMatrix extends React.Component {
           40,
           currentY
         );
-
-        const programNames = (this.state.exportProgramIds || [])
-          .map((p) => p.label.split("~v")[0])
-          .join(", ");
-        currentY += renderBoldLine(
-          i18n.t("static.program.program"),
-          programNames,
-          40,
-          currentY,
-          doc.internal.pageSize.width - 80
-        );
-
-        if (this.state.exportProgramIds.length == 1) {
-          const vId = this.state.onlyDownloadedPrograms ? this.state.exportProgramIds[0].versionId : this.state.exportVersionId;
-          const vObj = (this.state.versionsForExport || []).find(v => v.versionId == vId);
-          const vText = (vId || i18n.t("static.report.latest")) + (vObj && vObj.createdDate ? ` (${moment(vObj.createdDate).format("MMM DD YYYY")})` : "");
-          currentY += renderBoldLine(
-            i18n.t("static.report.version"),
-            vText,
-            40,
-            currentY
-          );
-        }
-
-        // const puNames = (this.state.exportPlanningUnitIds || [])
-        //   .map((p) => p.label)
-        //   .join(", ");
-        // currentY += renderBoldLine(
-        //   i18n.t("static.planningunit.planningunit"),
-        //   puNames,
-        //   40,
-        //   currentY,
-        //   doc.internal.pageSize.width - 80
-        // );
 
         currentY += renderBoldLine(
           i18n.t("static.report.withinstock"),
@@ -1498,32 +1464,30 @@ export default class StockStatusMatrix extends React.Component {
           currentY
         );
       } else {
-        const [cleanProg, vFromProg] = (progLabel || "").split("~v");
+        const [progPart] = (progLabel || "").split("~v");
+        const cleanProg = progPart.replace("(Local)", "").trim();
+        const vPart = versionText ? (versionText.startsWith("v") ? versionText : "v" + versionText) : "v" + (this.state.exportVersionId || i18n.t("static.report.latest"));
+        const combined = `${cleanProg} ${vPart}`;
         currentY += renderBoldLine(
           i18n.t("static.program.program"),
-          cleanProg,
+          combined,
           40,
           currentY,
           doc.internal.pageSize.width - 80
         );
-
-        if (versionText || this.state.exportProgramIds.length == 1) {
-          currentY += renderBoldLine(
-            i18n.t("static.report.version"),
-            versionText || this.state.exportVersionId,
-            40,
-            currentY
-          );
-        }
       }
       return currentY;
     };
 
-    // First Page: Filters only
-    renderFilterSummary(80);
+    // First Page: Filters and First Program Table
+    let initialY = 80;
+    initialY = renderFilterSummary(initialY);
+    doc.setDrawColor("#cfcdc9");
+    doc.line(40, initialY + 2, doc.internal.pageSize.width - 40, initialY + 2);
+    initialY += 15;
 
     const uniquePrograms = this.state.exportProgramIds;
-    uniquePrograms.forEach((prog) => {
+    uniquePrograms.forEach((prog, pIdx) => {
       const progId = prog.value;
       const programFilteredMatrix = (stockStatusMatrix || []).filter(
         (m) => String(m.programId) == String(progId)
@@ -1534,7 +1498,8 @@ export default class StockStatusMatrix extends React.Component {
         )
         .map((p) => p.label);
       if (progPUIds.length > 0) {
-        const progLabel = prog.label;
+        let progLabel = prog.label;
+        const isLocalProg = (this.state.downloadedPrograms || []).some(dp => dp.programId == prog.value);
 
         if (programFilteredMatrix.length == 0) return;
 
@@ -1550,15 +1515,57 @@ export default class StockStatusMatrix extends React.Component {
           .join(", ");
 
         // Section 1: Matrix Table (with horizontal chunking)
-        const maxColsPerPage = 15;
+        const pageWidth = doc.internal.pageSize.width - 80; // 40pt margin each side
+        const fixedColsWidth = 200 + 40 + 40; // planningUnit + plannedBy + minMax (wrap cols approx)
+        // Sort matrix rows by planning unit display name for PDF
+        const sortedPFM = programFilteredMatrix.slice().sort((a, b) => {
+          const la = getLabelText(
+            a.planningUnit.label,
+            this.state.lang
+          ).toUpperCase();
+          const lb = getLabelText(
+            b.planningUnit.label,
+            this.state.lang
+          ).toUpperCase();
+          return la < lb ? -1 : la > lb ? 1 : 0;
+        });
+        const colWidths = monthColumns.map((dateKey) => {
+          const maxContentWidth = sortedPFM.reduce((max, row) => {
+            const entry = (row.dataMap || {})[dateKey];
+            const raw = entry ? cellDisplayValue(entry, showQuantity, row.planBasedOn) : null;
+            if (raw == null) return max;
+            const formatted = showQuantity || row.planBasedOn == 2
+              ? formatter(raw)
+              : roundAMC(raw, 2);
+            const text = formatted !== i18n.t("static.supplyPlanFormula.na")
+              ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : formatted;
+            return Math.max(max, doc.getTextWidth(String(text)));
+          }, doc.getTextWidth(moment(dateKey).format("MMM YY")));
+          return Math.max(40, maxContentWidth + 8);
+        });
+
         const chunks = [];
-        for (let i = 0; i < monthColumns.length; i += maxColsPerPage) {
-          chunks.push(monthColumns.slice(i, i + maxColsPerPage));
+        let i = 0;
+        while (i < monthColumns.length) {
+          let usedWidth = fixedColsWidth;
+          let j = i;
+          while (j < monthColumns.length && usedWidth + colWidths[j] <= pageWidth) {
+            usedWidth += colWidths[j];
+            j++;
+          }
+          if (j === i) j = i + 1; // always include at least one column to avoid infinite loop
+          chunks.push(monthColumns.slice(i, j));
+          i = j;
         }
 
         chunks.forEach((chunkMonths, cIdx) => {
           let y = 80;
-          const vId = prog.versionId || (uniquePrograms.length == 1 ? this.state.exportVersionId : null);
+          const vIdRaw = prog.versionId || (uniquePrograms.length == 1 ? this.state.exportVersionId : null);
+          let vId = vIdRaw;
+          if (isLocalProg && vId && !String(vId).includes("Local")) {
+            vId = `${vId} (Local)`;
+          }
           const vObj = vId ? (this.state.versionsForExport || []).find(v => v.versionId == vId) : null;
           const vDate = vObj && vObj.createdDate ? ` (${moment(vObj.createdDate).format("MMM DD YYYY")})` : (prog.createdDate ? ` (${moment(prog.createdDate).format("MMM DD YYYY")})` : "");
           const versionText = vId
@@ -1566,7 +1573,12 @@ export default class StockStatusMatrix extends React.Component {
             : i18n.t("static.report.latest");
 
           if (cIdx == 0) {
-            doc.addPage();
+            if (pIdx > 0) {
+              doc.addPage();
+              y = 80;
+            } else {
+              y = initialY;
+            }
             y = renderFilterSummary(
               y,
               false,
@@ -1593,18 +1605,6 @@ export default class StockStatusMatrix extends React.Component {
             }
           }
 
-          // Sort matrix rows by planning unit display name for PDF
-          const sortedPFM = programFilteredMatrix.slice().sort((a, b) => {
-            const la = getLabelText(
-              a.planningUnit.label,
-              this.state.lang
-            ).toUpperCase();
-            const lb = getLabelText(
-              b.planningUnit.label,
-              this.state.lang
-            ).toUpperCase();
-            return la < lb ? -1 : la > lb ? 1 : 0;
-          });
 
           const head = [
             [
@@ -1642,7 +1642,7 @@ export default class StockStatusMatrix extends React.Component {
                 const formatted =
                   showQuantity || row.planBasedOn == 2
                     ? formatter(raw)
-                    : formatterMOS(raw, 2);
+                    : roundAMC(raw, 2);
                 return formatted !== i18n.t("static.supplyPlanFormula.na")
                   ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   : formatted;
@@ -1650,21 +1650,30 @@ export default class StockStatusMatrix extends React.Component {
             ];
           });
 
+          const matrixColStyles = {
+            0: { cellWidth: 200, halign: "left" },
+            1: { cellWidth: "wrap" },
+            2: { cellWidth: "wrap" },
+          };
+          chunkMonths.forEach((d, i) => {
+            const globalIdx = monthColumns.indexOf(chunkMonths[i]);
+            matrixColStyles[3 + i] = { cellWidth: colWidths[globalIdx] };
+          });
+
           doc.autoTable({
             startY: y + 10,
+            tableWidth: "wrap",
             head: head,
             body: body,
             margin: { top: 120 },
             styles: {
               lineWidth: 1,
-              fontSize: 6,
+              fontSize: 6.5,
               halign: "center",
               valign: "middle",
               overflow: "linebreak",
             },
-            columnStyles: {
-              0: { cellWidth: 100, halign: "left" },
-            },
+            columnStyles: matrixColStyles,
             didDrawPage(data) {
               if (data.pageNumber > 1) {
                 renderFilterSummary(
@@ -1691,7 +1700,7 @@ export default class StockStatusMatrix extends React.Component {
                   : "#cfcdc9";
                 data.cell.styles.fillColor = bgColor;
                 // if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
-                  data.cell.styles.textColor = "#2B2B2B";
+                data.cell.styles.textColor = "#2B2B2B";
                 // }
 
                 // Reserve left padding for however many icons will be drawn:
@@ -1806,6 +1815,8 @@ export default class StockStatusMatrix extends React.Component {
               i18n.t("static.common.month"),
               i18n.t("static.planningunit.planningunit"),
               i18n.t("static.supplyPlan.consumption"),
+              i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+              i18n.t("static.supplyPlan.expiredQty"),
               i18n.t("static.report.amc"),
               i18n.t("static.report.stock"),
               i18n.t("static.report.mos"),
@@ -1817,11 +1828,16 @@ export default class StockStatusMatrix extends React.Component {
             const matrixRow = programFilteredMatrix.find(
               (m) => String(m.planningUnit.id) == String(row.planningUnit.id)
             );
+            const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+            const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+            const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+            const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
             const planBasedOn = matrixRow
               ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
               : row.planningUnit?.planBasedOn ?? 1;
             const statusLabel = (
-              STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
+              STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
             ).label;
             return [
               moment(row.month).format("MMM YY"),
@@ -1833,6 +1849,8 @@ export default class StockStatusMatrix extends React.Component {
                   .toString()
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 : "",
+              shipmentQty != null ? formatter(Math.round(shipmentQty)) : 0,
+              expiredQty != null ? formatter(Math.round(expiredQty)) : 0,
               row.amc != null
                 ? formatter(Math.round(row.amc))
                   .toString()
@@ -1860,6 +1878,7 @@ export default class StockStatusMatrix extends React.Component {
             : i18n.t("static.report.latest");
 
           doc.autoTable({
+            tableWidth: "auto",
             startY:
               renderFilterSummary(
                 y,
@@ -1873,14 +1892,14 @@ export default class StockStatusMatrix extends React.Component {
             margin: { top: 120 },
             styles: {
               lineWidth: 1,
-              fontSize: 6,
+              fontSize: 7,
               halign: "center",
               valign: "middle",
               overflow: "linebreak",
             },
             columnStyles: {
-              1: { cellWidth: 150, halign: "left" },
-              6: { halign: "center" },
+              1: { cellWidth: 180, halign: "left" },
+              8: { halign: "center" },
             },
             didDrawPage(data) {
               if (data.pageNumber > 1) {
@@ -1901,14 +1920,17 @@ export default class StockStatusMatrix extends React.Component {
                   (m) =>
                     String(m.planningUnit.id) == String(rowData.planningUnit.id)
                 );
+                const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[rowData.month] : null;
+                const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : rowData.stockStatusId;
+
                 const pbo = matrixRow ? matrixRow.planBasedOn : 1;
-                const bg = colorForStatus(rowData.stockStatusId);
+                const bg = colorForStatus(stockStatusId);
                 if (
-                  data.column.index == 6 ||
-                  (data.column.index == 5 && pbo !== 2)
+                  data.column.index == 8 ||
+                  (data.column.index == 7 && pbo !== 2)
                 ) {
                   data.cell.styles.fillColor = bg;
-                    data.cell.styles.textColor = "#2B2B2B";
+                  data.cell.styles.textColor = "#2B2B2B";
                 }
               }
             },
@@ -1951,7 +1973,7 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push("");
+    // csvRow.push("");
 
     // ── FIX 3: Stock status filter ──
     const stockStatusLabels = (this.state.stockStatusValues || [])
@@ -1966,7 +1988,7 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push("");
+    // csvRow.push("");
 
     // ── FIX 3: Show Quantity ──
     csvRow.push(
@@ -1980,7 +2002,7 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push("");
+    // csvRow.push("");
 
     // ── FIX 3: Remove Planned Shipments ──
     csvRow.push(
@@ -1994,7 +2016,7 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push("");
+    // csvRow.push("");
 
     // ── FIX 3: Remove TBD Funding Source Shipments ──
     csvRow.push(
@@ -2008,9 +2030,9 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push("");
-    csvRow.push("");
-
+    csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+    csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
+csvRow.push("");
     const uniquePrograms = this.state.exportProgramIds;
 
     uniquePrograms.forEach((prog) => {
@@ -2018,12 +2040,12 @@ export default class StockStatusMatrix extends React.Component {
       const progLabel = prog.label;
 
       const programFilteredMatrix = (stockStatusMatrix || []).filter(
-        (m) => String(m.programId) == String(progId)
+        (m) => String(m.programId) == String(progId) && String(m.planningUnit.id) != "0"
       );
       if (programFilteredMatrix.length == 0) return;
 
       const programFilteredDetails = (stockStatusDetails || []).filter(
-        (d) => String(d.programId) == String(progId)
+        (d) => String(d.programId) == String(progId) && String(d.planningUnit.id) != "0"
       );
 
       csvRow.push(
@@ -2045,12 +2067,13 @@ export default class StockStatusMatrix extends React.Component {
         `${i18n.t("static.report.version")}: ${String(csvVersionText).replaceAll(" ", "%20")}`
       );
       csvRow.push("");
-      csvRow.push("");
+      // csvRow.push("");
 
       const t1Headers = [
         i18n.t("static.planningunit.planningunit"),
         i18n.t("static.stockStatus.plannedBy"),
-        i18n.t("static.stockStatusMatrix.minMax"),
+        i18n.t("static.report.minMosOrQty"),
+        i18n.t("static.report.maxMosOrQty"),
         ...monthColumns.map((d) => moment(d).format("MMM YY")),
         i18n.t("static.program.notes"),
       ];
@@ -2073,15 +2096,6 @@ export default class StockStatusMatrix extends React.Component {
         return la < lb ? -1 : la > lb ? 1 : 0;
       });
       sortedPFMcsv.forEach((row) => {
-        const minMax =
-          row.planBasedOn == 1
-            ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-              Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-              0
-            )}`
-            : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-              Math.round(row.maxStock || 0)
-            )}`;
         A.push(
           addDoubleQuoteToRowContent([
             (
@@ -2094,7 +2108,12 @@ export default class StockStatusMatrix extends React.Component {
             row.planBasedOn == 1
               ? i18n.t("static.report.mos")
               : i18n.t("static.report.qty"),
-            minMax,
+            row.planBasedOn == 1
+              ? formatterMOS(row.minMonthsOfStock, 0)
+              : formatter(Math.round(row.minStock || 0)),
+            row.planBasedOn == 1
+              ? formatterMOS(Number(row.minMonthsOfStock) + Number(row.reorderFrequency), 0)
+              : formatter(Math.round(row.maxStock || 0)),
             ...monthColumns.map((dateKey) => {
               const entry = (row.dataMap || {})[dateKey];
               const raw = entry
@@ -2140,12 +2159,17 @@ export default class StockStatusMatrix extends React.Component {
           ),
         ];
         programFilteredDetails.forEach((row) => {
-          const statusLabel = (
-            STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
-          ).label;
           const matrixRow = programFilteredMatrix.find(
             (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
           );
+          const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+          const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+          const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+          const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+          const statusLabel = (
+            STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+          ).label;
           const planBasedOn = matrixRow
             ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
             : row.planningUnit?.planBasedOn ?? 1;
@@ -2157,8 +2181,8 @@ export default class StockStatusMatrix extends React.Component {
                 : i18n.t("static.supplyPlanFormula.na");
 
           let iconStr = "";
-          if (row.shipmentQty > 0) iconStr += "+";
-          if (row.expiredQty != null && row.expiredQty > 0) iconStr += "*";
+          if (shipmentQty > 0) iconStr += "+";
+          if (expiredQty != null && expiredQty > 0) iconStr += "*";
 
           B.push(
             addDoubleQuoteToRowContent([
@@ -2171,8 +2195,8 @@ export default class StockStatusMatrix extends React.Component {
                 .replaceAll(",", " ")
                 .replaceAll(" ", "%20"),
               row.consumptionQty != null ? Math.round(row.consumptionQty) : "",
-              row.shipmentQty != null ? Math.round(row.shipmentQty) : 0,
-              row.expiredQty != null ? Math.round(row.expiredQty) : 0,
+              shipmentQty != null ? Math.round(shipmentQty) : 0,
+              expiredQty != null ? Math.round(expiredQty) : 0,
               row.amc != null ? Math.round(row.amc) : "",
               (row.closingBalance != null ? Math.round(row.closingBalance) : ""),
               mosDisplay,
@@ -2534,7 +2558,7 @@ export default class StockStatusMatrix extends React.Component {
         const statusId = entry != null ? entry.stockStatusId : -1;
         const bgColor = colorForStatus(statusId);
 
-        const textColor ="#2B2B2B";
+        const textColor = "#2B2B2B";
         const fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
         if (value === null || value === "" || value == undefined) {
@@ -2580,7 +2604,7 @@ export default class StockStatusMatrix extends React.Component {
           }
           if (showQuantity && entry.mos != null) {
             tips.push(
-              `${i18n.t("static.report.mos")}: ${formatterMOS(entry.mos, 0)}`
+              `${i18n.t("static.report.mos")}: ${roundAMC(entry.mos, 0)}`
             );
           }
           tips.push(
@@ -2628,7 +2652,7 @@ export default class StockStatusMatrix extends React.Component {
                 const entry = entryLookup[lookupKey];
                 const statusId = entry != null ? entry.stockStatusId : -1;
                 bgColor = colorForStatus(statusId);
-                textColor ="#2B2B2B";
+                textColor = "#2B2B2B";
                 fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
                 // Exact icons in HTML clipboard using Data URLs
@@ -2739,13 +2763,18 @@ export default class StockStatusMatrix extends React.Component {
     });
 
     const tableRows = sorted.map((row) => {
-      const statusLabel = (
-        STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
-      ).label;
       const matrixRow = this.state.filteredMatrix.find(
         (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
       );
       const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+      const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+      const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+      const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+      const statusLabel = (
+        STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+      ).label;
 
       const mosValue =
         planBasedOn == 2 ? "" : row.mos != null ? roundAMC(row.mos) : null;
@@ -2756,13 +2785,13 @@ export default class StockStatusMatrix extends React.Component {
         " | " +
         row.planningUnit.id,
         row.consumptionQty != null ? Math.round(row.consumptionQty) : null,
-        row.shipmentQty != null ? Math.round(row.shipmentQty) : 0,
-        row.expiredQty != null ? Math.round(row.expiredQty) : 0,
+        shipmentQty != null ? Math.round(shipmentQty) : 0,
+        expiredQty != null ? Math.round(expiredQty) : 0,
         row.amc != null ? Math.round(row.amc) : null,
         row.closingBalance != null ? Math.round(row.closingBalance) : null,
         mosValue,
         statusLabel,
-        String(row.stockStatusId),
+        String(stockStatusId),
         row.actualStock ? "1" : "0",
         row.actualConsumption ? "1" : "0",
         String(planBasedOn),
@@ -2793,14 +2822,14 @@ export default class StockStatusMatrix extends React.Component {
         readOnly: true,
       },
       {
-        title: i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+        title: i18n.t("static.dashboard.shipments"),
         type: "numeric",
         mask: "#,##0",
         width: 105,
         readOnly: true,
       },
       {
-        title: i18n.t("static.supplyPlan.expiredQty"),
+        title: i18n.t("static.supplyPlan.expiry"),
         type: "numeric",
         mask: "#,##0",
         width: 105,
@@ -2840,17 +2869,20 @@ export default class StockStatusMatrix extends React.Component {
       { title: "planBasedOn", type: "hidden" },
     ];
 
-    const applyDetailColours = (el, pageSize, pageIndex) => {
-      console.log("page size Test@123", pageSize)
-      console.log("Page Index Test@123", pageIndex)
-      if (!el) return;
+    const applyDetailColours = (instance, pageSize, pageIndex) => {
+      let sheet = instance;
+      if (instance && instance.worksheets && instance.worksheets[0]) {
+        sheet = instance.worksheets[0];
+      }
+      const el = sheet.element || (sheet.instance ? sheet.instance.element : sheet);
+      if (!el || !sheet) return;
       const tbody = el.querySelector && el.querySelector("tbody");
       if (!tbody) return;
       const trs = tbody.querySelectorAll("tr");
-      console.log("Table Rows in apply details colour Test@123", tableRows);
+      const currentData = sheet.getJson ? sheet.getJson(null, false) : (sheet.getData ? sheet.getData() : []);
       trs.forEach((tr, visibleRowOffset) => {
         const absoluteRowIdx = pageIndex * pageSize + visibleRowOffset;
-        const rowData = tableRows[absoluteRowIdx];
+        const rowData = currentData[absoluteRowIdx];
         console.log("Row Data Test@123", rowData);
         if (!rowData) return;
 
@@ -2940,8 +2972,7 @@ export default class StockStatusMatrix extends React.Component {
       filters: true,
       onload: (instance) => {
         this.loadedDetail(instance);
-        const el = instance.element || instance;
-        applyDetailColours(el, pageSize, 0);
+        applyDetailColours(instance, pageSize, 0);
       },
       pagination: pageSize,
       search: true,
@@ -2957,8 +2988,13 @@ export default class StockStatusMatrix extends React.Component {
       onchangepage: (instance, page) => {
         const zeroBasedPage = Math.max(0, Number(page) - 1);
         currentPage = zeroBasedPage;
-        const el = instance.element || instance;
-        applyDetailColours(el, pageSize, page);
+        applyDetailColours(instance, pageSize, zeroBasedPage);
+      },
+      onfilter: (instance) => {
+        applyDetailColours(instance, pageSize, currentPage);
+      },
+      onsearch: (instance) => {
+        applyDetailColours(instance, pageSize, currentPage);
       },
       oncopy: (worksheet, selection, str) => {
         try {
@@ -3210,12 +3246,16 @@ export default class StockStatusMatrix extends React.Component {
     );
     csvRow.push("");
 
+    // ── Legend for icons ──
+    const legendText = `${i18n.t("static.common.legend")}: + ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}, * ${i18n.t("static.supplyPlan.expiredQty")}`;
+    csvRow.push('"' + legendText.replaceAll(" ", "%20") + '"');
+    csvRow.push("");
+
     const t1Headers = [
       i18n.t("static.planningunit.planningunit"),
       i18n.t("static.stockStatus.plannedBy"),
-      `${i18n.t("static.report.minMosOrQty")}/${i18n.t(
-        "static.report.maxMosOrQty"
-      )}`,
+      i18n.t("static.report.minMosOrQty"),
+      i18n.t("static.report.maxMosOrQty"),
       ...monthColumns.map((d) => moment(d).format("MMM YY")),
       i18n.t("static.program.notes"),
     ];
@@ -3225,21 +3265,12 @@ export default class StockStatusMatrix extends React.Component {
       ),
     ];
     // Sort by planning unit display name for CSV
-    const sortedMatrix = filteredMatrix.slice().sort((a, b) => {
+    const sortedMatrix = filteredMatrix.filter(m => String(m.planningUnit.id) != "0").slice().sort((a, b) => {
       const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
       const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
       return la < lb ? -1 : la > lb ? 1 : 0;
     });
     sortedMatrix.forEach((row) => {
-      const minMax =
-        row.planBasedOn == 1
-          ? `${formatterMOS(row.minMonthsOfStock, 0)}/${formatterMOS(
-            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
-            0
-          )}`
-          : `${formatter(Math.round(row.minStock || 0))}/${formatter(
-            Math.round(row.maxStock || 0)
-          )}`;
       A.push(
         addDoubleQuoteToRowContent([
           (
@@ -3252,7 +3283,12 @@ export default class StockStatusMatrix extends React.Component {
           row.planBasedOn == 1
             ? i18n.t("static.report.mos")
             : i18n.t("static.report.qty"),
-          minMax,
+          row.planBasedOn == 1
+            ? formatterMOS(row.minMonthsOfStock, 0)
+            : formatter(Math.round(row.minStock || 0)),
+          row.planBasedOn == 1
+            ? formatterMOS(Number(row.minMonthsOfStock) + Number(row.reorderFrequency), 0)
+            : formatter(Math.round(row.maxStock || 0)),
           ...monthColumns.map((dateKey) => {
             const entry = (row.dataMap || {})[dateKey];
             const raw = entry
@@ -3297,13 +3333,18 @@ export default class StockStatusMatrix extends React.Component {
           t2Headers.map((h) => h.replaceAll(" ", "%20"))
         ),
       ];
-      filteredDetails.forEach((row) => {
-        const statusLabel = (
-          STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
-        ).label;
+      filteredDetails.filter(d => String(d.planningUnit.id) != "0").forEach((row) => {
         const matrixRow = this.state.filteredMatrix.find(
           (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
         );
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+        const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+        const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+        const statusLabel = (
+          STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+        ).label;
         const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
 
         const mosDisplay =
@@ -3314,8 +3355,8 @@ export default class StockStatusMatrix extends React.Component {
               : i18n.t("static.supplyPlanFormula.na");
 
         let iconStr = "";
-        if (row.shipmentQty > 0) iconStr += "+";
-        if (row.expiredQty > 0) iconStr += "*";
+        if (shipmentQty > 0) iconStr += "+";
+        if (expiredQty > 0) iconStr += "*";
 
         B.push(
           addDoubleQuoteToRowContent([
@@ -3328,8 +3369,8 @@ export default class StockStatusMatrix extends React.Component {
               .replaceAll(",", " ")
               .replaceAll(" ", "%20"),
             row.consumptionQty != null ? Math.round(row.consumptionQty) : "",
-            row.shipmentQty != null ? Math.round(row.shipmentQty) : 0,
-            row.expiredQty != null ? Math.round(row.expiredQty) : 0,
+            shipmentQty != null ? Math.round(shipmentQty) : 0,
+            expiredQty != null ? Math.round(expiredQty) : 0,
             row.amc != null ? Math.round(row.amc) : "",
             (row.closingBalance != null ? Math.round(row.closingBalance) : "") +
             iconStr,
@@ -3533,11 +3574,21 @@ export default class StockStatusMatrix extends React.Component {
           (m) => String(m.planningUnit.id) == String(r.planningUnit.id)
         );
         const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
-        return { bgColor: colorForStatus(r.stockStatusId), planBasedOn };
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[r.month] : null;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : r.stockStatusId;
+        return { bgColor: colorForStatus(stockStatusId), planBasedOn };
       });
       const body2 = filteredDetails.map((row, idx) => {
+        const matrixRow = this.state.filteredMatrix.find(
+          (m) => String(m.planningUnit.id) == String(row.planningUnit.id)
+        );
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+        const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+        const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
         const statusLabel = (
-          STOCK_STATUS_MAP[row.stockStatusId] || STOCK_STATUS_MAP["-1"]
+          STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
         ).label;
         const planBasedOn = colorMap2[idx].planBasedOn;
         const mosDisplay =
@@ -3555,8 +3606,8 @@ export default class StockStatusMatrix extends React.Component {
           row.consumptionQty != null
             ? formatter(Math.round(row.consumptionQty))
             : "",
-          row.shipmentQty != null ? formatter(Math.round(row.shipmentQty)) : 0,
-          row.expiredQty != null ? formatter(Math.round(row.expiredQty)) : 0,
+          shipmentQty != null ? formatter(Math.round(shipmentQty)) : 0,
+          expiredQty != null ? formatter(Math.round(expiredQty)) : 0,
           row.amc != null ? formatter(Math.round(row.amc)) : "",
           row.closingBalance != null
             ? formatter(Math.round(row.closingBalance))
