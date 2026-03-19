@@ -2399,7 +2399,22 @@ class ShipmentSummery extends Component {
                     message: "",
                   },
                   () => {
-                    this.fetchData();
+                    const sesIsRedirectionFromScorecard = localStorage.getItem("sesIsRedirectionFromScorecard");
+                    if (sesIsRedirectionFromScorecard == "true") {
+                      let planningUnitValues = proList.map(item => ({
+                        label: getLabelText(item.label, this.state.lang),
+                        value: Number(item.id)
+                      }));
+                      this.setState({
+                        planningUnitValues: planningUnitValues,
+                        planningUnitLabels: planningUnitValues.map(item => item.label)
+                      }, () => {
+                        localStorage.removeItem("sesIsRedirectionFromScorecard");
+                        this.fetchData();
+                      })
+                    } else {
+                      this.fetchData();
+                    }
                   }
                 );
               }.bind(this);
@@ -2415,6 +2430,22 @@ class ShipmentSummery extends Component {
                 planningUnitList: response.data.planningUnitList,
                 planningUnitId: []
               }, () => {
+                const sesIsRedirectionFromScorecard = localStorage.getItem("sesIsRedirectionFromScorecard");
+                if (sesIsRedirectionFromScorecard == "true") {
+                  let planningUnitValues = response.data.planningUnitList.map(item => ({
+                    label: getLabelText(item.label, this.state.lang),
+                    value: Number(item.id)
+                  }));
+                  this.setState({
+                    planningUnitValues: planningUnitValues,
+                    planningUnitLabels: planningUnitValues.map(item => item.label)
+                  }, () => {
+                    localStorage.removeItem("sesIsRedirectionFromScorecard");
+                    this.fetchData();
+                  })
+                } else {
+                  this.fetchData();
+                }
               })
             }).catch(
               error => {

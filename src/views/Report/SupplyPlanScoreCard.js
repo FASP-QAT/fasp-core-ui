@@ -234,6 +234,7 @@ class SupplyPlanScoreCard extends Component {
       countryExpandedMap: {},
       sortedLabels: [],
       collapseAllChecked: false,
+      defaultExpansionState: true,
       large: false,
       loadingForNotes: false,
       notesTransTableEl: "",
@@ -307,29 +308,14 @@ class SupplyPlanScoreCard extends Component {
    * @param {Object} event - The checkbox change event.
    */
   toggleCollapseExpandAll(event) {
-    const isChecked = event.target.checked;
-    this.setState({ collapseAllChecked: isChecked }, () => {
-      if (isChecked) {
-        // Collapse All
-        this.setState({ countryExpandedMap: {} }, () => {
-          this.buildJexcel();
-        });
-      } else {
-        // Expand All
-        const list = this.state.dashboardBottomDataList || [];
-        let newExpandedMap = {};
-        list.forEach(dbd => {
-          if (!dbd) return;
-          const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
-          const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
-          const cKey = `${cId}_${cLabel}`;
-          newExpandedMap[cKey] = true;
-        });
-        this.setState({ countryExpandedMap: newExpandedMap }, () => {
-          this.buildJexcel();
-        });
-      }
-    });
+  const isChecked = event.target.checked;
+  this.setState({ 
+    collapseAllChecked: isChecked,
+    defaultExpansionState: !isChecked,
+    countryExpandedMap: {} 
+  }, () => {
+    this.buildJexcel();
+  });
   }
   /**
    * Handles the change event for countries.
@@ -898,16 +884,16 @@ class SupplyPlanScoreCard extends Component {
       DashboardService.getDashboardBottom(inputJson)
         .then(response => {
           var data = response.data;
-          this.setState({
-            dashboardBottomDataList: data.map(item => ({
-              ...item,
-              stockStatusScore: item.stockStatusScore * 100,
-              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
-            })),
-            loading: false
-          }, () => {
-            this.buildJexcel();
-          })
+           this.setState({
+             dashboardBottomDataList: data.map(item => ({
+               ...item,
+               stockStatusScore: item.stockStatusScore * 100,
+               supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+             })),
+             loading: false
+           }, () => {
+             this.buildJexcel();
+           })
         }
         ).catch(
           error => {
@@ -1090,7 +1076,7 @@ class SupplyPlanScoreCard extends Component {
 
         Object.values(countryGroupsMap).sort((a,b) => a.label.localeCompare(b.label)).forEach(cg => {
             cg.programs.sort((p1, p2) => (p1.program?.code || '').localeCompare(p2.program?.code || ''));
-            const isExpanded = !!this.state.countryExpandedMap[cg.key];
+            const isExpanded = this.state.countryExpandedMap[cg.key] !== undefined ? !!this.state.countryExpandedMap[cg.key] : this.state.defaultExpansionState;
             const toggleIcon = isExpanded ? '-' : '+';
             const n = cg.programs.length;
             const activePUs = cg.programs.reduce((s,d)=>s+(d.totalPus||0),0);
@@ -1330,21 +1316,30 @@ class SupplyPlanScoreCard extends Component {
                     cell1.style.paddingLeft = '5px';
                 }
                 if (cell0) {
-                    cell0.style.cursor = 'pointer';
-                    cell0.onclick = (e) => {
+                    const toggleHandler = (e) => {
                         e.stopPropagation();
                         const cKey = rowData[15];
                         this.setState(prev => {
-                            const newMap = { ...prev.countryExpandedMap, [cKey]: !prev.countryExpandedMap[cKey] };
-                            const anyExpanded = Object.values(newMap).some(v => v === true);
+                            const currentExpanded = prev.countryExpandedMap[cKey] !== undefined ? prev.countryExpandedMap[cKey] : prev.defaultExpansionState;
+                            const newExpandedState = !currentExpanded;
+                            const newMap = { ...prev.countryExpandedMap, [cKey]: newExpandedState };
+                            let collapseAllChecked = prev.collapseAllChecked;
+                            if (newExpandedState) {
+                                collapseAllChecked = false;
+                            }
                             return {
                                 countryExpandedMap: newMap,
-                                collapseAllChecked: !anyExpanded
+                                collapseAllChecked: collapseAllChecked
                             };
                         }, () => {
                             this.buildJexcel();
                         });
                     };
+
+                    if (cell0) {
+                        cell0.style.cursor = 'pointer';
+                        cell0.onclick = toggleHandler;
+                    }
                 }
             } else if (rowType === 'row_child') {
                 childRowIndex++;
@@ -1436,6 +1431,7 @@ class SupplyPlanScoreCard extends Component {
                                 localStorage.setItem("sesProgramIdReport", cleanProgramId);
                                 localStorage.setItem("sesVersionIdReport", -1);
                                 localStorage.setItem("sesVersionId", -1);
+                                localStorage.setItem("sesIsRedirectionFromScorecard", "true");
                             };
                             
                             const roleList = AuthenticationService.getLoggedInUserRole() ? AuthenticationService.getLoggedInUserRole().map(r => r.roleId) : [];
