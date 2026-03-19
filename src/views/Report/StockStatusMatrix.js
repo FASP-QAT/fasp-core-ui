@@ -269,12 +269,12 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
 function buildPdfIconCache() {
   return {
     truck: {
-      light: renderFaIconToDataUrl("\uf0d1", "#2B2B2B", 28),
-      dark: renderFaIconToDataUrl("\uf0d1", "#2B2B2B", 28),
+      light: renderFaIconToDataUrl("\uf0d1", "#1A1A1A", 28),
+      dark: renderFaIconToDataUrl("\uf0d1", "#1A1A1A", 28),
     },
     warning: {
-      light: renderFaIconToDataUrl("\uf071", "#2B2B2B", 28),
-      dark: renderFaIconToDataUrl("\uf071", "#2B2B2B", 28),
+      light: renderFaIconToDataUrl("\uf071", "#1A1A1A", 28),
+      dark: renderFaIconToDataUrl("\uf071", "#1A1A1A", 28),
     },
   };
 }
@@ -1700,7 +1700,7 @@ export default class StockStatusMatrix extends React.Component {
                   : "#cfcdc9";
                 data.cell.styles.fillColor = bgColor;
                 // if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
-                data.cell.styles.textColor = "#2B2B2B";
+                data.cell.styles.textColor = "#1A1A1A";
                 // }
 
                 // Reserve left padding for however many icons will be drawn:
@@ -1930,7 +1930,7 @@ export default class StockStatusMatrix extends React.Component {
                   (data.column.index == 7 && pbo !== 2)
                 ) {
                   data.cell.styles.fillColor = bg;
-                  data.cell.styles.textColor = "#2B2B2B";
+                  data.cell.styles.textColor = "#1A1A1A";
                 }
               }
             },
@@ -2030,7 +2030,7 @@ export default class StockStatusMatrix extends React.Component {
       ).replaceAll(" ", "%20") +
       '"'
     );
-    csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+    csvRow.push(`'+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
     csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
 csvRow.push("");
     const uniquePrograms = this.state.exportProgramIds;
@@ -2377,12 +2377,10 @@ csvRow.push("");
 
     const monthCols = monthColumns.map((dateKey) => ({
       title: moment(dateKey).format("MMM YY"),
-      type: "numeric",
-      mask: "#,##.000",
-      decimal: ".",
+      type: "text",
       width: 72,
       readOnly: true,
-      align: "center",
+      align: "center"
     }));
 
     const columns = [
@@ -2558,7 +2556,7 @@ csvRow.push("");
         const statusId = entry != null ? entry.stockStatusId : -1;
         const bgColor = colorForStatus(statusId);
 
-        const textColor = "#2B2B2B";
+        const textColor = "#1A1A1A";
         const fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
         if (value === null || value === "" || value == undefined) {
@@ -2652,7 +2650,7 @@ csvRow.push("");
                 const entry = entryLookup[lookupKey];
                 const statusId = entry != null ? entry.stockStatusId : -1;
                 bgColor = colorForStatus(statusId);
-                textColor = "#2B2B2B";
+                textColor = "#1A1A1A";
                 fontWeight = entry && entry.actualStock ? "bold" : "normal";
 
                 // Exact icons in HTML clipboard using Data URLs
