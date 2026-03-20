@@ -1050,7 +1050,7 @@ class SupplyPlanScoreCard extends Component {
             const row = [ha];
             countryList.forEach(c => {
                 const s = scoresMap[ha][c];
-                row.push(s ? (!isNaN(s.sum / s.count) ? `${Math.round(s.sum / s.count)}%` : 'N/A') : '');
+                row.push(s ? (!isNaN(s.sum / s.count) ? Math.round(s.sum / s.count) : 'N/A') : '');
             });
             row.push('matrix_row');
             row.push('');
@@ -1119,10 +1119,10 @@ class SupplyPlanScoreCard extends Component {
                 sumActual,
                 sumInventory,
                 sumShipments,
-                !isNaN(avgQ) ? `${Math.round(avgQ)}%` : 'N/A',
+                !isNaN(avgQ) ? Math.round(avgQ) : 'N/A',
                 `${soPerc},${usPerc},${adPerc},${ovPerc},${naPerc}`,
-                !isNaN(avgS) ? `${Math.round(avgS)}%` : 'N/A',
-                !isNaN(avgT) ? `${Math.round(avgT)}%` : 'N/A',
+                !isNaN(avgS) ? Math.round(avgS) : 'N/A',
+                !isNaN(avgT) ? Math.round(avgT) : 'N/A',
                 '-',
                 '-',
                 'row_parent',
@@ -1153,10 +1153,10 @@ class SupplyPlanScoreCard extends Component {
                         dbd.actualConsumptionQpl?.correctCount || 0,
                         dbd.inventoryQpl?.correctCount || 0,
                         dbd.shipmentQpl?.correctCount || 0,
-                        !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'N/A',
+                        !isNaN(dbd.supplyPlanQualityScore) ? Math.round(dbd.supplyPlanQualityScore) : 'N/A',
                         `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
-                        !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'N/A',
-                        !isNaN(totalScore) ? `${totalScore}%` : 'N/A',
+                        !isNaN(dbd.stockStatusScore) ? Math.round(dbd.stockStatusScore) : 'N/A',
+                        !isNaN(totalScore) ? totalScore : 'N/A',
                         reviewStatus,
                         dbd.versionNotes || '',
                         'row_child',
@@ -1192,10 +1192,10 @@ class SupplyPlanScoreCard extends Component {
                 dbd.actualConsumptionQpl?.correctCount || 0,
                 dbd.inventoryQpl?.correctCount || 0,
                 dbd.shipmentQpl?.correctCount || 0,
-                !isNaN(dbd.supplyPlanQualityScore) ? `${Math.round(dbd.supplyPlanQualityScore)}%` : 'N/A',
+                !isNaN(dbd.supplyPlanQualityScore) ? Math.round(dbd.supplyPlanQualityScore) : 'N/A',
                 `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
-                !isNaN(dbd.stockStatusScore) ? `${Math.round(dbd.stockStatusScore)}%` : 'N/A',
-                !isNaN(totalScore) ? `${totalScore}%` : 'N/A',
+                !isNaN(dbd.stockStatusScore) ? Math.round(dbd.stockStatusScore) : 'N/A',
+                !isNaN(totalScore) ? totalScore : 'N/A',
                 reviewStatus,
                 dbd.versionNotes || '',
                 'program',
@@ -1545,10 +1545,10 @@ class SupplyPlanScoreCard extends Component {
             { title: 'Actual Consumption <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualConsumptionTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
             { title: 'Actual Inventory <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualInventoryTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
             { title: 'Shipments <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.shipmentsTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
-            { title: 'Quality Score <i class="fa fa-info-circle icons" title="This score represents the average percent compliance across all data quality metrics - forecasted consumption, actual consumption, actual inventory, and shipments. Supply plans that are more complete and up‑to‑date earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Quality Score <i class="fa fa-info-circle icons" title="This score represents the average percent compliance across all data quality metrics - forecasted consumption, actual consumption, actual inventory, and shipments. Supply plans that are more complete and up‑to‑date earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
             { title: 'Stock Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
-            { title: 'Stock Status Score <i class="fa fa-info-circle icons" title="This score reflects the average number of months in which all planning units are Stocked to Plan. Supply plans that adhere to MIN/MAX parameters and remain Stocked to Plan earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'text', readOnly: true, align: 'left' },
-            { title: 'Total Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'text', readOnly: true, align: 'left' },
+            { title: 'Stock Status Score <i class="fa fa-info-circle icons" title="This score reflects the average number of months in which all planning units are Stocked to Plan. Supply plans that adhere to MIN/MAX parameters and remain Stocked to Plan earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
+            { title: 'Total Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
             { title: 'Review Status <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.reviewStatusTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 200 },
             { title: 'Version Notes', type: 'hidden', readOnly: true, align: 'left', width: 150 },
             { title: 'RowType', type: 'hidden' },
@@ -1603,6 +1603,7 @@ class SupplyPlanScoreCard extends Component {
         }.bind(this),
         search: true,
         columnSorting: true,
+
         contextMenu: function (obj, x, y, e) {
           return false;
         }.bind(this),
