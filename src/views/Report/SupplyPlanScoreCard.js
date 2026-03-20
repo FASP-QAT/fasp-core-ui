@@ -115,7 +115,7 @@ const targetLinePlugin = {
         let totalDataset = null;
         let totalIndex = -1;
         for (let i = 0; i < datasets.length; i++) {
-            if (datasets[i].label === 'Total Score') {
+            if (datasets[i].label === i18n.t('static.supplyPlan.totalScore')) {
                 totalDataset = datasets[i];
                 totalIndex = i;
                 break;
@@ -1044,7 +1044,7 @@ class SupplyPlanScoreCard extends Component {
         const countryList = Object.keys(countriesMap).sort();
         const healthAreaList = Object.keys(healthAreasMap).sort();
         
-        matrixCols = [{ title: 'Technical Area', type: 'text', readOnly: true, align: 'left' }];
+        matrixCols = [{ title: i18n.t('static.healtharea.healtharea'), type: 'text', readOnly: true, align: 'left' }];
         countryList.forEach(c => {
             matrixCols.push({ title: c, type: 'text', readOnly: true, align: 'center' });
         });
@@ -1524,7 +1524,7 @@ class SupplyPlanScoreCard extends Component {
                     const c3 = c2 + Number(parts[2]);
                     const c4 = c3 + Number(parts[3]);
                     stockCell.style.background = `linear-gradient(to right, #BA0C2F 0%, #BA0C2F ${c1}%, #f48521 ${c1}%, #f48521 ${c2}%, #118b70 ${c2}%, #118b70 ${c3}%, #edb944 ${c3}%, #edb944 ${c4}%, #cfcdc9 ${c4}%, #cfcdc9 100%)`;
-                    stockCell.title = `🟥 Stock Out: ${parts[0]}%\n🟧 Below Min: ${parts[1]}%\n🟩 Stocked to Plan: ${parts[2]}%\n🟨 Above Max: ${parts[3]}%\n⬜ N/A: ${parts[4]}%`;
+                    stockCell.title = `🟥 ${i18n.t("static.supplyPlan.stockOut")}: ${parts[0]}%\n🟧 ${i18n.t("static.report.lowstock")}: ${parts[1]}%\n🟩 ${i18n.t("static.report.okaystock")}: ${parts[2]}%\n🟨 ${i18n.t("static.report.overstock")}: ${parts[3]}%\n⬜ ${i18n.t("static.ModelingTransfer.NA")}: ${parts[4]}%`;
                     stockCell.style.backgroundRepeat = 'no-repeat';
                     stockCell.style.backgroundPosition = 'center';
                     stockCell.style.backgroundSize = '95% 14px';
@@ -1541,19 +1541,19 @@ class SupplyPlanScoreCard extends Component {
         columnDrag: true,
         columns: isMatrixView ? matrixCols : [
             { title: ' ', type: isCountryView ? 'text' : 'hidden', readOnly: true, align: 'center', width: 25, filter: false },
-            { title: isCountryView ? 'Country' : 'Program', type: 'text', readOnly: true, align: 'left' },
-            { title: 'Latest Version <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.uploadedDateTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'text', readOnly: true, align: 'left' },
-            { title: 'Active PUs', type: 'numeric', readOnly: true, align: 'left' },
-            { title: 'Forecasted Consumption <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.forecastedConsumptionTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
-            { title: 'Actual Consumption <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualConsumptionTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
-            { title: 'Actual Inventory <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualInventoryTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
-            { title: 'Shipments <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.shipmentsTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
-            { title: 'Quality Score <i class="fa fa-info-circle icons" title="This score represents the average percent compliance across all data quality metrics - forecasted consumption, actual consumption, actual inventory, and shipments. Supply plans that are more complete and up‑to‑date earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
-            { title: 'Stock Status', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
-            { title: 'Stock Status Score <i class="fa fa-info-circle icons" title="This score reflects the average number of months in which all planning units are Stocked to Plan. Supply plans that adhere to MIN/MAX parameters and remain Stocked to Plan earn higher scores." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
-            { title: 'Total Score <i class="fa fa-info-circle icons" title="This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status." aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
-            { title: 'Review Status <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.reviewStatusTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 200 },
-            { title: 'Version Notes', type: 'hidden', readOnly: true, align: 'left', width: 150 },
+            { title: isCountryView ? i18n.t('static.program.realmcountrydashboard') : i18n.t('static.consumption.program'), type: 'text', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.latestVersion') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.uploadedDateTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'text', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.activePUs'), type: 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.report.forecastConsumption') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.forecastedConsumptionTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.actualConsumption') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualConsumptionTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.actualInventory') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.actualInventoryTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.report.orders') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.shipmentsTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.qualityScore') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.supplyPlan.qualityScoreTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.dashboard.stockstatusmain'), type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.stockStatusScore') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.supplyPlan.stockStatusScoreTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.supplyPlan.totalScore') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.supplyPlan.totalScoreTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: 'numeric', readOnly: true, align: 'left' },
+            { title: i18n.t('static.dashboard.reviewStatus') + ' <i class="fa fa-info-circle icons" title="' + i18n.t("static.dashboard.reviewStatusTooltip") + '" aria-hidden="true" style="color: #002f6c; cursor: pointer;"></i>', type: String(this.state.showDetail) === '0' ? 'hidden' : 'text', readOnly: true, align: 'left', width: 200 },
+            { title: i18n.t('static.program.programDiscription'), type: 'hidden', readOnly: true, align: 'left', width: 150 },
             { title: 'RowType', type: 'hidden' },
             { title: 'CountryKey', type: 'hidden' },
             { title: 'ProgramId', type: 'hidden' }
@@ -1698,7 +1698,7 @@ class SupplyPlanScoreCard extends Component {
 
                         const detailLabel = document.createElement('label');
                         detailLabel.htmlFor = 'showDetailInline';
-                        detailLabel.textContent = 'Show Detail';
+                        detailLabel.textContent = i18n.t('static.supplyPlan.showDetail');
                         detailLabel.style.cssText = 'font-size:12px;cursor:pointer;margin:0 0 0 5px;';
 
                         detailDiv.appendChild(detailCheckbox);
@@ -1753,7 +1753,7 @@ class SupplyPlanScoreCard extends Component {
     return (
       <div style={{ width: '100%', height: '18px', borderRadius: '3px', overflow: 'hidden',
         background: `linear-gradient(to right, #BA0C2F 0% ${p1}%, #f48521 ${p1}% ${p2}%, #118b70 ${p2}% ${p3}%, #edb944 ${p3}% ${p4}%, #cfcdc9 ${p4}% 100%)` }}
-        title={`StockOut:${c1}% Under:${c2}% Adequate:${c3}% Over:${c4}% NA:${c5}%`} />
+        title={`${i18n.t('static.supplyPlan.stockOut')}:${c1}% ${i18n.t('static.supplyPlan.underStock')}:${c2}% ${i18n.t('static.supplyPlan.adequate')}:${c3}% ${i18n.t('static.supplyPlan.overStock')}:${c4}% ${i18n.t('static.supplyPlan.na')}:${c5}%`} />
     );
   }
 
@@ -1776,7 +1776,7 @@ class SupplyPlanScoreCard extends Component {
    * Relies on the structure of the data: first column is label, subsequent are numeric percentages.
    */
   calculateTotals = (rows, countryCount) => {
-    if (!rows || rows.length === 0) return ["Total"];
+    if (!rows || rows.length === 0) return [i18n.t('static.supplyPlan.total')];
     let columnSums = new Array(countryCount).fill(0);
     let columnCounts = new Array(countryCount).fill(0);
 
@@ -1791,7 +1791,7 @@ class SupplyPlanScoreCard extends Component {
         }
     });
 
-    const footer = ["Total"];
+    const footer = [i18n.t('static.supplyPlan.total')];
     for (let i = 0; i < countryCount; i++) {
         footer.push(columnCounts[i] > 0 ? `${Math.round(columnSums[i] / columnCounts[i])}%` : '');
     }
@@ -1810,7 +1810,7 @@ class SupplyPlanScoreCard extends Component {
     const visibleRows = instance.results && instance.results.length > 0 ? instance.results : data.map((_, idx) => idx);
 
     if (!visibleRows || visibleRows.length === 0) {
-        instance.setFooter([["Total"]]);
+        instance.setFooter([[i18n.t('static.supplyPlan.total')]]);
         return;
     }
 
@@ -1830,7 +1830,7 @@ class SupplyPlanScoreCard extends Component {
         }
     });
 
-    const footer = ["Total"];
+    const footer = [i18n.t('static.supplyPlan.total')];
     for (let i = 0; i < countryCount; i++) {
         footer.push(columnCounts[i] > 0 ? `${Math.round(columnSums[i] / columnCounts[i])}%` : '');
     }
@@ -1917,7 +1917,7 @@ class SupplyPlanScoreCard extends Component {
     }
     if (this.state.technicalAreaLabels && this.state.technicalAreaLabels.length > 0) {
         this.state.technicalAreaLabels.map(ele =>
-            csvRow.push('"' + ('Technical Area' + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
+            csvRow.push('"' + (i18n.t('static.healtharea.healtharea') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'));
         csvRow.push('');
     }
     if (this.state.programLabels && this.state.programLabels.length > 0) {
@@ -1927,11 +1927,11 @@ class SupplyPlanScoreCard extends Component {
     }
     var viewByEl = document.getElementById("viewById");
     if (viewByEl) {
-        csvRow.push('"' + ('View By' + ' : ' + viewByEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
+        csvRow.push('"' + (i18n.t('static.supplyPlan.viewBy') + ' : ' + viewByEl.selectedOptions[0].text).replaceAll(' ', '%20') + '"');
         csvRow.push('');
     }
-    var showDetailVal = String(this.state.showDetail) === '1' ? 'Yes' : 'No';
-    csvRow.push('"' + ('Show Detail' + ' : ' + showDetailVal).replaceAll(' ', '%20') + '"');
+    var showDetailVal = String(this.state.showDetail) === '1' ? i18n.t('static.realm.yes') : i18n.t('static.realm.no');
+    csvRow.push('"' + (i18n.t('static.supplyPlan.showDetail') + ' : ' + showDetailVal).replaceAll(' ', '%20') + '"');
     csvRow.push('');
     csvRow.push('');
     csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"');
@@ -1945,7 +1945,7 @@ class SupplyPlanScoreCard extends Component {
             // Skip the first column (toggle icon) in Country view as it's not needed in CSV
             if (String(this.state.viewBy) === '1' && c === 0) continue;
             // Skip Stock Status column as it's visual and not useful in CSV
-            if ((columns[c].title || '').toString().replace(/<[^>]*>?/gm, '').trim() === 'Stock Status') continue;
+            if ((columns[c].title || '').toString().replace(/<[^>]*>?/gm, '').trim() === i18n.t('static.dashboard.stockstatusmain')) continue;
             visibleIndexes.push(c);
         }
     }
@@ -2029,7 +2029,7 @@ class SupplyPlanScoreCard extends Component {
             doc.setPage(i);
             doc.addImage(LOGO, 'png', 0, 10, 180, 50, 'FAST');
             doc.setTextColor("#002f6c");
-            doc.text('Supply Plan Score Card', doc.internal.pageSize.width / 2, 60, {
+            doc.text(i18n.t('static.supplyPlan.scorecard'), doc.internal.pageSize.width / 2, 60, {
                 align: 'center'
             });
         }
@@ -2048,7 +2048,7 @@ class SupplyPlanScoreCard extends Component {
         y = y + countryText.length * 10;
     }
     if (this.state.technicalAreaLabels && this.state.technicalAreaLabels.length > 0) {
-        var taText = doc.splitTextToSize('Technical Area : ' + this.state.technicalAreaLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
+        var taText = doc.splitTextToSize(i18n.t('static.healtharea.healtharea') + ' : ' + this.state.technicalAreaLabels.join('; '), doc.internal.pageSize.width * 3 / 4);
         doc.text(leftMargin, y, taText);
         y = y + taText.length * 10;
     }
@@ -2059,11 +2059,11 @@ class SupplyPlanScoreCard extends Component {
     }
     var viewByEl = document.getElementById("viewById");
     if (viewByEl) {
-        doc.text('View By : ' + viewByEl.selectedOptions[0].text, leftMargin, y, { align: 'left' });
+        doc.text(i18n.t('static.supplyPlan.viewBy') + ' : ' + viewByEl.selectedOptions[0].text, leftMargin, y, { align: 'left' });
         y = y + 15;
     }
     var showDetailPdfVal = String(this.state.showDetail) === '1' ? 'Yes' : 'No';
-    doc.text('Show Detail : ' + showDetailPdfVal, leftMargin, y, { align: 'left' });
+    doc.text(i18n.t('static.supplyPlan.showDetail') + ' : ' + showDetailPdfVal, leftMargin, y, { align: 'left' });
     y = y + 15;
 
     // Add chart image
@@ -2092,7 +2092,7 @@ class SupplyPlanScoreCard extends Component {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor("#002f6c");
-    doc.text('Stock Status:', legendX, y);
+    doc.text(i18n.t('static.dashboard.stockstatusmain') + ':', legendX, y);
     var lx = legendX + 65;
     var stockLegendItems = [
         { label: i18n.t('static.supplyPlan.stockOut'), color: [186, 12, 47] },
@@ -2417,7 +2417,7 @@ class SupplyPlanScoreCard extends Component {
         text: '50', value: 50
       },
       {
-        text: 'All', value: this.state.problemActionList.length
+        text: i18n.t('static.common.all'), value: this.state.problemActionList.length
       }]
     }
 
@@ -2475,10 +2475,10 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: countryAggregates.map(c => c.label),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => !isNaN(c.avgTotal) && c.avgTotal !== null ? Math.round(c.avgTotal) : null) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgQuality) && c.avgQuality !== null ? Math.round(c.avgQuality) : null) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgStock) && c.avgStock !== null ? Math.round(c.avgStock) : null) },
-                { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
+                { type: 'line', label: i18n.t('static.supplyPlan.totalScore'), borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => !isNaN(c.avgTotal) && c.avgTotal !== null ? Math.round(c.avgTotal) : null) },
+                { type: 'bar', label: i18n.t('static.supplyPlan.qualityScore'), backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgQuality) && c.avgQuality !== null ? Math.round(c.avgQuality) : null) },
+                { type: 'bar', label: i18n.t('static.supplyPlan.stockStatusScore'), backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgStock) && c.avgStock !== null ? Math.round(c.avgStock) : null) },
+                { type: 'line', label: i18n.t('static.tree.target'), borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
             ]
         };
     } else if (viewBy === '2') {
@@ -2553,7 +2553,7 @@ class SupplyPlanScoreCard extends Component {
             datasets: [
                 {
                     type: 'line',
-                    label: 'Total Score',
+                    label: i18n.t('static.supplyPlan.totalScore'),
                     borderColor: '#BA0C2F',
                     backgroundColor: '#BA0C2F',
                     fill: false,
@@ -2579,7 +2579,7 @@ class SupplyPlanScoreCard extends Component {
                 },
                 {
                     type: 'line',
-                    label: 'Target',
+                    label: i18n.t('static.tree.target'),
                     borderColor: '#6C6463',
                     backgroundColor: '#6C6463',
                     borderWidth: 4,
@@ -2621,7 +2621,7 @@ class SupplyPlanScoreCard extends Component {
             datasets: [
                 {
                     type: 'line',
-                    label: 'Total Score',
+                    label: i18n.t('static.supplyPlan.totalScore'),
                     borderColor: '#BA0C2F',
                     backgroundColor: '#BA0C2F',
                     fill: false,
@@ -2644,9 +2644,9 @@ class SupplyPlanScoreCard extends Component {
                         return progScore !== null ? Math.round(progScore) : null;
                     })
                 },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: displayList.map(d => (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null) ? Math.round(d.supplyPlanQualityScore) : null) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: displayList.map(d => (!isNaN(d.stockStatusScore) && d.stockStatusScore !== null) ? Math.round(d.stockStatusScore) : null) },
-                { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
+                { type: 'bar', label: i18n.t('static.supplyPlan.qualityScore'), backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: displayList.map(d => (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null) ? Math.round(d.supplyPlanQualityScore) : null) },
+                { type: 'bar', label: i18n.t('static.supplyPlan.stockStatusScore'), backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: displayList.map(d => (!isNaN(d.stockStatusScore) && d.stockStatusScore !== null) ? Math.round(d.stockStatusScore) : null) },
+                { type: 'line', label: i18n.t('static.tree.target'), borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
             ]
         };
     }
@@ -2654,7 +2654,7 @@ class SupplyPlanScoreCard extends Component {
     const barOptions = {
         title: {
             display: true,
-            text: 'Supply Plan Score by ' + (viewBy === '0' ? 'Program' : (viewBy === '1' ? 'Country' : 'Country x Program')),
+            text: i18n.t('static.supplyPlan.scoreBy') + ' ' + (viewBy === '0' ? i18n.t('static.consumption.program') : (viewBy === '1' ? i18n.t('static.program.realmcountrydashboard') : i18n.t('static.supplyPlan.countryXprogram'))),
             fontSize: 18,
             fontColor: fontColor
         },
@@ -2773,7 +2773,7 @@ class SupplyPlanScoreCard extends Component {
                           </div>
                         </FormGroup>}
                         {!this.state.onlyDownloadedProgram && <FormGroup className='col-md-3 FormGroupD'>
-                          <Label htmlFor="technicalAreaId">Technical Area</Label>
+                          <Label htmlFor="technicalAreaId">{i18n.t('static.healtharea.healtharea')}</Label>
                           <MultiSelect
                               name="technicalAreaId"
                               id="technicalAreaId"
@@ -2812,7 +2812,7 @@ class SupplyPlanScoreCard extends Component {
                           </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
-                          <Label htmlFor="viewById">View By</Label>
+                          <Label htmlFor="viewById">{i18n.t('static.supplyPlan.viewBy')}</Label>
                           <div className="controls ">
                               <InputGroup>
                                   <Input
@@ -2822,9 +2822,9 @@ class SupplyPlanScoreCard extends Component {
                                       bsSize="sm"
                                       onChange={this.toggleView}
                                   >
-                                      <option value="0">Program</option>
-                                      <option value="1">Country</option>
-                                      <option value="2">Country x Program</option>
+                                      <option value="0">{i18n.t('static.consumption.program')}</option>
+                                      <option value="1">{i18n.t('static.program.realmcountrydashboard')}</option>
+                                      <option value="2">{i18n.t('static.supplyPlan.countryXprogram')}</option>
                                   </Input>
                               </InputGroup>
                           </div>
@@ -2850,7 +2850,7 @@ class SupplyPlanScoreCard extends Component {
                       <div>
 
                         <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Stock Status:</span>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>{i18n.t('static.dashboard.stockstatusmain')}:</span>
                           <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.supplyPlan.stockOut')}</span></div>
                           <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.lowstock')}</span></div>
                           <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.okaystock')}</span></div>
