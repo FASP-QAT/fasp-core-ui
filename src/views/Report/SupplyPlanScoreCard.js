@@ -969,7 +969,7 @@ class SupplyPlanScoreCard extends Component {
                             results.forEach(dbd => {
                                 if (!dbd) return;
                                 const cId = dbd.realmCountry ? dbd.realmCountry.realmCountryId : 0;
-                                const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+                                const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : '';
                                 const cKey = `${cId}_${cLabel}`;
                                 newExpandedMap[cKey] = true;
                             });
@@ -1024,7 +1024,7 @@ class SupplyPlanScoreCard extends Component {
         
         list.forEach(dbd => {
             if (!dbd) return;
-            const countryLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const countryLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : '';
             const score = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2);
             
             if (!countriesMap[countryLabel]) countriesMap[countryLabel] = true;
@@ -1073,7 +1073,7 @@ class SupplyPlanScoreCard extends Component {
             } else {
                 cId = dbd.realmCountryId || 0;
             }
-            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : '';
             const cKey = `${cId}_${cLabel}`;
             if (!countryGroupsMap[cKey]) countryGroupsMap[cKey] = { label: cLabel, programs: [], key: cKey };
             countryGroupsMap[cKey].programs.push(dbd);
@@ -1143,7 +1143,7 @@ class SupplyPlanScoreCard extends Component {
                     } else {
                         cId = dbd.realmCountryId || 0;
                     }
-                    const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+                    const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : '';
                     const cKey = `${cId}_${cLabel}`;
                     let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2);
                     let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
@@ -1182,7 +1182,7 @@ class SupplyPlanScoreCard extends Component {
             } else {
                 cId = dbd.realmCountryId || 0;
             }
-            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : 'Unknown';
+            const cLabel = dbd.realmCountry ? getLabelText(dbd.realmCountry.label, this.state.lang) : '';
             const cKey = `${cId}_${cLabel}`;
             let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2);
             let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
@@ -1379,9 +1379,7 @@ class SupplyPlanScoreCard extends Component {
                             const notes = rowData[13];
                             if (val && val !== '-' && val.trim() !== '') {
                                 let iconHtml = '';
-                                if (notes && notes.trim() !== '' && notes !== '-') {
-                                    iconHtml = `<i class="fa fa-book notes-icon icons IconColorD" title="${notes}" aria-hidden="true" style="color: #002f6c; vertical-align: middle; margin-left: 5px; cursor: pointer;"></i>`;
-                                }
+                                iconHtml = `<i class="fa fa-book notes-icon icons IconColorD" title="${notes}" aria-hidden="true" style="color: #002f6c; vertical-align: middle; margin-left: 5px; cursor: pointer;"></i>`;
                                 cell.innerHTML = `<span>${val}</span> ${iconHtml}`;
                                 cell.style.setProperty('color', '#002f6c', 'important');
                                 cell.style.setProperty('text-decoration', 'none', 'important');
@@ -2477,9 +2475,9 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: countryAggregates.map(c => c.label),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => Math.round(c.avgTotal)) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgQuality)) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: countryAggregates.map(c => Math.round(c.avgStock)) },
+                { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: countryAggregates.map(c => !isNaN(c.avgTotal) && c.avgTotal !== null ? Math.round(c.avgTotal) : null) },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgQuality) && c.avgQuality !== null ? Math.round(c.avgQuality) : null) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: countryAggregates.map(c => !isNaN(c.avgStock) && c.avgStock !== null ? Math.round(c.avgStock) : null) },
                 { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: countryAggregates.map(() => this.state.supplyPlanScoreThresholdPerc ) }
             ]
         };
@@ -2491,18 +2489,32 @@ class SupplyPlanScoreCard extends Component {
         
         graphDataList.forEach(d => {
             if (!d) return;
-            const cLabel = d.realmCountry ? getLabelText(d.realmCountry.label, this.state.lang) : 'Unknown';
-            const score = Math.round((d.supplyPlanQualityScore + d.stockStatusScore) / 2);
-            d.totalScore = score; // Store for sorting/filtering
-            countriesSet.add(cLabel);
-            (d.healthAreaList || []).forEach(ha => {
-                const haLabel = getLabelText(ha.label, this.state.lang);
-                haSet.add(haLabel);
-                if (!scoreMatrix[cLabel]) scoreMatrix[cLabel] = {};
-                if (!scoreMatrix[cLabel][haLabel]) scoreMatrix[cLabel][haLabel] = { sum: 0, count: 0 };
-                scoreMatrix[cLabel][haLabel].sum += score;
-                scoreMatrix[cLabel][haLabel].count += 1;
-            });
+            const cLabel = d.realmCountry ? getLabelText(d.realmCountry.label, this.state.lang) : '';
+            let progScore = null;
+            if (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null && !isNaN(d.stockStatusScore) && d.stockStatusScore !== null) {
+                progScore = (d.supplyPlanQualityScore + d.stockStatusScore) / 2;
+            } else if (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null) {
+                progScore = d.supplyPlanQualityScore;
+            } else if (!isNaN(d.stockStatusScore) && d.stockStatusScore !== null) {
+                progScore = d.stockStatusScore;
+            }
+
+            if (progScore !== null) {
+                const score = Math.round(progScore);
+                d.totalScore = score; // Store for sorting/filtering
+                countriesSet.add(cLabel);
+                (d.healthAreaList || []).forEach(ha => {
+                    const haLabel = getLabelText(ha.label, this.state.lang);
+                    haSet.add(haLabel);
+                    if (!scoreMatrix[cLabel]) scoreMatrix[cLabel] = {};
+                    if (!scoreMatrix[cLabel][haLabel]) scoreMatrix[cLabel][haLabel] = { sum: 0, count: 0 };
+                    scoreMatrix[cLabel][haLabel].sum += score;
+                    scoreMatrix[cLabel][haLabel].count += 1;
+                });
+            } else {
+                 d.totalScore = null;
+                 countriesSet.add(cLabel);
+            }
         });
         
         
@@ -2539,17 +2551,6 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: sortedCountries,
             datasets: [
-                ...sortedHAs.map((ha, idx) => ({
-                    type: 'bar',
-                    label: ha,
-                    backgroundColor: palette[idx % palette.length],
-                    borderColor: palette[idx % palette.length],
-                    borderWidth: 1,
-                    data: sortedCountries.map(c => {
-                        const s = scoreMatrix[c] && scoreMatrix[c][ha];
-                        return s ? Math.round(s.sum / s.count) : 0;
-                    })
-                })),
                 {
                     type: 'line',
                     label: 'Total Score',
@@ -2562,17 +2563,18 @@ class SupplyPlanScoreCard extends Component {
                     pointHitRadius: 0,
                     pointStyle: 'line',
                     borderWidth: 4,
+                    hoverBorderWidth: 4,
                     data: sortedCountries.map(c => {
                         let countrySum = 0;
                         let countryCount = 0;
                         sortedHAs.forEach(ha => {
                             const s = scoreMatrix[c] && scoreMatrix[c][ha];
-                            if (s) {
-                                countrySum += s.sum;
-                                countryCount += s.count;
+                            if (s && !isNaN(s.sum / s.count)) {
+                                countrySum += (s.sum / s.count);
+                                countryCount += 1;
                             }
                         });
-                        return countryCount > 0 ? Math.round(countrySum / countryCount) : 0;
+                        return countryCount > 0 ? Math.round(countrySum / countryCount) : null;
                     })
                 },
                 {
@@ -2588,7 +2590,18 @@ class SupplyPlanScoreCard extends Component {
                     pointHoverRadius: 0,
                     pointStyle: 'line',
                     data: sortedCountries.map(() => this.state.supplyPlanScoreThresholdPerc)
-                }
+                },
+                ...sortedHAs.map((ha, idx) => ({
+                    type: 'bar',
+                    label: ha,
+                    backgroundColor: palette[idx % palette.length],
+                    borderColor: palette[idx % palette.length],
+                    borderWidth: 1,
+                    data: sortedCountries.map(c => {
+                        const s = scoreMatrix[c] && scoreMatrix[c][ha];
+                        return s ? Math.round(s.sum / s.count) : null;
+                    })
+                }))
             ]
         };
     } else {
@@ -2606,9 +2619,33 @@ class SupplyPlanScoreCard extends Component {
         barData = {
             labels: displayList.map(d => d.program ? d.program.code : ''),
             datasets: [
-                { type: 'line', label: 'Total Score', borderColor: '#BA0C2F', backgroundColor: '#BA0C2F', fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointHitRadius: 0, pointStyle: 'line', borderWidth: 4, hoverBorderWidth: 4, data: displayList.map(d => Math.round((d.supplyPlanQualityScore + d.stockStatusScore) / 2)) },
-                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: displayList.map(d => Math.round(d.supplyPlanQualityScore)) },
-                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: displayList.map(d => Math.round(d.stockStatusScore)) },
+                {
+                    type: 'line',
+                    label: 'Total Score',
+                    borderColor: '#BA0C2F',
+                    backgroundColor: '#BA0C2F',
+                    fill: false,
+                    showLine: false,
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    pointHitRadius: 0,
+                    pointStyle: 'line',
+                    borderWidth: 4,
+                    hoverBorderWidth: 4,
+                    data: displayList.map(d => {
+                        let progScore = null;
+                        if (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null && !isNaN(d.stockStatusScore) && d.stockStatusScore !== null) {
+                            progScore = (d.supplyPlanQualityScore + d.stockStatusScore) / 2;
+                        } else if (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null) {
+                            progScore = d.supplyPlanQualityScore;
+                        } else if (!isNaN(d.stockStatusScore) && d.stockStatusScore !== null) {
+                            progScore = d.stockStatusScore;
+                        }
+                        return progScore !== null ? Math.round(progScore) : null;
+                    })
+                },
+                { type: 'bar', label: 'Quality Score', backgroundColor: '#002F6C', borderColor: '#002F6C', borderWidth: 1, data: displayList.map(d => (!isNaN(d.supplyPlanQualityScore) && d.supplyPlanQualityScore !== null) ? Math.round(d.supplyPlanQualityScore) : null) },
+                { type: 'bar', label: 'Stock Status Score', backgroundColor: '#A7C6ED', borderColor: '#A7C6ED', borderWidth: 1, data: displayList.map(d => (!isNaN(d.stockStatusScore) && d.stockStatusScore !== null) ? Math.round(d.stockStatusScore) : null) },
                 { type: 'line', label: 'Target', borderColor: '#6C6463', backgroundColor: '#6C6463', borderWidth: 4, borderDash: [10, 5], fill: false, showLine: false, pointRadius: 0, pointHoverRadius: 0, pointStyle: 'line', data: displayList.map(() => this.state.supplyPlanScoreThresholdPerc) }
             ]
         };
