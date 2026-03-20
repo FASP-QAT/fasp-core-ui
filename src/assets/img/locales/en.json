@@ -3695,5 +3695,22 @@
   "static.stockStatusMatrix.consumptionTooltip": "Actual consumption where available. Otherwise, forecasted consumption.",
   "static.stockStatusMatrix.amcTooltip": "Average Monthly Consumption. Dynamic value based on user-entered number of months past & future in the Planning Unit settings screen.",
   "static.stockStatusMatrix.mosTooltip": "Months of Stock",
-  "static.stockStatusMatrix.statusTooltip": "Stock status relative to minimum and maximum levels (either in MOS or quantity) as set in the Planning Unit settings screen."
+  "static.stockStatusMatrix.statusTooltip": "Stock status relative to minimum and maximum levels (either in MOS or quantity) as set in the Planning Unit settings screen.",
+  "static.supplyPlan.scorecard": "Supply Plan Scorecard",
+  "static.supplyPlan.totalScore": "Total Score",
+  "static.supplyPlan.overallScore": "Overall Score",
+  "static.supplyPlan.overallScoreTitle": "Overall Supply Plan Score",
+  "static.supplyPlan.qualityScore": "Quality Score",
+  "static.supplyPlan.score": "Score",
+  "static.supplyPlan.stockStatusScore": "Stock Status Score",
+  "static.supplyPlan.countryXprogram": "Country x Program",
+  "static.supplyPlan.viewBy": "View By",
+  "static.supplyPlan.scoreBy": "Supply Plan Score by",
+  "static.supplyPlan.showDetail": "Show Detail",
+  "static.supplyPlan.latestVersion": "Latest Version",
+  "static.supplyPlan.activePUs": "Active PUs",
+  "static.supplyPlan.actualInventory": "Actual Inventory",
+  "static.supplyPlan.qualityScoreTooltip": "This score represents the average percent compliance across all data quality metrics - forecasted consumption, actual consumption, actual inventory, and shipments. Supply plans that are more complete and up‑to‑date earn higher scores.",
+  "static.supplyPlan.stockStatusScoreTooltip": "This score reflects the average number of months in which all planning units are Stocked to Plan. Supply plans that adhere to MIN/MAX parameters and remain Stocked to Plan earn higher scores.",
+  "static.supplyPlan.totalScoreTooltip": "This score is calculated as the average of the Quality Score and Stock Status Score. Higher scores indicate stronger overall supply plan performance across data quality and stock status."
 }
