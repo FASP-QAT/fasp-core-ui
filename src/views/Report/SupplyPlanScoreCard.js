@@ -1561,7 +1561,13 @@ class SupplyPlanScoreCard extends Component {
             // accordion logic moved to td.onclick in reapplyFormatting 
         }.bind(this),
         onchangepage: function(obj) { reapplyFormatting(obj); },
+        onbeforesort: function(instance, column, direction, newOrder) {
+            // Capture scroll position BEFORE jspreadsheet rebuilds the DOM
+            this._savedScrollY = window.scrollY;
+        }.bind(this),
         onsort: function(instance, column, dir) { 
+            const savedScrollY = this._savedScrollY || 0;
+
             if (isMatrixView) {
                 setTimeout(() => { this.recalculateFooter(instance, this.matrixCountryCount); }, 0);
             }
@@ -1583,8 +1589,10 @@ class SupplyPlanScoreCard extends Component {
             
             requestAnimationFrame(() => {
                 this.setState({ sortedLabels }, () => {
+                    window.scrollTo(0, savedScrollY);
                     setTimeout(() => {
                         reapplyFormatting(instance);
+                        window.scrollTo(0, savedScrollY);
                     }, 0);
                 });
             });
