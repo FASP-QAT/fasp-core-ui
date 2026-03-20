@@ -251,6 +251,11 @@ class SupplyPlanScoreCard extends Component {
     this.getNotes = this.getNotes.bind(this);
     this.redirectToSPVR = this.redirectToSPVR.bind(this);
   }
+  handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.fetchData();
+    }
+  };
   /**
    * Reterives dashboard data from server on component mount
    */
@@ -453,7 +458,7 @@ class SupplyPlanScoreCard extends Component {
         programValues: programIds.map(ele => ele),
         programLabels: programIds.map(ele => ele.label)
     }, () => {
-        this.fetchData();
+        // this.fetchData();
     })
   }
   handleTechnicalAreaIdChange = (technicalAreaIds) => {
@@ -2752,19 +2757,21 @@ class SupplyPlanScoreCard extends Component {
                           <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                           <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
                           <div className="controls ">
-                              <MultiSelect
-                                  bsSize="sm"
-                                  name="programIds"
-                                  id="programIds"
-                                  value={this.state.programValues}
-                                  onChange={(e) => { this.handleChangeProgram(e) }}
-                                  options={programList && programList.length > 0 ? programList : []}
-                                  disabled={this.state.loading}
-                                  overrideStrings={{
-                                      allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                      selectSomeItems: i18n.t('static.common.select')
-                                  }}
-                              />
+                            <div onBlur={this.handleBlur}>
+                                <MultiSelect
+                                    bsSize="sm"
+                                    name="programIds"
+                                    id="programIds"
+                                    value={this.state.programValues}
+                                    onChange={(e) => { this.handleChangeProgram(e) }}
+                                    options={programList && programList.length > 0 ? programList : []}
+                                    disabled={this.state.loading}
+                                    overrideStrings={{
+                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                        selectSomeItems: i18n.t('static.common.select')
+                                    }}
+                                />
+                            </div>
                           </div>
                       </FormGroup>
                       <FormGroup className="col-md-3">
