@@ -40,6 +40,7 @@ const AddOrganisationType = React.lazy(() => import('../../views/OrganisationTyp
 const OrganisationTypeList = React.lazy(() => import('../../views/OrganisationType/OrganisationTypeList'));
 const EditOrganisationType = React.lazy(() => import('../../views/OrganisationType/EditOrganisationType'));
 const ApplicationDashboard = React.lazy(() => import('../../views/ApplicationDashboard/ApplicationDashboard.js'));
+const SupplyPlanScoreCard = React.lazy(() => import('../../views/Report/SupplyPlanScoreCard.js'));
 const ShipmentLinkingNotifications = React.lazy(() => import('../../views/ManualTagging/ShipmentLinkingNotifications'));
 const AddFunderType = React.lazy(() => import('../../views/FunderType/AddFunderTypeComponent'));
 const ListFunderType = React.lazy(() => import('../../views/FunderType/ListFunderTypeComponent'));
@@ -287,6 +288,7 @@ const routes = [
   { path: '/ApplicationDashboard/:id/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
   { path: '/ApplicationDashboard/:color/:message', exact: true, name: 'static.dashboard.applicationdashboard', component: ApplicationDashboard },
+  { path: '/report/supplyPlanScoreCard', exact: true, name: 'static.supplyPlan.scorecard', component: SupplyPlanScoreCard },
   { path: '/shipmentLinkingNotification', exact: true, name: 'static.mt.shipmentLinkingNotification', component: ShipmentLinkingNotifications },
   { path: '/procurementAgent/addProcurementAgent', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementagentheader', component: AddProcurementAgent },
   { path: '/procurementAgent/listProcurementAgent', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.procurementagent', component: ListProcurementAgent },
@@ -1893,6 +1895,17 @@ class DefaultLayout extends Component {
                               name: i18n.t('static.dashboard.stockstatus'),
                               url: '/report/stockStatus',
                               icon: 'fa fa-file-text',
+                              attributes: {
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2) ? false : true),
+                                onClick: e => {
+                                  this.refreshPage();
+                                }
+                              }
+                            },
+                            {
+                              name: i18n.t('static.supplyPlan.scorecard'),
+                              url: '/report/supplyPlanScorecard',
+                              icon: 'fa fa-trophy',
                               attributes: {
                                 hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT') && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
