@@ -1,786 +1,4066 @@
-import { DatePicker } from "antd";
 import "antd/dist/antd.css";
 import CryptoJS from "crypto-js";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
+import jexcel from "jspreadsheet";
+import {
+  onOpenFilter,
+  jExcelLoadedFunction,
+  jExcelLoadedFunctionWithoutPagination,
+  jExcelLoadedFunctionStockStatusMatrix,
+} from "../../CommonComponent/JExcelCommonFunctions.js";
 import moment from "moment";
 import React from "react";
-import {
-  CSVExport,
-  Search,
-} from "react-bootstrap-table2-toolkit";
+import { Line } from "react-chartjs-2";
 import { MultiSelect } from "react-multi-select-component";
 import {
+  Button,
   Card,
   CardBody,
   FormGroup,
   Input,
   InputGroup,
   Label,
-  Table
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
 } from "reactstrap";
+import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
+import "../../../node_modules/jsuites/dist/jsuites.css";
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import { LOGO } from "../../CommonComponent/Logo.js";
 import getLabelText from "../../CommonComponent/getLabelText";
 import {
   API_URL,
+  DATE_FORMAT_CAP,
   INDEXED_DB_NAME,
   INDEXED_DB_VERSION,
-  PROGRAM_TYPE_SUPPLY_PLAN,
-  REPORT_DATEPICKER_END_MONTH,
-  REPORT_DATEPICKER_START_MONTH,
-  SECRET_KEY
+  JEXCEL_PAGINATION_OPTION,
+  JEXCEL_PRO_KEY,
+  SECRET_KEY,
 } from "../../Constants.js";
 import DropdownService from "../../api/DropdownService";
 import ProductService from "../../api/ProductService";
+import ReportService from "../../api/ReportService";
 import csvicon from "../../assets/img/csv.png";
 import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
-import { addDoubleQuoteToRowContent, filterOptions, formatter, formatterMOS, roundAMC } from "../../CommonComponent/JavascriptCommonFunctions";
-const { RangePicker } = DatePicker;
+import {
+  addDoubleQuoteToRowContent,
+  filterOptions,
+  formatter,
+  formatterMOS,
+  roundAMC,
+  makeText,
+} from "../../CommonComponent/JavascriptCommonFunctions";
+import Picker from "react-month-picker";
+import MonthBox from "../../CommonComponent/MonthBox.js";
+import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const pickerLang = {
+  months: [
+    i18n.t("static.month.jan"),
+    i18n.t("static.month.feb"),
+    i18n.t("static.month.mar"),
+    i18n.t("static.month.apr"),
+    i18n.t("static.month.may"),
+    i18n.t("static.month.jun"),
+    i18n.t("static.month.jul"),
+    i18n.t("static.month.aug"),
+    i18n.t("static.month.sep"),
+    i18n.t("static.month.oct"),
+    i18n.t("static.month.nov"),
+    i18n.t("static.month.dec"),
+  ],
+  from: "From",
+  to: "To",
+};
+
+// stockStatusId → { label, color }
+const STOCK_STATUS_MAP = {
+  "-1": { label: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9" },
+  0: { label: i18n.t("static.report.stockout"), color: "#BA0C2F" },
+  1: { label: i18n.t("static.report.lowstock"), color: "#f48521" },
+  2: { label: i18n.t("static.report.okaystock"), color: "#118b70" },
+  3: { label: i18n.t("static.report.overstock"), color: "#edb944" },
+};
+
 const legendcolor = [
   { text: i18n.t("static.report.stockout"), color: "#BA0C2F", value: 0 },
   { text: i18n.t("static.report.lowstock"), color: "#f48521", value: 1 },
   { text: i18n.t("static.report.okaystock"), color: "#118b70", value: 2 },
   { text: i18n.t("static.report.overstock"), color: "#edb944", value: 3 },
-  { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: 4 },
+  { text: i18n.t("static.supplyPlanFormula.na"), color: "#cfcdc9", value: -1 },
 ];
-const { ExportCSVButton } = CSVExport;
+
+// All stock status options pre-selected by default
+const ALL_STOCK_STATUS = legendcolor.map((item) => ({
+  label: item.text,
+  value: item.value,
+}));
+
 const entityname = i18n.t("static.dashboard.productCatalog");
-/**
- * Component for Stock Status Matrix Report.
- */
+
+const DARK_COLORS = [
+  "#d4bbff",
+  "#BA0C2F",
+  "#757575",
+  "#0067B9",
+  "#A7C6ED",
+  "#205493",
+  "#ba4e00",
+  "#6C6463",
+  "#BC8985",
+  "#cfcdc9",
+  "#49A4A1",
+  "#118B70",
+  "#EDB944",
+  "#F48521",
+  "#ED5626",
+  "#d4bbff",
+  "#BA0C2F",
+  "#757575",
+  "#0067B9",
+  "#A7C6ED",
+  "#205493",
+  "#ba4e00",
+  "#6C6463",
+  "#BC8985",
+  "#cfcdc9",
+  "#49A4A1",
+  "#118B70",
+  "#EDB944",
+  "#F48521",
+  "#ED5626",
+  "#d4bbff",
+  "#BA0C2F",
+  "#757575",
+  "#0067B9",
+  "#A7C6ED",
+];
+const LIGHT_COLORS = [
+  "#002F6C",
+  "#BA0C2F",
+  "#212721",
+  "#0067B9",
+  "#A7C6ED",
+  "#205493",
+  "#651D32",
+  "#6C6463",
+  "#BC8985",
+  "#cfcdc9",
+  "#49A4A1",
+  "#118B70",
+  "#EDB944",
+  "#F48521",
+  "#ED5626",
+  "#002F6C",
+  "#BA0C2F",
+  "#212721",
+  "#0067B9",
+  "#A7C6ED",
+  "#205493",
+  "#651D32",
+  "#6C6463",
+  "#BC8985",
+  "#cfcdc9",
+  "#49A4A1",
+  "#118B70",
+  "#EDB944",
+  "#F48521",
+  "#ED5626",
+  "#002F6C",
+  "#BA0C2F",
+  "#212721",
+  "#0067B9",
+  "#A7C6ED",
+];
+
+// ─── Pure helpers ─────────────────────────────────────────────────────────────
+
+function deriveMonthColumns(stockStatusMatrix, startDate, endDate) {
+  const keySet = new Set();
+  (stockStatusMatrix || []).forEach((row) =>
+    Object.keys(row.dataMap || {}).forEach((k) => {
+      if (k >= startDate && k <= endDate) keySet.add(k);
+    })
+  );
+  return Array.from(keySet).sort();
+}
+
+function colorForStatus(statusId) {
+  return (STOCK_STATUS_MAP[statusId] || STOCK_STATUS_MAP["-1"]).color;
+}
+
+// Returns raw number or null (null → shown as N/A via render callback on numeric col)
+function cellDisplayValue(dataEntry, showQuantity, planBasedOn) {
+  if (!dataEntry || dataEntry.stockStatusId == -1) return null;
+  const { mos, closingBalance } = dataEntry;
+  if (showQuantity || planBasedOn == 2) {
+    return closingBalance != null ? Math.round(closingBalance) : null;
+  }
+  return mos != null ? roundAMC(mos) : null;
+}
+
+// Local version: derive statusId from MOS vs min/reorder thresholds
+function calcStatusIdLocal(mos, minMos, reorderFrequency) {
+  if (mos == null) return -1;
+  const v = roundAMC(mos);
+  if (v == 0) return 0;
+  if (v < minMos) return 1;
+  if (v > minMos + reorderFrequency) return 3;
+  return 2;
+}
+
+// Calculate dynamic maxStock for plan-by-qty
+// For each month: dynamicMax = minStock + reorderFrequency * AMC
+// Return the average across all months that have AMC data.
+function calcAverageMaxStock(supplyPlanEntries, minStock, reorderFrequency) {
+  const monthlyMaxValues = (supplyPlanEntries || [])
+    .filter((sp) => sp.amc != null && sp.amc > 0)
+    .map((sp) => minStock + reorderFrequency * sp.amc);
+
+  if (monthlyMaxValues.length == 0) return 0;
+  const sum = monthlyMaxValues.reduce((acc, v) => acc + v, 0);
+  return sum / monthlyMaxValues.length;
+}
+
+// ─── PDF Icon Helpers ─────────────────────────────────────────────────────────
+// We render each FontAwesome icon onto a tiny offscreen <canvas> using the FA
+// font that is already loaded in the browser, then stamp the canvas as a PNG
+// image into the PDF via doc.addImage(). This guarantees a pixel-perfect match
+// to the on-screen icons — no hand-drawn approximations needed.
+//
+// FA unicode code points:
+//   fa-truck                → U+F0D1  (\uf0d1)
+//   fa-exclamation-triangle → U+F071  (\uf071)
+//
+// Returns a { dataUrl, widthPt } object. widthPt is the pt width to reserve
+// in the PDF so the caller can advance its x cursor correctly.
+
+function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = sizePx;
+    canvas.height = sizePx;
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, sizePx, sizePx);
+    // "Font Awesome 5 Free" is the name used by FA5; FA4 registers as "FontAwesome"
+    // We try both so it works regardless of which version the project uses.
+    ctx.font = `900 ${sizePx * 0.85}px "Font Awesome 5 Free", "FontAwesome"`;
+    ctx.fillStyle = color;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(glyphChar, sizePx / 2, sizePx / 2);
+    return { dataUrl: canvas.toDataURL("image/png"), widthPt: 10 };
+  } catch (_) {
+    return null;
+  }
+}
+
+// Pre-render both icons once so they are ready synchronously during didDrawCell.
+// Called just before exportPDFFromModal builds the autoTable.
+function buildPdfIconCache() {
+  return {
+    truck: {
+      light: renderFaIconToDataUrl("\uf0d1", "#1A1A1A", 28),
+      dark: renderFaIconToDataUrl("\uf0d1", "#1A1A1A", 28),
+    },
+    warning: {
+      light: renderFaIconToDataUrl("\uf071", "#1A1A1A", 28),
+      dark: renderFaIconToDataUrl("\uf071", "#1A1A1A", 28),
+    },
+  };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export default class StockStatusMatrix extends React.Component {
   constructor(props) {
     super(props);
     var dt = new Date();
-    dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
+    dt.setMonth(dt.getMonth() - 3);
     var dt1 = new Date();
-    dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+    dt1.setMonth(dt1.getMonth() + 14);
+
     this.state = {
-      realms: [],
-      productCategories: [],
-      planningUnits: [],
-      data: [],
-      selData: [],
+      stockStatusMatrix: [],
+      stockStatusDetails: [],
+      filteredMatrix: [],
+      filteredDetails: [],
+      monthColumns: [],
       programs: [],
       versions: [],
-      includePlanningShipments: true,
-      years: [],
-      pulst: [],
-      tracerCategories: [],
-      tracerCategoryValues: [],
-      tracerCategoryLabels: [],
-      planningUnitList: [],
-      message: "",
+      planningUnits: [],
       planningUnitValues: [],
       planningUnitLabels: [],
+      // Default: all stock statuses selected
+      stockStatusValues: ALL_STOCK_STATUS,
+      stockStatusLabels: ALL_STOCK_STATUS.map((x) => x.label),
       rangeValue: {
         from: { year: dt.getFullYear(), month: dt.getMonth() + 1 },
         to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 },
       },
-      startYear: new Date().getFullYear() - 1,
-      endYear: new Date().getFullYear(),
-      loading: true,
+      minDate: {
+        year: new Date().getFullYear() - 10,
+        month: new Date().getMonth() + 1,
+      },
+      maxDate: {
+        year: new Date().getFullYear() + 10,
+        month: new Date().getMonth() + 1,
+      },
       programId: "",
       versionId: "",
+      showQuantity: false, // default unchecked
+      showIcon: true, // default checked
+      showDetailData: false, // Show Data button toggle
+      removePlannedShipments: false,
+      removeTBDFundingSourceShipments: false,
+      message: "",
+      loading: true,
+      lang: localStorage.getItem("lang"),
+      exportModal: false,
+      onlyDownloadedPrograms: false,
+      exportProgramIds: [],
+      exportVersionId: "",
+      exportPlanningUnitIds: [],
+      exportType: 0, // 1 for PDF, 2 for CSV
+      downloadedPrograms: [],
+      allProgramsForExport: [],
+      versionsForExport: [],
+      planningUnitsForExport: [],
+      exportLoading: false,
+      exportMessage: "",
+      PlanningUnitDataForExport: [],
+      puByProgramForExport: {}, // keyed by programId → puList, used to filter PUs per-program at export time
     };
+
+    this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
+    this.handleRangeDissmis = this.handleRangeDissmis.bind(this);
     this.filterData = this.filterData.bind(this);
     this.setProgramId = this.setProgramId.bind(this);
     this.setVersionId = this.setVersionId.bind(this);
+    this.buildMatrixJExcel = this.buildMatrixJExcel.bind(this);
+    this.buildDetailJExcel = this.buildDetailJExcel.bind(this);
+    this.loadedMatrix = this.loadedMatrix.bind(this);
+    this.loadedDetail = this.loadedDetail.bind(this);
   }
-  /**
-   * Retrieves tracer categories based on the selected program and version.
-   * Fetches from local IndexedDB if version is local, or from server API.
-   * Updates component state with fetched data and handles errors.
-   */
-  getTracerCategoryList() {
-    let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
+
+  toggleExportModal = (type) => {
+    if (!this.state.exportModal) {
+      this.fetchProgramsForExport();
+    }
+    const programsForExport = this.state.programs
+      .filter((p) => String(p.programId) == String(this.state.programId))
+      .map((p) => ({
+        label: p.programCode,
+        value: p.programId,
+      }));
+
+    // Build puByProgramForExport synchronously from the already-loaded
+    // planningUnits on the main screen, so fetchDataForExport has the
+    // per-program PU map immediately — even before the async
+    // fetchVersionsAndPlanningUnits() call completes.
+    const syncPuByProgram = {};
+    if (programsForExport.length == 1) {
+      const pid = String(programsForExport[0].value);
+      syncPuByProgram[pid] = (this.state.planningUnits || []).map((p) => ({
+        ...p,
+        id: p.id || p.value,
+        value: p.id || p.value,
+      }));
+    }
+
     this.setState(
       {
-        tracerCategories: [],
-        tracerCategoryValues: [],
-        tracerCategoryLabels: [],
+        exportModal: !this.state.exportModal,
+        exportType: type,
+        exportProgramIds: programsForExport,
+        exportVersionId: this.state.versionId,
+        exportPlanningUnitIds: this.state.planningUnitValues,
+        onlyDownloadedPrograms: false,
+        puByProgramForExport: syncPuByProgram,
       },
       () => {
-        if (programId > 0 && versionId != 0) {
-          localStorage.setItem("sesVersionIdReport", versionId);
-          var cutOffDateFromProgram = this.state.versions.filter(c => c.versionId == versionId)[0].cutOffDate;
-          var cutOffDate = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-1, 'years').format("YYYY-MM-DD");
-          var cutOffDateForMin = cutOffDateFromProgram != undefined && cutOffDateFromProgram != null && cutOffDateFromProgram != "" ? cutOffDateFromProgram : moment(Date.now()).add(-10, 'years').format("YYYY-MM-DD");
-          var startYear = this.state.startYear;
-          var endYear = this.state.endYear;
-          if (moment(startYear).format("YYYY") < moment(cutOffDate).format("YYYY")) {
-            startYear = moment(cutOffDate).format("YYYY");
-            endYear = moment(cutOffDate).add(1, 'years').format("YYYY")
-          }
-          this.setState({
-            startYear: startYear,
-            endYear: endYear,
-            minDate: moment(cutOffDateForMin).format("YYYY")
-          })
-          if (versionId.includes("Local")) {
-            var db1;
-            getDatabase();
-            var openRequest = indexedDB.open(
-              INDEXED_DB_NAME,
-              INDEXED_DB_VERSION
-            );
-            openRequest.onsuccess = function (e) {
-              db1 = e.target.result;
-              var planningunitTransaction = db1.transaction(
-                ["programPlanningUnit"],
-                "readwrite"
-              );
-              var planningunitOs = planningunitTransaction.objectStore(
-                "programPlanningUnit"
-              );
-              var planningunitRequest = planningunitOs.getAll();
-              var planningList = [];
-              planningunitRequest.onerror = function (event) {
-              };
-              planningunitRequest.onsuccess = function (e) {
-                var myResult = [];
-                myResult = planningunitRequest.result.filter(
-                  (c) => c.active == true
-                );
-                var programId = document
-                  .getElementById("programId")
-                  .value.split("_")[0];
-                var proList = [];
-                for (var i = 0; i < myResult.length; i++) {
-                  if (myResult[i].program.id == programId) {
-                    proList.push(myResult[i].planningUnit);
-                  }
-                }
-                this.setState({ programPlanningUnitList: myResult });
-                var planningunitTransaction1 = db1.transaction(
-                  ["planningUnit"],
-                  "readwrite"
-                );
-                var planningunitOs1 =
-                  planningunitTransaction1.objectStore("planningUnit");
-                var planningunitRequest1 = planningunitOs1.getAll();
-                planningunitRequest1.onerror = function (event) {
-                };
-                planningunitRequest1.onsuccess = function (e) {
-                  var myResult = [];
-                  myResult = planningunitRequest1.result;
-                  var flList = [];
-                  for (var i = 0; i < myResult.length; i++) {
-                    for (var j = 0; j < proList.length; j++) {
-                      if (myResult[i].planningUnitId == proList[j].id) {
-                        flList.push(myResult[i].forecastingUnit);
-                        planningList.push(myResult[i]);
-                      }
-                    }
-                  }
-                  var tcList = [];
-                  flList.filter(function (item) {
-                    var i = tcList.findIndex(
-                      (x) => x.id == item.tracerCategory.id
-                    );
-                    if (i <= -1 && item.tracerCategory.id != 0) {
-                      tcList.push({
-                        id: item.tracerCategory.id,
-                        label: item.tracerCategory.label,
-                      });
-                    }
-                    return null;
-                  });
-                  var lang = this.state.lang;
-                  this.setState(
-                    {
-                      tracerCategories: tcList.sort(function (a, b) {
-                        a = getLabelText(a.label, lang).toLowerCase();
-                        b = getLabelText(b.label, lang).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                      }),
-                      planningUnitList: planningList,
-                    },
-                    () => {
-                      this.filterData();
-                    }
-                  );
-                }.bind(this);
-              }.bind(this);
-            }.bind(this);
-          } else {
-            DropdownService.getTracerCategoryForMultipleProgramsDropdownList([
-              programId,
-            ])
-              .then((response) => {
-                if (response.status == 200) {
-                  var listArray = response.data;
-                  listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(
-                      a.label,
-                      this.state.lang
-                    ).toUpperCase();
-                    var itemLabelB = getLabelText(
-                      b.label,
-                      this.state.lang
-                    ).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                  });
-                  this.setState(
-                    {
-                      tracerCategories: listArray,
-                    },
-                    () => {
-                      this.filterData();
-                    }
-                  );
-                }
-              })
-              .catch((error) => {
-                if (error.message === "Network Error") {
-                  this.setState({
-                    message: API_URL.includes("uat")
-                      ? i18n.t("static.common.uatNetworkErrorMessage")
-                      : API_URL.includes("demo")
-                        ? i18n.t("static.common.demoNetworkErrorMessage")
-                        : i18n.t("static.common.prodNetworkErrorMessage"),
-                    loading: false,
-                  });
-                } else {
-                  switch (error.response ? error.response.status : "") {
-                    case 401:
-                      this.props.history.push(
-                        `/login/static.message.sessionExpired`
-                      );
-                      break;
-                    case 409:
-                      this.setState({
-                        message: i18n.t('static.common.accessDenied'),
-                        loading: false,
-                        color: "#BA0C2F",
-                      });
-                      break;
-                    case 403:
-                      this.props.history.push(`/accessDenied`);
-                      break;
-                    case 500:
-                    case 404:
-                    case 406:
-                      this.setState({
-                        message: i18n.t(error.response.data.messageCode, {
-                          entityname: i18n.t("static.dashboard.Country"),
-                        }),
-                        loading: false,
-                      });
-                      break;
-                    case 412:
-                      this.setState({
-                        message: i18n.t(error.response.data.messageCode, {
-                          entityname: i18n.t("static.dashboard.Country"),
-                        }),
-                        loading: false,
-                      });
-                      break;
-                    default:
-                      this.setState({
-                        message: "static.unkownError",
-                        loading: false,
-                      });
-                      break;
-                  }
-                }
-              });
-          }
-        } else {
-          this.filterData();
+        if (this.state.exportModal && programsForExport.length > 0) {
+          this.fetchVersionsAndPlanningUnits(false); // will overwrite puByProgramForExport with full data when ready
         }
       }
     );
-  }
-  /**
-   * Updates startYear and endYear in component state based on the selected range of years.
-   * Triggers data filtering after updating the state.
-   * @param {Array} value - Array containing start and end dates selected by the user.
-   */
-  onYearChange = (value) => {
-    this.setState(
-      {
-        startYear: value[0].format("YYYY"),
-        endYear: value[1].format("YYYY"),
-      },
-      () => {
-        this.filterData();
-      }
-    );
   };
+
   /**
-   * Handles the change event for planning units.
-   * @param {Array} planningUnitIds - An array containing the selected planning unit IDs.
+   * Fetch programs for export modal
    */
-  handlePlanningUnitChange = (planningUnitIds) => {
-    planningUnitIds = planningUnitIds.sort(function (a, b) {
-      return parseInt(a.value) - parseInt(b.value);
+  fetchProgramsForExport = () => {
+    const downloadedPrograms = [];
+    const allPrograms = [...this.state.programs];
+
+    // Get downloaded programs from IndexedDB
+    getDatabase();
+    const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    req.onsuccess = (e) => {
+      const db = e.target.result;
+      const get = db
+        .transaction(["programData"], "readwrite")
+        .objectStore("programData")
+        .getAll();
+      get.onsuccess = () => {
+        const userId = CryptoJS.AES.decrypt(
+          localStorage.getItem("curUser"),
+          SECRET_KEY
+        ).toString(CryptoJS.enc.Utf8);
+        get.result.forEach((r) => {
+          if (r.userId == userId) {
+            const pd = JSON.parse(
+              CryptoJS.AES.decrypt(
+                r.programData.generalData,
+                SECRET_KEY
+              ).toString(CryptoJS.enc.Utf8)
+            );
+            if (
+              !downloadedPrograms.find(
+                (p) =>
+                  p.programId == pd.programId &&
+                  p.versionId == pd.currentVersion.versionId
+              )
+            ) {
+              downloadedPrograms.push({
+                programId: pd.programId,
+                label: pd.programName || { label_en: "Unknown" },
+                code: pd.programCode,
+                versionId: pd.currentVersion.versionId,
+                displayLabel: `${pd.programCode}~v${pd.currentVersion.versionId}`,
+                createdDate: pd.currentVersion.createdDate,
+              });
+            }
+          }
+        });
+
+        const sortedDownloaded = downloadedPrograms.sort((a, b) =>
+          (a.displayLabel || "").toUpperCase() >
+            (b.displayLabel || "").toUpperCase()
+            ? 1
+            : -1
+        );
+        const sortedAll = allPrograms.sort((a, b) =>
+          (a.programCode || "").toUpperCase() >
+            (b.programCode || "").toUpperCase()
+            ? 1
+            : -1
+        );
+
+        this.setState({
+          downloadedPrograms: sortedDownloaded,
+          allProgramsForExport: sortedAll,
+        });
+      };
+    };
+  };
+
+  /**
+   * Handle onlyDownloadedPrograms checkbox change
+   */
+  handleOnlyDownloadedChange = (e) => {
+    this.setState({
+      onlyDownloadedPrograms: e.target.checked,
+      exportProgramIds: [],
+      exportVersionId: "",
+      exportPlanningUnitIds: [],
+      versionsForExport: [],
+      planningUnitsForExport: [],
+      puByProgramForExport: {},
     });
+  };
+
+  /**
+   * Handle program selection change
+   */
+  handleExportProgramChange = (selectedPrograms) => {
     this.setState(
       {
-        planningUnitValues: planningUnitIds.map((ele) => ele),
-        planningUnitLabels: planningUnitIds.map((ele) => ele.label),
+        exportProgramIds: selectedPrograms,
+        exportVersionId: "",
+        exportPlanningUnitIds: [],
+        planningUnitsForExport: [],
+        puByProgramForExport: {},
       },
       () => {
-        this.filterData();
+        if (selectedPrograms.length > 0) {
+          this.fetchVersionsAndPlanningUnits();
+        }
       }
     );
   };
+
   /**
-   * Filters data based on the selected stock status and updates the component state.
+   * Fetch versions and planning units based on selected programs
    */
-  filterDataAsperstatus = () => {
-    let stockStatusId = document.getElementById("stockStatusId").value;
-    var filteredData = [];
-    if (stockStatusId != -1) {
-      this.state.selData.map((ele) => {
-        var min = ele.minMonthsOfStock;
-        var reorderFrequency = ele.reorderFrequency;
-        if (stockStatusId == 0) {
-          if (
-            (ele.jan != null && roundAMC(ele.jan) == 0) ||
-            (ele.feb != null && roundAMC(ele.feb) == 0) ||
-            (ele.mar != null && roundAMC(ele.mar) == 0) ||
-            (ele.apr != null && roundAMC(ele.apr) == 0) ||
-            (ele.may != null && roundAMC(ele.may) == 0) ||
-            (ele.jun != null && roundAMC(ele.jun) == 0) ||
-            (ele.jul != null && roundAMC(ele.jul) == 0) ||
-            (ele.aug != null && roundAMC(ele.aug) == 0) ||
-            (ele.sep != null && roundAMC(ele.sep) == 0) ||
-            (ele.oct != null && roundAMC(ele.oct) == 0) ||
-            (ele.nov != null && roundAMC(ele.nov) == 0) ||
-            (ele.dec != null && roundAMC(ele.dec) == 0)
-          ) {
-            filteredData.push(ele);
+  fetchVersionsAndPlanningUnits = (resetSelections = true) => {
+    const { exportProgramIds, onlyDownloadedPrograms, exportVersionId } =
+      this.state;
+    const lang = this.state.lang;
+    const vId = onlyDownloadedPrograms
+      ? null
+      : exportProgramIds.length > 1
+        ? null
+        : exportVersionId || null;
+    if (onlyDownloadedPrograms || String(vId).includes("Local")) {
+      const selectedProgramIds = exportProgramIds.map((p) => p.value);
+      getDatabase();
+      const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      req.onsuccess = (e) => {
+        const db = e.target.result;
+        const ppuGet = db
+          .transaction(["programPlanningUnit"], "readwrite")
+          .objectStore("programPlanningUnit")
+          .getAll();
+        ppuGet.onsuccess = () => {
+          // Build per-program PU map
+          const puByProgram = {};
+          (ppuGet.result || [])
+            .filter(
+              (r) =>
+                selectedProgramIds
+                  .map((id) => String(id))
+                  .includes(String(r.program.id)) && r.active
+            )
+            .forEach((r) => {
+              const pid = String(r.program.id);
+              if (!puByProgram[pid]) puByProgram[pid] = [];
+              puByProgram[pid].push({
+                label: r.planningUnit.label,
+                value: r.planningUnit.id,
+                json: r,
+              });
+            });
+
+          // Deduplicate and sort within each program
+          Object.keys(puByProgram).forEach((pid) => {
+            const seen = new Map();
+            puByProgram[pid].forEach((p) => seen.set(p.value, p));
+            puByProgram[pid] = [...seen.values()].sort((a, b) =>
+              getLabelText(a.label, lang).toUpperCase() >
+                getLabelText(b.label, lang).toUpperCase()
+                ? 1
+                : -1
+            );
+          });
+
+          // Flat union for the dropdown display (deduplicated by PU id)
+          const flatUnion = [];
+          const seenIds = new Set();
+          Object.values(puByProgram)
+            .flat()
+            .forEach((p) => {
+              if (!seenIds.has(p.value)) {
+                seenIds.add(p.value);
+                flatUnion.push(p);
+              }
+            });
+          flatUnion.sort((a, b) =>
+            getLabelText(a.label, lang).toUpperCase() >
+              getLabelText(b.label, lang).toUpperCase()
+              ? 1
+              : -1
+          );
+
+          this.setState({
+            planningUnitsForExport: flatUnion,
+            puByProgramForExport: puByProgram, // keyed map for per-program filtering
+            exportPlanningUnitIds: resetSelections
+              ? flatUnion.map((p) => ({
+                label: getLabelText(p.label, lang) + " | " + p.value,
+                value: p.value,
+              }))
+              : this.state.exportPlanningUnitIds,
+          });
+        };
+      };
+    }
+    if (!onlyDownloadedPrograms) {
+      if (exportProgramIds.length == 1) {
+        const selectedProgramId = exportProgramIds[0].value;
+        DropdownService.getVersionListForSPProgram(selectedProgramId)
+          .then((res) => {
+            let verList = [...(res.data || [])];
+            getDatabase();
+            const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            req.onsuccess = (e) => {
+              const db = e.target.result;
+              const get = db
+                .transaction(["programData"], "readwrite")
+                .objectStore("programData")
+                .getAll();
+              get.onsuccess = () => {
+                const userId = CryptoJS.AES.decrypt(
+                  localStorage.getItem("curUser"),
+                  SECRET_KEY
+                ).toString(CryptoJS.enc.Utf8);
+                get.result.forEach((r) => {
+                  if (
+                    r.userId == userId &&
+                    String(r.programId) == String(selectedProgramId)
+                  ) {
+                    const pd = JSON.parse(
+                      CryptoJS.AES.decrypt(
+                        r.programData.generalData,
+                        SECRET_KEY
+                      ).toString(CryptoJS.enc.Utf8)
+                    );
+                    if (pd.currentVersion) {
+                      pd.currentVersion.versionId = `${pd.currentVersion.versionId} (Local)`;
+                      verList.push(pd.currentVersion);
+                    }
+                  }
+                });
+                const unique = [
+                  ...new Map(verList.map((v) => [v.versionId, v])).values(),
+                ];
+                const versionList = unique.sort((a, b) => {
+                  const aLocal = String(a.versionId).includes("Local");
+                  const bLocal = String(b.versionId).includes("Local");
+                  if (aLocal && !bLocal) return -1;
+                  if (!aLocal && bLocal) return 1;
+                  const aNum =
+                    parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  const bNum =
+                    parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  return bNum - aNum;
+                });
+                const localVer = versionList.find((v) =>
+                  String(v.versionId).includes("Local")
+                );
+                this.setState(
+                  {
+                    versionsForExport: versionList,
+                    exportVersionId: resetSelections
+                      ? localVer
+                        ? localVer.versionId
+                        : versionList.length > 0
+                          ? versionList[0].versionId
+                          : ""
+                      : this.state.exportVersionId,
+                  },
+                  () => {
+                    if (!String(vId).includes("Local")) {
+                      this.fetchPlanningUnitsForExportProgram(
+                        selectedProgramId,
+                        resetSelections
+                      );
+                    }
+                  }
+                );
+              };
+            };
+          })
+          .catch(() => {
+            let verList = [];
+            getDatabase();
+            const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            req.onsuccess = (e) => {
+              const db = e.target.result;
+              const get = db
+                .transaction(["programData"], "readwrite")
+                .objectStore("programData")
+                .getAll();
+              get.onsuccess = () => {
+                const userId = CryptoJS.AES.decrypt(
+                  localStorage.getItem("curUser"),
+                  SECRET_KEY
+                ).toString(CryptoJS.enc.Utf8);
+                get.result.forEach((r) => {
+                  if (
+                    r.userId == userId &&
+                    String(r.programId) == String(selectedProgramId)
+                  ) {
+                    const pd = JSON.parse(
+                      CryptoJS.AES.decrypt(
+                        r.programData.generalData,
+                        SECRET_KEY
+                      ).toString(CryptoJS.enc.Utf8)
+                    );
+                    if (pd.currentVersion) {
+                      pd.currentVersion.versionId = `${pd.currentVersion.versionId} (Local)`;
+                      verList.push(pd.currentVersion);
+                    }
+                  }
+                });
+                const unique = [
+                  ...new Map(verList.map((v) => [v.versionId, v])).values(),
+                ];
+                const versionList = unique.sort((a, b) => {
+                  const aLocal = String(a.versionId).includes("Local");
+                  const bLocal = String(b.versionId).includes("Local");
+                  if (aLocal && !bLocal) return -1;
+                  if (!aLocal && bLocal) return 1;
+                  const aNum =
+                    parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  const bNum =
+                    parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) ||
+                    0;
+                  return bNum - aNum;
+                });
+                const localVer = versionList.find((v) =>
+                  String(v.versionId).includes("Local")
+                );
+                this.setState(
+                  {
+                    versionsForExport: versionList,
+                    exportVersionId: resetSelections
+                      ? localVer
+                        ? localVer.versionId
+                        : versionList.length > 0
+                          ? versionList[0].versionId
+                          : ""
+                      : this.state.exportVersionId,
+                  },
+                  () => {
+                    if (!String(vId).includes("Local")) {
+                      this.fetchPlanningUnitsForExportProgram(
+                        selectedProgramId,
+                        resetSelections
+                      );
+                    }
+                  }
+                );
+              };
+            };
           }
-        } else if (stockStatusId == 1) {
-          if (
-            (ele.jan != null &&
-              roundAMC(ele.jan) != 0 &&
-              roundAMC(ele.jan) < min) ||
-            (ele.feb != null &&
-              roundAMC(ele.feb) != 0 &&
-              roundAMC(ele.feb) < min) ||
-            (ele.mar != null &&
-              roundAMC(ele.mar) != 0 &&
-              roundAMC(ele.mar) < min) ||
-            (ele.apr != null &&
-              roundAMC(ele.apr) != 0 &&
-              roundAMC(ele.apr) < min) ||
-            (ele.may != null &&
-              roundAMC(ele.may) != 0 &&
-              roundAMC(ele.may) < min) ||
-            (ele.jun != null &&
-              roundAMC(ele.jun) != 0 &&
-              roundAMC(ele.jun) < min) ||
-            (ele.jul != null &&
-              roundAMC(ele.jul) != 0 &&
-              roundAMC(ele.jul) < min) ||
-            (ele.aug != null &&
-              roundAMC(ele.aug) != 0 &&
-              roundAMC(ele.aug) < min) ||
-            (ele.sep != null &&
-              roundAMC(ele.sep) != 0 &&
-              roundAMC(ele.sep) < min) ||
-            (ele.oct != null &&
-              roundAMC(ele.oct) != 0 &&
-              roundAMC(ele.oct) < min) ||
-            (ele.nov != null &&
-              roundAMC(ele.nov) != 0 &&
-              roundAMC(ele.nov) < min) ||
-            (ele.dec != null &&
-              roundAMC(ele.dec) != 0 &&
-              roundAMC(ele.dec) < min)
-          ) {
-            filteredData.push(ele);
+          );
+      } else {
+        // Multiple programs: fetch PUs per-program separately and store the map
+        const programIds = exportProgramIds.map((p) => p.value);
+        Promise.all(
+          programIds.map((pid) =>
+            ReportService.getDropdownListByProgramIds({
+              programIds: [pid],
+              onlyAllowPuPresentAcrossAllPrograms: false,
+            })
+              .then((res) => ({
+                pid: String(pid),
+                puList: res.data.planningUnitList || [],
+              }))
+              .catch(() => ({ pid: String(pid), puList: [] }))
+          )
+        ).then((results) => {
+          const puByProgram = {};
+          results.forEach(({ pid, puList }) => {
+            puByProgram[pid] = puList
+              .map((p) => ({ ...p, value: p.id, json: p }))
+              .sort((a, b) =>
+                getLabelText(a.label, lang).toUpperCase() >
+                  getLabelText(b.label, lang).toUpperCase()
+                  ? 1
+                  : -1
+              );
+          });
+
+          // Flat union for the dropdown (deduplicated by PU id)
+          const flatUnion = [];
+          const seenIds = new Set();
+          Object.values(puByProgram)
+            .flat()
+            .forEach((p) => {
+              if (!seenIds.has(p.id || p.value)) {
+                seenIds.add(p.id || p.value);
+                flatUnion.push(p);
+              }
+            });
+          flatUnion.sort((a, b) =>
+            getLabelText(a.label, lang).toUpperCase() >
+              getLabelText(b.label, lang).toUpperCase()
+              ? 1
+              : -1
+          );
+
+          this.setState({
+            planningUnitsForExport: flatUnion,
+            puByProgramForExport: puByProgram,
+            exportPlanningUnitIds: resetSelections
+              ? flatUnion.map((p) => ({
+                label:
+                  getLabelText(p.label, lang) + " | " + (p.id || p.value),
+                value: p.id || p.value,
+              }))
+              : this.state.exportPlanningUnitIds,
+          });
+        });
+      }
+    }
+  };
+
+  fetchPlanningUnitsForExportProgram = (programId, resetSelections = true) => {
+    const lang = this.state.lang;
+    ReportService.getDropdownListByProgramIds({
+      programIds: [programId],
+      onlyAllowPuPresentAcrossAllPrograms: false,
+    })
+      .then((res) => {
+        const puList = (res.data.planningUnitList || []).sort((a, b) =>
+          getLabelText(a.label, lang).toUpperCase() >
+            getLabelText(b.label, lang).toUpperCase()
+            ? 1
+            : -1
+        );
+        // Store both the flat list for the dropdown and the per-program map
+        const puByProgram = {
+          [String(programId)]: puList.map((p) => ({
+            ...p,
+            value: p.id,
+            json: p,
+          })),
+        };
+        this.setState({
+          planningUnitsForExport: puList,
+          puByProgramForExport: puByProgram,
+          exportPlanningUnitIds: resetSelections
+            ? puList.map((p) => ({
+              label: getLabelText(p.label, lang) + " | " + p.id,
+              value: p.id,
+            }))
+            : this.state.exportPlanningUnitIds,
+        });
+      })
+      .catch(() =>
+        this.setState({ planningUnitsForExport: [], puByProgramForExport: {} })
+      );
+  };
+
+  /**
+   * Handle version selection change
+   */
+  handleExportVersionChange = (e) => {
+    this.setState(
+      {
+        exportVersionId: e.target.value,
+        exportPlanningUnitIds: [],
+      },
+      () => {
+        if (this.state.exportVersionId) {
+          this.fetchPlanningUnitsForExportProgram(
+            this.state.exportProgramIds[0].value
+          );
+        }
+      }
+    );
+  };
+
+  /**
+   * Handle export planning unit selection
+   */
+  handleExportPlanningUnitChange = (selectedUnits) => {
+    this.setState({
+      exportPlanningUnitIds: selectedUnits,
+    });
+  };
+
+  /**
+   * Fetch data for export
+   */
+  fetchDataForExport = () => {
+    const {
+      exportProgramIds,
+      exportVersionId,
+      exportPlanningUnitIds,
+      rangeValue,
+      onlyDownloadedPrograms,
+      puByProgramForExport,
+    } = this.state;
+
+    const programIds = (exportProgramIds || []).map((p) => p.value);
+    // All selected PU ids (user's selection in the modal)
+    const selectedPuIds = new Set(
+      (exportPlanningUnitIds || []).map((p) => String(p.value || p.id))
+    );
+
+    const startDate = `${rangeValue.from.year}-${String(
+      rangeValue.from.month
+    ).padStart(2, "0")}-01`;
+    const lastDay = new Date(
+      rangeValue.to.year,
+      rangeValue.to.month,
+      0
+    ).getDate();
+    const endDate = `${rangeValue.to.year}-${String(
+      rangeValue.to.month
+    ).padStart(2, "0")}-${lastDay}`;
+
+    this.setState({ exportLoading: true, exportMessage: "" });
+
+    const fetchProgramData = (pId) => {
+      const vId = onlyDownloadedPrograms
+        ? exportProgramIds.find((p) => p.value == pId)?.versionId
+        : programIds.length > 1
+          ? null
+          : exportVersionId || null;
+
+      // Derive a clean numeric versionId:
+      // - null / undefined / "" / -1  → send -1 (server treats as "latest")
+      // - "123 (Local)"               → parse the numeric part only
+      // - "123"                        → parseInt
+      // - NaN guard: if parseInt fails, fall back to -1
+      let cleanVersionId;
+      if (vId == null || vId == "" || vId == -1) {
+        cleanVersionId = -1;
+      } else if (String(vId).includes("Local")) {
+        const parsed = parseInt(String(vId).split("(")[0].trim(), 10);
+        cleanVersionId = isNaN(parsed) ? -1 : parsed;
+      } else {
+        const parsed = parseInt(String(vId), 10);
+        cleanVersionId = isNaN(parsed) ? -1 : parsed;
+      }
+
+      // ── Fix 2 & 3: only pass PUs that belong to THIS program ──
+      const programPuIds = ((puByProgramForExport || {})[String(pId)] || [])
+        .map((p) => Number(p.id || p.value))
+        .filter((id) => selectedPuIds.has(id));
+
+      // Fallback: if no per-program map available, use full selected list
+      const planningUnitIds =
+        programPuIds.length > 0 ? programPuIds : [...selectedPuIds];
+
+      const inputjson = {
+        programId: pId,
+        programIds: [pId],
+        versionId: cleanVersionId,
+        startDate: startDate,
+        stopDate: endDate,
+        planningUnitIds: planningUnitIds,
+        stockStatusConditions: this.state.stockStatusValues.map((e) =>
+          Number(e.value)
+        ),
+        removePlannedShipments: this.state.removePlannedShipments
+          ? 1
+          : this.state.removeTBDFundingSourceShipments
+            ? 2
+            : 0,
+        fundingSourceIds: [],
+        procurementAgentIds: [],
+        showByQty: this.state.showQuantity,
+      };
+
+      if (onlyDownloadedPrograms || String(vId).includes("Local")) {
+        return new Promise((resolve) => {
+          this.fetchExportDataFromIndexedDB(
+            pId,
+            vId,
+            planningUnitIds,
+            startDate,
+            endDate,
+            resolve
+          );
+        });
+      } else {
+        return Promise.all([
+          ProductService.getStockStatusMatrixData(inputjson),
+          (cleanVersionId == -1 && !onlyDownloadedPrograms)
+            ? DropdownService.getVersionListForSPProgram(pId)
+            : Promise.resolve(null),
+        ]).then(([response, verRes]) => {
+          const matrix = (response.data.stockStatusMatrix || []).map((r) => ({
+            ...r,
+            programId: pId,
+            planBasedOn: r.planBasedOn ?? r.planningUnit?.planBasedOn ?? 1,
+          }));
+          const details = (response.data.stockStatusDetails || []).map((r) => ({
+            ...r,
+            programId: pId,
+          }));
+          // Guard: verRes is null when a specific versionId was requested
+          const verData = verRes != null ? (verRes.data || []) : [];
+          const sortedVer = verData.sort((a, b) => {
+            const aNum = parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) || 0;
+            const bNum = parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) || 0;
+            return bNum - aNum;
+          });
+          let latestV = sortedVer.length > 0 ? sortedVer[0] : null;
+          return { matrix, details, pId, latestV };
+        });
+      }
+    };
+
+    Promise.all(programIds.map((id) => fetchProgramData(id)))
+      .then((allResults) => {
+        const combinedMatrix = allResults.flatMap((r) => r.matrix || []);
+        const combinedDetails = allResults.flatMap((r) => r.details || []);
+
+        const updatedExportPrograms = this.state.exportProgramIds.map(prog => {
+          const res = allResults.find(r => String(r.pId || (r.matrix && r.matrix.length > 0 ? r.matrix[0].programId : null)) == String(prog.value));
+          if (res && res.latestV) {
+            return {
+              ...prog,
+              versionId: res.latestV.versionId,
+              createdDate: res.latestV.createdDate
+            };
           }
-        } else if (stockStatusId == 3) {
-          if (
-            roundAMC(ele.jan) > min + reorderFrequency ||
-            roundAMC(ele.feb) > min + reorderFrequency ||
-            roundAMC(ele.mar) > min + reorderFrequency ||
-            roundAMC(ele.apr) > min + reorderFrequency ||
-            roundAMC(ele.may) > min + reorderFrequency ||
-            roundAMC(ele.jun) > min + reorderFrequency ||
-            roundAMC(ele.jul) > min + reorderFrequency ||
-            roundAMC(ele.aug) > min + reorderFrequency ||
-            roundAMC(ele.sep) > min + reorderFrequency ||
-            roundAMC(ele.oct) > min + reorderFrequency ||
-            roundAMC(ele.nov) > min + reorderFrequency ||
-            roundAMC(ele.dec) > min + reorderFrequency
-          ) {
-            filteredData.push(ele);
+          return prog;
+        });
+
+        this.prepareExportData(
+          combinedMatrix,
+          combinedDetails,
+          startDate,
+          endDate,
+          () => {
+            this.setState({
+              exportModal: false,
+              onlyDownloadedPrograms: false,
+              exportProgramIds: updatedExportPrograms,
+            });
+            if (this.state.exportType == 1) {
+              this.exportPDFFromModal();
+            } else {
+              this.exportCSVFromModal();
+            }
           }
-        } else if (stockStatusId == 2) {
-          if (
-            (roundAMC(ele.jan) < min + reorderFrequency &&
-              roundAMC(ele.jan) > min) ||
-            (roundAMC(ele.feb) < min + reorderFrequency &&
-              roundAMC(ele.feb) > min) ||
-            (roundAMC(ele.mar) < min + reorderFrequency &&
-              roundAMC(ele.mar) > min) ||
-            (roundAMC(ele.apr) < min + reorderFrequency &&
-              roundAMC(ele.apr) > min) ||
-            (roundAMC(ele.may) < min + reorderFrequency &&
-              roundAMC(ele.may) > min) ||
-            (roundAMC(ele.jun) < min + reorderFrequency &&
-              roundAMC(ele.jun) > min) ||
-            (roundAMC(ele.jul) < min + reorderFrequency &&
-              roundAMC(ele.jul) > min) ||
-            (roundAMC(ele.aug) < min + reorderFrequency &&
-              roundAMC(ele.aug) > min) ||
-            (roundAMC(ele.sep) < min + reorderFrequency &&
-              roundAMC(ele.sep) > min) ||
-            (roundAMC(ele.oct) < min + reorderFrequency &&
-              roundAMC(ele.act) > min) ||
-            (roundAMC(ele.nov) < min + reorderFrequency &&
-              roundAMC(ele.nov) > min) ||
-            (roundAMC(ele.dec) < min + reorderFrequency &&
-              roundAMC(ele.dec) > min)
-          ) {
-            filteredData.push(ele);
+        );
+      })
+      .catch((err) => {
+        console.error("Export Error:", err);
+        this.setState({
+          exportLoading: false,
+          exportMessage: i18n.t("static.common.error"),
+        });
+      });
+  };
+  /**
+   * Fetch export data from IndexedDB for downloaded programs
+   */
+  fetchExportDataFromIndexedDB = (
+    programId,
+    versionId,
+    planningUnitIds,
+    startDate,
+    endDate,
+    resolve // Added
+  ) => {
+    const version = String(versionId).split("(")[0].trim();
+    const userId = CryptoJS.AES.decrypt(
+      localStorage.getItem("curUser"),
+      SECRET_KEY
+    ).toString(CryptoJS.enc.Utf8);
+    const key = `${programId}_v${version}_uId_${userId}`;
+
+    getDatabase();
+    const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    req.onsuccess = (e) => {
+      const db = e.target.result;
+      const get = db
+        .transaction(["programData"], "readwrite")
+        .objectStore("programData")
+        .get(key);
+      get.onsuccess = () => {
+        const programData = get.result?.programData;
+        if (!programData) {
+          this.setState({
+            exportLoading: false,
+            exportModal: false, // Added
+            exportMessage: i18n.t("static.program.errortext"),
+          });
+          return;
+        }
+
+        const puDataList = programData.planningUnitDataList || [];
+        const generalData = JSON.parse(
+          CryptoJS.AES.decrypt(programData.generalData, SECRET_KEY).toString(
+            CryptoJS.enc.Utf8
+          )
+        );
+
+        const matrix = [];
+        const details = [];
+
+        planningUnitIds.forEach((puId) => {
+          const puItem = this.state.planningUnitsForExport.find(
+            (p) => String(p.id || p.value) == String(puId)
+          );
+          const puActualLabel = puItem
+            ? puItem.label
+            : { label_en: String(puId) };
+
+          const puSettings =
+            this.state.planningUnitsForExport.find(
+              (p) => String(p.value || p.id) == String(puId)
+            ) || {};
+          const minMos =
+            puSettings.json?.minMonthsOfStock ??
+            puSettings.minMonthsOfStock ??
+            5;
+          const reorderFreq =
+            puSettings.json?.reorderFrequencyInMonths ??
+            puSettings.reorderFrequencyInMonths ??
+            5;
+          const planBasedOn =
+            puSettings.json?.planBasedOn ?? puSettings.planBasedOn ?? 1;
+          const minStock = puSettings.json?.minQty ?? puSettings.minQty ?? 0;
+          const notes = puSettings.json?.notes ?? puSettings.notes ?? "";
+
+          const puDataIdx = puDataList.findIndex(
+            (p) => p.planningUnitId == puId
+          );
+          let programJson = { supplyPlan: [] };
+          if (puDataIdx !== -1) {
+            const bytes = CryptoJS.AES.decrypt(
+              puDataList[puDataIdx].planningUnitData,
+              SECRET_KEY
+            );
+            programJson = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
           }
-        } else if (stockStatusId == 4) {
-          if (
-            ele.jan == null ||
-            ele.feb == null ||
-            ele.mar == null ||
-            ele.apr == null ||
-            ele.may == null ||
-            ele.jun == null ||
-            ele.jul == null ||
-            ele.aug == null ||
-            ele.sep == null ||
-            ele.oct == null ||
-            ele.nov == null ||
-            ele.dec == null
-          ) {
-            filteredData.push(ele);
+
+          const inRangeEntries = (programJson.supplyPlan || []).filter(
+            (sp) =>
+              sp.planningUnitId == puId &&
+              sp.transDate >= startDate &&
+              sp.transDate <= endDate
+          );
+
+          let maxStock;
+          if (planBasedOn == 2) {
+            maxStock = calcAverageMaxStock(
+              inRangeEntries,
+              minStock,
+              reorderFreq
+            );
+          } else {
+            maxStock = puSettings.json?.maxStock || 0;
           }
+
+          const dataMap = {};
+          inRangeEntries.forEach((sp) => {
+            const useWps = this.state.removePlannedShipments;
+            const useWtbd = this.state.removeTBDFundingSourceShipments;
+
+            const mos = useWps ? sp.mosWps : useWtbd ? sp.mosWtbdps : sp.mos;
+            const cb = useWps
+              ? sp.closingBalanceWps
+              : useWtbd
+                ? sp.closingBalanceWtbdps
+                : sp.closingBalance;
+            const amc = sp.amc;
+
+            let statusId;
+            if (planBasedOn == 1) {
+              statusId = calcStatusIdLocal(mos, minMos, reorderFreq);
+            } else {
+              const dynamicMax =
+                amc != null ? minStock + reorderFreq * amc : maxStock;
+              statusId =
+                cb == null
+                  ? -1
+                  : cb == 0
+                    ? 0
+                    : cb < minStock
+                      ? 1
+                      : cb > dynamicMax
+                        ? 3
+                        : 2;
+            }
+
+            const shipmentQty = useWps
+              ? sp.shipmentTotalQtyWps
+              : useWtbd
+                ? sp.shipmentTotalQtyWtbdps
+                : sp.shipmentTotalQty;
+            const expiredQty = useWps
+              ? sp.expiredStockWps
+              : useWtbd
+                ? sp.expiredStockWtbdps
+                : sp.expiredStock;
+
+            dataMap[sp.transDate] = {
+              mos,
+              closingBalance: cb,
+              amc,
+              stockStatusId: statusId,
+              actualStock: sp.regionCountForStock == sp.regionCount,
+              shipmentQty,
+              expiredQty,
+            };
+            details.push({
+              programId: programId, // Added
+              month: sp.transDate,
+              planningUnit: { id: Number(puId), label: puActualLabel },
+              consumptionQty: sp.consumptionQty || 0,
+              actualConsumption: sp.actualFlag,
+              amc,
+              closingBalance: cb,
+              actualStock: sp.regionCountForStock == sp.regionCount,
+              mos,
+              stockStatusId: statusId,
+              shipmentQty,
+              expiredQty,
+            });
+          });
+
+          matrix.push({
+            programId: programId, // Added
+            planningUnit: { id: Number(puId), label: puActualLabel },
+            planBasedOn,
+            minMonthsOfStock: minMos,
+            reorderFrequency: reorderFreq,
+            maxStock: Math.round(maxStock),
+            minStock,
+            dataMap,
+            notes,
+          });
+        });
+
+        if (resolve) resolve({ matrix, details, pId: programId, latestV: generalData.currentVersion });
+      };
+    };
+  };
+
+  /**
+   * Apply status recalculation for plan-by-qty matrices
+   */
+  applyStatusRecalculation = (stockStatusMatrix, startDate, endDate) => {
+    return (stockStatusMatrix || []).map((row) => {
+      if (row.planBasedOn !== 2) return row;
+
+      const inRangeEntries = Object.entries(row.dataMap || {}).filter(
+        ([dateKey]) => dateKey >= startDate && dateKey <= endDate
+      );
+      const avgMax = calcAverageMaxStock(
+        inRangeEntries.map(([, entry]) => entry),
+        row.minStock || 0,
+        row.reorderFrequency || 0
+      );
+
+      const updatedDataMap = {};
+      inRangeEntries.forEach(([dateKey, entry]) => {
+        const amc = entry.amc;
+        const cb = entry.closingBalance;
+        const minStock = row.minStock || 0;
+        const dynamicMax =
+          amc != null ? minStock + (row.reorderFrequency || 0) * amc : avgMax;
+        const statusId =
+          cb == null
+            ? -1
+            : cb == 0
+              ? 0
+              : cb < minStock
+                ? 1
+                : cb > dynamicMax
+                  ? 3
+                  : 2;
+        updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
+      });
+
+      return { ...row, maxStock: Math.round(avgMax), dataMap: updatedDataMap };
+    });
+  };
+
+  /**
+   * Prepare data for export
+   */
+  prepareExportData = (
+    stockStatusMatrix,
+    stockStatusDetails,
+    startDate,
+    endDate,
+    callback
+  ) => {
+    const { from, to } = this.state.rangeValue;
+
+    const recalculatedMatrix = this.applyStatusRecalculation(
+      stockStatusMatrix,
+      startDate,
+      endDate
+    );
+
+    const rangeFilteredDetails = (stockStatusDetails || []).filter(
+      (d) => d.month >= startDate && d.month <= endDate
+    );
+    const monthColumns = deriveMonthColumns(
+      recalculatedMatrix,
+      startDate,
+      endDate
+    );
+
+    const selectedIds = this.state.stockStatusValues.map((v) =>
+      Number(v.value)
+    );
+    let filteredMatrix = recalculatedMatrix;
+    let filteredDetails = rangeFilteredDetails;
+
+    if (selectedIds.length > 0) {
+      filteredMatrix = (stockStatusMatrix || []).filter((row) =>
+        Object.values(row.dataMap || {}).some((d) =>
+          selectedIds.includes(d.stockStatusId)
+        )
+      );
+      filteredDetails = (rangeFilteredDetails || []).filter((d) =>
+        selectedIds.includes(d.stockStatusId)
+      );
+    }
+
+    this.setState(
+      {
+        PlanningUnitDataForExport: {
+          stockStatusMatrix: filteredMatrix,
+          stockStatusDetails: filteredDetails,
+          monthColumns: monthColumns,
+          startDate: startDate,
+          endDate: endDate,
+          showQuantity: this.state.showQuantity,
+          lang: this.state.lang,
+        },
+      },
+      () => {
+        // Wait for hidden charts to render.
+        setTimeout(() => {
+          if (callback) {
+            callback();
+          } else {
+            if (this.state.exportType == 1) {
+              this.exportPDFFromModal();
+            } else {
+              this.exportCSVFromModal();
+            }
+          }
+        }, 1200);
+      }
+    );
+  };
+
+  /**
+   * Export PDF from modal data
+   */
+  exportPDFFromModal = () => {
+    const {
+      stockStatusMatrix,
+      stockStatusDetails,
+      monthColumns,
+      showQuantity,
+      lang,
+      startDate,
+      endDate,
+    } = this.state.PlanningUnitDataForExport || {};
+    const doc = new jsPDF("landscape", "pt", "A4");
+    console.log(
+      "PlanningUnitDataForExport Test@123",
+      this.state.planningUnitsForExport
+    );
+    // Pre-render FA icons from the browser's loaded FontAwesome font once,
+    // so didDrawCell can stamp them synchronously without re-creating canvases.
+    const iconCache = buildPdfIconCache();
+    // iconPt: the pt size we stamp each icon at inside the cell
+    const ICON_PT = 6;
+    // gap between icons and between last icon and the value text
+    const ICON_GAP = 1;
+
+    const addHeaders = (d) => {
+      const n = d.internal.getNumberOfPages();
+      for (let i = 1; i <= n; i++) {
+        d.setPage(i);
+        if (String(LOGO).startsWith("data:image")) {
+          d.addImage(LOGO, "png", 30, 10, 180, 50, "FAST");
+        }
+        d.setFontSize(14);
+        d.setFont("helvetica", "bold");
+        d.setTextColor("#002f6c");
+        d.text(
+          i18n.t("static.dashboard.stockstatusmatrix"),
+          d.internal.pageSize.width / 2,
+          40,
+          { align: "center" }
+        );
+      }
+    };
+
+    const addFooters = (d) => {
+      const n = d.internal.getNumberOfPages();
+      d.setFont("helvetica", "normal");
+      d.setFontSize(7);
+      for (let i = 1; i <= n; i++) {
+        d.setPage(i);
+        d.text(`Page ${i} of ${n}`, 40, d.internal.pageSize.height - 30);
+        d.text(
+          `Copyright © 2020 ${i18n.t("static.footer")}`,
+          d.internal.pageSize.width - 40,
+          d.internal.pageSize.height - 30,
+          { align: "right" }
+        );
+      }
+    };
+
+    const renderBoldLine = (label, value, x, y, maxWidth) => {
+      doc.setFont("helvetica", "bold");
+      const fullLabel = label + ": ";
+      doc.text(fullLabel, x, y);
+      const labelWidth = doc.getTextWidth(fullLabel);
+      doc.setFont("helvetica", "normal");
+      if (maxWidth) {
+        const lines = doc.splitTextToSize(String(value), maxWidth - labelWidth);
+        doc.text(lines, x + labelWidth, y);
+        return lines.length * 10 + 2;
+      } else {
+        doc.text(String(value), x + labelWidth, y);
+        return 12;
+      }
+    };
+
+    const renderFilterSummary = (
+      currentY,
+      showAll = true,
+      progLabel = null,
+      puLabel = null,
+      versionText = null,
+      onlyProgram = false
+    ) => {
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor("#002f6c");
+
+      if (showAll) {
+        currentY += renderBoldLine(
+          i18n.t("static.report.dateRange"),
+          `${moment(startDate).format("MMM YYYY")} ~ ${moment(endDate).format(
+            "MMM YYYY"
+          )}`,
+          40,
+          currentY
+        );
+
+        currentY += renderBoldLine(
+          i18n.t("static.report.withinstock"),
+          (this.state.stockStatusValues || []).map((v) => v.label).join(", "),
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.showQuantity"),
+          showQuantity
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.removePlannedShipments"),
+          this.state.removePlannedShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
+        currentY += renderBoldLine(
+          i18n.t("static.report.removeTBDFundingSourceShipments"),
+          this.state.removeTBDFundingSourceShipments
+            ? i18n.t("static.program.yes")
+            : i18n.t("static.program.no"),
+          40,
+          currentY
+        );
+      } else {
+        const [progPart] = (progLabel || "").split("~v");
+        const cleanProg = progPart.replace("(Local)", "").trim();
+        const vPart = versionText ? (versionText.startsWith("v") ? versionText : "v" + versionText) : "v" + (this.state.exportVersionId || i18n.t("static.report.latest"));
+        const combined = `${cleanProg} ${vPart}`;
+        currentY += renderBoldLine(
+          i18n.t("static.program.program"),
+          combined,
+          40,
+          currentY,
+          doc.internal.pageSize.width - 80
+        );
+      }
+      return currentY;
+    };
+
+    // First Page: Filters and First Program Table
+    let initialY = 80;
+    initialY = renderFilterSummary(initialY);
+    doc.setDrawColor("#cfcdc9");
+    doc.line(40, initialY + 2, doc.internal.pageSize.width - 40, initialY + 2);
+    initialY += 15;
+
+    const uniquePrograms = this.state.exportProgramIds;
+    uniquePrograms.forEach((prog, pIdx) => {
+      const progId = prog.value;
+      const programFilteredMatrix = (stockStatusMatrix || []).filter(
+        (m) => String(m.programId) == String(progId)
+      );
+      const progPUIds = (this.state.exportPlanningUnitIds || [])
+        .filter((p) =>
+          programFilteredMatrix.some((m) => m.planningUnit.id == p.value)
+        )
+        .map((p) => p.label);
+      if (progPUIds.length > 0) {
+        let progLabel = prog.label;
+        const isLocalProg = (this.state.downloadedPrograms || []).some(dp => dp.programId == prog.value);
+
+        if (programFilteredMatrix.length == 0) return;
+
+        const programFilteredDetails = (stockStatusDetails || []).filter(
+          (d) => String(d.programId) == String(progId)
+        );
+
+        const progPUIdsLabel = (this.state.exportPlanningUnitIds || [])
+          .filter((p) =>
+            programFilteredMatrix.some((m) => m.planningUnit.id == p.value)
+          )
+          .map((p) => p.label)
+          .join(", ");
+
+        // Section 1: Matrix Table (with horizontal chunking)
+        const pageWidth = doc.internal.pageSize.width - 80; // 40pt margin each side
+        const fixedColsWidth = 200 + 40 + 40; // planningUnit + plannedBy + minMax (wrap cols approx)
+        // Sort matrix rows by planning unit display name for PDF
+        const sortedPFM = programFilteredMatrix.slice().sort((a, b) => {
+          const la = getLabelText(
+            a.planningUnit.label,
+            this.state.lang
+          ).toUpperCase();
+          const lb = getLabelText(
+            b.planningUnit.label,
+            this.state.lang
+          ).toUpperCase();
+          return la < lb ? -1 : la > lb ? 1 : 0;
+        });
+        const colWidths = monthColumns.map((dateKey) => {
+          const maxContentWidth = sortedPFM.reduce((max, row) => {
+            const entry = (row.dataMap || {})[dateKey];
+            const raw = entry ? cellDisplayValue(entry, showQuantity, row.planBasedOn) : null;
+            if (raw == null) return max;
+            const formatted = showQuantity || row.planBasedOn == 2
+              ? formatter(raw)
+              : roundAMC(raw, 2);
+            const text = formatted !== i18n.t("static.supplyPlanFormula.na")
+              ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+              : formatted;
+            return Math.max(max, doc.getTextWidth(String(text)));
+          }, doc.getTextWidth(moment(dateKey).format("MMM YY")));
+          return Math.max(40, maxContentWidth + 8);
+        });
+
+        const chunks = [];
+        let i = 0;
+        while (i < monthColumns.length) {
+          let usedWidth = fixedColsWidth;
+          let j = i;
+          while (j < monthColumns.length && usedWidth + colWidths[j] <= pageWidth) {
+            usedWidth += colWidths[j];
+            j++;
+          }
+          if (j === i) j = i + 1; // always include at least one column to avoid infinite loop
+          chunks.push(monthColumns.slice(i, j));
+          i = j;
+        }
+
+        chunks.forEach((chunkMonths, cIdx) => {
+          let y = 80;
+          const vIdRaw = prog.versionId || (uniquePrograms.length == 1 ? this.state.exportVersionId : null);
+          let vId = vIdRaw;
+          if (isLocalProg && vId && !String(vId).includes("Local")) {
+            vId = `${vId} (Local)`;
+          }
+          const vObj = vId ? (this.state.versionsForExport || []).find(v => v.versionId == vId) : null;
+          const vDate = vObj && vObj.createdDate ? ` (${moment(vObj.createdDate).format("MMM DD YYYY")})` : (prog.createdDate ? ` (${moment(prog.createdDate).format("MMM DD YYYY")})` : "");
+          const versionText = vId
+            ? (vId + vDate)
+            : i18n.t("static.report.latest");
+
+          if (cIdx == 0) {
+            if (pIdx > 0) {
+              doc.addPage();
+              y = 80;
+            } else {
+              y = initialY;
+            }
+            y = renderFilterSummary(
+              y,
+              false,
+              progLabel,
+              progPUIdsLabel,
+              versionText,
+              false
+            );
+          } else {
+            const lastY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 0;
+            // If there's enough space (approx 120pt buffer for header + few rows), continue on same page
+            if (lastY > 40 && lastY + 120 < doc.internal.pageSize.height - 90) {
+              y = lastY + 20;
+            } else {
+              doc.addPage();
+              y = renderFilterSummary(
+                y,
+                false,
+                progLabel,
+                progPUIdsLabel,
+                versionText,
+                true
+              );
+            }
+          }
+
+
+          const head = [
+            [
+              i18n.t("static.planningunit.planningunit"),
+              i18n.t("static.stockStatus.plannedBy"),
+              i18n.t("static.stockStatusMatrix.minMax"),
+              ...chunkMonths.map((d) => moment(d).format("MMM YY")),
+            ],
+          ];
+          const body = sortedPFM.map((row) => {
+            const minMax =
+              row.planBasedOn == 1
+                ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
+                  Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+                  0
+                )}`
+                : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
+                  Math.round(row.maxStock || 0)
+                )}`;
+
+            return [
+              getLabelText(row.planningUnit.label, this.state.lang) +
+              " | " +
+              row.planningUnit.id,
+              row.planBasedOn == 1
+                ? i18n.t("static.report.mos")
+                : i18n.t("static.report.qty"),
+              minMax,
+              ...chunkMonths.map((dateKey) => {
+                const entry = (row.dataMap || {})[dateKey];
+                const raw = entry
+                  ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+                  : null;
+                if (raw == null) return i18n.t("static.supplyPlanFormula.na");
+                const formatted =
+                  showQuantity || row.planBasedOn == 2
+                    ? formatter(raw)
+                    : roundAMC(raw, 2);
+                return formatted !== i18n.t("static.supplyPlanFormula.na")
+                  ? formatted.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  : formatted;
+              }),
+            ];
+          });
+
+          const matrixColStyles = {
+            0: { cellWidth: 200, halign: "left" },
+            1: { cellWidth: "wrap" },
+            2: { cellWidth: "wrap" },
+          };
+          chunkMonths.forEach((d, i) => {
+            const globalIdx = monthColumns.indexOf(chunkMonths[i]);
+            matrixColStyles[3 + i] = { cellWidth: colWidths[globalIdx] };
+          });
+
+          doc.autoTable({
+            startY: y + 10,
+            tableWidth: "wrap",
+            head: head,
+            body: body,
+            margin: { top: 120 },
+            styles: {
+              lineWidth: 1,
+              fontSize: 6.5,
+              halign: "center",
+              valign: "middle",
+              overflow: "linebreak",
+            },
+            columnStyles: matrixColStyles,
+            didDrawPage(data) {
+              if (data.pageNumber > 1) {
+                renderFilterSummary(
+                  80,
+                  false,
+                  progLabel,
+                  progPUIdsLabel,
+                  versionText,
+                  true
+                );
+              }
+            },
+            didParseCell(data) {
+              if (
+                data.section == "body" &&
+                data.column.index >= 3 &&
+                data.column.index < 3 + chunkMonths.length
+              ) {
+                const dateKey = chunkMonths[data.column.index - 3];
+                const rowData = sortedPFM[data.row.index];
+                const entry = (rowData.dataMap || {})[dateKey];
+                const bgColor = entry
+                  ? colorForStatus(entry.stockStatusId)
+                  : "#cfcdc9";
+                data.cell.styles.fillColor = bgColor;
+                // if (bgColor == "#BA0C2F" || bgColor == "#118b70") {
+                data.cell.styles.textColor = "#1A1A1A";
+                // }
+
+                // Reserve left padding for however many icons will be drawn:
+                const hasTruck = entry && entry.shipmentQty > 0;
+                const hasWarning = entry && entry.expiredQty > 0;
+                const iconCount = (hasTruck ? 1 : 0) + (hasWarning ? 1 : 0);
+                const leftPad =
+                  iconCount > 0 ? 2 + iconCount * (ICON_PT + ICON_GAP) : 4;
+                data.cell.styles.halign = "center";
+                data.cell.styles.cellPadding = {
+                  left: leftPad,
+                  right: 2,
+                  top: 2,
+                  bottom: 2,
+                };
+              }
+            },
+            didDrawCell(data) {
+              if (
+                data.section == "body" &&
+                data.column.index >= 3 &&
+                data.column.index < 3 + chunkMonths.length &&
+                data.row.index != -1
+              ) {
+                const dateKey = chunkMonths[data.column.index - 3];
+                const rowData = sortedPFM[data.row.index];
+                const entry = (rowData.dataMap || {})[dateKey];
+                if (!entry) return;
+
+                let iconX = data.cell.x + 2;
+                const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
+
+                const bgColor = entry
+                  ? colorForStatus(entry.stockStatusId)
+                  : "#cfcdc9";
+                const isLight = bgColor == "#BA0C2F" || bgColor == "#118b70";
+                const version = isLight ? "light" : "dark";
+
+                if (entry.shipmentQty > 0 && iconCache.truck[version]) {
+                  doc.addImage(
+                    iconCache.truck[version].dataUrl,
+                    "PNG",
+                    iconX,
+                    iconY,
+                    ICON_PT,
+                    ICON_PT
+                  );
+                  iconX += ICON_PT + ICON_GAP;
+                }
+
+                if (entry.expiredQty > 0 && iconCache.warning[version]) {
+                  doc.addImage(
+                    iconCache.warning[version].dataUrl,
+                    "PNG",
+                    iconX,
+                    iconY,
+                    ICON_PT,
+                    ICON_PT
+                  );
+                }
+              }
+            },
+          });
+
+          // ── Notes as footnotes below the matrix table (first chunk only) ──
+          if (cIdx === chunks.length - 1) {
+            const notedRows = sortedPFM.filter((row) => row.notes);
+            if (notedRows.length > 0) {
+              let fnY = doc.lastAutoTable.finalY + 15;
+              if (fnY > doc.internal.pageSize.height - 90) {
+                doc.addPage();
+                fnY = 80;
+              }
+              doc.setFont("helvetica", "bold");
+              doc.setFontSize(8);
+              doc.setTextColor("#000000");
+              doc.text(i18n.t("static.program.notes") + ":", 40, fnY);
+              fnY += 12;
+
+              doc.setFont("helvetica", "normal");
+              notedRows.forEach((row, idx) => {
+                const puName =
+                  getLabelText(row.planningUnit.label, this.state.lang) +
+                  " | " +
+                  row.planningUnit.id;
+                const fnText = `${idx + 1}. ${puName}: ${row.notes}`;
+                const lines = doc.splitTextToSize(
+                  fnText,
+                  doc.internal.pageSize.width - 80
+                );
+                lines.forEach((line) => {
+                  if (fnY > doc.internal.pageSize.height - 90) {
+                    doc.addPage();
+                    fnY = 80;
+                  }
+                  doc.text(line, 40, fnY);
+                  fnY += 10;
+                });
+                fnY += 4;
+              });
+              doc.lastAutoTable.finalY = fnY;
+            }
+          }
+        });
+
+
+        // Section 3: Details Table
+        if (this.state.showDetailData) {
+          doc.addPage();
+          const headDet = [
+            [
+              i18n.t("static.common.month"),
+              i18n.t("static.planningunit.planningunit"),
+              i18n.t("static.supplyPlan.consumption"),
+              i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+              i18n.t("static.supplyPlan.expiredQty"),
+              i18n.t("static.report.amc"),
+              i18n.t("static.report.stock"),
+              i18n.t("static.report.mos"),
+              i18n.t("static.dashboard.stockstatusmain"),
+            ],
+          ];
+
+          const bodyDet = programFilteredDetails.map((row) => {
+            const matrixRow = programFilteredMatrix.find(
+              (m) => String(m.planningUnit.id) == String(row.planningUnit.id)
+            );
+            const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+            const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+            const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+            const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+            const planBasedOn = matrixRow
+              ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
+              : row.planningUnit?.planBasedOn ?? 1;
+            const statusLabel = (
+              STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+            ).label;
+            return [
+              moment(row.month).format("MMM YY"),
+              getLabelText(row.planningUnit.label, this.state.lang) +
+              " | " +
+              row.planningUnit.id,
+              row.consumptionQty != null
+                ? formatter(Math.round(row.consumptionQty))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "",
+              shipmentQty != null ? formatter(Math.round(shipmentQty)) : 0,
+              expiredQty != null ? formatter(Math.round(expiredQty)) : 0,
+              row.amc != null
+                ? formatter(Math.round(row.amc))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "",
+              row.closingBalance != null
+                ? formatter(Math.round(row.closingBalance))
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "",
+              planBasedOn == 2
+                ? "-"
+                : row.mos != null
+                  ? formatterMOS(roundAMC(row.mos), 1)
+                  : i18n.t("static.supplyPlanFormula.na"),
+              statusLabel,
+            ];
+          });
+          let y = 80;
+          const vId = prog.versionId || (uniquePrograms.length == 1 ? this.state.exportVersionId : null);
+          const vObj = vId ? (this.state.versionsForExport || []).find(v => v.versionId == vId) : null;
+          const vDate = vObj && vObj.createdDate ? ` (${moment(vObj.createdDate).format("MMM DD YYYY")})` : (prog.createdDate ? ` (${moment(prog.createdDate).format("MMM DD YYYY")})` : "");
+          const versionText = vId
+            ? (vId + vDate)
+            : i18n.t("static.report.latest");
+
+          doc.autoTable({
+            tableWidth: "auto",
+            startY:
+              renderFilterSummary(
+                y,
+                false,
+                progLabel,
+                progPUIdsLabel,
+                versionText
+              ) + 10,
+            head: headDet,
+            body: bodyDet,
+            margin: { top: 120 },
+            styles: {
+              lineWidth: 1,
+              fontSize: 7,
+              halign: "center",
+              valign: "middle",
+              overflow: "linebreak",
+            },
+            columnStyles: {
+              1: { cellWidth: 180, halign: "left" },
+              8: { halign: "center" },
+            },
+            didDrawPage(data) {
+              if (data.pageNumber > 1) {
+                renderFilterSummary(
+                  80,
+                  false,
+                  progLabel,
+                  progPUIdsLabel,
+                  versionText,
+                  true
+                );
+              }
+            },
+            didParseCell(data) {
+              if (data.section == "body") {
+                const rowData = programFilteredDetails[data.row.index];
+                const matrixRow = programFilteredMatrix.find(
+                  (m) =>
+                    String(m.planningUnit.id) == String(rowData.planningUnit.id)
+                );
+                const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[rowData.month] : null;
+                const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : rowData.stockStatusId;
+
+                const pbo = matrixRow ? matrixRow.planBasedOn : 1;
+                const bg = colorForStatus(stockStatusId);
+                if (
+                  data.column.index == 8 ||
+                  (data.column.index == 7 && pbo !== 2)
+                ) {
+                  data.cell.styles.fillColor = bg;
+                  data.cell.styles.textColor = "#1A1A1A";
+                }
+              }
+            },
+          });
+        }
+      }
+    });
+
+    addHeaders(doc);
+    addFooters(doc);
+    doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
+    this.setState({ exportModal: false, exportLoading: false });
+  };
+
+  /**
+   * Export CSV from modal data
+   * ── FIX 3: all filter values are now included in the CSV header block ──
+   */
+  exportCSVFromModal = () => {
+    const {
+      stockStatusMatrix,
+      stockStatusDetails,
+      monthColumns,
+      showQuantity,
+      startDate,
+      endDate,
+    } = this.state.PlanningUnitDataForExport || {};
+
+    const csvRow = [];
+
+    // ── Date range ──
+    csvRow.push(
+      '"' +
+      (
+        i18n.t("static.report.dateRange") +
+        ": " +
+        moment(startDate).format("MMM YYYY") +
+        " ~ " +
+        moment(endDate).format("MMM YYYY")
+      ).replaceAll(" ", "%20") +
+      '"'
+    );
+    // csvRow.push("");
+
+    // ── FIX 3: Stock status filter ──
+    const stockStatusLabels = (this.state.stockStatusValues || [])
+      .map((v) => v.label)
+      .join(", ");
+    csvRow.push(
+      '"' +
+      (
+        i18n.t("static.report.withinstock") +
+        ": " +
+        stockStatusLabels
+      ).replaceAll(" ", "%20") +
+      '"'
+    );
+    // csvRow.push("");
+
+    // ── FIX 3: Show Quantity ──
+    csvRow.push(
+      '"' +
+      (
+        i18n.t("static.report.showQuantity") +
+        ": " +
+        (this.state.showQuantity
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
+    );
+    // csvRow.push("");
+
+    // ── FIX 3: Remove Planned Shipments ──
+    csvRow.push(
+      '"' +
+      (
+        i18n.t("static.report.removePlannedShipments") +
+        ": " +
+        (this.state.removePlannedShipments
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
+    );
+    // csvRow.push("");
+
+    // ── FIX 3: Remove TBD Funding Source Shipments ──
+    csvRow.push(
+      '"' +
+      (
+        i18n.t("static.report.removeTBDFundingSourceShipments") +
+        ": " +
+        (this.state.removeTBDFundingSourceShipments
+          ? i18n.t("static.program.yes")
+          : i18n.t("static.program.no"))
+      ).replaceAll(" ", "%20") +
+      '"'
+    );
+    csvRow.push(`'+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+    csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
+    csvRow.push("");
+    const uniquePrograms = this.state.exportProgramIds;
+
+    uniquePrograms.forEach((prog) => {
+      const progId = prog.value;
+      const progLabel = prog.label;
+
+      const programFilteredMatrix = (stockStatusMatrix || []).filter(
+        (m) => String(m.programId) == String(progId) && String(m.planningUnit.id) != "0"
+      );
+      if (programFilteredMatrix.length == 0) return;
+
+      const programFilteredDetails = (stockStatusDetails || []).filter(
+        (d) => String(d.programId) == String(progId) && String(d.planningUnit.id) != "0"
+      );
+
+      csvRow.push(
+        `${i18n.t("static.dashboard.programheader")}: ${progLabel.replaceAll(
+          " ",
+          "%20"
+        )}`
+      );
+      // Add version + date (same logic as PDF)
+      const csvVId = prog.versionId || (uniquePrograms.length == 1 ? this.state.exportVersionId : null);
+      const csvVObj = csvVId ? (this.state.versionsForExport || []).find(v => v.versionId == csvVId) : null;
+      const csvVDate = csvVObj && csvVObj.createdDate
+        ? ` (${moment(csvVObj.createdDate).format("MMM DD YYYY")})`
+        : (prog.createdDate ? ` (${moment(prog.createdDate).format("MMM DD YYYY")})` : "");
+      const csvVersionText = csvVId
+        ? (csvVId + csvVDate)
+        : i18n.t("static.report.latest");
+      csvRow.push(
+        `${i18n.t("static.report.version")}: ${String(csvVersionText).replaceAll(" ", "%20")}`
+      );
+      csvRow.push("");
+      // csvRow.push("");
+
+      const t1Headers = [
+        i18n.t("static.planningunit.planningunit"),
+        i18n.t("static.stockStatus.plannedBy"),
+        i18n.t("static.report.minMosOrQty"),
+        i18n.t("static.report.maxMosOrQty"),
+        ...monthColumns.map((d) => moment(d).format("MMM YY")),
+        i18n.t("static.program.notes"),
+      ];
+
+      const A = [
+        addDoubleQuoteToRowContent(
+          t1Headers.map((h) => h.replaceAll(" ", "%20"))
+        ),
+      ];
+      // Sort by planning unit display name for CSV
+      const sortedPFMcsv = programFilteredMatrix.slice().sort((a, b) => {
+        const la = getLabelText(
+          a.planningUnit.label,
+          this.state.lang
+        ).toUpperCase();
+        const lb = getLabelText(
+          b.planningUnit.label,
+          this.state.lang
+        ).toUpperCase();
+        return la < lb ? -1 : la > lb ? 1 : 0;
+      });
+      sortedPFMcsv.forEach((row) => {
+        A.push(
+          addDoubleQuoteToRowContent([
+            (
+              getLabelText(row.planningUnit.label, this.state.lang) +
+              " | " +
+              row.planningUnit.id
+            )
+              .replaceAll(",", " ")
+              .replaceAll(" ", "%20"),
+            row.planBasedOn == 1
+              ? i18n.t("static.report.mos")
+              : i18n.t("static.report.qty"),
+            row.planBasedOn == 1
+              ? formatterMOS(row.minMonthsOfStock, 0)
+              : formatter(Math.round(row.minStock || 0)),
+            row.planBasedOn == 1
+              ? formatterMOS(Number(row.minMonthsOfStock) + Number(row.reorderFrequency), 0)
+              : formatter(Math.round(row.maxStock || 0)),
+            ...monthColumns.map((dateKey) => {
+              const entry = (row.dataMap || {})[dateKey];
+              const raw = entry
+                ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+                : null;
+              let iconStr1 = "";
+              if (entry && entry.shipmentQty > 0) iconStr1 += "+";
+              if (entry && entry.expiredQty != null && entry.expiredQty > 0) iconStr1 += "*";
+              if (raw == null) return (i18n.t("static.supplyPlanFormula.na") + iconStr1);
+              const val =
+                showQuantity || row.planBasedOn == 2
+                  ? formatter(raw)
+                  : formatterMOS(raw, 2);
+              let iconStr = "";
+              if (entry.shipmentQty > 0) iconStr += "+";
+              if (entry.expiredQty != null && entry.expiredQty > 0) iconStr += "*";
+              return (val + iconStr).replaceAll(" ", "%20");
+            }),
+            (row.notes || "").replaceAll(" ", "%20"),
+          ])
+        );
+      });
+      A.forEach((r) => csvRow.push(r.join(",")));
+
+      if (this.state.showDetailData) {
+        csvRow.push("");
+        csvRow.push("");
+        const t2Headers = [
+          i18n.t("static.common.month"),
+          i18n.t("static.planningunit.planningunit"),
+          i18n.t("static.supplyPlan.consumption"),
+          i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+          i18n.t("static.supplyPlan.expiredQty"),
+          i18n.t("static.report.amc"),
+          i18n.t("static.report.stock"),
+          i18n.t("static.report.mos"),
+          i18n.t("static.dashboard.stockstatusmain"),
+        ];
+
+        const B = [
+          addDoubleQuoteToRowContent(
+            t2Headers.map((h) => h.replaceAll(" ", "%20"))
+          ),
+        ];
+        programFilteredDetails.forEach((row) => {
+          const matrixRow = programFilteredMatrix.find(
+            (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
+          );
+          const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+          const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+          const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+          const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+          const statusLabel = (
+            STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+          ).label;
+          const planBasedOn = matrixRow
+            ? matrixRow.planBasedOn ?? matrixRow.planningUnit?.planBasedOn ?? 1
+            : row.planningUnit?.planBasedOn ?? 1;
+          const mosDisplay =
+            planBasedOn == 2
+              ? "-"
+              : row.mos != null
+                ? formatterMOS(roundAMC(row.mos), 1)
+                : i18n.t("static.supplyPlanFormula.na");
+
+          let iconStr = "";
+          if (shipmentQty > 0) iconStr += "+";
+          if (expiredQty != null && expiredQty > 0) iconStr += "*";
+
+          B.push(
+            addDoubleQuoteToRowContent([
+              moment(row.month).format("MMM YY").replaceAll(" ", "%20"),
+              (
+                getLabelText(row.planningUnit.label, this.state.lang) +
+                " | " +
+                row.planningUnit.id
+              )
+                .replaceAll(",", " ")
+                .replaceAll(" ", "%20"),
+              row.consumptionQty != null ? Math.round(row.consumptionQty) : "",
+              shipmentQty != null ? Math.round(shipmentQty) : 0,
+              expiredQty != null ? Math.round(expiredQty) : 0,
+              row.amc != null ? Math.round(row.amc) : "",
+              (row.closingBalance != null ? Math.round(row.closingBalance) : ""),
+              mosDisplay,
+              statusLabel.replaceAll(" ", "%20"),
+            ])
+          );
+        });
+        B.forEach((r) => csvRow.push(r.join(",")));
+      }
+      csvRow.push("");
+      csvRow.push("");
+    });
+
+    const a = document.createElement("a");
+    a.href = "data:attachment/csv," + csvRow.join("%0A");
+    a.target = "_Blank";
+    a.download = i18n.t("static.dashboard.stockstatusmatrix") + ".csv";
+    document.body.appendChild(a);
+    a.click();
+
+    this.setState({ exportModal: false, exportLoading: false });
+  };
+
+  /**
+   * Get error message from error response
+   */
+  getErrorMessage = (error) => {
+    if (error.message == "Network Error") {
+      return API_URL.includes("uat")
+        ? i18n.t("static.common.uatNetworkErrorMessage")
+        : API_URL.includes("demo")
+          ? i18n.t("static.common.demoNetworkErrorMessage")
+          : i18n.t("static.common.prodNetworkErrorMessage");
+    }
+    switch (error.response?.status) {
+      case 401:
+        this.props.history.push(`/login/static.message.sessionExpired`);
+        break;
+      case 403:
+        this.props.history.push(`/accessDenied`);
+        break;
+      case 409:
+        return i18n.t("static.common.accessDenied");
+      default:
+        return "static.unkownError";
+    }
+  };
+
+  // ─── Utility ─────────────────────────────────────────────────────────────────
+
+  destroyJExcel(divId) {
+    try {
+      jexcel(document.getElementById(divId), "");
+    } catch (_) { }
+    try {
+      jexcel.destroy(document.getElementById(divId), true);
+    } catch (_) { }
+  }
+
+  processApiData(stockStatusMatrix, stockStatusDetails) {
+    const { from, to } = this.state.rangeValue;
+    const startDate = `${from.year}-${String(from.month).padStart(2, "0")}-01`;
+    const lastDay = new Date(to.year, to.month, 0).getDate();
+    const endDate = `${to.year}-${String(to.month).padStart(
+      2,
+      "0"
+    )}-${lastDay}`;
+
+    const rangeFilteredDetails = (stockStatusDetails || []).filter(
+      (d) => d.month >= startDate && d.month <= endDate
+    );
+    const monthColumns = deriveMonthColumns(
+      stockStatusMatrix,
+      startDate,
+      endDate
+    );
+    this.setState(
+      {
+        stockStatusMatrix,
+        stockStatusDetails: rangeFilteredDetails,
+        monthColumns,
+        loading: false,
+        message: "",
+      },
+      () => this.applyStockStatusFilter()
+    );
+  }
+
+  applyStockStatusFilter() {
+    const { stockStatusMatrix, stockStatusDetails, stockStatusValues } =
+      this.state;
+    const selectedIds = (stockStatusValues || []).map((v) => Number(v.value));
+
+    let filteredMatrix = stockStatusMatrix || [];
+    let filteredDetails = stockStatusDetails || [];
+
+    if (selectedIds.length > 0) {
+      filteredMatrix = (stockStatusMatrix || []).filter((row) =>
+        Object.values(row.dataMap || {}).some((d) =>
+          selectedIds.includes(d.stockStatusId)
+        )
+      );
+      filteredDetails = (stockStatusDetails || []).filter((d) =>
+        selectedIds.includes(d.stockStatusId)
+      );
+    }
+
+    // Sort filteredMatrix by planning unit display name (ascending)
+    const lang = this.state.lang;
+    filteredMatrix = filteredMatrix.slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+
+    this.setState({ filteredMatrix, filteredDetails }, () => {
+      this.buildMatrixJExcel();
+      if (this.state.showDetailData) this.buildDetailJExcel();
+    });
+  }
+
+  // ─── Table 1: Stock Status Matrix ────────────────────────────────────────────
+
+  buildMatrixJExcel() {
+    this.destroyJExcel("stockMatrixTableDiv");
+    const { filteredMatrix, monthColumns, showQuantity, lang } = this.state;
+    if (!filteredMatrix.length) return;
+
+    const statusLookup = {};
+    const entryLookup = {};
+    filteredMatrix.forEach((row) => {
+      const puId = row.planningUnit.id;
+      Object.entries(row.dataMap || {}).forEach(([dateKey, entry]) => {
+        const lookupKey = `${puId}|${dateKey}`;
+        statusLookup[lookupKey] = entry.stockStatusId;
+        entryLookup[lookupKey] = entry;
+      });
+    });
+
+    const tableRows = filteredMatrix.map((row) => {
+      const puLabel =
+        getLabelText(row.planningUnit.label, lang) +
+        " | " +
+        row.planningUnit.id;
+      const puId = row.planningUnit.id;
+      const planBy =
+        row.planBasedOn == 1
+          ? i18n.t("static.report.mos")
+          : i18n.t("static.report.qty");
+      const minMax =
+        row.planBasedOn == 1
+          ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
+            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+            0
+          )}`
+          : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
+            Math.round(row.maxStock || 0)
+          )}`;
+
+      const dataCells = monthColumns.map((dateKey) => {
+        const entry = (row.dataMap || {})[dateKey];
+        return entry
+          ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+          : null;
+      });
+
+      // Notes are stored as a hidden column (last-1) for hover logic;
+      // puId is the very last element used as lookup key.
+      return [
+        puLabel,
+        planBy,
+        minMax,
+        ...dataCells,
+        row.notes || "", // notes hidden slot (not a visible column)
+        String(puId),
+      ];
+    });
+
+    const monthCols = monthColumns.map((dateKey) => ({
+      title: moment(dateKey).format("MMM YY"),
+      type: "text",
+      width: 72,
+      readOnly: true,
+      align: "center"
+    }));
+
+    const columns = [
+      {
+        title: i18n.t("static.planningunit.planningunit"),
+        type: "text",
+        width: 230,
+        readOnly: true,
+        align: "left",
+      },
+      {
+        title: i18n.t("static.stockStatus.plannedBy"),
+        type: "text",
+        width: 62,
+        readOnly: true,
+      },
+      {
+        title: `${i18n.t("static.stockStatusMatrix.minMax")}`,
+        type: "text",
+        width: 95,
+        readOnly: true,
+      },
+      ...monthCols,
+      { title: "notes", type: "hidden" },
+      { title: "puId", type: "hidden" },
+    ];
+
+    const monthStartIdx = 3;
+    const monthEndIdx = monthStartIdx + monthColumns.length - 1;
+
+    jexcel.setDictionary({ Show: " ", entries: " " });
+
+    const self = this;
+
+    const options = {
+      data: tableRows,
+      columns,
+      columnDrag: false,
+      editable: false,
+      license: JEXCEL_PRO_KEY,
+      onopenfilter: (worksheets, columnNumber, options) => {
+        var type = worksheets.getConfig().columns[columnNumber].type;
+        if (type == "dropdown" || type == "autocomplete") {
+          setTimeout(() => {
+            const dropdown = document.querySelector(".jss_filters_options");
+            if (dropdown) {
+              const options = Array.from(
+                dropdown.querySelectorAll("label")
+              ).slice(1);
+              const sorted = options.sort((a, b) =>
+                a.textContent.localeCompare(b.textContent)
+              );
+              sorted.forEach((option) => dropdown.appendChild(option));
+            }
+          }, 50);
+        }
+        setTimeout(() => {
+          document
+            .querySelectorAll(".jss_filters_options i")
+            .forEach((icon) => icon.remove());
+        }, 0);
+        setTimeout(() => {
+          const container = document.querySelector(".jss_filters_options");
+          if (!container) return;
+
+          // Get all labels except "(Select all)"
+          const labels = Array.from(container.querySelectorAll("label"))
+            .filter(l => !l.innerText.includes("(Select all)"));
+
+          // Extract value + element
+          const items = labels.map(label => {
+            const text = label.innerText.trim();
+
+            // Remove icons / symbols if any
+            const clean = text.replace(/[^\d.\-]/g, "");
+
+            return {
+              value: parseFloat(clean) || 0,
+              element: label
+            };
+          });
+
+          // 🔥 Sort numerically (ascending)
+          items.sort((a, b) => a.value - b.value);
+
+          // Clear and re-append
+          items.forEach(item => container.appendChild(item.element));
+
+        }, 0);
+      },
+      allowRenameColumn: false,
+      filters: true,
+      onload: (instance) => {
+        this.loadedMatrix(instance);
+        // Hide filter icons from column headers as requested
+        const el = instance.element || instance;
+        const filterIcons = el.querySelectorAll(".jss_column_filter");
+        filterIcons.forEach((icon) => {
+          icon.style.display = "none";
+        });
+        document
+          .querySelectorAll(".jss_filters_options i, .jexcel_filter svg")
+          .forEach((icon) => {
+            icon.style.display = "none";
+          });
+      },
+      pagination: false,
+      search: true,
+      columnSorting: true,
+      onsort: (worksheet, col, direction) => {
+        if (col < monthStartIdx || col > monthEndIdx) return;
+        const rows = worksheet.getData();
+        const nonNa = rows.filter(
+          (r) => r[col] !== null && r[col] !== "" && r[col] !== undefined
+        );
+        const na = rows.filter(
+          (r) => r[col] == null || r[col] == "" || r[col] == undefined
+        );
+        if (na.length > 0) worksheet.setData([...nonNa, ...na]);
+      },
+      wordWrap: false,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      position: "top",
+      onclick: (worksheet, section, x, y) => {
+        if (section == "cell" && x == 0) {
+          const rowData = worksheet.getRowData(y) || [];
+          const puId = rowData[rowData.length - 1];
+          if (puId) {
+            localStorage.setItem(
+              "stockStatusMatrixPayload",
+              JSON.stringify({
+                programId: self.state.programId,
+                versionId: self.state.versionId,
+                planningUnitId: puId,
+                startDate: self.state.rangeValue.from,
+                endDate: self.state.rangeValue.to,
+              })
+            );
+            let url =
+              window.location.href.split("#")[0] + "#/report/stockStatus";
+            window.open(url, "_blank");
+          }
+        }
+      },
+      updateTable(worksheet, cell, col, row, value) {
+        const td = cell && cell.element ? cell.element : cell;
+        if (!td || !td.style) return;
+
+        if (col == 0 && row >= 0) {
+          td.style.cursor = "pointer";
+          td.style.setProperty("text-align", "left", "important");
+          // Add hover-over tooltip for notes (stored at index monthEndIdx+1)
+          const rowData = worksheet.getRowData(row);
+          if (rowData) {
+            const noteVal = rowData[monthEndIdx + 1] || "";
+            if (noteVal) td.title = noteVal;
+          }
+          return;
+        }
+
+        if (col < monthStartIdx || col > monthEndIdx) return;
+
+        const rowData = worksheet.getRowData(row);
+        if (!rowData) return;
+        const puId = rowData[rowData.length - 1];
+        const dateKey = monthColumns[col - monthStartIdx];
+        const lookupKey = `${puId}|${dateKey}`;
+        const entry = entryLookup[lookupKey];
+        const statusId = entry != null ? entry.stockStatusId : -1;
+        const bgColor = colorForStatus(statusId);
+
+        const textColor = "#1A1A1A";
+        const fontWeight = entry && entry.actualStock ? "bold" : "normal";
+
+        if (value === null || value === "" || value == undefined) {
+          td.innerHTML = "N/A";
+        } else {
+          td.innerHTML = formatter(value);
+        }
+
+        td.style.cssText = `background-color: ${bgColor} !important; color: ${textColor} !important; font-weight: ${fontWeight} !important;`;
+
+        if (self.state.showIcon && entry) {
+          if (
+            entry.expiredQty &&
+            entry.expiredQty > 0 &&
+            !td.querySelector("i.warning-icon")
+          ) {
+            const warningIcon = document.createElement("i");
+            warningIcon.className = "fa fa-exclamation-triangle warning-icon";
+            warningIcon.style.color = textColor;
+            warningIcon.style.marginRight = "5px";
+            td.prepend(warningIcon);
+          }
+          if (
+            entry.shipmentQty &&
+            entry.shipmentQty > 0 &&
+            !td.querySelector("i.truck-icon")
+          ) {
+            const truckIcon = document.createElement("i");
+            truckIcon.className = "fa fa-truck truck-icon";
+            truckIcon.style.color = textColor;
+            truckIcon.style.marginRight = "5px";
+            td.prepend(truckIcon);
+          }
+        }
+
+        if (entry) {
+          const tips = [];
+          if (!showQuantity) {
+            tips.push(
+              `${i18n.t("static.report.stock")}: ${entry.closingBalance != null
+                ? formatter(Math.round(entry.closingBalance))
+                : 0
+              }`
+            );
+          }
+          if (showQuantity && entry.mos != null) {
+            tips.push(
+              `${i18n.t("static.report.mos")}: ${roundAMC(entry.mos, 0)}`
+            );
+          }
+          tips.push(
+            `${i18n.t("static.stockStatusMatrix.totalShipmentQty")}: ${entry.shipmentQty != null ? formatter(entry.shipmentQty) : 0
+            }`
+          );
+          tips.push(
+            `${i18n.t("static.supplyPlan.expiredQty")}: ${entry.expiredQty != null ? formatter(entry.expiredQty) : 0
+            }`
+          );
+          td.title = tips.join(" | ");
+        }
+      },
+      contextMenu: () => false,
+      oncopy: (worksheet, selection, str) => {
+        try {
+          const [x1, y1, x2, y2] = selection;
+          const currentTableData = worksheet.getData();
+          const lines = [];
+
+          let html = '<table border="1">';
+          for (let r = y1; r <= y2; r++) {
+            const cols = [];
+            html += "<tr>";
+            for (let c = x1; c <= x2; c++) {
+              const rowData = currentTableData[r];
+              if (!rowData) {
+                cols.push("");
+                html += "<td></td>";
+                continue;
+              }
+
+              let val = rowData[c];
+              if (val == null || val === "") val = "N/A";
+              let bgColor = "";
+              let textColor = "";
+              let fontWeight = "normal";
+
+              if (c >= monthStartIdx && c <= monthEndIdx) {
+                const raw = rowData[c];
+
+                const puId = rowData[rowData.length - 1];
+                const dateKey = monthColumns[c - monthStartIdx];
+                const lookupKey = `${puId}|${dateKey}`;
+                const entry = entryLookup[lookupKey];
+                const statusId = entry != null ? entry.stockStatusId : -1;
+                bgColor = colorForStatus(statusId);
+                textColor = "#1A1A1A";
+                fontWeight = entry && entry.actualStock ? "bold" : "normal";
+
+                // Exact icons in HTML clipboard using Data URLs
+                let htmlIcons = "";
+                let prefixIcons = "";
+                if (self.state.showIcon && entry) {
+                  if (entry.shipmentQty && entry.shipmentQty > 0) {
+                    prefixIcons += "\uD83D\uDE9A ";
+                    const truck = renderFaIconToDataUrl(
+                      "\uf0d1",
+                      textColor,
+                      32
+                    );
+                    if (truck)
+                      htmlIcons += `<img src="${truck.dataUrl}" style="width:12px; height:12px; margin-right:4px; vertical-align:middle;">`;
+                  }
+                  if (entry.expiredQty && entry.expiredQty > 0) {
+                    prefixIcons += "\u26A0\uFE0F ";
+                    const warn = renderFaIconToDataUrl("\uf071", textColor, 32);
+                    if (warn)
+                      htmlIcons += `<img src="${warn.dataUrl}" style="width:12px; height:12px; margin-right:4px; vertical-align:middle;">`;
+                  }
+                }
+                const formattedVal = val === "N/A" ? val : formatter(val);
+                cols.push(prefixIcons + formattedVal);
+                html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight}; vertical-align:middle;">${htmlIcons}${formattedVal}</td>`;
+              } else {
+                const v = rowData[c];
+                val = v != null ? String(v) : "";
+                cols.push(val);
+                html += `<td style="vertical-align:middle;">${val}</td>`;
+              }
+            }
+            lines.push(cols.join("\t"));
+            html += "</tr>";
+          }
+          html += "</table>";
+
+          const text = lines.join("\n");
+
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.write &&
+            typeof window.ClipboardItem !== "undefined"
+          ) {
+            const textBlob = new Blob([text], { type: "text/plain" });
+            const htmlBlob = new Blob([html], { type: "text/html" });
+            const clipboardItem = new ClipboardItem({
+              "text/plain": textBlob,
+              "text/html": htmlBlob,
+            });
+            navigator.clipboard.write([clipboardItem]).catch(() => {
+              // fallback if failed
+            });
+          }
+          return text;
+        } catch (e) {
+          console.warn("oncopy override failed", e);
+          return str;
+        }
+      },
+    };
+
+    this.matrixEl = jexcel(
+      document.getElementById("stockMatrixTableDiv"),
+      options
+    );
+  }
+
+  loadedMatrix(instance) {
+    jExcelLoadedFunctionWithoutPagination(instance);
+    try {
+      const currentMonthLabel = moment().format("MMM YY");
+      const table = instance.element || instance;
+      const ths = table.querySelectorAll("thead tr td");
+      if (ths.length > 1) {
+        ths[1].classList.add('InfoTr');
+        ths[2].classList.add('InfoTr');
+        ths[3].classList.add('InfoTr');
+        ths[1].title = i18n.t("static.stockStatusMatrix.planningUnitTooltip");
+        ths[2].title = i18n.t("static.stockStatusMatrix.planByTooltip");
+        ths[3].title = i18n.t("static.stockStatusMatrix.minMaxTooltip");
+      }
+      ths.forEach((th) => {
+        if (
+          (th.innerText || th.textContent || "").trim() == currentMonthLabel
+        ) {
+          th.classList.add("supplyplan-Thead");
+          th.style.cssText +=
+            "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
         }
       });
-    } else {
-      filteredData = this.state.selData;
+    } catch (_) { }
+  }
+
+  // ─── Table 2: Stock Status Detail ────────────────────────────────────────────
+
+  buildDetailJExcel() {
+    this.destroyJExcel("stockDetailTableDiv");
+    const { filteredDetails, lang } = this.state;
+    if (!filteredDetails.length) return;
+
+    const sorted = [...filteredDetails].sort((a, b) => {
+      if (a.month < b.month) return -1;
+      if (a.month > b.month) return 1;
+      return getLabelText(a.planningUnit.label, lang).localeCompare(
+        getLabelText(b.planningUnit.label, lang)
+      );
+    });
+
+    const tableRows = sorted.map((row) => {
+      const matrixRow = this.state.filteredMatrix.find(
+        (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
+      );
+      const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+      const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+      const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+      const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+      const statusLabel = (
+        STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+      ).label;
+
+      const mosValue =
+        planBasedOn == 2 ? "" : row.mos != null ? roundAMC(row.mos) : null;
+
+      return [
+        moment(row.month).format("MMM YY"),
+        getLabelText(row.planningUnit.label, lang) +
+        " | " +
+        row.planningUnit.id,
+        row.consumptionQty != null ? Math.round(row.consumptionQty) : null,
+        shipmentQty != null ? Math.round(shipmentQty) : 0,
+        expiredQty != null ? Math.round(expiredQty) : 0,
+        row.amc != null ? Math.round(row.amc) : null,
+        row.closingBalance != null ? Math.round(row.closingBalance) : null,
+        mosValue,
+        statusLabel,
+        String(stockStatusId),
+        row.actualStock ? "1" : "0",
+        row.actualConsumption ? "1" : "0",
+        String(planBasedOn),
+      ];
+    });
+
+    console.log("Table Rows Test@123", tableRows)
+
+    const columns = [
+      {
+        title: i18n.t("static.common.month"),
+        type: "text",
+        width: 85,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.planningunit.planningunit"),
+        type: "text",
+        width: 270,
+        readOnly: true,
+        align: "left",
+      },
+      {
+        title: i18n.t("static.supplyPlan.consumption"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.dashboard.shipments"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.supplyPlan.expiry"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.report.amc"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.report.stock"),
+        type: "numeric",
+        mask: "#,##0",
+        width: 105,
+        readOnly: true,
+      },
+      {
+        title: i18n.t("static.report.mos"),
+        type: "numeric",
+        mask: "#,##0.00",
+        width: 80,
+        readOnly: true,
+        align: "center",
+      },
+      {
+        title: i18n.t("static.dashboard.stockstatusmain"),
+        type: "text",
+        width: 125,
+        readOnly: true,
+      },
+      { title: "statusId", type: "hidden" },
+      { title: "actualStock", type: "hidden" },
+      { title: "actualConsumption", type: "hidden" },
+      { title: "planBasedOn", type: "hidden" },
+    ];
+
+    const applyDetailColours = (instance, pageSize, pageIndex) => {
+      let sheet = instance;
+      if (instance && instance.worksheets && instance.worksheets[0]) {
+        sheet = instance.worksheets[0];
+      }
+      const el = sheet.element || (sheet.instance ? sheet.instance.element : sheet);
+      if (!el || !sheet) return;
+      const tbody = el.querySelector && el.querySelector("tbody");
+      if (!tbody) return;
+      const trs = tbody.querySelectorAll("tr");
+
+      trs.forEach((tr) => {
+        // Read the row index from the first cell's data-y attribute
+        const firstTd = tr.querySelector("td[data-y]");
+        if (!firstTd) return;
+        const absoluteRowIdx = Number(firstTd.getAttribute("data-y"));
+
+        // Use getRowData with the absolute row index jExcel stamped on the cell
+        const rowData = sheet.getRowData
+          ? sheet.getRowData(absoluteRowIdx)
+          : null;
+        if (!rowData) return;
+
+        const isActualStock = rowData[10] == "1";
+        const isActualConsumption = rowData[11] == "1";
+        const planBasedOn = Number(rowData[12]);
+        const statusId = Number(rowData[9]);
+        const bgColor = colorForStatus(statusId);
+        const textColor =
+          bgColor == "#BA0C2F" || bgColor == "#118b70" ? "#fff" : "#000";
+
+        const tds = tr.querySelectorAll("td");
+        tds.forEach((td) => {
+          const col = Number(td.getAttribute("data-x"));
+          if (isNaN(col)) return;
+
+          if (col == 1) {
+            td.style.setProperty("text-align", "left", "important");
+            return;
+          }
+
+          if (col == 2) {
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            td.setAttribute(
+              "style",
+              isActualConsumption
+                ? "color: #000 !important; font-weight: normal !important;"
+                : "color: rgb(170,85,161) !important; font-style: italic !important;"
+            );
+            return;
+          }
+
+          if (col == 3 || col == 4) {
+            if (!td.textContent.trim()) td.innerHTML = "0";
+            return;
+          }
+
+          if (col == 5) {
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            return;
+          }
+
+          if (col == 6) {
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            if (isActualStock)
+              td.style.setProperty("font-weight", "bold", "important");
+            else
+              td.style.setProperty("font-weight", "normal", "important");
+            return;
+          }
+
+          if (col == 7) {
+            if (planBasedOn == 2) {
+              td.innerHTML = "-";
+              td.style.cssText = "";
+              return;
+            }
+            if (!td.textContent.trim()) td.innerHTML = "N/A";
+            td.style.cssText = `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important; font-weight: normal !important;`;
+            return;
+          }
+
+          if (col == 8) {
+            td.setAttribute(
+              "style",
+              `background-color: ${bgColor} !important; color: ${textColor} !important; text-align: center !important;`
+            );
+            return;
+          }
+        });
+      });
+    };
+
+    jexcel.setDictionary({ Show: " ", entries: " " });
+
+    const pageSize = Number(localStorage.getItem("sesRecordCount")) || 15;
+    let currentPage = 0;
+
+    const options = {
+      data: tableRows,
+      columns,
+      columnDrag: false,
+      editable: false,
+      license: JEXCEL_PRO_KEY,
+      onopenfilter: onOpenFilter,
+      allowRenameColumn: false,
+      filters: true,
+      onload: (instance) => {
+        this.loadedDetail(instance);
+        applyDetailColours(instance, pageSize, 0);
+      },
+      pagination: pageSize,
+      search: true,
+      columnSorting: true,
+      wordWrap: false,
+      allowInsertColumn: false,
+      allowManualInsertColumn: false,
+      allowDeleteRow: false,
+      copyCompatibility: true,
+      allowExport: false,
+      paginationOptions: JEXCEL_PAGINATION_OPTION,
+      position: "top",
+      onchangepage: (instance, page) => {
+        const zeroBasedPage = Number(page);
+        currentPage = zeroBasedPage;
+        applyDetailColours(instance, pageSize, zeroBasedPage);
+      },
+      onfilter: (instance) => {
+        currentPage = 0;
+        applyDetailColours(instance, pageSize, 0);
+      },
+      onsearch: (instance) => {
+        currentPage = 0;
+        applyDetailColours(instance, pageSize, 0);
+      },
+      oncopy: (worksheet, selection, str) => {
+        try {
+          const [x1, y1, x2, y2] = selection;
+          const currentTableData = worksheet.getData();
+          const lines = [];
+
+          let html = '<table border="1">';
+          for (let r = y1; r <= y2; r++) {
+            const cols = [];
+            html += "<tr>";
+            for (let c = x1; c <= x2; c++) {
+              const rowData = currentTableData[r];
+              if (!rowData) {
+                cols.push("");
+                html += "<td></td>";
+                continue;
+              }
+
+              let val = rowData[c];
+              let bgColor = "";
+              let textColor = "";
+              let fontWeight = "normal";
+
+              if (c == 5 || c == 6) {
+                const statusId = Number(rowData[7]);
+                const isActualStock = rowData[8] == "1";
+                bgColor = colorForStatus(statusId);
+                textColor =
+                  bgColor == "#BA0C2F" || bgColor == "#118b70"
+                    ? "#fff"
+                    : "#000";
+                if (c == 5) fontWeight = isActualStock ? "bold" : "normal";
+              }
+
+              val = val != null ? String(val) : "";
+              cols.push(val);
+              html += `<td style="background-color:${bgColor}; color:${textColor}; font-weight:${fontWeight};">${val}</td>`;
+            }
+            lines.push(cols.join("\t"));
+            html += "</tr>";
+          }
+          html += "</table>";
+
+          const text = lines.join("\n");
+
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.write &&
+            typeof window.ClipboardItem !== "undefined"
+          ) {
+            const textBlob = new Blob([text], { type: "text/plain" });
+            const htmlBlob = new Blob([html], { type: "text/html" });
+            const clipboardItem = new ClipboardItem({
+              "text/plain": textBlob,
+              "text/html": htmlBlob,
+            });
+            navigator.clipboard.write([clipboardItem]).catch(() => {
+              // fallback if failed
+            });
+          }
+          return text;
+        } catch (e) {
+          console.warn("oncopy override failed", e);
+          return str;
+        }
+      },
+      contextMenu: () => false,
+    };
+
+    this.detailEl = jexcel(
+      document.getElementById("stockDetailTableDiv"),
+      options
+    );
+  }
+
+  loadedDetail(instance) {
+    jExcelLoadedFunctionStockStatusMatrix(instance, 1);
+    try {
+      const table = instance.element || instance;
+      const ths = table.querySelectorAll("thead tr td");
+      if (ths.length > 9) {
+        ths[3].classList.add('InfoTr');
+        ths[6].classList.add('InfoTr');
+        ths[8].classList.add('InfoTr');
+        ths[9].classList.add('InfoTr');
+        ths[3].title = i18n.t("static.stockStatusMatrix.consumptionTooltip");
+        ths[6].title = i18n.t("static.stockStatusMatrix.amcTooltip");
+        ths[8].title = i18n.t("static.stockStatusMatrix.mosTooltip");
+        ths[9].title = i18n.t("static.stockStatusMatrix.statusTooltip");
+      }
+    } catch (_) { }
+  }
+
+  // Helper for export charts
+  buildChartDataForProgram = (
+    progId,
+    filteredDetails,
+    filteredMatrix,
+    showQuantity,
+    lang
+  ) => {
+    const progDetails = (filteredDetails || []).filter(
+      (d) => String(d.programId) == String(progId)
+    );
+    if (!progDetails.length) return null;
+
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const backgroundColor1 = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
+
+    const allMonths = [
+      ...new Set((progDetails || []).map((d) => d.month)),
+    ].sort();
+    const labels = allMonths.map((m) => moment(m).format("MMM YY"));
+
+    const byPU = {};
+    progDetails.forEach((d) => {
+      const id = d.planningUnit.id;
+      if (!byPU[id])
+        byPU[id] = {
+          label: getLabelText(d.planningUnit.label, lang),
+          data: {},
+        };
+
+      const matrixRow = filteredMatrix.find(
+        (r) => String(r.planningUnit.id) == String(id)
+      );
+      const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const isQty = showQuantity || planBasedOn == 2;
+
+      const val = isQty
+        ? d.closingBalance != null
+          ? Math.round(d.closingBalance)
+          : null
+        : d.mos != null
+          ? roundAMC(d.mos)
+          : null;
+      byPU[id].data[d.month] = val;
+    });
+
+    const puKeys = Object.keys(byPU);
+    const datasets = puKeys.map((id, index) => {
+      const matrixRow = (filteredMatrix || []).find(
+        (r) => String(r.planningUnit.id) == String(id)
+      );
+      const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const yAxisID =
+        showQuantity || planBasedOn == 1 ? "y-axis-1" : "y-axis-2";
+
+      return {
+        type: "line",
+        pointStyle: "line",
+        lineTension: 0,
+        backgroundColor: "transparent",
+        label: byPU[id].label,
+        data: allMonths.map((m) => byPU[id].data[m] ?? null),
+        borderColor: backgroundColor1[index % backgroundColor1.length],
+        borderWidth: 4,
+        spanGaps: false,
+        yAxisID: yAxisID,
+      };
+    });
+
+    return { labels, datasets };
+  };
+
+  // ─── Line Graph ───────────────────────────────────────────────────────────────
+
+  buildChartData() {
+    const { filteredDetails, showQuantity, lang, filteredMatrix } = this.state;
+    if (!filteredDetails || !filteredDetails.length) return null;
+
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const backgroundColor1 = isDarkMode ? DARK_COLORS : LIGHT_COLORS;
+
+    const allMonths = [
+      ...new Set((filteredDetails || []).map((d) => d.month)),
+    ].sort();
+    const labels = allMonths.map((m) => moment(m).format("MMM YY"));
+
+    const byPU = {};
+    filteredDetails.forEach((d) => {
+      const id = d.planningUnit.id;
+      if (!byPU[id])
+        byPU[id] = {
+          label: getLabelText(d.planningUnit.label, lang),
+          data: {},
+        };
+
+      const matrixRow = filteredMatrix.find(
+        (r) => String(r.planningUnit.id) == String(id)
+      );
+      const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const isQty = showQuantity || planBasedOn == 2;
+
+      const val = isQty
+        ? d.closingBalance != null
+          ? Math.round(d.closingBalance)
+          : null
+        : d.mos != null
+          ? roundAMC(d.mos)
+          : null;
+      byPU[id].data[d.month] = val;
+    });
+
+    const puKeys = Object.keys(byPU);
+    const datasets = puKeys.map((id, index) => {
+      const matrixRow = filteredMatrix.find(
+        (r) => String(r.planningUnit.id) == String(id)
+      );
+      const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+      const yAxisID = showQuantity
+        ? "y-axis-1"
+        : planBasedOn == 2
+          ? "y-axis-2"
+          : "y-axis-1";
+
+      return {
+        type: "line",
+        pointStyle: "line",
+        lineTension: 0,
+        backgroundColor: "transparent",
+        label: byPU[id].label,
+        data: allMonths.map((m) => byPU[id].data[m] ?? null),
+        borderColor: backgroundColor1[index % backgroundColor1.length],
+        borderWidth: 4,
+        spanGaps: false,
+        yAxisID: yAxisID,
+      };
+    });
+
+    return { labels, datasets };
+  }
+
+  // ─── CSV export ───────────────────────────────────────────────────────────────
+
+  exportCSV() {
+    const {
+      filteredMatrix,
+      monthColumns,
+      filteredDetails,
+      showQuantity,
+      lang,
+    } = this.state;
+    const csvRow = [];
+
+    csvRow.push(
+      `"${i18n.t("static.dashboard.stockstatusmatrix").replaceAll(" ", "%20")}"`
+    );
+    csvRow.push("");
+
+    // ── Legend for icons ──
+    const legendText = `${i18n.t("static.common.legend")}: + ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}, * ${i18n.t("static.supplyPlan.expiredQty")}`;
+    csvRow.push('"' + legendText.replaceAll(" ", "%20") + '"');
+    csvRow.push("");
+
+    const t1Headers = [
+      i18n.t("static.planningunit.planningunit"),
+      i18n.t("static.stockStatus.plannedBy"),
+      i18n.t("static.report.minMosOrQty"),
+      i18n.t("static.report.maxMosOrQty"),
+      ...monthColumns.map((d) => moment(d).format("MMM YY")),
+      i18n.t("static.program.notes"),
+    ];
+    const A = [
+      addDoubleQuoteToRowContent(
+        t1Headers.map((h) => h.replaceAll(" ", "%20"))
+      ),
+    ];
+    // Sort by planning unit display name for CSV
+    const sortedMatrix = filteredMatrix.filter(m => String(m.planningUnit.id) != "0").slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+    sortedMatrix.forEach((row) => {
+      A.push(
+        addDoubleQuoteToRowContent([
+          (
+            getLabelText(row.planningUnit.label, lang) +
+            " | " +
+            row.planningUnit.id
+          )
+            .replaceAll(",", " ")
+            .replaceAll(" ", "%20"),
+          row.planBasedOn == 1
+            ? i18n.t("static.report.mos")
+            : i18n.t("static.report.qty"),
+          row.planBasedOn == 1
+            ? formatterMOS(row.minMonthsOfStock, 0)
+            : formatter(Math.round(row.minStock || 0)),
+          row.planBasedOn == 1
+            ? formatterMOS(Number(row.minMonthsOfStock) + Number(row.reorderFrequency), 0)
+            : formatter(Math.round(row.maxStock || 0)),
+          ...monthColumns.map((dateKey) => {
+            const entry = (row.dataMap || {})[dateKey];
+            const raw = entry
+              ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+              : null;
+            if (raw == null) return i18n.t("static.supplyPlanFormula.na");
+            const val =
+              showQuantity || row.planBasedOn == 2
+                ? formatter(raw)
+                : formatterMOS(raw, 2);
+            let iconStr = "";
+            if (entry.shipmentQty > 0) iconStr += "+";
+            if (entry.expiredQty > 0) iconStr += "*";
+            return (val + iconStr).replaceAll(" ", "%20");
+          }),
+          (row.notes || "").replaceAll(" ", "%20"),
+        ])
+      );
+    });
+    A.forEach((r) => csvRow.push(r.join(",")));
+    csvRow.push("");
+    csvRow.push("");
+
+    if (this.state.showDetailData) {
+      csvRow.push(
+        `"${i18n.t("static.report.stockStatusDetail").replaceAll(" ", "%20")}"`
+      );
+      csvRow.push("");
+      const t2Headers = [
+        i18n.t("static.common.month"),
+        i18n.t("static.planningunit.planningunit"),
+        i18n.t("static.supplyPlan.consumption"),
+        i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+        i18n.t("static.supplyPlan.expiredQty"),
+        i18n.t("static.report.amc"),
+        i18n.t("static.report.stock"),
+        i18n.t("static.report.mos"),
+        i18n.t("static.dashboard.stockstatusmain"),
+      ];
+      const B = [
+        addDoubleQuoteToRowContent(
+          t2Headers.map((h) => h.replaceAll(" ", "%20"))
+        ),
+      ];
+      filteredDetails.filter(d => String(d.planningUnit.id) != "0").forEach((row) => {
+        const matrixRow = this.state.filteredMatrix.find(
+          (r) => String(r.planningUnit.id) == String(row.planningUnit.id)
+        );
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+        const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+        const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+        const statusLabel = (
+          STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+        ).label;
+        const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+
+        const mosDisplay =
+          planBasedOn == 2
+            ? ""
+            : row.mos != null
+              ? formatterMOS(roundAMC(row.mos), 1)
+              : i18n.t("static.supplyPlanFormula.na");
+
+        let iconStr = "";
+        if (shipmentQty > 0) iconStr += "+";
+        if (expiredQty > 0) iconStr += "*";
+
+        B.push(
+          addDoubleQuoteToRowContent([
+            moment(row.month).format("MMM YY").replaceAll(" ", "%20"),
+            (
+              getLabelText(row.planningUnit.label, lang) +
+              " | " +
+              row.planningUnit.id
+            )
+              .replaceAll(",", " ")
+              .replaceAll(" ", "%20"),
+            row.consumptionQty != null ? Math.round(row.consumptionQty) : "",
+            shipmentQty != null ? Math.round(shipmentQty) : 0,
+            expiredQty != null ? Math.round(expiredQty) : 0,
+            row.amc != null ? Math.round(row.amc) : "",
+            (row.closingBalance != null ? Math.round(row.closingBalance) : "") +
+            iconStr,
+            mosDisplay,
+            statusLabel.replaceAll(" ", "%20"),
+          ])
+        );
+      });
+      B.forEach((r) => csvRow.push(r.join(",")));
     }
+
+    const a = document.createElement("a");
+    a.href = "data:attachment/csv," + csvRow.join("%0A");
+    a.target = "_Blank";
+    a.download = i18n.t("static.dashboard.stockstatusmatrix") + ".csv";
+    document.body.appendChild(a);
+    a.click();
+  }
+
+  // ─── PDF export ───────────────────────────────────────────────────────────────
+
+  exportPDF() {
+    const {
+      filteredMatrix,
+      monthColumns,
+      filteredDetails,
+      showQuantity,
+      lang,
+    } = this.state;
+    const doc = new jsPDF("landscape", "pt", "A4");
+    doc.setFontSize(8);
+
+    const addHeaders = (d) => {
+      const n = d.internal.getNumberOfPages();
+      for (let i = 1; i <= n; i++) {
+        d.setFontSize(12);
+        d.setFont("helvetica", "bold");
+        d.setPage(i);
+        d.addImage(LOGO, "png", 0, 10, 180, 50, "FAST");
+        d.setTextColor("#002f6c");
+        d.text(
+          i18n.t("static.dashboard.stockstatusmatrix"),
+          d.internal.pageSize.width / 2,
+          60,
+          { align: "center" }
+        );
+      }
+    };
+    const addFooters = (d) => {
+      const n = d.internal.getNumberOfPages();
+      d.setFont("helvetica", "bold");
+      d.setFontSize(6);
+      for (let i = 1; i <= n; i++) {
+        d.setPage(i);
+        d.text(
+          `Page ${i} of ${n}`,
+          d.internal.pageSize.width / 9,
+          d.internal.pageSize.height - 30,
+          { align: "center" }
+        );
+        d.text(
+          `Copyright © 2020 ${i18n.t("static.footer")}`,
+          (d.internal.pageSize.width * 6) / 7,
+          d.internal.pageSize.height - 30,
+          { align: "center" }
+        );
+      }
+    };
+
+    // Sort matrix by planning unit display name for PDF
+    const sortedMatrix1 = filteredMatrix.slice().sort((a, b) => {
+      const la = getLabelText(a.planningUnit.label, lang).toUpperCase();
+      const lb = getLabelText(b.planningUnit.label, lang).toUpperCase();
+      return la < lb ? -1 : la > lb ? 1 : 0;
+    });
+
+    const head1 = [
+      [
+        i18n.t("static.planningunit.planningunit"),
+        i18n.t("static.stockStatus.plannedBy"),
+        `${i18n.t("static.report.minMosOrQty")} / ${i18n.t(
+          "static.report.maxMosOrQty"
+        )}`,
+        ...monthColumns.map((d) => moment(d).format("MMM YY")),
+      ],
+    ];
+    const colorMap1 = sortedMatrix1.map((row) =>
+      monthColumns.map((dateKey) => {
+        const entry = (row.dataMap || {})[dateKey];
+        return entry ? colorForStatus(entry.stockStatusId) : "#cfcdc9";
+      })
+    );
+    const body1 = sortedMatrix1.map((row) => {
+      const minMax =
+        row.planBasedOn == 1
+          ? `${formatterMOS(row.minMonthsOfStock, 0)} / ${formatterMOS(
+            Number(row.minMonthsOfStock) + Number(row.reorderFrequency),
+            0
+          )}`
+          : `${formatter(Math.round(row.minStock || 0))} / ${formatter(
+            Math.round(row.maxStock || 0)
+          )}`;
+      return [
+        getLabelText(row.planningUnit.label, lang) +
+        " | " +
+        row.planningUnit.id,
+        row.planBasedOn == 1
+          ? i18n.t("static.report.mos")
+          : i18n.t("static.report.qty"),
+        minMax,
+        ...monthColumns.map((dateKey) => {
+          const entry = (row.dataMap || {})[dateKey];
+          const raw = entry
+            ? cellDisplayValue(entry, showQuantity, row.planBasedOn)
+            : null;
+          if (raw == null) return i18n.t("static.supplyPlanFormula.na");
+          return showQuantity || row.planBasedOn == 2
+            ? formatter(raw)
+            : formatterMOS(raw, 2);
+        }),
+      ];
+    });
+    doc.autoTable({
+      margin: { top: 80, bottom: 90 },
+      startY: 90,
+      head: head1,
+      body: body1,
+      styles: {
+        lineWidth: 1,
+        fontSize: 6,
+        halign: "center",
+        overflow: "linebreak",
+      },
+      columnStyles: { 0: { cellWidth: 100 } },
+      didParseCell(data) {
+        if (
+          data.section == "body" &&
+          data.column.index >= 3 &&
+          data.column.index < 3 + monthColumns.length
+        ) {
+          data.cell.styles.fillColor =
+            colorMap1[data.row.index]?.[data.column.index - 3] || "#cfcdc9";
+        }
+      },
+    });
+
+    // ── Notes as footnotes below the first table ──
+    const notedRows1 = sortedMatrix1.filter((row) => row.notes);
+    if (notedRows1.length > 0) {
+      let fnY = doc.lastAutoTable.finalY + 15;
+      if (fnY > doc.internal.pageSize.height - 90) {
+        doc.addPage();
+        fnY = 80;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(8);
+      doc.setTextColor("#000000");
+      doc.text(i18n.t("static.program.notes") + ":", 40, fnY);
+      fnY += 12;
+
+      doc.setFont("helvetica", "normal");
+      notedRows1.forEach((row, idx) => {
+        const puName =
+          getLabelText(row.planningUnit.label, lang) +
+          " | " +
+          row.planningUnit.id;
+        const fnText = `${idx + 1}. ${puName}: ${row.notes}`;
+        const lines = doc.splitTextToSize(
+          fnText,
+          doc.internal.pageSize.width - 80
+        );
+        lines.forEach((line) => {
+          if (fnY > doc.internal.pageSize.height - 90) {
+            doc.addPage();
+            fnY = 80;
+          }
+          doc.text(line, 40, fnY);
+          fnY += 10;
+        });
+        fnY += 4;
+      });
+      doc.lastAutoTable.finalY = fnY;
+    }
+
+    if (this.state.showDetailData) {
+      const head2 = [
+        [
+          i18n.t("static.common.month"),
+          i18n.t("static.planningunit.planningunit"),
+          i18n.t("static.supplyPlan.consumption"),
+          i18n.t("static.stockStatusMatrix.totalShipmentQty"),
+          i18n.t("static.supplyPlan.expiredQty"),
+          i18n.t("static.report.amc"),
+          i18n.t("static.report.stock"),
+          i18n.t("static.report.mos"),
+          i18n.t("static.dashboard.stockstatusmain"),
+        ],
+      ];
+      const colorMap2 = filteredDetails.map((r) => {
+        const matrixRow = this.state.filteredMatrix.find(
+          (m) => String(m.planningUnit.id) == String(r.planningUnit.id)
+        );
+        const planBasedOn = matrixRow ? matrixRow.planBasedOn : 1;
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[r.month] : null;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : r.stockStatusId;
+        return { bgColor: colorForStatus(stockStatusId), planBasedOn };
+      });
+      const body2 = filteredDetails.map((row, idx) => {
+        const matrixRow = this.state.filteredMatrix.find(
+          (m) => String(m.planningUnit.id) == String(row.planningUnit.id)
+        );
+        const dataMapEntry = (matrixRow && matrixRow.dataMap) ? matrixRow.dataMap[row.month] : null;
+        const shipmentQty = dataMapEntry && dataMapEntry.shipmentQty != null ? dataMapEntry.shipmentQty : row.shipmentQty;
+        const expiredQty = dataMapEntry && dataMapEntry.expiredQty != null ? dataMapEntry.expiredQty : row.expiredQty;
+        const stockStatusId = dataMapEntry && dataMapEntry.stockStatusId != null ? dataMapEntry.stockStatusId : row.stockStatusId;
+
+        const statusLabel = (
+          STOCK_STATUS_MAP[stockStatusId] || STOCK_STATUS_MAP["-1"]
+        ).label;
+        const planBasedOn = colorMap2[idx].planBasedOn;
+        const mosDisplay =
+          planBasedOn == 2
+            ? ""
+            : row.mos != null
+              ? formatterMOS(roundAMC(row.mos), 1)
+              : i18n.t("static.supplyPlanFormula.na");
+
+        return [
+          moment(row.month).format("MMM YY"),
+          getLabelText(row.planningUnit.label, lang) +
+          " | " +
+          row.planningUnit.id,
+          row.consumptionQty != null
+            ? formatter(Math.round(row.consumptionQty))
+            : "",
+          shipmentQty != null ? formatter(Math.round(shipmentQty)) : 0,
+          expiredQty != null ? formatter(Math.round(expiredQty)) : 0,
+          row.amc != null ? formatter(Math.round(row.amc)) : "",
+          row.closingBalance != null
+            ? formatter(Math.round(row.closingBalance))
+            : "",
+          mosDisplay,
+          statusLabel,
+        ];
+      });
+      doc.autoTable({
+        margin: { top: 80, bottom: 90 },
+        startY: doc.lastAutoTable.finalY + 20,
+        head: head2,
+        body: body2,
+        styles: {
+          lineWidth: 1,
+          fontSize: 7,
+          halign: "center",
+          overflow: "linebreak",
+        },
+        columnStyles: { 1: { cellWidth: 130 }, 8: { halign: "center" } },
+        didParseCell(data) {
+          if (data.section == "body") {
+            if (data.column.index == 8) {
+              data.cell.styles.fillColor =
+                colorMap2[data.row.index]?.bgColor || "#cfcdc9";
+            }
+            if (
+              data.column.index == 7 &&
+              colorMap2[data.row.index]?.planBasedOn !== 2
+            ) {
+              data.cell.styles.fillColor =
+                colorMap2[data.row.index]?.bgColor || "#cfcdc9";
+            }
+          }
+        },
+      });
+    }
+
+    addHeaders(doc);
+    addFooters(doc);
+    doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
+  }
+
+  // ─── Program / Version / PU loading ──────────────────────────────────────────
+
+  getPlanningUnit() {
+    const programId = document.getElementById("programId").value;
+    const versionId = document.getElementById("versionId")?.value ?? "0";
+    if (programId <= 0 || versionId == 0) return;
+
+    if (versionId.includes("Local")) {
+      getDatabase();
+      const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+      req.onsuccess = (e) => {
+        const db = e.target.result;
+        const get = db
+          .transaction(["programPlanningUnit"], "readwrite")
+          .objectStore("programPlanningUnit")
+          .getAll();
+        get.onsuccess = () => {
+          const lang = this.state.lang;
+          const proList = get.result
+            .filter((r) => r.program.id == programId && r.active)
+            .map((r) => ({
+              label: r.planningUnit.label,
+              value: r.planningUnit.id,
+              json: r,
+            }))
+            .sort((a, b) =>
+              getLabelText(a.label, lang).toUpperCase() >
+                getLabelText(b.label, lang).toUpperCase()
+                ? 1
+                : -1
+            );
+          this.setState(
+            {
+              planningUnits: proList,
+              planningUnitValues: proList.map((p) => ({
+                label: getLabelText(p.label, lang) + " | " + p.value,
+                value: Number(p.value),
+              })),
+            },
+            () => this.filterData()
+          );
+        };
+      };
+    } else {
+      ReportService.getDropdownListByProgramIds({
+        programIds: [programId],
+        onlyAllowPuPresentAcrossAllPrograms: false,
+      })
+        .then((res) => {
+          const lang = this.state.lang;
+          const list = (res.data.planningUnitList || []).sort((a, b) =>
+            getLabelText(a.label, lang).toUpperCase() >
+              getLabelText(b.label, lang).toUpperCase()
+              ? 1
+              : -1
+          );
+          this.setState(
+            {
+              planningUnits: list,
+              planningUnitValues: list.map((p) => ({
+                label: getLabelText(p.label, lang) + " | " + p.id,
+                value: Number(p.id),
+              })),
+            },
+            () => this.filterData()
+          );
+        })
+        .catch(() => this.setState({ planningUnits: [], loading: false }));
+    }
+  }
+
+  handleRangeDissmis(value) {
+    this.setState({ rangeValue: value }, () => this.filterData());
+  }
+  _handleClickRangeBox() {
+    this.refs.pickRange.show();
+  }
+
+  handlePlanningUnitChange = (ids) => {
+    ids = ids.sort((a, b) => parseInt(a.value) - parseInt(b.value));
     this.setState({
-      data: filteredData,
+      planningUnitValues: ids,
+      planningUnitLabels: ids.map((e) => e.label),
     });
   };
-  /**
-   * Filters data based on selected parameters and updates component state accordingly.
-   */
+
+  handleBlur = (e) => {
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      this.filterData();
+    }
+  };
+
+  // ─── Main data fetch ──────────────────────────────────────────────────────────
+
   filterData() {
-    let startDate = this.state.startYear + "-01-01";
-    let endDate =
-      this.state.endYear +
-      "-12-" +
-      new Date(this.state.endYear, 12, 0).getDate();
-    let programId = document.getElementById("programId").value;
-    let planningUnitIds = this.state.planningUnitValues.map((ele) =>
-      ele.value.toString()
+    const programId = document.getElementById("programId").value;
+    const versionId = document.getElementById("versionId")?.value ?? "0";
+    const planningUnitIds = this.state.planningUnitValues.map((e) =>
+      Number(e.value)
     );
-    let versionId = document.getElementById("versionId").value;
-    let tracercategory =
-      this.state.tracerCategoryValues.length ==
-        this.state.tracerCategories.length
-        ? []
-        : this.state.tracerCategoryValues.map((ele) => ele.value.toString());
-    let includePlannedShipments = document.getElementById(
-      "includePlanningShipments"
-    ).value;
+    const { from, to } = this.state.rangeValue;
+    const startDate = `${from.year}-${String(from.month).padStart(2, "0")}-01`;
+    const lastDay = new Date(to.year, to.month, 0).getDate();
+    const endDate = `${to.year}-${String(to.month).padStart(
+      2,
+      "0"
+    )}-${lastDay}`;
+
     if (
-      this.state.planningUnitValues.length > 0 &&
+      planningUnitIds.length > 0 &&
       programId > 0 &&
       versionId != 0 &&
-      this.state.tracerCategoryValues.length > 0
+      this.state.stockStatusValues.length > 0
     ) {
       if (versionId.includes("Local")) {
         this.setState({ loading: true });
-        var data = [];
-        var data1 = [];
-        var db1;
         getDatabase();
-        var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-        openRequest.onerror = function (event) {
+        const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+        req.onerror = () =>
           this.setState({
             message: i18n.t("static.program.errortext"),
             loading: false,
           });
-        }.bind(this);
-        openRequest.onsuccess = function (e) {
-          db1 = e.target.result;
-          var planningUnitTransaction = db1.transaction(
-            ["planningUnit"],
-            "readwrite"
-          );
-          var planningUnitObjectStore =
-            planningUnitTransaction.objectStore("planningUnit");
-          var planningunitRequest = planningUnitObjectStore.getAll();
-          planningunitRequest.onerror = function (event) {
-            this.setState({
-              loading: false,
-            });
-          };
-          var plunit = [];
-          planningunitRequest.onsuccess = function (e) {
-            var myResult1 = [];
-            myResult1 = e.target.result;
-            planningUnitIds.map((planningUnitId) => {
-              plunit = [
-                ...plunit,
-                ...myResult1.filter((c) => c.planningUnitId == planningUnitId),
-              ];
-            });
-          }.bind(this);
-          var transaction = db1.transaction(["programData"], "readwrite");
-          var programTransaction = transaction.objectStore("programData");
-          var version = versionId.split("(")[0].trim();
-          var userBytes = CryptoJS.AES.decrypt(
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          const version = versionId.split("(")[0].trim();
+          const userId = CryptoJS.AES.decrypt(
             localStorage.getItem("curUser"),
             SECRET_KEY
-          );
-          var userId = userBytes.toString(CryptoJS.enc.Utf8);
-          var program = `${programId}_v${version}_uId_${userId}`;
-          var programRequest = programTransaction.get(program);
-          programRequest.onerror = function (event) {
-            this.setState({
-              loading: false,
-            });
-          }.bind(this);
-          programRequest.onsuccess = function (event) {
-            var planningUnitDataList =
-              programRequest.result.programData.planningUnitDataList;
-            planningUnitIds.map((planningUnitId) => {
-              var planningUnitDataIndex = planningUnitDataList.findIndex(
-                (c) => c.planningUnitId == planningUnitId
+          ).toString(CryptoJS.enc.Utf8);
+          const key = `${programId}_v${version}_uId_${userId}`;
+          const get = db
+            .transaction(["programData"], "readwrite")
+            .objectStore("programData")
+            .get(key);
+          get.onerror = () => this.setState({ loading: false });
+          get.onsuccess = () => {
+            const programData = get.result?.programData;
+            if (!programData) {
+              this.setState({ loading: false });
+              return;
+            }
+
+            const puDataList = programData.planningUnitDataList || [];
+            const generalData = JSON.parse(
+              CryptoJS.AES.decrypt(
+                programData.generalData,
+                SECRET_KEY
+              ).toString(CryptoJS.enc.Utf8)
+            );
+            const matrix = [];
+            const details = [];
+
+            (planningUnitIds || []).forEach((puId) => {
+              const puItem = (this.state.planningUnits || []).find(
+                (p) => String(p.id || p.value) == puId
               );
-              var programJson = {};
-              if (planningUnitDataIndex != -1) {
-                var planningUnitData = planningUnitDataList.filter(
-                  (c) => c.planningUnitId == planningUnitId
-                )[0];
-                var programDataBytes = CryptoJS.AES.decrypt(
-                  planningUnitData.planningUnitData,
+              console.log("this.state.planningUnits", this.state.planningUnits);
+              const puActualLabel = puItem
+                ? puItem.label
+                : { label_en: String(puId) };
+
+              const puSettings =
+                (this.state.planningUnits || []).find(
+                  (p) => String(p.value) == puId
+                ) || {};
+              const minMos = puSettings.json?.minMonthsOfStock || 5;
+              const reorderFreq =
+                puSettings.json?.reorderFrequencyInMonths || 5;
+              const planBasedOn = puSettings.json?.planBasedOn || 1;
+              const minStock = puSettings.json?.minQty || 0;
+              const notes = puSettings.json?.notes || "";
+
+              const puDataIdx = puDataList.findIndex(
+                (p) => p.planningUnitId == puId
+              );
+              let programJson = { supplyPlan: [] };
+              if (puDataIdx !== -1) {
+                const bytes = CryptoJS.AES.decrypt(
+                  puDataList[puDataIdx].planningUnitData,
                   SECRET_KEY
                 );
-                var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                programJson = JSON.parse(programData);
+                programJson = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+              }
+
+              const inRangeEntries = (programJson.supplyPlan || []).filter(
+                (sp) =>
+                  sp.planningUnitId == puId &&
+                  sp.transDate >= startDate &&
+                  sp.transDate <= endDate
+              );
+              console.log("In Range Entries Test@123", inRangeEntries);
+
+              let maxStock;
+              if (planBasedOn == 2) {
+                maxStock = calcAverageMaxStock(
+                  inRangeEntries,
+                  minStock,
+                  reorderFreq
+                );
               } else {
-                programJson = {
-                  consumptionList: [],
-                  inventoryList: [],
-                  shipmentList: [],
-                  batchInfoList: [],
-                  supplyPlan: [],
-                };
+                maxStock = puSettings.json?.maxStock || 0;
               }
-              var pu = this.state.planningUnits.filter(
-                (c) => c.planningUnit.id == planningUnitId
-              )[0];
-              for (
-                var from = this.state.startYear, to = this.state.endYear;
-                from <= to;
-                from++
-              ) {
-                var monthlydata = [];
-                var monthlydata1 = [];
-                var monthlydataTotal = 0;
-                var totalMonths = 0;
-                for (var month = 1; month <= 12; month++) {
-                  var dtstr =
-                    from + "-" + String(month).padStart(2, "0") + "-01";
-                  var dt = dtstr;
-                  var list = programJson.supplyPlan.filter(
-                    (c) =>
-                      c.planningUnitId == planningUnitId && c.transDate == dt
-                  );
-                  if (list.length > 0) {
-                    if (includePlannedShipments.toString() == "true") {
-                      monthlydata.push(
-                        pu.planBasedOn == 1 ? list[0].mos : list[0].maxStock
-                      );
-                      monthlydata1.push(list[0].closingBalance);
-                      monthlydataTotal += Number(list[0].maxStock);
-                      totalMonths += 1;
-                    } else {
-                      monthlydata.push(
-                        pu.planBasedOn == 1 ? list[0].mosWps : list[0].maxStock
-                      );
-                      monthlydata1.push(list[0].closingBalanceWps);
-                      monthlydataTotal += Number(list[0].maxStock);
-                      totalMonths += 1;
-                    }
-                  } else {
-                    monthlydata.push(null);
-                    monthlydata1.push(null);
-                  }
+
+              const dataMap = {};
+              inRangeEntries.forEach((sp) => {
+                const useWps = this.state.removePlannedShipments;
+                const useWtbd = this.state.removeTBDFundingSourceShipments;
+
+                const mos = useWps
+                  ? sp.mosWps
+                  : useWtbd
+                    ? sp.mosWtbdps
+                    : sp.mos;
+                const cb = useWps
+                  ? sp.closingBalanceWps
+                  : useWtbd
+                    ? sp.closingBalanceWtbdps
+                    : sp.closingBalance;
+                const amc = sp.amc;
+
+                let statusId;
+                if (planBasedOn == 1) {
+                  statusId = calcStatusIdLocal(mos, minMos, reorderFreq);
+                } else {
+                  const dynamicMax =
+                    amc != null ? minStock + reorderFreq * amc : maxStock;
+                  statusId =
+                    cb == null
+                      ? -1
+                      : cb == 0
+                        ? 0
+                        : cb < minStock
+                          ? 1
+                          : cb > dynamicMax
+                            ? 3
+                            : 2;
                 }
-                var json = {
-                  tracerCategoryId: this.state.planningUnitList.filter(
-                    (c) => c.planningUnitId == planningUnitId
-                  )[0].forecastingUnit.tracerCategory.id,
-                  planningUnit: pu.planningUnit,
-                  unit: plunit.filter(
-                    (c) => c.planningUnitId == planningUnitId
-                  )[0].unit,
-                  reorderFrequency: pu.reorderFrequencyInMonths,
-                  year: from,
-                  minMonthsOfStock:
-                    pu.planBasedOn == 1 ? pu.minMonthsOfStock : pu.minQty,
-                  jan: monthlydata[0],
-                  feb: monthlydata[1],
-                  mar: monthlydata[2],
-                  apr: monthlydata[3],
-                  may: monthlydata[4],
-                  jun: monthlydata[5],
-                  jul: monthlydata[6],
-                  aug: monthlydata[7],
-                  sep: monthlydata[8],
-                  oct: monthlydata[9],
-                  nov: monthlydata[10],
-                  dec: monthlydata[11],
-                  planBasedOn: pu.planBasedOn,
-                  janStock: monthlydata1[0],
-                  febStock: monthlydata1[1],
-                  marStock: monthlydata1[2],
-                  aprStock: monthlydata1[3],
-                  mayStock: monthlydata1[4],
-                  junStock: monthlydata1[5],
-                  julStock: monthlydata1[6],
-                  augStock: monthlydata1[7],
-                  sepStock: monthlydata1[8],
-                  octStock: monthlydata1[9],
-                  novStock: monthlydata1[10],
-                  decStock: monthlydata1[11],
-                  maxStock:
-                    totalMonths != 0
-                      ? Number(monthlydataTotal) / totalMonths
-                      : "",
+
+                const shipmentQty = useWps
+                  ? sp.shipmentTotalQtyWps
+                  : useWtbd
+                    ? sp.shipmentTotalQtyWtbdps
+                    : sp.shipmentTotalQty;
+                const expiredQty = useWps
+                  ? sp.expiredStockWps
+                  : useWtbd
+                    ? sp.expiredStockWtbdps
+                    : sp.expiredStock;
+
+                dataMap[sp.transDate] = {
+                  mos,
+                  closingBalance: cb,
+                  amc,
+                  stockStatusId: statusId,
+                  actualStock: sp.regionCountForStock == sp.regionCount,
+                  shipmentQty,
+                  expiredQty,
+                  planningUnitIds: null,
                 };
-                data.push(json);
-              }
+                details.push({
+                  month: sp.transDate,
+                  planningUnit: { id: Number(puId), label: puActualLabel },
+                  consumptionQty: sp.consumptionQty || 0,
+                  actualConsumption: sp.actualFlag,
+                  amc,
+                  closingBalance: cb,
+                  actualStock: sp.regionCountForStock == sp.regionCount,
+                  mos,
+                  stockStatusId: statusId,
+                  shipmentQty,
+                  expiredQty,
+                });
+              });
+
+              matrix.push({
+                planningUnit: { id: Number(puId), label: puActualLabel },
+                planBasedOn,
+                minMonthsOfStock: minMos,
+                reorderFrequency: reorderFreq,
+                maxStock: Math.round(maxStock),
+                minStock,
+                dataMap,
+                notes,
+              });
             });
-            let tracerCategoryValues = this.state.tracerCategoryValues;
-            for (let i = 0; i < data.length; i++) {
-              for (let j = 0; j < tracerCategoryValues.length; j++) {
-                if (tracerCategoryValues[j].value == data[i].tracerCategoryId) {
-                  data1.push(data[i]);
-                }
-              }
-            }
-            data1.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-              if (itemLabelA > itemLabelB) return 1;
-              if (itemLabelA < itemLabelB) return -1;
-              return a.year - b.year;
-            });
-            this.setState(
-              {
-                selData: data1,
-                message: "",
-                loading: false,
-              },
-              () => {
-                this.filterDataAsperstatus();
-              }
-            );
-          }.bind(this);
-        }.bind(this);
+
+            this.processApiData(matrix, details);
+          };
+        };
       } else {
         this.setState({ loading: true });
-        var inputjson = {
-          programId: programId,
-          versionId: versionId,
-          startDate: startDate,
+        const inputjson = {
+          programId,
+          versionId,
+          startDate,
           stopDate: endDate,
-          planningUnitIds: planningUnitIds,
-          includePlannedShipments: includePlannedShipments,
-          tracerCategoryIds: tracercategory,
+          planningUnitIds,
+          stockStatusConditions: this.state.stockStatusValues.map((e) =>
+            Number(e.value)
+          ),
+          removePlannedShipments: this.state.removePlannedShipments
+            ? 1
+            : this.state.removeTBDFundingSourceShipments
+              ? 2
+              : 0,
+          fundingSourceIds: [],
+          procurementAgentIds: [],
+          showByQty: this.state.showQuantity,
         };
         ProductService.getStockStatusMatrixData(inputjson)
           .then((response) => {
-            var listArray = response.data;
-            listArray.sort((a, b) => {
-              var itemLabelA = getLabelText(a.planningUnit.label, this.state.lang).toUpperCase();
-              var itemLabelB = getLabelText(b.planningUnit.label, this.state.lang).toUpperCase();
-              if (itemLabelA > itemLabelB) return 1;
-              if (itemLabelA < itemLabelB) return -1;
-              return a.year - b.year;
+            let { stockStatusMatrix = [], stockStatusDetails = [] } =
+              response.data;
+            stockStatusMatrix = stockStatusMatrix.filter(c => c.planningUnit.id != 0);
+            stockStatusMatrix = stockStatusMatrix.map((row) => {
+              if (row.planBasedOn !== 2) return row;
+
+              const inRangeEntries = Object.entries(row.dataMap || {}).filter(
+                ([dateKey]) => dateKey >= startDate && dateKey <= endDate
+              );
+              const avgMax = calcAverageMaxStock(
+                inRangeEntries.map(([, entry]) => entry),
+                row.minStock || 0,
+                row.reorderFrequency || 0
+              );
+
+              const updatedDataMap = {};
+              inRangeEntries.forEach(([dateKey, entry]) => {
+                const amc = entry.amc;
+                const cb = entry.closingBalance;
+                const minStock = row.minStock || 0;
+                const dynamicMax =
+                  amc != null
+                    ? minStock + (row.reorderFrequency || 0) * amc
+                    : avgMax;
+                const statusId =
+                  cb == null
+                    ? -1
+                    : cb == 0
+                      ? 0
+                      : cb < minStock
+                        ? 1
+                        : cb > dynamicMax
+                          ? 3
+                          : 2;
+                updatedDataMap[dateKey] = { ...entry, stockStatusId: statusId };
+              });
+
+              return {
+                ...row,
+                maxStock: Math.round(avgMax),
+                dataMap: updatedDataMap,
+              };
             });
-            this.setState(
-              {
-                selData: listArray,
-                message: "",
-                loading: false,
-              },
-              () => {
-                this.filterDataAsperstatus();
-              }
-            );
+
+            const matrixById = {};
+            stockStatusMatrix.forEach((r) => {
+              matrixById[r.planningUnit.id] = r;
+            });
+            stockStatusDetails = stockStatusDetails.map((detail) => {
+              const matrixRow = matrixById[detail.planningUnit.id];
+              if (!matrixRow || matrixRow.planBasedOn !== 2) return detail;
+              const entry = (matrixRow.dataMap || {})[detail.month];
+              if (!entry) return detail;
+              return { ...detail, stockStatusId: entry.stockStatusId };
+            });
+
+            this.processApiData(stockStatusMatrix, stockStatusDetails);
           })
           .catch((error) => {
             this.setState({
-              selData: [],
-              data: [],
+              filteredMatrix: [],
+              filteredDetails: [],
               loading: false,
             });
-            if (error.message === "Network Error") {
+            if (error.message == "Network Error") {
               this.setState({
                 message: API_URL.includes("uat")
                   ? i18n.t("static.common.uatNetworkErrorMessage")
                   : API_URL.includes("demo")
                     ? i18n.t("static.common.demoNetworkErrorMessage")
                     : i18n.t("static.common.prodNetworkErrorMessage"),
-                loading: false,
               });
             } else {
-              switch (error.response ? error.response.status : "") {
+              switch (error.response?.status) {
                 case 401:
                   this.props.history.push(
                     `/login/static.message.sessionExpired`
                   );
                   break;
-                case 409:
-                  this.setState({
-                    message: i18n.t('static.common.accessDenied'),
-                    loading: false,
-                    color: "#BA0C2F",
-                  });
-                  break;
                 case 403:
                   this.props.history.push(`/accessDenied`);
                   break;
-                case 500:
-                case 404:
-                case 406:
+                case 409:
                   this.setState({
-                    message: i18n.t(error.response.data.messageCode, {
-                      entityname: i18n.t("static.dashboard.productcategory"),
-                    }),
-                    loading: false,
-                  });
-                  break;
-                case 412:
-                  this.setState({
-                    message: i18n.t(error.response.data.messageCode, {
-                      entityname: i18n.t("static.dashboard.productcategory"),
-                    }),
-                    loading: false,
+                    message: i18n.t("static.common.accessDenied"),
                   });
                   break;
                 default:
-                  this.setState({
-                    message: "static.unkownError",
-                    loading: false,
-                  });
-                  break;
+                  this.setState({ message: "static.unkownError" });
               }
             }
           });
@@ -788,2306 +4068,1048 @@ export default class StockStatusMatrix extends React.Component {
     } else if (programId == 0) {
       this.setState({
         message: i18n.t("static.common.selectProgram"),
-        selData: [],
-        data: [],
-        tracerCategories: [],
-        tracerCategoryValues: [],
-        tracerCategoryLabels: [],
-        planningUnits: [],
-        planningUnitValues: [],
-        planningUnitLabels: [],
+        filteredMatrix: [],
+        filteredDetails: [],
+        loading: false,
       });
     } else if (versionId == 0) {
       this.setState({
         message: i18n.t("static.program.validversion"),
-        selData: [],
-        data: [],
-        tracerCategories: [],
-        tracerCategoryValues: [],
-        tracerCategoryLabels: [],
-        planningUnits: [],
-        planningUnitValues: [],
-        planningUnitLabels: [],
+        filteredMatrix: [],
+        filteredDetails: [],
+        loading: false,
       });
-    } else if (this.state.tracerCategoryValues.length == 0) {
-      this.setState({
-        message: i18n.t("static.tracercategory.tracercategoryText"),
-        selData: [],
-        data: [],
-        planningUnits: [],
-        planningUnitValues: [],
-        planningUnitLabels: [],
-      });
-    } else if (this.state.planningUnitValues.length == 0) {
+    } else if (planningUnitIds.length == 0) {
       this.setState({
         message: i18n.t("static.procurementUnit.validPlanningUnitText"),
-        selData: [],
-        data: [],
+        filteredMatrix: [],
+        filteredDetails: [],
+        loading: false,
+      });
+    } else if (this.state.stockStatusValues.length == 0) {
+      this.setState({
+        message: i18n.t("static.stockStatusMatrix.selectStockStatus"),
+        filteredMatrix: [],
+        filteredDetails: [],
+        loading: false,
       });
     }
   }
-  /**
-   * Retrieves the list of programs.
-   */
+
+  // ─── Program / version loading ────────────────────────────────────────────────
+
   getPrograms = () => {
-    if (localStorage.getItem("sessionType") === 'Online') {
-      let realmId = AuthenticationService.getRealmId();
-      DropdownService.getSPProgramBasedOnRealmId(realmId)
-        .then((response) => {
-          var proList = [];
-          for (var i = 0; i < response.data.length; i++) {
-            var programJson = {
-              programId: response.data[i].id,
-              label: response.data[i].label,
-              programCode: response.data[i].code,
-            };
-            proList[i] = programJson;
-          }
-          this.setState(
-            {
-              programs: proList,
-              loading: false,
-            },
-            () => {
-              this.consolidatedProgramList();
-            }
+    if (localStorage.getItem("sessionType") == "Online") {
+      DropdownService.getSPProgramBasedOnRealmId(
+        AuthenticationService.getRealmId()
+      )
+        .then((res) => {
+          const proList = res.data.map((p) => ({
+            programId: p.id,
+            label: p.label,
+            programCode: p.code,
+          }));
+          this.setState({ programs: proList, loading: false }, () =>
+            this.consolidatedProgramList()
           );
         })
-        .catch((error) => {
-          this.setState(
-            {
-              programs: [],
-              loading: false,
-            },
-            () => {
-              this.consolidatedProgramList();
-            }
-          );
-          if (error.message === "Network Error") {
-            this.setState({
-              message: API_URL.includes("uat")
-                ? i18n.t("static.common.uatNetworkErrorMessage")
-                : API_URL.includes("demo")
-                  ? i18n.t("static.common.demoNetworkErrorMessage")
-                  : i18n.t("static.common.prodNetworkErrorMessage"),
-              loading: false,
-            });
-          } else {
-            switch (error.response ? error.response.status : "") {
-              case 401:
-                this.props.history.push(`/login/static.message.sessionExpired`);
-                break;
-              case 409:
-                this.setState({
-                  message: i18n.t('static.common.accessDenied'),
-                  loading: false,
-                  color: "#BA0C2F",
-                });
-                break;
-              case 403:
-                this.props.history.push(`/accessDenied`);
-                break;
-              case 500:
-              case 404:
-              case 406:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              case 412:
-                this.setState({
-                  message: i18n.t(error.response.data.messageCode, {
-                    entityname: i18n.t("static.dashboard.program"),
-                  }),
-                  loading: false,
-                });
-                break;
-              default:
-                this.setState({
-                  message: "static.unkownError",
-                  loading: false,
-                });
-                break;
-            }
-          }
-        });
+        .catch(() =>
+          this.setState({ programs: [], loading: false }, () =>
+            this.consolidatedProgramList()
+          )
+        );
     } else {
       this.setState({ loading: false });
       this.consolidatedProgramList();
     }
   };
-  /**
-   * Consolidates the list of programs obtained from Server and local programs.
-   */
+
   consolidatedProgramList = () => {
-    const { programs } = this.state;
-    var proList = programs;
-    var db1;
+    let proList = [...this.state.programs];
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(["programData"], "readwrite");
-      var program = transaction.objectStore("programData");
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-      };
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(
+    const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    req.onsuccess = (e) => {
+      const db = e.target.result;
+      const get = db
+        .transaction(["programData"], "readwrite")
+        .objectStore("programData")
+        .getAll();
+      get.onsuccess = () => {
+        const userId = CryptoJS.AES.decrypt(
           localStorage.getItem("curUser"),
           SECRET_KEY
-        );
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (myResult[i].userId == userId) {
-            var databytes = CryptoJS.AES.decrypt(
-              myResult[i].programData.generalData,
-              SECRET_KEY
+        ).toString(CryptoJS.enc.Utf8);
+        get.result.forEach((r) => {
+          if (r.userId == userId) {
+            const pd = JSON.parse(
+              CryptoJS.AES.decrypt(
+                r.programData.generalData,
+                SECRET_KEY
+              ).toString(CryptoJS.enc.Utf8)
             );
-            var programData = JSON.parse(databytes.toString(CryptoJS.enc.Utf8));
-            var f = 0;
-            for (var k = 0; k < this.state.programs.length; k++) {
-              if (this.state.programs[k].programId == programData.programId) {
-                f = 1;
-              }
-            }
-            if (f == 0) {
-              proList.push(programData);
-            }
+            if (!proList.find((p) => p.programId == pd.programId))
+              proList.push(pd);
           }
-        }
-        if (
-          localStorage.getItem("sesProgramIdReport") != "" &&
-          localStorage.getItem("sesProgramIdReport") != undefined
-        ) {
-          this.setState(
-            {
-              programs: proList.sort(function (a, b) {
-                a = a.programCode.toLowerCase();
-                b = b.programCode.toLowerCase();
-                return a < b ? -1 : a > b ? 1 : 0;
-              }),
-              programId: localStorage.getItem("sesProgramIdReport"),
-            },
-            () => {
-              this.filterVersion();
-              this.filterData();
-            }
-          );
-        } else {
-          this.setState({
-            programs: proList.sort(function (a, b) {
-              a = a.programCode.toLowerCase();
-              b = b.programCode.toLowerCase();
-              return a < b ? -1 : a > b ? 1 : 0;
-            }),
+        });
+        const sorted = proList.sort((a, b) =>
+          a.programCode.toLowerCase() > b.programCode.toLowerCase() ? 1 : -1
+        );
+        const sesId = localStorage.getItem("sesProgramIdReport");
+        if (sesId) {
+          this.setState({ programs: sorted, programId: sesId }, () => {
+            this.filterVersion();
+            this.filterData();
           });
-        }
-      }.bind(this);
-    }.bind(this);
-  };
-  /**
-   * Filters versions based on the selected program ID and updates the state accordingly.
-   * Sets the selected program ID in local storage.
-   * Fetches version list for the selected program and updates the state with the fetched versions.
-   * Handles error cases including network errors, session expiry, access denial, and other status codes.
-   */
-  filterVersion = () => {
-    let programId = this.state.programId;
-    if (programId != 0) {
-      localStorage.setItem("sesProgramIdReport", programId);
-      const program = this.state.programs.filter(
-        (c) => c.programId == programId
-      );
-      if (program.length == 1) {
-        if (localStorage.getItem("sessionType") === 'Online') {
-          this.setState(
-            {
-              versions: [],
-            },
-            () => {
-              DropdownService.getVersionListForSPProgram(
-                programId
-              )
-                .then((response) => {
-                  this.setState(
-                    {
-                      versions: [],
-                    },
-                    () => {
-                      this.setState(
-                        {
-                          versions: response.data,
-                        },
-                        () => {
-                          this.consolidatedVersionList(programId);
-                        }
-                      );
-                    }
-                  );
-                })
-                .catch((error) => {
-                  this.setState({
-                    programs: [],
-                    loading: false,
-                  });
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: API_URL.includes("uat")
-                        ? i18n.t("static.common.uatNetworkErrorMessage")
-                        : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
-                      loading: false,
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-                      case 401:
-                        this.props.history.push(
-                          `/login/static.message.sessionExpired`
-                        );
-                        break;
-                      case 409:
-                        this.setState({
-                          message: i18n.t('static.common.accessDenied'),
-                          loading: false,
-                          color: "#BA0C2F",
-                        });
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`);
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t("static.dashboard.program"),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t("static.dashboard.program"),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: "static.unkownError",
-                          loading: false,
-                        });
-                        break;
-                    }
-                  }
-                });
-            }
-          );
         } else {
-          this.setState(
-            {
-              versions: [],
-            },
-            () => {
-              this.consolidatedVersionList(programId);
-            }
-          );
+          this.setState({ programs: sorted });
         }
-      } else {
-        this.setState({
-          versions: [],
-        });
-      }
-    } else {
-      this.setState({
-        versions: [],
+      };
+    };
+  };
+
+  filterVersion = () => {
+    const programId = this.state.programId;
+    if (!programId || programId == 0) {
+      this.setState({ versions: [] });
+      return;
+    }
+    localStorage.setItem("sesProgramIdReport", programId);
+    if (!this.state.programs.find((p) => p.programId == programId)) {
+      this.setState({ versions: [] });
+      return;
+    }
+    if (localStorage.getItem("sessionType") == "Online") {
+      this.setState({ versions: [] }, () => {
+        DropdownService.getVersionListForSPProgram(programId)
+          .then((res) =>
+            this.setState({ versions: res.data }, () =>
+              this.consolidatedVersionList(programId)
+            )
+          )
+          .catch(() => this.setState({ versions: [], loading: false }));
       });
+    } else {
+      this.setState({ versions: [] }, () =>
+        this.consolidatedVersionList(programId)
+      );
     }
   };
-  /**
-   * Retrieves data from IndexedDB and combines it with fetched versions to create a consolidated version list.
-   * Filters out duplicate versions and reverses the list.
-   * Sets the version list in the state and triggers fetching of planning units.
-   * Handles cases where a version is selected from local storage or the default version is selected.
-   * @param {number} programId - The ID of the selected program
-   */
+
   consolidatedVersionList = (programId) => {
-    const { versions } = this.state;
-    var verList = versions;
-    var db1;
+    let verList = [...this.state.versions];
     getDatabase();
-    var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
-    openRequest.onsuccess = function (e) {
-      db1 = e.target.result;
-      var transaction = db1.transaction(["programData"], "readwrite");
-      var program = transaction.objectStore("programData");
-      var getRequest = program.getAll();
-      getRequest.onerror = function (event) {
-      };
-      getRequest.onsuccess = function (event) {
-        var myResult = [];
-        myResult = getRequest.result;
-        var userBytes = CryptoJS.AES.decrypt(
+    const req = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+    req.onsuccess = (e) => {
+      const db = e.target.result;
+      const get = db
+        .transaction(["programData"], "readwrite")
+        .objectStore("programData")
+        .getAll();
+      get.onsuccess = () => {
+        const userId = CryptoJS.AES.decrypt(
           localStorage.getItem("curUser"),
           SECRET_KEY
-        );
-        var userId = userBytes.toString(CryptoJS.enc.Utf8);
-        for (var i = 0; i < myResult.length; i++) {
-          if (
-            myResult[i].userId == userId &&
-            myResult[i].programId == programId
-          ) {
-            var databytes = CryptoJS.AES.decrypt(
-              myResult[i].programData.generalData,
-              SECRET_KEY
+        ).toString(CryptoJS.enc.Utf8);
+        get.result.forEach((r) => {
+          if (r.userId == userId && r.programId == programId) {
+            const pd = JSON.parse(
+              CryptoJS.AES.decrypt(
+                r.programData.generalData,
+                SECRET_KEY
+              ).toString(CryptoJS.enc.Utf8)
             );
-            var programData = databytes.toString(CryptoJS.enc.Utf8);
-            var version = JSON.parse(programData).currentVersion;
-            version.versionId = `${version.versionId} (Local)`;
-            version.cutOffDate = JSON.parse(programData).cutOffDate != undefined && JSON.parse(programData).cutOffDate != null && JSON.parse(programData).cutOffDate != "" ? JSON.parse(programData).cutOffDate : ""
-            verList.push(version);
+            const v = pd.currentVersion;
+            if (v) {
+              v.versionId = `${v.versionId} (Local)`;
+              v.cutOffDate = pd.cutOffDate || "";
+              verList.push(v);
+            }
           }
-        }
-        let versionList = verList.filter(function (x, i, a) {
-          return a.indexOf(x) === i;
         });
-        versionList.reverse();
-        if (
-          localStorage.getItem("sesVersionIdReport") != "" &&
-          localStorage.getItem("sesVersionIdReport") != undefined
-        ) {
-          let versionVar = versionList.filter(
-            (c) => c.versionId == localStorage.getItem("sesVersionIdReport")
-          );
-          if (versionVar != "" && versionVar != undefined) {
-            this.setState(
-              {
-                versions: versionList,
-                versionId: localStorage.getItem("sesVersionIdReport"),
-              },
-              () => {
-                this.getTracerCategoryList();
-              }
-            );
-          } else {
-            this.setState(
-              {
-                versions: versionList,
-                versionId: versionList[0].versionId,
-              },
-              () => {
-                this.getTracerCategoryList();
-              }
-            );
-          }
-        } else {
-          this.setState(
-            {
-              versions: versionList,
-              versionId: versionList[0].versionId,
-            },
-            () => {
-              this.getTracerCategoryList();
-            }
-          );
-        }
-      }.bind(this);
-    }.bind(this);
+        const unique = [
+          ...new Map(verList.map((v) => [v.versionId, v])).values(),
+        ];
+        const versionList = unique.sort((a, b) => {
+          const aLocal = String(a.versionId).includes("Local");
+          const bLocal = String(b.versionId).includes("Local");
+          if (aLocal && !bLocal) return -1;
+          if (!aLocal && bLocal) return 1;
+          const aNum =
+            parseInt(String(a.versionId).replace(/[^0-9]/g, ""), 10) || 0;
+          const bNum =
+            parseInt(String(b.versionId).replace(/[^0-9]/g, ""), 10) || 0;
+          return bNum - aNum;
+        });
+        const sesVer = localStorage.getItem("sesVersionIdReport");
+        const matched =
+          sesVer && versionList.find((v) => v.versionId == sesVer);
+        this.setState(
+          {
+            versions: versionList,
+            versionId: matched ? sesVer : versionList[0]?.versionId || "",
+          },
+          () => this.getPlanningUnit()
+        );
+      };
+    };
   };
-  /**
-   * Handles the change event for tracer categories.
-   * @param {Array} tracerCategoryIds - An array containing the selected tracer category IDs.
-   */
-  handleTracerCategoryChange = (tracerCategoryIds) => {
-    tracerCategoryIds = tracerCategoryIds.sort(function (a, b) {
-      return parseInt(a.value) - parseInt(b.value);
-    });
-    this.setState(
-      {
-        tracerCategoryValues: tracerCategoryIds.map((ele) => ele),
-        tracerCategoryLabels: tracerCategoryIds.map((ele) => ele.label),
-      },
-      () => {
-        this.getPlanningUnit();
-        this.filterData();
-      }
-    );
-  };
-  /**
-   * Retrieves the list of planning units for a selected program and selected version.
-   */
-  getPlanningUnit = () => {
-    let programId = document.getElementById("programId").value;
-    let versionId = document.getElementById("versionId").value;
-    let tracercategory =
-      this.state.tracerCategoryValues.length ==
-        this.state.tracerCategories.length
-        ? []
-        : this.state.tracerCategoryValues.map((ele) => ele.value.toString());
-    if (this.state.tracerCategoryValues.length > 0) {
-      this.setState(
-        {
-          planningUnits: [],
-          planningUnitValues: [],
-          planningUnitLabels: [],
-        },
-        () => {
-          if (versionId == 0) {
-            this.setState({
-              message: i18n.t("static.program.validversion"),
-              selData: [],
-              data: [],
-            });
-          } else {
-            localStorage.setItem("sesVersionIdReport", versionId);
-            if (versionId.includes("Local")) {
-              var db1;
-              getDatabase();
-              var openRequest = indexedDB.open(
-                INDEXED_DB_NAME,
-                INDEXED_DB_VERSION
-              );
-              openRequest.onsuccess = function (e) {
-                db1 = e.target.result;
-                var planningunitTransaction = db1.transaction(
-                  ["programPlanningUnit"],
-                  "readwrite"
-                );
-                var planningunitOs = planningunitTransaction.objectStore(
-                  "programPlanningUnit"
-                );
-                var planningunitRequest = planningunitOs.getAll();
-                planningunitRequest.onerror = function (event) {
-                };
-                planningunitRequest.onsuccess = function (e) {
-                  var myResult = [];
-                  myResult = planningunitRequest.result;
-                  var programId = document
-                    .getElementById("programId")
-                    .value.split("_")[0];
-                  var proList = [];
-                  let incrmental = 0;
-                  for (var i = 0; i < myResult.length; i++) {
-                    if (
-                      myResult[i].program.id == programId &&
-                      myResult[i].active == true
-                    ) {
-                      let tempTCId = this.state.planningUnitList.filter(
-                        (c) => c.planningUnitId == myResult[i].planningUnit.id
-                      )[0].forecastingUnit.tracerCategory.id;
-                      let tempPUObj = myResult[i];
-                      tempPUObj["tracerCategoryId"] = tempTCId;
-                      proList[incrmental] = tempPUObj;
-                      incrmental = incrmental + 1;
-                    }
-                  }
-                  let tracerCategoryValues =
-                    this.state.tracerCategoryValues.map((item, i) => {
-                      return { tracerCategoryId: item.value };
-                    }, this);
-                  let data1 = [];
-                  for (let i = 0; i < proList.length; i++) {
-                    for (let j = 0; j < tracerCategoryValues.length; j++) {
-                      if (
-                        tracerCategoryValues[j].tracerCategoryId ==
-                        proList[i].tracerCategoryId
-                      ) {
-                        data1.push(proList[i]);
-                      }
-                    }
-                  }
-                  var lang = this.state.lang;
-                  this.setState(
-                    {
-                      planningUnits: data1.sort(function (a, b) {
-                        a = getLabelText(
-                          a.planningUnit.label,
-                          lang
-                        ).toLowerCase();
-                        b = getLabelText(
-                          b.planningUnit.label,
-                          lang
-                        ).toLowerCase();
-                        return a < b ? -1 : a > b ? 1 : 0;
-                      }),
-                      planningUnitValues: data1.map((item, i) => {
-                        return {
-                          label: getLabelText(
-                            item.planningUnit.label,
-                            this.state.lang
-                          ),
-                          value: item.planningUnit.id,
-                        };
-                      }, this),
-                      planningUnitLabels: data1.map((item, i) => {
-                        return getLabelText(
-                          item.planningUnit.label,
-                          this.state.lang
-                        );
-                      }, this),
-                      message: "",
-                    },
-                    () => {
-                      this.filterData();
-                    }
-                  );
-                }.bind(this);
-              }.bind(this);
-            } else {
-              var json = {
-                tracerCategoryIds: tracercategory,
-                programIds: [programId],
-              };
-              DropdownService.getProgramPlanningUnitDropdownList(json)
-                .then((response) => {
-                  var listArray = response.data;
-                  for (var i = 0; i < listArray.length; i++) {
-                    var programJson = {
-                      id: listArray[i].id,
-                      label: listArray[i].label,
-                    };
-                    listArray[i].planningUnit = programJson;
-                  }
-                  listArray.sort((a, b) => {
-                    var itemLabelA = getLabelText(
-                      a.planningUnit.label,
-                      this.state.lang
-                    ).toUpperCase();
-                    var itemLabelB = getLabelText(
-                      b.planningUnit.label,
-                      this.state.lang
-                    ).toUpperCase();
-                    return itemLabelA > itemLabelB ? 1 : -1;
-                  });
-                  this.setState(
-                    {
-                      planningUnits: listArray,
-                      planningUnitValues: response.data.map((item, i) => {
-                        return {
-                          label: getLabelText(
-                            item.planningUnit.label,
-                            this.state.lang
-                          ),
-                          value: item.planningUnit.id,
-                        };
-                      }, this),
-                      planningUnitLabels: response.data.map((item, i) => {
-                        return getLabelText(
-                          item.planningUnit.label,
-                          this.state.lang
-                        );
-                      }, this),
-                      message: "",
-                    },
-                    () => {
-                      this.filterData();
-                    }
-                  );
-                })
-                .catch((error) => {
-                  this.setState({
-                    planningUnits: [],
-                  });
-                  if (error.message === "Network Error") {
-                    this.setState({
-                      message: API_URL.includes("uat")
-                        ? i18n.t("static.common.uatNetworkErrorMessage")
-                        : API_URL.includes("demo")
-                          ? i18n.t("static.common.demoNetworkErrorMessage")
-                          : i18n.t("static.common.prodNetworkErrorMessage"),
-                      loading: false,
-                    });
-                  } else {
-                    switch (error.response ? error.response.status : "") {
-                      case 401:
-                        this.props.history.push(
-                          `/login/static.message.sessionExpired`
-                        );
-                        break;
-                      case 409:
-                        this.setState({
-                          message: i18n.t('static.common.accessDenied'),
-                          loading: false,
-                          color: "#BA0C2F",
-                        });
-                        break;
-                      case 403:
-                        this.props.history.push(`/accessDenied`);
-                        break;
-                      case 500:
-                      case 404:
-                      case 406:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t(
-                              "static.planningunit.planningunit"
-                            ),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      case 412:
-                        this.setState({
-                          message: i18n.t(error.response.data.messageCode, {
-                            entityname: i18n.t(
-                              "static.planningunit.planningunit"
-                            ),
-                          }),
-                          loading: false,
-                        });
-                        break;
-                      default:
-                        this.setState({
-                          message: "static.unkownError",
-                          loading: false,
-                        });
-                        break;
-                    }
-                  }
-                });
-            }
-          }
-        }
-      );
-    } else {
-      this.setState({
-        message: i18n.t("static.tracercategory.tracercategoryText"),
-        selData: [],
-        data: [],
-      });
-    }
-  };
-  /**
-   * Calls the get programs function on page load
-   */
+
   componentDidMount() {
     this.getPrograms();
   }
-  /**
-   * Sets the selected program ID selected by the user.
-   * @param {object} event - The event object containing information about the program selection.
-   */
+
   setProgramId(event) {
-    this.setState(
-      {
-        programId: event.target.value,
-        versionId: "",
-      },
-      () => {
-        localStorage.setItem("sesVersionIdReport", "");
-        this.filterVersion();
-        this.filterData();
-      }
-    );
-  }
-  /**
-   * Sets the version ID and updates the tracer category list.
-   * @param {Object} event - The event object containing the version ID value.
-   */
-  setVersionId(event) {
-    if (this.state.versionId != "" || this.state.versionId != undefined) {
-      this.setState(
-        {
-          versionId: event.target.value,
-        },
-        () => {
-          localStorage.setItem("sesVersionIdReport", this.state.versionId);
-          this.getTracerCategoryList();
-        }
-      );
-    } else {
-      this.setState(
-        {
-          versionId: event.target.value,
-        },
-        () => {
-          this.getTracerCategoryList();
-        }
-      );
-    }
-  }
-  /**
-   * Exports the data to a CSV file.
-   * @param {array} columns - The columns to be exported.
-   */
-  exportCSV(columns) {
-    var csvRow = [];
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.report.dateRange") +
-        " : " +
-        (this.state.startYear + " ~ " + this.state.endYear)
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.program.program") +
-        " : " +
-        document.getElementById("programId").selectedOptions[0].text
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
-    this.state.planningUnitLabels.map((ele) =>
-      csvRow.push(
-        '"' +
-        (
-          i18n.t("static.planningunit.planningunit") +
-          " : " +
-          ele.toString()
-        ).replaceAll(" ", "%20") +
-        '"'
-      )
-    );
-    csvRow.push("");
-    this.state.tracerCategoryLabels.map((ele) =>
-      csvRow.push(
-        '"' +
-        i18n
-          .t("static.tracercategory.tracercategory")
-          .replaceAll(" ", "%20") +
-        " : " +
-        ele.toString().replaceAll(" ", "%20") +
-        '"'
-      )
-    );
-    csvRow.push("");
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.program.isincludeplannedshipment") +
-        " : " +
-        document.getElementById("includePlanningShipments").selectedOptions[0]
-          .text
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
-    csvRow.push(
-      '"' +
-      (
-        i18n.t("static.dashboard.stockstatusmain") +
-        " : " +
-        document.getElementById("stockStatusId").selectedOptions[0].text
-      ).replaceAll(" ", "%20") +
-      '"'
-    );
-    csvRow.push("");
-    csvRow.push("");
-    csvRow.push("");
-    csvRow.push(
-      '"' + i18n.t("static.common.youdatastart").replaceAll(" ", "%20") + '"'
-    );
-    csvRow.push("");
-    const headers = [];
-    columns.map((item, idx) => {
-      headers[idx] = item.text.replaceAll(" ", "%20").replaceAll("#", "%23");
+    this.setState({ programId: event.target.value, versionId: "" }, () => {
+      localStorage.setItem("sesVersionIdReport", "");
+      this.filterVersion();
+      this.filterData();
     });
-    var A = [addDoubleQuoteToRowContent(headers)];
-    this.state.data.map((ele) =>
-      A.push(
-        addDoubleQuoteToRowContent([
-          ele.planningUnit.id,
-          getLabelText(ele.planningUnit.label, this.state.lang)
-            .replaceAll(",", " ")
-            .replaceAll(" ", "%20"),
-          ele.planBasedOn == 1
-            ? i18n.t("static.report.mos")
-            : i18n.t("static.report.qty"),
-          ele.minMonthsOfStock,
-          ele.planBasedOn == 1
-            ? Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
-            : roundAMC(ele.maxStock),
-          ele.year,
-          ele.planBasedOn == 1
-            ? ele.jan != null
-              ? isNaN(ele.jan)
-                ? ""
-                : roundAMC(ele.jan)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.janStock != null
-              ? isNaN(ele.janStock)
-                ? ""
-                : roundAMC(ele.janStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.feb != null
-              ? isNaN(ele.feb)
-                ? ""
-                : roundAMC(ele.feb)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.febStock != null
-              ? isNaN(ele.febStock)
-                ? ""
-                : roundAMC(ele.febStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.mar != null
-              ? isNaN(ele.mar)
-                ? ""
-                : roundAMC(ele.mar)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.marStock != null
-              ? isNaN(ele.marStock)
-                ? ""
-                : roundAMC(ele.marStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.apr != null
-              ? isNaN(ele.apr)
-                ? ""
-                : roundAMC(ele.apr)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.aprStock != null
-              ? isNaN(ele.aprStock)
-                ? ""
-                : roundAMC(ele.aprStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.may != null
-              ? isNaN(ele.may)
-                ? ""
-                : roundAMC(ele.may)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.mayStock != null
-              ? isNaN(ele.mayStock)
-                ? ""
-                : roundAMC(ele.mayStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.jun != null
-              ? isNaN(ele.jun)
-                ? ""
-                : roundAMC(ele.jun)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.junStock != null
-              ? isNaN(ele.junStock)
-                ? ""
-                : roundAMC(ele.junStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.jul != null
-              ? isNaN(ele.jul)
-                ? ""
-                : roundAMC(ele.jul)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.julStock != null
-              ? isNaN(ele.julStock)
-                ? ""
-                : roundAMC(ele.julStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.aug != null
-              ? isNaN(ele.aug)
-                ? ""
-                : roundAMC(ele.aug)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.augStock != null
-              ? isNaN(ele.augStock)
-                ? ""
-                : roundAMC(ele.augStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.sep != null
-              ? isNaN(ele.sep)
-                ? ""
-                : roundAMC(ele.sep)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.sepStock != null
-              ? isNaN(ele.sepStock)
-                ? ""
-                : roundAMC(ele.sepStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.oct != null
-              ? isNaN(ele.oct)
-                ? ""
-                : roundAMC(ele.oct)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.octStock != null
-              ? isNaN(ele.octStock)
-                ? ""
-                : roundAMC(ele.octStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.nov != null
-              ? isNaN(ele.nov)
-                ? ""
-                : roundAMC(ele.nov)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.novStock != null
-              ? isNaN(ele.novStock)
-                ? ""
-                : roundAMC(ele.novStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-          ele.planBasedOn == 1
-            ? ele.dec != null
-              ? isNaN(ele.dec)
-                ? ""
-                : roundAMC(ele.dec)
-              : i18n.t("static.supplyPlanFormula.na")
-            : ele.decStock != null
-              ? isNaN(ele.decStock)
-                ? ""
-                : roundAMC(ele.decStock)
-              : i18n.t("static.supplyPlanFormula.na"),
-        ])
-      )
-    );
-    for (var i = 0; i < A.length; i++) {
-      csvRow.push(A[i].join(","));
-    }
-    var csvString = csvRow.join("%0A");
-    var a = document.createElement("a");
-    a.href = "data:attachment/csv," + csvString;
-    a.target = "_Blank";
-    a.download =
-      i18n.t("static.dashboard.stockstatusmatrix") +
-      "-" +
-      this.state.startYear +
-      "~" +
-      this.state.endYear +
-      ".csv";
-    document.body.appendChild(a);
-    a.click();
   }
-  /**
-   * Exports the data to a PDF file.
-   * @param {array} columns - The columns to be exported.
-   */
-  exportPDF = (columns) => {
-    const addFooters = (doc) => {
-      const pageCount = doc.internal.getNumberOfPages();
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(6);
-      for (var i = 1; i <= pageCount; i++) {
-        doc.setPage(i);
-        doc.setPage(i);
-        doc.text(
-          "Page " + String(i) + " of " + String(pageCount),
-          doc.internal.pageSize.width / 9,
-          doc.internal.pageSize.height - 30,
-          {
-            align: "center",
-          }
-        );
-        doc.text(
-          "Copyright © 2020 " + i18n.t("static.footer"),
-          (doc.internal.pageSize.width * 6) / 7,
-          doc.internal.pageSize.height - 30,
-          {
-            align: "center",
-          }
-        );
-      }
-    };
-    const addHeaders = (doc) => {
-      const pageCount = doc.internal.getNumberOfPages();
-      for (var i = 1; i <= pageCount; i++) {
-        doc.setFontSize(12);
-        doc.setFont("helvetica", "bold");
-        doc.setPage(i);
-        doc.addImage(LOGO, "png", 0, 10, 180, 50, "FAST");
-        doc.setTextColor("#002f6c");
-        doc.text(
-          i18n.t("static.dashboard.stockstatusmatrix"),
-          doc.internal.pageSize.width / 2,
-          60,
-          {
-            align: "center",
-          }
-        );
-        if (i == 1) {
-          doc.setFontSize(8);
-          doc.setFont("helvetica", "normal");
-          doc.text(
-            i18n.t("static.report.dateRange") +
-            " : " +
-            this.state.startYear +
-            " ~ " +
-            this.state.endYear,
-            doc.internal.pageSize.width / 8,
-            90,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.program.program") +
-            " : " +
-            document.getElementById("programId").selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            110,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.program.isincludeplannedshipment") +
-            " : " +
-            document.getElementById("includePlanningShipments")
-              .selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            130,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t("static.dashboard.stockstatusmain") +
-            " : " +
-            document.getElementById("stockStatusId").selectedOptions[0].text,
-            doc.internal.pageSize.width / 8,
-            150,
-            {
-              align: "left",
-            }
-          );
-          var planningText = doc.splitTextToSize(
-            i18n.t("static.tracercategory.tracercategory") +
-            " : " +
-            this.state.tracerCategoryLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(doc.internal.pageSize.width / 8, 170, planningText);
-          var planningText = doc.splitTextToSize(
-            i18n.t("static.planningunit.planningunit") +
-            " : " +
-            this.state.planningUnitLabels.join("; "),
-            (doc.internal.pageSize.width * 3) / 4
-          );
-          doc.text(
-            doc.internal.pageSize.width / 8,
-            180 + this.state.tracerCategoryValues.length * 1.2,
-            planningText
-          );
-          doc.setDrawColor(0);
-          doc.setFillColor(186, 12, 47);
-          doc.rect(
-            doc.internal.pageSize.width / 8,
-            200 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            15,
-            12,
-            "F"
-          );
-          doc.setFillColor(244, 133, 33);
-          doc.rect(
-            doc.internal.pageSize.width / 8 + 100,
-            200 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            15,
-            12,
-            "F"
-          );
-          doc.setFillColor(17, 139, 112);
-          doc.rect(
-            doc.internal.pageSize.width / 8 + 200,
-            200 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            15,
-            12,
-            "F"
-          );
-          doc.setFillColor(237, 185, 68);
-          doc.rect(
-            doc.internal.pageSize.width / 8 + 300,
-            200 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            15,
-            12,
-            "F"
-          );
-          doc.setFillColor(207, 205, 201);
-          doc.rect(
-            doc.internal.pageSize.width / 8 + 400,
-            200 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            15,
-            12,
-            "F"
-          );
-          doc.text(
-            i18n.t(legendcolor[0].text),
-            doc.internal.pageSize.width / 8 + 20,
-            210 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t(legendcolor[1].text),
-            doc.internal.pageSize.width / 8 + 120,
-            210 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t(legendcolor[2].text),
-            doc.internal.pageSize.width / 8 + 220,
-            210 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t(legendcolor[3].text),
-            doc.internal.pageSize.width / 8 + 320,
-            210 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            {
-              align: "left",
-            }
-          );
-          doc.text(
-            i18n.t(legendcolor[4].text),
-            doc.internal.pageSize.width / 8 + 420,
-            210 +
-            this.state.planningUnitValues.length * 3 +
-            this.state.tracerCategoryValues.length * 1.2,
-            {
-              align: "left",
-            }
-          );
-        }
-      }
-    };
-    const unit = "pt";
-    const size = "A4";
-    const orientation = "landscape";
-    const marginLeft = 10;
-    const doc = new jsPDF(orientation, unit, size);
-    doc.setFontSize(8);
-    let header = [];
-    header = [
-      [
-        {
-          content: i18n.t("static.report.qatPID"),
-          styles: { halign: "center" },
-        },
-        {
-          content: i18n.t("static.planningunit.planningunit"),
-          styles: { halign: "center" },
-        },
-        {
-          content: i18n.t("static.stockStatus.plannedBy"),
-          styles: { halign: "center" },
-        },
-        {
-          content: i18n.t("static.report.minMosOrQty"),
-          styles: { halign: "center" },
-        },
-        {
-          content: i18n.t("static.report.maxMosOrQty"),
-          styles: { halign: "center" },
-        },
-        { content: i18n.t("static.common.year"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.jan"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.feb"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.mar"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.apr"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.may"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.jun"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.jul"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.aug"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.sep"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.oct"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.nov"), styles: { halign: "center" } },
-        { content: i18n.t("static.month.dec"), styles: { halign: "center" } },
-      ],
-    ];
-    let data;
-    data = this.state.data.map((ele) => [
-      ele.planningUnit.id,
-      getLabelText(ele.planningUnit.label, this.state.lang),
-      ele.planBasedOn == 1
-        ? i18n.t("static.report.mos")
-        : i18n.t("static.report.qty"),
-      formatterMOS(ele.minMonthsOfStock, 1),
-      ele.planBasedOn == 1
-        ? formatterMOS(
-          Number(ele.minMonthsOfStock) + Number(ele.reorderFrequency)
-          , 0)
-        : formatterMOS(roundAMC(ele.maxStock), 0),
-      ele.year,
-      ele.planBasedOn == 1
-        ? ele.jan != null
-          ? isNaN(ele.jan)
-            ? ""
-            : formatter(roundAMC(ele.jan))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.janStock != null
-          ? isNaN(ele.janStock)
-            ? ""
-            : formatter(roundAMC(ele.janStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.feb != null
-          ? isNaN(ele.feb)
-            ? ""
-            : formatter(roundAMC(ele.feb))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.febStock != null
-          ? isNaN(ele.febStock)
-            ? ""
-            : formatter(roundAMC(ele.febStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.mar != null
-          ? isNaN(ele.mar)
-            ? ""
-            : formatter(roundAMC(ele.mar))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.marStock != null
-          ? isNaN(ele.marStock)
-            ? ""
-            : formatter(roundAMC(ele.marStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.apr != null
-          ? isNaN(ele.apr)
-            ? ""
-            : formatter(roundAMC(ele.apr))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.aprStock != null
-          ? isNaN(ele.aprStock)
-            ? ""
-            : formatter(roundAMC(ele.aprStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.may != null
-          ? isNaN(ele.may)
-            ? ""
-            : formatter(roundAMC(ele.may))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.mayStock != null
-          ? isNaN(ele.mayStock)
-            ? ""
-            : formatter(roundAMC(ele.mayStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.jun != null
-          ? isNaN(ele.jun)
-            ? ""
-            : formatter(roundAMC(ele.jun))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.junStock != null
-          ? isNaN(ele.junStock)
-            ? ""
-            : formatter(roundAMC(ele.junStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.jul != null
-          ? isNaN(ele.jul)
-            ? ""
-            : formatter(roundAMC(ele.jul))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.julStock != null
-          ? isNaN(ele.julStock)
-            ? ""
-            : formatter(roundAMC(ele.julStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.aug != null
-          ? isNaN(ele.aug)
-            ? ""
-            : formatter(roundAMC(ele.aug))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.augStock != null
-          ? isNaN(ele.augStock)
-            ? ""
-            : formatter(roundAMC(ele.augStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.sep != null
-          ? isNaN(ele.sep)
-            ? ""
-            : formatter(roundAMC(ele.sep))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.sepStock != null
-          ? isNaN(ele.sepStock)
-            ? ""
-            : formatter(roundAMC(ele.sepStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.oct != null
-          ? isNaN(ele.oct)
-            ? ""
-            : formatter(roundAMC(ele.oct))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.octStock != null
-          ? isNaN(ele.octStock)
-            ? ""
-            : formatter(roundAMC(ele.octStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.nov != null
-          ? isNaN(ele.nov)
-            ? ""
-            : formatter(roundAMC(ele.nov))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.novStock != null
-          ? isNaN(ele.novStock)
-            ? ""
-            : formatter(roundAMC(ele.novStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-      ele.planBasedOn == 1
-        ? ele.dec != null
-          ? isNaN(ele.dec)
-            ? ""
-            : formatter(roundAMC(ele.dec))
-          : i18n.t("static.supplyPlanFormula.na")
-        : ele.decStock != null
-          ? isNaN(ele.decStock)
-            ? ""
-            : formatter(roundAMC(ele.decStock))
-          : i18n.t("static.supplyPlanFormula.na"),
-    ]);
-    const cellStyle = (
-      planBasedOn,
-      min,
-      reorderFrequency,
-      value,
-      valueStock
-    ) => {
-      var actualValue = planBasedOn == 1 ? value : valueStock;
-      var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
-      if (actualValue != null) {
-        actualValue = (actualValue);
-        if (actualValue == 0) {
-          return legendcolor[0].color;
-        } else if (min > actualValue) {
-          return legendcolor[1].color;
-        } else if (maxValue < actualValue) {
-          return legendcolor[3].color;
-        } else {
-          return legendcolor[2].color;
-        }
-      } else {
-        return legendcolor[4].color;
-      }
-    };
-    let dataColor;
-    dataColor = this.state.data.map((ele) => [
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.jan,
-        ele.janStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.feb,
-        ele.febStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.mar,
-        ele.marStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.apr,
-        ele.aprStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.may,
-        ele.mayStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.jun,
-        ele.junStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.jul,
-        ele.julStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.aug,
-        ele.augStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.sep,
-        ele.sepStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.oct,
-        ele.octStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.nov,
-        ele.novStock
-      ),
-      cellStyle(
-        ele.planBasedOn,
-        ele.minMonthsOfStock,
-        ele.reorderFrequency,
-        ele.dec,
-        ele.decStock
-      ),
-    ]);
-    var startY =
-      230 +
-      this.state.planningUnitValues.length * 3 +
-      this.state.tracerCategoryValues.length * 1.2;
-    let content = {
-      margin: { top: 80, bottom: 90 },
-      startY: startY,
-      head: header,
-      body: data,
-      styles: { lineWidth: 1, fontSize: 8, cellWidth: 38, halign: "center" },
-      columnStyles: {
-        1: { cellWidth: 99.89 },
-        2: { cellWidth: 54 },
-      },
-      didParseCell: function (data) {
-        if (data.section == "body" && data.column.index > 5)
-          data.cell.styles.fillColor =
-            dataColor[data.row.index][data.column.index - 6];
-      },
-    };
-    doc.autoTable(content);
-    addHeaders(doc);
-    addFooters(doc);
-    doc.save(i18n.t("static.dashboard.stockstatusmatrix") + ".pdf");
-  };
-  /**
-   * Determines the cell background color based on the provided parameters.
-   * @param {number} planBasedOn - Indicates whether the plan is based on months of stock or maximum stock.
-   * @param {number} min - The minimum months of stock or quantity.
-   * @param {number} reorderFrequency - The reorder frequency.
-   * @param {number} value - The value to be compared with the minimum and maximum.
-   * @param {number} valueStock - The value for stock-based plan.
-   * @returns {object} - The style object with the background color determined based on the provided values.
-   */
-  cellStyle = (planBasedOn, min, reorderFrequency, value, valueStock) => {
-    var actualValue = planBasedOn == 1 ? value : valueStock;
-    var maxValue = planBasedOn == 1 ? min + reorderFrequency : value;
-    if (actualValue != null) {
-      actualValue = (actualValue);
-      if (actualValue == 0) {
-        return { backgroundColor: legendcolor[0].color };
-      } else if (min > actualValue) {
-        return { backgroundColor: legendcolor[1].color };
-      } else if (maxValue < actualValue) {
-        return { backgroundColor: legendcolor[3].color };
-      } else {
-        return { backgroundColor: legendcolor[2].color };
-      }
-    } else {
-      return { backgroundColor: legendcolor[4].color };
-    }
-  };
-  /**
-   * Renders the Stock Status Overtime report table.
-   * @returns {JSX.Element} - Stock Status Overtime report table.
-   */
+  setVersionId(event) {
+    this.setState({ versionId: event.target.value }, () => {
+      localStorage.setItem("sesVersionIdReport", this.state.versionId);
+      this.getPlanningUnit();
+    });
+  }
+
+  // ─── Render ───────────────────────────────────────────────────────────────────
+
   render() {
-    const { planningUnits } = this.state;
-    let planningUnitList =
-      planningUnits.length > 0 &&
-      planningUnits.map((item, i) => {
-        return {
-          label: getLabelText(item.planningUnit.label, this.state.lang),
-          value: item.planningUnit.id,
-        };
-      }, this);
-    const { SearchBar, ClearSearchButton } = Search;
-    const { programs } = this.state;
-    let programList =
-      programs.length > 0 &&
-      programs.map((item, i) => {
-        return (
-          <option key={i} value={item.programId}>
-            {item.programCode}
-          </option>
-        );
-      }, this);
-    const { versions } = this.state;
-    let versionList =
-      versions.length > 0 &&
-      versions.map((item, i) => {
-        return (
-          <option key={i} value={item.versionId}>
-            {item.versionStatus.id == 2 && item.versionType.id == 2
-              ? item.versionId + "*"
-              : item.versionId}{" "}
-            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
-          </option>
-        );
-      }, this);
-    const { tracerCategories } = this.state;
-    let columns = [
-      {
-        text: i18n.t("static.report.qatPID")
+    const {
+      planningUnits,
+      programs,
+      versions,
+      filteredMatrix,
+      filteredDetails,
+      showDetailData,
+      showQuantity: showQty,
+    } = this.state;
+
+    const isDarkMode = document.body.classList.contains("dark-mode");
+    const fontColor = isDarkMode ? "#fff" : "#212721";
+    const gridLineColor = isDarkMode ? "#444" : "#e0e0e0";
+
+    const planningUnitList = planningUnits.map((item) => ({
+      label:
+        getLabelText(item.label, this.state.lang) +
+        " | " +
+        (item.id || item.value),
+      value: Number(item.id || item.value),
+    }));
+
+    const programOptions = programs.map((item, i) => (
+      <option key={i} value={item.programId}>
+        {item.programCode}
+      </option>
+    ));
+    const versionOptions = versions.map((item, i) => (
+      <option key={i} value={item.versionId}>
+        {item.versionStatus?.id == 2 && item.versionType?.id == 2
+          ? item.versionId + "**"
+          : item.versionType?.id == 2
+            ? item.versionId + "*"
+            : item.versionId}{" "}
+        ({moment(item.createdDate).format("MMM DD YYYY")})
+        {item.cutOffDate
+          ? ` (${i18n.t("static.supplyPlan.start")} ${moment(
+            item.cutOffDate
+          ).format("MMM YYYY")})`
+          : ""}
+      </option>
+    ));
+
+    const hasData = filteredMatrix.length > 0;
+    const hasDetails = filteredDetails.length > 0;
+    const chartData =
+      hasDetails && showDetailData ? this.buildChartData() : null;
+
+    let hasMOS = false;
+    let hasQty = false;
+    if (showQty) {
+      hasMOS = false;
+      hasQty = false;
+    } else {
+      if (filteredMatrix) {
+        hasQty = filteredMatrix.some((r) => r.planBasedOn == 2);
+        hasMOS = filteredMatrix.some((r) => r.planBasedOn == 1);
+      }
+    }
+
+    const chartOptions = {
+      maintainAspectRatio: false,
+      title: {
+        display: true,
+        text: i18n.t("static.dashboard.stockstatusovertime"),
+        fontColor,
       },
-      {
-        text: i18n.t("static.planningunit.planningunit"),
+      scales: {
+        yAxes: [
+          {
+            id: "y-axis-1",
+            type: "linear",
+            position: "left",
+            display: showQty || hasMOS || (!hasMOS && !hasQty),
+            scaleLabel: {
+              display: true,
+              labelString: showQty
+                ? i18n.t("static.report.stock")
+                : i18n.t("static.report.mos"),
+              fontColor,
+            },
+            ticks: {
+              beginAtZero: true,
+              fontColor,
+              callback: function (value) {
+                var x = (value + "").split(".");
+                var x1 = x[0],
+                  x2 = x.length > 1 ? "." + x[1] : "";
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) x1 = x1.replace(rgx, "$1,$2");
+                return x1 + x2;
+              },
+            },
+            gridLines: {
+              color: gridLineColor,
+              drawBorder: true,
+              lineWidth: 0,
+              zeroLineColor: gridLineColor,
+            },
+          },
+          {
+            id: "y-axis-2",
+            type: "linear",
+            position: "right",
+            display: !showQty && hasQty,
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t("static.report.stock"),
+              fontColor,
+            },
+            ticks: {
+              beginAtZero: true,
+              fontColor,
+              callback: function (value) {
+                var x = (value + "").split(".");
+                var x1 = x[0],
+                  x2 = x.length > 1 ? "." + x[1] : "";
+                var rgx = /(\d+)(\d{3})/;
+                while (rgx.test(x1)) x1 = x1.replace(rgx, "$1,$2");
+                return x1 + x2;
+              },
+            },
+            gridLines: {
+              color: gridLineColor,
+              drawBorder: false,
+              lineWidth: 0,
+              zeroLineColor: gridLineColor,
+            },
+          },
+        ],
+        xAxes: [
+          {
+            scaleLabel: {
+              display: true,
+              labelString: i18n.t("static.common.month"),
+              fontColor,
+              fontStyle: "normal",
+              fontSize: "12",
+            },
+            ticks: { fontColor },
+            gridLines: {
+              color: gridLineColor,
+              drawBorder: true,
+              lineWidth: 0,
+              zeroLineColor: gridLineColor,
+            },
+          },
+        ],
       },
-      {
-        text: i18n.t("static.stockStatus.plannedBy"),
+      tooltips: {
+        mode: "index",
+        enabled: false,
+        custom: CustomTooltips,
+        callback: function (value) {
+          var x = (value + "").split(".");
+          var x1 = x[0],
+            x2 = x.length > 1 ? "." + x[1] : "";
+          var rgx = /(\d+)(\d{3})/;
+          while (rgx.test(x1)) x1 = x1.replace(rgx, "$1,$2");
+          return x1 + x2;
+        },
       },
-      {
-        text: i18n.t("static.report.minMosOrQty"),
+      legend: {
+        display: true,
+        position: "bottom",
+        labels: {
+          usePointStyle: true,
+          fontColor,
+          fontSize: 12,
+          boxWidth: 15,
+          boxHeight: 4,
+        },
       },
-      {
-        text: i18n.t("static.report.maxMosOrQty"),
-      },
-      {
-        text: i18n.t("static.common.year"),
-      },
-      {
-        text: i18n.t("static.month.jan"),
-      },
-      {
-        text: i18n.t("static.month.feb"),
-      },
-      {
-        text: i18n.t("static.month.mar"),
-      },
-      {
-        text: i18n.t("static.month.apr"),
-      },
-      {
-        text: i18n.t("static.month.may"),
-      },
-      {
-        text: i18n.t("static.month.jun"),
-      },
-      {
-        text: i18n.t("static.month.jul"),
-      },
-      {
-        text: i18n.t("static.month.aug"),
-      },
-      {
-        text: i18n.t("static.month.sep"),
-      },
-      {
-        text: i18n.t("static.month.oct"),
-      },
-      {
-        text: i18n.t("static.month.nov"),
-      },
-      {
-        text: i18n.t("static.month.dec"),
-      },
-    ];
-    const MyExportCSV = (props) => {
-      const handleClick = () => {
-        props.onExport();
-      };
-      return (
-        <div>
-          <img
-            style={{ height: "40px", width: "40px" }}
-            src={csvicon}
-            title="Export CSV"
-            onClick={() => handleClick()}
-          />
-        </div>
-      );
     };
+
     return (
       <div className="animated">
         <AuthenticationServiceComponent history={this.props.history} />
         <h5>{i18n.t(this.props.match.params.message, { entityname })}</h5>
         <h5 className="red">{i18n.t(this.state.message, { entityname })}</h5>
         <SupplyPlanFormulas ref="formulaeChild" />
+
         <Card>
+          {/* ── Header icons ── */}
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
               <a className="card-header-action">
                 <span
                   style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    this.refs.formulaeChild.toggleStockStatusMatrix();
-                  }}
+                  onClick={() =>
+                    this.refs.formulaeChild.toggleStockStatusMatrix()
+                  }
                 >
                   <small className="supplyplanformulas">
                     {i18n.t("static.supplyplan.supplyplanformula")}
                   </small>
                 </span>
               </a>
-              {this.state.data.length > 0 && (
+              {(hasData || hasDetails) && (
                 <div className="card-header-actions">
                   <img
                     style={{ height: "25px", width: "25px", cursor: "pointer" }}
                     src={pdfIcon}
                     title={i18n.t("static.report.exportPdf")}
-                    onClick={() => this.exportPDF(columns)}
+                    onClick={() => this.toggleExportModal(1)}
                   />
                   <img
                     style={{ height: "25px", width: "25px", cursor: "pointer" }}
                     src={csvicon}
                     title={i18n.t("static.report.exportCsv")}
-                    onClick={() => this.exportCSV(columns)}
+                    onClick={() => this.toggleExportModal(2)}
                   />
                 </div>
               )}
             </div>
           </div>
+
           <CardBody className="pb-md-3 pb-lg-2 pt-lg-0">
             <div className="pl-0">
+              {/* ── Filter row 1 ── */}
               <div className="row">
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.report.dateRange")}
-                    <span className="stock-box-icon  fa fa-sort-desc ml-1"></span>
-                  </Label>
-                  <div className="controls box">
-                    <RangePicker
-                      picker="year"
-                      allowClear={false}
-                      id="date"
-                      name="date"
-                      onChange={this.onYearChange}
-                      disabledDate={(current) => current && current.year() < this.state.minDate}
-                      value={[
-                        moment(this.state.startYear.toString()),
-                        moment(this.state.endYear.toString()),
-                      ]}
-                    />
+                  <Label>{i18n.t("static.report.dateRange")}<i
+                    className="fa fa-info-circle icons"
+                    title={i18n.t("static.report.reportPeriodTooltip")}
+                    aria-hidden="true"
+                    style={{
+                      color: "#002f6c",
+                      cursor: "pointer",
+                      marginLeft: "5px",
+                    }}
+                  ></i></Label>
+                  <div className="controls edit">
+                    <Picker
+                      ref="pickRange"
+                      years={{
+                        min: this.state.minDate,
+                        max: this.state.maxDate,
+                      }}
+                      value={this.state.rangeValue}
+                      lang={pickerLang}
+                      key={
+                        JSON.stringify(this.state.minDate) +
+                        "-" +
+                        JSON.stringify(this.state.rangeValue)
+                      }
+                      onDismiss={this.handleRangeDissmis}
+                    >
+                      <MonthBox
+                        value={
+                          makeText(this.state.rangeValue.from) +
+                          " ~ " +
+                          makeText(this.state.rangeValue.to)
+                        }
+                        onClick={this._handleClickRangeBox}
+                      />
+                    </Picker>
                   </div>
                 </FormGroup>
+
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.program.program")}
-                  </Label>
-                  <div className="controls ">
+                  <Label>{i18n.t("static.program.program")}</Label>
+                  <div className="controls">
                     <InputGroup>
                       <Input
                         type="select"
                         name="programId"
                         id="programId"
                         bsSize="sm"
-                        onChange={(e) => {
-                          this.setProgramId(e);
-                        }}
+                        onChange={(e) => this.setProgramId(e)}
                         value={this.state.programId}
                       >
                         <option value="0">
                           {i18n.t("static.common.select")}
                         </option>
-                        {programList}
+                        {programOptions}
                       </Input>
                     </InputGroup>
                   </div>
                 </FormGroup>
+
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.report.versionFinal*")}
-                  </Label>
-                  <div className="controls ">
+                  <Label>{i18n.t("static.report.versionFinal*")}<i
+                    className="fa fa-info-circle icons"
+                    title={i18n.t("static.report.versionTooltip")}
+                    aria-hidden="true"
+                    style={{
+                      color: "#002f6c",
+                      cursor: "pointer",
+                      marginLeft: "5px",
+                    }}
+                  ></i></Label>
+                  <div className="controls">
                     <InputGroup>
                       <Input
                         type="select"
                         name="versionId"
                         id="versionId"
                         bsSize="sm"
-                        onChange={(e) => {
-                          this.setVersionId(e);
-                        }}
+                        onChange={(e) => this.setVersionId(e)}
                         value={this.state.versionId}
                       >
                         <option value="0">
                           {i18n.t("static.common.select")}
                         </option>
-                        {versionList}
+                        {versionOptions}
                       </Input>
                     </InputGroup>
                   </div>
                 </FormGroup>
+
                 <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.tracercategory.tracercategory")}
-                  </Label>
-                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                  <div className="controls">
-                    <MultiSelect
-                      name="tracerCategoryId"
-                      id="tracerCategoryId"
-                      filterOptions={filterOptions}
-                      bsSize="sm"
-                      value={this.state.tracerCategoryValues}
-                      onChange={(e) => {
-                        this.handleTracerCategoryChange(e);
-                      }}
-                      disabled={this.state.loading}
-                      options={
-                        tracerCategories.length > 0
-                          ? tracerCategories.map((item, i) => {
-                            return {
-                              label: getLabelText(
-                                item.label,
-                                this.state.lang
-                              ),
-                              value: item.id,
-                            };
-                          }, this)
-                          : []
-                      }
-                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                      selectSomeItems: i18n.t('static.common.select')}}
-                    />
-                  </div>
-                </FormGroup>
-                <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.planningunit.planningunit")}
-                  </Label>
-                  <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                  <div className="controls">
+                  <Label>{i18n.t("static.planningunit.planningunit")}</Label>
+                  <div onBlur={this.handleBlur}>
                     <MultiSelect
                       name="planningUnitId"
                       id="planningUnitId"
                       filterOptions={filterOptions}
                       bsSize="md"
                       value={this.state.planningUnitValues}
-                      onChange={(e) => {
-                        this.handlePlanningUnitChange(e);
-                      }}
-                      options={
-                        planningUnitList && planningUnitList.length > 0
-                          ? planningUnitList
-                          : []
-                      }
+                      onChange={(e) => this.handlePlanningUnitChange(e)}
+                      options={planningUnitList}
                       disabled={this.state.loading}
-                      overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                      selectSomeItems: i18n.t('static.common.select')}}
-                    />{" "}
+                      overrideStrings={{
+                        allItemsAreSelected: i18n.t(
+                          "static.common.allitemsselected"
+                        ),
+                        selectSomeItems: i18n.t("static.common.select"),
+                      }}
+                    />
                   </div>
-                </FormGroup>
-                <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.program.isincludeplannedshipment")}
-                  </Label>
-                  <div className="controls ">
-                    <InputGroup>
-                      <Input
-                        type="select"
-                        name="includePlanningShipments"
-                        id="includePlanningShipments"
-                        bsSize="sm"
-                        onChange={(e) => {
-                          this.filterData();
-                        }}
-                      >
-                        <option value="true">
-                          {i18n.t("static.program.yes")}
-                        </option>
-                        <option value="false">
-                          {i18n.t("static.program.no")}
-                        </option>
-                      </Input>
-                    </InputGroup>
-                  </div>
-                </FormGroup>
-                <FormGroup className="col-md-3">
-                  <Label htmlFor="appendedInputButton">
-                    {i18n.t("static.report.withinstock")}
-                  </Label>
-                  <div className="controls ">
-                    <InputGroup>
-                      <Input
-                        type="select"
-                        name="stockStatusId"
-                        id="stockStatusId"
-                        bsSize="sm"
-                        onChange={(e) => {
-                          this.filterDataAsperstatus();
-                        }}
-                      >
-                        <option value="-1">
-                          {i18n.t("static.common.all")}
-                        </option>
-                        {legendcolor.length > 0 &&
-                          legendcolor.map((item, i) => {
-                            return (
-                              <option key={i} value={item.value}>
-                                {item.text}
-                              </option>
-                            );
-                          }, this)}
-                      </Input>
-                    </InputGroup>
-                  </div>
-                </FormGroup>
-                <FormGroup
-                  className="col-md-12 mt-2 "
-                  style={{ display: this.state.display }}
-                >
-                  <ul className="legendcommitversion list-group">
-                    {legendcolor.map((item1) => (
-                      <li>
-                        <span
-                          className="legendcolor"
-                          style={{ backgroundColor: item1.color }}
-                        ></span>{" "}
-                        <span className="legendcommitversionText">
-                          {item1.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
                 </FormGroup>
               </div>
-            </div>
-            <div
-              class="TableCust"
-              style={{ display: this.state.loading ? "none" : "block" }}
-            >
-              {this.state.data.length > 0 && (
-                <div className="fixTableHead1">
-                  <Table
-                    striped
-                    bordered
-                    responsive="md"
-                    style={{ width: "100%" }}
-                  >
-                    <thead className="Theadtablesticky">
-                      <tr>
-                        <th className="text-center" style={{ width: "20%" }}>
-                          {i18n.t("static.planningunit.planningunit")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.stockStatus.plannedBy")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.report.minMosOrQty")}
-                        </th>
-                        <th
-                          className="text-center infoIconStockStatus"
-                          style={{ width: "5%" }}
-                          title={i18n.t(
-                            "static.programPU.stockStatusMatrixMaxTooltip"
-                          )}
+
+              {/* ── Filter row 2 ── */}
+              <div className="row">
+                <FormGroup className="col-md-3">
+                  <Label>{i18n.t("static.report.withinstock")}</Label>
+                  <div onBlur={this.handleBlur}>
+                    <MultiSelect
+                      name="stockStatusId"
+                      id="stockStatusId"
+                      bsSize="sm"
+                      value={this.state.stockStatusValues}
+                      onChange={(e) =>
+                        this.setState({
+                          stockStatusValues: e,
+                          stockStatusLabels: e.map((x) => x.label),
+                        })
+                      }
+                      options={legendcolor.map((item) => ({
+                        label: item.text,
+                        value: item.value,
+                      }))}
+                      overrideStrings={{
+                        allItemsAreSelected: i18n.t(
+                          "static.common.allitemsselected"
+                        ),
+                        selectSomeItems: i18n.t("static.common.select"),
+                      }}
+                    />
+                  </div>
+                </FormGroup>
+
+                <FormGroup className="col-md-3 mt-3">
+                  <div className="controls form-check">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="removePlannedShipments"
+                      checked={this.state.removePlannedShipments}
+                      onChange={(e) =>
+                        this.setState(
+                          { removePlannedShipments: e.target.checked },
+                          () => this.filterData()
+                        )
+                      }
+                    />
+                    <Label
+                      className="form-check-label"
+                      htmlFor="removePlannedShipments"
+                    >
+                      {i18n.t("static.report.removePlannedShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removePlannedShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
+                    </Label>
+                  </div>
+                  <div className="controls form-check mt-1">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="removeTBDFundingSourceShipments"
+                      checked={this.state.removeTBDFundingSourceShipments}
+                      onChange={(e) =>
+                        this.setState(
+                          { removeTBDFundingSourceShipments: e.target.checked },
+                          () => this.filterData()
+                        )
+                      }
+                    />
+                    <Label
+                      className="form-check-label"
+                      htmlFor="removeTBDFundingSourceShipments"
+                    >
+                      {i18n.t("static.report.removeTBDFundingSourceShipments")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t(
+                          "static.report.removeTBDFundingSourceShipmentsTooltip"
+                        )}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
+                    </Label>
+                  </div>
+                </FormGroup>
+
+                <FormGroup className="col-md-3 mt-3">
+                  <div className="controls form-check">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="showQuantity"
+                      checked={this.state.showQuantity}
+                      onChange={(e) =>
+                        this.setState(
+                          { showQuantity: e.target.checked },
+                          () => {
+                            this.buildMatrixJExcel();
+                            if (this.state.showDetailData)
+                              this.buildDetailJExcel();
+                          }
+                        )
+                      }
+                    />
+                    <Label className="form-check-label" htmlFor="showQuantity">
+                      {i18n.t("static.report.showQuantity")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showQuantityTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
+                    </Label>
+                  </div>
+                  <div className="controls form-check mt-1">
+                    <Input
+                      className="form-check-input"
+                      type="checkbox"
+                      id="showIcon"
+                      checked={this.state.showIcon}
+                      onChange={(e) =>
+                        this.setState({ showIcon: e.target.checked }, () =>
+                          this.buildMatrixJExcel()
+                        )
+                      }
+                    />
+                    <Label className="form-check-label" htmlFor="showIcon">
+                      {i18n.t("static.report.showIcon")}
+                      <i
+                        className="fa fa-info-circle icons"
+                        title={i18n.t("static.report.showIconTooltip")}
+                        aria-hidden="true"
+                        style={{
+                          color: "#002f6c",
+                          cursor: "pointer",
+                          marginLeft: "5px",
+                        }}
+                      ></i>
+                    </Label>
+                  </div>
+                </FormGroup>
+              </div>
+
+              {/* ── Data area ── */}
+              <div style={{ display: this.state.loading ? "none" : "block" }}>
+                {hasData && (
+                  <div className="row">
+                    <FormGroup className="col-md-10 mt-3">
+                      <ul className="legendcommitversion list-group">
+                        {legendcolor.map((item, idx) => (
+                          <li key={idx}>
+                            <span
+                              className="legendcolor"
+                              style={{ backgroundColor: item.color }}
+                            ></span>
+                            <span className="legendcommitversionText">
+                              {item.text}
+                            </span>
+                          </li>
+                        ))}
+                        <li
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
                         >
-                          {i18n.t("static.report.maxMosOrQty")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.common.year")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.jan")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.feb")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.mar")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.apr")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.may")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.jun")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.jul")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.aug")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.sep")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.oct")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.nov")}
-                        </th>
-                        <th className="text-center" style={{ width: "5%" }}>
-                          {i18n.t("static.month.dec")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {this.state.data.map((ele) => {
-                        return (
-                          <tr>
-                            <td className="text-center">
-                              {" "}
-                              {getLabelText(
-                                ele.planningUnit.label,
-                                this.state.lang
-                              )}
-                            </td>
-                            <td className="text-center">
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? i18n.t("static.report.mos")
-                                : i18n.t("static.report.qty")}
-                            </td>
-                            <td className="text-center">
-                              {formatterMOS(ele.minMonthsOfStock, 0)}
-                            </td>
-                            <td className="text-center">
-                              {ele.planBasedOn == 1
-                                ? formatterMOS(
-                                  Number(ele.minMonthsOfStock) +
-                                  Number(ele.reorderFrequency)
-                                  , 0)
-                                : formatterMOS(
-                                  roundAMC(ele.maxStock)
-                                  , 0)}
-                            </td>
-                            <td className="text-center">{ele.year}</td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.jan,
-                                ele.janStock
-                              )}
-                            >
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.jan)
-                                  ? ""
-                                  : ele.jan != null
-                                    ? formatter(roundAMC(ele.jan))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.janStock)
-                                  ? ""
-                                  : ele.janStock != null
-                                    ? formatter(roundAMC(ele.janStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.feb,
-                                ele.febStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.feb)
-                                  ? ""
-                                  : ele.feb != null
-                                    ? formatter(roundAMC(ele.feb))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.febStock)
-                                  ? ""
-                                  : ele.febStock != null
-                                    ? formatter(roundAMC(ele.febStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.mar,
-                                ele.marStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.mar)
-                                  ? ""
-                                  : ele.mar != null
-                                    ? formatter(roundAMC(ele.mar))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.marStock)
-                                  ? ""
-                                  : ele.marStock != null
-                                    ? formatter(roundAMC(ele.marStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.apr,
-                                ele.aprStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.apr)
-                                  ? ""
-                                  : ele.apr != null
-                                    ? formatter(roundAMC(ele.apr))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.aprStock)
-                                  ? ""
-                                  : ele.aprStock != null
-                                    ? formatter(roundAMC(ele.aprStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.may,
-                                ele.mayStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.may)
-                                  ? ""
-                                  : ele.may != null
-                                    ? formatter(roundAMC(ele.may))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.mayStock)
-                                  ? ""
-                                  : ele.mayStock != null
-                                    ? formatter(roundAMC(ele.mayStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.jun,
-                                ele.junStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.jun)
-                                  ? ""
-                                  : ele.jun != null
-                                    ? formatter(roundAMC(ele.jun))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.junStock)
-                                  ? ""
-                                  : ele.junStock != null
-                                    ? formatter(roundAMC(ele.junStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.jul,
-                                ele.julStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.jul)
-                                  ? ""
-                                  : ele.jul != null
-                                    ? formatter(roundAMC(ele.jul))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.julStock)
-                                  ? ""
-                                  : ele.julStock != null
-                                    ? formatter(roundAMC(ele.julStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.aug,
-                                ele.augStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.aug)
-                                  ? ""
-                                  : ele.aug != null
-                                    ? formatter(roundAMC(ele.aug))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.augStock)
-                                  ? ""
-                                  : ele.augStock != null
-                                    ? formatter(roundAMC(ele.augStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.sep,
-                                ele.sepStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.sep)
-                                  ? ""
-                                  : ele.sep != null
-                                    ? formatter(roundAMC(ele.sep))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.sepStock)
-                                  ? ""
-                                  : ele.sepStock != null
-                                    ? formatter(roundAMC(ele.sepStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.oct,
-                                ele.octStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.oct)
-                                  ? ""
-                                  : ele.oct != null
-                                    ? formatter(roundAMC(ele.oct))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.octStock)
-                                  ? ""
-                                  : ele.octStock != null
-                                    ? formatter(roundAMC(ele.octStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.nov,
-                                ele.novStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.nov)
-                                  ? ""
-                                  : ele.nov != null
-                                    ? formatter(roundAMC(ele.nov))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.novStock)
-                                  ? ""
-                                  : ele.novStock != null
-                                    ? formatter(roundAMC(ele.novStock))
-                                    : ""}
-                            </td>
-                            <td
-                              className="text-center countZero"
-                              style={this.cellStyle(
-                                ele.planBasedOn,
-                                ele.minMonthsOfStock,
-                                ele.reorderFrequency,
-                                ele.dec,
-                                ele.decStock
-                              )}
-                            >
-                              {" "}
-                              {ele.planBasedOn == 1
-                                ? isNaN(ele.dec)
-                                  ? ""
-                                  : ele.dec != null
-                                    ? formatter(roundAMC(ele.dec))
-                                    : i18n.t("static.supplyPlanFormula.na")
-                                : isNaN(ele.decStock)
-                                  ? ""
-                                  : ele.decStock != null
-                                    ? formatter(roundAMC(ele.decStock))
-                                    : ""}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </Table>
-                </div>
-              )}
-            </div>
-            <div style={{ display: this.state.loading ? "block" : "none" }}>
-              <div
-                className="d-flex align-items-center justify-content-center"
-                style={{ height: "500px" }}
-              >
-                <div class="align-items-center">
-                  <div>
+                          <span
+                            className="fa fa-truck"
+                            style={{
+                              color: "#000",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "14px",
+                              height: "14px",
+                              fontSize: "14px",
+                              lineHeight: 1,
+                              verticalAlign: "middle",
+                            }}
+                          ></span>
+                          <span style={{ verticalAlign: "middle" }}>
+                            {i18n.t("static.shipment.shipment")}
+                          </span>
+                        </li>
+
+                        <li
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          <span
+                            className="fa fa-exclamation-triangle"
+                            style={{
+                              color: "#000",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: "14px",
+                              height: "14px",
+                              fontSize: "14px",
+                              lineHeight: 1,
+                              verticalAlign: "middle",
+                            }}
+                          ></span>
+                          <span style={{ verticalAlign: "middle" }}>
+                            {i18n.t("static.supplyplan.exipredStock")}
+                          </span>
+                        </li>
+                        <li>
+                          <span
+                            className="legendcommitversionText"
+                            style={{ verticalAlign: "middle" }}
+                          >
+                            <b>{i18n.t("static.supplyPlan.actualBalance")}</b>
+                          </span>
+                        </li>
+                      </ul>
+                    </FormGroup>
+
+                    <div className="ReportSearchMarginTop TableWidth100 consumptionDataEntryTable">
+                      <div
+                        className="jexcelremoveReadonlybackground TableWidth100"
+                        id="stockMatrixTableDiv"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {hasDetails && (
+                  <div className="col-md-12">
+                    <button
+                      className="mr-1 mb-2 mt-2 float-right btn btn-info btn-md showdatabtn"
+                      onClick={() => {
+                        const next = !showDetailData;
+                        this.setState({ showDetailData: next }, () => {
+                          if (next) this.buildDetailJExcel();
+                        });
+                      }}
+                    >
+                      {showDetailData
+                        ? i18n.t("static.common.hideData")
+                        : i18n.t("static.common.showData")}
+                    </button>
+                  </div>
+                )}
+
+                {showDetailData && (
+                  <>
+                    <br /><br /><br />
+                    {hasDetails && (
+                      <div className="row">
+                        <FormGroup className="col-md-10 mt-3">
+                          <ul className="legendcommitversion list-group mb-2 pt-2 pb-2">
+                            <li>
+                              <span className="purplelegend legendcolor"></span>
+                              <span
+                                className="legendcommitversionText"
+                                style={{ color: "rgb(170, 85, 161)" }}
+                              >
+                                <i>
+                                  {i18n.t(
+                                    "static.supplyPlan.forecastedConsumption"
+                                  )}
+                                </i>
+                              </span>
+                            </li>
+                            <li>
+                              <span className="blacklegend legendcolor"></span>
+                              <span className="legendcommitversionText">
+                                {i18n.t("static.supplyPlan.actualConsumption")}
+                              </span>
+                            </li>
+                            <li>
+                              <span className="legendcolor"></span>
+                              <span className="legendcommitversionText">
+                                <b>
+                                  {i18n.t("static.supplyPlan.actualBalance")}
+                                </b>
+                              </span>
+                            </li>
+                          </ul>
+                        </FormGroup>
+                        <div className="consumptionDataEntryTable ReportSearchMarginTop TableWidth100">
+                          <div
+                            className="jexcelremoveReadonlybackground TableWidth100"
+                            id="stockDetailTableDiv"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {!hasData &&
+                  !this.state.loading &&
+                  this.state.planningUnitValues.length > 0 && (
+                    <h5 className="red mt-3">
+                      {i18n.t("static.stockStatusMatrix.noData")}
+                    </h5>
+                  )}
+              </div>
+              <Modal isOpen={this.state.exportModal} className="modal-lg">
+                <ModalHeader
+                  toggle={() => this.toggleExportModal(0)}
+                  className="modalHeaderSupplyPlan"
+                >
+                  <strong>
+                    {this.state.exportType == 1
+                      ? i18n.t("static.supplyPlan.exportAsPDF")
+                      : i18n.t("static.supplyPlan.exportAsCsv")}
+                  </strong>
+                </ModalHeader>
+                <ModalBody>
+                  <div className="row mb-1">
+                    <div className="col-md-4">
+                      <Label className="mb-0">
+                        {i18n.t("static.program.program")}
+                      </Label>
+                    </div>
+                    <div className="col-md-8 text-right">
+                      <FormGroup check inline className="mb-0">
+                        <Label check htmlFor="onlyDownloaded" className="mb-0">
+                          <Input
+                            type="checkbox"
+                            id="onlyDownloaded"
+                            checked={this.state.onlyDownloadedPrograms}
+                            onChange={this.handleOnlyDownloadedChange}
+                          />
+                          {i18n.t("static.common.onlyDownloadedProgram")}
+                        </Label>
+                      </FormGroup>
+                    </div>
+                  </div>
+                  <FormGroup>
+                    <MultiSelect
+                      name="exportProgramIds"
+                      id="exportProgramIds"
+                      options={
+                        this.state.onlyDownloadedPrograms
+                          ? this.state.downloadedPrograms.map((p) => ({
+                            value: p.programId,
+                            label: p.displayLabel,
+                            versionId: p.versionId,
+                          }))
+                          : this.state.allProgramsForExport.map((p) => ({
+                            value: p.programId,
+                            label: p.programCode,
+                          }))
+                      }
+                      value={this.state.exportProgramIds}
+                      onChange={this.handleExportProgramChange}
+                      filterOptions={filterOptions}
+                      overrideStrings={{
+                        allItemsAreSelected: i18n.t(
+                          "static.common.allitemsselected"
+                        ),
+                        selectSomeItems: i18n.t("static.common.select"),
+                      }}
+                    />
+                  </FormGroup>
+
+                  {!this.state.onlyDownloadedPrograms &&
+                    this.state.exportProgramIds.length == 1 && (
+                      <FormGroup>
+                        <Label>{i18n.t("static.report.version")}</Label>
+                        <Input
+                          type="select"
+                          name="exportVersionId"
+                          id="exportVersionId"
+                          value={this.state.exportVersionId}
+                          onChange={this.handleExportVersionChange}
+                          bsSize="sm"
+                        >
+                          <option value="">
+                            {i18n.t("static.common.select")}
+                          </option>
+                          {(this.state.versionsForExport || []).map((v, i) => (
+                            <option key={i} value={v.versionId}>
+                              {v.versionId} (
+                              {moment(v.createdDate).format("MMM DD YYYY")})
+                            </option>
+                          ))}
+                        </Input>
+                      </FormGroup>
+                    )}
+
+                  <FormGroup>
+                    <Label>{i18n.t("static.planningunit.planningunit")}</Label>
+                    <MultiSelect
+                      name="exportPlanningUnitIds"
+                      id="exportPlanningUnitIds"
+                      options={(this.state.planningUnitsForExport || []).map(
+                        (p) => ({
+                          value: p.value || p.id,
+                          label:
+                            getLabelText(p.label, this.state.lang) +
+                            " | " +
+                            (p.value || p.id),
+                        })
+                      )}
+                      value={this.state.exportPlanningUnitIds}
+                      onChange={this.handleExportPlanningUnitChange}
+                      filterOptions={filterOptions}
+                      overrideStrings={{
+                        allItemsAreSelected: i18n.t(
+                          "static.common.allitemsselected"
+                        ),
+                        selectSomeItems: i18n.t("static.common.select"),
+                      }}
+                    />
+                  </FormGroup>
+                </ModalBody>
+                <ModalFooter>
+                  {this.state.exportProgramIds.length > 0 &&
+                    this.state.exportPlanningUnitIds.length > 0 &&
+                    (!this.state.onlyDownloadedPrograms &&
+                      this.state.exportProgramIds.length == 1
+                      ? this.state.exportVersionId
+                      : true) && (
+                      <Button
+                        color="success"
+                        size="md"
+                        onClick={this.fetchDataForExport}
+                        disabled={this.state.exportLoading}
+                      >
+                        {this.state.exportLoading
+                          ? i18n.t("static.common.loading")
+                          : i18n.t("static.common.submit")}
+                      </Button>
+                    )}
+                </ModalFooter>
+              </Modal>
+
+              {/* ── Loading spinner ── */}
+              <div style={{ display: this.state.loading ? "block" : "none" }}>
+                <div
+                  className="d-flex align-items-center justify-content-center"
+                  style={{ height: "500px" }}
+                >
+                  <div className="align-items-center">
                     <h4>
-                      {" "}
                       <strong>{i18n.t("static.common.loading")}</strong>
                     </h4>
+                    <div
+                      className="spinner-border blue ml-4"
+                      role="status"
+                    ></div>
                   </div>
-                  <div class="spinner-border blue ml-4" role="status"></div>
                 </div>
               </div>
+            </div>
+
+            {/* Hidden charts for PDF export support - must be visible enough for browser to render canvas */}
+            <div
+              id="hidden-export-charts"
+              style={{
+                position: "absolute",
+                left: "-10000px",
+                top: "0",
+                visibility: "hidden",
+              }}
+            >
+              {this.state.exportLoading &&
+                this.state.PlanningUnitDataForExport &&
+                (this.state.exportProgramIds || []).map((prog, idx) => {
+                  const cData = this.buildChartDataForProgram(
+                    prog.value,
+                    this.state.PlanningUnitDataForExport.stockStatusDetails,
+                    this.state.PlanningUnitDataForExport.stockStatusMatrix,
+                    this.state.showQuantity,
+                    this.state.lang
+                  );
+                  if (!cData) return null;
+                  return (
+                    <div key={idx} style={{ width: "800px", height: "400px" }}>
+                      <Line
+                        id={`export-chart-${prog.value}`}
+                        data={cData}
+                        options={chartOptions}
+                      />
+                    </div>
+                  );
+                })}
             </div>
           </CardBody>
         </Card>
