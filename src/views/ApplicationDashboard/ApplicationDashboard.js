@@ -549,7 +549,7 @@ class ApplicationDashboard extends Component {
       localStorage.setItem("bottomReportPeriod", JSON.stringify(value))
       if (localStorage.getItem("bottomProgramId") && localStorage.getItem("bottomProgramId").split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
           stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
           displayShipmentsBy: this.state.displayBy
@@ -1009,7 +1009,7 @@ class ApplicationDashboard extends Component {
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM") + "-01",
           stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM") + "-" + moment(endDate).endOf('month').format("DD"),
           displayShipmentsBy: this.state.displayBy
@@ -1065,9 +1065,14 @@ class ApplicationDashboard extends Component {
     } else {
       if (localStorage.getItem('sessionType') === 'Online') {
         DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
-          localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
+          const data = response.data.map(item => ({
+            ...item,
+            stockStatusScore: item.stockStatusScore * 100,
+            supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+          }));
+          localStorage.setItem("dashboardTopList", JSON.stringify(data))
           this.setState({
-            dashboardTopList: (response.data).sort((a, b) => {
+            dashboardTopList: data.sort((a, b) => {
               var itemLabelA = a.program.code.toUpperCase();
               var itemLabelB = b.program.code.toUpperCase();
               return itemLabelA > itemLabelB ? 1 : -1;
@@ -1098,7 +1103,7 @@ class ApplicationDashboard extends Component {
     }, () => {
       if (this.state.bottomProgramId && this.state.bottomProgramId.toString().split("_").length == 1) {
         var inputJson = {
-          programId: this.state.bottomProgramId,
+          programIds: [this.state.bottomProgramId],
           startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
           stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
           displayShipmentsBy: this.state.displayBy
@@ -1174,14 +1179,32 @@ class ApplicationDashboard extends Component {
     if (localStorage.getItem('sessionType') === 'Online') {
       DashboardService.getDashboardBottom(inputJson)
         .then(response => {
+          var data = response.data[0];
+          // Compute supplyPlanQualityScore
+          var totalQpl = data.forecastConsumptionQpl ? data.forecastConsumptionQpl.puCount : 0;
+          var flaggedCountForecastConsumptionData = totalQpl - (data.forecastConsumptionQpl ? data.forecastConsumptionQpl.correctCount : 0);
+          var flaggedCountActualConsumptionData = totalQpl - (data.actualConsumptionQpl ? data.actualConsumptionQpl.correctCount : 0);
+          var flaggedCountInventoryData = totalQpl - (data.inventoryQpl ? data.inventoryQpl.correctCount : 0);
+          var flaggedCountShipmentData = totalQpl - (data.shipmentQpl ? data.shipmentQpl.correctCount : 0);
+          data.supplyPlanQualityScore = totalQpl > 0
+            ? (((1 - (flaggedCountForecastConsumptionData / totalQpl)) + (1 - (flaggedCountActualConsumptionData / totalQpl)) + (1 - (flaggedCountInventoryData / totalQpl)) + (1 - (flaggedCountShipmentData / totalQpl))) / 4) * 100
+            : 0;
+          // Compute stockStatusScore
+          var stockOut = data.stockStatus ? Number(data.stockStatus.stockOut) : 0;
+          var underStock = data.stockStatus ? Number(data.stockStatus.underStock) : 0;
+          var adequate = data.stockStatus ? Number(data.stockStatus.adequate) : 0;
+          var overStock = data.stockStatus ? Number(data.stockStatus.overStock) : 0;
+          var totalStockDenom = stockOut + underStock + adequate + overStock;
+          data.stockStatusScore = totalStockDenom > 0 ? (adequate / totalStockDenom) * 100 : 0;
+
           this.setState({
-            dashboardBottomData: response.data,
+            dashboardBottomData: data,
             rangeValue: this.state.rangeValue ? this.state.rangeValue : { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }
           }, () => {
             if (document.getElementById("shipmentsTBDJexcel")) {
               this.buildStockedOutJexcel();
-              this.buildForecastErrorJexcel();
               this.buildShipmentsTBDJexcel();
+              this.buildForecastErrorJexcel();
               this.buildExpiriesJexcel();
               this.setState({
                 bottomSubmitLoader: false,
@@ -1385,8 +1408,13 @@ class ApplicationDashboard extends Component {
             );
         } else {
           DashboardService.getDashboardTop(this.state.topProgramId.map(x => x.value.toString())).then(response => {
+            const data = response.data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }));
             this.setState({
-              dashboardTopList: (response.data).sort((a, b) => {
+              dashboardTopList: data.sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();
                 var itemLabelB = b.program.code.toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
@@ -1439,7 +1467,7 @@ class ApplicationDashboard extends Component {
           if (!localStorage.getItem("bottomReportPeriod"))
             localStorage.setItem("bottomReportPeriod", JSON.stringify({ from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: dt1.getFullYear(), month: dt1.getMonth() + 1 } }));
           var inputJson = {
-            programId: this.state.bottomProgramId,
+            programIds: [this.state.bottomProgramId],
             startDate: this.state.rangeValue.from.year + "-" + this.state.rangeValue.from.month + "-01",
             stopDate: this.state.rangeValue.to.year + "-" + this.state.rangeValue.to.month + "-01",
             displayShipmentsBy: this.state.displayBy
@@ -1462,10 +1490,14 @@ class ApplicationDashboard extends Component {
           })
           var topProgramId=JSON.parse(localStorage.getItem("topProgramId"));
           DashboardService.getDashboardTop(topProgramId.map(x => x.value.toString())).then(response => {
-            localStorage.setItem("dashboardTopList", JSON.stringify(response.data))
-            console.log("Hello ",response.data);
+            const data = response.data.map(item => ({
+              ...item,
+              stockStatusScore: item.stockStatusScore * 100,
+              supplyPlanQualityScore: item.supplyPlanQualityScore * 100
+            }));
+            localStorage.setItem("dashboardTopList", JSON.stringify(data))
             this.setState({
-              dashboardTopList: (response.data).sort((a, b) => {
+              dashboardTopList: data.sort((a, b) => {
                 var itemLabelA = a.program.code.toUpperCase();
                 var itemLabelB = b.program.code.toUpperCase();
                 return itemLabelA > itemLabelB ? 1 : -1;
@@ -1575,7 +1607,7 @@ class ApplicationDashboard extends Component {
                   const labelY = model.y + y * (model.outerRadius + 10);
 
                   const value = dataset.data[index];
-                  if ((((value / total) * 100).toFixed(2) >= 0 && index == 0)) {
+                  if ((((value / total) * 100).toFixed(2) >= 0 && index == 0) && dataset.needleValue === undefined) {
                     ctx.beginPath();
                     ctx.moveTo(model.x, model.y);
                     ctx.strokeStyle = "#000000" //dataset.backgroundColor[index];
@@ -1869,8 +1901,8 @@ class ApplicationDashboard extends Component {
       if (key == "dashboardBottomData") {
         if (document.getElementById("shipmentsTBDJexcel")) {
           this.buildStockedOutJexcel();
-          this.buildForecastErrorJexcel();
           this.buildShipmentsTBDJexcel();
+          this.buildForecastErrorJexcel();
           this.buildExpiriesJexcel();
         }
         this.setState({
@@ -1993,7 +2025,7 @@ class ApplicationDashboard extends Component {
         }
       ],
       onload: function (instance, cell, x, y, value) {
-        jExcelLoadedFunctionWithoutPagination(instance, 1);
+        jExcelLoadedFunctionWithoutPagination(instance, 2);
         var asterisk = document.getElementsByClassName("jss")[0].firstChild.nextSibling;
         var tr = asterisk.firstChild;
         var elInstance = instance.worksheets[0];
@@ -2022,7 +2054,7 @@ class ApplicationDashboard extends Component {
       position: 'top',
       filters: true,
       license: JEXCEL_PRO_KEY, onopenfilter:onOpenFilter, allowRenameColumn: false,
-      height: 10,
+      height: 100,
       contextMenu: function (obj, x, y, e) {
         return false;
       }.bind(this),
@@ -2072,7 +2104,7 @@ class ApplicationDashboard extends Component {
           width: '70px'
         }
       ],
-      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 2) },
+      onload: (instance, cell) => { jExcelLoadedFunctionWithoutPagination(instance, 1) },
       pagination: false,
       search: false,
       columnSorting: true,
@@ -2183,7 +2215,7 @@ class ApplicationDashboard extends Component {
     var options = {
       data: data,
       columnDrag: false,
-      colWidths: [20, 80],
+      colWidths: [20, 40],
       colHeaderClasses: ["Reqasterisk"],
       columns: [
         {
@@ -2798,6 +2830,80 @@ class ApplicationDashboard extends Component {
       },
     };
 
+    const overallScoreValue = ((this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) : 0) + (this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.stockStatusScore) : 0)) / 2;
+    const overallScoreData = {
+      labels: ['Red', 'Yellow', 'Green'],
+      datasets: [{
+        data: [60, 15, 15, 10],
+        backgroundColor: ['#BA0C2F', '#f48521', '#edba26', '#118b70'],
+        needleValue: overallScoreValue,
+        datalabels: {
+          display: false,
+          color: 'rgba(0,0,0,0)',
+          font: {
+            size: 0
+          },
+          formatter: () => ''
+        }
+      }]
+    };
+
+    const overallScoreOptions = {
+      rotation: -Math.PI,
+      circumference: Math.PI,
+      cutoutPercentage: 70,
+      legend: { display: false },
+      tooltips: { enabled: false },
+      aspectRatio: 2,
+      layout: {
+        padding: {
+          top: 25,
+          bottom: 15,
+          left: 15,
+          right: 15
+        }
+      },
+      plugins: {
+        datalabels: {
+          display: false
+        }
+      }
+    };
+
+    const gaugeNeedle = {
+      id: 'gaugeNeedle',
+      afterDatasetsDraw: (chart) => {
+        const { ctx, config, data } = chart;
+        const dataset = data.datasets[0];
+        const needleValue = dataset.needleValue;
+        const dataTotal = 100;
+        const angle = Math.PI + (1 / dataTotal * needleValue * Math.PI);
+        const meta = chart.getDatasetMeta(0);
+        if (!meta.data[0]) return;
+        const arc = meta.data[0];
+        const cx = arc._model.x;
+        const cy = arc._model.y;
+        const outerRadius = arc._model.outerRadius;
+        const needleLength = outerRadius - 5;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(angle);
+        ctx.beginPath();
+        ctx.moveTo(0, -2);
+        ctx.lineTo(needleLength, 0); 
+        ctx.lineTo(0, 2);
+        ctx.fillStyle = '#444';
+        ctx.fill();
+        ctx.restore();
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#444';
+        ctx.fill();
+      }
+    };
+
     const forecastConsumptionData = {
       datasets: [{
         label: 'Forecast Consumption Dataset',
@@ -2932,7 +3038,7 @@ class ApplicationDashboard extends Component {
         label: 'Shipments Dataset',
         data: [shipmentQplCorrectCount, shipmentQplPuCount - shipmentQplCorrectCount],
         backgroundColor: [
-          (shipmentQplCorrectCount / shipmentQplPuCount) >= 1 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (2 / 3) ? "#edba26" : (shipmentQplCorrectCount / shipmentQplPuCount) >= (1 / 3) ? "#f48521" : "#BA0C2F",
+          (shipmentQplCorrectCount / shipmentQplPuCount) >= 0.91 ? "#118b70" : (shipmentQplCorrectCount / shipmentQplPuCount) >= 0.76 ? "#edba26" : (shipmentQplCorrectCount / shipmentQplPuCount) >= 0.61 ? "#f48521" : "#BA0C2F",
           '#c8ced3'
         ],
         hoverOffset: 4
@@ -3575,11 +3681,14 @@ class ApplicationDashboard extends Component {
                     <thead>
                       {localStorage.getItem("topLocalProgram") == "true" && <th scope="col">{i18n.t("static.common.action")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.actionTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>}
                       <th scope="col">{i18n.t("static.common.programAndProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.programTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope='col'>{i18n.t('static.supplyPlan.latestVersion')} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.activePlanningUnits")}</th>
                       <th scope="col">{i18n.t("static.dashboard.stockoutPUs")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockoutTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">{i18n.t('static.supplyPlan.qualityScore')} <i class="fa fa-info-circle icons" title={i18n.t('static.supplyPlan.qualityScoreTooltip')} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">{i18n.t('static.supplyPlan.stockStatusScore')} <i class="fa fa-info-circle icons" title={i18n.t('static.supplyPlan.stockStatusScoreTooltip')} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
+                      <th scope="col" width="125px">{i18n.t('static.supplyPlan.overallScore')} <i class="fa fa-info-circle icons" title={i18n.t('static.supplyPlan.totalScoreTooltip')} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope="col" width="125px">{i18n.t("static.dashboard.totalExpiriesCost")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.expiryTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope='col' width="125px">{i18n.t("static.dashboard.openQATProblems")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.qatProblemTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("topLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculationMultiple()}></i>}</th>
-                      <th scope='col'>{i18n.t("static.dashboard.uploadedDate")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.uploadedDateTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                       <th scope='col'>{i18n.t("static.dashboard.reviewStatus")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.reviewStatusTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></th>
                     </thead>
                     <tbody>
@@ -3592,8 +3701,9 @@ class ApplicationDashboard extends Component {
                               {localStorage.getItem('sessionType') === 'Online' && <><i class="cui-cloud-upload icons" style={{ color: d.isChanged ? "#FF0000" : "", cursor: "pointer", verticalAlign: 'middle', fontWeight: 'bolder' }} title="Upload" onClick={() => this.redirectToCrudWindow("/program/syncPage/", 2, d.program.id)}></i> &nbsp;</>}
                               {/* <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(d.program.id)}></i> */}
                             </td>}
-                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{d.program.code + " ~v" + d.program.version} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
-                            {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{d.program.code + " ~v" + d.versionId} {d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​</td>}
+                            <td scope="row">{d.program.code}​</td>
+                            {localStorage.getItem("topLocalProgram") == "true" && <td scope="row">{"v" + d.program.version}{d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​ {"(" + moment(d.commitDate).format('MMM DD, YYYY') + ")"}</td>}
+                            {localStorage.getItem("topLocalProgram") != "true" && <td scope="row">{"v" + d.versionId}{d.versionType.id == 2 && d.versionStatus.id == 2 ? "*" : ""}​ {"(" + moment(d.commitDate).format('MMM DD, YYYY') + ")"}</td>}
                             <td>
                               {d.activePlanningUnits}
                             </td>
@@ -3611,11 +3721,22 @@ class ApplicationDashboard extends Component {
                                 </div>
                               </div>
                             </td>
+                            <td>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.supplyPlanQualityScore) ? '#999' : Math.round(d.supplyPlanQualityScore) < 60 ? '#BA0C2F' : Math.round(d.supplyPlanQualityScore) < 75 ? '#f48521' : Math.round(d.supplyPlanQualityScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.supplyPlanQualityScore) ? "N/A" : Math.round(d.supplyPlanQualityScore) + "%"}</b>
+                            </td>
+                            <td>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(d.stockStatusScore) ? '#999' : Math.round(d.stockStatusScore) < 60 ? '#BA0C2F' : Math.round(d.stockStatusScore) < 75 ? '#f48521' : Math.round(d.stockStatusScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN(d.stockStatusScore) ? "N/A" : Math.round(d.stockStatusScore) + "%"}</b>
+                            </td>
+                            <td>
+                              <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? '#999' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 60 ? '#BA0C2F' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 75 ? '#f48521' : (Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2)) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '0.775rem', margin: 0 }}>{isNaN((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) ? "N/A" : Math.round((Math.round(d.stockStatusScore)+Math.round(d.supplyPlanQualityScore))/2) + "%"}</b>
+                            </td>
                             <td style={{ color: d.valueOfExpiredPU > 0 ? "red" : "" }}>{d.valueOfExpiredPU ? "$" : "-"}{addCommas(roundARU(d.valueOfExpiredPU, 1))}</td>
                             {localStorage.getItem("topLocalProgram") == "true" && <td title="QAT Problem List" onClick={() => this.redirectToCrudWindow(`/report/problemList/1/` + d.program.id + "/false")} style={{ color: d.countOfOpenProblem > 0 ? "red" : "", cursor: "pointer" }}>{d.countOfOpenProblem}</td>}
                             {localStorage.getItem("topLocalProgram") != "true" && <td style={{ color: d.countOfOpenProblem > 0 ? "red" : "" }}>{d.countOfOpenProblem}</td>}
-                            <td>{moment(d.commitDate).format('DD-MMMM-YY')}</td>
-                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? getLabelText(d.latestFinalVersionStatus.label, this.state.lang) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('DD-MMMM-YY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('DD-MMMM-YY') + ") " : "")}</a>
+                            <td><a className="IconColorD" style={{ color: "#002F6C", cursor: "pointer" }} onClick={() => this.redirectToCrudWindow("/report/supplyPlanVersionAndReview/1", true, d.program.id)}>{localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? ("v"+d.program.version+" - "+getLabelText(d.latestFinalVersion.versionStatus.label, this.state.lang)) : "No Historical Final Uploads") : (d.latestFinalVersionStatus && d.latestFinalVersionStatus.id) ? ("v"+d.versionId+" - "+getLabelText(d.latestFinalVersionStatus.label, this.state.lang)) : "No Historical Final Uploads"} {localStorage.getItem("topLocalProgram") == "true" ? (d.latestFinalVersion ? "(" + moment(d.latestFinalVersion.lastModifiedDate).format('MMM DD, YYYY') + ") " : "") : (d.latestFinalVersionLastModifiedDate ? "(" + moment(d.latestFinalVersionLastModifiedDate).format('MMM DD, YYYY') + ") " : "")}</a>
                               {localStorage.getItem('sessionType') === 'Online' && <i class="fa fa-book icons IconColorD" onClick={() => this.getNotes(localStorage.getItem("topLocalProgram") == "true" ? d.program.id.split("_")[0] : d.program.id)} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>}
                             </td>
                           </tr>)
@@ -3788,10 +3909,38 @@ class ApplicationDashboard extends Component {
                 {this.state.dashboardBottomData && this.state.bottomProgramId && <div className='row'>
                   {/* <div className='col-md-12'> */}
                   <div className='row px-3 pt-lg-2'>
-                    <div className={this.state.onlyDownloadedBottomProgram ? 'col-md-6' : 'col-md-3'}>
+                    <div className={'col-md-3'}>
+                      <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
+                        <div class="card-header justify-content-between">
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/supplyPlanScoreCard')} style={{ cursor: 'pointer' }}> {i18n.t('static.supplyPlan.overallScoreTitle')} <i class="fa fa-info-circle icons" title={i18n.t('static.supplyPlan.totalScoreTooltip')} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                        </div>
+                        <div class="card-body scrollable-content d-flex flex-column justify-content-center">
+                          <div className='row px-4'>
+                            <Doughnut data={overallScoreData} options={overallScoreOptions} plugins={[gaugeNeedle]} />
+                          </div>
+                          <div className="text-center" style={{ marginTop: '15px' }}>
+                            <div style={{ fontSize: '13px', color: '#000', fontWeight: 'bold' }}>{i18n.t('static.supplyPlan.overallScoreTitle')}:</div>
+                            <h3 style={{ fontWeight: 'bold', fontSize: '30px', color: isNaN(overallScoreValue) ? "#999" : overallScoreValue < 60 ? "#BA0C2F" : overallScoreValue < 75 ? "#f48521" : overallScoreValue < 90 ? "#edba26" : "#118b70" }}>{isNaN(overallScoreValue) ? "N/A" : Math.round(overallScoreValue) + "%"}</h3>
+                            <div className="d-flex justify-content-center flex-wrap" style={{ gap: '4px', marginTop: '8px' }}>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>0%-59%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>60%-74%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>75%-89%</span></div>
+                              <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '0.775rem', fontWeight: '500' }}>90%-100%</span></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={'col-md-3'}>
                       <div className="card custom-card CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/stockStatusMatrix')} style={{ cursor: 'pointer' }}> {i18n.t("static.dashboard.stockstatusmain")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.stockStatusHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
+                            <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                              {i18n.t('static.supplyPlan.score')}: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.stockStatusScore) ? '#999' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.stockStatusScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.stockStatusScore) ? "N/A" : Math.round(this.state.dashboardBottomData.stockStatusScore) + "%"}</b>
+                            </i>
+                          </div>
                         </div>
                         <div class="card-body pt-lg-2 scrollable-content">
                           <HorizontalBar data={stockStatusData} options={stockStatusOptions} height={150} />
@@ -3804,19 +3953,7 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
-                      {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
-                      <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
-                        <div class="card-header  justify-content-between">
-                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> {i18n.t("static.report.error")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
-                        </div>
-                        <div class="card-body px-1 py-2">
-                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable3'>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className='col-md-6'>
+                    <div className={'col-md-6'}>
                       <div className="card custom-card pb-lg-2 CustomHeight" style={{ overflow: 'visible' }}>
                         <div class="card-header justify-content-between">
                           <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/shipmentSummery')} style={{ cursor: 'pointer' }}>{i18n.t("static.report.orders")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.shipmentsHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
@@ -3872,6 +4009,12 @@ class ApplicationDashboard extends Component {
                       <div class="card custom-card CustomHeight boxHeightBottom">
                         <div class="card-header justify-content-between">
                           <div class="card-title" style={{ cursor: 'pointer' }}><span onClick={() => this.redirectToCrudWindow('/report/problemList/1/' + this.state.bottomProgramId + "/false")}> {i18n.t("static.dashboard.dataQuality")} </span><i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.dataQualityHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> {localStorage.getItem("bottomLocalProgram") == "true" && <i class="fa fa-refresh" style={{ color: "info", cursor: "pointer" }} title="Re-calculate QPL" onClick={() => this.getProblemListAfterCalculation(this.state.bottomProgramId)}></i>}</div>
+                          <div className='col-md-7 pl-lg-0' style={{ textAlign: 'end', display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}> 
+                            <i class="fs-10" style={{ color: '#000', display: 'flex', alignItems: 'center' }}>
+                              {i18n.t('static.supplyPlan.score')}: <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? '#999' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 60 ? '#BA0C2F' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 75 ? '#f48521' : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) < 90 ? '#edba26' : '#118b70', margin: '0 5px 0 5px' }}></span>
+                              <b className='h3 DarkFontbold' style={{ fontSize: '14px', margin: 0 }}>{isNaN(this.state.dashboardBottomData.supplyPlanQualityScore) ? "N/A" : Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) + "%"}</b>
+                            </i>
+                          </div>
                         </div>
                         <div class="card-body py-2 scrollable-content">
                           <div className='row pt-lg-2'>
@@ -3911,7 +4054,19 @@ class ApplicationDashboard extends Component {
                         </div>
                       </div>
                     </div>
-                    <div className='col-md-6'>
+                    <div className='col-md-3' style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}>
+                      {/* <div className="col-md-3" style={{ display: this.state.onlyDownloadedBottomProgram ? "none" : "block" }}> */}
+                      <div className="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{ overflow: 'visible' }}>
+                        <div class="card-header  justify-content-between">
+                          <div class="card-title" onClick={() => this.redirectToCrudWindow('/report/consumptionForecastErrorSupplyPlan')} style={{ cursor: 'pointer' }}> {i18n.t("static.report.error")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.forecastErrorHeaderTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></div>
+                        </div>
+                        <div class="card-body px-1 py-2 scrollable-content" style={{ overflow: 'visible' }}>
+                          <div id="forecastErrorJexcel" className='DashboardreadonlyBg dashboardTable2E' style={{ padding: '3px 8px' }}>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className={this.state.onlyDownloadedBottomProgram ? "col-md-6" : "col-md-3"}>
                       <div className='row'>
                         <div class="col-md-12">
                           <div class="card custom-card pb-lg-2 CustomHeight boxHeightBottom" style={{ overflow: 'visible' }}>

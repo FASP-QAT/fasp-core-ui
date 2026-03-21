@@ -1,0 +1,173 @@
+                                  {i18n.t("static.common.onlyDownloadedProgram")} <i class="fa fa-info-circle icons" title={i18n.t("static.dashboard.localTooltip")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i>
+                                </Label>}
+                                {!AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_DOWNLOAD_PROGARM') && <Label
+                                  className="form-check-label"
+                                  check htmlFor="onlyDownloadedProgram" style={{ fontSize: '12px', marginTop: '2px' }}>
+                                  {""}
+                                </Label>}
+                              </div>
+                            </FormGroup>
+                          </Label>
+                        </FormGroup>
+                      </div>
+                      <div className='row'>
+                        {!this.state.onlyDownloadedProgram && <FormGroup className="col-md-3">
+                          <Label htmlFor="countrysId">{i18n.t('static.program.realmcountry')}</Label>
+                          <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                          <div className="controls edit">
+                            <MultiSelect
+                              bsSize="sm"
+                              name="countrysId"
+                              id="countrysId"
+                              value={this.state.countryValues}
+                              onChange={(e) => { this.handleChange(e) }}
+                              options={countryList && countryList.length > 0 ? countryList : []}
+                              filterOptions={filterOptions}
+                              disabled={this.state.loading}
+                              overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                              selectSomeItems: i18n.t('static.common.select')}}
+                            />
+                            {!!this.props.error &&
+                              this.props.touched && (
+                                <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
+                              )}
+                          </div>
+                        </FormGroup>}
+                        {!this.state.onlyDownloadedProgram && <FormGroup className='col-md-3 FormGroupD'>
+                          <Label htmlFor="technicalAreaId">Technical Area<span class="red Reqasterisk">*</span></Label>
+                          <MultiSelect
+                              name="technicalAreaId"
+                              id="technicalAreaId"
+                              bsSize="sm"
+                              value={this.state.technicalAreaValues}
+                              onChange={(e) => { this.handleTechnicalAreaIdChange(e) }}
+                              options={technicalAreaList && technicalAreaList.length > 0 ? technicalAreaList : []}
+                              labelledBy={i18n.t('static.common.regiontext')}
+                              disabled={this.state.loading}
+                              overrideStrings={{
+                                  allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                  selectSomeItems: i18n.t('static.common.select')
+                              }}
+                              filterOptions={filterOptions}
+                          />
+                        </FormGroup>}
+                        <FormGroup className="col-md-3">
+                          <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
+                          <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
+                          <div className="controls ">
+                              <MultiSelect
+                                  bsSize="sm"
+                                  name="programIds"
+                                  id="programIds"
+                                  value={this.state.programValues}
+                                  onChange={(e) => { this.handleChangeProgram(e) }}
+                                  options={programList && programList.length > 0 ? programList : []}
+                                  disabled={this.state.loading}
+                                  overrideStrings={{
+                                      allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                      selectSomeItems: i18n.t('static.common.select')
+                                  }}
+                              />
+                          </div>
+                      </FormGroup>
+                      <FormGroup className="col-md-3">
+                          <Label htmlFor="viewById">View By</Label>
+                          <div className="controls ">
+                              <InputGroup>
+                                  <Input
+                                      type="select"
+                                      name="viewById"
+                                      id="viewById"
+                                      bsSize="sm"
+                                      onChange={this.toggleView}
+                                  >
+                                      <option value="0">Program</option>
+                                      <option value="1">Country</option>
+                                      <option value="2">Country x Program</option>
+                                  </Input>
+                              </InputGroup>
+                          </div>
+                      </FormGroup>
+                      <FormGroup className="col-md-3">
+                          <Label htmlFor="showDetailId">Show Detail</Label>
+                          <div className="controls ">
+                              <InputGroup>
+                                  <Input
+                                      type="select"
+                                      name="showDetailId"
+                                      id="showDetailId"
+                                      bsSize="sm"
+                                      onChange={this.toggleShowDetail}
+                                  >
+                                      <option value="0">No</option>
+                                      <option value="1">Yes</option>
+                                  </Input>
+                              </InputGroup>
+                          </div>
+                      </FormGroup>
+                    </div>
+                  </div>
+                </div>    
+              </div>
+            
+            {this.state.programValues && this.state.programValues.length > 0 && dataList.length > 0 && (
+              <>
+                <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
+                  <Card>
+                    <CardBody>
+                      <div className="chart-wrapper" style={{ height: '400px' }}>
+                        <Bar data={barData} options={barOptions} plugins={[targetLinePlugin]} />
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+                <div className="col-xl-12 pl-lg-2 pr-lg-2 mt-2">
+                  <Card>
+                    <CardBody>
+                      <div className="mb-3">
+                        <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Stock Status:</span>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.stockOut')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.underStock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.adequate')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#edb944', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.overStock')}</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 12, height: 12, backgroundColor: '#cfcdc9', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>{i18n.t('static.report.na')}</span></div>
+                        </div>
+
+                        <div className="d-flex flex-wrap mb-2" style={{ gap: '15px' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 'bold' }}>Scores:</span>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#BA0C2F', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>0%-35%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f48521', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>36%-70%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#edba26', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>71%-99%</span></div>
+                          <div className="d-flex align-items-center"><div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#118b70', marginRight: 5 }}></div><span style={{ fontSize: '11px' }}>100%</span></div>
+                        </div>
+
+                        {Number(this.state.viewBy) === 1 && (
+                          <div className="form-check d-flex align-items-center mt-2" style={{ paddingLeft: '20px' }}>
+                            <Input
+                              className="form-check-input"
+                              type="checkbox"
+                              id="collapseAll"
+                              checked={this.state.collapseAllChecked}
+                              onChange={(e) => this.toggleCollapseExpandAll(e)}
+                              style={{ marginTop: '0px', position: 'relative' }}
+                            />
+                            <Label className="form-check-label ml-2" htmlFor="collapseAll" style={{ fontSize: '12px', cursor: 'pointer', marginBottom: '0px' }}>
+                              Collapse All
+                            </Label>
+                          </div>
+                        )}
+                      </div>
+                      <div className="table-responsive">
+                          <div id="scorecardTableDiv" className="DashboardreadonlyBg"></div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+              </>
+            )}
+        </div>
+    );
+  }
+}
+export default SupplyPlanScoreCard;

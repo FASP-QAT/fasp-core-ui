@@ -30,6 +30,7 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                         pqdRequest.onsuccess = function (event) {
                             var pqdList = pqdRequest.result;
                             var dashboradTopList = [];
+                            
                             try {
                                 pdList.map(item => {
                                     var pqd = pqdList.filter(c => c.id == item.id);
@@ -45,6 +46,17 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                         var stockedOutCount = 0;
                                         var valueOfExpiredPU = 0;
                                         var linkedShipmentsCount=0;
+                                        var bottomPuData = dashboardData.bottomPuData;
+                                        var stockOut = 0;
+                                        var underStock = 0;
+                                        var adequate = 0;
+                                        var overStock = 0;
+                                        var na = 0;
+                                        var forecastConsumptionQplCount = 0;
+                                        var actualConsumptionQplCount = 0;
+                                        var inventoryQplCount = 0;
+                                        var shipmentQplCount = 0;
+                                        var totalQpl = 0;
                                         if (topPuData != "" && topPuData != undefined) {
                                             var puIds = ppu.filter(c => c.active.toString() == "true")
                                             puIds.map(pu => {
@@ -56,7 +68,34 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                                     valueOfExpiredPU += Number(Math.round(item.valueOfExpiredStock))
                                                     linkedShipmentsCount+=Number(item.linkedShipmentsCount);
                                                 }
+                                                if (bottomPuData != "" && bottomPuData != undefined) {
+                                                    var value = bottomPuData[pu.planningUnit.id];
+                                                    if (value != undefined) {
+                                                        stockOut += Number(value.stockStatus.stockOut);
+                                                        underStock += Number(value.stockStatus.underStock);
+                                                        adequate += Number(value.stockStatus.adequate);
+                                                        overStock += Number(value.stockStatus.overStock);
+                                                        na += Number(value.stockStatus.na);
+                                                        totalQpl += 1;
+                                                        if (value.forecastConsumptionQplPassed.toString() == "true") {
+                                                            forecastConsumptionQplCount += 1;
+                                                        }
+                                                        if (value.actualConsumptionQplPassed.toString() == "true") {
+                                                            actualConsumptionQplCount += 1;
+                                                        }
+                                                        if (value.inventoryQplPassed.toString() == "true") {
+                                                            inventoryQplCount += 1;
+                                                        }
+                                                        if (value.shipmentQplPassed.toString() == "true") {
+                                                            shipmentQplCount += 1;
+                                                        }
+                                                    }
+                                                }
                                             })
+                                            var flaggedCountForecastConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length;
+                                            var flaggedCountActualConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length;
+                                            var flaggedCountInventoryData = [...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length;
+                                            var flaggedCountShipmentData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
                                         }
                                         var dashboradTop = {
                                             "program": {
@@ -77,7 +116,9 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                             "versionStatus": programJson.currentVersion.versionStatus,
                                             "latestFinalVersion": p[0].versionList.filter(c => c.versionType.id == FINAL_VERSION_TYPE).slice(-1)[0],
                                             "isLatest": p[0].currentVersion.versionId > item.version ? false : true,
-                                            "isChanged": pqd[0].programModified
+                                            "isChanged": pqd[0].programModified,
+                                            "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
+                                            "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
                                         }
                                         dashboradTopList.push(dashboradTop);
                                     }
@@ -193,6 +234,12 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                             shipmentDetailsList.map(item => {
                                 shipmentTotal += Number(item.cost)
                             })
+                            var flaggedCountForecastConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length;
+                            var flaggedCountActualConsumptionData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length;
+                            var flaggedCountInventoryData = [...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length;
+                            var flaggedCountShipmentData = [...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+console.log("StockStatusScore",Number(stockOut),Number(underStock),Number(adequate),Number(overStock))
+console.log("Flagged",Number(flaggedCountForecastConsumptionData),Number(flaggedCountActualConsumptionData),Number(flaggedCountInventoryData),Number(flaggedCountShipmentData))
                             dashboardBottomData = {
                                 "stockStatus": {
                                     "stockOut": stockOut,
@@ -214,22 +261,24 @@ export function Dashboard(props, programId, reportBy, updateTopPart, updateBotto
                                 "forecastErrorList": [],
                                 "forecastConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==8).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountForecastConsumptionData
                                 },
                                 "actualConsumptionQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==1 || c.realmProblem.problem.problemId==25)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountActualConsumptionData
                                 },
                                 "inventoryQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=>  c.planningUnitActive != false && c.problemStatus.id==1 && c.realmProblem.problem.problemId==2).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountInventoryData
                                 },
                                 "shipmentQpl": {
                                     "puCount": totalQpl,
-                                    "correctCount": totalQpl-[...new Set(generalProgramJson.problemReportList.filter(c=> c.planningUnitActive != false && c.problemStatus.id==1 && (c.realmProblem.problem.problemId==3 || c.realmProblem.problem.problemId==4)).map(c => c.planningUnit.id))].length
+                                    "correctCount": totalQpl-flaggedCountShipmentData
                                 },
                                 "expiryTotal": expiryTotal,
-                                "shipmentTotal": shipmentTotal
+                                "shipmentTotal": shipmentTotal,
+                                "supplyPlanQualityScore": (((1-(flaggedCountForecastConsumptionData/totalQpl)) + (1-(flaggedCountActualConsumptionData/totalQpl)) + (1-(flaggedCountInventoryData/totalQpl)) + (1-(flaggedCountShipmentData/totalQpl)))/4)*100,
+                                "stockStatusScore": (Number(adequate)/(Number(stockOut)+Number(underStock)+Number(adequate)+Number(overStock)))*100
                             }
                             props.updateStateDashboard("dashboardStartDateBottom", generalProgramJson.dashboardData.startDateBottom);
                             props.updateStateDashboard("dashboardStopDateBottom", generalProgramJson.dashboardData.stopDateBottom);
