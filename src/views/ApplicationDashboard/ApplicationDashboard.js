@@ -1538,7 +1538,7 @@ class ApplicationDashboard extends Component {
       }.bind(this);
     }.bind(this);
     Chart.plugins.register({
-      afterDraw: function (chart) {
+      afterDatasetsDraw: function (chart) {
         if (chart.config.type === 'pie') {
           const ctx = chart.chart.ctx;
           const total = chart.data.datasets[0].data.reduce((sum, value) => sum + parseInt(value), 0);
