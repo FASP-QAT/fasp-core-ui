@@ -215,6 +215,7 @@ class ShipmentSummery extends Component {
       budgetValues: [],
       budgetLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       lang: localStorage.getItem("lang"),
       fundingSourceTypes: [],
       fundingSourceTypeValues: [],
@@ -278,6 +279,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
@@ -303,7 +305,21 @@ class ShipmentSummery extends Component {
             this.setState({
               countrys: listArray,
               loading: false
-            }, () => { })
+            }, () => {
+              const sesRealmCountryId = localStorage.getItem("sesRealmCountryId");
+              if (sesRealmCountryId && sesRealmCountryId !== "" && sesRealmCountryId !== "undefined") {
+                const country = listArray.find(c => c.id == sesRealmCountryId);
+                if (country) {
+                  let countryValues = [{
+                    label: getLabelText(country.label, this.state.lang),
+                    value: Number(country.id)
+                  }];
+                  this.setState({ countryValues }, () => {
+                    this.filterProgram();
+                  });
+                }
+              }
+            })
           } else {
             this.setState({ message: response.data.messageCode, loading: false },
               () => { this.hideSecondComponent(); })
@@ -420,7 +436,23 @@ class ShipmentSummery extends Component {
                 this.setState({
                   programLst: listArray
                 }, () => {
-                  this.fetchData()
+                  const sesProgramIdReport = localStorage.getItem("sesProgramIdReport");
+                  if (sesProgramIdReport && sesProgramIdReport !== "" && sesProgramIdReport !== "undefined") {
+                    const prog = listArray.find(p => p.id == sesProgramIdReport);
+                    if (prog) {
+                      const progVal = { label: prog.code, value: prog.id };
+                      this.setState({
+                        programValues: [progVal],
+                        programLabels: [progVal.label]
+                      }, () => {
+                        this.handleChangeProgram([progVal]);
+                      });
+                    } else {
+                      this.fetchData();
+                    }
+                  } else {
+                    this.fetchData();
+                  }
                 });
               } else {
                 this.setState({
@@ -518,7 +550,22 @@ class ShipmentSummery extends Component {
                 programLst: proList,
                 loading: false
               }, () => {
-                this.fetchData()
+                if (localStorage.getItem("sesProgramIdReport") != "" && localStorage.getItem("sesProgramIdReport") != undefined) {
+                  const prog = proList.find(p => p.id == localStorage.getItem("sesProgramIdReport"));
+                  if (prog) {
+                    const progVal = { label: prog.code, value: prog.id };
+                    this.setState({
+                      programValues: [progVal],
+                      programLabels: [progVal.label]
+                    }, () => {
+                      this.handleChangeProgram([progVal]);
+                    });
+                  } else {
+                    this.fetchData();
+                  }
+                } else {
+                  this.fetchData();
+                }
               })
             }.bind(this);
           }.bind(this)
@@ -553,6 +600,7 @@ class ShipmentSummery extends Component {
       fundingSourceValues: [],
       fundingSourceLabels: [],
       filteredBudgetList: [],
+      filteredBudgetListProgram: [],
       procurementAgentValues: [],
       procurementAgentLabels: []
     }, () => {
@@ -1337,6 +1385,7 @@ class ShipmentSummery extends Component {
               fundingSourceValues: listArray.map(c => { return { value: c.id, label: c.code } }),
               fundingSourceLabels: listArray.map(c => c.code),
               filteredBudgetList: [],
+              filteredBudgetListProgram: [],
             },
             () => {
               this.getBudgetList();
@@ -1411,6 +1460,7 @@ class ShipmentSummery extends Component {
               fundingSourceValues: fundingSource.map(c => { return { value: c.id, label: c.code } }),
               fundingSourceLabels: fundingSource.map(c => c.code),
               filteredBudgetList: [],
+              filteredBudgetListProgram: [],
             },
             () => {
               this.getBudgetList();
@@ -1577,6 +1627,7 @@ class ShipmentSummery extends Component {
                 budgetLabels: budgetLabelsFromProps.length > 0 ? budgetLabelsFromProps : proList.map(item => getLabelText(item.label, this.state.lang)),
                 budgets: proList,
                 filteredBudgetList: proList,
+                filteredBudgetListProgram: proList,
               },
               () => {
                 this.fetchData();
@@ -1669,6 +1720,11 @@ class ShipmentSummery extends Component {
                   b = b.budgetCode.toLowerCase();
                   return a < b ? -1 : a > b ? 1 : 0;
                 }),
+                filteredBudgetListProgram: fSourceResult.sort(function (a, b) {
+                  a = a.budgetCode.toLowerCase();
+                  b = b.budgetCode.toLowerCase();
+                  return a < b ? -1 : a > b ? 1 : 0;
+                }),
               },
               () => {
                 this.fetchData();
@@ -1696,6 +1752,7 @@ class ShipmentSummery extends Component {
           budgetLabels: budgetLabelsFromProps,
           budgets: [],
           filteredBudgetList: [],
+          filteredBudgetListProgram: []
         },
         () => {
           this.fetchData();
@@ -1720,7 +1777,7 @@ class ShipmentSummery extends Component {
             var bList = [];
             var groupedBudgetsFilter = {};
             for (var i = 0; i < budgetList.length; i++) {
-              if (this.state.filteredBudgetList.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
+              if (this.state.filteredBudgetListProgram.some(c => c.budgetId.toString().split(',').includes(budgetList[i].id.toString()))) {
                 var budgetCode = budgetList[i].code;
                 if (!groupedBudgetsFilter[budgetCode]) {
                   groupedBudgetsFilter[budgetCode] = {
@@ -2343,7 +2400,22 @@ class ShipmentSummery extends Component {
                     message: "",
                   },
                   () => {
-                    this.fetchData();
+                    const sesIsRedirectionFromScorecard = localStorage.getItem("sesIsRedirectionFromScorecard");
+                    if (sesIsRedirectionFromScorecard == "true") {
+                      let planningUnitValues = proList.map(item => ({
+                        label: getLabelText(item.label, this.state.lang),
+                        value: Number(item.id)
+                      }));
+                      this.setState({
+                        planningUnitValues: planningUnitValues,
+                        planningUnitLabels: planningUnitValues.map(item => item.label)
+                      }, () => {
+                        localStorage.removeItem("sesIsRedirectionFromScorecard");
+                        this.fetchData();
+                      })
+                    } else {
+                      this.fetchData();
+                    }
                   }
                 );
               }.bind(this);
@@ -2359,6 +2431,22 @@ class ShipmentSummery extends Component {
                 planningUnitList: response.data.planningUnitList,
                 planningUnitId: []
               }, () => {
+                const sesIsRedirectionFromScorecard = localStorage.getItem("sesIsRedirectionFromScorecard");
+                if (sesIsRedirectionFromScorecard == "true") {
+                  let planningUnitValues = response.data.planningUnitList.map(item => ({
+                    label: getLabelText(item.label, this.state.lang),
+                    value: Number(item.id)
+                  }));
+                  this.setState({
+                    planningUnitValues: planningUnitValues,
+                    planningUnitLabels: planningUnitValues.map(item => item.label)
+                  }, () => {
+                    localStorage.removeItem("sesIsRedirectionFromScorecard");
+                    this.fetchData();
+                  })
+                } else {
+                  this.fetchData();
+                }
               })
             }).catch(
               error => {

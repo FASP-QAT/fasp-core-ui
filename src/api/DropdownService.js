@@ -196,5 +196,12 @@ class DropdownService {
     return axios.get(`${API_URL}/api/dropdown/program/all/expanded/realm/${realmId}`, {}
     );
   }
+  getProgramListBasedOnRealmCountryIdsAndHealthAreaIds(json) {
+    return axios.post(
+      `${API_URL}/api/dropdown/program/realmCountryIds/healthAreaIds`,
+      json,
+      {}
+    );
+  }
 }
 export default new DropdownService();

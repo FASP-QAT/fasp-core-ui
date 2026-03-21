@@ -55,6 +55,59 @@ export function jExcelLoadedFunction(instance, number) {
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
 /**
+ * This function is used to format the jexcel table
+ * @param {*} instance This is the instance of the jexcel table
+ * @param {*} number This is the position number of jexcel table
+ */
+export function jExcelLoadedFunctionStockStatusMatrix(instance, number) {
+    if (number == undefined) {
+        number = 0;
+    }
+    var obj = {};
+    obj.options = {};
+    var elInstance = instance.worksheets[0];
+    elInstance.hideIndex(0);
+    var pagignation = document.getElementsByClassName('jss_pagination')[0];
+    pagignation.classList.add('row');
+    // console.log("pagignation", pagignation.firstChild.innerHTML)
+    // pagignation.firstChild.innerHTML = i18n.t('static.common.result', { from:1, size:20 });
+    var searchContainer = document.getElementsByClassName('jss_search_container')[number];
+    var searchDiv = (document.getElementsByClassName('jss_search_container')[number]).childNodes[1];
+    try {
+        searchDiv.removeChild(((document.getElementsByClassName('jss_search_container')[number]).childNodes[1]).childNodes[0]);
+    } catch (error) { }
+    document.getElementsByClassName("jss_search")[number].placeholder = i18n.t('static.jexcel.search');
+    var clearBtn = document.createElement('button');
+    clearBtn.type = "button";
+    clearBtn.classList.add('btn-default');
+    clearBtn.classList.add('btn');
+    clearBtn.classList.add('jexcel_clear_btn');
+    var clarText = document.createTextNode(i18n.t('static.jexcel.clear'));
+    clearBtn.setAttribute("id", "clearBtnID");
+    clearBtn.onclick = function () {
+        document.getElementsByClassName("jss_search")[number].value = "";
+        elInstance.search('')
+    };
+    clearBtn.appendChild(clarText);
+    searchContainer.appendChild(clearBtn);
+    var jexcel_pagination = document.getElementsByClassName('jss_pagination')[number];
+    jexcel_pagination.lastChild.classList.add('order-3');
+    jexcel_pagination.firstChild.classList.add('order-2');
+    jexcel_pagination.firstChild.classList.add('mr-auto');
+    jexcel_pagination.firstChild.classList.add('pl-0');
+    var pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
+    pageSelect.options[3].innerHTML = "All";
+    pageSelect.addEventListener("change", () => paginationChange(0));
+    var jexcel_filterFirstdiv = document.getElementsByClassName('jss_search_container')[number];
+    var filter = jexcel_filterFirstdiv.firstChild;
+    filter.classList.add('order-1');
+    filter.classList.add('pr-1');
+    filter.classList.add('ml-2');
+    jexcel_pagination.appendChild(filter);
+    var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
+    jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
+}
+/**
  * This function is used to format the jexcel table for erp linking screens
  * @param {*} instance This is the instance of the jexcel table
  * @param {*} number This is the position number of jexcel table
@@ -303,7 +356,7 @@ export function jExcelLoadedFunctionQuantimed(instance, number) {
  */
 export function checkValidtion(type, colName, rowNo, value, elInstance, reg, greaterThan0, equalTo0, colNo) {
     if (type == "text") {
-        value=value.toString().replaceAll('&nbsp;','').trim();
+        value = value.toString().replaceAll('&nbsp;', '').trim();
         var col = (colName).concat(parseInt(rowNo) + 1);
         if (value == "" || value == undefined || value == "undefined") {
             elInstance.setStyle(col, "background-color", "transparent");
@@ -324,7 +377,7 @@ export function checkValidtion(type, colName, rowNo, value, elInstance, reg, gre
             elInstance.setComments(col, i18n.t('static.label.fieldRequired'));
             return false;
         } else {
-            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? 1==0 : value == 0))) {
+            if (isNaN(Number(value)) || !(reg.test(value)) || (greaterThan0 == 1 && (equalTo0 == 1 ? value < 0 : value <= 0)) || (greaterThan0 == 0 && (equalTo0 == 1 ? 1 == 0 : value == 0))) {
                 elInstance.setStyle(col, "background-color", "transparent");
                 elInstance.setStyle(col, "background-color", "yellow");
                 elInstance.setComments(col, i18n.t('static.message.invalidnumber'));
@@ -576,7 +629,7 @@ export function checkValidation(worksheets) {
                     valid = false;
                     columnValid = false;
                 }
-            }            
+            }
             if (columns[c].number === true && columnValid != false && value != "") {
                 if (isNaN(parseInt(value))) {
                     worksheets.setStyle(col, "background-color", "transparent");
@@ -709,7 +762,7 @@ export function changed(worksheets, cell, x, y, value) {
 export function loadedForNonEditableTables(instance, cell) {
     jExcelLoadedFunction(instance);
 }
-export function jExcelLoadedFunctionForNotes(instance,number) {
+export function jExcelLoadedFunctionForNotes(instance, number) {
     if (number == undefined) {
         number = 0;
     }
@@ -757,9 +810,9 @@ export function jExcelLoadedFunctionForNotes(instance,number) {
     var jexcel_filterFirstdiv1 = document.getElementsByClassName('jss_table_container')[0];
     jexcel_filterFirstdiv1.firstChild.nextSibling.classList.remove('jss_scrollX')
 }
-export function onOpenFilter(worksheets,columnNumber,options){
-    var type=worksheets.getConfig().columns[columnNumber].type;
-    if(type=='dropdown' || type=='autocomplete'){
+export function onOpenFilter(worksheets, columnNumber, options) {
+    var type = worksheets.getConfig().columns[columnNumber].type;
+    if (type == 'dropdown' || type == 'autocomplete') {
         setTimeout(() => {
             const dropdown = document.querySelector('.jss_filters_options');
             if (dropdown) {
