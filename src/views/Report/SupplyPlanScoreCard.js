@@ -108,6 +108,7 @@ const targetLinePlugin = {
     afterDatasetsDraw: function(chart) {
         if (!chart.scales['x-axis-0'] || !chart.scales['y-axis-0']) return;
         const ctx = chart.ctx;
+        const xAxis = chart.scales['x-axis-0'];
         const yAxis = chart.scales['y-axis-0'];
         const datasets = chart.data.datasets;
 
@@ -155,6 +156,15 @@ const targetLinePlugin = {
                         }
                     });
                     
+                    if (minX === Infinity || maxX === -Infinity) {
+                        if (typeof xAxis.getPixelForTick === 'function') {
+                            const xPos = xAxis.getPixelForTick(i);
+                            const catWidth = (xAxis.width / xAxis.ticks.length);
+                            minX = xPos - (catWidth * 0.25);
+                            maxX = xPos + (catWidth * 0.25);
+                        }
+                    }
+
                     if (minX !== Infinity && maxX !== -Infinity) {
                         ctx.beginPath();
                         ctx.moveTo(minX, yPos);
