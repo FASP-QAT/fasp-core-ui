@@ -1,0 +1,101 @@
+            const cKey = `${cId}_${cLabel}`;
+            if (!countryGroupsMap[cKey]) countryGroupsMap[cKey] = { label: cLabel, programs: [], key: cKey };
+            countryGroupsMap[cKey].programs.push(dbd);
+        });
+
+        Object.values(countryGroupsMap).sort((a,b) => a.label.localeCompare(b.label)).forEach(cg => {
+            cg.programs.sort((p1, p2) => (p1.program?.code || '').localeCompare(p2.program?.code || ''));
+            const isExpanded = !!this.state.countryExpandedMap[cg.key];
+            const toggleIcon = isExpanded ? '-' : '+';
+            const n = cg.programs.length;
+            const activePUs = cg.programs.reduce((s,d)=>s+(d.totalPus||0),0);
+            const sumForecast = cg.programs.reduce((s,d)=>s+(d.forecastConsumptionQpl?.correctCount||0),0);
+            const sumActual = cg.programs.reduce((s,d)=>s+(d.actualConsumptionQpl?.correctCount||0),0);
+            const sumInventory = cg.programs.reduce((s,d)=>s+(d.inventoryQpl?.correctCount||0),0);
+            const sumShipments = cg.programs.reduce((s,d)=>s+(d.shipmentQpl?.correctCount||0),0);
+            const avgQ = n > 0 ? cg.programs.reduce((s,d)=>s+(d.supplyPlanQualityScore||0),0)/n : 0;
+            const avgS = n > 0 ? cg.programs.reduce((s,d)=>s+(d.stockStatusScore||0),0)/n : 0;
+            const avgT = (avgQ + avgS) / 2;
+            
+            const totalSO = cg.programs.reduce((s,d)=>s+(d.stockStatus?.stockOut||0),0);
+            const totalUS = cg.programs.reduce((s,d)=>s+(d.stockStatus?.underStock||0),0);
+            const totalAd = cg.programs.reduce((s,d)=>s+(d.stockStatus?.adequate||0),0);
+            const totalOv = cg.programs.reduce((s,d)=>s+(d.stockStatus?.overStock||0),0);
+            const totalNA = cg.programs.reduce((s,d)=>s+(d.stockStatus?.na||0),0);
+            const totalSt = totalSO+totalUS+totalAd+totalOv+totalNA;
+            
+            const soPerc = totalSt>0 ? Math.round((totalSO/totalSt)*100) : 0;
+            const usPerc = totalSt>0 ? Math.round((totalUS/totalSt)*100) : 0;
+            const adPerc = totalSt>0 ? Math.round((totalAd/totalSt)*100) : 0;
+            const ovPerc = totalSt>0 ? Math.round((totalOv/totalSt)*100) : 0;
+            const naPerc = totalSt>0 ? Math.round((totalNA/totalSt)*100) : 0;
+
+            data.push([
+                `${toggleIcon} ${cg.label}`,
+                '-',
+                activePUs,
+                sumForecast,
+                sumActual,
+                sumInventory,
+                sumShipments,
+                `${Math.round(avgQ)}%`,
+                `${soPerc},${usPerc},${adPerc},${ovPerc},${naPerc}`,
+                `${Math.round(avgS)}%`,
+                `${Math.round(avgT)}%`,
+                '-',
+                '-',
+                'row_parent',
+                cg.key
+            ]);
+
+            if (isExpanded) {
+                cg.programs.forEach(dbd => {
+                    let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
+                    let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
+                    reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
+                    data.push([
+                        `${dbd.program.code}`,
+                        `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                        dbd.totalPus,
+                        dbd.forecastConsumptionQpl?.correctCount || 0,
+                        dbd.actualConsumptionQpl?.correctCount || 0,
+                        dbd.inventoryQpl?.correctCount || 0,
+                        dbd.shipmentQpl?.correctCount || 0,
+                        `${Math.round(dbd.supplyPlanQualityScore || 0)}%`,
+                        `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
+                        `${Math.round(dbd.stockStatusScore || 0)}%`,
+                        `${totalScore}%`,
+                        reviewStatus,
+                        dbd.versionNotes || '',
+                        'row_child',
+                        cg.key
+                    ]);
+                });
+            }
+        });
+    } else {
+        const sortedList = [...list].sort((a, b) => (a.program?.code || '').localeCompare(b.program?.code || ''));
+        sortedList.forEach(dbd => {
+            if (!dbd || !dbd.program) return;
+            let totalScore = Math.round((dbd.supplyPlanQualityScore + dbd.stockStatusScore) / 2) || 0;
+            let reviewStatus = dbd.versionStatus ? (dbd.versionStatus.label ? `${dbd.program.version ? `v${dbd.program.version} - ` : ''}${getLabelText(dbd.versionStatus.label, this.state.lang)}` : dbd.versionStatus.id) : '';
+            reviewStatus += (dbd.versionLastModifiedDate ? ' (' + moment(dbd.versionLastModifiedDate).format('MMM DD, YYYY') + ')' : '');
+            data.push([
+                dbd.program.code,
+                `v${dbd.program.version}${dbd.versionCreatedDate ? ' (' + moment(dbd.versionCreatedDate).format('MMM DD, YYYY') + ')' : ''}`,
+                dbd.totalPus,
+                dbd.forecastConsumptionQpl?.correctCount || 0,
+                dbd.actualConsumptionQpl?.correctCount || 0,
+                dbd.inventoryQpl?.correctCount || 0,
+                dbd.shipmentQpl?.correctCount || 0,
+                `${Math.round(dbd.supplyPlanQualityScore || 0)}%`,
+                `${Math.round((dbd.stockStatus.stockOutPerc || 0) * 100)},${Math.round((dbd.stockStatus.underStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.adequatePerc || 0) * 100)},${Math.round((dbd.stockStatus.overStockPerc || 0) * 100)},${Math.round((dbd.stockStatus.naPerc || 0) * 100)}`,
+                `${Math.round(dbd.stockStatusScore || 0)}%`,
+                `${totalScore}%`,
+                reviewStatus,
+                dbd.versionNotes || '',
+                'program',
+                ''
+            ]);
+        });
+    }

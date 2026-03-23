@@ -111,6 +111,9 @@ class StockStatus extends Component {
       planningUnitDetailsExport: "",
       matrixPayload: localStorage.getItem("stockStatusMatrixPayload") ? JSON.parse(localStorage.getItem("stockStatusMatrixPayload")) : null
     };
+    if (this.state.matrixPayload && this.state.matrixPayload.startDate && this.state.matrixPayload.endDate) {
+      this.state.rangeValue = { from: this.state.matrixPayload.startDate, to: this.state.matrixPayload.endDate };
+    }
     localStorage.removeItem("stockStatusMatrixPayload");
     this.filterData = this.filterData.bind(this);
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
