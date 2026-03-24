@@ -79,10 +79,8 @@ function renderFaIconToDataUrl(glyphChar, color, sizePx = 28) {
  */
 function buildPdfIconCache() {
   return {
-    truckBlack:   renderFaIconToDataUrl("\uf0d1", "#000", 28),
-    truckWhite:   renderFaIconToDataUrl("\uf0d1", "#fff", 28),
-    warningBlack: renderFaIconToDataUrl("\uf071", "#000", 28),
-    warningWhite: renderFaIconToDataUrl("\uf071", "#fff", 28),
+    truck:   renderFaIconToDataUrl("\uf0d1", "#1A1A1A", 28),
+    warning: renderFaIconToDataUrl("\uf071", "#1A1A1A", 28),
   };
 }
 
@@ -393,16 +391,16 @@ class StockStatusMatrixGlobal extends Component {
                     doc.text(item.text, leftMargin + (index * 90) + 15, y + 10);
                 });
                 
-                if (iconCache.truckBlack) {
-                    doc.addImage(iconCache.truckBlack.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 2, ICON_PT, ICON_PT);
+                if (iconCache.truck) {
+                    doc.addImage(iconCache.truck.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 2, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
                 doc.setFontSize(8);
                 doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 90), y + 10);
                 
-                if (iconCache.warningBlack) {
-                    doc.addImage(iconCache.warningBlack.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
+                if (iconCache.warning) {
+                    doc.addImage(iconCache.warning.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
@@ -545,15 +543,15 @@ class StockStatusMatrixGlobal extends Component {
                         
                         if (color) {
                             data.cell.styles.fillColor = color;
-                            data.cell.styles.textColor = (color === '#BA0C2F' || color === '#118b70') ? '#fff' : '#000';
+                            data.cell.styles.textColor = '#1A1A1A';
                         }
 
                         // Icons padding
                         if (dataEntry && this.state.showIcons) {
                             let iconCount = (dataEntry.shipmentQty > 0 ? 1 : 0) + (dataEntry.expiredQty > 0 ? 1 : 0);
-                            let rightPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
-                            data.cell.styles.halign = 'right';
-                            data.cell.styles.cellPadding = { left: 2, right: rightPad, top: 2, bottom: 2 };
+                            let leftPad = iconCount > 0 ? 4 + iconCount * (ICON_PT + ICON_GAP) : 4;
+                            data.cell.styles.halign = 'center';
+                            data.cell.styles.cellPadding = { left: leftPad, right: 2, top: 2, bottom: 2 };
                         }
                     }
                 }.bind(this),
@@ -564,26 +562,15 @@ class StockStatusMatrixGlobal extends Component {
                         let dataEntry = dataList[data.row.index].dataMap[sortedDates[overallDateIdx]];
 
                         if (dataEntry && this.state.showIcons && (dataEntry.shipmentQty > 0 || dataEntry.expiredQty > 0)) {
-                            let iconCount = (dataEntry.shipmentQty > 0 ? 1 : 0) + (dataEntry.expiredQty > 0 ? 1 : 0);
-                            let totalIconWidth = iconCount * (ICON_PT + ICON_GAP) - ICON_GAP;
-                            let iconX = data.cell.x + data.cell.width - totalIconWidth - 3;
+                            let iconX = data.cell.x + 2;
                             const iconY = data.cell.y + (data.cell.height - ICON_PT) / 2;
 
-                            const bgColor = data.cell.styles.fillColor;
-                            const useWhite = (bgColor === '#BA0C2F' || bgColor === '#118b70');
-
-                            if (dataEntry.shipmentQty > 0) {
-                                const truckIcon = useWhite ? iconCache.truckWhite : iconCache.truckBlack;
-                                if (truckIcon) {
-                                    doc.addImage(truckIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
-                                }
+                            if (dataEntry.shipmentQty > 0 && iconCache.truck) {
+                                doc.addImage(iconCache.truck.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
                                 iconX += ICON_PT + ICON_GAP;
                             }
-                            if (dataEntry.expiredQty > 0) {
-                                const warningIcon = useWhite ? iconCache.warningWhite : iconCache.warningBlack;
-                                if (warningIcon) {
-                                    doc.addImage(warningIcon.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
-                                }
+                            if (dataEntry.expiredQty > 0 && iconCache.warning) {
+                                doc.addImage(iconCache.warning.dataUrl, "PNG", iconX, iconY, ICON_PT, ICON_PT);
                             }
                         }
                     }
@@ -1234,6 +1221,14 @@ class StockStatusMatrixGlobal extends Component {
             },
             onload: function (instance) {
                 jExcelLoadedFunction(instance);
+                if (colOffset > 0) {
+                    setTimeout(() => {
+                        let elInstance = instance.worksheets ? instance.worksheets[0] : instance;
+                        if (elInstance && typeof elInstance.setFreezeColumns === 'function') {
+                            elInstance.setFreezeColumns(colOffset);
+                        }
+                    }, 500);
+                }
                 // Hide filter icons from column headers as requested
                 const el = instance.element || instance;
                 const filterIcons = el.querySelectorAll(".jss_column_filter");
