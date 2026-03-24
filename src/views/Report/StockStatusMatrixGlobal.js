@@ -1169,6 +1169,7 @@ class StockStatusMatrixGlobal extends Component {
             jexcelData.push(row);
         });
         jexcel.destroy(document.getElementById("shipmentJexcel"), true);
+        jexcel.setDictionary({ Show: " ", entries: " " });
         const colOffset = isEquUnitMode ? 2 : 1;
         var options = {
             data: jexcelData,
@@ -1180,11 +1181,71 @@ class StockStatusMatrixGlobal extends Component {
             position: 'top',
             copyCompatibility: true,
             allowExport: false,
-            pagination: localStorage.getItem("sesRecordCount"),
-            paginationOptions: JEXCEL_PAGINATION_OPTION,
-            license: JEXCEL_PRO_KEY, onopenfilter: onOpenFilter,
+            license: JEXCEL_PRO_KEY,
+            onopenfilter: (worksheets, columnNumber, options) => {
+                var type = worksheets.getConfig().columns[columnNumber].type;
+                if (type == "dropdown" || type == "autocomplete") {
+                    setTimeout(() => {
+                        const dropdown = document.querySelector(".jss_filters_options");
+                        if (dropdown) {
+                            const options = Array.from(
+                                dropdown.querySelectorAll("label")
+                            ).slice(1);
+                            const sorted = options.sort((a, b) =>
+                                a.textContent.localeCompare(b.textContent)
+                            );
+                            sorted.forEach((option) => dropdown.appendChild(option));
+                        }
+                    }, 50);
+                }
+                setTimeout(() => {
+                    document
+                        .querySelectorAll(".jss_filters_options i")
+                        .forEach((icon) => icon.remove());
+                }, 0);
+                setTimeout(() => {
+                    const container = document.querySelector(".jss_filters_options");
+                    if (!container) return;
+
+                    // Get all labels except "(Select all)"
+                    const labels = Array.from(container.querySelectorAll("label"))
+                        .filter(l => !l.innerText.includes("(Select all)"));
+
+                    // Extract value + element
+                    const items = labels.map(label => {
+                        const text = label.innerText.trim();
+
+                        // Remove icons / symbols if any
+                        const clean = text.replace(/[^\d.\-]/g, "");
+
+                        return {
+                            value: parseFloat(clean) || 0,
+                            element: label
+                        };
+                    });
+
+                    // 🔥 Sort numerically (ascending)
+                    items.sort((a, b) => a.value - b.value);
+
+                    // Clear and re-append
+                    items.forEach(item => container.appendChild(item.element));
+
+                }, 0);
+            },
             onload: function (instance) {
                 jExcelLoadedFunction(instance);
+                // Hide filter icons from column headers as requested
+                const el = instance.element || instance;
+                const filterIcons = el.querySelectorAll(".jss_column_filter");
+                filterIcons.forEach((icon) => {
+                    icon.style.display = "none";
+                });
+                document
+                    .querySelectorAll(".jss_filters_options i, .jexcel_filter svg")
+                    .forEach((icon) => {
+                        icon.style.display = "none";
+                    });
+
                 try {
                     const currentMonthLabel = moment().format("MMM YY");
                     const table = instance.element || instance;
@@ -1200,10 +1261,24 @@ class StockStatusMatrixGlobal extends Component {
                     });
                 } catch (_) { }
             },
+            pagination: localStorage.getItem("sesRecordCount"),
+            paginationOptions: JEXCEL_PAGINATION_OPTION,
+            search: true,
+            columnSorting: true,
             onfilter: function (instance) {
                 this.refreshJexcel(instance);
             }.bind(this),
-            onsort: function (instance) {
+            onsort: function (instance, col, direction) {
+                if (col >= colOffset && col < columns.length - 1) {
+                    const rows = instance.getData();
+                    const nonNa = rows.filter(
+                        (r) => r[col] !== null && r[col] !== "" && r[col] !== undefined && r[col] !== i18n.t("static.supplyPlanFormula.na")
+                    );
+                    const na = rows.filter(
+                        (r) => r[col] == null || r[col] == "" || r[col] == undefined || r[col] == i18n.t("static.supplyPlanFormula.na")
+                    );
+                    if (na.length > 0) instance.setData([...nonNa, ...na]);
+                }
                 setTimeout(() => {
                     this.refreshJexcel(instance);
                 }, 0);
@@ -1220,32 +1295,37 @@ class StockStatusMatrixGlobal extends Component {
                     var rowData = instance.getRowData(row);
                     var rowIndex = rowData[columns.length - 1];
                     let dataEntry = (dataList[rowIndex] && dataList[rowIndex].dataMap) ? dataList[rowIndex].dataMap[date] : null;
-                    let textColor = '#000';
+                    const textColor = "#1A1A1A";
                     if (val == i18n.t("static.supplyPlanFormula.na")) {
                         cell.style.backgroundColor = '#cfcdc9';
-                        cell.style.color = '#000';
-                        textColor = '#000';
+                        cell.style.color = textColor;
                     } else if (dataEntry) {
                         let stockStatusId = dataEntry.stockStatusId;
                         let colorEntry = legendcolor.find(c => c.value === stockStatusId);
                         if (colorEntry) {
                             cell.style.backgroundColor = colorEntry.color;
-                            textColor = (colorEntry.color === '#BA0C2F' || colorEntry.color === '#118b70') ? '#fff' : '#000';
                             cell.style.color = textColor;
                         }
                     }
 
                     if (dataEntry) {
-                        let innerHTML = val;
+                        cell.innerHTML = val;
                         if (this.state.showIcons) {
-                            if (dataEntry.shipmentQty > 0) {
-                                innerHTML += ' <i class="fa fa-truck" aria-hidden="true" style="color: ' + textColor + ';" title="' + i18n.t('static.shipment.shipment') + ': ' + dataEntry.shipmentQty + '"></i>';
-                            }
                             if (dataEntry.expiredQty > 0) {
-                                innerHTML += ' <i class="fa fa-exclamation-triangle" aria-hidden="true" style="color: ' + textColor + ';" title="' + i18n.t('static.supplyPlan.expiry') + ': ' + dataEntry.expiredQty + '"></i>';
+                                const warningIcon = document.createElement("i");
+                                warningIcon.className = "fa fa-exclamation-triangle warning-icon";
+                                warningIcon.style.color = textColor;
+                                warningIcon.style.marginRight = "5px";
+                                cell.prepend(warningIcon);
+                            }
+                            if (dataEntry.shipmentQty > 0) {
+                                const truckIcon = document.createElement("i");
+                                truckIcon.className = "fa fa-truck truck-icon";
+                                truckIcon.style.color = textColor;
+                                truckIcon.style.marginRight = "5px";
+                                cell.prepend(truckIcon);
                             }
                         }
-                        cell.innerHTML = innerHTML;
                     }
                 }
             }.bind(this)
