@@ -193,19 +193,20 @@ class StockStatusMatrixGlobal extends Component {
         let csvRow = [];
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.dashboard.stockstatusmatrix') + " (Global)"]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.dateRange') + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.realmcountry') + " : " + this.state.countryLabels.join("; ")]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.program') + " : " + this.state.programLabels.join("; ")]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.realmcountry') + " : " + (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : this.state.countryLabels.join("; "))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.program') + " : " + (this.state.programValues.length > 0 && this.state.programValues.length === this.state.programLst.length ? i18n.t('static.common.all') : this.state.programLabels.join("; "))]));
         if (this.state.programValues.length == 1) {
             csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.version') + " : " + this.state.versionLabel]));
         }
         csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.planningUnit') + " : " + this.state.planningUnitLabels.join("; ")]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + " : " + this.state.stockStatusValues.map(ele => ele.label).join("; ")]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.planningUnit') + " : " + (this.state.planningUnitId.length > 0 && this.state.planningUnitId.length === this.state.planningUnitList.length ? i18n.t('static.common.all') : this.state.planningUnitLabels.join("; "))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : this.state.stockStatusValues.map(ele => ele.label).join("; "))]));
         csvRow.push(addDoubleQuoteToRowContent(["Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.showIcon') + " : " + (this.state.showIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+        csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
         const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
             ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
             : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
@@ -236,7 +237,11 @@ class StockStatusMatrixGlobal extends Component {
                 let dataEntry = item.dataMap[date];
                 if (dataEntry) {
                     let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
-                    row.push(val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : "N/A");
+                    let formattedVal = val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : "N/A";
+                    let iconStr = "";
+                    if (dataEntry.shipmentQty > 0) iconStr += "+";
+                    if (dataEntry.expiredQty != null && dataEntry.expiredQty > 0) iconStr += "*";
+                    row.push(formattedVal + iconStr);
                 } else {
                     row.push("N/A");
                 }
@@ -296,26 +301,23 @@ class StockStatusMatrixGlobal extends Component {
                 doc.setPage(i);
                 doc.text(
                     "Page " + String(i) + " of " + String(pageCount),
-                    doc.internal.pageSize.width / 9,
-                    doc.internal.pageSize.height - 30,
-                    {
-                        align: "center",
-                    }
+                    40,
+                    doc.internal.pageSize.height - 30
                 );
                 doc.text(
                     "Copyright © 2020 " + i18n.t("static.footer"),
-                    (doc.internal.pageSize.width * 6) / 7,
+                    doc.internal.pageSize.width - 40,
                     doc.internal.pageSize.height - 30,
                     {
-                        align: "center",
+                        align: "right",
                     }
                 );
             }
         };
         const drawFirstPageFilterInfo = (doc, startY, isDrawing) => {
             let y = startY;
-            let leftMargin = doc.internal.pageSize.width / 8;
-            let contentWidth = doc.internal.pageSize.width * 3 / 4;
+            let leftMargin = 40;
+            let contentWidth = doc.internal.pageSize.width - 80;
             let pageHeight = doc.internal.pageSize.height;
             const writeWrappedText = (text) => {
                 let lines = doc.splitTextToSize(text, contentWidth);
@@ -336,19 +338,18 @@ class StockStatusMatrixGlobal extends Component {
             if (isDrawing) doc.setTextColor(0);
 
             writeWrappedText(i18n.t("static.report.dateRange") + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to));
-            writeWrappedText(i18n.t("static.program.realmcountry") + " : " + (this.state.countryLabels ? this.state.countryLabels.join("; ") : ""));
-            writeWrappedText(i18n.t("static.program.program") + " : " + (this.state.programLabels ? this.state.programLabels.join("; ") : ""));
+            writeWrappedText(i18n.t("static.program.realmcountry") + " : " + (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : (this.state.countryLabels ? this.state.countryLabels.join("; ") : "")));
+            writeWrappedText(i18n.t("static.program.program") + " : " + (this.state.programValues.length > 0 && this.state.programValues.length === this.state.programLst.length ? i18n.t('static.common.all') : (this.state.programLabels ? this.state.programLabels.join("; ") : "")));
             if (this.state.programValues.length == 1) {
                 writeWrappedText(i18n.t("static.report.version") + " : " + this.state.versionLabel);
             }
             writeWrappedText(i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')));
-            writeWrappedText(i18n.t("static.report.planningUnit") + " : " + (this.state.planningUnitLabels ? this.state.planningUnitLabels.join("; ") : ""));
-            writeWrappedText(i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : ""));
+            writeWrappedText(i18n.t("static.report.planningUnit") + " : " + (this.state.planningUnitId.length > 0 && this.state.planningUnitId.length === this.state.planningUnitList.length ? i18n.t('static.common.all') : (this.state.planningUnitLabels ? this.state.planningUnitLabels.join("; ") : "")));
+            writeWrappedText(i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : "")));
             writeWrappedText("Show by : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty')));
             writeWrappedText(i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
             writeWrappedText(i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
             writeWrappedText("Aggregate Countries : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
-            writeWrappedText(i18n.t('static.report.showIcon') + " : " + (this.state.showIcons ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
 
             y += 5;
             let titleLabelText = "";
@@ -416,7 +417,7 @@ class StockStatusMatrixGlobal extends Component {
                 doc.setFontSize(12);
                 doc.setFont("helvetica", "bold");
                 doc.setPage(i);
-                doc.addImage(LOGO, "png", 0, 10, 180, 50, "FAST");
+                doc.addImage(LOGO, "png", 30, 10, 180, 50, "FAST");
                 doc.setTextColor("#002f6c");
                 doc.text(
                     i18n.t("static.dashboard.stockstatusmatrix") + " (Global)",
@@ -514,16 +515,25 @@ class StockStatusMatrixGlobal extends Component {
                 return row;
             });
 
+            let finalColStyles = {
+                0: { halign: 'left', cellWidth: 150 },
+            };
+            if (isEquUnitMode) {
+                finalColStyles[1] = { halign: 'left', cellWidth: 100 };
+            }
+            // Set consistent width for monthly data columns
+            chunk.dates.forEach((_, idx) => {
+                finalColStyles[colOffset + idx] = { cellWidth: 45 };
+            });
+
             doc.autoTable({
                 margin: { top: 80, bottom: 50 },
                 startY: startY,
+                tableWidth: 'wrap',
                 head: [chunkHeaderCols],
                 body: chunkData,
                 styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
-                columnStyles: {
-                    0: { halign: 'left' },
-                    1: { halign: 'left' },
-                },
+                columnStyles: finalColStyles,
                 didParseCell: function (data) {
                     if (data.section === 'body' && data.column.index >= colOffset) {
                         const colIdxInChunk = data.column.index - colOffset;
@@ -611,7 +621,7 @@ class StockStatusMatrixGlobal extends Component {
                     finalY = 50;
                 }
                 
-                doc.text(formattedStr, doc.internal.pageSize.width / 8, finalY);
+                doc.text(formattedStr, 40, finalY);
                 finalY += 15;
             });
         }
@@ -1878,7 +1888,7 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>}
                                         <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                            <Label htmlFor="appendedInputButton">{i18n.t("static.shipmentReport.yAxisInEquivalencyUnit")}</Label>
+                                            <Label htmlFor="appendedInputButton">Show data in equivalency unit <i className="fa fa-info-circle icons" title="QAT is able to aggregate across different products (different pack sizes, products, etc.), by utilizing Equivalency Units, which are mapped to different forecasting units. View under Realm Masters > Products > Equivalency Units. Realm-level mappings are available to all users. Program admins can also create program-specific mappings." aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                 <Input
