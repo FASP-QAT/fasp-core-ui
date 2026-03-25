@@ -192,24 +192,18 @@ class StockStatusMatrixGlobal extends Component {
 
         let csvRow = [];
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.dashboard.stockstatusmatrix') + " (Global)"]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.dateRange') + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.realmcountry') + " : " + (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : this.state.countryLabels.join("; "))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.program') + " : " + (this.state.programValues.length > 0 && this.state.programValues.length === this.state.programLst.length ? i18n.t('static.common.all') : this.state.programLabels.join("; "))]));
-        if (this.state.programValues.length == 1) {
-            csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.version') + " : " + this.state.versionLabel]));
-        }
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.planningUnit') + " : " + (this.state.planningUnitId.length > 0 && this.state.planningUnitId.length === this.state.planningUnitList.length ? i18n.t('static.common.all') : this.state.planningUnitLabels.join("; "))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : this.state.stockStatusValues.map(ele => ele.label).join("; "))]));
-        csvRow.push(addDoubleQuoteToRowContent(["Show by" + " : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + " : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.dateRange') + ": " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.program.realmcountry') + ": " + (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : this.state.countryLabels.join("; "))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t("static.report.withinstock") + ": " + (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : this.state.stockStatusValues.map(ele => ele.label).join("; "))]));
+        csvRow.push(addDoubleQuoteToRowContent(["Show by: " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty'))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + ": " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + ": " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
+        csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + ": " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
         csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
         const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
-            ? i18n.t("static.equivalancyUnit.equivalancyUnits") + " : " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
-            : i18n.t('static.report.planningUnit') + " : " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
+            ? i18n.t("static.equivalancyUnit.equivalancyUnits") + ": " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
+            : i18n.t('static.report.planningUnit') + ": " + (Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
         csvRow.push("");
         csvRow.push(addDoubleQuoteToRowContent([reportTitle]));
         csvRow.push("");
@@ -319,64 +313,49 @@ class StockStatusMatrixGlobal extends Component {
             let leftMargin = 40;
             let contentWidth = doc.internal.pageSize.width - 80;
             let pageHeight = doc.internal.pageSize.height;
-            const writeWrappedText = (text) => {
-                let lines = doc.splitTextToSize(text, contentWidth);
-                lines.forEach(line => {
-                    if (y + 15 > pageHeight - 60) {
-                        if (isDrawing) doc.addPage();
+            const writeBoldLabelAndText = (label, value) => {
+                if (!isDrawing) {
+                    let lines = doc.splitTextToSize(label + ": " + value, contentWidth);
+                    y += lines.length * 12;
+                    return;
+                }
+                doc.setFont("helvetica", "bold");
+                doc.setTextColor("#002f6c");
+                doc.text(label + ": ", leftMargin, y);
+                let labelWidth = doc.getTextWidth(label + ": ");
+                doc.setFont("helvetica", "normal");
+                // doc.setTextColor(0); // This line is being commented out or removed to keep the dark blue color
+                let textValue = String(value);
+                let lines = doc.splitTextToSize(textValue, contentWidth - labelWidth);
+                lines.forEach((line, index) => {
+                    if (y + 12 > pageHeight - 60) {
+                        doc.addPage();
                         y = 100;
                     }
-                    if (isDrawing) {
-                        doc.text(line, leftMargin, y);
-                    }
-                    y += 15;
+                    doc.text(line, leftMargin + (index === 0 ? labelWidth : 0), y);
+                    if (index < lines.length - 1) y += 12;
                 });
+                y += 12;
             };
 
             doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
-            if (isDrawing) doc.setTextColor(0);
+            if (isDrawing) doc.setTextColor("#002f6c");
 
-            writeWrappedText(i18n.t("static.report.dateRange") + " : " + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to));
-            writeWrappedText(i18n.t("static.program.realmcountry") + " : " + (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : (this.state.countryLabels ? this.state.countryLabels.join("; ") : "")));
-            writeWrappedText(i18n.t("static.program.program") + " : " + (this.state.programValues.length > 0 && this.state.programValues.length === this.state.programLst.length ? i18n.t('static.common.all') : (this.state.programLabels ? this.state.programLabels.join("; ") : "")));
-            if (this.state.programValues.length == 1) {
-                writeWrappedText(i18n.t("static.report.version") + " : " + this.state.versionLabel);
-            }
-            writeWrappedText(i18n.t("static.shipmentReport.yAxisInEquivalencyUnit") + " : " + (this.state.yaxisEquUnit != -1 ? this.state.yaxisEquUnitLabel : i18n.t('static.program.no')));
-            writeWrappedText(i18n.t("static.report.planningUnit") + " : " + (this.state.planningUnitId.length > 0 && this.state.planningUnitId.length === this.state.planningUnitList.length ? i18n.t('static.common.all') : (this.state.planningUnitLabels ? this.state.planningUnitLabels.join("; ") : "")));
-            writeWrappedText(i18n.t("static.report.withinstock") + " : " + (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : "")));
-            writeWrappedText("Show by : " + (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty')));
-            writeWrappedText(i18n.t('static.report.removePlannedShipments') + " : " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
-            writeWrappedText(i18n.t('static.report.removeTBDFundingSourceShipments') + " : " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
-            writeWrappedText("Aggregate Countries : " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeBoldLabelAndText(i18n.t("static.report.dateRange"), makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to));
+            writeBoldLabelAndText(i18n.t("static.program.realmcountry"), (this.state.countryValues.length > 0 && this.state.countryValues.length === this.state.countrys.length ? i18n.t('static.common.all') : (this.state.countryLabels ? this.state.countryLabels.join("; ") : "")));
+            writeBoldLabelAndText(i18n.t("static.report.withinstock"), (this.state.stockStatusValues.length > 0 && this.state.stockStatusValues.length === legendcolor.length ? i18n.t('static.common.all') : (this.state.stockStatusValues ? this.state.stockStatusValues.map(ele => ele.label).join("; ") : "")));
+            writeBoldLabelAndText("Show by", (this.state.viewBy == 1 ? i18n.t('static.report.mos') : i18n.t('static.report.qty')));
+            writeBoldLabelAndText(i18n.t('static.report.removePlannedShipments'), (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeBoldLabelAndText(i18n.t('static.report.removeTBDFundingSourceShipments'), (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
+            writeBoldLabelAndText("Aggregate Countries", (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False')));
 
             y += 5;
-            let titleLabelText = "";
-            let titleValueText = "";
-
             if (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1") {
-                titleLabelText = i18n.t("static.equivalancyUnit.equivalancyUnits") + " : ";
-                titleValueText = Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel;
+                writeBoldLabelAndText(i18n.t("static.equivalancyUnit.equivalancyUnits"), Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel);
             } else {
-                titleLabelText = i18n.t("static.report.planningUnit") + " : ";
-                titleValueText = Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels;
+                writeBoldLabelAndText(i18n.t("static.report.planningUnit"), Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
             }
-
-            // 2. Set font to bold and draw the label
-            doc.setFont("helvetica", "bold");
-            if (isDrawing) doc.setTextColor("#002f6c");
-            doc.text(titleLabelText, leftMargin, y);
-
-            // 3. Calculate exactly how wide the bold label is
-            const labelWidth = doc.getTextWidth(titleLabelText);
-
-            // 4. Set font to normal and draw the value right next to the label
-            doc.setFont("helvetica", "normal");
-            if (isDrawing) doc.setTextColor("#002f6c");
-            doc.text(titleValueText, leftMargin + labelWidth, y);
-            
-            y += 10;
             if (isDrawing) {
                 if (y + 20 > pageHeight - 60) {
                     doc.addPage();
@@ -1254,6 +1233,12 @@ class StockStatusMatrixGlobal extends Component {
                 try {
                     const currentMonthLabel = moment().format("MMM YY");
                     const table = instance.element || instance;
+                    const thead = table.querySelector("thead");
+                    if (thead) {
+                        thead.style.position = "sticky";
+                        thead.style.top = "0";
+                        thead.style.zIndex = "20";
+                    }
                     const ths = table.querySelectorAll("thead tr td");
                     ths.forEach((th, idx) => {
                         if (idx == 1) {
