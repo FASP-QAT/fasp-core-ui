@@ -1236,16 +1236,45 @@ class SupplyPlanScoreCard extends Component {
         }
         
         // Align headers based on view
-        const headers = instance.thead.querySelectorAll('td');
-        headers.forEach((h, idx) => {
-            const headTitle = (h.innerText || h.textContent || '').trim();
-            if (headTitle !== '') {
-                h.style.textAlign = 'center';
-                h.style.setProperty('text-align', 'center', 'important');
-                h.style.verticalAlign = 'middle';
-                h.style.setProperty('vertical-align', 'middle', 'important');
-            }
-        });
+        // Horizontal sticky columns (Expansion + Program/Country labels)
+        const stickyXHead = isMatrixView ? [0] : (isCountryView ? [0, 1] : [1]);
+        
+        // Handle header rows (Title row and Filter row)
+        if (instance.thead) {
+            const headRows = instance.thead.querySelectorAll('tr');
+            headRows.forEach(hr => {
+                let headLeft = 0;
+                const headCells = hr.querySelectorAll('td');
+                headCells.forEach(h => {
+                    const dataXAttr = h.getAttribute('data-x');
+                    const dataX = dataXAttr ? parseInt(dataXAttr, 10) : -1;
+                    const headTitle = (h.innerText || h.textContent || '').trim();
+
+                    // Basic header styling
+                    if (headTitle !== '' && !hr.classList.contains('jexcel_filter') && !hr.classList.contains('jss_filter')) {
+                        h.style.textAlign = 'center';
+                        h.style.setProperty('text-align', 'center', 'important');
+                        h.style.verticalAlign = 'middle';
+                        h.style.setProperty('vertical-align', 'middle', 'important');
+                    }
+
+                    // Headers sticky for specific columns
+                    if (stickyXHead.includes(dataX)) {
+                        if (h.style.display !== 'none') {
+                            h.style.position = 'sticky';
+                            h.style.left = headLeft + 'px';
+                            h.style.setProperty('z-index', '6', 'important');
+                            h.style.backgroundColor = '#f4f4f4'; // Match the table header color
+                            headLeft += h.offsetWidth;
+                            // Add a border-right to the last frozen column to separate it
+                            if (dataX === stickyXHead[stickyXHead.length - 1]) {
+                                h.style.borderRight = '1px solid #c8ced3';
+                            }
+                        }
+                    }
+                });
+            });
+        }
 
         const rows = instance.tbody.children;
         const allData = instance.options.data;
@@ -1260,6 +1289,19 @@ class SupplyPlanScoreCard extends Component {
             const activePUs = Number(rowData[2]) || 0;
             const rowType = isMatrixView ? rowData[rowData.length - 2] : rowData[14];
             
+            // Determine consistent row background color to avoid transparency during scroll
+            let rowColor = (r % 2 === 0) ? '#dce8f4' : '#ffffff'; 
+            if (rowType === 'matrix_total' || rowType === 'row_parent') {
+                rowColor = '#f4f4f4';
+                childRowIndex = 0;
+            } else if (rowType === 'row_child') {
+                childRowIndex++;
+                rowColor = (childRowIndex % 2 === 0) ? '#ffffff' : '#dce8f4';
+            }
+            
+            // Explicitly set background color on the row
+            tr.style.setProperty('background-color', rowColor, 'important');
+
             if (isMatrixView) {
                 const cell0Matrix = tr.querySelector(`td[data-x="0"]`);
                 if (cell0Matrix) {
@@ -1271,7 +1313,6 @@ class SupplyPlanScoreCard extends Component {
 
                 if (rowType === 'matrix_total') {
                     tr.style.fontWeight = 'bold';
-                    tr.style.backgroundColor = '#f4f4f4';
                     for (let i = 0; i < tr.children.length; i++) {
                         tr.children[i].style.setProperty('border-right', '1px solid #999', 'important');
                     }
@@ -1318,7 +1359,6 @@ class SupplyPlanScoreCard extends Component {
 
             if (rowType === 'row_parent') {
                 childRowIndex = 0;
-                tr.style.backgroundColor = '#f4f4f4';
                 tr.onclick = null;
                 for (let i = 0; i < tr.children.length; i++) {
                     tr.children[i].style.fontWeight = 'bold';
@@ -1355,8 +1395,6 @@ class SupplyPlanScoreCard extends Component {
                     }
                 }
             } else if (rowType === 'row_child') {
-                childRowIndex++;
-                tr.style.backgroundColor = childRowIndex % 2 === 0 ? '#ffffff' : '#dce8f4';
                 if (cell1) {
                     cell1.style.paddingLeft = '30px';
                 }
@@ -1507,6 +1545,26 @@ class SupplyPlanScoreCard extends Component {
                     }
                 }
             }
+            // Implement horizontal freezing for identification columns
+            // Column 0 is expansion icon, Column 1 is Program/Country name
+            const stickyX = isMatrixView ? [0] : (isCountryView ? [0, 1] : [1]);
+            let currentLeft = 0;
+            stickyX.forEach(x => {
+                const cell = tr.querySelector(`td[data-x="${x}"]`);
+                if (cell && cell.style.display !== 'none') {
+                    cell.style.position = 'sticky';
+                    cell.style.left = currentLeft + 'px';
+                    cell.style.setProperty('z-index', '3', 'important');
+                    // Ensure solid background for sticky cells
+                    cell.style.setProperty('background-color', rowColor, 'important');
+                    currentLeft += cell.offsetWidth;
+                    // Add a separator border to the last frozen column
+                    if (x === stickyX[stickyX.length - 1]) {
+                        cell.style.setProperty('border-right', '1px solid #c8ced3', 'important');
+                    }
+                }
+            });
+
             for (let c of [8, 10, 11]) {
                 const cell = tr.querySelector(`td[data-x="${c}"]`);
                 if (!cell) continue;
