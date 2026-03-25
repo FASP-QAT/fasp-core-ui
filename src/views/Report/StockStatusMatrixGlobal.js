@@ -217,7 +217,18 @@ class StockStatusMatrixGlobal extends Component {
 
         dataList.forEach(item => {
             let row = [];
-            row.push(getLabelText(item.programOrCountry.label, this.state.lang));
+            let programLabel = getLabelText(item.programOrCountry.label, this.state.lang);
+            if (!this.state.aggregateCountries) {
+                let programId = item.programOrCountry.id || item.programOrCountry.programId;
+                let programObj = (this.state.programLst || []).find(p => p.id == programId || p.programId == programId);
+                let versionToDisplay = (this.state.programValues.length > 1 || this.state.versionId == -1) 
+                    ? (item.programOrCountry.currentVersionId || (programObj ? programObj.currentVersionId : ""))
+                    : this.state.versionId;
+                if (versionToDisplay !== "" && versionToDisplay !== undefined && versionToDisplay !== null) {
+                    programLabel += " ~v" + versionToDisplay;
+                }
+            }
+            row.push(programLabel);
             if (isEquUnitMode) {
                 let puIds = new Set();
                 sortedDates.forEach(date => {
@@ -328,17 +339,17 @@ class StockStatusMatrixGlobal extends Component {
                 let textValue = String(value);
                 let lines = doc.splitTextToSize(textValue, contentWidth - labelWidth);
                 lines.forEach((line, index) => {
-                    if (y + 12 > pageHeight - 60) {
+                    if (y + 10 > pageHeight - 60) {
                         doc.addPage();
                         y = 100;
                     }
                     doc.text(line, leftMargin + (index === 0 ? labelWidth : 0), y);
-                    if (index < lines.length - 1) y += 12;
+                    if (index < lines.length - 1) y += 10;
                 });
-                y += 12;
+                y += 10;
             };
 
-            doc.setFontSize(8);
+            doc.setFontSize(7);
             doc.setFont("helvetica", "normal");
             if (isDrawing) doc.setTextColor("#002f6c");
 
@@ -357,37 +368,37 @@ class StockStatusMatrixGlobal extends Component {
                 writeBoldLabelAndText(i18n.t("static.report.planningUnit"), Array.isArray(this.state.planningUnitLabels) ? this.state.planningUnitLabels.join("; ") : this.state.planningUnitLabels);
             }
             if (isDrawing) {
-                if (y + 20 > pageHeight - 60) {
+                if (y + 15 > pageHeight - 60) {
                     doc.addPage();
                     y = 100;
                 }
                 legendcolor.forEach((item, index) => {
                     doc.setDrawColor(0);
                     doc.setFillColor(item.color);
-                    doc.rect(leftMargin + (index * 90), y, 12, 12, "F");
+                    doc.rect(leftMargin + (index * 90), y, 10, 10, "F");
                     doc.setTextColor(0);
                     doc.setFont("helvetica", "normal");
-                    doc.setFontSize(8);
-                    doc.text(item.text, leftMargin + (index * 90) + 15, y + 10);
+                    doc.setFontSize(7);
+                    doc.text(item.text, leftMargin + (index * 90) + 12, y + 8);
                 });
                 
                 if (iconCache.truck) {
-                    doc.addImage(iconCache.truck.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 2, ICON_PT, ICON_PT);
+                    doc.addImage(iconCache.truck.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 1, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 90), y + 10);
+                doc.setFontSize(7);
+                doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 90), y + 8);
                 
                 if (iconCache.warning) {
-                    doc.addImage(iconCache.warning.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 2, ICON_PT, ICON_PT);
+                    doc.addImage(iconCache.warning.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 1, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(8);
-                doc.text(i18n.t('static.supplyPlan.expiry'), leftMargin + (5 * 90) + 106, y + 10);
+                doc.setFontSize(7);
+                doc.text(i18n.t('static.supplyPlan.expiry'), leftMargin + (5 * 90) + 106, y + 8);
             }
-            return { y: y + 25, page: doc.internal.getNumberOfPages() };
+            return { y: y + 15, page: doc.internal.getNumberOfPages() };
         };
 
         const addHeaders = (doc) => {
@@ -401,7 +412,7 @@ class StockStatusMatrixGlobal extends Component {
                 doc.text(
                     i18n.t("static.dashboard.stockstatusmatrix") + " (Global)",
                     doc.internal.pageSize.width / 2,
-                    75,
+                    65,
                     {
                         align: "center",
                     }
@@ -453,7 +464,7 @@ class StockStatusMatrixGlobal extends Component {
             
             let startY = 80;
             if (cIdx === 0) {
-                const { y, page } = drawFirstPageFilterInfo(doc, 105, true);
+                const { y, page } = drawFirstPageFilterInfo(doc, 75, true);
                 doc.setPage(page);
                 startY = y;
             } else {
@@ -472,7 +483,18 @@ class StockStatusMatrixGlobal extends Component {
 
             let chunkData = dataList.map(item => {
                 let row = [];
-                row.push(getLabelText(item.programOrCountry.label, this.state.lang));
+                let programLabel = getLabelText(item.programOrCountry.label, this.state.lang);
+                if (!this.state.aggregateCountries) {
+                    let programId = item.programOrCountry.id || item.programOrCountry.programId;
+                    let programObj = (this.state.programLst || []).find(p => p.id == programId);
+                    let versionToDisplay = (this.state.programValues.length > 1 || this.state.versionId == -1) 
+                        ? (programObj ? programObj.currentVersionId : "")
+                        : this.state.versionId;
+                    if (versionToDisplay !== "" && versionToDisplay !== undefined && versionToDisplay !== null) {
+                        programLabel += " ~v" + versionToDisplay;
+                    }
+                }
+                row.push(programLabel);
                 if (isEquUnitMode) {
                     let puIds = new Set();
                     sortedDates.forEach(date => {
@@ -506,9 +528,11 @@ class StockStatusMatrixGlobal extends Component {
             });
 
             doc.autoTable({
-                margin: { top: 80, bottom: 50 },
+                margin: { top: 80, bottom: 50, left: 40, right: 40 },
                 startY: startY,
-                tableWidth: 'wrap',
+                tableWidth: 'auto',
+                pageBreak: 'auto',
+                rowPageBreak: 'auto',
                 head: [chunkHeaderCols],
                 body: chunkData,
                 styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
@@ -918,8 +942,9 @@ class StockStatusMatrixGlobal extends Component {
      * @param {object} value - The new range value selected by the user.
      */
     handleRangeDissmis(value) {
-        this.setState({ rangeValue: value })
-        this.fetchData();
+        this.setState({ rangeValue: value }, () => {
+            this.fetchData();
+        })
     }
     /**
      * Handles the click event on the range picker box.
@@ -1122,7 +1147,18 @@ class StockStatusMatrixGlobal extends Component {
         let jexcelData = [];
         dataList.forEach((item, index) => {
             let row = [];
-            row.push(getLabelText(item.programOrCountry.label, this.state.lang));
+            let programLabel = getLabelText(item.programOrCountry.label, this.state.lang);
+            if (!this.state.aggregateCountries) {
+                let programId = item.programOrCountry.id || item.programOrCountry.programId;
+                let programObj = (this.state.programLst || []).find(p => p.id == programId || p.programId == programId);
+                let versionToDisplay = (this.state.programValues.length > 1 || this.state.versionId == -1) 
+                    ? (item.programOrCountry.currentVersionId || (programObj ? programObj.currentVersionId : ""))
+                    : this.state.versionId;
+                if (versionToDisplay !== "" && versionToDisplay !== undefined && versionToDisplay !== null) {
+                    programLabel += " ~v" + versionToDisplay;
+                }
+            }
+            row.push(programLabel);
             if (isEquUnitMode) {
                 let puIds = new Set();
                 sortedDates.forEach(date => {
