@@ -902,7 +902,7 @@ class ShipmentSummery extends Component {
     for (var item = 0; item < re.length; item++) {
       B.push(
         addDoubleQuoteToRowContent([
-          re[item].program.code.replaceAll(" ", "%20"),
+          (re[item].program && re[item].program.code ? re[item].program.code : "").toString().replaceAll(" ", "%20"),
           (getLabelText(re[item].planningUnit.label, this.state.lang) + " | " + re[item].planningUnit.id)
             .replaceAll(",", " ")
             .replaceAll(" ", "%20"),
