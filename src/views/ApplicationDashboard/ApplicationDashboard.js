@@ -2830,7 +2830,7 @@ class ApplicationDashboard extends Component {
       },
     };
 
-    const overallScoreValue = ((this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.supplyPlanQualityScore) : 0) + (this.state.dashboardBottomData ? Math.round(this.state.dashboardBottomData.stockStatusScore) : 0)) / 2;
+    const overallScoreValue = Math.round(((this.state.dashboardBottomData ? this.state.dashboardBottomData.supplyPlanQualityScore : 0) + (this.state.dashboardBottomData ? this.state.dashboardBottomData.stockStatusScore : 0)) / 2);
     const overallScoreData = {
       labels: ['Red', 'Yellow', 'Green'],
       datasets: [{

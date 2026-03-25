@@ -886,14 +886,12 @@ class SupplyPlanScoreCard extends Component {
   fetchData = () => {
     this.setState({ loading: true });
     if (localStorage.getItem("sessionType") === 'Online' && !this.state.onlyDownloadedProgram) {
-      var dt = new Date();
-      dt.setMonth(dt.getMonth() - REPORT_DATEPICKER_START_MONTH);
-      var dt1 = new Date();
-      dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
+      var startDate = moment(Date.now()).subtract(6, 'months').startOf('month').format("YYYY-MM-DD");
+      var endDate = moment(Date.now()).add(17, 'months').startOf('month').format("YYYY-MM-DD")
       var inputJson = {
         programIds: this.state.programValues.map(p => p.value),
-        startDate: dt.getFullYear() + "-" + dt.getMonth() + "-01",
-        stopDate: dt1.getFullYear() + "-" + dt1.getMonth() + "-01",
+        startDate: moment(startDate).format("YYYY") + "-" + moment(startDate).format("MM") + "-01",
+        stopDate: moment(endDate).format("YYYY") + "-" + moment(endDate).format("MM") + "-" + moment(endDate).endOf('month').format("DD"),
         displayShipmentsBy: 1
       }
       DashboardService.getDashboardBottom(inputJson)
