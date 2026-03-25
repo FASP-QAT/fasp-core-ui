@@ -33,7 +33,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText, formatter } from '../../CommonComponent/JavascriptCommonFunctions.js';
+import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText, formatter, roundAMC } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import WorldMap from '../../CommonComponent/WorldMap.js';
 const ref = React.createRef();
 function getColumnLetter(index) {
@@ -222,7 +222,7 @@ class StockStatusMatrixGlobal extends Component {
                 let programId = item.programOrCountry.id || item.programOrCountry.programId;
                 let programObj = (this.state.programLst || []).find(p => p.id == programId || p.programId == programId);
                 let versionToDisplay = (this.state.programValues.length > 1 || this.state.versionId == -1) 
-                    ? (item.programOrCountry.currentVersionId || (programObj ? programObj.currentVersionId : ""))
+                    ? (programObj ? programObj.currentVersionId : "")
                     : this.state.versionId;
                 if (versionToDisplay !== "" && versionToDisplay !== undefined && versionToDisplay !== null) {
                     programLabel += " ~v" + versionToDisplay;
@@ -344,12 +344,12 @@ class StockStatusMatrixGlobal extends Component {
                         y = 100;
                     }
                     doc.text(line, leftMargin + (index === 0 ? labelWidth : 0), y);
-                    if (index < lines.length - 1) y += 10;
+                    if (index < lines.length - 1) y += 12;
                 });
-                y += 10;
+                y += 12;
             };
 
-            doc.setFontSize(7);
+            doc.setFontSize(8);
             doc.setFont("helvetica", "normal");
             if (isDrawing) doc.setTextColor("#002f6c");
 
@@ -375,28 +375,28 @@ class StockStatusMatrixGlobal extends Component {
                 legendcolor.forEach((item, index) => {
                     doc.setDrawColor(0);
                     doc.setFillColor(item.color);
-                    doc.rect(leftMargin + (index * 90), y, 10, 10, "F");
+                    doc.rect(leftMargin + (index * 95), y, 10, 10, "F");
                     doc.setTextColor(0);
                     doc.setFont("helvetica", "normal");
-                    doc.setFontSize(7);
-                    doc.text(item.text, leftMargin + (index * 90) + 12, y + 8);
+                    doc.setFontSize(8);
+                    doc.text(item.text, leftMargin + (index * 95) + 12, y + 8);
                 });
                 
                 if (iconCache.truck) {
-                    doc.addImage(iconCache.truck.dataUrl, 'PNG', leftMargin + (5 * 90) - 11, y + 1, ICON_PT, ICON_PT);
+                    doc.addImage(iconCache.truck.dataUrl, 'PNG', leftMargin + (5 * 95) - 11, y + 1, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(7);
-                doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 90), y + 8);
+                doc.setFontSize(8);
+                doc.text(i18n.t('static.shipment.shipment'), leftMargin + (5 * 95), y + 8);
                 
                 if (iconCache.warning) {
-                    doc.addImage(iconCache.warning.dataUrl, 'PNG', leftMargin + (5 * 90) + 95, y + 1, ICON_PT, ICON_PT);
+                    doc.addImage(iconCache.warning.dataUrl, 'PNG', leftMargin + (5 * 95) + 95, y + 1, ICON_PT, ICON_PT);
                 }
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
-                doc.setFontSize(7);
-                doc.text(i18n.t('static.supplyPlan.expiry'), leftMargin + (5 * 90) + 106, y + 8);
+                doc.setFontSize(8);
+                doc.text(i18n.t('static.supplyPlan.expiry'), leftMargin + (5 * 95) + 106, y + 8);
             }
             return { y: y + 15, page: doc.internal.getNumberOfPages() };
         };
@@ -450,7 +450,11 @@ class StockStatusMatrixGlobal extends Component {
 
 
         // ─── CHUNKING LOGIC ───
-        const maxColsPerPage = 12;
+        const colWidth = 40;
+        const programColWidth = 150;
+        const puLevelColWidth = 100;
+        const availableWidth = doc.internal.pageSize.width - 80 - programColWidth - (isEquUnitMode ? puLevelColWidth : 0);
+        const maxColsPerPage = Math.floor(availableWidth / colWidth);
         const dateChunks = [];
         for (let i = 0; i < sortedDates.length; i += maxColsPerPage) {
             dateChunks.push({
@@ -459,18 +463,25 @@ class StockStatusMatrixGlobal extends Component {
             });
         }
 
+        let currentYTracker = 80;
         dateChunks.forEach((chunk, cIdx) => {
-            if (cIdx > 0) doc.addPage();
-            
             let startY = 80;
             if (cIdx === 0) {
                 const { y, page } = drawFirstPageFilterInfo(doc, 75, true);
                 doc.setPage(page);
                 startY = y;
+                currentYTracker = y;
             } else {
-                // For subsequent pages, simplified header or filter info if needed
-                // For now, let's just start high
-                startY = 100;
+                // If the next table is expected to exceed the current page, add a new page
+                // Standard row height is roughly 10pt. 10 * dataList.length + header (20)
+                const estimatedTableHeight = (dataList.length * 15) + 30;
+                if (currentYTracker + estimatedTableHeight > doc.internal.pageSize.height - 50) {
+                    doc.addPage();
+                    currentYTracker = 80; // Reset for new page
+                } else {
+                    currentYTracker += 30; // Small space between tables on the same page
+                }
+                startY = currentYTracker;
             }
 
             let chunkHeaderCols = [
@@ -505,10 +516,12 @@ class StockStatusMatrixGlobal extends Component {
                     row.push(Array.from(puIds).join(', '));
                 }
                 chunk.dates.forEach(date => {
-                    let dataEntry = item.dataMap[date];
+                    let dataMap = item.dataMap || {};
+                    let dataEntry = dataMap[date];
                     if (dataEntry) {
                         let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
-                        row.push(val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : i18n.t("static.supplyPlanFormula.na"));
+                        let formattedVal = val !== null && val !== undefined ? (showByQty ? formatter(Math.round(val)) : roundAMC(val)) : i18n.t("static.supplyPlanFormula.na");
+                        row.push(formattedVal);
                     } else {
                         row.push(i18n.t("static.supplyPlanFormula.na"));
                     }
@@ -524,7 +537,7 @@ class StockStatusMatrixGlobal extends Component {
             }
             // Set consistent width for monthly data columns
             chunk.dates.forEach((_, idx) => {
-                finalColStyles[colOffset + idx] = { cellWidth: 45 };
+                finalColStyles[colOffset + idx] = { cellWidth: colWidth };
             });
 
             doc.autoTable({
@@ -535,7 +548,7 @@ class StockStatusMatrixGlobal extends Component {
                 rowPageBreak: 'auto',
                 head: [chunkHeaderCols],
                 body: chunkData,
-                styles: { lineWidth: 0.1, fontSize: 7, halign: 'center', valign: 'middle' },
+                styles: { lineWidth: 0.1, fontSize: 6.5, halign: 'center', valign: 'middle' },
                 columnStyles: finalColStyles,
                 didParseCell: function (data) {
                     if (data.section === 'body' && data.column.index >= colOffset) {
@@ -543,7 +556,8 @@ class StockStatusMatrixGlobal extends Component {
                         const overallDateIdx = chunk.startIndex + colIdxInChunk;
                         
                         // Extract color
-                        let dataEntry = dataList[data.row.index].dataMap[sortedDates[overallDateIdx]];
+                        let rowObj = dataList[data.row.index];
+                        let dataEntry = (rowObj && rowObj.dataMap) ? rowObj.dataMap[sortedDates[overallDateIdx]] : null;
                         let color = '#cfcdc9';
                         if (dataEntry) {
                             let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
@@ -572,7 +586,8 @@ class StockStatusMatrixGlobal extends Component {
                     if (data.section === 'body' && data.column.index >= colOffset) {
                         const colIdxInChunk = data.column.index - colOffset;
                         const overallDateIdx = chunk.startIndex + colIdxInChunk;
-                        let dataEntry = dataList[data.row.index].dataMap[sortedDates[overallDateIdx]];
+                        let rowObj = dataList[data.row.index];
+                        let dataEntry = (rowObj && rowObj.dataMap) ? rowObj.dataMap[sortedDates[overallDateIdx]] : null;
 
                         if (dataEntry && this.state.showIcons && (dataEntry.shipmentQty > 0 || dataEntry.expiredQty > 0)) {
                             let iconX = data.cell.x + 2;
@@ -589,6 +604,7 @@ class StockStatusMatrixGlobal extends Component {
                     }
                 }.bind(this)
             });
+            currentYTracker = doc.lastAutoTable.finalY;
         });
 
         let finalY = doc.lastAutoTable.finalY + 20;
@@ -649,7 +665,9 @@ class StockStatusMatrixGlobal extends Component {
         }, () => {
             this.filterVersion();
             this.getDropdownLists();
-            this.fetchData();
+            setTimeout(()=> {
+                this.fetchData();
+            }, 1000)
         })
     }
     /**
@@ -756,9 +774,10 @@ class StockStatusMatrixGlobal extends Component {
                 planningUnitListAll: newPlanningUnitList,
                 planningUnitList: newPlanningUnitList,
                 planningUnits: newPlanningUnitList,
-                planningUnitId: [],
-                planningUnitLabels: [],
-                consumptions: []
+                planningUnitId: filteredPlanningUnitId,
+                planningUnitLabels: filteredPlanningUnitId.map(pu => pu.label).sort((a, b) => a.localeCompare(b)),
+                consumptions: [],
+                data: []
             }, () => {
                 if (this.state.yaxisEquUnit != -1 && this.state.programValues.length > 0 && this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit).length > 0) {
                     var validFu = this.state.equivalencyUnitList.filter(x => x.id == this.state.yaxisEquUnit)[0].forecastingUnitIds;
@@ -969,7 +988,7 @@ class StockStatusMatrixGlobal extends Component {
         let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
-        
+        console.log("Hello",planningUnitIds)
         if (realmId > 0 && planningUnitIds.length != 0 && this.state.countryValues.length > 0 && this.state.programValues.length > 0) {
             this.setState({
                 message: '',
@@ -1152,7 +1171,7 @@ class StockStatusMatrixGlobal extends Component {
                 let programId = item.programOrCountry.id || item.programOrCountry.programId;
                 let programObj = (this.state.programLst || []).find(p => p.id == programId || p.programId == programId);
                 let versionToDisplay = (this.state.programValues.length > 1 || this.state.versionId == -1) 
-                    ? (item.programOrCountry.currentVersionId || (programObj ? programObj.currentVersionId : ""))
+                    ? (programObj ? programObj.currentVersionId : "")
                     : this.state.versionId;
                 if (versionToDisplay !== "" && versionToDisplay !== undefined && versionToDisplay !== null) {
                     programLabel += " ~v" + versionToDisplay;
@@ -1172,7 +1191,8 @@ class StockStatusMatrixGlobal extends Component {
                 let dataEntry = item.dataMap[date];
                 if (dataEntry) {
                     let val = showByQty ? dataEntry.closingBalance : dataEntry.mos;
-                    row.push(val !== null && val !== undefined ? (val % 1 === 0 ? val : val.toFixed(1)) : i18n.t("static.supplyPlanFormula.na"));
+                    let formattedVal = val !== null && val !== undefined ? (showByQty ? formatter(Math.round(val)) : roundAMC(val)) : i18n.t("static.supplyPlanFormula.na");
+                    row.push(formattedVal);
                 } else {
                     row.push(i18n.t("static.supplyPlanFormula.na"));
                 }
@@ -1273,10 +1293,21 @@ class StockStatusMatrixGlobal extends Component {
                     if (thead) {
                         thead.style.position = "sticky";
                         thead.style.top = "0";
-                        thead.style.zIndex = "20";
+                        thead.style.zIndex = "40"; // Above all month data
                     }
                     const ths = table.querySelectorAll("thead tr td");
+                    let headerLeft = 0;
                     ths.forEach((th, idx) => {
+                        // Skip JSS Index (idx 0) and freeze precisely colOffset identifiers
+                        if (idx > 0 && idx < colOffset + 1) {
+                            if (th.style.display !== "none") {
+                                th.style.setProperty("position", "sticky", "important");
+                                th.style.setProperty("left", headerLeft + "px", "important");
+                                th.style.setProperty("z-index", "41", "important");
+                                th.style.setProperty("background-color", "#f8f9fa", "important");
+                                headerLeft += th.offsetWidth;
+                            }
+                        }
                         if (idx == 1) {
                             th.style.setProperty("text-align", "left", "important");
                         }
@@ -1284,6 +1315,27 @@ class StockStatusMatrixGlobal extends Component {
                             th.classList.add("supplyplan-Thead");
                             th.style.cssText += "background-color: #e4e5e6 !important; color: #20a8d8 !important;";
                         }
+                    });
+
+                    // Also freeze body cells horizontally
+                    const rows = table.querySelectorAll("tbody tr");
+                    rows.forEach(row => {
+                        const tds = row.querySelectorAll("td");
+                        let bodyLeft = 0;
+                        tds.forEach((td, idx) => {
+                            if (idx > 0 && idx < colOffset && td.style.display !== "none") {
+                                td.style.setProperty("position", "sticky", "important");
+                                td.style.setProperty("left", bodyLeft + "px", "important");
+                                td.style.setProperty("z-index", "10", "important");
+                                // Ensure background is opaque
+                                if (td.style.backgroundColor == "" || td.style.backgroundColor == "transparent" || td.style.backgroundColor == "rgba(0, 0, 0, 0)") {
+                                    td.style.setProperty("background-color", (row.rowIndex % 2 !== 0) ? "#e5edf5" : "#fff", "important");
+                                } else {
+                                    td.style.setProperty("background-color", td.style.backgroundColor, "important");
+                                }
+                                bodyLeft += td.offsetWidth;
+                            }
+                        });
                     });
                 } catch (_) { }
             },
@@ -1315,6 +1367,11 @@ class StockStatusMatrixGlobal extends Component {
             updateTable: function (instance, cell, col, row, val, label, cellName) {
                 if (cell && col < colOffset) {
                     cell.style.setProperty("text-align", "left", "important");
+                    if (row % 2 !== 0) {
+                        cell.style.backgroundColor = '#fff';
+                    } else {
+                        cell.style.backgroundColor = '#e5edf5';
+                    }
                 }
                 if (cell && col >= colOffset && col < columns.length - 1) {
                     let date = sortedDates[col - colOffset];
@@ -1334,25 +1391,42 @@ class StockStatusMatrixGlobal extends Component {
                         }
                     }
 
-                    if (dataEntry) {
-                        cell.innerHTML = val;
-                        if (this.state.showIcons) {
+                        cell.innerHTML = "";
+                        const cellWrapper = document.createElement("span");
+                        if (dataEntry) {
+                            let cellTitle = [];
+                            if (showByQty) {
+                                cellTitle.push(`${i18n.t("static.report.mos")}: ${dataEntry.mos != null ? roundAMC(dataEntry.mos) : i18n.t("static.supplyPlanFormula.na")}`);
+                            } else {
+                                cellTitle.push(`${i18n.t("static.report.stock")}: ${dataEntry.closingBalance != null ? formatter(Math.round(dataEntry.closingBalance)) : i18n.t("static.supplyPlanFormula.na")}`);
+                            }
+                            if (dataEntry.shipmentQty > 0) {
+                                cellTitle.push(`${i18n.t("static.shipment.shipment")}: ${formatter(Math.round(dataEntry.shipmentQty))}`);
+                            }
+                            if (dataEntry.expiredQty > 0) {
+                                cellTitle.push(`${i18n.t("static.supplyPlan.expiry")}: ${formatter(Math.round(dataEntry.expiredQty))}`);
+                            }
+                            cellWrapper.title = cellTitle.join("\n");
+                        }
+                        cellWrapper.innerHTML = val;
+                        
+                        if (this.state.showIcons && dataEntry) {
                             if (dataEntry.expiredQty > 0) {
                                 const warningIcon = document.createElement("i");
                                 warningIcon.className = "fa fa-exclamation-triangle warning-icon";
                                 warningIcon.style.color = textColor;
                                 warningIcon.style.marginRight = "5px";
-                                cell.prepend(warningIcon);
+                                cellWrapper.prepend(warningIcon);
                             }
                             if (dataEntry.shipmentQty > 0) {
                                 const truckIcon = document.createElement("i");
                                 truckIcon.className = "fa fa-truck truck-icon";
                                 truckIcon.style.color = textColor;
                                 truckIcon.style.marginRight = "5px";
-                                cell.prepend(truckIcon);
+                                cellWrapper.prepend(truckIcon);
                             }
                         }
-                    }
+                        cell.appendChild(cellWrapper);
                 }
             }.bind(this)
         };
