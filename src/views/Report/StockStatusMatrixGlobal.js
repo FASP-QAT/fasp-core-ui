@@ -665,9 +665,9 @@ class StockStatusMatrixGlobal extends Component {
         }, () => {
             this.filterVersion();
             this.getDropdownLists();
-            setTimeout(()=> {
-                this.fetchData();
-            }, 1000)
+            // setTimeout(()=> {
+            //     this.fetchData();
+            // }, 1000)
         })
     }
     /**
@@ -909,9 +909,14 @@ class StockStatusMatrixGlobal extends Component {
         this.setState({
             stockStatusValues: e.map(item => item),
         }, () => {
-            this.fetchData();
+            // this.fetchData();
         })
     }
+    handleBlur = (e) => {
+        if (!e.currentTarget.contains(e.relatedTarget)) {
+            this.fetchData();
+        }
+    };
     setPlanningUnit(e) {
         if (this.state.yaxisEquUnit == -1) {
         var selectedText = e.map(item => item.label);
@@ -928,7 +933,7 @@ class StockStatusMatrixGlobal extends Component {
             planningUnitDetails: "",
             planningUnitDetailsExport: ""
         }, () => {
-            this.fetchData();
+            // this.fetchData();
             // this.filterData(this.state.rangeValue);
         })
         } else {
@@ -944,7 +949,7 @@ class StockStatusMatrixGlobal extends Component {
                 loading: false
                 }, () => {
                 if (this.state.planningUnitId.length > 0) {
-                    this.fetchData();
+                    // this.fetchData();
                     // this.filterData(this.state.rangeValue);
                 } else {
                     this.setState({
@@ -2001,18 +2006,20 @@ class StockStatusMatrixGlobal extends Component {
                                         <FormGroup className="col-md-3">
                                             <Label htmlFor="programIds">{i18n.t('static.program.program')}</Label>
                                             <span className="reportdown-box-icon  fa fa-sort-desc ml-1"></span>
-                                            <MultiSelect
-                                                bsSize="sm"
-                                                name="programIds"
-                                                id="programIds"
-                                                value={this.state.programValues}
-                                                onChange={(e) => { this.handleChangeProgram(e) }}
-                                                options={programList && programList.length > 0 ? programList : []}
-                                                disabled={this.state.loading}
-                                                filterOptions={filterOptions}
-                                                overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                selectSomeItems: i18n.t('static.common.select')}}
-                                            />
+                                            <div onBlur={this.handleBlur}>
+                                                <MultiSelect
+                                                    bsSize="sm"
+                                                    name="programIds"
+                                                    id="programIds"
+                                                    value={this.state.programValues}
+                                                    onChange={(e) => { this.handleChangeProgram(e) }}
+                                                    options={programList && programList.length > 0 ? programList : []}
+                                                    disabled={this.state.loading}
+                                                    filterOptions={filterOptions}
+                                                    overrideStrings={{ allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                    selectSomeItems: i18n.t('static.common.select')}}
+                                                />
+                                            </div>
                                             {!!this.props.error &&
                                                 this.props.touched && (
                                                     <div style={{ color: '#BA0C2F', marginTop: '.5rem' }}>{this.props.error}</div>
@@ -2109,22 +2116,24 @@ class StockStatusMatrixGlobal extends Component {
                                                 {i18n.t("static.report.withinstock")}
                                             </Label>
                                             <div className="controls ">
-                                                <MultiSelect
-                                                    bsSize="sm"
-                                                    name="stockStatusId"
-                                                    id="stockStatusId"
-                                                    value={this.state.stockStatusValues}
-                                                    onChange={(e) => { this.setStockStatusId(e); }}
-                                                    options={legendcolor.map(item => ({
-                                                        value: item.value,
-                                                        label: item.text
-                                                    }))}
-                                                    filterOptions={filterOptions}
-                                                    overrideStrings={{
-                                                        allItemsAreSelected: i18n.t('static.common.allitemsselected'),
-                                                        selectSomeItems: i18n.t('static.common.select')
-                                                    }}
-                                                />
+                                                <div onBlur={this.handleBlur}>
+                                                    <MultiSelect
+                                                        bsSize="sm"
+                                                        name="stockStatusId"
+                                                        id="stockStatusId"
+                                                        value={this.state.stockStatusValues}
+                                                        onChange={(e) => { this.setStockStatusId(e); }}
+                                                        options={legendcolor.map(item => ({
+                                                            value: item.value,
+                                                            label: item.text
+                                                        }))}
+                                                        filterOptions={filterOptions}
+                                                        overrideStrings={{
+                                                            allItemsAreSelected: i18n.t('static.common.allitemsselected'),
+                                                            selectSomeItems: i18n.t('static.common.select')
+                                                        }}
+                                                    />
+                                                </div>
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3 d-flex flex-column justify-content-end" style={{ marginBottom: '30px' }}>
