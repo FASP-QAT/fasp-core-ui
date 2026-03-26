@@ -3712,5 +3712,9 @@
   "static.currency.conversionrateusd": "Conversion rate to 1 USD",
   "static.logout.confirmLogout": "Are you sure you want to log out?",
   "static.common.node": "Node",
-  "static.pipeline.pipelineConvertorLinux": "Linux."
+  "static.pipeline.pipelineConvertorLinux": "Linux.",
+  "static.report.showInEu": "Show data in quivalency unit",
+  "static.report.stockStatusMatrixGlobal": "Stock Status Matrix (Global)",
+  "static.stockStatus.showInEuTooltip": "QAT is able to aggregate across different products (different pack sizes, products, etc.), by utilizing Equivalency Units, which are mapped to different forecasting units. View under Realm Masters > Products > Equivalency Units. Realm-level mappings are available to all users. Program admins can also create program-specific mappings.",
+  "static.report.showPUsInAllProgram": "Only show PUs available in ALL programs"
 }

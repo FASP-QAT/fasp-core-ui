@@ -623,24 +623,36 @@ class StockStatusMatrixGlobal extends Component {
                 }
             });
         });
-        if(this.state.yaxisEquUnit != -1) {
+        if (this.state.yaxisEquUnit != -1) {
             Array.from(uniquePUs).sort().forEach((puId, index) => {
                 let puObj = (this.state.planningUnitListAll || []).find(p => p.id == puId);
-                let formattedStr = "";
+                let idText = "";
+                let labelText = "";
                 if (puObj) {
-                    formattedStr = puObj.id + " " + getLabelText(puObj.label, this.state.lang);
+                    idText = puObj.id + "";
+                    labelText = " " + getLabelText(puObj.label, this.state.lang);
                 } else {
                     let parts = puId.split(' | ');
-                    formattedStr = parts.length > 1 ? parts[1] + " " + parts[0] : puId;
+                    if (parts.length > 1) {
+                        idText = parts[1];
+                        labelText = " " + parts[0];
+                    } else {
+                        idText = puId;
+                        labelText = "";
+                    }
                 }
-                
+
                 // Check for page overflow
                 if (finalY > doc.internal.pageSize.height - 50) {
                     doc.addPage();
-                    finalY = 50;
+                    finalY = 80;
                 }
-                
-                doc.text(formattedStr, 40, finalY);
+
+                doc.setFont("helvetica", "bold");
+                doc.text(idText, 40, finalY);
+                let idWidth = doc.getTextWidth(idText);
+                doc.setFont("helvetica", "normal");
+                doc.text(labelText, 40 + idWidth, finalY);
                 finalY += 15;
             });
         }
@@ -2048,7 +2060,7 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>}
                                         <FormGroup className="col-md-3" id="equivelencyUnitDiv">
-                                            <Label htmlFor="appendedInputButton">Show data in equivalency unit <i className="fa fa-info-circle icons" title="QAT is able to aggregate across different products (different pack sizes, products, etc.), by utilizing Equivalency Units, which are mapped to different forecasting units. View under Realm Masters > Products > Equivalency Units. Realm-level mappings are available to all users. Program admins can also create program-specific mappings." aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
+                                            <Label htmlFor="appendedInputButton">{i18n.t('static.report.showInEu')} <i className="fa fa-info-circle icons" title={i18n.t('static.stockStatus.showInEuTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
                                             <div className="controls ">
                                                 <InputGroup>
                                                 <Input
@@ -2087,7 +2099,7 @@ class StockStatusMatrixGlobal extends Component {
                                                         <Label
                                                             className="form-check-label ml-1"
                                                             check htmlFor="onlyShowAllPUs" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                            Only show PUs available in ALL programs
+                                                            {i18n.t('static.report.showPUsInAllProgram')}
                                                         </Label>
                                                     </div>
                                                 }
@@ -2186,7 +2198,7 @@ class StockStatusMatrixGlobal extends Component {
                                                 <Label
                                                     className="form-check-label ml-1"
                                                     check htmlFor="viewByComp" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    Show Quantity
+                                                    {i18n.t('static.report.showQuantity')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
