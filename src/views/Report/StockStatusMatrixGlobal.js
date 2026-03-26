@@ -1343,6 +1343,23 @@ class StockStatusMatrixGlobal extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             search: true,
             columnSorting: true,
+            onopenfilter: function (instance, col) {
+                setTimeout(() => {
+                    const dropdown = document.querySelector(".jss_filters_options");
+                    if (dropdown) {
+                        // Remove icons from the filter options list
+                        dropdown.querySelectorAll("label i, label svg").forEach(icon => icon.remove());
+
+                        const options = Array.from(
+                            dropdown.querySelectorAll("label")
+                        ).slice(1);
+                        const sorted = options.sort((a, b) =>
+                            a.textContent.trim().localeCompare(b.textContent.trim(), undefined, { numeric: true, sensitivity: 'base' })
+                        );
+                        sorted.forEach((option) => dropdown.appendChild(option));
+                    }
+                }, 100);
+            }.bind(this),
             onfilter: function (instance) {
                 this.refreshJexcel(instance);
             }.bind(this),
