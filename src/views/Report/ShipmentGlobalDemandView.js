@@ -281,11 +281,11 @@ class ShipmentGlobalDemandView extends Component {
   // ------------------------------------------------------------------
   buildJExcel() {
     // ── Save scroll position so sorting / rebuild doesn't jump to top ──
-    // const scrollContainer = document.querySelector(".globalviwe-scroll") ||
-    //   document.querySelector(".app-body") ||
-    //   document.documentElement;
-    // const savedScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
-    // const savedWindowScrollY = window.scrollY;
+    const scrollContainer = document.querySelector(".globalviwe-scroll") ||
+      document.querySelector(".app-body") ||
+      document.documentElement;
+    const savedScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+    const savedWindowScrollY = window.scrollY;
 
     // Destroy any previous instance
     if (this.tableDiv && this.tableDiv.current) {
@@ -1237,25 +1237,25 @@ class ShipmentGlobalDemandView extends Component {
         // jspreadsheet resets scroll internally after sort; capture the
         // scroll position on mousedown and restore it at multiple delays
         // to reliably catch both sync and async scroll resets.
-        // if (worksheet.thead) {
-        //   worksheet.thead.addEventListener("mousedown", function () {
-        //     const snapScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
-        //     const snapWindowY = window.scrollY;
-        //     const restore = function () {
-        //       if (scrollContainer) scrollContainer.scrollTop = snapScrollTop;
-        //       window.scrollTo(0, snapWindowY);
-        //     };
-        //     setTimeout(restore, 0);
-        //     setTimeout(restore, 50);
-        //     setTimeout(restore, 150);
-        //   });
-        // }
+        if (worksheet.thead) {
+          worksheet.thead.addEventListener("mousedown", function () {
+            const snapScrollTop = scrollContainer ? scrollContainer.scrollTop : 0;
+            const snapWindowY = window.scrollY;
+            const restore = function () {
+              if (scrollContainer) scrollContainer.scrollTop = snapScrollTop;
+              window.scrollTo(0, snapWindowY);
+            };
+            setTimeout(restore, 0);
+            setTimeout(restore, 50);
+            setTimeout(restore, 150);
+          });
+        }
 
         // ── Restore scroll position after initial rebuild ──
-        // requestAnimationFrame(() => {
-        //   if (scrollContainer) scrollContainer.scrollTop = savedScrollTop;
-        //   window.scrollTo(0, savedWindowScrollY);
-        // });
+        requestAnimationFrame(() => {
+          if (scrollContainer) scrollContainer.scrollTop = savedScrollTop;
+          window.scrollTo(0, savedWindowScrollY);
+        });
       },
     };
 
