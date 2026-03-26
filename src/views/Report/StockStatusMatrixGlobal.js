@@ -199,7 +199,7 @@ class StockStatusMatrixGlobal extends Component {
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + ": " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + ": " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + ": " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+        csvRow.push(`'+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
         csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
         const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
             ? i18n.t("static.equivalancyUnit.equivalancyUnits") + ": " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
@@ -212,7 +212,7 @@ class StockStatusMatrixGlobal extends Component {
         if (isEquUnitMode) {
             headerRow.push(i18n.t('static.modelingValidation.puLevel'));
         }
-        headerRow.push(...sortedDates.map(date => moment(date).format('MMM YY')));
+        headerRow.push(...sortedDates.map(date => moment(date).format('01-MMM-YY')));
         csvRow.push(addDoubleQuoteToRowContent(headerRow));
 
         dataList.forEach(item => {
@@ -608,8 +608,8 @@ class StockStatusMatrixGlobal extends Component {
         });
 
         let finalY = doc.lastAutoTable.finalY + 20;
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
         doc.setTextColor("#002f6c");
         
         let uniquePUs = new Set();
