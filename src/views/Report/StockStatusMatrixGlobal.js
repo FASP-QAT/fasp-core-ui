@@ -1365,12 +1365,18 @@ class StockStatusMatrixGlobal extends Component {
                 this.refreshJexcel(instance, pageNo);
             }.bind(this),
             updateTable: function (instance, cell, col, row, val, label, cellName) {
-                if (cell && col < colOffset) {
-                    cell.style.setProperty("text-align", "left", "important");
-                    if (row % 2 !== 0) {
-                        cell.style.backgroundColor = '#fff';
+                if (cell && col < columns.length - 1) {
+                    // Identify the visual order among visible rows to maintain zebra striping despite filters/sort
+                    const visibleSiblings = Array.from(cell.parentNode.parentNode.children).filter(tr => tr.style.display !== 'none');
+                    const visualRowIndex = visibleSiblings.indexOf(cell.parentNode);
+                    const isOdd = visualRowIndex % 2 !== 0;
+                    const zebraColor = isOdd ? '#e5edf5' : '#fff';
+
+                    if (col < colOffset) {
+                        cell.style.setProperty("background-color", zebraColor, "important");
+                        cell.style.setProperty("text-align", "left", "important");
                     } else {
-                        cell.style.backgroundColor = '#e5edf5';
+                        cell.style.backgroundColor = zebraColor;
                     }
                 }
                 if (cell && col >= colOffset && col < columns.length - 1) {
@@ -1444,10 +1450,28 @@ class StockStatusMatrixGlobal extends Component {
             if (end > json.length) {
                 end = json.length;
             }
+
+            // Manually re-apply visual zebra striping for identifier columns on current visible rows
+            const table = elInstance.element || elInstance;
+            const bodyRows = table.querySelectorAll("tbody tr");
+            let visibleIdx = 0;
+            bodyRows.forEach(tr => {
+                if (tr.style.display !== 'none') {
+                    const zebraColor = (visibleIdx % 2 !== 0) ? '#e5edf5' : '#fff';
+                    const tds = tr.querySelectorAll("td");
+                    for (let x = 1; x < colOffset + 1; x++) {
+                        if (tds[x]) {
+                            tds[x].style.setProperty("background-color", zebraColor, "important");
+                        }
+                    }
+                    visibleIdx++;
+                }
+            });
+
             var updateTableFunc = options.updateTable || (elInstance.config ? elInstance.config.updateTable : null);
             if (typeof updateTableFunc !== 'function') return;
             for (var y = start; y < end; y++) {
-                for (var x = colOffset; x < columns.length - 1; x++) {
+                for (var x = 0; x < columns.length - 1; x++) {
                     var cell = elInstance.getCell(x, y);
                     if (cell) {
                         var val = elInstance.getValueFromCoords(x, y);
