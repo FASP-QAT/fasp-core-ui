@@ -900,7 +900,7 @@ class StockStatusMatrixGlobal extends Component {
     }
     setViewBy(e) {
         this.setState({
-            viewBy: e.target.value,
+            viewBy: e.target.checked ? 2 : 1,
         }, () => {
             this.fetchData();
         })
@@ -1921,7 +1921,24 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <Label htmlFor="countryIds">{i18n.t('static.program.realmcountry')}</Label>
+                                                <div className="d-flex align-items-center">
+                                                    <Input
+                                                        type="checkbox"
+                                                        id="aggregateCountries"
+                                                        name="aggregateCountries"
+                                                        checked={this.state.aggregateCountries}
+                                                        onClick={(e) => { this.setAggregateCountries(e); }}
+                                                        style={{ marginTop: '0px', position: 'relative' }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label ml-1"
+                                                        check htmlFor="aggregateCountries" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                        {"Aggregate Countries"}
+                                                    </Label>
+                                                </div>
+                                            </div>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <MultiSelect
                                                 bsSize="sm"
@@ -2002,12 +2019,31 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" >
-                                            <Label
-                                                className="form-check-label"
-                                                // check htmlFor="inline-radio1"
-                                                title={i18n.t('static.report.planningUnit')}>
-                                                {i18n.t('static.report.planningUnit')}
-                                            </Label>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <Label
+                                                    className="form-check-label"
+                                                    // check htmlFor="inline-radio1"
+                                                    title={i18n.t('static.report.planningUnit')}>
+                                                    {i18n.t('static.report.planningUnit')}
+                                                </Label>
+                                                {this.state.programValues.length > 1 &&
+                                                    <div className="d-flex align-items-center" style={{ marginLeft: '10px' }}>
+                                                        <Input
+                                                            type="checkbox"
+                                                            id="onlyShowAllPUs"
+                                                            name="onlyShowAllPUs"
+                                                            checked={this.state.onlyShowAllPUs}
+                                                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                                                            style={{ marginTop: '0px', position: 'relative' }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label ml-1"
+                                                            check htmlFor="onlyShowAllPUs" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                            Only show PUs available in ALL programs
+                                                        </Label>
+                                                    </div>
+                                                }
+                                            </div>
                                             <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
                                                 <div className="controls">
                                                     <div onBlur={this.handleBlur}>
@@ -2026,30 +2062,12 @@ class StockStatusMatrixGlobal extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                            {this.state.programValues.length > 1 && <FormGroup style={{ "marginTop": "-10px" }}>
-                                                <div className={this.state.yaxisEquUnit != 1 ? "col-md-12" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="onlyShowAllPUs"
-                                                    name="onlyShowAllPUs"
-                                                    checked={this.state.onlyShowAllPUs}
-                                                    onClick={(e) => { this.setOnlyShowAllPUs(e); }}
-                                                    style={{ marginTop: '2px' }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
-                                                </Label>
-                                                </div>
-                                            </FormGroup>}
                                         </FormGroup>
-                                         <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">
-                                            {i18n.t("static.report.withinstock")}
+                                                {i18n.t("static.report.withinstock")}
                                             </Label>
-                                             <div className="controls ">
+                                            <div className="controls ">
                                                 <MultiSelect
                                                     bsSize="sm"
                                                     name="stockStatusId"
@@ -2066,28 +2084,10 @@ class StockStatusMatrixGlobal extends Component {
                                                         selectSomeItems: i18n.t('static.common.select')
                                                     }}
                                                 />
-                                             </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Show by<i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
-                                            <div className="controls">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="viewBy"
-                                                        id="viewBy"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.setViewBy(e); }}
-                                                        value={this.state.viewBy}
-                                                    >
-                                                        <option value="1">{i18n.t('static.report.mos')}</option>
-                                                        <option value="2">{i18n.t('static.report.qty')}</option>
-                                                    </Input>
-                                                </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-12 d-flex flex-wrap" style={{ "marginTop": "-15px" }}>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                        <FormGroup className="col-md-3 d-flex flex-column justify-content-end" style={{ marginBottom: '30px' }}>
+                                            <div className="d-flex align-items-center" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -2098,13 +2098,13 @@ class StockStatusMatrixGlobal extends Component {
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="removePlannedShipments" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removePlannedShipments')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.removePlannedShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                            <div className="d-flex align-items-center mt-1" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -2115,41 +2115,44 @@ class StockStatusMatrixGlobal extends Component {
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="removeTbdFundingSource" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removeTBDFundingSourceShipments')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.removeTBDFundingSourceShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3 d-flex flex-column justify-content-end" style={{ marginBottom: '30px' }}>
+                                            <div className="d-flex align-items-center" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
-                                                    id="aggregateCountries"
-                                                    name="aggregateCountries"
-                                                    checked={this.state.aggregateCountries}
-                                                    onClick={(e) => { this.setAggregateCountries(e); }}
+                                                    id="viewByComp"
+                                                    name="viewByComp"
+                                                    checked={this.state.viewBy == 2}
+                                                    onClick={(e) => { this.setViewBy(e); }}
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    {"Aggregate Countries"}
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="viewByComp" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    Show Quantity
+                                                    <i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                            <div className="d-flex align-items-center mt-1" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
-                                                    id="showIcons"
-                                                    name="showIcons"
+                                                    id="showIconsComp"
+                                                    name="showIconsComp"
                                                     checked={this.state.showIcons}
                                                     onClick={(e) => { this.setShowIcons(e); }}
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="showIconsComp" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.showIcon')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.showIconTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
