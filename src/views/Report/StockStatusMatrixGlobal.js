@@ -199,7 +199,7 @@ class StockStatusMatrixGlobal extends Component {
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removePlannedShipments') + ": " + (this.state.removePlannedShipments ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent([i18n.t('static.report.removeTBDFundingSourceShipments') + ": " + (this.state.removeTbdFundingSource ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
         csvRow.push(addDoubleQuoteToRowContent(["Aggregate Countries" + ": " + (this.state.aggregateCountries ? i18n.t('static.dataEntry.True') : i18n.t('static.dataEntry.False'))]));
-        csvRow.push(`+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
+        csvRow.push(`'+ ${i18n.t("static.stockStatusMatrix.totalShipmentQty")}`);
         csvRow.push(`* ${i18n.t("static.supplyPlan.expiredQty")}`);
         const reportTitle = (this.state.yaxisEquUnit != -1 && this.state.yaxisEquUnit != "-1")
             ? i18n.t("static.equivalancyUnit.equivalancyUnits") + ": " + (Array.isArray(this.state.yaxisEquUnitLabel) ? this.state.yaxisEquUnitLabel.join("; ") : this.state.yaxisEquUnitLabel)
@@ -212,7 +212,7 @@ class StockStatusMatrixGlobal extends Component {
         if (isEquUnitMode) {
             headerRow.push(i18n.t('static.modelingValidation.puLevel'));
         }
-        headerRow.push(...sortedDates.map(date => moment(date).format('MMM YY')));
+        headerRow.push(...sortedDates.map(date => moment(date).format('01-MMM-YY')));
         csvRow.push(addDoubleQuoteToRowContent(headerRow));
 
         dataList.forEach(item => {
@@ -608,8 +608,8 @@ class StockStatusMatrixGlobal extends Component {
         });
 
         let finalY = doc.lastAutoTable.finalY + 20;
-        doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "normal");
         doc.setTextColor("#002f6c");
         
         let uniquePUs = new Set();
@@ -900,7 +900,7 @@ class StockStatusMatrixGlobal extends Component {
     }
     setViewBy(e) {
         this.setState({
-            viewBy: e.target.value,
+            viewBy: e.target.checked ? 2 : 1,
         }, () => {
             this.fetchData();
         })
@@ -1343,6 +1343,23 @@ class StockStatusMatrixGlobal extends Component {
             paginationOptions: JEXCEL_PAGINATION_OPTION,
             search: true,
             columnSorting: true,
+            onopenfilter: function (instance, col) {
+                setTimeout(() => {
+                    const dropdown = document.querySelector(".jss_filters_options");
+                    if (dropdown) {
+                        // Remove icons from the filter options list
+                        dropdown.querySelectorAll("label i, label svg").forEach(icon => icon.remove());
+
+                        const options = Array.from(
+                            dropdown.querySelectorAll("label")
+                        ).slice(1);
+                        const sorted = options.sort((a, b) =>
+                            a.textContent.trim().localeCompare(b.textContent.trim(), undefined, { numeric: true, sensitivity: 'base' })
+                        );
+                        sorted.forEach((option) => dropdown.appendChild(option));
+                    }
+                }, 100);
+            }.bind(this),
             onfilter: function (instance) {
                 this.refreshJexcel(instance);
             }.bind(this),
@@ -1365,12 +1382,18 @@ class StockStatusMatrixGlobal extends Component {
                 this.refreshJexcel(instance, pageNo);
             }.bind(this),
             updateTable: function (instance, cell, col, row, val, label, cellName) {
-                if (cell && col < colOffset) {
-                    cell.style.setProperty("text-align", "left", "important");
-                    if (row % 2 !== 0) {
-                        cell.style.backgroundColor = '#fff';
+                if (cell && col < columns.length - 1) {
+                    // Identify the visual order among visible rows to maintain zebra striping despite filters/sort
+                    const visibleSiblings = Array.from(cell.parentNode.parentNode.children).filter(tr => tr.style.display !== 'none');
+                    const visualRowIndex = visibleSiblings.indexOf(cell.parentNode);
+                    const isOdd = visualRowIndex % 2 !== 0;
+                    const zebraColor = isOdd ? '#e5edf5' : '#fff';
+
+                    if (col < colOffset) {
+                        cell.style.setProperty("background-color", zebraColor, "important");
+                        cell.style.setProperty("text-align", "left", "important");
                     } else {
-                        cell.style.backgroundColor = '#e5edf5';
+                        cell.style.backgroundColor = zebraColor;
                     }
                 }
                 if (cell && col >= colOffset && col < columns.length - 1) {
@@ -1444,10 +1467,28 @@ class StockStatusMatrixGlobal extends Component {
             if (end > json.length) {
                 end = json.length;
             }
+
+            // Manually re-apply visual zebra striping for identifier columns on current visible rows
+            const table = elInstance.element || elInstance;
+            const bodyRows = table.querySelectorAll("tbody tr");
+            let visibleIdx = 0;
+            bodyRows.forEach(tr => {
+                if (tr.style.display !== 'none') {
+                    const zebraColor = (visibleIdx % 2 !== 0) ? '#e5edf5' : '#fff';
+                    const tds = tr.querySelectorAll("td");
+                    for (let x = 1; x < colOffset + 1; x++) {
+                        if (tds[x]) {
+                            tds[x].style.setProperty("background-color", zebraColor, "important");
+                        }
+                    }
+                    visibleIdx++;
+                }
+            });
+
             var updateTableFunc = options.updateTable || (elInstance.config ? elInstance.config.updateTable : null);
             if (typeof updateTableFunc !== 'function') return;
             for (var y = start; y < end; y++) {
-                for (var x = colOffset; x < columns.length - 1; x++) {
+                for (var x = 0; x < columns.length - 1; x++) {
                     var cell = elInstance.getCell(x, y);
                     if (cell) {
                         var val = elInstance.getValueFromCoords(x, y);
@@ -1921,7 +1962,24 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3">
-                                            <Label htmlFor="programIds">{i18n.t('static.program.realmcountry')}</Label>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <Label htmlFor="countryIds">{i18n.t('static.program.realmcountry')}</Label>
+                                                <div className="d-flex align-items-center">
+                                                    <Input
+                                                        type="checkbox"
+                                                        id="aggregateCountries"
+                                                        name="aggregateCountries"
+                                                        checked={this.state.aggregateCountries}
+                                                        onClick={(e) => { this.setAggregateCountries(e); }}
+                                                        style={{ marginTop: '0px', position: 'relative' }}
+                                                    />
+                                                    <Label
+                                                        className="form-check-label ml-1"
+                                                        check htmlFor="aggregateCountries" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                        {"Aggregate Countries"}
+                                                    </Label>
+                                                </div>
+                                            </div>
                                             <span className="reportdown-box-icon fa fa-sort-desc ml-1"></span>
                                             <MultiSelect
                                                 bsSize="sm"
@@ -2002,12 +2060,31 @@ class StockStatusMatrixGlobal extends Component {
                                             </div>
                                         </FormGroup>
                                         <FormGroup className="col-md-3" >
-                                            <Label
-                                                className="form-check-label"
-                                                // check htmlFor="inline-radio1"
-                                                title={i18n.t('static.report.planningUnit')}>
-                                                {i18n.t('static.report.planningUnit')}
-                                            </Label>
+                                            <div className="d-flex align-items-center justify-content-between">
+                                                <Label
+                                                    className="form-check-label"
+                                                    // check htmlFor="inline-radio1"
+                                                    title={i18n.t('static.report.planningUnit')}>
+                                                    {i18n.t('static.report.planningUnit')}
+                                                </Label>
+                                                {this.state.programValues.length > 1 &&
+                                                    <div className="d-flex align-items-center" style={{ marginLeft: '10px' }}>
+                                                        <Input
+                                                            type="checkbox"
+                                                            id="onlyShowAllPUs"
+                                                            name="onlyShowAllPUs"
+                                                            checked={this.state.onlyShowAllPUs}
+                                                            onClick={(e) => { this.setOnlyShowAllPUs(e); }}
+                                                            style={{ marginTop: '0px', position: 'relative' }}
+                                                        />
+                                                        <Label
+                                                            className="form-check-label ml-1"
+                                                            check htmlFor="onlyShowAllPUs" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                            Only show PUs available in ALL programs
+                                                        </Label>
+                                                    </div>
+                                                }
+                                            </div>
                                             <FormGroup id="planningUnitDiv" style={{ "marginTop": "8px" }}>
                                                 <div className="controls">
                                                     <div onBlur={this.handleBlur}>
@@ -2026,30 +2103,12 @@ class StockStatusMatrixGlobal extends Component {
                                                     </div>
                                                 </div>
                                             </FormGroup>
-                                            {this.state.programValues.length > 1 && <FormGroup style={{ "marginTop": "-10px" }}>
-                                                <div className={this.state.yaxisEquUnit != 1 ? "col-md-12" : "col-md-12"} style={{ "padding-left": "23px", "marginTop": "-25px !important" }}>
-                                                <Input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    id="onlyShowAllPUs"
-                                                    name="onlyShowAllPUs"
-                                                    checked={this.state.onlyShowAllPUs}
-                                                    onClick={(e) => { this.setOnlyShowAllPUs(e); }}
-                                                    style={{ marginTop: '2px' }}
-                                                />
-                                                <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px' }}>
-                                                    {i18n.t('static.consumptionGlobal.onlyShowPUsThatArePartOfAllPrograms')}
-                                                </Label>
-                                                </div>
-                                            </FormGroup>}
                                         </FormGroup>
-                                         <FormGroup className="col-md-3">
+                                        <FormGroup className="col-md-3">
                                             <Label htmlFor="appendedInputButton">
-                                            {i18n.t("static.report.withinstock")}
+                                                {i18n.t("static.report.withinstock")}
                                             </Label>
-                                             <div className="controls ">
+                                            <div className="controls ">
                                                 <MultiSelect
                                                     bsSize="sm"
                                                     name="stockStatusId"
@@ -2066,28 +2125,10 @@ class StockStatusMatrixGlobal extends Component {
                                                         selectSomeItems: i18n.t('static.common.select')
                                                     }}
                                                 />
-                                             </div>
-                                        </FormGroup>
-                                        <FormGroup className="col-md-3">
-                                            <Label htmlFor="appendedInputButton">Show by<i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i></Label>
-                                            <div className="controls">
-                                                <InputGroup>
-                                                    <Input
-                                                        type="select"
-                                                        name="viewBy"
-                                                        id="viewBy"
-                                                        bsSize="sm"
-                                                        onChange={(e) => { this.setViewBy(e); }}
-                                                        value={this.state.viewBy}
-                                                    >
-                                                        <option value="1">{i18n.t('static.report.mos')}</option>
-                                                        <option value="2">{i18n.t('static.report.qty')}</option>
-                                                    </Input>
-                                                </InputGroup>
                                             </div>
                                         </FormGroup>
-                                        <FormGroup className="col-md-12 d-flex flex-wrap" style={{ "marginTop": "-15px" }}>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                        <FormGroup className="col-md-3 d-flex flex-column justify-content-end" style={{ marginBottom: '30px' }}>
+                                            <div className="d-flex align-items-center" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -2098,13 +2139,13 @@ class StockStatusMatrixGlobal extends Component {
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="removePlannedShipments" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removePlannedShipments')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.removePlannedShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                            <div className="d-flex align-items-center mt-1" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
@@ -2115,41 +2156,44 @@ class StockStatusMatrixGlobal extends Component {
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="removeTbdFundingSource" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.removeTBDFundingSourceShipments')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.removeTBDFundingSourceShipmentsTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                        </FormGroup>
+                                        <FormGroup className="col-md-3 d-flex flex-column justify-content-end" style={{ marginBottom: '30px' }}>
+                                            <div className="d-flex align-items-center" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
-                                                    id="aggregateCountries"
-                                                    name="aggregateCountries"
-                                                    checked={this.state.aggregateCountries}
-                                                    onClick={(e) => { this.setAggregateCountries(e); }}
+                                                    id="viewByComp"
+                                                    name="viewByComp"
+                                                    checked={this.state.viewBy == 2}
+                                                    onClick={(e) => { this.setViewBy(e); }}
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
-                                                    {"Aggregate Countries"}
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="viewByComp" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    Show Quantity
+                                                    <i className="fa fa-info-circle icons" title={i18n.t('static.report.showQuantityTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
                                             </div>
-                                            <div className="mr-3 d-flex align-items-center" style={{ "padding-left": "23px" }}>
+                                            <div className="d-flex align-items-center mt-1" style={{ marginLeft: '20px', marginBottom: '0px' }}>
                                                 <Input
                                                     className="form-check-input"
                                                     type="checkbox"
-                                                    id="showIcons"
-                                                    name="showIcons"
+                                                    id="showIconsComp"
+                                                    name="showIconsComp"
                                                     checked={this.state.showIcons}
                                                     onClick={(e) => { this.setShowIcons(e); }}
                                                     style={{ marginTop: '0px' }}
                                                 />
                                                 <Label
-                                                    className="form-check-label"
-                                                    check htmlFor="inline-radio2" style={{ fontSize: '12px', marginBottom: '0px' }}>
+                                                    className="form-check-label ml-1"
+                                                    check htmlFor="showIconsComp" style={{ fontSize: '12px', marginBottom: '0px' }}>
                                                     {i18n.t('static.report.showIcon')}
                                                     <i className="fa fa-info-circle icons" title={i18n.t('static.report.showIconTooltip')} aria-hidden="true" style={{ color: "#002f6c", cursor: "pointer", marginLeft: "5px" }}></i>
                                                 </Label>
