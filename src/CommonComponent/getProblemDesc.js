@@ -325,7 +325,7 @@ export default function getProblemDesc(row, lang) {
             desc += i18n.t('static.problemList.minMaxProblemDescStockedOut', { count, monthNames });
         }
         if (obj.shipmentListMonthsCount > 0) {
-            var monthNames = formatMonthRanges(obj.shipmentListMonths.toString().split(","));
+            var monthNames = formatMonthRanges([...new Set(obj.shipmentListMonths.toString().split(","))]);
             desc += i18n.t('static.problemList.minMaxProblemDescShipments', { monthNames });
         }
         if (desc_en != null && desc_en != '') {

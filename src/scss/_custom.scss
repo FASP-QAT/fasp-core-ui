@@ -18428,6 +18428,7 @@ label.arrow_label:before {
   top: 0px !important;
   right: 0;
 }
+
 .table td.custom-padding-program {
   padding-left: 15px !important;
 }
@@ -18435,6 +18436,7 @@ label.arrow_label:before {
 .table td.custom-padding-pu {
   padding-left: 25px !important;
 }
+
 #shipmentGlobalDemandTableDiv .jss>tbody>tr>td:nth-child(3) {
   text-align: left !important;
 }
@@ -18451,6 +18453,7 @@ label.arrow_label:before {
 #shipmentGlobalDemandTableDiv .jss>thead>tr>td:nth-child(n+4) {
   text-align: right !important;
 }
+
 #shipmentGlobalDemandTableDiv .jss_search_container {
   position: absolute;
   top: -40px;
@@ -18461,21 +18464,45 @@ label.arrow_label:before {
   gap: 4px;
   margin: 0;
 }
-#shipmentGlobalDemandTableDiv .jss_search_container > div:first-child {
+
+#shipmentGlobalDemandTableDiv .jss_search_container>div:first-child {
   display: none;
 }
+
 #shipmentGlobalDemandTableDiv .jss_search_container input.jss_search {
   height: 28px;
   margin: 0;
 }
+
 #shipmentGlobalDemandTableDiv .jss_search_container .jexcel_clear_btn {
   height: 28px;
   margin: 0;
   white-space: nowrap;
 }
+
 // #shipmentGlobalDemandTableDiv .jss_filters{
 //   transform: translateY(-100%);
 // }
 #stockDetailTableDiv .jss_filters {
   transform: translateY(-85%);
+}
+
+#stockMatrixTableDiv .jss_content table thead tr td:nth-child(2),
+#stockMatrixTableDiv .jss_content table tbody tr td:nth-child(2) {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 5 !important;
+}
+
+#stockMatrixTableDiv .jss_content table thead tr td:nth-child(2) {
+  z-index: 6 !important;
+  background-color: #fff !important;
+}
+
+#stockMatrixTableDiv .jss_content table tbody tr:nth-of-type(odd) td:nth-child(2) {
+  background-color: #e5edf5 !important;
+}
+
+#stockMatrixTableDiv .jss_content table tbody tr:nth-of-type(even) td:nth-child(2) {
+  background-color: #fff !important;
 }
