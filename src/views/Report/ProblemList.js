@@ -573,6 +573,7 @@ export default class ProblemList extends React.Component {
                     title: i18n.t('static.planningunit.planningunit'),
                     type: 'text',
                     readOnly: true,
+                    width:200
                 },
                 {
                     type: 'text',
