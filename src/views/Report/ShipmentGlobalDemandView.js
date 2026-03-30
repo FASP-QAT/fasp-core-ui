@@ -1325,7 +1325,7 @@ class ShipmentGlobalDemandView extends Component {
       csvRow.push(
         '"' +
         (
-          i18n.t("static.report.version") +
+          i18n.t("static.report.versionFinal*") +
           "  :  " +
           document.getElementById("versionId").selectedOptions[0].text
         ).replaceAll(" ", "%20") +
@@ -1769,7 +1769,7 @@ class ShipmentGlobalDemandView extends Component {
     if (this.state.programValues.length == 1) {
       len += 10;
       doc.text(
-        i18n.t("static.report.version") +
+        i18n.t("static.report.versionFinal*") +
         " : " +
         document.getElementById("versionId").selectedOptions[0].text,
         doc.internal.pageSize.width / 8,
@@ -3837,11 +3837,16 @@ class ShipmentGlobalDemandView extends Component {
     const { versions } = this.state;
     let versionList =
       versions.length > 0 &&
-      versions.map((item, i) => (
-        <option key={i} value={item.versionId}>
-          {item.versionId}
-        </option>
-      ));
+      versions.map((item, i) => {
+        return (
+          <option key={i} value={item.versionId}>
+            {item.versionStatus.id == 2 && item.versionType.id == 2
+              ? item.versionId + "*"
+              : item.versionId}{" "}
+            ({moment(item.createdDate).format(`MMM DD YYYY`)}) {item.cutOffDate != undefined && item.cutOffDate != null && item.cutOffDate != '' ? " (" + i18n.t("static.supplyPlan.start") + " " + moment(item.cutOffDate).format('MMM YYYY') + ")" : ""}
+          </option>
+        );
+      }, this);
 
     const { programLst } = this.state;
     let programList =
@@ -4036,7 +4041,7 @@ class ShipmentGlobalDemandView extends Component {
                     {this.state.programValues.length == 1 && (
                       <FormGroup className="col-md-3">
                         <Label htmlFor="appendedInputButton">
-                          {i18n.t("static.report.version")}
+                          {i18n.t("static.report.versionFinal*")}
                         </Label>
                         <div className="controls">
                           <InputGroup>

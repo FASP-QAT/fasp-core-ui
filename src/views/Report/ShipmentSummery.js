@@ -1053,7 +1053,7 @@ class ShipmentSummery extends Component {
       y = y + 10;
     }
     if (this.state.programValues.length == 1) {
-      planningText = doc.splitTextToSize(i18n.t('static.report.version') + ': ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
+      planningText = doc.splitTextToSize(i18n.t('static.report.versionFinal*') + ': ' + document.getElementById("versionId").selectedOptions[0].text, doc.internal.pageSize.width * 3 / 4);
       y = y + 10;
       for (var i = 0; i < planningText.length; i++) {
         if (y > doc.internal.pageSize.height - 100) {
@@ -3697,7 +3697,7 @@ class ShipmentSummery extends Component {
                           )}
                       </FormGroup>
                       {this.state.programValues.length == 1 && <FormGroup className="col-md-3">
-                        <Label htmlFor="appendedInputButton">{i18n.t('static.report.version')}</Label>
+                        <Label htmlFor="appendedInputButton">{i18n.t("static.report.versionFinal*")}</Label>
                         <div className="controls">
                           <InputGroup>
                             <Input
