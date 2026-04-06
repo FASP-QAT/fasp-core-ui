@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Tableau de Bord du
+                                            Plan d'Approvisionnement</h3>
+
+                                        <p style="font-size: 13px;">Le tableau de bord du plan d'approvisionnement
+                                            génère
+                                            un score global pour le plan d'approvisionnement de chaque programme basé
+                                            sur
+                                            la <b>Qualité</b> (y compris la complétude des données et la planification
+                                            des achats) et le <b>Statut des stocks</b> (par rapport aux niveaux minimum
+                                            et maximum). Le score utilise les mêmes critères que la liste de problèmes
+                                            QAT, un écran de validation disponible pour les utilisateurs et les
+                                            administrateurs de programmes pour améliorer leurs plans
+                                            d'approvisionnement. Le tableau de bord met en évidence les domaines
+                                            nécessitant des améliorations et permet aux utilisateurs globaux de comparer
+                                            les performances entre les programmes.
+                                            Les utilisateurs peuvent visualiser les résultats à trois niveaux :</p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Programme individuel</li>
+                                            <li>Programmes agrégés par pays</li>
+                                            <li>Domaines techniques agrégés par pays</li>
+                                        </ul>
+
+                                        <p style="font-size: 13px;">Des scores plus élevés indiquent une meilleure
+                                            performance du plan d'approvisionnement. Les scores sont classés par
+                                            couleur,
+                                            avec un score cible de
+                                            <b>90%</b>.
+                                        </p>
+
+                                        <p
+                                            style="font-size: 13px; background-color: #fff3cd; padding: 8px; border-radius: 4px; border-left: 4px solid #EDB944;">
+                                            <b>Remarque :</b> Étant donné que les scores sont dérivés des données de la
+                                            liste de problèmes QAT, ils ne sont pas liés à une période de rapport
+                                            spécifique. Les versions de programmes téléchargées recalculent la liste de
+                                            problèmes QAT en utilisant la date actuelle, tandis que les versions de
+                                            programmes basées sur le serveur la calculent en fonction de la date de
+                                            téléchargement.
+                                        </p>
+
+                                        <!-- Score global du plan d'approvisionnement -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Score Global du Plan d'Approvisionnement</h4>
+                                        <p style="font-size: 13px;">Le score global du plan d'approvisionnement est une
+                                            moyenne du score de qualité et du score de statut des stocks.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemple :</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Catégorie</th>
+                                                <th>Score</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Score de qualité des données</td>
+                                                <td>65%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Score de statut des stocks</td>
+                                                <td>57%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Score global du plan d'approvisionnement</b></td>
+                                                <td><b>61% = (65%+57%)/2</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Score de qualité -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Score de Qualité</h4>
+                                        <p style="font-size: 13px;">Le score de qualité s'appuie sur quatre domaines de
+                                            données clés définis dans la liste de problèmes QAT. Pour chaque critère,
+                                            QAT calcule la proportion d'unités de planification conformes par rapport au
+                                            nombre d'unités de planification actives. Ces pourcentages de conformité
+                                            sont
+                                            ensuite moyennés pour produire le score de qualité.</p>
+
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Consommation prévisionnelle :</b> L'absence de données de
+                                                consommation
+                                                prévisionnelle au cours des 18 prochains mois entraîne le marquage de
+                                                l'unité de planification comme non&#8209;conforme.</li>
+                                            <li><b>Consommation réelle :</b> L'absence de données de consommation réelle
+                                                récentes au cours des 3 derniers mois ou des lacunes au cours des 6
+                                                derniers mois entraîne le marquage de l'unité de planification comme
+                                                non&#8209;conforme.</li>
+                                            <li><b>Inventaire réel :</b> L'absence de données d'inventaire réel au cours
+                                                des 3 derniers mois entraîne le marquage de l'unité de planification
+                                                comme non&#8209;conforme.
+                                            </li>
+                                            <li><b>Expéditions :</b> QAT identifie les unités de planification
+                                                présentant
+                                                des problèmes de planification des achats, notamment :
+                                                <ul>
+                                                    <li>des expéditions avec des dates de réception passées mais non
+                                                        marquées « reçues », ou
+                                                    </li>
+                                                    <li>des expéditions qui auraient dû être soumises (en fonction du
+                                                        délai de livraison) mais qui ne sont toujours pas marquées
+                                                        « soumises ».</li>
+                                                </ul>
+                                                Tout problème de planification des achats entraîne le marquage de
+                                                l'unité de planification comme non&#8209;conforme.
+                                            </li>
+                                        </ul>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemple :</p>
+                                        <p style="font-size: 13px;">Le plan d'approvisionnement a 12 unités de
+                                            planification actives</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Critères</th>
+                                                <th>Unités de planification conformes</th>
+                                                <th>Pourcentage de conformité</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Consommation prévisionnelle</td>
+                                                <td>9</td>
+                                                <td>9/12 = 75%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Consommation réelle</td>
+                                                <td>7</td>
+                                                <td>7/12 = 58%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Inventaire</td>
+                                                <td>5</td>
+                                                <td>5/12 = 42%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Expéditions</td>
+                                                <td>10</td>
+                                                <td>10/12 = 83%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Score de qualité</b></td>
+                                                <td></td>
+                                                <td><b>65% = (75%+58%+42%+83%)/4 critères</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Score de statut des stocks -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Score de Statut des Stocks</h4>
+                                        <p style="font-size: 13px;">Le score de statut des stocks est calculé en
+                                            fonction
+                                            du nombre de mois (18 mois dans le futur) où chaque unité de planification
+                                            est approvisionnée&#8209;selon&#8209;le&#8209;plan. QAT calcule la
+                                            proportion
+                                            de mois d'unités de planification conformes (c'est-à-dire
+                                            approvisionnées&#8209;selon&#8209;le&#8209;plan) par rapport au
+                                            nombre de mois possibles.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemple :</p>
+                                        <p style="font-size: 13px;">Le plan d'approvisionnement a 12 unités de
+                                            planification actives</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Statut</th>
+                                                <th>Mois de conformité</th>
+                                                <th>Pourcentage de conformité</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Approvisionné selon le plan</td>
+                                                <td>120</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Au-dessus du maximum</td>
+                                                <td>31</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>En dessous du minimum</td>
+                                                <td>53</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Rupture de stock</td>
+                                                <td>7</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>N/A</td>
+                                                <td>5</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Score de statut des stocks</b></td>
+                                                <td></td>
+                                                <td><b>57% = 120/211</b></td>
+                                            </tr>
+                                        </table>
+                                        <ul>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Numérateur</b> = Mois d'unités de
+                                                    planification&#8209;en
+                                                    conformité (Approvisionné&#8209;selon&#8209;le&#8209;plan) = 120
+                                                    mois</p>
+                                            </li>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Dénominateur</b> = Nombre maximum de mois
+                                                    d'unités de planification&#8209;en conformité<br />
+                                                    = (18 mois de données) &times; (# unités de planification actives)
+                                                    &minus;
+                                                    mois avec
+                                                    statut de stock N/A<br />
+                                                    = (18 mois de données &times; 12 unités de planification actives)
+                                                    &minus; 5
+                                                    mois en
+                                                    N/A<br />
+                                                    = <b>211 mois</b></p>
+                                            </li>
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
