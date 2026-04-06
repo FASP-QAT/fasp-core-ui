@@ -1050,7 +1050,7 @@ class AuthenticationService {
                         }
                         break;
                     case "/report/stockStatusAccrossPlanningUnitGlobalView":
-                        if (bfunction.includes("ROLE_BF_STOCK_STATUS_GLOBAL_VIEW_REPORT")) {
+                        if (bfunction.includes("ROLE_BF_STOCK_STATUS_SNAPSHOT_GLOBAL_REPORT")) {
                             return true;
                         }
                         break;
