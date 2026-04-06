@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1">
+	<meta name="">
+	<title>Show Guidance</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		table,
+		td,
+		div,
+		h1,
+		p {
+			font-family: Arial, sans-serif;
+			line-height: 20px;
+		}
+
+		body {
+			padding: 0;
+			margin: 0;
+			color: #272127;
+		}
+
+		.table1 td {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+		}
+
+		.table1 th {
+			border: 1px solid #c8ced3 !important;
+			padding: 6px;
+			font-size: 13px;
+			background-color: #f0f3f5;
+			font-weight: bold;
+		}
+
+		.table1 {
+			border-collapse: collapse;
+			width: 100%;
+			margin-bottom: 10px;
+		}
+
+		a {
+			color: #205493;
+			background-color: transparent;
+		}
+	</style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+	<table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+		<tr>
+			<td align="center" style="padding:0;">
+				<table role="presentation"
+					style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+					<tr>
+						<td style="padding:10px 30px 20px 30px;">
+							<table role="presentation"
+								style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+								<tr>
+									<td style="padding:0 0 10px 0;color:#153643;">
+										<h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Supply Plan
+											Scorecard</h3>
+
+										<p style="font-size: 13px;">The Supply Plan Scorecard generates an overall score
+											for each program's supply plan based on <b>Quality</b> (including data
+											completeness and procurement scheduling) and <b>Stock Status</b> (against
+											minimum and maximum levels). The score uses the same criteria as the QAT
+											Problem list, a validation screen available to program users and admins to
+											improve their supply plans. The scorecard highlights areas needing
+											improvement and allows global users to compare performance across programs.
+											Users can view results at three levels:</p>
+										<ul style="font-size: 13px;">
+											<li>Individual program</li>
+											<li>Aggregated programs by country</li>
+											<li>Aggregated technical areas by country</li>
+										</ul>
+
+										<p style="font-size: 13px;">Higher scores indicate stronger supply plan
+											performance. Scores are color&#8209;ranked, with a target score of
+											<b>90%</b>.
+										</p>
+
+										<p
+											style="font-size: 13px; background-color: #fff3cd; padding: 8px; border-radius: 4px; border-left: 4px solid #EDB944;">
+											<b>Note:</b> Because the scores are derived from the data in the QAT Problem
+											List, they are not tied to a specific reporting period. Instead, downloaded
+											program versions recalculate the QAT Problem List using the current date,
+											while server&#8209;based program versions calculate it based on the upload
+											date.
+										</p>
+
+										<!-- Overall Supply Plan Score -->
+										<h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+											Overall Supply Plan Score</h4>
+										<p style="font-size: 13px;">The Overall Supply Plan Score is an average of the
+											Quality Score and the Stock Status Score.</p>
+
+										<p style="font-size: 13px; font-weight: bold;">Example:</p>
+										<table class="table1">
+											<tr>
+												<th>Category</th>
+												<th>Score</th>
+											</tr>
+											<tr>
+												<td>Data Quality Score</td>
+												<td>65%</td>
+											</tr>
+											<tr>
+												<td>Stock Status Score</td>
+												<td>57%</td>
+											</tr>
+											<tr>
+												<td><b>Overall Supply Plan Score</b></td>
+												<td><b>61% = (65%+57%)/2</b></td>
+											</tr>
+										</table>
+
+										<!-- Quality Score -->
+										<h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+											Quality Score</h4>
+										<p style="font-size: 13px;">The Quality Score draws on four key data areas
+											defined in the QAT Problem List. For each criterion, QAT calculates the
+											proportion of compliant planning units relative to the number of active
+											planning units. These compliance percentages are then averaged to produce
+											the Quality Score.</p>
+
+										<ul style="font-size: 13px;">
+											<li><b>Forecasted Consumption:</b> Missing forecast consumption data in the
+												next 18 months results in the planning unit being marked
+												non&#8209;compliant.</li>
+											<li><b>Actual Consumption:</b> Missing recent actual consumption data in the
+												last 3 months or gaps within the last 6 months results in the planning
+												unit being marked non&#8209;compliant.</li>
+											<li><b>Actual Inventory:</b> Missing actual inventory data in the last 3
+												months results in the planning unit being marked non&#8209;compliant.
+											</li>
+											<li><b>Shipments:</b> QAT identifies planning units with procurement
+												scheduling issues, including:
+												<ul>
+													<li>shipments with past receive dates but not marked "received," or
+													</li>
+													<li>shipments that should have been submitted (based on lead time)
+														but are still not marked "submitted."</li>
+												</ul>
+												Any procurement scheduling issue results in the planning unit being
+												marked non&#8209;compliant.
+											</li>
+										</ul>
+
+										<p style="font-size: 13px; font-weight: bold;">Example:</p>
+										<p style="font-size: 13px;">Supply plan has 12 active planning units</p>
+										<table class="table1">
+											<tr>
+												<th>Criteria</th>
+												<th>Planning Units in compliance</th>
+												<th>Percentage In-compliance</th>
+											</tr>
+											<tr>
+												<td>Forecasted Consumption</td>
+												<td>9</td>
+												<td>9/12 = 75%</td>
+											</tr>
+											<tr>
+												<td>Actual Consumption</td>
+												<td>7</td>
+												<td>7/12 = 58%</td>
+											</tr>
+											<tr>
+												<td>Inventory</td>
+												<td>5</td>
+												<td>5/12 = 42%</td>
+											</tr>
+											<tr>
+												<td>Shipments</td>
+												<td>10</td>
+												<td>10/12 = 83%</td>
+											</tr>
+											<tr>
+												<td><b>Quality Score</b></td>
+												<td></td>
+												<td><b>65% = (75%+58%+42%+83%)/4 criteria</b></td>
+											</tr>
+										</table>
+
+										<!-- Stock Status Score -->
+										<h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+											Stock Status Score</h4>
+										<p style="font-size: 13px;">The Stock Status Score is calculated based on the
+											number of months (18 months in future) each planning unit is
+											stocked&#8209;to&#8209;plan. QAT calculates the proportion of compliant
+											planning unit months (i.e. stocked&#8209;to&#8209;plan) relative to the
+											number of possible months.</p>
+
+										<p style="font-size: 13px; font-weight: bold;">Example:</p>
+										<p style="font-size: 13px;">Supply plan has 12 active planning units</p>
+										<table class="table1">
+											<tr>
+												<th>Status</th>
+												<th>Months in compliance</th>
+												<th>Percentage In-compliance</th>
+											</tr>
+											<tr>
+												<td>Stocked-to-Plan</td>
+												<td>120</td>
+												<td>100%</td>
+											</tr>
+											<tr>
+												<td>Above Max</td>
+												<td>31</td>
+												<td>0%</td>
+											</tr>
+											<tr>
+												<td>Below Min</td>
+												<td>53</td>
+												<td>0%</td>
+											</tr>
+											<tr>
+												<td>Stocked Out</td>
+												<td>7</td>
+												<td>0%</td>
+											</tr>
+											<tr>
+												<td>N/A</td>
+												<td>5</td>
+												<td>-</td>
+											</tr>
+											<tr>
+												<td><b>Stock Status Score</b></td>
+												<td></td>
+												<td><b>57% = 120/211</b></td>
+											</tr>
+										</table>
+										<ul>
+											<li>
+												<p style="font-size: 13px;"><b>Numerator</b> = Planning
+													unit&#8209;months in
+													compliance (Stocked&#8209;to&#8209;plan) = 120 months</p>
+											</li>
+											<li>
+												<p style="font-size: 13px;"><b>Denominator</b> = Maximum planning
+													unit&#8209;months in compliance<br />
+													= (18 months of data) &times; (# active planning units) &minus;
+													months with
+													stock status as N/A<br />
+													= (18 months of data &times; 12 active planning units) &minus; 5
+													months as
+													N/A<br />
+													= <b>211 months</b></p>
+											</li>
+										</ul>
+
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</body>
+
+</html>

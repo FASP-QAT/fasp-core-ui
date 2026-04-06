@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Cuadro de Mando del
+                                            Plan de Suministro</h3>
+
+                                        <p style="font-size: 13px;">El cuadro de mando del plan de suministro genera una
+                                            puntuación general para el plan de suministro de cada programa basada en la
+                                            <b>Calidad</b> (incluyendo la completitud de los datos y la programación de
+                                            adquisiciones) y el <b>Estado de Existencias</b> (frente a los niveles
+                                            mínimo
+                                            y máximo). La puntuación utiliza los mismos criterios que la lista de
+                                            problemas QAT, una pantalla de validación disponible para los usuarios y
+                                            administradores del programa para mejorar sus planes de suministro. El
+                                            cuadro
+                                            de mando destaca las áreas que necesitan mejoras y permite a los usuarios
+                                            globales comparar el rendimiento entre los programas.
+                                            Los usuarios pueden ver los resultados en tres niveles:
+                                        </p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Programa individual</li>
+                                            <li>Programas agregados por país</li>
+                                            <li>Áreas técnicas agregadas por país</li>
+                                        </ul>
+
+                                        <p style="font-size: 13px;">Las puntuaciones más altas indican un mejor
+                                            rendimiento del plan de suministro. Las puntuaciones están clasificadas por
+                                            color, con una puntuación objetivo del
+                                            <b>90%</b>.
+                                        </p>
+
+                                        <p
+                                            style="font-size: 13px; background-color: #fff3cd; padding: 8px; border-radius: 4px; border-left: 4px solid #EDB944;">
+                                            <b>Nota:</b> Dado que las puntuaciones se derivan de los datos de la lista
+                                            de
+                                            problemas QAT, no están vinculadas a un período de informe específico. Las
+                                            versiones de programas descargadas recalculan la lista de problemas QAT
+                                            utilizando la fecha actual, mientras que las versiones de programas basadas
+                                            en el servidor la calculan en función de la fecha de
+                                            carga.
+                                        </p>
+
+                                        <!-- Puntuación general del plan de suministro -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Puntuación General del Plan de Suministro</h4>
+                                        <p style="font-size: 13px;">La puntuación general del plan de suministro es un
+                                            promedio de la puntuación de calidad y la puntuación de estado de
+                                            existencias.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Ejemplo:</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Categoría</th>
+                                                <th>Puntuación</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Puntuación de calidad de datos</td>
+                                                <td>65%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Puntuación de estado de existencias</td>
+                                                <td>57%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Puntuación general del plan de suministro</b></td>
+                                                <td><b>61% = (65%+57%)/2</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Puntuación de calidad -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Puntuación de Calidad</h4>
+                                        <p style="font-size: 13px;">La puntuación de calidad se basa en cuatro áreas de
+                                            datos clave definidas en la lista de problemas QAT. Para cada criterio, QAT
+                                            calcula la proporción de unidades de planificación conformes en relación con
+                                            el número de unidades de planificación activas. Estos porcentajes de
+                                            cumplimiento se promedian para producir la puntuación de calidad.</p>
+
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Consumo previsto:</b> La falta de datos de consumo previsto en los
+                                                próximos 18 meses resulta en que la unidad de planificación sea marcada
+                                                como no&#8209;conforme.</li>
+                                            <li><b>Consumo real:</b> La falta de datos de consumo real recientes en los
+                                                últimos 3 meses o brechas dentro de los últimos 6 meses resulta en que
+                                                la unidad de planificación sea marcada como
+                                                no&#8209;conforme.</li>
+                                            <li><b>Inventario real:</b> La falta de datos de inventario real en los
+                                                últimos 3 meses resulta en que la unidad de planificación sea marcada
+                                                como no&#8209;conforme.
+                                            </li>
+                                            <li><b>Envíos:</b> QAT identifica unidades de planificación con problemas de
+                                                programación de adquisiciones, incluyendo:
+                                                <ul>
+                                                    <li>envíos con fechas de recepción pasadas pero no marcados como
+                                                        « recibidos », o
+                                                    </li>
+                                                    <li>envíos que deberían haber sido sometidos (basado en el tiempo de
+                                                        entrega) pero que aún no están marcados como
+                                                        « sometidos ».</li>
+                                                </ul>
+                                                Cualquier problema de programación de adquisiciones resulta en que la
+                                                unidad de planificación sea marcada como no&#8209;conforme.
+                                            </li>
+                                        </ul>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Ejemplo:</p>
+                                        <p style="font-size: 13px;">El plan de suministro tiene 12 unidades de
+                                            planificación activas</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Criterios</th>
+                                                <th>Unidades de planificación en cumplimiento</th>
+                                                <th>Porcentaje de cumplimiento</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Consumo previsto</td>
+                                                <td>9</td>
+                                                <td>9/12 = 75%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Consumo real</td>
+                                                <td>7</td>
+                                                <td>7/12 = 58%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Inventario</td>
+                                                <td>5</td>
+                                                <td>5/12 = 42%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Envíos</td>
+                                                <td>10</td>
+                                                <td>10/12 = 83%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Puntuación de calidad</b></td>
+                                                <td></td>
+                                                <td><b>65% = (75%+58%+42%+83%)/4 criterios</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Puntuación de estado de existencias -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Puntuación de Estado de Existencias</h4>
+                                        <p style="font-size: 13px;">La puntuación de estado de existencias se calcula en
+                                            función del número de meses (18 meses en el futuro) en que cada unidad de
+                                            planificación está abastecida&#8209;según&#8209;el&#8209;plan. QAT calcula
+                                            la
+                                            proporción de meses de unidades de planificación conformes (es decir,
+                                            abastecidos&#8209;según&#8209;el&#8209;plan) en relación con el
+                                            número de meses posibles.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Ejemplo:</p>
+                                        <p style="font-size: 13px;">El plan de suministro tiene 12 unidades de
+                                            planificación activas</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Estado</th>
+                                                <th>Meses en cumplimiento</th>
+                                                <th>Porcentaje de cumplimiento</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Abastecido según el plan</td>
+                                                <td>120</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Por encima del máximo</td>
+                                                <td>31</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Por debajo del mínimo</td>
+                                                <td>53</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sin existencias</td>
+                                                <td>7</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>N/A</td>
+                                                <td>5</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Puntuación de estado de existencias</b></td>
+                                                <td></td>
+                                                <td><b>57% = 120/211</b></td>
+                                            </tr>
+                                        </table>
+                                        <ul>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Numerador</b> = Meses de unidades de
+                                                    planificación&#8209;en
+                                                    cumplimiento (Abastecido&#8209;según&#8209;el&#8209;plan) = 120
+                                                    meses</p>
+                                            </li>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Denominador</b> = Máximo de meses de
+                                                    unidades de planificación&#8209;en cumplimiento<br />
+                                                    = (18 meses de datos) &times; (# unidades de planificación activas)
+                                                    &minus;
+                                                    meses con
+                                                    estado de existencias como N/A<br />
+                                                    = (18 meses de datos &times; 12 unidades de planificación activas)
+                                                    &minus; 5
+                                                    meses como
+                                                    N/A<br />
+                                                    = <b>211 meses</b></p>
+                                            </li>
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

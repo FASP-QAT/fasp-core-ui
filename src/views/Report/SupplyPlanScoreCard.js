@@ -63,6 +63,10 @@ import imageHelp from '../../assets/img/help-icon.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import showguidanceSupplyPlanScoreCardEn from '../../../src/ShowGuidanceFiles/SupplyPlanScoreCardEn.html';
+import showguidanceSupplyPlanScoreCardFr from '../../../src/ShowGuidanceFiles/SupplyPlanScoreCardFr.html';
+import showguidanceSupplyPlanScoreCardSp from '../../../src/ShowGuidanceFiles/SupplyPlanScoreCardSp.html';
+import showguidanceSupplyPlanScoreCardPr from '../../../src/ShowGuidanceFiles/SupplyPlanScoreCardPr.html';
 import { hideFirstComponent, hideSecondComponent, roundARU, filterOptions, formatter, makeText } from '../../CommonComponent/JavascriptCommonFunctions';
 import { Dashboard } from '../Dashboard/Dashboard.js';
 
@@ -249,7 +253,8 @@ class SupplyPlanScoreCard extends Component {
       loadingForNotes: false,
       notesTransTableEl: "",
       supplyPlanScoreThresholdPerc: 0,
-      loading: false
+      loading: false,
+      showGuidance: false
     };
     this.getCountrys = this.getCountrys.bind(this);
     this.getHealthAreaList = this.getHealthAreaList.bind(this);
@@ -362,6 +367,14 @@ class SupplyPlanScoreCard extends Component {
     this.setState({
       large: !this.state.large,
     });
+  }
+  /**
+   * Toggles the visibility of the show guidance modal.
+   */
+  toggleShowGuidance() {
+    this.setState({
+      showGuidance: !this.state.showGuidance
+    })
   }
   /**
    * Fetches version notes history for a specific program and displays them in a Jexcel table modal.
@@ -2785,6 +2798,13 @@ class SupplyPlanScoreCard extends Component {
                         </div>
                     }
                 </div>
+                <div className="card-header-actions">
+                    <div className="card-header-action pr-lg-4">
+                        <a style={{ float: 'right' }}>
+                            <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        </a>
+                    </div>
+                </div>
                 <div class="card-body py-1">
                     <div className='row'>
                         <FormGroup className='FormGroupD col-10' style={{ marginBottom: '0px'}}>
@@ -2983,6 +3003,25 @@ class SupplyPlanScoreCard extends Component {
               <ModalFooter>
                 <Button color="secondary" onClick={this.toggleLarge}>{i18n.t('static.common.close')}</Button>
               </ModalFooter>
+            </Modal>
+            <Modal isOpen={this.state.showGuidance}
+                className={'modal-lg ' + this.props.className} >
+                <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                </ModalHeader>
+                <div>
+                    <ModalBody>
+                        <div dangerouslySetInnerHTML={{
+                            __html: localStorage.getItem('lang') == 'en' ?
+                                showguidanceSupplyPlanScoreCardEn :
+                                localStorage.getItem('lang') == 'fr' ?
+                                    showguidanceSupplyPlanScoreCardFr :
+                                    localStorage.getItem('lang') == 'sp' ?
+                                        showguidanceSupplyPlanScoreCardSp :
+                                        showguidanceSupplyPlanScoreCardPr
+                        }} />
+                    </ModalBody>
+                </div>
             </Modal>
             </div>
                 </div>    
