@@ -3774,7 +3774,7 @@ class ShipmentGlobalDemandView extends Component {
           left: 50,
           right: 50,
           top: -20,
-          bottom: 0,
+          bottom: 40,
         },
       },
       title: {
@@ -3790,7 +3790,7 @@ class ShipmentGlobalDemandView extends Component {
       },
       legend: {
         position: "bottom",
-        labels: { fontColor, usePointStyle: true },
+        labels: { fontColor, usePointStyle: true, padding: 25 },
       },
       tooltips: {
         callbacks: {

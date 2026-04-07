@@ -317,28 +317,28 @@ class Login extends Component {
                 </div>
               </Col>
               <Col md="12">
-                <div className="upper-logo logo-MarginTop">
+                {/* <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
-                </div>
-                {/* <Row className='pb-lg-5'>
+                </div> */}
+                <Row className='pb-lg-5'>
                   <Col md="4">
                     <div className="upper-logo logo-MarginTop">
                       <img src={image1} className="img-fluid " />
                     </div>
                   </Col>
                   <Col md="5" lg="5">
-                    <div style={{ marginBottom: '20px', marginTop:'-25px',fontSize:'14px',fontWeight:'500' }}>
+                    <div style={{ marginBottom: '20px', marginTop: '40px', fontSize:'14px',fontWeight:'500' }}>
                       {this.state.lang === 'en' ?
-                        <p style={{color:'#BA0C2F'}}>QAT will be experiencing approximately 1 hour of downtime for routine maintenance services on Sunday January 11th, 2026 starting at 07:30 pm EDT // 03:30 am GMT.</p>:
+                        <p style={{color:'#BA0C2F'}}>QAT will be experiencing downtime on April 11, 2026 from 02:30 to 04:30 GMT a part of a routine maintenance upgrade. We apologize for the inconvenience.</p>:
                         this.state.lang === 'sp' ?
-                        <p style={{color:'#BA0C2F'}}>QAT experimentará una interrupción del servicio de aproximadamente 1 hora debido a tareas de mantenimiento rutinarias el domingo 11 de enero de 2026, a partir de las 07:30 pm EDT // 03:30 am GMT.</p>:
+                        <p style={{color:'#BA0C2F'}}>QAT experimentará una interrupción del servicio el 11 de abril de 2026 de 02:30 a 04:30 GMT como parte de una actualización de mantenimiento de rutina. Pedimos disculpas por las molestias.</p>:
                         this.state.lang === 'fr' ?
-                        <p style={{color:'#BA0C2F'}}>Le système QAT subira une interruption de service d'environ une heure pour des opérations de maintenance de routine le dimanche 11 janvier 2026, à partir de 19h30 HAE // 3h30 GMT.</p>:
-                        <p style={{color:'#BA0C2F'}}>A QAT terá aproximadamente 1 hora de inatividade para os serviços de manutenção de rotina no domingo, 11 de janeiro de 2026, a partir das 19h30 EDT // 3h30 GMT.</p>
+                        <p style={{color:'#BA0C2F'}}>QAT sera en maintenance le 11 avril 2026 de 02h30 à 04h30 GMT dans le cadre d'une mise à jour de maintenance de routine. Nous nous excusons pour la gêne occasionnée.</p>:
+                        <p style={{color:'#BA0C2F'}}>O QAT ficará fora do ar no dia 11 de abril de 2026, das 02:30 às 04:30 GMT, como parte de uma atualização de manutenção de rotina. Pedimos desculpas pelo inconveniente.</p>
                       }
                     </div>
                   </Col>
-                </Row> */}
+                </Row>
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
