@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">Painel do
+                                            Plano de Abastecimento</h3>
+
+                                        <p style="font-size: 13px;">O painel do plano de abastecimento gera uma
+                                            pontuação geral para o plano de abastecimento de cada programa com base na
+                                            <b>Qualidade</b> (incluindo a completude dos dados e o agendamento de
+                                            aquisições) e no <b>Estado de Stock</b> (em relação aos níveis mínimo e
+                                            máximo). A pontuação utiliza os mesmos critérios que a lista de problemas
+                                            QAT, um ecrã de validação disponível para os utilizadores e administradores
+                                            de programas melhorarem os seus planos de abastecimento. O painel destaca as
+                                            áreas que necessitam de melhoria e permite que os utilizadores globais
+                                            comparem o desempenho entre programas.
+                                            Os utilizadores podem visualizar os resultados em três níveis:
+                                        </p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Programa individual</li>
+                                            <li>Programas agregados por país</li>
+                                            <li>Áreas técnicas agregadas por país</li>
+                                        </ul>
+
+                                        <p style="font-size: 13px;">Pontuações mais altas indicam um melhor desempenho
+                                            do
+                                            plano de abastecimento. As pontuações são classificadas por cor, com uma
+                                            pontuação alvo de
+                                            <b>90%</b>.
+                                        </p>
+
+                                        <p
+                                            style="font-size: 13px; background-color: #fff3cd; padding: 8px; border-radius: 4px; border-left: 4px solid #EDB944;">
+                                            <b>Nota:</b> Como as pontuações são derivadas dos dados da lista de
+                                            problemas
+                                            QAT, não estão vinculadas a um período de relatório específico. As versões
+                                            de
+                                            programas descarregadas recalculam a lista de problemas QAT utilizando a
+                                            data
+                                            atual, enquanto as versões de programas baseadas no servidor a calculam com
+                                            base na data de
+                                            carregamento.
+                                        </p>
+
+                                        <!-- Pontuação geral do plano de abastecimento -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Pontuação Geral do Plano de Abastecimento</h4>
+                                        <p style="font-size: 13px;">A pontuação geral do plano de abastecimento é uma
+                                            média da pontuação de qualidade e da pontuação de estado de stock.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemplo:</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Categoria</th>
+                                                <th>Pontuação</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Pontuação de qualidade dos dados</td>
+                                                <td>65%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Pontuação de estado de stock</td>
+                                                <td>57%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Pontuação geral do plano de abastecimento</b></td>
+                                                <td><b>61% = (65%+57%)/2</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Pontuação de qualidade -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Pontuação de Qualidade</h4>
+                                        <p style="font-size: 13px;">A pontuação de qualidade baseia-se em quatro áreas
+                                            de
+                                            dados chave definidas na lista de problemas QAT. Para cada critério, o QAT
+                                            calcula a proporção de unidades de planificação conformes em relação ao
+                                            número de unidades de planificação ativas. Essas percentagens de
+                                            conformidade
+                                            são então calculadas em média para produzir a pontuação de qualidade.</p>
+
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Consumo previsto:</b> A falta de dados de consumo previsto nos
+                                                próximos 18 meses resulta na unidade de planificação ser marcada como
+                                                não&#8209;conforme.</li>
+                                            <li><b>Consumo real:</b> A falta de dados de consumo real recentes nos
+                                                últimos 3 meses ou lacunas nos últimos 6 meses resulta na unidade de
+                                                planificação ser marcada como
+                                                não&#8209;conforme.</li>
+                                            <li><b>Inventário real:</b> A falta de dados de inventário real nos últimos
+                                                3
+                                                meses resulta na unidade de planificação ser marcada como
+                                                não&#8209;conforme.
+                                            </li>
+                                            <li><b>Envios:</b> O QAT identifica unidades de planificação com problemas
+                                                de
+                                                agendamento de aquisições, incluindo:
+                                                <ul>
+                                                    <li>envios com datas de receção passadas mas não marcados como
+                                                        « recebidos », ou
+                                                    </li>
+                                                    <li>envios que deveriam ter sido submetidos (com base no prazo de
+                                                        entrega) mas que ainda não estão marcados como
+                                                        « submetidos ».</li>
+                                                </ul>
+                                                Qualquer problema de agendamento de aquisições resulta na unidade de
+                                                planificação ser marcada como não&#8209;conforme.
+                                            </li>
+                                        </ul>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemplo:</p>
+                                        <p style="font-size: 13px;">O plano de abastecimento tem 12 unidades de
+                                            planificação ativas</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Critérios</th>
+                                                <th>Unidades de planificação em conformidade</th>
+                                                <th>Percentagem de conformidade</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Consumo previsto</td>
+                                                <td>9</td>
+                                                <td>9/12 = 75%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Consumo real</td>
+                                                <td>7</td>
+                                                <td>7/12 = 58%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Inventário</td>
+                                                <td>5</td>
+                                                <td>5/12 = 42%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Envios</td>
+                                                <td>10</td>
+                                                <td>10/12 = 83%</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Pontuação de qualidade</b></td>
+                                                <td></td>
+                                                <td><b>65% = (75%+58%+42%+83%)/4 critérios</b></td>
+                                            </tr>
+                                        </table>
+
+                                        <!-- Pontuação de estado de stock -->
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">
+                                            Pontuação de Estado de Stock</h4>
+                                        <p style="font-size: 13px;">A pontuação de estado de stock é calculada com base
+                                            no número de meses (18 meses no futuro) em que cada unidade de planificação
+                                            está abastecida&#8209;conforme&#8209;o&#8209;plano. O QAT calcula a
+                                            proporção
+                                            de meses de unidades de planificação conformes (ou seja,
+                                            abastecidas&#8209;conforme&#8209;o&#8209;plano) em relação ao
+                                            número de meses possíveis.</p>
+
+                                        <p style="font-size: 13px; font-weight: bold;">Exemplo:</p>
+                                        <p style="font-size: 13px;">O plano de abastecimento tem 12 unidades de
+                                            planificação ativas</p>
+                                        <table class="table1">
+                                            <tr>
+                                                <th>Estado</th>
+                                                <th>Meses em conformidade</th>
+                                                <th>Percentagem de conformidade</th>
+                                            </tr>
+                                            <tr>
+                                                <td>Abastecido conforme o plano</td>
+                                                <td>120</td>
+                                                <td>100%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Acima do máximo</td>
+                                                <td>31</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Abaixo do mínimo</td>
+                                                <td>53</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Sem stock</td>
+                                                <td>7</td>
+                                                <td>0%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>N/A</td>
+                                                <td>5</td>
+                                                <td>-</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Pontuação de estado de stock</b></td>
+                                                <td></td>
+                                                <td><b>57% = 120/211</b></td>
+                                            </tr>
+                                        </table>
+                                        <ul>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Numerador</b> = Meses de unidades de
+                                                    planificação&#8209;em
+                                                    conformidade (Abastecido&#8209;conforme&#8209;o&#8209;plano) = 120
+                                                    meses</p>
+                                            </li>
+                                            <li>
+                                                <p style="font-size: 13px;"><b>Denominador</b> = Número máximo de meses
+                                                    de unidades de planificação&#8209;em conformidade<br />
+                                                    = (18 meses de dados) &times; (# unidades de planificação ativas)
+                                                    &minus;
+                                                    meses com
+                                                    estado de stock como N/A<br />
+                                                    = (18 meses de dados &times; 12 unidades de planificação ativas)
+                                                    &minus; 5
+                                                    meses como
+                                                    N/A<br />
+                                                    = <b>211 meses</b></p>
+                                            </li>
+                                        </ul>
+
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
