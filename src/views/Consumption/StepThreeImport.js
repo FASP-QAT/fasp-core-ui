@@ -753,6 +753,7 @@ export default class StepThreeImportMapPlanningUnits extends Component {
                             if(puObjs.length > 0) {
                                 puObjs[0].consumptionNotes = consumptionNotes;
                             }
+                            puObjs[0].consumptionDataType=2;
                         });
                         
                         var programDataWithoutEncrypt = programData;
