@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formula-img-mr {
+            margin: 10px 0px 20px 0px;
+            border: 1px solid #20a8d8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">A Matriz do Estado de Stock</h3>
+
+                                        <p style="font-size: 13px;">A Matriz do Estado de Stock fornece uma visão geral de alto nível, baseada em grelha, do estado de stock (Meses de Stock (MOS) ou Quantidade) entre as unidades de planeamento e ao longo do tempo dentro de um único programa de plano de abastecimento. Para visualizar o estado de stock de uma única unidade de planeamento ou unidade de equivalência em vários programas, consulte a <a href="#/report/stockStatusMatrixGlobal">Matriz do Estado de Stock (Global)</a>.</p>
+
+                                        <p style="font-size: 13px; font-style: italic;">Para obter mais explicações sobre o saldo final, AMC, MOS mínimo/máximo e quantidade, consulte o ecrã ‘Mostrar orientação’ no <a href="#/report/stockStatus">Relatório do Plano de Abastecimento</a> ou o Manual do Utilizador (<a href="https://fasp-qat.github.io/qat-documentation/pt/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Relatórios do Estado de Stock</a> e <a href="https://fasp-qat.github.io/qat-documentation/pt/docs/user/annex-2-business-rules" target="_blank">Anexo 2</a>).</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Codificação por Cores do Estado de Stock</h4>
+                                        <p style="font-size: 13px;">As células são codificadas por cores com base no estado de stock utilizando a codificação por cores apresentada na legenda.</p>
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Planeado por MOS :</b> O estado de stock é determinado comparando o MOS com o MOS Mínimo (inserido no ecrã de Definições da Unidade de Planeamento) e o MOS Máximo (calculado).</li>
+                                            <li><b>Planeado por Quantidade :</b> O estado de stock é determinado comparando a quantidade do “saldo final” com a quantidade Mínima (inserido no ecrã de Definições da Unidade de Planeamento) e a quantidade Máxima (calculada).</li>
+                                        </ul>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Consumo Médio Mensal (AMC)</h4>
+                                        <p style="font-size: 13px;">Utiliza o consumo ajustado quando disponível, tendo em conta o número de dias com falta de stock e o consumo real.</p>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/AMC-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+                                        
+                                        <p style="font-size: 13px;">* Considere apenas valores não nulos. Além disso, o mês atual está incluído nos meses no futuro para o AMC</p>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Exemplo:</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Meses no passado = 3 (Baseado na unidade de planeamento do programa)<br/>
+                                            Meses no futuro = 3 (Baseado na unidade de planeamento do programa)<br/>
+                                            Mês atual = Maio de 2020<br/>
+                                            Consumo em Fev 2020 = 5.000<br/>
+                                            Consumo Ajustado em Março 2020 = 6.890<br/>
+                                            Consumo Ajustado em Abril 2020 = 6.907<br/>
+                                            Consumo Ajustado em Maio 2020 = 7.087<br/>
+                                            Consumo Ajustado em Jun 2020 = 5.678<br/>
+                                            Consumo Ajustado em Julho 2020 = 6.789<br/><br/>
+
+                                            AMC = Consumo Ajustado no N.º de MESES_NO_PASSADO + Consumo Ajustado no N.º de MESES_NO_FUTURO / número de meses<br/>
+                                            AMC = (Consumo Ajustado para Fev, Março, Abril, Maio 2020 + Junho e Julho 2020) / 6<br/>
+                                            AMC = (5.000+6.890+6.907+7.087+5.678+6.789) / 6<br/>
+                                            AMC = 6.392
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Meses de Stock</h4>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/Month0fstock-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Exemplo :</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Saldo Final = 22.642<br/>
+                                            AMC = 6.392<br/>
+                                            Meses de Stock = Saldo Final / AMC<br/>
+                                            Meses de Stock = 22.642 / 6.392<br/>
+                                            Meses de Stock = 3.54
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Caixa de Verificação Mostrar Quantidade</h4>
+                                        <p style="font-size: 13px;">Se não estiver selecionada (predefinição), o stock é apresentado por meses de stock (MOS) para as unidades de planeamento planeadas por MOS e como quantidades para as planeadas por quantidade. Se estiver selecionada, o stock é apresentado por quantidade, independentemente das definições de 'planear por'. Quando o stock é apresentado por quantidade, o valor representa o inventário ou inventário projetado disponível no final do mês.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Caixa de Verificação Mostrar Ícone</h4>
+                                        <p style="font-size: 13px;">Se estiver selecionada (predefinição), apresenta os ícones de envio e de expiração. Existe um ícone de envio apresentado para todos os meses com envio(s), excluindo envios cancelados e inativos. Existe um ícone de expiração apresentado para todos os meses com uma expiração projetada.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Caixas de Verificação Remover Envios</h4>
+                                        <p style="font-size: 13px;">Estas caixas de verificação permitem-lhe simular diferentes cenários de stock, excluindo certos envios (por exemplo, planeados, não financiados) do inventário projetado</p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Se <b>ambas as caixas de verificação não estiverem selecionadas</b>, todos os envios ativos (Estado = Planeado, Submetido, Aprovado, Expedido, Chegado, Recebido, Em espera) são incluídos no inventário projetado (tanto em quantidade como em MOS).</li>
+                                            <li>Se <b>“Remover Envio Planeado” estiver selecionado</b>, os envios com estado = Planeado são removidos das projeções de stock. Nota: por definição, isto remove todos os envios TBD, uma vez que os envios TBD estão sempre no estado Planeado.</li>
+                                            <li>Se <b>“Remover Envios da Fonte de Financiamento TBD” estiver selecionado</b>, os envios com fonte de financiamento = TBD são removidos das projeções de stock.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
