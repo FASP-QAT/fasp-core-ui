@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formula-img-mr {
+            margin: 10px 0px 20px 0px;
+            border: 1px solid #20a8d8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">La Matriz de estado de existencias</h3>
+
+                                        <p style="font-size: 13px;">La Matrice de estado de existencias proporciona una visión general de alto nivel, basada en una cuadrícula, del estado de las existencias (meses de existencias (MOS) o cantidad) a través de las unidades de planificación y a lo largo del tiempo dentro de un solo programa de plan de suministro. Para ver el estado de las existencias de una sola unidad de planificación o unidad de equivalencia en varios programas, consulte la <a href="#/report/stockStatusMatrixGlobal">Matriz de estado de existencias (Global)</a>.</p>
+
+                                        <p style="font-size: 13px; font-style: italic;">Para obtener más explicaciones sobre el saldo final, el AMC, el MOS mínimo/máximo y la cantidad, consulte la pantalla 'Mostrar guía' en el <a href="#/report/stockStatus">Informe del plan de suministro</a> o el Manuel del usuario (<a href="https://fasp-qat.github.io/qat-documentation/es/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Informes de estado de existencias</a> y <a href="https://fasp-qat.github.io/qat-documentation/es/docs/user/annex-2-business-rules" target="_blank">Anexo 2</a>).</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Codificación por colores del estado de existencias</h4>
+                                        <p style="font-size: 13px;">Las celdas están codificadas por colores según el estado de las existencias utilizando la codificación por colores que se muestra en la leyenda.</p>
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Planificado por MOS :</b> El estado de las existencias se determina comparando el MOS con el MOS mínimo (ingresado en la pantalla de configuración de la unidad de planificación) y el MOS máximo (calculado).</li>
+                                            <li><b>Planificado por cantidad :</b> El estado de las existencias se determina comparando la cantidad del “saldo final” con la cantidad mínima (ingresado en la pantalla de configuración de la unidad de planificación) and la cantidad máxima (calculada).</li>
+                                        </ul>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Consumo promedio mensual (AMC)</h4>
+                                        <p style="font-size: 13px;">Utiliza el consumo ajustado cuando está disponible, teniendo en cuenta el número de días con falta de existencias y el consumo real.</p>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/AMC-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+                                        
+                                        <p style="font-size: 13px;">* Considere únicamente los valores no nulos. Además, el mes actual se incluye en los meses futuros para el AMC</p>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Ejemplo:</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Meses en el pasado = 3 (según la unidad de planificación del programa)<br/>
+                                            Meses en el futuro = 3 (según la unidad de planificación del programa)<br/>
+                                            Mes actual = Mayo de 2020<br/>
+                                            Consumo en Feb de 2020 = 5,000<br/>
+                                            Consumo ajustado en marzo de 2020 = 6,890<br/>
+                                            Consumo ajustado en abril de 2020 = 6,907<br/>
+                                            Consumo ajustado en mayo de 2020 = 7,087<br/>
+                                            Consumo ajustado en jun de 2020 = 5,678<br/>
+                                            Consumo ajustado en julio de 2020 = 6,789<br/><br/>
+
+                                            AMC = Consumo ajustado en el n.º de MESES_EN_EL_PASADO + Consumo ajustado en el n.º de MESES_EN_EL_FUTURO / número de meses<br/>
+                                            AMC = (Consumo ajustado de Feb, Marzo, Abril, Mayo de 2020 + Junio y Julio de 2020) / 6<br/>
+                                            AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br/>
+                                            AMC = 6,332
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Meses de existencia</h4>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/Month0fstock-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Ejemplo :</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Saldo final = 22,642<br/>
+                                            AMC = 6,392<br/>
+                                            Meses de existencia = Saldo final / AMC<br/>
+                                            Meses de existencia = 22,642 / 6,392<br/>
+                                            Meses de existencia = 3.54
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Casilla Mostrar cantidad</h4>
+                                        <p style="font-size: 13px;">Si está desactivada (predeterminado), las existencias se muestran por meses de existencia (MOS) para las unidades de planificación planificadas por MOS y como cantidades para las planificadas por cantidad. Si está activada, las existencias se muestran por cantidad, independientemente de los ajustes de 'planificar por'. Cuando las existencias se muestran por cantidad, el valor representa el inventario o inventario proyectado disponible al final del mes.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Casilla Mostrar icono</h4>
+                                        <p style="font-size: 13px;">Si está desactivada (predeterminado), muestra los iconos de envío y caducidad. Se muestra un icono de envío mostrado para cada mes con envío(s), excluyendo los envios cancelados e inactivos. Se muestra un icono de caducidad mostrado para cada mes con una caducidad proyectada.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Casillas Eliminar envío</h4>
+                                        <p style="font-size: 13px;">Estas casillas de verificación le permiten simular diferentes escenarios de existencias excluyendo ciertos envios (por ejemplo, planificados, no financiados) del inventario proyectado</p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Si <b>ambas casillas están desactivadas</b>, todos los envíos activos (Estado = Planificado, Enviado, Aprobado, Expedido, Llegado, Recibido, En espera) se incluyen en el inventario proyectado (tanto en cantidad como en MOS).</li>
+                                            <li>Si <b>“Eliminar envío planificado” está activado</b>, los envíos con estado = Planificado se eliminan de las proyecciones de existencias. Nota: por definición, esto elimina todos los envíos TBD, ya que los envíos TBD siempre están en el estado Planificado.</li>
+                                            <li>Si <b>“Eliminar envíos con fuente de financiación TBD” está activado</b>, los envíos con fuente de financiación = TBD se eliminan de las proyecciones de existencias.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

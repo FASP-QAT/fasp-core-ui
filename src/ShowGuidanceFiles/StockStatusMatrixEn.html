@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formula-img-mr {
+            margin: 10px 0px 20px 0px;
+            border: 1px solid #20a8d8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">The Stock Status Matrix</h3>
+
+                                        <p style="font-size: 13px;">The Stock Status Matrix provides a high-level, grid-based overview of stock status (Months of Stock (MOS) or Quantity) across planning units and over time within a single supply plan program. To view stock status for a single planning unit or equivalency unit across multiple programs, refer to the <a href="#/report/stockStatusMatrixGlobal">Stock Status Matrix (Global)</a>.</p>
+
+                                        <p style="font-size: 13px; font-style: italic;">For more explanation of ending balance, AMC, min/max MOS and quantity, please see the ‘Show guidance’ screen on <a href="#/report/stockStatus">Supply Plan Report</a> or the User Manual (<a href="https://fasp-qat.github.io/qat-documentation/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Stock Status Reports</a> and <a href="https://fasp-qat.github.io/qat-documentation/docs/user/annex-2-business-rules" target="_blank">Annex 2</a>).</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Stock Status Color-coding</h4>
+                                        <p style="font-size: 13px;">Cells are color-coded based on the stock status using the color coding displayed in the legend.</p>
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Plan by MOS:</b> Stock status is determined by comparing the MOS with the Min MOS (user-entered in Planning Unit Settings screen) and Max MOS (calculated).</li>
+                                            <li><b>Plan by Quantity:</b> Stock status is determined by comparing the quantity of the “ending balance” with the Min quantity (user-entered in Planning Unit Settings screen) and Max quantity (calculated).</li>
+                                        </ul>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Average Monthly Consumption (AMC)</h4>
+                                        <p style="font-size: 13px;">Uses adjusted consumption when available, factoring in the number of days stocked out and actual consumption.</p>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/AMC-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+                                        
+                                        <p style="font-size: 13px;">* Consider only non zero values. Also current month is included in the months in future for AMC</p>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Example:</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Months in past = 3 (Based on program planning unit)<br/>
+                                            Months in future = 3 (Based on program planning unit)<br/>
+                                            Current month = May 2020<br/>
+                                            Consumption in Feb 2020 = 5,000<br/>
+                                            Adjusted Consumption in March 2020 = 6,890<br/>
+                                            Adjusted Consumption in April 2020 = 6,907<br/>
+                                            Adjusted Consumption in May 2020 = 7,087<br/>
+                                            Adjusted Consumption in Jun 2020 = 5,678<br/>
+                                            Adjusted Consumption in July 2020 = 6,789<br/><br/>
+
+                                            AMC = Adjusted Consumption in No. of MONTHS_IN_PAST + Adjusted Consumption in No. of MONTHS_IN_FUTURE / number of months<br/>
+                                            AMC = (Adjusted Consumption for Feb, March, April, May 2020 + June & July 2020) / 6<br/>
+                                            AMC = (5,000+6,890+6,907+7,087+5,678+6,789) / 6<br/>
+                                            AMC = 6,392
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Months of Stock</h4>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/Month0fstock-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Example :</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Ending Balance = 22,642<br/>
+                                            AMC = 6,392<br/>
+                                            Months of Stock = Ending Balance / AMC<br/>
+                                            Months of Stock = 22,642 / 6,392<br/>
+                                            Months of Stock = 3.54
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Show Quantity Checkbox</h4>
+                                        <p style="font-size: 13px;">If unchecked (default), stock is displayed by months of stock (MOS) for planning units planned by MOS and as quantities for those planned by quantity. If checked, stock is displayed by quantity, regardless of the ‘plan by’ settings. When stock is displayed by quantity, the value represents the inventory or projected inventory available at the end of the month.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Show Icon Checkbox</h4>
+                                        <p style="font-size: 13px;">If checked (default), this displays the shipment and expiry icons. There is a shipment icon displayed for every month with shipment(s), excluding cancelled, and inactive shipments. There is an expiry icon displayed for every month with a projected expiry.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Remove Shipment Checkboxes</h4>
+                                        <p style="font-size: 13px;">These checkboxes allow you to simulate different stock scenarios by excluding certain shipments (e.g. planned, unfunded) from the projected inventory</p>
+                                        <ul style="font-size: 13px;">
+                                            <li>If <b>both checkboxes are unchecked</b>, all active shipments (Status = Planned, Submitted, Approved, Shipped, Arrived, Received, On-hold) are included in the projected inventory (both quantity and MOS).</li>
+                                            <li>If <b>“Remove Planned Shipment” is checked</b>, shipments with status = Planned are removed from the stock projections. Note: that by definition, this removes all TBD shipments since TBD shipments are always in the Planned status.</li>
+                                            <li>If <b>“Remove TBD Funding Source Shipments” is checked</b>, shipments with funding source = TBD are removed from the stock projections.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
