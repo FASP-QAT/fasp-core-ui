@@ -1,0 +1,125 @@
+<div>
+    <p>
+    The Stock Status Matrix (Global) provides a high-level, grid-based overview of stock status (Months of Stock (MOS) or Quantity) for a single planning unit or equivalency unit across multiple programs, planning units, and time periods. To view stock status across planning units and over time within a single supply plan program, refer to the <a href="/#/report/stockStatusMatrix">Stock Status Matrix</a>.
+    </p>
+    <p>
+    <i>For more explanation of ending balance, AMC, min/max MOS and quantity, please see the ‘Show guidance’ screen on <a href="/#/report/supplyPlanScoreCard">Supply Plan Report</a> or the User Manual (<a href="https://fasp-qat.github.io/qat-documentation/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Stock Status Reports</a> and <a href="https://fasp-qat.github.io/qat-documentation/docs/user/annex-2-business-rules" target="_blank">Annex 2</a>.)</i>
+    </p>
+    <p>
+    Each planning unit can be planned by either MOS or Quantity, and their stock status is determined based on Planning Unit setting. Program admins can update the “Plan By” setting (MOS or Quantity) in the “<a href="/#/dataset/planningUnitSetting">Planning Unit Settings</a>” screen.
+    </p>
+    <p>
+    <b>Stock Status Color-coding</b><br/>
+    Cells are color-coded based on the stock status using the color coding displayed in the legend.
+    </p>
+    <ul>
+        <li><b>Plan by MOS:</b> Stock status is determined by comparing the MOS with the Min MOS (user-entered in Planning Unit Settings screen) and Max MOS (calculated).</li>
+        <li><b>Plan by Quantity:</b> Stock status is determined by comparing the quantity of the “ending balance” with the Min quantity (user-entered in Planning Unit Settings screen) and Max quantity (calculated).</li>
+    </ul>
+
+    <p>
+    <b>Average Monthly Consumption (AMC)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/AMC-Formula.png" alt="AMC Formula" />
+    <p>
+    *Consider only non-zero values. Also, current month is included in the months in future for AMC<br/>
+    If the report includes multiple programs or planning units, the AMC of the selected program/planning units will be aggregated (summed) into a single total quantity.
+    </p>
+
+    <p>
+    <b>Months of Stock (MOS)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Month0fstock-Formula.png" alt="Months of Stock Formula" />
+    <p>
+    If the report includes multiple programs or planning units:<br/>
+    Months of Stock = (sum of selected programs/planning units’ ending balance / sum of selected programs/planning units’ AMC)
+    </p>
+
+    <p>
+    <span class="formulastext-p">Example:</span><br/>
+    Program A Ending Balance = 10,000<br/>
+    Program A AMC = 2,500<br/>
+    Program B Ending Balance = 6,000<br/>
+    Program B AMC = 3,000<br/>
+    Program C Ending Balance = 750<br/>
+    Program C AMC = 250<br/>
+    <br/>
+    Months of Stock = (10,000 + 6,000 + 750) / (2,500 + 3,000 + 250)<br/>
+    Months of Stock = 2.91
+    </p>
+
+    <p>
+    <b>Min/Max Months of Stock</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Min-Months-Of-Stock-formula.png" alt="Min MOS Formula" />
+    <br/>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Max-Months-Of-Stock-formula.png" alt="Max MOS Formula" />
+
+    <p>
+    If the report includes multiple programs or planning units,
+    </p>
+    <ul>
+        <li>Aggregate Min MOS = the average of the selected program & planning units’ Min MOS</li>
+        <li>Aggregate Max MOS = the average of the selected program & planning units’ Max MOS</li>
+    </ul>
+
+    <p>
+    <span class="formulastext-p">Example:</span><br/>
+    Program A min MOS = 3<br/>
+    Program A max MOS = 6<br/>
+    Program B min MOS = 5<br/>
+    Program B max MOS = 12<br/>
+    <br/>
+    Aggregate Min MOS = Average (3, 5) = 4<br/>
+    Aggregate Max MOS = Average (6, 12) = 9
+    </p>
+
+    <p>
+    <b>Min/Max Quantity</b><br/>
+    Min Qty = Defined by the user in program settings
+    </p>
+
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/MaxQty.png" alt="Max Quantity Formula" />
+
+    <p>
+    Note that max quantity changes by month as AMC changes by month.
+    </p>
+
+    <p>
+    If the report includes multiple programs or planning units,
+    </p>
+    <ul>
+        <li>Aggregate Min Quantity = the average of the selected program & planning units’ Min Quantity</li>
+        <li>Aggregate Max Quantity = the average of the selected program &  planning units’ Max Quantity</li>
+    </ul>
+    <p>
+    <span class="formulastext-p">Example:</span><br/>
+    Program A min Quantity = 3,000<br/>
+    Program A max Quantity = 6,000<br/>
+    Program B min Quantity = 5,000<br/>
+    Program B max Quantity = 12,000<br/>
+    <br/>
+    Aggregate Min Quantity = Average (3000, 5000) = 4000<br/>
+    Aggregate Max Quantity = Average (6000, 12000) = 9000
+    </p>
+
+    <p>
+    <b>Show Quantity Checkbox</b><br/>
+    If unchecked (default), stock is displayed by months of stock (MOS) for planning units planned by MOS and as quantities for those planned by quantity. If checked, stock is displayed by quantity, regardless of the ‘plan by’ settings. When stock is displayed by quantity, the value represents the inventory or projected inventory available at the end of the month.
+    </p>
+
+    <p>
+    <b>Show Icon Checkbox</b><br/>
+    If checked (default), this displays the shipment and expiry icons. There is a shipment icon displayed for every month with shipment(s), excluding cancelled, on-hold, and inactive shipments. There is an expiry icon displayed for every month with a projected expiry.
+    </p>
+
+    <p>
+    <b>Remove Shipment Checkboxes</b><br/>
+    These checkboxes allow you to simulate different stock scenarios by excluding certain shipments (e.g. planned, unfunded) from the projected inventory
+    </p>
+    <ul>
+        <li>If <b>both checkboxes are unchecked</b>, all active shipments (Status = Planned, Submitted, Approved, Shipped, Arrived, Received, On-hold) are included in the projected inventory (both quantity and MOS).</li>
+        <li>If <b>“Remove Planned Shipment” is checked</b>, shipments with status = Planned are removed from the stock projections. Note: that by definition, this removes all TBD shipments since TBD shipments are always in the Planned status.</li>
+        <li>If <b>“Remove TBD Funding Source Shipments” is checked</b>, shipments with funding source = TBD are removed from the stock projections.</li>
+    </ul>
+</div>

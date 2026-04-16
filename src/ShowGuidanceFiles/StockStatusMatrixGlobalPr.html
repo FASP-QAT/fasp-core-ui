@@ -1,0 +1,125 @@
+<div>
+    <p>
+    A Matriz de Estado do Estoque (Global) fornece uma visão geral baseada em grade de alto nível do estado do estoque (Meses de Estoque (MOS) ou Quantidade) para uma única unidade de planejamento ou unidade de equivalência em vários programas, unidades de planejamento e períodos de tempo. Para visualizar o estado do estoque nas unidades de planejamento e ao longo do tempo em um único programa de plano de fornecimento, consulte a <a href="/#/report/stockStatusMatrix">Matriz de estado de estoque</a>.
+    </p>
+    <p>
+    <i>Para mais explicações sobre saldo final, AMC, MOS mínimo/máximo e quantidade, consulte a tela ‘Mostrar orientação’ no <a href="/#/report/supplyPlanScoreCard">Relatório do Plano de Fornecimento</a> ou no Manual do Usuário (<a href="https://fasp-qat.github.io/qat-documentation/pt/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Relatórios de status de estoque</a> e <a href="https://fasp-qat.github.io/qat-documentation/pt/docs/user/annex-2-business-rules" target="_blank">Anexo 2</a>.)</i>
+    </p>
+    <p>
+    Cada unidade de planejamento pode ser planejada por MOS ou Quantidade, e seu status de estoque é determinado com base na configuração da Unidade de Planejamento. Os administradores do programa podem atualizar a configuração "Planejar por" (MOS ou Quantidade) na tela "<a href="/#/dataset/planningUnitSetting">Configurações da Unidade de Planejamento</a>".
+    </p>
+    <p>
+    <b>Codificação por Cores do Status de Estoque</b><br/>
+    As células são codificadas por cores com base no status do estoque usando a codificação de cores exibida na legenda.
+    </p>
+    <ul>
+        <li><b>Planejado por MOS:</b> O estado do estoque é determinado pela comparação do MOS com o MOS Mínimo (inserido pelo usuário na tela de Configurações da Unidade de Planejamento) e o MOS Máximo (calculado).</li>
+        <li><b>Planejado por Quantidade:</b> O estado do estoque é determinado pela comparação da quantidade do "saldo final" com a quantidade mínima (inserida pelo usuário na tela de configurações da unidade de planejamento) e a quantidade máxima (calculada).</li>
+    </ul>
+
+    <p>
+    <b>Consumo Médio Mensal (AMC)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/AMC-Formula.png" alt="AMC Formula" />
+    <p>
+    *Considere apenas valores diferentes de zero. Além disso, o mês atual está incluído nos meses no futuro para o AMC.<br/>
+    Se o relatório incluir vários programas ou unidades de planejamento, o AMC dos programas/unidades de planejamento selecionados será agregado (somado) em uma única quantidade total.
+    </p>
+
+    <p>
+    <b>Meses de Estoque (MOS)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Month0fstock-Formula.png" alt="Months of Stock Formula" />
+    <p>
+    Se o relatório incluir vários programas ou unidades de planejamento:<br/>
+    Meses de Estoque = (soma do saldo final dos programas/unidades de planejamento selecionados / soma do AMC dos programas/unidades de planejamento selecionados)
+    </p>
+
+    <p>
+    <span class="formulastext-p">Exemplo:</span><br/>
+    Programa A Saldo Final = 10.000<br/>
+    Programa A AMC =  2.500<br/>
+    Programa B Saldo Final = 6.000<br/>
+    Programa B AMC = 3.000<br/>
+    Programa C Saldo Final = 750<br/>
+    Programa C AMC = 250<br/>
+    <br/>
+    Meses de Estoque = (10.000 + 6.000 + 750) / (2.500 + 3.000 + 250)<br/>
+    Meses de Estoque = 2,91
+    </p>
+
+    <p>
+    <b>Min/Max Meses de Estoque</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Min-Months-Of-Stock-formula.png" alt="Min MOS Formula" />
+    <br/>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Max-Months-Of-Stock-formula.png" alt="Max MOS Formula" />
+
+    <p>
+    Se o relatório incluir vários programas ou unidades de planejamento,
+    </p>
+    <ul>
+        <li>MOS Mínimo Agregado = a média do MOS mínimo dos programas e unidades de planejamento selecionadas</li>
+        <li>MOS Máximo Agregado = a média do MOS máximo dos programas e unidades de planejamento selecionadas</li>
+    </ul>
+
+    <p>
+    <span class="formulastext-p">Exemplo:</span><br/>
+    Programa A min MOS = 3<br/>
+    Programa A max MOS = 6<br/>
+    Programa B min MOS = 5<br/>
+    Programa B max MOS = 12<br/>
+    <br/>
+    MOS Mínimo Agregado = Média (3, 5) = 4<br/>
+    MOS Máximo Agregado = Média (6, 12) = 9
+    </p>
+
+    <p>
+    <b>Min/Max Quantidade</b><br/>
+    Quantidade Mínima = Definida pelo usuário nas configurações do programa
+    </p>
+
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/MaxQty.png" alt="Max Quantity Formula" />
+
+    <p>
+    Observe que a quantidade máxima muda de acordo com o mês, conforme o AMC muda por mês.
+    </p>
+
+    <p>
+    Se o relatório incluir vários programas ou unidades de planejamento,
+    </p>
+    <ul>
+        <li>Quantidade Mín. Agregada = a média das quantidades mínimas dos programas e unidades de planejamento selecionadas</li>
+        <li>Quantidade Máx. Agregada = a média das quantidades máximas dos programas e unidades de planejamento selecionadas</li>
+    </ul>
+    <p>
+    <span class="formulastext-p">Exemplo:</span><br/>
+    Programa A Quantidade min = 3.000<br/>
+    Programa A Quantidade max = 6.000<br/>
+    Programa B Quantidade min = 5.000<br/>
+    Programa B Quantidade max = 12.000<br/>
+    <br/>
+    Quantidade Mínima Agregada = Média (3000, 5000) = 4000<br/>
+    Quantidade Máxima Agregada = Média (6000, 12000) = 9000
+    </p>
+
+    <p>
+    <b>Caixa de seleção Mostrar Quantidade</b><br/>
+    Se desmarcada (padrão), o estoque é exibido por meses de estoque (MOS) para as unidades planejadas por MOS e como quantidades para aquelas planejadas por quantidade. Se marcado, o inventário é exibido por quantidade, independentemente das configurações de 'planejar por'. Quando o estoque é exibido em quantidade, o valor representa o estoque ou estoque projetado disponível no final do mês.
+    </p>
+
+    <p>
+    <b>Caixa de Seleção Mostrar Ícone</b><br/>
+    Se marcado (padrão), isso exibe os ícones de remessa e expiração. Há um ícone de remessa exibido para cada mês com remessa(s), excluindo remessas canceladas, retidas e inativas. Há um ícone de expiração exibido para cada mês com uma expiração projetada.
+    </p>
+
+    <p>
+    <b>Caixas de Seleção Remover Remessas</b><br/>
+    Essas caixas de seleção permitem simular diferentes cenários de estoque, excluindo certas remessas (por exemplo, planejadas, não financiadas) do estoque projetado
+    </p>
+    <ul>
+        <li>Se <b>ambas as caixas de seleção estiverem desmarcadas</b>, todas as remessas ativas (Status = Planejado, Submetido, Aprovado, Enviado, Chegado, Recebido, Retido) serão incluídas no estoque projetado (Quantidade e MOS).</li>
+        <li>Se <b>“Remover Remessa Planejada” estiver marcada</b>, os envios com o status = Planejado serão removidas das projeções de estoque. Observação: por definição, isso remove todas as remessas TBD, pois as remessas TBD estão sempre no status Planejado.</li>
+        <li>Se <b>“Remover Remessas de Fonte de Financiamento TBD” estiver marcada</b>, as remessas com fonte de financiamento = TBD serão removidas das projeções de estoque.</li>
+    </ul>
+</div>
