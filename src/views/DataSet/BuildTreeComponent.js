@@ -6981,7 +6981,7 @@ export default class BuildTree extends Component {
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "ContactTemplate",
-            linesColor: Colors.White,
+            linesColor: Colors.Black,
             annotations: treeLevelItems,
             items: newItems,
             templates: (templates || [])

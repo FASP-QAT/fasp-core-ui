@@ -3150,7 +3150,7 @@ export default class CreateTreeTemplate extends Component {
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "ContactTemplate",
-            linesColor: Colors.White,
+            linesColor: Colors.Black,
             annotations: treeLevelItems,
             items: newItems,
             templates: (templates || [])
