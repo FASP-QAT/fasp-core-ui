@@ -1869,7 +1869,7 @@ class DefaultLayout extends Component {
                         {
                           name: i18n.t('static.dashboard.supplyPlan'),
                           icon: 'fa fa-list',
-                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING'))) && this.state.activeTab == 2) ? false : true) },
                           children: [
                             {
                               name: i18n.t('static.dashboard.supplyPlan'),
@@ -2356,7 +2356,7 @@ class DefaultLayout extends Component {
                         {
                           name: i18n.t('static.dashboard.supplyPlan'),
                           icon: 'fa fa-list',
-                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_REPORT'))) && this.state.activeTab == 2) ? false : true) },
+                          attributes: { hidden: ((((this.state.businessFunctions.includes('ROLE_BF_PROBLEM_AND_ACTION_REPORT')) || (this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN')) || (this.state.businessFunctions.includes('ROLE_BF_SCENARIO_PLANNING'))) && this.state.activeTab == 2) ? false : true) },
                           children: [
                             {
                               name: i18n.t('static.dashboard.supplyPlan'),
