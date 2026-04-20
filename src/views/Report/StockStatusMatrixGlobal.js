@@ -1014,9 +1014,9 @@ class StockStatusMatrixGlobal extends Component {
      */
     fetchData = () => {
         let realmId = AuthenticationService.getRealmId()
-        let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+        let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
         let includePlanningShipments = !this.state.removePlannedShipments;
-        let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+        let programIds = this.state.programValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
