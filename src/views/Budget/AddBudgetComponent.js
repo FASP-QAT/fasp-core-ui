@@ -550,7 +550,7 @@ class AddBudgetComponent extends Component {
                                                         case 406:
                                                             if (error.response) {
                                                                 this.setState({
-                                                                    message: i18n.t('static.budget.duplicateBudget') + ": " + error.response.data.duplicateLabels.map(x => x.label_en),
+                                                                    message: i18n.t('static.budget.duplicateBudget'),
                                                                     loading: false
                                                                 });        
                                                             } else {
