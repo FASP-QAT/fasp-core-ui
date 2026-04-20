@@ -1936,7 +1936,7 @@ class ShipmentSummery extends Component {
         fundingSourceLabels: [],
         filteredBudgetList: [],
       }, () => {
-        this.fetchData();
+        // this.fetchData();
       })
     }
   };
