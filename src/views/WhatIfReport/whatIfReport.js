@@ -4772,7 +4772,7 @@ export default class WhatIfReportComponent extends React.Component {
                         var fsRequest = fsOs.getAll();
                         fsRequest.onsuccess = function (event) {
                             var fsResult = [];
-                            fsResult = fsRequest.result.filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId);
+                            fsResult = fsRequest.result.filter(c => c.realm.id == generalProgramJson.realmCountry.realm.realmId  && [...new Set(c.programList.map(ele => ele.id))].includes(parseInt(generalProgramJson.programId)));
                             this.setState({
                                 fundingSourceListForWhatIf: fsResult,
                                 fundingSourceUsed: [...new Set((programJson.shipmentList).filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true").map(ele1 => (Number(ele1.fundingSource.id))))]
