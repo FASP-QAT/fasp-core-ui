@@ -3637,7 +3637,7 @@
   "static.pipeline.pplnfundingsource": "Pipeline Funding Source",
   "static.dataSet.forecastperiodInMonthRequired": "Forecast period should not contain negative number, decimal numbers, characters & special symbols",
   "static.equivalancyUnit.ManageMappings": "Use the main screen to manage mappings between equivalency units and forecasting units. Realm-level mappings are available to all users and are indicated by All.",
-  "static.budget.duplicateBudget": "Budget code already exists for following program",
+  "static.budget.duplicateBudget": "Duplicate Budget. Please choose another Program, Budget Display Name, or both.",
   "static.dashboard.monthlyForecast": "Monthly Forecast",
   "static.supplyplan.adjustmentDataEntry": "Adjustment and inventory details data entry",
   "static.program.datasetDisplayName": "Program Display Name",
