@@ -3637,7 +3637,7 @@
   "static.pipeline.pplnfundingsource": "Fonte de financiamento do PipeLine",
   "static.dataSet.forecastperiodInMonthRequired": "O período de previsão não deve conter números negativos, números decimais, caracteres e símbolos especiais",
   "static.equivalancyUnit.ManageMappings": "Use a tela principal para gerenciar mapeamentos entre unidades de equivalência e unidades de previsão. Os mapeamentos a nível de domínio estão disponíveis para todos os usuários e são indicados por \"Todos\".",
-  "static.budget.duplicateBudget": "O código orçamentário já existe para o seguinte programa.",
+  "static.budget.duplicateBudget": "Orçamento duplicado. Por favor, escolha outro programa, nome de exibição do orçamento ou ambos.",
   "static.dashboard.monthlyForecast": "Previsão Mensal",
   "static.supplyplan.adjustmentDataEntry": "Inserção de dados de detalhe de ajustes e stock",
   "static.program.datasetDisplayName": "Nome de exibição do programa",

@@ -3149,7 +3149,7 @@ export default class CreateTreeTemplate extends Component {
             buttonsPanelSize: 40,
             orientationType: OrientationType.Top,
             defaultTemplateName: "ContactTemplate",
-            linesColor: Colors.White,
+            linesColor: Colors.Black,
             annotations: treeLevelItems,
             items: newItems,
             templates: (templates || [])
@@ -5178,7 +5178,7 @@ export default class CreateTreeTemplate extends Component {
             data = [];
             data[0] = momList[j].month
             if(this.state.currentItemConfig.context.payload.nodeType.id == 6){
-                data[1] = parseFloat(momList[j].calculatedValue).toFixed(2);
+                data[1] = parseFloat(momList[j].startValue).toFixed(2);
             }else{
                 data[1] = j == 0 ? parseFloat(momList[j].startValue).toFixed(2) : `=(IF(OR(I1==true,I1==1),G${parseInt(j)},D${parseInt(j)}))`
             }

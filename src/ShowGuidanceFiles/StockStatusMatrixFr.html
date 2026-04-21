@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="">
+    <title>Show Guidance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        table,
+        td,
+        div,
+        h1,
+        p {
+            font-family: Arial, sans-serif;
+            line-height: 20px;
+        }
+
+        body {
+            padding: 0;
+            margin: 0;
+            color: #272127;
+        }
+
+        .table1 td {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+        }
+
+        .table1 th {
+            border: 1px solid #c8ced3 !important;
+            padding: 6px;
+            font-size: 13px;
+            background-color: #f0f3f5;
+            font-weight: bold;
+        }
+
+        .table1 {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: #205493;
+            background-color: transparent;
+        }
+
+        .formula-img-mr {
+            margin: 10px 0px 20px 0px;
+            border: 1px solid #20a8d8;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .img-fluid {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body style="margin:0;padding:0;background:#e4e5e6;">
+    <table role="presentation" style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+        <tr>
+            <td align="center" style="padding:0;">
+                <table role="presentation"
+                    style="max-width: 910px;min-width:100%;margin-top:20px;margin-bottom:20px;border-collapse:collapse;border-spacing:0;text-align:left;border-radius: 0.25rem;background-color: #fff;">
+                    <tr>
+                        <td style="padding:10px 30px 20px 30px;">
+                            <table role="presentation"
+                                style="width:100%;border-collapse:collapse;border:0;border-spacing:0;">
+                                <tr>
+                                    <td style="padding:0 0 10px 0;color:#153643;">
+                                        <h3 style="color: #002f6c;font-weight: 600;font-size: 19px;">La Matrice d'état des stocks</h3>
+
+                                        <p style="font-size: 13px;">La Matrice d'état des stocks fournit une vue d'ensemble de haut niveau, sous forme de grille, de l'état des stocks (mois de stock (MOS) ou quantité) pour l'ensemble des unités de planification et au fil du temps au sein d'un programme de plan d'approvisionnement unique. Pour visualiser l'état des stocks d'une seule unité de planification ou d'une unité d'équivalence à travers plusieurs programmes, reportez-vous à la <a href="#/report/stockStatusMatrixGlobal">Matrice d'état des stocks (mondiale)</a>.</p>
+
+                                        <p style="font-size: 13px; font-style: italic;">Pour plus d'explications sur le solde final, la CMM, le MOS min/max et la quantité, veuillez consulter l'écran « Afficher les conseils » dans le <a href="#/report/stockStatus">Rapport de plan d'approvisionnement</a> ou le Manuel de l'utilisateur (<a href="https://fasp-qat.github.io/qat-documentation/fr/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Rapports sur l'état des stocks</a> et <a href="https://fasp-qat.github.io/qat-documentation/fr/docs/user/annex-2-business-rules" target="_blank">Annexe 2</a>).</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Code couleur de l'état des stocks</h4>
+                                        <p style="font-size: 13px;">Les cellules sont codées par couleur en fonction de l'état du stock en utilisant le code couleur affiché dans la légende.</p>
+                                        <ul style="font-size: 13px;">
+                                            <li><b>Planifié par MOS :</b> L'état du stock est déterminé en comparant le MOS avec le MOS minimum (saisi dans l'écran de paramétrage de l'unité de planification) et le MOS maximum (calculé).</li>
+                                            <li><b>Planifié par quantité :</b> L'état du stock est déterminé en comparant la quantité du « solde final » avec la quantité minimale (saisi dans l'écran de paramétrage de l'unité de planification) et la quantité maximale (calculée).</li>
+                                        </ul>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Consommation mensuelle moyenne (CMM)</h4>
+                                        <p style="font-size: 13px;">Utilise la consommation ajustée lorsqu'elle est disponible, en tenant compte du nombre de jours de rupture de stock et de la consommation réelle.</p>
+                                        <div style="text-align: center;">
+                                            <img src="../assets/img/AMC-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+                                        
+                                        <p style="font-size: 13px;">* Ne considérez que les valeurs non nuls. De plus, le mois en cours est inclus dans les mois à venir pour la CMM</p>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Exemple :</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Nombre de mois passés = 3 (basé sur l'unité de planification du programme)<br/>
+                                            Nombre de mois futurs = 3 (basé sur l'unité de planification du programme)<br/>
+                                            Mois en cours = Mai 2020<br/>
+                                            Consommation em fév. 2020 = 5 000<br/>
+                                            Consommation ajustée em mars 2020 = 6 890<br/>
+                                            Consommation ajustée em avril 2020 = 6 907<br/>
+                                            Consommation ajustée em mai 2020 = 7 087<br/>
+                                            Consommation ajustée em juin 2020 = 5 678<br/>
+                                            Consommation ajustée em juillet 2020 = 6 789<br/><br/>
+
+                                            CMM = consommation ajustée au cours du nombre de mois PASSE + consommation ajustée au cours du nombre de mois FUTUR / nombre de mois<br/>
+                                            CMM = (consommation ajustée pour fév., mars, avril, mai 2020 + juin & juillet 2020) / 6<br/>
+                                            CMM = (5 000 + 6 890 + 6 907 + 7 087 + 5 678 + 6 789) / 6<br/>
+                                            CMM = 6 392
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Mois de stock</h4>
+                                        <div style="text-align: left;">
+                                            <img src="../assets/img/Month0fstock-Formula.png" class="formula-img-mr img-fluid" />
+                                        </div>
+
+                                        <p style="font-size: 13px; font-weight: bold; color: #205493;">Exemple :</p>
+                                        <p style="font-size: 13px; margin-left: 10px;">
+                                            Solde final = 22 642<br/>
+                                            CMM = 6 392<br/>
+                                            Mois de stock = solde final / CMM<br/>
+                                            Mois de stock = 22 642 / 6 392<br/>
+                                            Mois de stock = 3,54
+                                        </p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Case à cocher Afficher la quantité</h4>
+                                        <p style="font-size: 13px;">Si elle n'est pas cochée (par défaut), le stock est affiché par mois de stock (MOS) pour les unités de planification planifiées par MOS et comme quantités pour celles planifiées par quantité. Si elle est cochée, le stock est affiché par quantité, quels que soient les paramètres de « planification par ». Lorsque le stock est affiché par quantité, la valeur représente l'inventaire ou l'inventaire projeté disponible à la fin du mois.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Case à cocher Afficher l'icône</h4>
+                                        <p style="font-size: 13px;">Si elle est cochée (par défaut), elle affiche les icônes d'expédition et d'expiration. Une icône d'expédition est affichée pour chaque mois avec une ou plusieurs expéditions, à l'exclusion des expéditions annulées et inactives. Une icône d'expiration est affichée pour chaque mois avec une expiration projetée.</p>
+
+                                        <h4 style="color: #002f6c;font-weight: 600;font-size: 16px; margin-top: 20px;">Cases à cocher Supprimer les expéditions</h4>
+                                        <p style="font-size: 13px;">Ces cases à cocher vous permettent de simuler différents scénarios de stock en excluant certaines expéditions (par exemple, planifiées, non financées) de l'inventaire projeté</p>
+                                        <ul style="font-size: 13px;">
+                                            <li>Si <b>les deux cases ne sont pas cochées</b>, toutes les expéditions actives (statut = planifié, soumis, approuvé, expédié, arrivé, reçu, en attente) sont incluses dans l'inventaire projeté (quantité et MOS).</li>
+                                            <li>Si <b>« Supprimer les expéditions planifiées » est cochée</b>, les expéditions dont le statut = Planifié sont supprimées des projections de stock. Remarque : par définition, cela supprime toutes les expéditions TBD puisque les expéditions TBD sont toujours au statut Planifié.</li>
+                                            <li>Si <b>« Supprimer les expéditions avec source de financement TBD » est cochée</b>, les expéditions dont la source de financement = TBD sont supprimées des projections de stock.</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>

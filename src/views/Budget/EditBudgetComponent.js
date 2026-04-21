@@ -548,7 +548,7 @@ class EditBudgetComponent extends Component {
                                                             break;
                                                         case 406:
                                                             this.setState({
-                                                                message: i18n.t('static.budget.duplicateDisplayName'),
+                                                                message: i18n.t('static.budget.duplicateBudget'),
                                                                 loading: false
                                                             });
                                                             break;
