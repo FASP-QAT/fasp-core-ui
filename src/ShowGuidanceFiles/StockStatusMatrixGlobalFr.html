@@ -1,0 +1,125 @@
+<div>
+    <p>
+    La matrice de l'état des stocks (globale) fournit un aperçu de haut niveau, sous forme de grille, de l'état des stocks (Mois de stock (MDS) ou Quantité) pour une seule unité de planification ou unité d'équivalence à travers plusieurs programmes, unités de planification et périodes. Pour consulter l'état des stocks à travers les unités de planification et au fil du temps dans un seul programme de plan d'approvisionnement, veuillez consulter la <a href="/#/report/stockStatusMatrix">Matrice de l'état des stocks</a>.
+    </p>
+    <p>
+    <i>Pour plus d'explications sur le solde de clôture, la CMA, le MDS min/max et la quantité, veuillez consulter l'écran « Afficher les conseils » dans le <a href="/#/report/supplyPlanScoreCard">Rapport du plan d'approvisionnement</a> ou le manuel d'utilisation (<a href="https://fasp-qat.github.io/qat-documentation/fr/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Rapports sur l'état des stocks</a> et <a href="https://fasp-qat.github.io/qat-documentation/fr/docs/user/annex-2-business-rules" target="_blank">Annexe 2</a>.)</i>
+    </p>
+    <p>
+    Chaque unité de planification peut être planifiée en fonction du MDS ou de la quantité, et son état de stock est déterminé par le réglage de l'unité de planification. Les administrateurs de programme peuvent mettre à jour le paramètre « Planifier par » (MDS ou Quantité) dans l'écran « <a href="/#/dataset/planningUnitSetting">Paramètres de l'unité de planification</a> ».
+    </p>
+    <p>
+    <b>Code couleur de l'état des stocks</b><br/>
+    Les cellules sont codées par couleur en fonction de l'état des stocks en utilisant le code couleur affiché dans la légende.
+    </p>
+    <ul>
+        <li><b>Planifié par MDS :</b> L'état des stocks est déterminé en comparant le MDS avec le MDS minimal (saisi par l'utilisateur dans l'écran des paramètres de l'unité de planification) et le MDS maximal (calculé).</li>
+        <li><b>Planifié par quantité :</b> L'état des stocks est déterminé en comparant la quantité du « solde de clôture » avec la quantité minimale (saisie par l'utilisateur dans l'écran des paramètres de l'unité de planification) et la quantité maximale (calculée).</li>
+    </ul>
+
+    <p>
+    <b>Consommation Mensuelle Moyenne (CMA)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/AMC-Formula.png" alt="AMC Formula" />
+    <p>
+    *Prendre uniquement en compte les valeurs non nulles. De plus, le mois en cours est inclus dans les mois à venir pour la CMA.<br/>
+    Si le rapport inclut plusieurs programmes ou unités de planification, la CMA des programmes/unités de planification sélectionnés sera agrégée (additionnée) en une seule quantité totale.
+    </p>
+
+    <p>
+    <b>Mois de Stock (MDS)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Month0fstock-Formula.png" alt="Months of Stock Formula" />
+    <p>
+    Si le rapport comprend plusieurs programmes ou unités de planification :<br/>
+    Mois de stock = (somme du solde de clôture des programmes/unités de planification sélectionnés / somme de la CMA des programmes/unités de planification sélectionnés)
+    </p>
+
+    <p>
+    <span class="formulastext-p">Exemple :</span><br/>
+    Programme A Solde de Clôture = 10 000<br/>
+    Programme A CMA = 2 500<br/>
+    Programme B Solde de Clôture = 6 000<br/>
+    Programme B CMA = 3 000<br/>
+    Programme C Solde de Clôture = 750<br/>
+    Programme C CMA = 250<br/>
+    <br/>
+    Mois de stock = (10 000 + 6 000 + 750) / (2 500 + 3 000 + 250)<br/>
+    Mois de stock = 2.91
+    </p>
+
+    <p>
+    <b>Mois de Stock (MDS) Min/Max</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Min-Months-Of-Stock-formula.png" alt="Min MOS Formula" />
+    <br/>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Max-Months-Of-Stock-formula.png" alt="Max MOS Formula" />
+
+    <p>
+    Si le rapport inclut plusieurs programmes ou unités de planification,
+    </p>
+    <ul>
+        <li>MDS minimum agrégé = la moyenne des MDS minimums des programmes et unités de planification sélectionnés</li>
+        <li>MDS maximum agrégé = la moyenne des MDS maximums des programmes et unités de planification sélectionnés</li>
+    </ul>
+
+    <p>
+    <span class="formulastext-p">Exemple :</span><br/>
+    Programme A MDS minimum = 3<br/>
+    Programme A MDS maximum = 6<br/>
+    Programme B MDS minimum = 5<br/>
+    Programme B MDS maximum = 12<br/>
+    <br/>
+    MDS minimum agrégé = Moyenne (3, 5) = 4<br/>
+    MDS maximum agrégé = Moyenne (6, 12) = 9
+    </p>
+
+    <p>
+    <b>Quantité Min/Max</b><br/>
+    Quantité Min = Défini par l'utilisateur dans les paramètres du programme
+    </p>
+
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/MaxQty.png" alt="Max Quantity Formula" />
+
+    <p>
+    Notez que la quantité maximale change chaque mois à mesure que la CMA change chaque mois.
+    </p>
+
+    <p>
+    Si le rapport inclut plusieurs programmes ou unités de planification,
+    </p>
+    <ul>
+        <li>Quantité Min Agrégée = la moyenne des quantités minimales des programmes et unités de planification sélectionnés</li>
+        <li>Quantité Max Agrégée = la moyenne des quantités maximales des programmes et unités de planification sélectionnés</li>
+    </ul>
+    <p>
+    <span class="formulastext-p">Exemple :</span><br/>
+    Programme A Quantité min = 3 000<br/>
+    Programme A Quantité max = 6 000<br/>
+    Programme B Quantité min = 5 000<br/>
+    Programme B Quantité max = 12 000<br/>
+    <br/>
+    Quantité minimale agrégée = Moyenne (3000, 5000) = 4000<br/>
+    Quantité maximale agrégée = Moyenne (6000, 12000) = 9000
+    </p>
+
+    <p>
+    <b>Case à cocher Afficher la quantité</b><br/>
+    Si elle n'est pas cochée (par défaut), le stock est affiché en mois de stock (MDS) pour les unités de planification planifiées par MDS et en quantités pour celles planifiées par quantité. Si elle est cochée, le stock est affiché en quantité, quels que soient les paramètres de « planifier par ». Lorsque le stock est affiché en quantité, la valeur représente l'inventaire ou l'inventaire projeté disponible à la fin du mois.
+    </p>
+
+    <p>
+    <b>Case à cocher Afficher l'icône</b><br/>
+    Si elle est cochée (par défaut), affiche les icônes d'expédition et d'expiration. Une icône d'expédition s'affiche pour chaque mois avec des expéditions, à l'exclusion des expéditions annulées, en attente et inactives. Une icône d'expiration s'affiche pour chaque mois comportant une expiration projetée.
+    </p>
+
+    <p>
+    <b>Cases à cocher Supprimer l'expédition</b><br/>
+    Ces cases à cocher vous permettent de simuler différents scénarios de stock en excluant certaines expéditions (ex. planifiées, non financées) de l'inventaire projeté.
+    </p>
+    <ul>
+        <li>Si <b>les deux cases sont décochées</b>, toutes les expéditions actives (Statut = Planifié, Soumis, Approuvé, Expédié, Arrivé, Reçu, En attente) sont incluses dans l'inventaire projeté (quantité et MDS).</li>
+        <li>Si <b>« Supprimer l'expédition planifiée » est cochée</b>, les expéditions avec le statut = Planifié sont supprimées des projections de stock. Remarque : par définition, cela supprime toutes les expéditions TBD car les expéditions TBD sont toujours dans le statut Planifié.</li>
+        <li>Si <b>« Supprimer les expéditions de source de financement TBD » est cochée</b>, les expéditions avec comme source de financement = TBD sont supprimées des projections de stock.</li>
+    </ul>
+</div>

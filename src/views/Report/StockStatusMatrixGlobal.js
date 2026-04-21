@@ -17,7 +17,11 @@ import {
     Form,
     FormGroup, Input, InputGroup,
     Label,
-    Table
+    Table,
+    Modal,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
 } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
@@ -35,6 +39,10 @@ import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
 import { addDoubleQuoteToRowContent, dateFormatterLanguage, filterOptions, makeText, formatter, roundAMC } from '../../CommonComponent/JavascriptCommonFunctions.js';
 import WorldMap from '../../CommonComponent/WorldMap.js';
+import showguidanceStockStatusMatrixGlobalEn from '../../../src/ShowGuidanceFiles/StockStatusMatrixGlobalEn.html';
+import showguidanceStockStatusMatrixGlobalFr from '../../../src/ShowGuidanceFiles/StockStatusMatrixGlobalFr.html';
+import showguidanceStockStatusMatrixGlobalSp from '../../../src/ShowGuidanceFiles/StockStatusMatrixGlobalSp.html';
+import showguidanceStockStatusMatrixGlobalPr from '../../../src/ShowGuidanceFiles/StockStatusMatrixGlobalPr.html';
 const ref = React.createRef();
 function getColumnLetter(index) {
     let letter = '';
@@ -158,7 +166,8 @@ class StockStatusMatrixGlobal extends Component {
             removeTbdFundingSource: false,
             aggregateCountries: false,
             viewBy: 1,
-            stockStatusValues: legendcolor.map(item => ({ value: item.value, label: item.text }))
+            stockStatusValues: legendcolor.map(item => ({ value: item.value, label: item.text })),
+            showGuidance: false
         };
         this.getCountrys = this.getCountrys.bind(this);
         this._handleClickRangeBox = this._handleClickRangeBox.bind(this)
@@ -173,6 +182,12 @@ class StockStatusMatrixGlobal extends Component {
         this.setViewBy = this.setViewBy.bind(this);
         this.setStockStatusId = this.setStockStatusId.bind(this);
         this.buildShipmentJexcel = this.buildShipmentJexcel.bind(this);
+        this.toggleShowGuidance = this.toggleShowGuidance.bind(this);
+    }
+    toggleShowGuidance() {
+        this.setState({
+            showGuidance: !this.state.showGuidance
+        });
     }
     loaded = function (instance, cell) {
         jExcelLoadedFunction(instance);
@@ -999,9 +1014,9 @@ class StockStatusMatrixGlobal extends Component {
      */
     fetchData = () => {
         let realmId = AuthenticationService.getRealmId()
-        let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
+        let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
         let includePlanningShipments = !this.state.removePlannedShipments;
-        let programIds = this.state.programValues.length == this.state.programLst.length ? [] : this.state.programValues.map(ele => (ele.value).toString());
+        let programIds = this.state.programValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
         let endDate = this.state.rangeValue.to.year + '-' + String(this.state.rangeValue.to.month).padStart(2, '0') + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
@@ -1958,6 +1973,13 @@ class StockStatusMatrixGlobal extends Component {
                                 </a>
                             </div>
                         }
+                        <div className="card-header-actions">
+                            <div className="card-header-action pr-lg-4">
+                                <a style={{ float: 'right' }}>
+                                    <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
                         <div ref={ref}>
@@ -2303,6 +2325,22 @@ class StockStatusMatrixGlobal extends Component {
                                     </div>
                                 </div>
                             </div>
+                            <Modal isOpen={this.state.showGuidance}
+                                className={'modal-lg ' + this.props.className} >
+                                <ModalHeader toggle={() => this.toggleShowGuidance()} className="ModalHead modal-info-Headher">
+                                    <strong className="TextWhite">{i18n.t('static.common.showGuidance')}</strong>
+                                </ModalHeader>
+                                <div>
+                                    <ModalBody>
+                                        <div dangerouslySetInnerHTML={{
+                                            __html: localStorage.getItem('lang') === 'en' ? showguidanceStockStatusMatrixGlobalEn :
+                                                localStorage.getItem('lang') === 'fr' ? showguidanceStockStatusMatrixGlobalFr :
+                                                localStorage.getItem('lang') === 'sp' ? showguidanceStockStatusMatrixGlobalSp :
+                                                showguidanceStockStatusMatrixGlobalPr
+                                        }} />
+                                    </ModalBody>
+                                </div>
+                            </Modal>
                         </div>
                     </CardBody>
                 </Card>

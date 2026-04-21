@@ -48,6 +48,10 @@ import pdfIcon from "../../assets/img/pdf.png";
 import i18n from "../../i18n";
 import AuthenticationService from "../Common/AuthenticationService.js";
 import AuthenticationServiceComponent from "../Common/AuthenticationServiceComponent";
+import showguidanceStockStatusMatrixEn from "../../ShowGuidanceFiles/StockStatusMatrixEn.html";
+import showguidanceStockStatusMatrixFr from "../../ShowGuidanceFiles/StockStatusMatrixFr.html";
+import showguidanceStockStatusMatrixSp from "../../ShowGuidanceFiles/StockStatusMatrixSp.html";
+import showguidanceStockStatusMatrixPr from "../../ShowGuidanceFiles/StockStatusMatrixPr.html";
 import SupplyPlanFormulas from "../SupplyPlan/SupplyPlanFormulas";
 import {
   addDoubleQuoteToRowContent,
@@ -339,6 +343,7 @@ export default class StockStatusMatrix extends React.Component {
       exportMessage: "",
       PlanningUnitDataForExport: [],
       puByProgramForExport: {}, // keyed by programId → puList, used to filter PUs per-program at export time
+      showGuidance: false,
     };
 
     this._handleClickRangeBox = this._handleClickRangeBox.bind(this);
@@ -350,6 +355,15 @@ export default class StockStatusMatrix extends React.Component {
     this.buildDetailJExcel = this.buildDetailJExcel.bind(this);
     this.loadedMatrix = this.loadedMatrix.bind(this);
     this.loadedDetail = this.loadedDetail.bind(this);
+  }
+
+  /**
+   * Toggles the visibility of the show guidance modal.
+   */
+  toggleShowGuidance() {
+    this.setState({
+      showGuidance: !this.state.showGuidance,
+    });
   }
 
   toggleExportModal = (type) => {
@@ -4461,7 +4475,17 @@ export default class StockStatusMatrix extends React.Component {
           {/* ── Header icons ── */}
           <div className="Card-header-reporticon pb-2">
             <div className="card-header-actions">
-              <a className="card-header-action">
+              <a className="card-header-action pr-lg-4">
+                <span
+                  style={{ cursor: "pointer" }}
+                  onClick={() => this.toggleShowGuidance()}
+                >
+                  <small className="supplyplanformulas">
+                    {i18n.t("static.common.showGuidance")}
+                  </small>
+                </span>
+              </a>
+              {/* <a className="card-header-action">
                 <span
                   style={{ cursor: "pointer" }}
                   onClick={() =>
@@ -4472,7 +4496,7 @@ export default class StockStatusMatrix extends React.Component {
                     {i18n.t("static.supplyplan.supplyplanformula")}
                   </small>
                 </span>
-              </a>
+              </a> */}
               {(hasData || hasDetails) && (
                 <div className="card-header-actions">
                   <img
@@ -5113,6 +5137,35 @@ export default class StockStatusMatrix extends React.Component {
             </div>
           </CardBody>
         </Card>
+        <Modal
+          isOpen={this.state.showGuidance}
+          className={"modal-lg " + this.props.className}
+        >
+          <ModalHeader
+            toggle={() => this.toggleShowGuidance()}
+            className="ModalHead modal-info-Headher"
+          >
+            <strong className="TextWhite">
+              {i18n.t("static.common.showGuidance")}
+            </strong>
+          </ModalHeader>
+          <div style={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}>
+            <ModalBody>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html:
+                    localStorage.getItem("lang") == "en"
+                      ? showguidanceStockStatusMatrixEn
+                      : localStorage.getItem("lang") == "fr"
+                      ? showguidanceStockStatusMatrixFr
+                      : localStorage.getItem("lang") == "sp"
+                      ? showguidanceStockStatusMatrixSp
+                      : showguidanceStockStatusMatrixPr,
+                }}
+              />
+            </ModalBody>
+          </div>
+        </Modal>
       </div>
     );
   }

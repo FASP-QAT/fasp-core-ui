@@ -1,0 +1,125 @@
+<div>
+    <p>
+    La matriz del estado de las existencias (global) proporciona una vista general, basada en cuadrículas, del estado de las existencias (Meses de Existencias (MOS) o Cantidad) para una única unidad de planificación o unidad de equivalencia en varios programas, unidades de planificación y períodos. Para ver el estado de las existencias en distintas unidades de planificación y a lo largo del tiempo dentro de un único programa del plan de suministro, consulte la <a href="/#/report/stockStatusMatrix">Matriz del estado de las existencias</a>.
+    </p>
+    <p>
+    <i>Para obtener más explicaciones sobre el saldo final, AMC, MOS mínimo/máximo y la cantidad, consulte la pantalla "Mostrar guía" en el <a href="/#/report/supplyPlanScoreCard">Informe del plan de suministro</a> o el Manual del usuario (<a href="https://fasp-qat.github.io/qat-documentation/es/docs/user/supply-planning-module-reports#stock-status-reports" target="_blank">Informes sobre el estado de las existencias</a> y el <a href="https://fasp-qat.github.io/qat-documentation/es/docs/user/annex-2-business-rules" target="_blank">Anexo 2</a>).</i>
+    </p>
+    <p>
+    Cada unidad de planificación se puede planificar por MOS o Cantidad, y el estado de sus existencias se determina según la configuración de la unidad de planificación. Los administradores del programa pueden actualizar la configuración "Proyectado Por" (MOS o Cantidad) en la pantalla "<a href="/#/dataset/planningUnitSetting">Configuraciones de Unidades de Planificación</a>".
+    </p>
+    <p>
+    <b>Codificación de colores del estado de existencias</b><br/>
+    Las celdas están codificadas por colores según el estado de las existencias mediante la codificación de colores que se muestra en la leyenda.
+    </p>
+    <ul>
+        <li><b>Planificado por MOS:</b> El estado de las existencias se determina comparando el MOS con el MOS Mínimo (ingresado por el usuario en la pantalla de Configuración de la Unidad de Planificación) y el MOS Máximo (calculado).</li>
+        <li><b>Planificado por cantidad:</b> El estado de las existencias se determina comparando la cantidad del "saldo final" con la cantidad mínima (ingresada por el usuario en la pantalla de configuración de la unidad de planificación) y la cantidad máxima (calculada).</li>
+    </ul>
+
+    <p>
+    <b>Consumo Mensual Promedio (AMC)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/AMC-Formula.png" alt="AMC Formula" />
+    <p>
+    *Considere sólo valores distintos de cero. Además, el mes actual está incluido en los meses para futuros del AMC.<br/>
+    Si el informe incluye varios programas o unidades de planificación, el AMC de los programas/unidades de planificación seleccionados se agregará (sumará) en una única cantidad total.
+    </p>
+
+    <p>
+    <b>Meses de Existencias (MOS)</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Month0fstock-Formula.png" alt="Months of Stock Formula" />
+    <p>
+    Si el informe incluye varios programas o unidades de planificación:<br/>
+    Meses de existencias = (suma del saldo final de los programas/unidades de planificación seleccionados / suma del AMC de los programas/unidades de planificación seleccionados)
+    </p>
+
+    <p>
+    <span class="formulastext-p">Ejemplo:</span><br/>
+    Programa A Saldo Final = 10,000<br/>
+    Programa A AMC =  2,500<br/>
+    Programa B Saldo Final = 6,000<br/>
+    Programa B AMC = 3,000<br/>
+    Programa C Saldo Final = 750<br/>
+    Programa C AMC = 250<br/>
+    <br/>
+    Meses de existencias = (10,000 + 6,000 + 750) / (2,500 + 3,000 + 250)<br/>
+    Meses de existencias = 2.91
+    </p>
+
+    <p>
+    <b>Min/Max Meses de existencias</b>
+    </p>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Min-Months-Of-Stock-formula.png" alt="Min MOS Formula" />
+    <br/>
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/Max-Months-Of-Stock-formula.png" alt="Max MOS Formula" />
+
+    <p>
+    Si el informe incluye múltiples programas o unidades de planificación,
+    </p>
+    <ul>
+        <li>MOS Mínimo Agregado = el promedio del MOS mínimo del programa seleccionado y unidades de planificación</li>
+        <li>MOS Máximo Agregado = el promedio del MOS máximo del programa seleccionado y unidades de planificación</li>
+    </ul>
+
+    <p>
+    <span class="formulastext-p">Ejemplo:</span><br/>
+    Programa A min MOS = 3<br/>
+    Programa A max MOS = 6<br/>
+    Programa B min MOS = 5<br/>
+    Programa B max MOS = 12<br/>
+    <br/>
+    Agregado mínimo MOS = Promedio (3, 5) = 4<br/>
+    Agregado máximo MOS = Promedio (6, 12) = 9
+    </p>
+
+    <p>
+    <b>Min/Max Cantidad</b><br/>
+    Cantidad mínima = definida por el usuario en la configuración del programa
+    </p>
+
+    <img class="formula-img-mr img-fluid" src="../ShowGuidanceFiles/img/MaxQty.png" alt="Max Quantity Formula" />
+
+    <p>
+    Tenga en cuenta que la cantidad máxima cambia por mes a medida que el AMC cambia por mes.
+    </p>
+
+    <p>
+    Si el informe incluye múltiples programas o unidades de planificación,
+    </p>
+    <ul>
+        <li>Cantidad Mínima Agregada = el promedio de la cantidad mínima de los programas y unidades de planificación seleccionados</li>
+        <li>Cantidad Máxima Agregada = el promedio de la cantidad máxima de los programas y unidades de planificación seleccionados</li>
+    </ul>
+    <p>
+    <span class="formulastext-p">Ejemplo:</span><br/>
+    Programa A Cantidad mínima = 3,000<br/>
+    Programa A Cantidad máxima = 6,000<br/>
+    Programa B Cantidad mínima = 5,000<br/>
+    Programa B Cantidad máxima = 12,000<br/>
+    <br/>
+    Cantidad Mínima Agregada = Promedio (3000, 5000) = 4000<br/>
+    Cantidad Máxima Agregada = Promedio (6000, 12000) = 9000
+    </p>
+
+    <p>
+    <b>Casilla de verificación de Mostrar la Cantidad</b><br/>
+    Si no está marcada (por defecto), las existencias se muestran por meses de existencias (MOS) para aquellas unidades planificadas por MOS y como cantidades para aquellas planificadas por cantidad. Si se selecciona, el inventario se muestra por cantidad, independientemente de la configuración de "Proyectado por". Cuando el inventario se muestra por cantidad, el valor representa el inventario principal o inventario proyectado disponible al final del mes.
+    </p>
+
+    <p>
+    <b>Casilla de verificación para mostrar icono</b><br/>
+    Si está marcado (predeterminado), se muestran los iconos de envío y caducidad. Se muestra un icono de envío para cada mes con uno (o más) envíos, sin incluir los envíos cancelados, retenidos o inactivos. Se muestra un icono de vencimiento para cada mes con un vencimiento proyectado.
+    </p>
+
+    <p>
+    <b>Casillas de Verificación de Retiro de Envíos</b><br/>
+    Estas casillas de verificación le permiten simular diferentes escenarios de stock excluyendo determinados envíos (p. ej., planificados, sin fondos) del inventario proyectado.
+    </p>
+    <ul>
+        <li>Si <b>ambas casillas están desmarcadas</b>, todos los envíos activos (Estado = Planificado, Enviado, Aprobado, Enviado, Entregado, Recibido, Retenido) se incluyen en el inventario proyectado (tanto Cantidad como MOS).</li>
+        <li>Si <b>"Eliminar envíos planificados" está marcado</b>, los envíos con estado = Planificado se eliminan de las proyecciones de existencias. Tenga en cuenta que, por definición, esto elimina todos los envíos pendientes de determinar (TBD), ya que los envíos pendientes siempre están en el estado Planificado.</li>
+        <li>Si <b>"Eliminar las fuentes de financiación TBD" está marcada</b>, los envíos con estado = TBD se eliminan de las proyecciones de stock.</li>
+    </ul>
+</div>
