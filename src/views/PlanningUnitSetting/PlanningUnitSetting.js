@@ -157,7 +157,7 @@ export default class PlanningUnitSetting extends Component {
                 var planningUnitValue = map.get("1");
                 var active = map.get("17");
                 if (planningUnitValue == value && y != i && i > y && active) {
-                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                     i = -1;
@@ -407,13 +407,13 @@ export default class PlanningUnitSetting extends Component {
                 var map = new Map(Object.entries(json[i]));
                 var planningUnitValue = map.get("1");
                 if (planningUnitValue == value && y != i) {
-                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "");
                     this.el.setStyle(col, "background-color", "yellow");
                     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                     // this.el.setValueFromCoords(11, y, 1, true);
                     i = -1;
                 } else {
-                    this.el.setStyle(col, "background-color", "transparent");
+                    this.el.setStyle(col, "background-color", "");
                     this.el.setComments(col, "");
                     // this.el.setValueFromCoords(11, y, 1, true);
                 }
