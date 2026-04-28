@@ -12942,7 +12942,7 @@ export default class BuildTree extends Component {
             if (itemConfig.payload.downwardAggregationAllowed) {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             } else if (itemConfig.payload.downwardAggregationList && itemConfig.payload.nodeType.id == 6) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.targetScenarioId == this.state.selectedScenario && (x.treeId != this.state.treeId || x.scenarioId != this.state.selectedScenario)).length > 0 ? true : false;
             }
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
@@ -13001,7 +13001,7 @@ export default class BuildTree extends Component {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             }
             if (itemConfig.payload.downwardAggregationList) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.targetScenarioId == this.state.selectedScenario && (x.treeId != this.state.treeId || x.scenarioId != this.state.selectedScenario)).length > 0 ? true : false;
             }
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{ height: "88px", width: "200px", zIndex: "1" }}>
