@@ -2464,24 +2464,21 @@ export default class StockStatusMatrix extends React.Component {
           const labels = Array.from(container.querySelectorAll("label"))
             .filter(l => !l.innerText.includes("(Select all)"));
 
-          // Extract value + element
-          const items = labels.map(label => {
-            const text = label.innerText.trim();
-
-            // Remove icons / symbols if any
-            const clean = text.replace(/[^\d.\-]/g, "");
-
-            return {
-              value: parseFloat(clean) || 0,
-              element: label
-            };
-          });
-
-          // 🔥 Sort numerically (ascending)
-          items.sort((a, b) => a.value - b.value);
-
-          // Clear and re-append
-          items.forEach(item => container.appendChild(item.element));
+          if (columnNumber === 0) {
+            labels.sort((a, b) => a.innerText.trim().localeCompare(b.innerText.trim(), undefined, { numeric: true, sensitivity: 'base' }));
+            labels.forEach(label => container.appendChild(label));
+          } else {
+            const items = labels.map(label => {
+              const text = label.innerText.trim();
+              const clean = text.replace(/[^\d.\-]/g, "");
+              return {
+                value: parseFloat(clean) || 0,
+                element: label
+              };
+            });
+            items.sort((a, b) => a.value - b.value);
+            items.forEach(item => container.appendChild(item.element));
+          }
 
         }, 0);
       },
@@ -2988,7 +2985,22 @@ export default class StockStatusMatrix extends React.Component {
       columnDrag: false,
       editable: false,
       license: JEXCEL_PRO_KEY,
-      onopenfilter: onOpenFilter,
+      onopenfilter: (worksheets, columnNumber, options) => {
+        if (columnNumber === 1) {
+          setTimeout(() => {
+            const container = document.querySelector(".jss_filters_options");
+            if (!container) return;
+            const labels = Array.from(container.querySelectorAll("label"));
+            const selectAll = labels.find(l => l.innerText.includes("(Select all)"));
+            const otherLabels = labels.filter(l => !l.innerText.includes("(Select all)"));
+            
+            otherLabels.sort((a, b) => a.innerText.trim().localeCompare(b.innerText.trim(), undefined, { numeric: true, sensitivity: 'base' }));
+            
+            if (selectAll) container.appendChild(selectAll);
+            otherLabels.forEach(label => container.appendChild(label));
+          }, 50);
+        }
+      },
       allowRenameColumn: false,
       filters: true,
       onload: (instance) => {
