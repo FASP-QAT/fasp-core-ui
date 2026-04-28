@@ -18209,6 +18209,18 @@ label.arrow_label:before {
   color: #000000 !important;
 }
 
+.select-menu-top .Select-menu-outer {
+  top: auto !important;
+  bottom: 100% !important;
+  border-bottom: none;
+  border-top: 1px solid #ccc;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 4px;
+  border-top-left-radius: 4px;
+  z-index: 9999 !important;
+}
+
 .MarginBtmformgroup {
   margin-top: -15px !important;
 }
