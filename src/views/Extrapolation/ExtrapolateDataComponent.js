@@ -2646,7 +2646,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                             var rangeValue2 = this.state.rangeValue1;
                             var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
                             var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
-
+                            var notNullConsumptionList = actualConsumptionListForPlanningUnitAndRegion.filter(c => (moment(c.month).format("YYYY-MM") >= moment(minDate).format("YYYY-MM")) && (moment(c.month).format("YYYY-MM") <= moment(maxDate).format("YYYY-MM"))).filter(c => c.puAmount != null)
+                            minDate = moment.min(notNullConsumptionList.map(d => moment(d.month))).format("YYYY-MM-DD");
+                            maxDate = moment.max(notNullConsumptionList.map(d => moment(d.month))).format("YYYY-MM-DD");
                             let curDate = minDate;
                             var inputDataMovingAvg = [];
                             var inputDataSemiAverage = [];
@@ -2968,6 +2970,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var consumptionExtrapolationList = datasetJson.consumptionExtrapolation;
                         for (var pu = 0; pu < listOfPlanningUnits.length; pu++) {
                             for (var r = 0; r < regionList.length; r++) {
+                                var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value);
                                 if (!this.state.missingTESAndARIMAFlag) {
                                     consumptionExtrapolationList = consumptionExtrapolationList.filter(c => c.planningUnit != undefined && (c.planningUnit.id != listOfPlanningUnits[pu].value || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id != regionList[r].value) || (c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value)));
                                 } else {
@@ -2989,6 +2992,9 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 var rangeValue2 = this.state.rangeValue1;
                                 var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
                                 var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
+                                var notNullConsumptionList = actualConsumptionListForPlanningUnitAndRegion.filter(c => (moment(c.month).format("YYYY-MM") >= moment(minDate).format("YYYY-MM")) && (moment(c.month).format("YYYY-MM") <= moment(maxDate).format("YYYY-MM"))).filter(c => c.puAmount != null)
+                                minDate = moment.min(notNullConsumptionList.map(d => moment(d.month))).format("YYYY-MM-DD");
+                                maxDate = moment.max(notNullConsumptionList.map(d => moment(d.month))).format("YYYY-MM-DD");
                                 var jsonDataSemiAvgFilter = this.state.jsonDataSemiAverage.filter(c => c.PlanningUnitId == listOfPlanningUnits[pu].value && c.regionId == regionList[r].value)
                                 if (jsonDataSemiAvgFilter.length > 0) {
                                     var jsonSemi = jsonDataSemiAvgFilter[0].data;
@@ -3707,6 +3713,8 @@ export default class ExtrapolateDataComponent extends React.Component {
             this.setState({
                 bulkExtrapolation: !this.state.bulkExtrapolation,
                 type:modalView
+            }, () => {
+                this.updateMinMaxDate();
             })
         } else if (modalView == 2) {
             this.setState({
@@ -3731,6 +3739,8 @@ export default class ExtrapolateDataComponent extends React.Component {
     handleRegionChange = (regionIds) => {
         this.setState({
             regionValues: regionIds.map(ele => ele),
+        }, () => {
+            this.updateMinMaxDate();
         })
     }
     /**
@@ -3742,7 +3752,38 @@ export default class ExtrapolateDataComponent extends React.Component {
         this.setState({
             planningUnitValues: planningUnitIds.map(ele => ele),
             missingPlanningUnitValues: planningUnitIds.map(ele => ele)
+        }, () => {
+            this.updateMinMaxDate();
         })
+    }
+    /**
+     * Updates the minimum and maximum date range based on the selected products (planning units and regions).
+     */
+    updateMinMaxDate = () => {
+        const { planningUnitValues, regionValues, datasetJson } = this.state;
+        const selectedPUIds = planningUnitValues.map(pu => pu.value);
+        const selectedRegionIds = regionValues.map(r => r.value);
+        if (selectedPUIds.length > 0 && selectedRegionIds.length > 0) {
+            const consumptionList = datasetJson.actualConsumptionList;
+            const filteredConsumption = consumptionList.filter(c =>
+                selectedPUIds.includes(c.planningUnit.id) &&
+                selectedRegionIds.includes(c.region.id)
+            );
+            if (filteredConsumption.length > 0) {
+                const months = filteredConsumption.map(c => moment(c.month));
+                const minMonth = moment.min(months);
+                const maxMonth = moment.max(months);
+                const newMin = { year: minMonth.year(), month: minMonth.month() + 1 };
+                const newMax = { year: maxMonth.year(), month: maxMonth.month() + 1 };
+                this.setState({
+                    minDate: newMin,
+                    maxDate: newMax,
+                    rangeValue1: { from: newMin, to: newMax }
+                }, () => {
+                    this.getDateDifference();
+                });
+            }
+        }
     }
     /**
      * Toggles info for confidence level
@@ -5357,6 +5398,37 @@ export default class ExtrapolateDataComponent extends React.Component {
                                         <ModalBody className="ModalBodyPadding">
                                             <div className="col-md-12">
                                                 <div className='row pt-lg-4 pb-lg-4'>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}<span className="red Reqasterisk">*</span></Label>
+                                                        <div className="controls">
+                                                            <MultiSelect
+                                                                name="planningUnit"
+                                                                id="planningUnit"
+                                                                bsSize="sm"
+                                                                value={this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues}
+                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
+                                                                options={this.state.missingTESAndARIMA ? (missingPlanningUnitMultiLists && missingPlanningUnitMultiLists.length > 0 ? missingPlanningUnitMultiLists : []) :
+                                                                    (planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : [])}
+                                                                labelledBy={i18n.t('static.mt.selectPlanninfUnit')}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                    <FormGroup className="col-md-6">
+                                                        <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
+                                                        <div className="controls ">
+                                                            <MultiSelect
+                                                                name="regionId2"
+                                                                id="regionId2"
+                                                                bsSize="sm"
+                                                                value={this.state.regionValues}
+                                                                onChange={(e) => { this.handleRegionChange(e) }}
+                                                                options={regionMultiLists && regionMultiLists.length > 0 ? regionMultiLists : []}
+                                                                labelledBy={i18n.t('static.common.regiontext')}
+                                                            />
+                                                        </div>
+                                                    </FormGroup>
+                                                </div>
+                                                <div className='row'>
                                                     <FormGroup className="col-md-7">
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                                         <div className="controls edit">
@@ -5396,37 +5468,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         </div>
                                                     </FormGroup>
                                                     }
-                                                </div>
-                                                <div className='row'>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="appendedInputButton">{i18n.t('static.procurementUnit.planningUnit')}<span className="red Reqasterisk">*</span></Label>
-                                                        <div className="controls">
-                                                            <MultiSelect
-                                                                name="planningUnit"
-                                                                id="planningUnit"
-                                                                bsSize="sm"
-                                                                value={this.state.missingTESAndARIMA ? this.state.missingPlanningUnitValues : this.state.planningUnitValues}
-                                                                onChange={(e) => { this.handlePlanningUnitChange(e) }}
-                                                                options={this.state.missingTESAndARIMA ? (missingPlanningUnitMultiLists && missingPlanningUnitMultiLists.length > 0 ? missingPlanningUnitMultiLists : []) :
-                                                                    (planningUnitMultiLists && planningUnitMultiLists.length > 0 ? planningUnitMultiLists : [])}
-                                                                labelledBy={i18n.t('static.mt.selectPlanninfUnit')}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
-                                                    <FormGroup className="col-md-6">
-                                                        <Label htmlFor="currencyId">{i18n.t('static.region.region')}<span class="red Reqasterisk">*</span></Label>
-                                                        <div className="controls ">
-                                                            <MultiSelect
-                                                                name="regionId2"
-                                                                id="regionId2"
-                                                                bsSize="sm"
-                                                                value={this.state.regionValues}
-                                                                onChange={(e) => { this.handleRegionChange(e) }}
-                                                                options={regionMultiLists && regionMultiLists.length > 0 ? regionMultiLists : []}
-                                                                labelledBy={i18n.t('static.common.regiontext')}
-                                                            />
-                                                        </div>
-                                                    </FormGroup>
                                                 </div>
                                             </div>
                                         </ModalBody>
