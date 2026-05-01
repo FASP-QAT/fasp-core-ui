@@ -229,6 +229,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             rSqdMovingAvg: "",
             wapeMovingAvg: "",
             monthsDiff: 0,
+            monthsDiffBulk: 0,
             rmseLinearReg: "",
             mapeLinearReg: "",
             mseLinearReg: "",
@@ -257,6 +258,9 @@ export default class ExtrapolateDataComponent extends React.Component {
             rangeValue1: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
             minDate: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
             maxDate: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
+            rangeValueBulk: { from: { year: Number(moment(startDate1).startOf('month').format("YYYY")), month: Number(moment(startDate1).startOf('month').format("M")) }, to: { year: Number(moment(endDate1).startOf('month').format("YYYY")), month: Number(moment(endDate1).startOf('month').format("M")) } },
+            minDateBulk: { year: new Date().getFullYear() - 10, month: new Date().getMonth() + 1 },
+            maxDateBulk: { year: new Date(endDate1).getFullYear(), month: new Date().getMonth() + 1 },
             popoverOpenD: false,
             popoverOpenMa: false,
             popoverOpenSa: false,
@@ -368,8 +372,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             arimaDisabled: ((event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!event.target.checked && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) && localStorage.getItem("sessionType") === "Online" ? false : true,
             dataChanged:true
         }, () => {
-            this.getDateDifference();
-            // this.handleRangeDissmiss2(this.state.rangeValue1)
+            this.getDateDifference(this.state.bulkExtrapolation || this.state.optimizeTESAndARIMA || this.state.missingTESAndARIMA);
         });
     }
     /**
@@ -736,8 +739,8 @@ export default class ExtrapolateDataComponent extends React.Component {
      * @param {object} value - The value object containing date range value.
      */
     handleRangeDissmiss2(value) {
-        this.setState({ rangeValue1: value }, () => {
-            this.getDateDifference()
+        this.setState({ rangeValueBulk: value }, () => {
+            this.getDateDifference(true)
             var regionList = this.state.regionList;
             var listOfPlanningUnits = this.state.planningUnitList;
             var test = false;
@@ -749,14 +752,14 @@ export default class ExtrapolateDataComponent extends React.Component {
                         var actualConsumptionListForPlanningUnitAndRegion = this.state.datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].planningUnit.id && c.region.id == regionList[i].regionId);
                         // var actualConsumptionListForPlanningUnitAndRegion = consumptionDataActual.filter(c => moment(c.month).format("YYYY-MM") >= moment(startDateFromRangeValue1).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(stopDateFromRangeValue1).format("YYYY-MM"));
                         if (this.state.optimizeTESAndARIMA) {
-                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24) //tes
-                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) //arima
+                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiffBulk >= 24) //tes
+                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiffBulk >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiffBulk >= 2)) //arima
                         } else {
-                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //movingAvg
-                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //semiAvg
-                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiff >= 3) //linearRegression
-                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiff >= 24) //tes
-                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiff >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiff >= 2)) //arima
+                            test = (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiffBulk >= 3) //movingAvg
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiffBulk >= 3) //semiAvg
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 3 && this.state.monthsDiffBulk >= 3) //linearRegression
+                                || (actualConsumptionListForPlanningUnitAndRegion.length >= 24 && this.state.monthsDiffBulk >= 24) //tes
+                                || ((this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 13 && this.state.monthsDiffBulk >= 13) || (!this.state.seasonality && actualConsumptionListForPlanningUnitAndRegion.length >= 2 && this.state.monthsDiffBulk >= 2)) //arima
                         }
                         if (test) {
                             regionObj.push(regionList[i])
@@ -2643,7 +2646,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                         if (actualConsumptionListForPlanningUnitAndRegion.length > 1) {
                             // let minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
                             // let maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-                            var rangeValue2 = this.state.rangeValue1;
+                            var rangeValue2 = this.state.rangeValueBulk;
                             var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
                             var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
                             var notNullConsumptionList = actualConsumptionListForPlanningUnitAndRegion.filter(c => (moment(c.month).format("YYYY-MM") >= moment(minDate).format("YYYY-MM")) && (moment(c.month).format("YYYY-MM") <= moment(maxDate).format("YYYY-MM"))).filter(c => c.puAmount != null)
@@ -3776,11 +3779,11 @@ export default class ExtrapolateDataComponent extends React.Component {
                 const newMin = { year: minMonth.year(), month: minMonth.month() + 1 };
                 const newMax = { year: maxMonth.year(), month: maxMonth.month() + 1 };
                 this.setState({
-                    minDate: newMin,
-                    maxDate: newMax,
-                    rangeValue1: { from: newMin, to: newMax }
+                    minDateBulk: newMin,
+                    maxDateBulk: newMax,
+                    rangeValueBulk: { from: newMin, to: newMax }
                 }, () => {
-                    this.getDateDifference();
+                    this.getDateDifference(true);
                 });
             }
         }
@@ -3812,14 +3815,20 @@ export default class ExtrapolateDataComponent extends React.Component {
     /**
      * Calculates the difference between selected date range
      */
-    getDateDifference() {
-        var rangeValue = this.state.rangeValue1;
+    getDateDifference(isBulk) {
+        var rangeValue = isBulk ? this.state.rangeValueBulk : this.state.rangeValue1;
         let startDate = moment(rangeValue.from.year + '-' + rangeValue.from.month + '-01').format("YYYY-MM");
         let endDate = moment(rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate()).format("YYYY-MM");
         const monthsDiff = moment(new Date(endDate)).diff(new Date(startDate), 'months', true);
-        this.setState({
-            monthsDiff: Math.round(monthsDiff) + 1
-        });
+        if (isBulk) {
+            this.setState({
+                monthsDiffBulk: Math.round(monthsDiff) + 1
+            });
+        } else {
+            this.setState({
+                monthsDiff: Math.round(monthsDiff) + 1
+            });
+        }
     }
     /**
      * Exports the data check data to a PDF file.
@@ -5433,20 +5442,20 @@ export default class ExtrapolateDataComponent extends React.Component {
                                                         <Label htmlFor="appendedInputButton">{i18n.t('static.extrapolation.dateRangeForHistoricData') + "    "}<i>(Forecast: {this.state.forecastProgramId != "" && makeText(rangeValue.from) + ' ~ ' + makeText(rangeValue.to)})</i> </Label>
                                                         <div className="controls edit">
                                                             <Picker
-                                                                years={{ min: this.state.minDate, max: this.state.maxDate }}
+                                                                years={{ min: this.state.minDateBulk, max: this.state.maxDateBulk }}
                                                                 ref={this.pickRange2}
-                                                                value={rangeValue1}
+                                                                value={this.state.rangeValueBulk}
                                                                 lang={pickerLang}
-                                                                key={JSON.stringify(rangeValue1)}
+                                                                key={JSON.stringify(this.state.rangeValueBulk)}
                                                                 onDismiss={this.handleRangeDissmiss2}
                                                             >
-                                                                <MonthBox value={makeText(rangeValue1.from) + ' ~ ' + makeText(rangeValue1.to)} onClick={this._handleClickRangeBox2} />
+                                                                <MonthBox value={makeText(this.state.rangeValueBulk.from) + ' ~ ' + makeText(this.state.rangeValueBulk.to)} onClick={this._handleClickRangeBox2} />
                                                             </Picker>
                                                         </div>
                                                     </FormGroup>
                                                     <FormGroup className="col-md-2">
                                                         <div style={{ marginTop: '28px' }}>
-                                                            <Label>{this.state.monthsDiff} {i18n.t('static.report.month')}</Label>
+                                                            <Label>{this.state.monthsDiffBulk} {i18n.t('static.report.month')}</Label>
                                                         </div>
                                                     </FormGroup>
                                                     {localStorage.getItem("sessionType") === "Online" && <FormGroup className="col-md-3">
