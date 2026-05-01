@@ -4039,10 +4039,11 @@ export default class BuildTree extends Component {
                 }
             }
             this.state.modelingEl.setValueFromCoords(9, i, calculatedChangeForMonth, true);
+            scalingTotal += parseFloat(calculatedChangeForMonth);
         }
         var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
         if (scalingDifference.length > 0) {
-            scalingTotal += scalingDifference[0].difference;
+            scalingTotal += parseFloat(scalingDifference[0].manualChange);
         }
         this.setState({ scalingTotal });
     }
@@ -4998,6 +4999,7 @@ export default class BuildTree extends Component {
                                 modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(this.state.currentItemConfig.context.id, 0, false);
+                                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
                             });
                         } else {
                             this.setState({
@@ -5250,7 +5252,9 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         }
-        this.setState({ showCalculatorFields: false });
+        this.setState({ showCalculatorFields: false }, () => {
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
+        });
     }
     /**
      * Accepts the value from the modeling calculator.
@@ -5341,6 +5345,7 @@ export default class BuildTree extends Component {
             document.getElementById("nodeValue").value = map1.get("9");
             this.handleAMonthDissmis1(json)
             this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"), 1)
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
         }
         );
     }
@@ -6353,7 +6358,9 @@ export default class BuildTree extends Component {
         }
         if (x != 11 && x != 9) {
             instance.setValueFromCoords(11, y, 1, true);
-            this.setState({ isChanged: true });
+            this.setState({ isChanged: true }, () => {
+                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
+            });
         }
         if (!this.state.modelingTabChanged) {
             this.setState({
@@ -6409,6 +6416,7 @@ export default class BuildTree extends Component {
         elInstance.insertRow(
             data, 0, 1
         );
+        this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
     };
     /**
      * Retrieves data from the payload based on the provided item configuration and type.
