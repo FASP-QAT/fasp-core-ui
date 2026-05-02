@@ -4040,10 +4040,11 @@ export default class BuildTree extends Component {
                 }
             }
             this.state.modelingEl.setValueFromCoords(9, i, calculatedChangeForMonth, true);
+            scalingTotal += parseFloat(calculatedChangeForMonth);
         }
         var scalingDifference = nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") == moment(date).format("YYYY-MM"));
         if (scalingDifference.length > 0) {
-            scalingTotal += scalingDifference[0].difference;
+            scalingTotal += parseFloat(scalingDifference[0].manualChange);
         }
         this.setState({ scalingTotal });
     }
@@ -4999,6 +5000,7 @@ export default class BuildTree extends Component {
                                 modelingChangedOrAdded: false
                             }, () => {
                                 this.calculateMOMData(this.state.currentItemConfig.context.id, 0, false);
+                                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
                             });
                         } else {
                             this.setState({
@@ -5251,7 +5253,9 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             }
         }
-        this.setState({ showCalculatorFields: false });
+        this.setState({ showCalculatorFields: false }, () => {
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
+        });
     }
     /**
      * Accepts the value from the modeling calculator.
@@ -5342,6 +5346,7 @@ export default class BuildTree extends Component {
             document.getElementById("nodeValue").value = map1.get("9");
             this.handleAMonthDissmis1(json)
             this.handleAMonthChange1(map1.get("8").split(" ")[1], moment(map1.get("8").split(" ")[0], "MMM").format("M"), 1)
+            this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
         }
         );
     }
@@ -6351,7 +6356,9 @@ export default class BuildTree extends Component {
         }
         if (x != 11 && x != 9) {
             instance.setValueFromCoords(11, y, 1, true);
-            this.setState({ isChanged: true });
+            this.setState({ isChanged: true }, () => {
+                this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
+            });
         }
         if (!this.state.modelingTabChanged) {
             this.setState({
@@ -6407,6 +6414,7 @@ export default class BuildTree extends Component {
         elInstance.insertRow(
             data, 0, 1
         );
+        this.filterScalingDataByMonth(this.state.scalingMonth.year + "-" + this.state.scalingMonth.month + "-01");
     };
     /**
      * Retrieves data from the payload based on the provided item configuration and type.
@@ -12937,7 +12945,7 @@ export default class BuildTree extends Component {
             if (itemConfig.payload.downwardAggregationAllowed) {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             } else if (itemConfig.payload.downwardAggregationList && itemConfig.payload.nodeType.id == 6) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.targetScenarioId == this.state.selectedScenario && (x.treeId != this.state.treeId || x.scenarioId != this.state.selectedScenario)).length > 0 ? true : false;
             }
             return connectDropTarget(connectDragSource(
                 (itemConfig.expanded ?
@@ -12996,7 +13004,7 @@ export default class BuildTree extends Component {
                 outerLink = sourceNodeUsageListCount.filter(x => x.treeId == this.state.treeId && x.scenarioId == this.state.selectedScenario).length == sourceNodeUsageListCount.length ? false : true
             }
             if (itemConfig.payload.downwardAggregationList) {
-                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.treeId == this.state.treeId && x.targetScenarioId == this.state.selectedScenario && x.scenarioId != this.state.selectedScenario).length > 0 ? true : false;
+                outerLink = itemConfig.payload.downwardAggregationList.filter(x => x.targetScenarioId == this.state.selectedScenario && (x.treeId != this.state.treeId || x.scenarioId != this.state.selectedScenario)).length > 0 ? true : false;
             }
             return (
                 <div className="ContactTemplate boxContactTemplate" title={itemConfig.payload.nodeDataMap[this.state.selectedScenario] != undefined ? itemConfig.payload.nodeDataMap[this.state.selectedScenario][0].notes : ''} style={{ height: "88px", width: "200px", zIndex: "1" }}>
