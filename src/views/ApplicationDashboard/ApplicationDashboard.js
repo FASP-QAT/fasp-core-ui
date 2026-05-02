@@ -92,6 +92,7 @@ class ApplicationDashboard extends Component {
     dt1.setMonth(dt1.getMonth() + REPORT_DATEPICKER_END_MONTH);
     this.state = {
       isDarkMode: false,
+      bottomSelectOpenTop: false,
       popoverOpenMa: false,
       id: this.props.match.params.id,
       dropdownOpen: false,
@@ -3874,10 +3875,19 @@ class ApplicationDashboard extends Component {
                         type="select"
                         name="bottomProgramId"
                         id="bottomProgramId"
-                        className="selectBlack MarginBtmformgroup"
+                        className={"selectBlack MarginBtmformgroup" + (this.state.bottomSelectOpenTop ? " select-menu-top" : "")}
                         value={this.state.bottomProgramId ? localStorage.getItem('sessionType') === 'Online' ? this.state.bottomProgramId : localStorage.getItem("bottomLocalProgram") == "false" ? "" : this.state.bottomProgramId : ""}
                         options={bottomProgramList}
                         onChange={(e) => { this.handleBottomProgramIdChange(e) }}
+                        onOpen={() => {
+                          const el = document.getElementById('bottomProgramId');
+                          if (el) {
+                            const rect = el.getBoundingClientRect();
+                            const spaceBelow = window.innerHeight - rect.bottom;
+                            this.setState({ bottomSelectOpenTop: spaceBelow < 250 });
+                          }
+                        }}
+                        onClose={() => { this.setState({ bottomSelectOpenTop: false }); }}
                         bsSize="sm"
                         required
                       />
