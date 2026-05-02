@@ -84,25 +84,17 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     }
 
     for (const [fy, entries] of Object.entries(fiscalBuckets)) {
-        let sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0, sum5 = 0, sum6 = 0;
+        let sums = new Array(entries[0].length).fill(0);
 
         for (const entry of entries) {
-            sum1 += parseFloat(entry[1]);
-            sum2 += parseFloat(entry[2]);
-            sum3 += parseFloat(entry[3]);
-            sum4 += parseFloat(entry[4]);
-            sum5 += parseFloat(entry[5]);
-            sum6 += parseFloat(entry[6]);
+            for (let i = 1; i < entry.length; i++) {
+                sums[i] += parseFloat(entry[i]) || 0;
+            }
         }
 
         result[fy] = [
             0,
-            sum1,
-            sum2,
-            sum3,
-            sum4,
-            sum5,
-            sum6,
+            ...sums.slice(1),
             entries.length
         ];
     }
@@ -115,10 +107,12 @@ const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
             filtered[y] = result[y];
         }
     }
+    const firstResult = Object.values(result)[0];
+    const placeholderLength = firstResult ? firstResult.length : (data.length > 0 ? data[0].length + 1 : 0);
     for (let y = parseInt(new Date(forecastStartDate).getFullYear()); y <= parseInt(new Date(forecastEndDate).getFullYear()); y++) {
         const yearStr = y.toString();
         if (!(yearStr in filtered)) {
-            filtered[yearStr] = ['', '', '', '', '', '']; // or some default placeholder
+            filtered[yearStr] = new Array(placeholderLength).fill('');
         }
     }
     return filtered;
@@ -534,14 +528,10 @@ class CompareAndSelectScenario extends Component {
             for (var tsl = 0; tsl < treeScenarioList.length; tsl++) {
                 if (treeScenarioList[tsl].type == "T") {
                     columns1.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
-                    if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
-                    }
+                    calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList[tsl].scenario.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                 } else {
                     columns1.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
-                    if (treeScenarioList[tsl].checked) {
-                        calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
-                    }
+                    calendarTableCol.push({ title: getLabelText(treeScenarioList[tsl].scenario.extrapolationMethod.label, this.state.lang), width: 100, type: treeScenarioList[tsl].checked ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
                 }
             }
             columns1.push({ title: i18n.t("static.compareAndSelect.totalAggregated"), width: 100, type: this.state.selectedTreeScenarioId.length > 1 ? 'numeric' : 'hidden', mask: '#,##.00', decimal: "." });
@@ -692,7 +682,7 @@ class CompareAndSelectScenario extends Component {
 
             for (var m = 0; m < monthArrayListWithoutFormat.length; m++) {
                 if(moment(monthArrayListWithoutFormat[m]) >= moment(this.state.forecastStartDate) && moment(monthArrayListWithoutFormat[m]) <= moment(this.state.forecastStopDate)){
-                    data1 = [];
+                    data1 = new Array(treeScenarioList.length + 1).fill("");
                     data1[0] = monthArrayListWithoutFormat[m];
                     var total = 0;
                     var count = 0;
