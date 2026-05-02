@@ -1370,10 +1370,10 @@ export default class ListTreeComponent extends Component {
                     if (planningUnitList.filter(x => x.treeForecast == true && x.active == true && x.planningUnit.id == puNodeList[i].payload.nodeDataMap[scenarioList[s].id][0].puNode.planningUnit.id).length == 0) {
                         var parentNodeData = treeTemplate.flatList.filter(x => x.id == puNodeList[i].parent)[0];
                         var productCategory = "";
-                        productCategory = parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.productCategory;
+                        productCategory = (parentNodeData != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id] != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit != undefined) ? parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.productCategory : undefined;
                         if (productCategory == undefined) {
                             var forecastingUnit = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.id);
-                            productCategory = forecastingUnit[0].productCategory;
+                            productCategory = forecastingUnit.length > 0 ? forecastingUnit[0].productCategory : { label: { label_en: "" } };
                         }
                         let existingPU = planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[scenarioList[s].id][0].puNode.planningUnit.id);
                         if (existingPU.length > 0) {
