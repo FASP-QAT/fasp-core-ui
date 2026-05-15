@@ -200,12 +200,12 @@ class CompareAndSelectScenario extends Component {
             singleValue2: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             singleValue3: { from: { year: dt.getFullYear(), month: dt.getMonth() + 1 }, to: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 } },
             maxDateForSingleValue: { year: new Date().getFullYear() + 10, month: new Date().getMonth() + 1 },
-            showForecastPeriod: false,
+            showForecastPeriod: localStorage.getItem("sesShowForecastPeriod") != null ? (localStorage.getItem("sesShowForecastPeriod") == 'true') : false,
             treeScenarioList: [],
             actualConsumptionListForMonth: [],
             changed: false,
             dataChangedFlag: 0,
-            showFits: false,
+            showFits: localStorage.getItem("sesShowFits") != null ? (localStorage.getItem("sesShowFits") == 'true') : false,
             minActualMonth: '',
             maxActualMonth: '',
             xAxisDisplayBy: 1,
@@ -273,6 +273,10 @@ class CompareAndSelectScenario extends Component {
         var checked = e.target.checked;
         var stopDate = this.state.singleValue2.to.year + '-' + this.state.singleValue2.to.month + '-' + new Date(this.state.singleValue2.to.year, this.state.singleValue2.to.month, 0).getDate();
         if (e.target.name == "showForecastPeriod") {
+            localStorage.setItem("sesShowForecastPeriod", checked);
+            if (checked) {
+                localStorage.setItem("sesShowFits", false);
+            }
             this.setState({
                 xAxisDisplayBy: 1,
                 showForecastPeriod: checked,
@@ -283,6 +287,10 @@ class CompareAndSelectScenario extends Component {
                 this.setMonth1List()
             })
         } else if (e.target.name == "showFits") {
+            localStorage.setItem("sesShowFits", checked);
+            if (checked) {
+                localStorage.setItem("sesShowForecastPeriod", false);
+            }
             this.setState({
                 showFits: checked,
                 minDate: checked ? this.state.minDate : { year: Number(moment(this.state.actualMinDate).startOf('month').format("YYYY")), month: Number(moment(this.state.actualMinDate).startOf('month').format("M")) },
