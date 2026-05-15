@@ -1581,18 +1581,34 @@ class VersionSettingsComponent extends Component {
                 <h5 className={this.props.match.params.color} id="div1">{i18n.t(this.props.match.params.message, { entityname })}</h5>
                 <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
                 <Card style={{ display: !this.state.syncPrograms ? "block" : "none" }}>
-                    <div className="card-header-actions">
-                        <div className="Card-header-reporticon">
-                            {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrow"> <i className="cui-arrow-left icons " > </i></span>}
-                            <span className="compareAndSelect-rarrow"> <i className="cui-arrow-right icons " > </i></span>
-                            {localStorage.getItem('sessionType') === 'Online' && <span className="compareAndSelect-larrowText"> {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a></span>}
-                            <span className="compareAndSelect-rarrowText"> {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a></span><br />
+                    <div style={{ padding: '10px 20px 5px 20px' }}>
+                        {/* Main navigation row */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            {/* Left side: Back link */}
+                            <div style={{ display: 'flex', alignItems: 'center', visibility: localStorage.getItem('sessionType') === 'Online' ? 'visible' : 'hidden' }}>
+                                <span className="compareAndSelect-larrow" style={{ float: 'none', marginTop: 0, marginRight: '5px' }}>
+                                    <i className="cui-arrow-left icons"></i>
+                                </span>
+                                <span className="compareAndSelect-larrowText" style={{ float: 'none' }}>
+                                    {i18n.t('static.common.backTo')} <a href="/#/dataSet/listDataSet" className="supplyplanformulas">{i18n.t('static.dataset.manageProgramInfo')}</a>
+                                </span>
+                            </div>
+                            {/* Right side: Continue link */}
+                            <div style={{ display: 'flex', alignItems: 'center', marginLeft: 'auto' }}>
+                                <span className="compareAndSelect-rarrowText" style={{ float: 'none', marginRight: '5px' }}>
+                                    {i18n.t('static.common.continueTo')} <a href="/#/planningUnitSetting/listPlanningUnitSetting" className="supplyplanformulas">{i18n.t('static.updatePlanningUnit.updatePlanningUnit')}</a>
+                                </span>
+                                <span className="compareAndSelect-rarrow" style={{ float: 'none', marginTop: 0 }}>
+                                    <i className="cui-arrow-right icons"></i>
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                    <div className="card-header-actions">
-                        <div className="card-header-action pr-lg-4">
-                            <a style={{ float: 'right' }}>
-                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}><small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small></span>
+                        {/* Guidance row */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '5px' }}>
+                            <a>
+                                <span style={{ cursor: 'pointer' }} onClick={() => { this.toggleShowGuidance() }}>
+                                    <small className="supplyplanformulas">{i18n.t('static.common.showGuidance')}</small>
+                                </span>
                             </a>
                         </div>
                     </div>
