@@ -18518,3 +18518,17 @@ label.arrow_label:before {
 #stockMatrixTableDiv .jss_content table tbody tr:nth-of-type(even) td:nth-child(2) {
   background-color: #fff !important;
 }
+[data-theme="dark"] #stockMatrixTableDiv .jss_content table thead tr td:nth-child(2) {
+  background-color: #212631 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] #stockMatrixTableDiv .jss_content table tbody tr:nth-of-type(odd) td:nth-child(2) {
+  background-color: #212631 !important;
+  color: #fff !important;
+}
+
+[data-theme="dark"] #stockMatrixTableDiv .jss_content table tbody tr:nth-of-type(even) td:nth-child(2) {
+  background-color: #373c46 !important;
+  color: #fff !important;
+}

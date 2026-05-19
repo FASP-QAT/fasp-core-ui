@@ -4652,11 +4652,11 @@ export default class BuildTree extends Component {
     /**
      * Displays the MOM data for the current node or its parent node.
      */
-    showMomData() {
+    showMomData(forceShow) {
         var getMomDataForCurrentNode = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.id)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : [];
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2 && this.state.currentItemConfig.context.payload.nodeType.id != 6) {
             var getMomDataForCurrentNodeParent = this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent).length > 0 ? this.state.items.filter(x => x.id == this.state.currentItemConfig.context.parent)[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList : []
-            this.setState({ showMomDataPercent: !this.state.showMomDataPercent, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
+            this.setState({ showMomDataPercent: forceShow != undefined ? forceShow : !this.state.showMomDataPercent, showMomData: false, momListPer: getMomDataForCurrentNode, momListPerParent: getMomDataForCurrentNodeParent }, () => {
                 if (this.state.showMomDataPercent) {
                     this.setState({ viewMonthlyData: false }, () => {
                         this.buildMomJexcelPercent();
@@ -4666,7 +4666,7 @@ export default class BuildTree extends Component {
                 }
             });
         } else {
-            this.setState({ showMomDataPercent: false, showMomData: !this.state.showMomData, momList: getMomDataForCurrentNode }, () => {
+            this.setState({ showMomDataPercent: false, showMomData: forceShow != undefined ? forceShow : !this.state.showMomData, momList: getMomDataForCurrentNode }, () => {
                 if (this.state.showMomData) {
                     this.setState({ viewMonthlyData: false }, () => {
                         this.buildMomJexcel();
@@ -9024,7 +9024,7 @@ export default class BuildTree extends Component {
             this.setState({ isValidError: isValid });
             if (this.state.currentItemConfig.context.payload.nodeType.id == 1 || this.state.currentItemConfig.context.payload.nodeType.id == 6) {
                 if (tab == 2) {
-                    this.showMomData();
+                    this.showMomData(true);
                 }
             }
             if (tab == 3) {
