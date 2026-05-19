@@ -2850,6 +2850,7 @@
   "static.supplyPlan.projectedBalance": "Balanço projetado",
   "static.stockStatus.openingBalanceTooltipSingleProgram": "Igual ao saldo final do mês anterior. Em negrito se houver uma contagem de inventário real no mês anterior",
   "static.quantimed.duplicateQATPlanningUnit": "Unidade de planeamento QAT duplicada",
+  "static.shipment.noData": "Não há dados de embarque disponíveis para esta unidade de planejamento durante o período de relatório selecionado.",
   "static.common.networkError": "Falha porque a conexão com a internet está instável. Por favor, tente novamente.",
   "static.loadDelDataset.changesNotSaved": "As alterações não são salvas ainda. Você deseja excluir esta versão?",
   "static.shipmentDetailHead.shipmentDetail": "Dados de embarque",
