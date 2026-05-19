@@ -2850,6 +2850,7 @@
   "static.supplyPlan.projectedBalance": "Solde projeté",
   "static.stockStatus.openingBalanceTooltipSingleProgram": "Égal au solde final du mois précédent. En gras s`il y a un inventaire réel au cours du mois précédent",
   "static.quantimed.duplicateQATPlanningUnit": "Produit QAT en double trouvé",
+  "static.shipment.noData": "Aucune donnée d'expédition n'est disponible pour cette unité de planification au cours de la période de rapport sélectionnée.",
   "static.common.networkError": "Échec car la connexion Internet est instable. Veuillez réessayer.",
   "static.loadDelDataset.changesNotSaved": "Les modifications ne sont pas enregistrées. Souhaitez-vous supprimer cette version ? ",
   "static.shipmentDetailHead.shipmentDetail": "Données d`envois",

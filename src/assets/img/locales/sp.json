@@ -2850,6 +2850,7 @@
   "static.supplyPlan.projectedBalance": "Stock proyectado",
   "static.stockStatus.openingBalanceTooltipSingleProgram": "Equivale a los stocks finales del mes anterior. Se muestra en negrita si hay un conteo de inventario real en el mes anterior",
   "static.quantimed.duplicateQATPlanningUnit": "Producto QAT duplicado",
+  "static.shipment.noData": "No hay datos de envío disponibles para esta unidad de planificación durante el período del informe seleccionado.",
   "static.common.networkError": "Falló porque la conexión a internet es inestable. Inténtalo de nuevo.",
   "static.loadDelDataset.changesNotSaved": "Los cambios no se han guardado, ¿quiere borrar esta versión?",
   "static.shipmentDetailHead.shipmentDetail": "Datos de pedidos",
