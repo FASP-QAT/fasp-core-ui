@@ -2850,6 +2850,7 @@
   "static.supplyPlan.projectedBalance": "Projected balance",
   "static.stockStatus.openingBalanceTooltipSingleProgram": "Equal to the previous month’s Ending Balance. Bolded if there is an actual inventory count in the previous month",
   "static.quantimed.duplicateQATPlanningUnit": "Duplicate QAT Planning Unit",
+  "static.shipment.noData": "There is no available shipment data for this planning unit during the selected report period.",
   "static.common.networkError": "Failed because internet connection is unstable. Please try again.",
   "static.loadDelDataset.changesNotSaved": "Changes are not saved still do you want to delete this version.",
   "static.shipmentDetailHead.shipmentDetail": "Shipment Data",
