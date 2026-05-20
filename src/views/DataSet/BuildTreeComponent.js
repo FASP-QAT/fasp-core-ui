@@ -11034,12 +11034,12 @@ export default class BuildTree extends Component {
                                                         {this.state.level0 &&
                                                             <>
                                                                 <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
                                                                         <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-4">
-                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2_5" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
                                                                         name="parent"
                                                                         bsSize="sm"
@@ -11052,12 +11052,12 @@ export default class BuildTree extends Component {
                                                                 </FormGroup>
                                                             </>}
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3_5" trigger="hover" toggle={this.toggleNodeTitle}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3_5" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="nodeTitle"
                                                                 name="nodeTitle"
@@ -11071,7 +11071,7 @@ export default class BuildTree extends Component {
                                                             <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4_5" trigger="hover" toggle={this.toggleNodeType}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                                             </Popover>
                                                         </div>
@@ -11082,7 +11082,7 @@ export default class BuildTree extends Component {
                                                             value={JSON.stringify(errors) != '{}'}
                                                         />
                                                         <FormGroup className={"col-md-4"}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4_5" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input
                                                                 type="select"
                                                                 id="nodeTypeId"
@@ -11128,12 +11128,12 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6_5" trigger="hover" toggle={this.toggleParentValue}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} in {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} in {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6_5" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="parentValue"
                                                                 name="parentValue"
@@ -11155,12 +11155,12 @@ export default class BuildTree extends Component {
                                                             ></Input>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5_5" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                                                 <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5_5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <InputGroup>
                                                                 <Input type="number"
                                                                     id="percentageOfParent"
@@ -11181,12 +11181,12 @@ export default class BuildTree extends Component {
                                                             </InputGroup>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7_5" trigger="hover" toggle={this.toggleNodeValue}>
                                                                 <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7_5" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="nodeValue"
                                                                 name="nodeValue"
