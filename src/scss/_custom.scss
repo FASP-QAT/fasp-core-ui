@@ -3895,6 +3895,16 @@ body {
     color: #e4e5e6 !important;
   }
 
+  .FreezePlaningUnitColumn1 .jss>tbody>tr>td:nth-child(2).readonly,
+  .FreezePlaningUnitColumn1New .jss>tbody>tr>td:nth-child(2).readonly {
+    width: 200px !important;
+    left: 0 !important;
+    z-index: 2 !important;
+    position: sticky !important;
+    background: #cfcdc9 !important;
+    color: #212721 !important;
+  }
+
   .react-confirm-alert-body>h1 {
     margin-top: 0;
     color: #e4e5e6 !important;
@@ -18328,6 +18338,24 @@ label.arrow_label:before {
   background-color: #00000010;
   background-origin: content-box;
   z-index: 999 !important;
+}
+
+.FreezePlaningUnitColumn1,
+.FreezePlaningUnitColumn1New {
+  .jss_border_main,
+  .jss_corner {
+    z-index: 1 !important;
+  }
+  .jss_content:has(td:nth-child(2).highlight) .jss_border_main,
+  .jss_content:has(td:nth-child(2).highlight) .jss_corner,
+  .jss_content:has(td:nth-child(3).highlight) .jss_border_main,
+  .jss_content:has(td:nth-child(3).highlight) .jss_corner,
+  .jss_content:has(td:nth-child(2).jss_cursor) .jss_border_main,
+  .jss_content:has(td:nth-child(2).jss_cursor) .jss_corner,
+  .jss_content:has(td:nth-child(3).jss_cursor) .jss_border_main,
+  .jss_content:has(td:nth-child(3).jss_cursor) .jss_corner {
+    z-index: 999 !important;
+  }
 }
 
 .jss_corner {
