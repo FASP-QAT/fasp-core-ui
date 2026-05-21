@@ -4,7 +4,7 @@ import moment from 'moment';
 import React, { Component } from 'react';
 import 'react-bootstrap-table/dist/react-bootstrap-table-all.min.css';
 import { Search } from 'react-bootstrap-table2-toolkit';
-import { Card, CardBody } from 'reactstrap';
+import { CardBody } from 'reactstrap';
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction, loadedForNonEditableTables } from '../../CommonComponent/JExcelCommonFunctions.js';
