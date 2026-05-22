@@ -3888,6 +3888,7 @@ class ApplicationDashboard extends Component {
                           }
                         }}
                         onClose={() => { this.setState({ bottomSelectOpenTop: false }); }}
+                        scrollMenuIntoView={false}
                         bsSize="sm"
                         required
                       />
