@@ -319,8 +319,8 @@ export default class ListTreeComponent extends Component {
      * Function to build a jexcel table.
      * Constructs and initializes a jexcel table using the provided data and options.
      */
-    buildMissingPUJexcel() {
-        if (localStorage.getItem('sessionType') === 'Online') {
+    buildMissingPUJexcel(skipApiCall) {
+        if (!skipApiCall && localStorage.getItem('sessionType') === 'Online') {
             this.getPlanningUnitWithPricesByIds();
         }
         var missingPUList = this.state.missingPUList;
@@ -364,7 +364,7 @@ export default class ListTreeComponent extends Component {
             columns: [
                 {
                     title: i18n.t('static.productCategory.productCategory'),
-                    type: 'test',
+                    type: 'text',
                     editable: false,
                     readOnly: true
                 },
@@ -1243,8 +1243,24 @@ export default class ListTreeComponent extends Component {
         PlanningUnitService.getPlanningUnitWithPricesByIds(this.state.missingPUList.map(ele => (ele.planningUnit.id).toString()))
             .then(response => {
                 var listArray = response.data;
+                var missingPUList = this.state.missingPUList;
+                var needsRebuild = false;
+                for (var m = 0; m < missingPUList.length; m++) {
+                    if (missingPUList[m].productCategory == undefined || missingPUList[m].productCategory.id == undefined || missingPUList[m].productCategory.id === "") {
+                        var puObj = listArray.filter(c => c.planningUnitId == missingPUList[m].planningUnit.id);
+                        if (puObj.length > 0 && puObj[0].forecastingUnit != undefined && puObj[0].forecastingUnit.productCategory != undefined) {
+                            missingPUList[m].productCategory = puObj[0].forecastingUnit.productCategory;
+                            needsRebuild = true;
+                        }
+                    }
+                }
                 this.setState({
-                    planningUnitObjList: response.data
+                    planningUnitObjList: response.data,
+                    missingPUList: missingPUList
+                }, () => {
+                    if (needsRebuild) {
+                        this.buildMissingPUJexcel(true);
+                    }
                 });
             }).catch(
                 error => {
@@ -1372,8 +1388,12 @@ export default class ListTreeComponent extends Component {
                         var productCategory = "";
                         productCategory = (parentNodeData != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id] != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit != undefined) ? parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.productCategory : undefined;
                         if (productCategory == undefined) {
-                            var forecastingUnit = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.id);
-                            productCategory = forecastingUnit.length > 0 ? forecastingUnit[0].productCategory : { label: { label_en: "" } };
+                            if (parentNodeData != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id] != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode != undefined && parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit != undefined) {
+                                var forecastingUnit = this.state.forecastingUnitList.filter(c => c.forecastingUnitId == parentNodeData.payload.nodeDataMap[scenarioList[s].id][0].fuNode.forecastingUnit.id);
+                                productCategory = forecastingUnit.length > 0 ? forecastingUnit[0].productCategory : { label: { label_en: "" } };
+                            } else {
+                                productCategory = { label: { label_en: "" } };
+                            }
                         }
                         let existingPU = planningUnitList.filter(x => x.planningUnit.id == puNodeList[i].payload.nodeDataMap[scenarioList[s].id][0].puNode.planningUnit.id);
                         if (existingPU.length > 0) {
