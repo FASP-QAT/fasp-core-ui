@@ -2173,7 +2173,6 @@ export default class ExtrapolateDataComponent extends React.Component {
                 var monthArray = [];
                 var curDate1 = startDate1;
                 var monthsForMovingAverage = this.state.monthsForMovingAverage;
-                console.log("consumptionExtrapolationList1", consumptionExtrapolationList)
                 var consumptionExtrapolationSemiAvg = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 6)
                 var consumptionExtrapolationMovingData = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 7)
                 var consumptionExtrapolationRegression = consumptionExtrapolationList.filter(c => c.extrapolationMethod.id == 5)
@@ -2992,7 +2991,7 @@ export default class ExtrapolateDataComponent extends React.Component {
                                 // var actualConsumptionListForPlanningUnitAndRegion = datasetJson.actualConsumptionList.filter(c => c.planningUnit.id == listOfPlanningUnits[pu].value && c.region.id == regionList[r].value);
                                 // var minDate = moment.min(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
                                 // var maxDate = moment.max(actualConsumptionListForPlanningUnitAndRegion.filter(c => c.puAmount >= 0).map(d => moment(d.month)));
-                                var rangeValue2 = this.state.rangeValue1;
+                                var rangeValue2 = this.state.rangeValueBulk;
                                 var minDate = rangeValue2.from.year + '-' + rangeValue2.from.month + '-01';
                                 var maxDate = rangeValue2.to.year + '-' + rangeValue2.to.month + '-' + new Date(rangeValue2.to.year, rangeValue2.to.month, 0).getDate();
                                 var notNullConsumptionList = actualConsumptionListForPlanningUnitAndRegion.filter(c => (moment(c.month).format("YYYY-MM") >= moment(minDate).format("YYYY-MM")) && (moment(c.month).format("YYYY-MM") <= moment(maxDate).format("YYYY-MM"))).filter(c => c.puAmount != null)
@@ -3731,7 +3730,7 @@ export default class ExtrapolateDataComponent extends React.Component {
             })
         }
         if (flag) {
-            this.handleRangeDissmiss2(this.state.rangeValue1)
+            this.handleRangeDissmiss2(this.state.rangeValueBulk)
         }
     }
     /**
@@ -3778,10 +3777,21 @@ export default class ExtrapolateDataComponent extends React.Component {
                 const maxMonth = moment.max(months);
                 const newMin = { year: minMonth.year(), month: minMonth.month() + 1 };
                 const newMax = { year: maxMonth.year(), month: maxMonth.month() + 1 };
+                // Preserve user's selected rangeValueBulk — only clamp it to stay within the new bounds.
+                // Do NOT reset rangeValueBulk to newMin/newMax; that would overwrite the user's date selection.
+                const currentRange = this.state.rangeValueBulk;
+                const clampedFrom = (
+                    currentRange.from.year < newMin.year ||
+                    (currentRange.from.year === newMin.year && currentRange.from.month < newMin.month)
+                ) ? newMin : currentRange.from;
+                const clampedTo = (
+                    currentRange.to.year > newMax.year ||
+                    (currentRange.to.year === newMax.year && currentRange.to.month > newMax.month)
+                ) ? newMax : currentRange.to;
                 this.setState({
                     minDateBulk: newMin,
                     maxDateBulk: newMax,
-                    rangeValueBulk: { from: newMin, to: newMax }
+                    rangeValueBulk: { from: clampedFrom, to: clampedTo }
                 }, () => {
                     this.getDateDifference(true);
                 });

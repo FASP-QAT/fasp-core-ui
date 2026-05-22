@@ -82,7 +82,7 @@ const validationSchemaNodeData = function (values) {
         percentageOfParent: Yup.string()
             .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
-                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
+                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,10}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
                         return false;
                     } else {

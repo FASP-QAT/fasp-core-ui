@@ -134,7 +134,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 }
             }
         }
-        suggestedOrd=Math.round(Number(suggestedOrd));
+        suggestedOrd = Math.round(Number(suggestedOrd));
         if (suggestShipment) {
             if (suggestedOrd <= 0) {
             } else {
@@ -164,11 +164,11 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 var curUser = AuthenticationService.getLoggedInUserId();
                 var username = AuthenticationService.getLoggedInUsername();
                 var rcpu = props.state.realmCountryPlanningUnitListAll.filter(c => c.multiplier == 1 && c.planningUnit.id == planningUnitId)[0];
-                var shipmentBudgetList=generalProgramJson.shipmentBudgetList;
-                if(shipmentBudgetList==undefined){
-                    shipmentBudgetList=[];
+                var shipmentBudgetList = generalProgramJson.shipmentBudgetList;
+                if (shipmentBudgetList == undefined) {
+                    shipmentBudgetList = [];
                 }
-                var tempShipmentId=planningUnitId.toString().concat(shipmentList.length);
+                var tempShipmentId = planningUnitId.toString().concat(shipmentList.length);
                 var shipmentJson = {
                     accountFlag: true,
                     active: true,
@@ -225,7 +225,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     expectedDeliveryDate: curDate,
                     receivedDate: null,
                     index: shipmentList.length,
-                    tempShipmentId:tempShipmentId,
+                    tempShipmentId: tempShipmentId,
                     batchInfoList: [],
                     orderNo: "",
                     createdBy: {
@@ -241,12 +241,12 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     isAddedViaScenario: true
                 }
                 shipmentBudgetList.push({
-                    shipmentId:0,
-                    tempShipmentId:tempShipmentId,
-                    shipmentAmt:Number(productCost)+Number(freightCost),
-                    budgetId:props.state.budgetIdSingle == "undefined" || props.state.budgetIdSingle == undefined || props.state.budgetIdSingle == "" ? '' : b.budgetId,
-                    currencyId:c.currencyId,
-                    conversionRateToUsd:c.conversionRateToUsd
+                    shipmentId: 0,
+                    tempShipmentId: tempShipmentId,
+                    shipmentAmt: Number(productCost) + Number(freightCost),
+                    budgetId: props.state.budgetIdSingle == "undefined" || props.state.budgetIdSingle == undefined || props.state.budgetIdSingle == "" ? '' : b.budgetId,
+                    currencyId: c.currencyId,
+                    conversionRateToUsd: c.conversionRateToUsd
                 })
                 var expectedDeliveryDate = moment(curDate).format("YYYY-MM-DD");
                 var createdDate = expectedDeliveryDate;
@@ -281,7 +281,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                 programJson.batchInfoList = batchInfoList;
                 shipmentList.push(shipmentJson);
                 programJson.shipmentList = shipmentList;
-                generalProgramJson.shipmentBudgetList=shipmentBudgetList;
+                generalProgramJson.shipmentBudgetList = shipmentBudgetList;
                 var coreBatchDetails = programJson.batchInfoList;
                 var supplyPlanData = programJson.supplyPlan;
                 if (supplyPlanData == undefined) {
@@ -400,7 +400,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var approvedShipmentsTotalData = 0;
                     var submittedShipmentsTotalData = 0;
                     var plannedShipmentsTotalData = 0;
-                                    var plannedShipmentsTotalWtbdData = 0;
+                    var plannedShipmentsTotalWtbdData = 0;
                     var onholdShipmentsTotalData = 0;
                     var erpTotalQty = 0;
                     var receivedErpShipmentsTotalData = 0;
@@ -408,7 +408,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                     var approvedErpShipmentsTotalData = 0;
                     var submittedErpShipmentsTotalData = 0;
                     var plannedErpShipmentsTotalData = 0;
-                                    var plannedErpShipmentsTotalWtbdData = 0;
+                    var plannedErpShipmentsTotalWtbdData = 0;
                     var onholdErpShipmentsTotalData = 0;
                     var shipmentBatchQtyTotal = 0;
                     var shipmentBatchQtyTotalWps = 0;
@@ -436,9 +436,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 submittedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                             } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                                 plannedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                            plannedShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
-                                                        }
+                                if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                    plannedShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
+                                }
                             } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                 onholdShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                             }
@@ -454,9 +454,9 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                                 submittedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                             } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
                                 plannedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                            plannedErpShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
-                                                        }
+                                if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                    plannedErpShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
+                                }
                             } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
                                 onholdErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                             }
@@ -744,7 +744,7 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         if (inventoryListForRegionFilter.length == totalNoOfRegions) {
                             var stock = 0;
                             inventoryListForRegionFilter.map(item => {
-                                stock += Number(item.actualQty)*Number(item.multiplier)
+                                stock += Number(item.actualQty) * Number(item.multiplier)
                             })
                             var batchQty = 0;
                             var batchInfoList = batchInventoryListFilter[0].batchList;
@@ -786,305 +786,305 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         }
                     }
                     myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
-                    if(useInventoryCalculations){
-                        for(var a=0;a<myArray.length;a++){
-                            var batchListForInventory=batchInventoryListFilter[0].batchList.filter(c=>c.batch.batchNo==myArray[a].batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(myArray[a].expiryDate).format("YYYY-MM"));
-                            myArray[a].closingBalance=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0;
-                            myArray[a].closingBalanceWps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                            myArray[a].closingBalanceWtbdps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                            myArray[a].qty=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0;
-                            myArray[a].qtyWps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                            myArray[a].qtyWtbdps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                            myArray[a].unallocatedFEFO=0;
-                            myArray[a].unallocatedFEFOWps=0;
-                            myArray[a].unallocatedFEFOWtbdps=0;
-                            myArray[a].unallocatedLEFO=0;
-                            myArray[a].unallocatedLEFOWps=0;
-                            myArray[a].unallocatedLEFOWtbdps=0;
-                            myArray[a].calculatedFEFO=0;
-                            myArray[a].calculatedFEFOWps=0;
-                            myArray[a].calculatedFEFOWtbdps=0;
-                            myArray[a].calculatedLEFO=0;
-                            myArray[a].calculatedLEFOWps=0;
-                            myArray[a].calculatedLEFOWtbdps=0;
+                    if (useInventoryCalculations) {
+                        for (var a = 0; a < myArray.length; a++) {
+                            var batchListForInventory = batchInventoryListFilter[0].batchList.filter(c => c.batch.batchNo == myArray[a].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(myArray[a].expiryDate).format("YYYY-MM"));
+                            myArray[a].closingBalance = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0;
+                            myArray[a].closingBalanceWps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                            myArray[a].closingBalanceWtbdps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                            myArray[a].qty = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0;
+                            myArray[a].qtyWps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                            myArray[a].qtyWtbdps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                            myArray[a].unallocatedFEFO = 0;
+                            myArray[a].unallocatedFEFOWps = 0;
+                            myArray[a].unallocatedFEFOWtbdps = 0;
+                            myArray[a].unallocatedLEFO = 0;
+                            myArray[a].unallocatedLEFOWps = 0;
+                            myArray[a].unallocatedLEFOWtbdps = 0;
+                            myArray[a].calculatedFEFO = 0;
+                            myArray[a].calculatedFEFOWps = 0;
+                            myArray[a].calculatedFEFOWtbdps = 0;
+                            myArray[a].calculatedLEFO = 0;
+                            myArray[a].calculatedLEFOWps = 0;
+                            myArray[a].calculatedLEFOWtbdps = 0;
                         }
-                    }else{
-                    var unallocatedFEFO = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    var unallocatedLEFO = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    var unallocatedFEFOWps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    var unallocatedFEFOWtbdps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    var unallocatedLEFOWps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    var unallocatedLEFOWtbdps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                    for (var a = 0; a < myArray.length; a++) {
-                        var bd = myArray[a];
-                        var tempOB = Number(myArray[a].openingBalance)
-                            - Number(myArray[a].expiredQty)
-                            + Number(myArray[a].shipment);
-                        var consumption = Number(myArray[a].consumption);
-                        var adjustment = Number(myArray[a].adjustment);
-                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
-                                unallocatedLEFO += Number(adjustment);
-                            } else {
-                                unallocatedLEFO -= Number(tempOB);
-                            }
-                        } else {
-                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
-                                unallocatedFEFO += Number(adjustment);
-                            } else {
-                                unallocatedFEFO -= Number(tempOB);
-                            }
-                        }
-                        if ((Number(tempOB) - Number(consumption) + Number(adjustment)) >= 0) {
-                            unallocatedFEFO -= Number(consumption);
-                        } else {
-                            unallocatedFEFO -= (Number(tempOB) + Number(adjustment)) > 0 ? Number(tempOB) + Number(adjustment) : 0;
-                        }
-                        if ((Number(tempOB) - Number(consumption) + Number(adjustment)) > 0) {
-                            myArray[a].closingBalance = (Number(tempOB) - Number(consumption) + Number(adjustment));
-                        } else {
-                            myArray[a].closingBalance = 0;
-                        }
-                        var tempOBWps = Number(myArray[a].openingBalanceWps)
-                            - Number(myArray[a].expiredQtyWps)
-                            + Number(myArray[a].shipmentWps);
-                        var consumptionWps = Number(myArray[a].consumption);
-                        var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
-                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
-                                unallocatedLEFOWps += Number(adjustmentWps);
-                            } else {
-                                unallocatedLEFOWps -= Number(tempOBWps);
-                            }
-                        } else {
-                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
-                                unallocatedFEFOWps += Number(adjustmentWps);
-                            } else {
-                                unallocatedFEFOWps -= Number(tempOBWps);
-                            }
-                        }
-                        if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) >= 0) {
-                            unallocatedFEFOWps -= Number(consumptionWps);
-                        } else {
-                            unallocatedFEFOWps -= (Number(tempOBWps) + Number(adjustmentWps)) > 0 ? Number(tempOBWps) + Number(adjustmentWps) : 0;
-                        }
-                        if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) > 0) {
-                            myArray[a].closingBalanceWps = (Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps));
-                        } else {
-                            myArray[a].closingBalanceWps = 0;
-                        }
-                        var tempOBWtbdps = Number(myArray[a].openingBalanceWtbdps)
-                            - Number(myArray[a].expiredQtyWtbdps)
-                            + Number(myArray[a].shipmentWtbdps);
-                        var consumptionWtbdps = Number(myArray[a].consumption);
-                        var adjustmentWtbdps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
-                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                            if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                                unallocatedLEFOWtbdps += Number(adjustmentWtbdps);
-                            } else {
-                                unallocatedLEFOWtbdps -= Number(tempOBWtbdps);
-                            }
-                        } else {
-                            if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                                unallocatedFEFOWtbdps += Number(adjustmentWtbdps);
-                            } else {
-                                unallocatedFEFOWtbdps -= Number(tempOBWtbdps);
-                            }
-                        }
-                        if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                            unallocatedFEFOWtbdps -= Number(consumptionWtbdps);
-                        } else {
-                            unallocatedFEFOWtbdps -= (Number(tempOBWtbdps) + Number(adjustmentWtbdps)) > 0 ? Number(tempOBWtbdps) + Number(adjustmentWtbdps) : 0;
-                        }
-                        if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) > 0) {
-                            myArray[a].closingBalanceWtbdps = (Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps));
-                        } else {
-                            myArray[a].closingBalanceWtbdps = 0;
-                        }
-                    }
-                    if (Number(unallocatedLEFO) != 0) {
-                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                            if (Number(unallocatedLEFO) != 0) {
-                                var tempCB = Number(myArray[a].closingBalance);
-                                myArray[a].unallocatedLEFO = Number(unallocatedLEFO);
-                                if (Number(tempCB) >= Number(unallocatedLEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                    myArray[a].closingBalance = Number(tempCB) - Number(unallocatedLEFO);
-                                    myArray[a].calculatedLEFO = Number(unallocatedLEFO);
-                                    unallocatedLEFO = 0;
+                    } else {
+                        var unallocatedFEFO = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        var unallocatedLEFO = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        var unallocatedFEFOWps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        var unallocatedFEFOWtbdps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        var unallocatedLEFOWps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        var unallocatedLEFOWtbdps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                        for (var a = 0; a < myArray.length; a++) {
+                            var bd = myArray[a];
+                            var tempOB = Number(myArray[a].openingBalance)
+                                - Number(myArray[a].expiredQty)
+                                + Number(myArray[a].shipment);
+                            var consumption = Number(myArray[a].consumption);
+                            var adjustment = Number(myArray[a].adjustment);
+                            if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                    unallocatedLEFO += Number(adjustment);
                                 } else {
-                                    myArray[a].closingBalance = 0;
-                                    myArray[a].calculatedLEFO = Number(tempCB);
-                                    unallocatedLEFO -= Number(tempCB);
+                                    unallocatedLEFO -= Number(tempOB);
                                 }
-                                myArray[a].qty = Number(myArray[a].closingBalance);
-                            }
-                        }
-                    }
-                    if (Number(unallocatedLEFOWps) != 0) {
-                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                            if (Number(unallocatedLEFOWps) != 0) {
-                                var tempCB = Number(myArray[a].closingBalanceWps);
-                                myArray[a].unallocatedLEFOWps = Number(unallocatedLEFOWps);
-                                if (Number(tempCB) >= Number(unallocatedLEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                    myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedLEFOWps);
-                                    myArray[a].calculatedLEFOWps = Number(unallocatedLEFOWps);
-                                    unallocatedLEFOWps = 0;
+                            } else {
+                                if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                    unallocatedFEFO += Number(adjustment);
                                 } else {
-                                    myArray[a].closingBalanceWps = 0;
-                                    myArray[a].calculatedLEFOWps = Number(tempCB);
-                                    unallocatedLEFOWps -= Number(tempCB);
+                                    unallocatedFEFO -= Number(tempOB);
                                 }
-                                myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
                             }
-                        }
-                    }
-                    if (Number(unallocatedLEFOWtbdps) != 0) {
-                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                            if (Number(unallocatedLEFOWtbdps) != 0) {
-                                var tempCB = Number(myArray[a].closingBalanceWtbdps);
-                                myArray[a].unallocatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
-                                if (Number(tempCB) >= Number(unallocatedLEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                    myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedLEFOWtbdps);
-                                    myArray[a].calculatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
-                                    unallocatedLEFOWtbdps = 0;
+                            if ((Number(tempOB) - Number(consumption) + Number(adjustment)) >= 0) {
+                                unallocatedFEFO -= Number(consumption);
+                            } else {
+                                unallocatedFEFO -= (Number(tempOB) + Number(adjustment)) > 0 ? Number(tempOB) + Number(adjustment) : 0;
+                            }
+                            if ((Number(tempOB) - Number(consumption) + Number(adjustment)) > 0) {
+                                myArray[a].closingBalance = (Number(tempOB) - Number(consumption) + Number(adjustment));
+                            } else {
+                                myArray[a].closingBalance = 0;
+                            }
+                            var tempOBWps = Number(myArray[a].openingBalanceWps)
+                                - Number(myArray[a].expiredQtyWps)
+                                + Number(myArray[a].shipmentWps);
+                            var consumptionWps = Number(myArray[a].consumption);
+                            var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                            if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                    unallocatedLEFOWps += Number(adjustmentWps);
                                 } else {
-                                    myArray[a].closingBalanceWtbdps = 0;
-                                    myArray[a].calculatedLEFOWtbdps = Number(tempCB);
-                                    unallocatedLEFOWtbdps -= Number(tempCB);
+                                    unallocatedLEFOWps -= Number(tempOBWps);
                                 }
-                                myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
+                            } else {
+                                if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                    unallocatedFEFOWps += Number(adjustmentWps);
+                                } else {
+                                    unallocatedFEFOWps -= Number(tempOBWps);
+                                }
+                            }
+                            if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) >= 0) {
+                                unallocatedFEFOWps -= Number(consumptionWps);
+                            } else {
+                                unallocatedFEFOWps -= (Number(tempOBWps) + Number(adjustmentWps)) > 0 ? Number(tempOBWps) + Number(adjustmentWps) : 0;
+                            }
+                            if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) > 0) {
+                                myArray[a].closingBalanceWps = (Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps));
+                            } else {
+                                myArray[a].closingBalanceWps = 0;
+                            }
+                            var tempOBWtbdps = Number(myArray[a].openingBalanceWtbdps)
+                                - Number(myArray[a].expiredQtyWtbdps)
+                                + Number(myArray[a].shipmentWtbdps);
+                            var consumptionWtbdps = Number(myArray[a].consumption);
+                            var adjustmentWtbdps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                            if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                    unallocatedLEFOWtbdps += Number(adjustmentWtbdps);
+                                } else {
+                                    unallocatedLEFOWtbdps -= Number(tempOBWtbdps);
+                                }
+                            } else {
+                                if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                    unallocatedFEFOWtbdps += Number(adjustmentWtbdps);
+                                } else {
+                                    unallocatedFEFOWtbdps -= Number(tempOBWtbdps);
+                                }
+                            }
+                            if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                unallocatedFEFOWtbdps -= Number(consumptionWtbdps);
+                            } else {
+                                unallocatedFEFOWtbdps -= (Number(tempOBWtbdps) + Number(adjustmentWtbdps)) > 0 ? Number(tempOBWtbdps) + Number(adjustmentWtbdps) : 0;
+                            }
+                            if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) > 0) {
+                                myArray[a].closingBalanceWtbdps = (Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps));
+                            } else {
+                                myArray[a].closingBalanceWtbdps = 0;
                             }
                         }
-                    }
-                    if (Number(unallocatedLEFO) < 0 || Number(unallocatedLEFOWps) < 0 || Number(unallocatedLEFOWtbdps) < 0) {
-                        var checkIfBatchExists = batchDetailsFromProgramJson.findIndex(c => moment(c.createdDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD") && moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"));
-                        if (checkIfBatchExists == -1) {
-                            var batchNo = (BATCH_PREFIX).concat(generalProgramJson.programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                            var json = {
-                                batchId: 0,
-                                batchNo: batchNo,
-                                autoGenerated: true,
-                                openingBalance: 0,
-                                openingBalanceWps: 0,
-                                openingBalanceWtbdps: 0,
-                                consumption: 0,
-                                adjustment: 0,
-                                stock: 0,
-                                shipment: 0,
-                                shipmentWps: 0,
-                                shipmentWtbdps: 0,
-                                expiredQty: 0,
-                                expiredQtyWps: 0,
-                                expiredQtyWtbdps: 0,
-                                shelfLife: programPlanningUnitList.shelfLife,
-                                expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
-                                createdDate: moment(startDate).format("YYYY-MM-DD"),
-                                openingBalance: 0,
-                                openingBalanceWps: 0,
-                                openingBalanceWtbdps: 0,
-                                unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                        if (Number(unallocatedLEFO) != 0) {
+                            for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                if (Number(unallocatedLEFO) != 0) {
+                                    var tempCB = Number(myArray[a].closingBalance);
+                                    myArray[a].unallocatedLEFO = Number(unallocatedLEFO);
+                                    if (Number(tempCB) >= Number(unallocatedLEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                        myArray[a].closingBalance = Number(tempCB) - Number(unallocatedLEFO);
+                                        myArray[a].calculatedLEFO = Number(unallocatedLEFO);
+                                        unallocatedLEFO = 0;
+                                    } else {
+                                        myArray[a].closingBalance = 0;
+                                        myArray[a].calculatedLEFO = Number(tempCB);
+                                        unallocatedLEFO -= Number(tempCB);
+                                    }
+                                    myArray[a].qty = Number(myArray[a].closingBalance);
+                                }
                             }
-                            myArray.push(json);
-                            var coreBatch = {
-                                batchId: 0,
-                                batchNo: batchNo,
-                                autoGenerated: true,
-                                planningUnitId: planningUnitId,
-                                expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
-                                createdDate: moment(startDate).format("YYYY-MM-DD")
+                        }
+                        if (Number(unallocatedLEFOWps) != 0) {
+                            for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                if (Number(unallocatedLEFOWps) != 0) {
+                                    var tempCB = Number(myArray[a].closingBalanceWps);
+                                    myArray[a].unallocatedLEFOWps = Number(unallocatedLEFOWps);
+                                    if (Number(tempCB) >= Number(unallocatedLEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                        myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedLEFOWps);
+                                        myArray[a].calculatedLEFOWps = Number(unallocatedLEFOWps);
+                                        unallocatedLEFOWps = 0;
+                                    } else {
+                                        myArray[a].closingBalanceWps = 0;
+                                        myArray[a].calculatedLEFOWps = Number(tempCB);
+                                        unallocatedLEFOWps -= Number(tempCB);
+                                    }
+                                    myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
+                                }
                             }
-                            coreBatchDetails.push(coreBatch)
-                        } else {
-                            var json = {
-                                batchId: batchDetailsFromProgramJson[checkIfBatchExists].batchId,
-                                batchNo: batchDetailsFromProgramJson[checkIfBatchExists].batchNo,
-                                autoGenerated: batchDetailsFromProgramJson[checkIfBatchExists].autoGenerated,
-                                openingBalance: 0,
-                                openingBalanceWps: 0,
-                                openingBalanceWtbdps: 0,
-                                consumption: 0,
-                                adjustment: 0,
-                                stock: 0,
-                                shipment: 0,
-                                shipmentWps: 0,
-                                shipmentWtbdps: 0,
-                                expiredQty: 0,
-                                expiredQtyWps: 0,
-                                expiredQtyWtbdps: 0,
-                                shelfLife: programPlanningUnitList.shelfLife,
-                                expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
-                                createdDate: moment(startDate).format("YYYY-MM-DD"),
-                                openingBalance: 0,
-                                openingBalanceWps: 0,
-                                openingBalanceWtbdps: 0,
-                                unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                        }
+                        if (Number(unallocatedLEFOWtbdps) != 0) {
+                            for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                if (Number(unallocatedLEFOWtbdps) != 0) {
+                                    var tempCB = Number(myArray[a].closingBalanceWtbdps);
+                                    myArray[a].unallocatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
+                                    if (Number(tempCB) >= Number(unallocatedLEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                        myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedLEFOWtbdps);
+                                        myArray[a].calculatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
+                                        unallocatedLEFOWtbdps = 0;
+                                    } else {
+                                        myArray[a].closingBalanceWtbdps = 0;
+                                        myArray[a].calculatedLEFOWtbdps = Number(tempCB);
+                                        unallocatedLEFOWtbdps -= Number(tempCB);
+                                    }
+                                    myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
+                                }
                             }
-                            myArray.push(json);
+                        }
+                        if (Number(unallocatedLEFO) < 0 || Number(unallocatedLEFOWps) < 0 || Number(unallocatedLEFOWtbdps) < 0) {
+                            var checkIfBatchExists = batchDetailsFromProgramJson.findIndex(c => moment(c.createdDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD") && moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"));
+                            if (checkIfBatchExists == -1) {
+                                var batchNo = (BATCH_PREFIX).concat(generalProgramJson.programId).concat(planningUnitId).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                var json = {
+                                    batchId: 0,
+                                    batchNo: batchNo,
+                                    autoGenerated: true,
+                                    openingBalance: 0,
+                                    openingBalanceWps: 0,
+                                    openingBalanceWtbdps: 0,
+                                    consumption: 0,
+                                    adjustment: 0,
+                                    stock: 0,
+                                    shipment: 0,
+                                    shipmentWps: 0,
+                                    shipmentWtbdps: 0,
+                                    expiredQty: 0,
+                                    expiredQtyWps: 0,
+                                    expiredQtyWtbdps: 0,
+                                    shelfLife: programPlanningUnitList.shelfLife,
+                                    expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
+                                    createdDate: moment(startDate).format("YYYY-MM-DD"),
+                                    openingBalance: 0,
+                                    openingBalanceWps: 0,
+                                    openingBalanceWtbdps: 0,
+                                    unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                    calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                    unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                    unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                    calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                    calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                    closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                    closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                    closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                    qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                    qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                    qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                }
+                                myArray.push(json);
+                                var coreBatch = {
+                                    batchId: 0,
+                                    batchNo: batchNo,
+                                    autoGenerated: true,
+                                    planningUnitId: planningUnitId,
+                                    expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
+                                    createdDate: moment(startDate).format("YYYY-MM-DD")
+                                }
+                                coreBatchDetails.push(coreBatch)
+                            } else {
+                                var json = {
+                                    batchId: batchDetailsFromProgramJson[checkIfBatchExists].batchId,
+                                    batchNo: batchDetailsFromProgramJson[checkIfBatchExists].batchNo,
+                                    autoGenerated: batchDetailsFromProgramJson[checkIfBatchExists].autoGenerated,
+                                    openingBalance: 0,
+                                    openingBalanceWps: 0,
+                                    openingBalanceWtbdps: 0,
+                                    consumption: 0,
+                                    adjustment: 0,
+                                    stock: 0,
+                                    shipment: 0,
+                                    shipmentWps: 0,
+                                    shipmentWtbdps: 0,
+                                    expiredQty: 0,
+                                    expiredQtyWps: 0,
+                                    expiredQtyWtbdps: 0,
+                                    shelfLife: programPlanningUnitList.shelfLife,
+                                    expiryDate: moment(startDate).add(programPlanningUnitList.shelfLife, 'months').format("YYYY-MM-DD"),
+                                    createdDate: moment(startDate).format("YYYY-MM-DD"),
+                                    openingBalance: 0,
+                                    openingBalanceWps: 0,
+                                    openingBalanceWtbdps: 0,
+                                    unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                    calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                    unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                    unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                    calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                    calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                    closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                    closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                    closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                    qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                    qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                    qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                }
+                                myArray.push(json);
+                            }
+                        }
+                        for (var a = 0; a < myArray.length; a++) {
+                            var tempCB = Number(myArray[a].closingBalance);
+                            myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
+                            if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
+                                myArray[a].calculatedFEFO = Number(unallocatedFEFO);
+                                unallocatedFEFO = 0;
+                            } else {
+                                myArray[a].closingBalance = 0;
+                                myArray[a].calculatedFEFO = Number(tempCB);
+                                unallocatedFEFO -= Number(tempCB);
+                            }
+                            myArray[a].qty = Number(myArray[a].closingBalance);
+                        }
+                        for (var a = 0; a < myArray.length; a++) {
+                            var tempCB = Number(myArray[a].closingBalanceWps);
+                            myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
+                            if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
+                                myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
+                                unallocatedFEFOWps = 0;
+                            } else {
+                                myArray[a].closingBalanceWps = 0;
+                                myArray[a].calculatedFEFOWps = Number(tempCB);
+                                unallocatedFEFOWps -= Number(tempCB);
+                            }
+                            myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
+                            var tempCB = Number(myArray[a].closingBalanceWtbdps);
+                            myArray[a].unallocatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
+                            if (Number(tempCB) >= Number(unallocatedFEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedFEFOWtbdps);
+                                myArray[a].calculatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
+                                unallocatedFEFOWtbdps = 0;
+                            } else {
+                                myArray[a].closingBalanceWtbdps = 0;
+                                myArray[a].calculatedFEFOWtbdps = Number(tempCB);
+                                unallocatedFEFOWtbdps -= Number(tempCB);
+                            }
+                            myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
                         }
                     }
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalance);
-                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
-                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
-                            unallocatedFEFO = 0;
-                        } else {
-                            myArray[a].closingBalance = 0;
-                            myArray[a].calculatedFEFO = Number(tempCB);
-                            unallocatedFEFO -= Number(tempCB);
-                        }
-                        myArray[a].qty = Number(myArray[a].closingBalance);
-                    }
-                    for (var a = 0; a < myArray.length; a++) {
-                        var tempCB = Number(myArray[a].closingBalanceWps);
-                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
-                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
-                            unallocatedFEFOWps = 0;
-                        } else {
-                            myArray[a].closingBalanceWps = 0;
-                            myArray[a].calculatedFEFOWps = Number(tempCB);
-                            unallocatedFEFOWps -= Number(tempCB);
-                        }
-                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
-                        var tempCB = Number(myArray[a].closingBalanceWtbdps);
-                        myArray[a].unallocatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
-                        if (Number(tempCB) >= Number(unallocatedFEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                            myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedFEFOWtbdps);
-                            myArray[a].calculatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
-                            unallocatedFEFOWtbdps = 0;
-                        } else {
-                            myArray[a].closingBalanceWtbdps = 0;
-                            myArray[a].calculatedFEFOWtbdps = Number(tempCB);
-                            unallocatedFEFOWtbdps -= Number(tempCB);
-                        }
-                        myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
-                    }
-                }
                     myArray = myArray.filter(c => (
                         (c.openingBalance != 0 && c.openingBalance != undefined) ||
                         (c.consumption != 0 && c.consumption != undefined) ||
@@ -1111,33 +1111,38 @@ export function convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDat
                         (c.closingBalanceWps != 0 && c.closingBalanceWps != undefined)
                     ));
                     var finalBatchDetails = []
-                    for (var ma = 0; ma < myArray.length; ma++) {
-                        var finalBatch = {
-                            batchId: myArray[ma].batchId,
-                            batchNo: myArray[ma].batchNo,
-                            expiryDate: myArray[ma].expiryDate,
-                            autoGenerated: myArray[ma].autoGenerated,
-                            qty: Number(myArray[ma].qty),
-                            qtyWps: Number(myArray[ma].qtyWps),
-                            qtyWtbdps: Number(myArray[ma].qtyWtbdps),
-                            expiredQty: Number(myArray[ma].expiredQty),
-                            expiredQtyWps: Number(myArray[ma].expiredQtyWps),
-                            expiredQtyWtbdps: Number(myArray[ma].expiredQtyWtbdps),
-                            createdDate: myArray[ma].createdDate,
-                            openingBalance: myArray[ma].openingBalance,
-                            unallocatedQty: Number(myArray[ma].calculatedFEFO) + (myArray[ma].calculatedLEFO != undefined && myArray[ma].calculatedLEFO != "" && myArray[ma].calculatedLEFO != null ? myArray[ma].calculatedLEFO : 0),
-                            consumptionQty: myArray[ma].consumption == 0 ? null : myArray[ma].consumption,
-                            adjustmentQty: myArray[ma].adjustment == 0 ? null : myArray[ma].adjustment,
-                            stockQty: myArray[ma].stock == 0 ? null : myArray[ma].stock,
-                            shipmentQty: myArray[ma].shipment,
-                            openingBalanceWps: myArray[ma].openingBalanceWps,
-                            openingBalanceWtbdps: myArray[ma].openingBalanceWtbdps,
-                            unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
-                            unallocatedQtyWtbdps: Number(myArray[ma].calculatedFEFOWtbdps) + (myArray[ma].calculatedLEFOWtbdps != undefined && myArray[ma].calculatedLEFOWtbdps != "" && myArray[ma].calculatedLEFOWtbdps != null ? myArray[ma].calculatedLEFOWtbdps : 0),
-                            shipmentQtyWps: myArray[ma].shipmentWps,
-                            shipmentQtyWtbdps: myArray[ma].shipmentWtbdps
+                    if (cutOffDate != "" && moment(createdDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM") && typeof currentMonthSupplyPlan !== 'undefined' && currentMonthSupplyPlan.length > 0) {
+                        finalBatchDetails = currentMonthSupplyPlan[0].batchDetails;
+                        myArray = currentMonthSupplyPlan[0].batchDetails;
+                    } else {
+                        for (var ma = 0; ma < myArray.length; ma++) {
+                            var finalBatch = {
+                                batchId: myArray[ma].batchId,
+                                batchNo: myArray[ma].batchNo,
+                                expiryDate: myArray[ma].expiryDate,
+                                autoGenerated: myArray[ma].autoGenerated,
+                                qty: Number(myArray[ma].qty),
+                                qtyWps: Number(myArray[ma].qtyWps),
+                                qtyWtbdps: Number(myArray[ma].qtyWtbdps),
+                                expiredQty: Number(myArray[ma].expiredQty),
+                                expiredQtyWps: Number(myArray[ma].expiredQtyWps),
+                                expiredQtyWtbdps: Number(myArray[ma].expiredQtyWtbdps),
+                                createdDate: myArray[ma].createdDate,
+                                openingBalance: myArray[ma].openingBalance,
+                                unallocatedQty: Number(myArray[ma].calculatedFEFO) + (myArray[ma].calculatedLEFO != undefined && myArray[ma].calculatedLEFO != "" && myArray[ma].calculatedLEFO != null ? myArray[ma].calculatedLEFO : 0),
+                                consumptionQty: myArray[ma].consumption == 0 ? null : myArray[ma].consumption,
+                                adjustmentQty: myArray[ma].adjustment == 0 ? null : myArray[ma].adjustment,
+                                stockQty: myArray[ma].stock == 0 ? null : myArray[ma].stock,
+                                shipmentQty: myArray[ma].shipment,
+                                openingBalanceWps: myArray[ma].openingBalanceWps,
+                                openingBalanceWtbdps: myArray[ma].openingBalanceWtbdps,
+                                unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
+                                unallocatedQtyWtbdps: Number(myArray[ma].calculatedFEFOWtbdps) + (myArray[ma].calculatedLEFOWtbdps != undefined && myArray[ma].calculatedLEFOWtbdps != "" && myArray[ma].calculatedLEFOWtbdps != null ? myArray[ma].calculatedLEFOWtbdps : 0),
+                                shipmentQtyWps: myArray[ma].shipmentWps,
+                                shipmentQtyWtbdps: myArray[ma].shipmentWtbdps
+                            }
+                            finalBatchDetails.push(finalBatch)
                         }
-                        finalBatchDetails.push(finalBatch)
                     }
                     adjustmentQty = adjustmentQty + nationalAdjustment;
                     if (inventoryList.length == 0) {

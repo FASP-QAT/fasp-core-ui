@@ -3640,7 +3640,7 @@
   "static.productCategory.success": "Categoria da unidade de planeamento actualizada com sucesso",
   "static.modelingCalculator.targetBeyondForecast": "Você forneceu metas além do período de previsão. O QAT calculará a modelagem de acordo com suas entradas, mas observe que a exibição (árvore de construção, gráfico de nós, tabela de dados de exibição de nós) é limitada pelo período de previsão. Se desejar ver mais meses, estenda seu período de previsão em Gerenciamento de programas > Configurações de versão.",
   "static.QATForecastImport.OldestForecasted": "consumo previsto mais antigo que você pode importar é 6 meses antes do mês atual.",
-  "static.tree.decimalValidation10&2": "Insira um número válido com no máximo 3 dígitos antes do decimal e no máximo 4 dígitos após o decimal.",
+  "static.tree.decimalValidation10&2": "Insira um número válido com no máximo 10 dígitos antes do decimal e no máximo 4 dígitos após o decimal.",
   "static.supplyPlan.inventoryType": "Tipo de inventário",
   "static.report.remainingBudgetAmt": "Valor do orçamento restante",
   "static.message.editBranchTemplate": "Modelo de filial atualizado com sucesso",
