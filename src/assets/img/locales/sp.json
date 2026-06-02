@@ -3666,7 +3666,7 @@
   "static.productCategory.success": "Categoría del producto actualizada correctamente",
   "static.modelingCalculator.targetBeyondForecast": "Ha proporcionado metas más allá del período de estimación. QAT calculará el modelado de acuerdo con sus entradas, pero tenga en cuenta que la visualización (Construir árbol de estimación, gráfico de nodos, tabla Mostrar Datos) está limitada por el período de estimación. Si desea ver más meses, extienda el período de estimación en Gestión de programas > Configuración de la versión.",
   "static.QATForecastImport.OldestForecasted": "El consumo previsto más antiguo que puede importar es 6 meses antes del mes actual.",
-  "static.tree.decimalValidation10&2": "Ingrese un número válido que tenga un máximo de 3 dígitos antes del decimal y un máximo de 4 dígitos después del decimal.",
+  "static.tree.decimalValidation10&2": "Ingrese un número válido que tenga un máximo de 10 dígitos antes del decimal y un máximo de 4 dígitos después del decimal.",
   "static.supplyPlan.inventoryType": "Tipo de inventario",
   "static.report.remainingBudgetAmt": "Monto restante",
   "static.message.editBranchTemplate": "Plantilla de ramal actualizada con éxito",

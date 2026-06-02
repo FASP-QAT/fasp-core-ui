@@ -3666,7 +3666,7 @@
   "static.productCategory.success": "Planning Unit Category updated successfully",
   "static.modelingCalculator.targetBeyondForecast": "You have provided targets beyond the forecast period. QAT will calculate the modeling according to your inputs, but note that the display (build tree, node graph, node show data table) is limited by the forecast period. If you wish to see more months, please extend your forecast period in Program Management > Version Settings.",
   "static.QATForecastImport.OldestForecasted": "The oldest forecasted consumption you can import is 6 months before the current month.",
-  "static.tree.decimalValidation10&2": "Please enter a valid number having max 3 digits before decimal and max 4 digits after decimal.",
+  "static.tree.decimalValidation10&2": "Please enter a valid number having max 10 digits before decimal and max 4 digits after decimal.",
   "static.supplyPlan.inventoryType": "Inventory Type",
   "static.report.remainingBudgetAmt": "Budget remaining",
   "static.message.editBranchTemplate": "Branch Template Updated Successfully",

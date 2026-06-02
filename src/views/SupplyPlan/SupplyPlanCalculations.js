@@ -18,7 +18,7 @@ import { convertSuggestedShipmentsIntoPlannedShipments } from '../SupplyPlan/Sup
  * @param {*} rebuild This is used to check if supply plan has to be rebuild or not
  * @param {*} rebuildQPL This is used to check if QPL has to be rebuild or not
  */
-export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL,monthsInPastForAMC,monthsInFutureForAMC) {
+export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, page, props, planningUnitList, minimumDate, problemListChild, rebuild, rebuildQPL, monthsInPastForAMC, monthsInFutureForAMC) {
     if (page == 'masterDataSync' && !rebuild) {
         if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
             problemListChild.qatProblemActions(programId, "loading", true);
@@ -58,360 +58,481 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                     programQPLDetailsJsonRequest.onsuccess = function (e) {
                         var programQPLDetailsJson = programQPLDetailsJsonRequest.result;
                         var paTransaction = db1.transaction(['procurementAgent'], 'readwrite');
-                    var paOs = paTransaction.objectStore('procurementAgent');
-                    var paRequest = paOs.getAll();
-                    paRequest.onsuccess = function (e) {
-                        var paJson = paRequest.result;
-                        if (objectStoreName != "whatIfProgramData") {
-                            if (page != "masterDataSync") {
-                                programQPLDetailsJson.programModified = 1;
+                        var paOs = paTransaction.objectStore('procurementAgent');
+                        var paRequest = paOs.getAll();
+                        paRequest.onsuccess = function (e) {
+                            var paJson = paRequest.result;
+                            if (objectStoreName != "whatIfProgramData") {
+                                if (page != "masterDataSync") {
+                                    programQPLDetailsJson.programModified = 1;
+                                }
                             }
-                        }
-                        var programPlanningUnitList = myResult;
-                        var regionListFiltered = [];
-                        var regionList = [];
-                        for (var i = 0; i < generalProgramJson.regionList.length; i++) {
-                            var regionJson = {
-                                id: generalProgramJson.regionList[i].regionId
+                            var programPlanningUnitList = myResult;
+                            var regionListFiltered = [];
+                            var regionList = [];
+                            for (var i = 0; i < generalProgramJson.regionList.length; i++) {
+                                var regionJson = {
+                                    id: generalProgramJson.regionList[i].regionId
+                                }
+                                regionList.push(regionJson);
                             }
-                            regionList.push(regionJson);
-                        }
-                        regionListFiltered = regionList;
-                        programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == generalProgramJson.programId && c.active.toString() == "true");
-                        if (planningUnitId != 0) {
-                            programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
-                        }
-                        if (planningUnitList != undefined && planningUnitList != [] && planningUnitList.length != 0) {
-                            var ppList = [];
-                            for (var pp = 0; pp < planningUnitList.length; pp++) {
-                                var p = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pp]);
-                                ppList.push(p[0]);
+                            regionListFiltered = regionList;
+                            programPlanningUnitList = (programPlanningUnitList).filter(c => c.program.id == generalProgramJson.programId && c.active.toString() == "true");
+                            if (planningUnitId != 0) {
+                                programPlanningUnitList = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId);
                             }
-                            programPlanningUnitList = ppList;
-                        }
-                        if ((page == 'masterDataSync' || page == 'syncPage' || page == 'erpDelink') && planningUnitList.length == 0) {
-                            programPlanningUnitList = [];
-                        }
-                        try {
-                            programPlanningUnitList = programPlanningUnitList.filter(c => c != undefined);
-                            for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
-                                var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
-                                var programJson = {};
-                                if (planningUnitDataIndex != -1) {
-                                    var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id))[0];
-                                    var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
-                                    var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
-                                    programJson = JSON.parse(programData);
-                                } else {
-                                    programJson = {
-                                        consumptionList: [],
-                                        inventoryList: [],
-                                        shipmentList: [],
-                                        batchInfoList: [],
-                                        supplyPlan: []
-                                    }
+                            if (planningUnitList != undefined && planningUnitList != [] && planningUnitList.length != 0) {
+                                var ppList = [];
+                                for (var pp = 0; pp < planningUnitList.length; pp++) {
+                                    var p = programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitList[pp]);
+                                    ppList.push(p[0]);
                                 }
-                                var programJsonForStoringTheResult = programJson;
-                                var coreBatchDetails = programJsonForStoringTheResult.batchInfoList;
-                                var supplyPlanData = programJsonForStoringTheResult.supplyPlan;
-                                if (supplyPlanData == undefined) {
-                                    supplyPlanData = []
-                                }
-                                var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
-                                var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                let invmax = moment.max(inventoryListForMax.map(d => moment(d.inventoryDate)))
-                                let shipmax = moment.max(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
-                                let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
-                                var maxDate = invmax.isAfter(shipmax) && invmax.isAfter(conmax) ? invmax : shipmax.isAfter(invmax) && shipmax.isAfter(conmax) ? shipmax : conmax
-                                var minDate;
-                                var monthsInPastForAmc=programPlanningUnitList[ppL].monthsInPastForAmc;
-                                if(monthsInPastForAMC!=undefined){
-                                    monthsInPastForAmc=monthsInPastForAMC
-                                }
-                                var monthsInFutureForAmc=programPlanningUnitList[ppL].monthsInFutureForAmc;
-                                if(monthsInFutureForAMC!=undefined){
-                                    monthsInFutureForAmc=monthsInFutureForAMC
-                                }
-                                if (minimumDate != null) {
-                                    minDate = moment(minimumDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
-                                } else {
-                                    minDate = undefined;
-                                }
-                                if (minDate == undefined) {
-                                    let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))
-                                    let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
-                                    let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))
-                                    minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
-                                    minDate = moment(minDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
-                                }
-                                var FIRST_DATA_ENTRY_DATE = minDate;
-                                var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
-                                var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
-                                var lastDataEntryDate = moment(maxDate).add((monthsInPastForAmc), 'months').format("YYYY-MM-DD");
-                                var lastDate = lastDataEntryDate;
-                                var dateAfterFiveYrs = moment(Date.now()).add(60, 'months').format("YYYY-MM-DD");
-                                var dateAfterTenYrs = moment(Date.now()).add(120, 'months').format("YYYY-MM-DD");
-                                if (moment(dateAfterFiveYrs).format("YYYY-MM-DD") > moment(lastDataEntryDate).format("YYYY-MM-DD")) {
-                                    lastDataEntryDate = dateAfterFiveYrs;
-                                }
-                                if (moment(dateAfterTenYrs).format("YYYY-MM-DD") < moment(lastDataEntryDate).format("YYYY-MM-DD")) {
-                                    lastDataEntryDate = dateAfterTenYrs;
-                                }
-                                supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
-                                for (var i = 0; createdDate < lastDataEntryDate; i++) {
-                                    createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
-                                    var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
-                                    var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
-                                    var prevMonthDate = moment(createdDate).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
-                                    var prevMonthSupplyPlan = [];
-                                    if (supplyPlanData.length > 0) {
-                                        prevMonthSupplyPlan = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(prevMonthDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                                programPlanningUnitList = ppList;
+                            }
+                            if ((page == 'masterDataSync' || page == 'syncPage' || page == 'erpDelink') && planningUnitList.length == 0) {
+                                programPlanningUnitList = [];
+                            }
+                            try {
+                                programPlanningUnitList = programPlanningUnitList.filter(c => c != undefined);
+                                for (var ppL = 0; ppL < programPlanningUnitList.length; ppL++) {
+                                    var planningUnitDataIndex = (planningUnitDataList).findIndex(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                                    var programJson = {};
+                                    if (planningUnitDataIndex != -1) {
+                                        var planningUnitData = ((planningUnitDataList).filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id))[0];
+                                        var programDataBytes = CryptoJS.AES.decrypt(planningUnitData.planningUnitData, SECRET_KEY);
+                                        var programData = programDataBytes.toString(CryptoJS.enc.Utf8);
+                                        programJson = JSON.parse(programData);
                                     } else {
-                                        prevMonthSupplyPlan = []
-                                    }
-                                    var batchDetails = [];
-                                    var batchDetailsFromProgramJson = programJsonForStoringTheResult.batchInfoList.filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
-                                    if (prevMonthSupplyPlan.length > 0) {
-                                        batchDetails = prevMonthSupplyPlan[0].batchDetails;
-                                    }
-                                    var expiredStock = 0;
-                                    var expiredStockWps = 0;
-                                    var expiredStockWtbdps = 0;
-                                    var myArray = [];
-                                    for (var b = 0; b < batchDetails.length; b++) {
-                                        if (moment(batchDetails[b].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            var json = {
-                                                batchId: batchDetails[b].batchId,
-                                                batchNo: batchDetails[b].batchNo,
-                                                expiryDate: batchDetails[b].expiryDate,
-                                                createdDate: batchDetails[b].createdDate,
-                                                autoGenerated: batchDetails[b].autoGenerated,
-                                                openingBalance: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
-                                                openingBalanceWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
-                                                openingBalanceWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0,
-                                                consumption: 0,
-                                                adjustment: 0,
-                                                stock: 0,
-                                                shipment: 0,
-                                                shipmentWps: 0,
-                                                shipmentWtbdps: 0,
-                                                expiredQty: batchDetails[b].expiredQty != undefined && batchDetails[b].expiredQty != null ? Number(batchDetails[b].expiredQty) : 0,
-                                                expiredQtyWps: batchDetails[b].expiredQtyWps != undefined && batchDetails[b].expiredQtyWps != null ? Number(batchDetails[b].expiredQtyWps) : 0,
-                                                expiredQtyWtbdps: batchDetails[b].expiredQtyWtbdps != undefined && batchDetails[b].expiredQtyWtbdps != null ? Number(batchDetails[b].expiredQtyWtbdps) : 0
-                                            }
-                                            myArray.push(json);
-                                        } else if (moment(batchDetails[b].expiryDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM")) {
-                                            expiredStock += Number(Number(Number(batchDetails[b].qty)).toFixed(8));
-                                            expiredStockWps += Number(Number(Number(batchDetails[b].qtyWps)).toFixed(8));
-                                            expiredStockWtbdps += Number(Number(Number(batchDetails[b].qtyWtbdps)).toFixed(8));
-                                            var json = {
-                                                batchId: batchDetails[b].batchId,
-                                                batchNo: batchDetails[b].batchNo,
-                                                expiryDate: batchDetails[b].expiryDate,
-                                                createdDate: batchDetails[b].createdDate,
-                                                autoGenerated: batchDetails[b].autoGenerated,
-                                                openingBalance: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
-                                                openingBalanceWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
-                                                openingBalanceWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0,
-                                                consumption: 0,
-                                                adjustment: 0,
-                                                stock: 0,
-                                                shipment: 0,
-                                                shipmentWps: 0,
-                                                shipmentWtbdps: 0,
-                                                expiredQty: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
-                                                expiredQtyWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
-                                                expiredQtyWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0
-                                            }
-                                            myArray.push(json);
+                                        programJson = {
+                                            consumptionList: [],
+                                            inventoryList: [],
+                                            shipmentList: [],
+                                            batchInfoList: [],
+                                            supplyPlan: []
                                         }
                                     }
-                                    var openingBalance = 0;
-                                    if (prevMonthSupplyPlan.length > 0) {
-                                        openingBalance = prevMonthSupplyPlan[0].closingBalance;
+                                    var programJsonForStoringTheResult = programJson;
+                                    var coreBatchDetails = programJsonForStoringTheResult.batchInfoList;
+                                    var supplyPlanData = programJsonForStoringTheResult.supplyPlan;
+                                    if (supplyPlanData == undefined) {
+                                        supplyPlanData = []
+                                    }
+                                    var shipmentListForMax = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
+                                    var inventoryListForMax = (programJsonForStoringTheResult.inventoryList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                    var consumptionListForMax = (programJsonForStoringTheResult.consumptionList).filter(c => c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                    let invmax = moment.max(inventoryListForMax.map(d => moment(d.inventoryDate)))
+                                    let shipmax = moment.max(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
+                                    let conmax = moment.max(consumptionListForMax.map(d => moment(d.consumptionDate)))
+                                    var maxDate = invmax.isAfter(shipmax) && invmax.isAfter(conmax) ? invmax : shipmax.isAfter(invmax) && shipmax.isAfter(conmax) ? shipmax : conmax
+                                    var minDate;
+                                    var monthsInPastForAmc = programPlanningUnitList[ppL].monthsInPastForAmc;
+                                    if (monthsInPastForAMC != undefined) {
+                                        monthsInPastForAmc = monthsInPastForAMC
+                                    }
+                                    var monthsInFutureForAmc = programPlanningUnitList[ppL].monthsInFutureForAmc;
+                                    if (monthsInFutureForAMC != undefined) {
+                                        monthsInFutureForAmc = monthsInFutureForAMC
+                                    }
+                                    if (minimumDate != null) {
+                                        minDate = moment(minimumDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
                                     } else {
-                                        openingBalance = 0;
+                                        minDate = undefined;
                                     }
-                                    var openingBalanceWps = 0;
-                                    var openingBalanceWtbdps = 0;
-                                    if (prevMonthSupplyPlan.length > 0) {
-                                        openingBalanceWps = prevMonthSupplyPlan[0].closingBalanceWps;
-                                        openingBalanceWtbdps = prevMonthSupplyPlan[0].closingBalanceWtbdps;
-                                    } else {
-                                        openingBalanceWps = 0;
-                                        openingBalanceWtbdps = 0;
+                                    if (minDate == undefined) {
+                                        let invmin = moment.min(inventoryListForMax.map(d => moment(d.inventoryDate)))
+                                        let shipmin = moment.min(shipmentListForMax.map(d => moment(d.expectedDeliveryDate)))
+                                        let conmin = moment.min(consumptionListForMax.map(d => moment(d.consumptionDate)))
+                                        minDate = invmin.isBefore(shipmin) && invmin.isBefore(conmin) ? invmin : shipmin.isBefore(invmin) && shipmin.isBefore(conmin) ? shipmin : conmin
+                                        minDate = moment(minDate).subtract(monthsInFutureForAmc + 1, 'months').format("YYYY-MM-DD");
                                     }
-                                    var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
-                                    if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).format("YYYY-MM")){
-                                        var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id)
-                                        if(currentMonthSupplyPlan.length>0){
-                                            openingBalance=currentMonthSupplyPlan[0].openingBalance;
-                                            openingBalanceWps=currentMonthSupplyPlan[0].openingBalanceWps;
-                                            openingBalanceWtbdps=currentMonthSupplyPlan[0].openingBalanceWtbdps;
-                                        }else{
-                                            openingBalance=0;
-                                            openingBalanceWps=0;
-                                            openingBalanceWtbdps=0;
-                                        }
+                                    var FIRST_DATA_ENTRY_DATE = minDate;
+                                    var createdDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+                                    var firstDataEntryDate = moment(FIRST_DATA_ENTRY_DATE).format("YYYY-MM-DD");
+                                    var lastDataEntryDate = moment(maxDate).add((monthsInPastForAmc), 'months').format("YYYY-MM-DD");
+                                    var lastDate = lastDataEntryDate;
+                                    var dateAfterFiveYrs = moment(Date.now()).add(60, 'months').format("YYYY-MM-DD");
+                                    var dateAfterTenYrs = moment(Date.now()).add(120, 'months').format("YYYY-MM-DD");
+                                    if (moment(dateAfterFiveYrs).format("YYYY-MM-DD") > moment(lastDataEntryDate).format("YYYY-MM-DD")) {
+                                        lastDataEntryDate = dateAfterFiveYrs;
                                     }
-                                    if (moment(startDate).format("YYYY-MM-DD") > moment(lastDate).format("YYYY-MM-DD") && openingBalance == 0 && openingBalanceWps == 0) {
-                                        lastDataEntryDate = startDate;
+                                    if (moment(dateAfterTenYrs).format("YYYY-MM-DD") < moment(lastDataEntryDate).format("YYYY-MM-DD")) {
+                                        lastDataEntryDate = dateAfterTenYrs;
                                     }
-                                    var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
-                                    var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
-                                    var shipmentTotalQty = 0;
-                                    var shipmentTotalQtyWps = 0;
-                                    var shipmentTotalQtyWtbdps = 0;
-                                    var manualTotalQty = 0;
-                                    var receivedShipmentsTotalData = 0;
-                                    var shippedShipmentsTotalData = 0;
-                                    var approvedShipmentsTotalData = 0;
-                                    var submittedShipmentsTotalData = 0;
-                                    var plannedShipmentsTotalData = 0;
-                                    var plannedShipmentsTotalWtbdData = 0;
-                                    var onholdShipmentsTotalData = 0;
-                                    var erpTotalQty = 0;
-                                    var receivedErpShipmentsTotalData = 0;
-                                    var shippedErpShipmentsTotalData = 0;
-                                    var approvedErpShipmentsTotalData = 0;
-                                    var submittedErpShipmentsTotalData = 0;
-                                    var plannedErpShipmentsTotalData = 0;
-                                    var plannedErpShipmentsTotalWtbdData = 0;
-                                    var onholdErpShipmentsTotalData = 0;
-                                    var shipmentBatchQtyTotal = 0;
-                                    var shipmentBatchQtyTotalWps = 0;
-                                    var shipmentBatchQtyTotalWtbdps = 0;
-                                    var consumptionBatchQtyTotal = 0;
-                                    var adjustmentBatchQtyTotal = 0;
-                                    var actualBatchQtyTotal = 0;
-                                    for (var j = 0; j < shipmentArr.length; j++) {
-                                        shipmentTotalQty += Number((shipmentArr[j].shipmentQty));
-                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                            shipmentTotalQtyWps += Number((shipmentArr[j].shipmentQty));
-                                        }
-                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                            shipmentTotalQtyWtbdps += Number((shipmentArr[j].shipmentQty));
-                                        }
-                                        if (shipmentArr[j].erpFlag.toString() == "false") {
-                                            manualTotalQty += Number((shipmentArr[j].shipmentQty));
-                                            if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                                receivedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                                shippedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                                approvedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                                submittedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                                plannedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                            plannedShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
-                                                        }
-                                            } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                                onholdShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            }
+                                    supplyPlanData = supplyPlanData.filter(c => (c.planningUnitId != programPlanningUnitList[ppL].planningUnit.id) || (c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id && moment(c.transDate).format("YYYY-MM") < moment(minDate).format("YYYY-MM")));
+                                    for (var i = 0; createdDate < lastDataEntryDate; i++) {
+                                        createdDate = moment(firstDataEntryDate).add(i, 'months').format("YYYY-MM-DD");
+                                        var startDate = moment(createdDate).startOf('month').format('YYYY-MM-DD');
+                                        var endDate = moment(createdDate).endOf('month').format('YYYY-MM-DD');
+                                        var prevMonthDate = moment(createdDate).subtract(1, 'months').startOf('month').format("YYYY-MM-DD");
+                                        var prevMonthSupplyPlan = [];
+                                        if (supplyPlanData.length > 0) {
+                                            prevMonthSupplyPlan = supplyPlanData.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(prevMonthDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
                                         } else {
-                                            erpTotalQty += Number((shipmentArr[j].shipmentQty));
-                                            if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
-                                                receivedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
-                                                shippedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
-                                                approvedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
-                                                submittedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                            } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
-                                                plannedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
-                                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                            plannedErpShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
-                                                        }
-                                            } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
-                                                onholdErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                            prevMonthSupplyPlan = []
+                                        }
+                                        var batchDetails = [];
+                                        var batchDetailsFromProgramJson = programJsonForStoringTheResult.batchInfoList.filter(c => c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id);
+                                        if (prevMonthSupplyPlan.length > 0) {
+                                            batchDetails = prevMonthSupplyPlan[0].batchDetails;
+                                        }
+                                        var expiredStock = 0;
+                                        var expiredStockWps = 0;
+                                        var expiredStockWtbdps = 0;
+                                        var myArray = [];
+                                        for (var b = 0; b < batchDetails.length; b++) {
+                                            if (moment(batchDetails[b].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                var json = {
+                                                    batchId: batchDetails[b].batchId,
+                                                    batchNo: batchDetails[b].batchNo,
+                                                    expiryDate: batchDetails[b].expiryDate,
+                                                    createdDate: batchDetails[b].createdDate,
+                                                    autoGenerated: batchDetails[b].autoGenerated,
+                                                    openingBalance: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
+                                                    openingBalanceWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
+                                                    openingBalanceWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0,
+                                                    consumption: 0,
+                                                    adjustment: 0,
+                                                    stock: 0,
+                                                    shipment: 0,
+                                                    shipmentWps: 0,
+                                                    shipmentWtbdps: 0,
+                                                    expiredQty: batchDetails[b].expiredQty != undefined && batchDetails[b].expiredQty != null ? Number(batchDetails[b].expiredQty) : 0,
+                                                    expiredQtyWps: batchDetails[b].expiredQtyWps != undefined && batchDetails[b].expiredQtyWps != null ? Number(batchDetails[b].expiredQtyWps) : 0,
+                                                    expiredQtyWtbdps: batchDetails[b].expiredQtyWtbdps != undefined && batchDetails[b].expiredQtyWtbdps != null ? Number(batchDetails[b].expiredQtyWtbdps) : 0
+                                                }
+                                                myArray.push(json);
+                                            } else if (moment(batchDetails[b].expiryDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM")) {
+                                                expiredStock += Number(Number(Number(batchDetails[b].qty)).toFixed(8));
+                                                expiredStockWps += Number(Number(Number(batchDetails[b].qtyWps)).toFixed(8));
+                                                expiredStockWtbdps += Number(Number(Number(batchDetails[b].qtyWtbdps)).toFixed(8));
+                                                var json = {
+                                                    batchId: batchDetails[b].batchId,
+                                                    batchNo: batchDetails[b].batchNo,
+                                                    expiryDate: batchDetails[b].expiryDate,
+                                                    createdDate: batchDetails[b].createdDate,
+                                                    autoGenerated: batchDetails[b].autoGenerated,
+                                                    openingBalance: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
+                                                    openingBalanceWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
+                                                    openingBalanceWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0,
+                                                    consumption: 0,
+                                                    adjustment: 0,
+                                                    stock: 0,
+                                                    shipment: 0,
+                                                    shipmentWps: 0,
+                                                    shipmentWtbdps: 0,
+                                                    expiredQty: batchDetails[b].qty != undefined && batchDetails[b].qty != null ? Number(batchDetails[b].qty) : 0,
+                                                    expiredQtyWps: batchDetails[b].qtyWps != undefined && batchDetails[b].qtyWps != null ? Number(batchDetails[b].qtyWps) : 0,
+                                                    expiredQtyWtbdps: batchDetails[b].qtyWtbdps != undefined && batchDetails[b].qtyWtbdps != null ? Number(batchDetails[b].qtyWtbdps) : 0
+                                                }
+                                                myArray.push(json);
                                             }
                                         }
-                                        var batchListForShipments = shipmentArr[j].batchInfoList;
-                                        for (var b = 0; b < batchListForShipments.length; b++) {
-                                            var batchNo = batchListForShipments[b].batch.batchNo;
-                                            var expiryDate = batchListForShipments[b].batch.expiryDate
-                                            var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                            if (index == -1) {
-                                                var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                if (bd.length > 0) {
-                                                    bd = bd[0];
-                                                    var shipmentQtyWps = 0;
-                                                    var shipmentQtyWtbdps = 0;
-                                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                        shipmentQtyWps = Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
-                                                    }
+                                        var openingBalance = 0;
+                                        if (prevMonthSupplyPlan.length > 0) {
+                                            openingBalance = prevMonthSupplyPlan[0].closingBalance;
+                                        } else {
+                                            openingBalance = 0;
+                                        }
+                                        var openingBalanceWps = 0;
+                                        var openingBalanceWtbdps = 0;
+                                        if (prevMonthSupplyPlan.length > 0) {
+                                            openingBalanceWps = prevMonthSupplyPlan[0].closingBalanceWps;
+                                            openingBalanceWtbdps = prevMonthSupplyPlan[0].closingBalanceWtbdps;
+                                        } else {
+                                            openingBalanceWps = 0;
+                                            openingBalanceWtbdps = 0;
+                                        }
+                                        var cutOffDate = generalProgramJson.cutOffDate != undefined && generalProgramJson.cutOffDate != null && generalProgramJson.cutOffDate != "" ? generalProgramJson.cutOffDate : "";
+                                        if (cutOffDate != "" && moment(createdDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM")) {
+                                            var currentMonthSupplyPlan = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM-DD") == moment(createdDate).format("YYYY-MM-DD") && c.planningUnitId == programPlanningUnitList[ppL].planningUnit.id)
+                                            if (currentMonthSupplyPlan.length > 0) {
+                                                openingBalance = currentMonthSupplyPlan[0].openingBalance;
+                                                openingBalanceWps = currentMonthSupplyPlan[0].openingBalanceWps;
+                                                openingBalanceWtbdps = currentMonthSupplyPlan[0].openingBalanceWtbdps;
+                                            } else {
+                                                openingBalance = 0;
+                                                openingBalanceWps = 0;
+                                                openingBalanceWtbdps = 0;
+                                            }
+                                        }
+                                        if (moment(startDate).format("YYYY-MM-DD") > moment(lastDate).format("YYYY-MM-DD") && openingBalance == 0 && openingBalanceWps == 0) {
+                                            lastDataEntryDate = startDate;
+                                        }
+                                        var shipmentList = (programJsonForStoringTheResult.shipmentList).filter(c => c.active.toString() == "true" && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && c.accountFlag.toString() == "true");
+                                        var shipmentArr = shipmentList.filter(c => (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (c.receivedDate >= startDate && c.receivedDate <= endDate) : (c.expectedDeliveryDate >= startDate && c.expectedDeliveryDate <= endDate))
+                                        var shipmentTotalQty = 0;
+                                        var shipmentTotalQtyWps = 0;
+                                        var shipmentTotalQtyWtbdps = 0;
+                                        var manualTotalQty = 0;
+                                        var receivedShipmentsTotalData = 0;
+                                        var shippedShipmentsTotalData = 0;
+                                        var approvedShipmentsTotalData = 0;
+                                        var submittedShipmentsTotalData = 0;
+                                        var plannedShipmentsTotalData = 0;
+                                        var plannedShipmentsTotalWtbdData = 0;
+                                        var onholdShipmentsTotalData = 0;
+                                        var erpTotalQty = 0;
+                                        var receivedErpShipmentsTotalData = 0;
+                                        var shippedErpShipmentsTotalData = 0;
+                                        var approvedErpShipmentsTotalData = 0;
+                                        var submittedErpShipmentsTotalData = 0;
+                                        var plannedErpShipmentsTotalData = 0;
+                                        var plannedErpShipmentsTotalWtbdData = 0;
+                                        var onholdErpShipmentsTotalData = 0;
+                                        var shipmentBatchQtyTotal = 0;
+                                        var shipmentBatchQtyTotalWps = 0;
+                                        var shipmentBatchQtyTotalWtbdps = 0;
+                                        var consumptionBatchQtyTotal = 0;
+                                        var adjustmentBatchQtyTotal = 0;
+                                        var actualBatchQtyTotal = 0;
+                                        for (var j = 0; j < shipmentArr.length; j++) {
+                                            shipmentTotalQty += Number((shipmentArr[j].shipmentQty));
+                                            if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
+                                                shipmentTotalQtyWps += Number((shipmentArr[j].shipmentQty));
+                                            }
+                                            if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                                shipmentTotalQtyWtbdps += Number((shipmentArr[j].shipmentQty));
+                                            }
+                                            if (shipmentArr[j].erpFlag.toString() == "false") {
+                                                manualTotalQty += Number((shipmentArr[j].shipmentQty));
+                                                if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                                    receivedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                                    shippedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                                    approvedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                                    submittedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                                    plannedShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                                     if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                        shipmentQtyWtbdps = Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
+                                                        plannedShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
                                                     }
-                                                    var json = {
-                                                        batchId: bd.batchId,
-                                                        batchNo: bd.batchNo,
-                                                        expiryDate: bd.expiryDate,
-                                                        createdDate: bd.createdDate,
-                                                        autoGenerated: bd.autoGenerated,
-                                                        openingBalance: 0,
-                                                        openingBalanceWps: 0,
-                                                        openingBalanceWtbdps: 0,
-                                                        consumption: 0,
-                                                        adjustment: 0,
-                                                        stock: 0,
-                                                        shipment: Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8))),
-                                                        shipmentWps: shipmentQtyWps,
-                                                        shipmentWtbdps: shipmentQtyWtbdps,
-                                                        expiredQty: 0,
-                                                        expiredQtyWps: 0,
-                                                        expiredQtyWtbdps: 0
-                                                    }
-                                                    myArray.push(json);
+                                                } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    onholdShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                                 }
                                             } else {
-                                                myArray[index].shipment = Number(myArray[index].shipment) + Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
-                                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number((Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier))).toFixed(8));
-                                                }
-                                                if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                    myArray[index].shipmentWtbdps = Number(myArray[index].shipmentWtbdps) + Number((Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier))).toFixed(8));
+                                                erpTotalQty += Number((shipmentArr[j].shipmentQty));
+                                                if (shipmentArr[j].shipmentStatus.id == DELIVERED_SHIPMENT_STATUS) {
+                                                    receivedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == SHIPPED_SHIPMENT_STATUS || shipmentArr[j].shipmentStatus.id == ARRIVED_SHIPMENT_STATUS) {
+                                                    shippedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == APPROVED_SHIPMENT_STATUS) {
+                                                    approvedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == SUBMITTED_SHIPMENT_STATUS) {
+                                                    submittedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                } else if (shipmentArr[j].shipmentStatus.id == PLANNED_SHIPMENT_STATUS) {
+                                                    plannedErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
+                                                    if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                                        plannedErpShipmentsTotalWtbdData += Number((shipmentArr[j].shipmentQty));
+                                                    }
+                                                } else if (shipmentArr[j].shipmentStatus.id == ON_HOLD_SHIPMENT_STATUS) {
+                                                    onholdErpShipmentsTotalData += Number((shipmentArr[j].shipmentQty));
                                                 }
                                             }
-                                            var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
-                                            if (index != -1) {
-                                                shipmentBatchQtyTotal += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
-                                                if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
-                                                    shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                            var batchListForShipments = shipmentArr[j].batchInfoList;
+                                            for (var b = 0; b < batchListForShipments.length; b++) {
+                                                var batchNo = batchListForShipments[b].batch.batchNo;
+                                                var expiryDate = batchListForShipments[b].batch.expiryDate
+                                                var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                if (index == -1) {
+                                                    var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                    if (bd.length > 0) {
+                                                        bd = bd[0];
+                                                        var shipmentQtyWps = 0;
+                                                        var shipmentQtyWtbdps = 0;
+                                                        if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
+                                                            shipmentQtyWps = Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
+                                                        }
+                                                        if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                                            shipmentQtyWtbdps = Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
+                                                        }
+                                                        var json = {
+                                                            batchId: bd.batchId,
+                                                            batchNo: bd.batchNo,
+                                                            expiryDate: bd.expiryDate,
+                                                            createdDate: bd.createdDate,
+                                                            autoGenerated: bd.autoGenerated,
+                                                            openingBalance: 0,
+                                                            openingBalanceWps: 0,
+                                                            openingBalanceWtbdps: 0,
+                                                            consumption: 0,
+                                                            adjustment: 0,
+                                                            stock: 0,
+                                                            shipment: Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8))),
+                                                            shipmentWps: shipmentQtyWps,
+                                                            shipmentWtbdps: shipmentQtyWtbdps,
+                                                            expiredQty: 0,
+                                                            expiredQtyWps: 0,
+                                                            expiredQtyWtbdps: 0
+                                                        }
+                                                        myArray.push(json);
+                                                    }
+                                                } else {
+                                                    myArray[index].shipment = Number(myArray[index].shipment) + Number(Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier)).toFixed(8));
+                                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
+                                                        myArray[index].shipmentWps = Number(myArray[index].shipmentWps) + Number((Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier))).toFixed(8));
+                                                    }
+                                                    if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                                        myArray[index].shipmentWtbdps = Number(myArray[index].shipmentWtbdps) + Number((Number(batchListForShipments[b].shipmentQty) * Number(Number(shipmentArr[j].realmCountryPlanningUnit.multiplier))).toFixed(8));
+                                                    }
                                                 }
-                                                if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
-                                                    shipmentBatchQtyTotalWtbdps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                                var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") && moment(expiryDate).format("YYYY-MM"));
+                                                if (index != -1) {
+                                                    shipmentBatchQtyTotal += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                                    if (shipmentArr[j].shipmentStatus.id != PLANNED_SHIPMENT_STATUS) {
+                                                        shipmentBatchQtyTotalWps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                                    }
+                                                    if (shipmentArr[j].fundingSource && shipmentArr[j].fundingSource.id != TBD_FUNDING_SOURCE) {
+                                                        shipmentBatchQtyTotalWtbdps += Number(myArray[index].shipment) + Number(batchListForShipments[b].shipmentQty);
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                    var actualStockCount = 0;
-                                    var adjustmentQty = 0;
-                                    var regionsReportingActualInventory = 0;
-                                    var totalNoOfRegions = (regionListFiltered).length;
-                                    for (var r = 0; r < totalNoOfRegions; r++) {
-                                        var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
-                                        var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty !== "")).length;
-                                        if (noOfEntriesOfActualStockCount > 0) {
-                                            regionsReportingActualInventory += 1;
-                                        }
-                                        for (var inv = 0; inv < inventoryListForRegion.length; inv++) {
+                                        var inventoryList = (programJsonForStoringTheResult.inventoryList).filter(c => (c.inventoryDate >= startDate && c.inventoryDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                        var actualStockCount = 0;
+                                        var adjustmentQty = 0;
+                                        var regionsReportingActualInventory = 0;
+                                        var totalNoOfRegions = (regionListFiltered).length;
+                                        for (var r = 0; r < totalNoOfRegions; r++) {
+                                            var inventoryListForRegion = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.region.id == regionList[r].id);
+                                            var noOfEntriesOfActualStockCount = (inventoryListForRegion.filter(c => c.actualQty != undefined && c.actualQty != null && c.actualQty !== "")).length;
                                             if (noOfEntriesOfActualStockCount > 0) {
-                                                if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
-                                                    actualStockCount += Number(Number(inventoryListForRegion[inv].actualQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                regionsReportingActualInventory += 1;
+                                            }
+                                            for (var inv = 0; inv < inventoryListForRegion.length; inv++) {
+                                                if (noOfEntriesOfActualStockCount > 0) {
+                                                    if (inventoryListForRegion[inv].actualQty !== "" && inventoryListForRegion[inv].actualQty != null && inventoryListForRegion[inv].actualQty != undefined) {
+                                                        actualStockCount += Number(Number(inventoryListForRegion[inv].actualQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                    }
+                                                    if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
+                                                        adjustmentQty += Number((Number(inventoryListForRegion[inv].adjustmentQty) * Number(Number(inventoryListForRegion[inv].multiplier))).toFixed(8));
+                                                    }
+                                                    var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
+                                                    for (var b = 0; b < batchListForInventory.length; b++) {
+                                                        var batchNo = batchListForInventory[b].batch.batchNo;
+                                                        var expiryDate = batchListForInventory[b].batch.expiryDate;
+                                                        var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                        if (index == -1) {
+                                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                            if (bd.length > 0) {
+                                                                bd = bd[0]
+                                                                var json = {
+                                                                    batchId: bd.batchId,
+                                                                    batchNo: bd.batchNo,
+                                                                    expiryDate: bd.expiryDate,
+                                                                    createdDate: bd.createdDate,
+                                                                    autoGenerated: bd.autoGenerated,
+                                                                    openingBalance: 0,
+                                                                    openingBalanceWps: 0,
+                                                                    openingBalanceWtbdps: 0,
+                                                                    consumption: 0,
+                                                                    adjustment: Number(Number(batchListForInventory[b].adjustmentQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
+                                                                    stock: Number(Number(batchListForInventory[b].actualQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
+                                                                    shipment: 0,
+                                                                    shipmentWps: 0,
+                                                                    shipmentWtbdps: 0,
+                                                                    expiredQty: 0,
+                                                                    expiredQtyWps: 0,
+                                                                    expiredQtyWtbdps: 0
+                                                                }
+                                                                myArray.push(json);
+                                                            }
+                                                        } else {
+                                                            myArray[index].stock = Number(myArray[index].stock) + Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                            myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                        }
+                                                        var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                        actualBatchQtyTotal += Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                    }
+                                                } else {
+                                                    if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
+                                                        adjustmentQty += Number(Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                    }
+                                                    var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
+                                                    for (var b = 0; b < batchListForInventory.length; b++) {
+                                                        var batchNo = batchListForInventory[b].batch.batchNo;
+                                                        var expiryDate = batchListForInventory[b].batch.expiryDate;
+                                                        var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                        if (index == -1) {
+                                                            var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                            if (bd.length > 0) {
+                                                                bd = bd[0];
+                                                                var json = {
+                                                                    batchId: bd.batchId,
+                                                                    batchNo: bd.batchNo,
+                                                                    expiryDate: bd.expiryDate,
+                                                                    createdDate: bd.createdDate,
+                                                                    autoGenerated: bd.autoGenerated,
+                                                                    openingBalance: 0,
+                                                                    openingBalanceWps: 0,
+                                                                    openingBalanceWtbdps: 0,
+                                                                    consumption: 0,
+                                                                    adjustment: Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
+                                                                    stock: 0,
+                                                                    shipment: 0,
+                                                                    shipmentWps: 0,
+                                                                    shipmentWtbdps: 0,
+                                                                    expiredQty: 0,
+                                                                    expiredQtyWps: 0,
+                                                                    expiredQtyWtbdps: 0
+                                                                }
+                                                                myArray.push(json);
+                                                                adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                            }
+                                                        } else {
+                                                            myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                            if (myArray[index].stock == 0) {
+                                                                adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
+                                                            }
+                                                        }
+                                                    }
                                                 }
-                                                if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                                    adjustmentQty += Number((Number(inventoryListForRegion[inv].adjustmentQty) * Number(Number(inventoryListForRegion[inv].multiplier))).toFixed(8));
+                                            }
+                                        }
+                                        var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                        var actualConsumptionQty = 0;
+                                        var trueDemandPerMonth = 0;
+                                        var forecastedConsumptionQty = 0;
+                                        var regionsReportingActualConsumption = [];
+                                        var noOfRegionsReportingActualConsumption = 0;
+                                        var consumptionQty = 0;
+                                        var consumptionType = "";
+                                        var regionList = regionListFiltered;
+                                        for (var c = 0; c < consumptionList.length; c++) {
+                                            if (consumptionList[c].actualFlag.toString() == "true") {
+                                                actualConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8));
+                                                if (consumptionList[c].dayOfStockOut > 0) {
+                                                    var daysPerMonth = moment(startDate).daysInMonth();
+                                                    var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
+                                                    if (daysOfData > 0) {
+                                                        var trueDemandPerDay = Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8)) / daysOfData;
+                                                        trueDemandPerMonth += Number(Number(trueDemandPerDay * daysPerMonth).toFixed(8));
+                                                    }
+                                                } else {
+                                                    trueDemandPerMonth += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
                                                 }
-                                                var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
-                                                for (var b = 0; b < batchListForInventory.length; b++) {
-                                                    var batchNo = batchListForInventory[b].batch.batchNo;
-                                                    var expiryDate = batchListForInventory[b].batch.expiryDate;
+                                                var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
+                                                if (index == -1) {
+                                                    regionsReportingActualConsumption.push(consumptionList[c].region.id);
+                                                }
+                                            } else {
+                                                forecastedConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
+                                            }
+                                        }
+                                        noOfRegionsReportingActualConsumption = regionsReportingActualConsumption.length;
+                                        if (consumptionList.length == 0) {
+                                            consumptionQty = "";
+                                            consumptionType = "";
+                                        } else if (((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) && (noOfRegionsReportingActualConsumption > 0)) {
+                                            consumptionQty = actualConsumptionQty;
+                                            consumptionType = 1;
+                                            var consumptionListForActualConsumption = consumptionList.filter(c => c.actualFlag.toString() == "true");
+                                            for (var ac = 0; ac < consumptionListForActualConsumption.length; ac++) {
+                                                var batchListForConsumption = consumptionListForActualConsumption[ac].batchInfoList;
+                                                for (var b = 0; b < batchListForConsumption.length; b++) {
+                                                    var batchNo = batchListForConsumption[b].batch.batchNo;
+                                                    var expiryDate = batchListForConsumption[b].batch.expiryDate;
                                                     var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
                                                     if (index == -1) {
                                                         var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
@@ -426,49 +547,8 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                                 openingBalance: 0,
                                                                 openingBalanceWps: 0,
                                                                 openingBalanceWtbdps: 0,
-                                                                consumption: 0,
-                                                                adjustment: Number(Number(batchListForInventory[b].adjustmentQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
-                                                                stock: Number(Number(batchListForInventory[b].actualQty) * Number(Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
-                                                                shipment: 0,
-                                                                shipmentWps: 0,
-                                                                shipmentWtbdps: 0,
-                                                                expiredQty: 0,
-                                                                expiredQtyWps: 0,
-                                                                expiredQtyWtbdps: 0
-                                                            }
-                                                            myArray.push(json);
-                                                        }
-                                                    } else {
-                                                        myArray[index].stock = Number(myArray[index].stock) + Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                    }
-                                                    var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                    actualBatchQtyTotal += Number(Number(Number(batchListForInventory[b].actualQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                }
-                                            } else {
-                                                if (inventoryListForRegion[inv].adjustmentQty !== "" && inventoryListForRegion[inv].adjustmentQty != null && inventoryListForRegion[inv].adjustmentQty != undefined) {
-                                                    adjustmentQty += Number(Number(Number(inventoryListForRegion[inv].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                }
-                                                var batchListForInventory = inventoryListForRegion[inv].batchInfoList;
-                                                for (var b = 0; b < batchListForInventory.length; b++) {
-                                                    var batchNo = batchListForInventory[b].batch.batchNo;
-                                                    var expiryDate = batchListForInventory[b].batch.expiryDate;
-                                                    var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                    if (index == -1) {
-                                                        var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                        if (bd.length > 0) {
-                                                            bd = bd[0];
-                                                            var json = {
-                                                                batchId: bd.batchId,
-                                                                batchNo: bd.batchNo,
-                                                                expiryDate: bd.expiryDate,
-                                                                createdDate: bd.createdDate,
-                                                                autoGenerated: bd.autoGenerated,
-                                                                openingBalance: 0,
-                                                                openingBalanceWps: 0,
-                                                                openingBalanceWtbdps: 0,
-                                                                consumption: 0,
-                                                                adjustment: Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8)),
+                                                                consumption: Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8)),
+                                                                adjustment: 0,
                                                                 stock: 0,
                                                                 shipment: 0,
                                                                 shipmentWps: 0,
@@ -478,163 +558,83 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                                 expiredQtyWtbdps: 0
                                                             }
                                                             myArray.push(json);
-                                                            adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
                                                         }
                                                     } else {
-                                                        myArray[index].adjustment = Number(myArray[index].adjustment) + Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                        if (myArray[index].stock == 0) {
-                                                            adjustmentBatchQtyTotal += Number(Number(Number(batchListForInventory[b].adjustmentQty) * Number(inventoryListForRegion[inv].multiplier)).toFixed(8));
-                                                        }
+                                                        myArray[index].consumption = Number(myArray[index].consumption) + Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
                                                     }
+                                                    var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
+                                                    consumptionBatchQtyTotal += Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
                                                 }
-                                            }
-                                        }
-                                    }
-                                    var consumptionList = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= startDate && c.consumptionDate <= endDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                    var actualConsumptionQty = 0;
-                                    var trueDemandPerMonth = 0;
-                                    var forecastedConsumptionQty = 0;
-                                    var regionsReportingActualConsumption = [];
-                                    var noOfRegionsReportingActualConsumption = 0;
-                                    var consumptionQty = 0;
-                                    var consumptionType = "";
-                                    var regionList = regionListFiltered;
-                                    for (var c = 0; c < consumptionList.length; c++) {
-                                        if (consumptionList[c].actualFlag.toString() == "true") {
-                                            actualConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8));
-                                            if (consumptionList[c].dayOfStockOut > 0) {
-                                                var daysPerMonth = moment(startDate).daysInMonth();
-                                                var daysOfData = daysPerMonth - consumptionList[c].dayOfStockOut;
-                                                if (daysOfData > 0) {
-                                                    var trueDemandPerDay = Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8)) / daysOfData;
-                                                    trueDemandPerMonth += Number(Number(trueDemandPerDay * daysPerMonth).toFixed(8));
-                                                }
-                                            } else {
-                                                trueDemandPerMonth += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
-                                            }
-                                            var index = regionsReportingActualConsumption.findIndex(f => f == consumptionList[c].region.id);
-                                            if (index == -1) {
-                                                regionsReportingActualConsumption.push(consumptionList[c].region.id);
                                             }
                                         } else {
-                                            forecastedConsumptionQty += Number(Number(Math.round(consumptionList[c].consumptionRcpuQty) * Number(consumptionList[c].multiplier)).toFixed(8))
+                                            consumptionQty = forecastedConsumptionQty;
+                                            consumptionType = 0;
+                                            trueDemandPerMonth = forecastedConsumptionQty;
                                         }
-                                    }
-                                    noOfRegionsReportingActualConsumption = regionsReportingActualConsumption.length;
-                                    if (consumptionList.length == 0) {
-                                        consumptionQty = "";
-                                        consumptionType = "";
-                                    } else if (((totalNoOfRegions == noOfRegionsReportingActualConsumption) || (actualConsumptionQty >= forecastedConsumptionQty)) && (noOfRegionsReportingActualConsumption > 0)) {
-                                        consumptionQty = actualConsumptionQty;
-                                        consumptionType = 1;
-                                        var consumptionListForActualConsumption = consumptionList.filter(c => c.actualFlag.toString() == "true");
-                                        for (var ac = 0; ac < consumptionListForActualConsumption.length; ac++) {
-                                            var batchListForConsumption = consumptionListForActualConsumption[ac].batchInfoList;
-                                            for (var b = 0; b < batchListForConsumption.length; b++) {
-                                                var batchNo = batchListForConsumption[b].batch.batchNo;
-                                                var expiryDate = batchListForConsumption[b].batch.expiryDate;
-                                                var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                if (index == -1) {
-                                                    var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                    if (bd.length > 0) {
-                                                        bd = bd[0]
-                                                        var json = {
-                                                            batchId: bd.batchId,
-                                                            batchNo: bd.batchNo,
-                                                            expiryDate: bd.expiryDate,
-                                                            createdDate: bd.createdDate,
-                                                            autoGenerated: bd.autoGenerated,
-                                                            openingBalance: 0,
-                                                            openingBalanceWps: 0,
-                                                            openingBalanceWtbdps: 0,
-                                                            consumption: Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8)),
-                                                            adjustment: 0,
-                                                            stock: 0,
-                                                            shipment: 0,
-                                                            shipmentWps: 0,
-                                                            shipmentWtbdps: 0,
-                                                            expiredQty: 0,
-                                                            expiredQtyWps: 0,
-                                                            expiredQtyWtbdps: 0
-                                                        }
-                                                        myArray.push(json);
-                                                    }
-                                                } else {
-                                                    myArray[index].consumption = Number(myArray[index].consumption) + Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
+                                        myArray.map(item => {
+                                            if (moment(item.expiryDate).format("YYYY-MM") <= moment(startDate).format("YYYY-MM") && moment(startDate).format("YYYY-MM") == moment(item.createdDate).format("YYYY-MM")) {
+                                                expiredStock += Number(Number(Number(item.openingBalance) + Number(item.shipment)).toFixed(8));
+                                                expiredStockWps += Number(Number(Number(item.openingBalanceWps) + Number(item.shipmentWps)).toFixed(8));
+                                                expiredStockWtbdps += Number(Number(Number(item.openingBalanceWtbdps) + Number(item.shipmentWtbdps)).toFixed(8));
+                                                var index = myArray.findIndex(c => c.batchNo == item.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM"));
+                                                myArray[index].expiredQty = Number(Number(Number(item.openingBalance) + Number(item.shipment)).toFixed(8));
+                                                myArray[index].expiredQtyWps = Number(Number(Number(item.openingBalanceWps) + Number(item.shipmentWps)).toFixed(8));
+                                                myArray[index].expiredQtyWtbdps = Number(Number(Number(item.openingBalanceWtbdps) + Number(item.shipmentWtbdps)).toFixed(8));
+                                            }
+                                        })
+                                        var expectedStock = 0;
+                                        expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
+                                        var expectedStockWps = 0;
+                                        expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
+                                        var expectedStockWtbdps = 0;
+                                        expectedStockWtbdps = openingBalanceWtbdps - expiredStockWtbdps + shipmentTotalQtyWtbdps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
+                                        var nationalAdjustment = 0;
+                                        if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
+                                            nationalAdjustment = actualStockCount - expectedStock;
+                                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                                            nationalAdjustment = actualStockCount - expectedStock;
+                                        } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
+                                            nationalAdjustment = actualStockCount - expectedStock;
+                                        }
+                                        var nationalAdjustmentWps = 0;
+                                        if (regionsReportingActualInventory == totalNoOfRegions && expectedStockWps != actualStockCount) {
+                                            nationalAdjustmentWps = actualStockCount - expectedStockWps;
+                                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                                            nationalAdjustmentWps = actualStockCount - expectedStockWps;
+                                        } else if (regionsReportingActualInventory > 0 && expectedStockWps < 0) {
+                                            nationalAdjustmentWps = actualStockCount - expectedStockWps;
+                                        }
+                                        var nationalAdjustmentWtbdps = 0;
+                                        if (regionsReportingActualInventory == totalNoOfRegions && expectedStockWtbdps != actualStockCount) {
+                                            nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
+                                        } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
+                                            nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
+                                        } else if (regionsReportingActualInventory > 0 && expectedStockWtbdps < 0) {
+                                            nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
+                                        }
+                                        var useInventoryCalculations = false;
+                                        var batchInventoryList = generalProgramJson.batchInventoryList;
+                                        if (batchInventoryList == undefined) {
+                                            batchInventoryList = [];
+                                        }
+                                        var batchInventoryListFilter = batchInventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(startDate).format("YYYY-MM"));
+                                        if (batchInventoryListFilter.length > 0) {
+                                            var inventoryListForRegionFilter = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.actualQty != undefined && c.actualQty != null && c.actualQty !== "" && c.active.toString() == "true");
+                                            if (inventoryListForRegionFilter.length == totalNoOfRegions) {
+                                                var stock = 0;
+                                                inventoryListForRegionFilter.map(item => {
+                                                    stock += Number(item.actualQty) * Number(item.multiplier)
+                                                })
+                                                var batchQty = 0;
+                                                var batchInfoList = batchInventoryListFilter[0].batchList;
+                                                batchInfoList.map(item => {
+                                                    batchQty += Number(item.qty)
+                                                })
+                                                if (Number(Number(stock).toFixed(8)) == Number(Number(batchQty).toFixed(8))) {
+                                                    useInventoryCalculations = true;
                                                 }
-                                                var index = myArray.findIndex(c => c.batchNo == batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(expiryDate).format("YYYY-MM"));
-                                                consumptionBatchQtyTotal += Number(Number(Number(batchListForConsumption[b].consumptionQty) * Number(consumptionListForActualConsumption[ac].multiplier)).toFixed(8));
-                                            }
-                                        }
-                                    } else {
-                                        consumptionQty = forecastedConsumptionQty;
-                                        consumptionType = 0;
-                                        trueDemandPerMonth = forecastedConsumptionQty;
-                                    }
-                                    myArray.map(item=>{
-                                        if (moment(item.expiryDate).format("YYYY-MM") <= moment(startDate).format("YYYY-MM") && moment(startDate).format("YYYY-MM")==moment(item.createdDate).format("YYYY-MM")) {
-                                            expiredStock += Number(Number(Number(item.openingBalance)+Number(item.shipment)).toFixed(8));
-                                            expiredStockWps += Number(Number(Number(item.openingBalanceWps)+Number(item.shipmentWps)).toFixed(8));
-                                            expiredStockWtbdps += Number(Number(Number(item.openingBalanceWtbdps)+Number(item.shipmentWtbdps)).toFixed(8));
-                                            var index = myArray.findIndex(c => c.batchNo == item.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM"));
-                                            myArray[index].expiredQty=Number(Number(Number(item.openingBalance)+Number(item.shipment)).toFixed(8));
-                                            myArray[index].expiredQtyWps=Number(Number(Number(item.openingBalanceWps)+Number(item.shipmentWps)).toFixed(8));
-                                            myArray[index].expiredQtyWtbdps=Number(Number(Number(item.openingBalanceWtbdps)+Number(item.shipmentWtbdps)).toFixed(8));
-                                        }
-                                    })
-                                    var expectedStock = 0;
-                                    expectedStock = openingBalance - expiredStock + shipmentTotalQty - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
-                                    var expectedStockWps = 0;
-                                    expectedStockWps = openingBalanceWps - expiredStockWps + shipmentTotalQtyWps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
-                                    var expectedStockWtbdps = 0;
-                                    expectedStockWtbdps = openingBalanceWtbdps - expiredStockWtbdps + shipmentTotalQtyWtbdps - (consumptionQty !== "" ? Number(consumptionQty) : 0) + (adjustmentQty !== "" ? Number(adjustmentQty) : 0);
-                                    var nationalAdjustment = 0;
-                                    if (regionsReportingActualInventory == totalNoOfRegions && expectedStock != actualStockCount) {
-                                        nationalAdjustment = actualStockCount - expectedStock;
-                                    } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                                        nationalAdjustment = actualStockCount - expectedStock;
-                                    } else if (regionsReportingActualInventory > 0 && expectedStock < 0) {
-                                        nationalAdjustment = actualStockCount - expectedStock;
-                                    }
-                                    var nationalAdjustmentWps = 0;
-                                    if (regionsReportingActualInventory == totalNoOfRegions && expectedStockWps != actualStockCount) {
-                                        nationalAdjustmentWps = actualStockCount - expectedStockWps;
-                                    } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                                        nationalAdjustmentWps = actualStockCount - expectedStockWps;
-                                    } else if (regionsReportingActualInventory > 0 && expectedStockWps < 0) {
-                                        nationalAdjustmentWps = actualStockCount - expectedStockWps;
-                                    }
-                                    var nationalAdjustmentWtbdps = 0;
-                                    if (regionsReportingActualInventory == totalNoOfRegions && expectedStockWtbdps != actualStockCount) {
-                                        nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
-                                    } else if (regionsReportingActualInventory > 0 && inventoryList.length != 0 && actualStockCount > (expectedStock + adjustmentQty)) {
-                                        nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
-                                    } else if (regionsReportingActualInventory > 0 && expectedStockWtbdps < 0) {
-                                        nationalAdjustmentWtbdps = actualStockCount - expectedStockWtbdps;
-                                    }
-                                    var useInventoryCalculations=false;
-                                    var batchInventoryList=generalProgramJson.batchInventoryList;
-                                    if(batchInventoryList==undefined){
-                                        batchInventoryList=[];
-                                    }
-                                    var batchInventoryListFilter = batchInventoryList.filter(c=>moment(c.inventoryDate).format("YYYY-MM")==moment(startDate).format("YYYY-MM"));
-                                    if(batchInventoryListFilter.length>0){
-                                        var inventoryListForRegionFilter = inventoryList.filter(c => c.region != null && c.region.id != 0 && c.actualQty != undefined && c.actualQty != null && c.actualQty !== "" && c.active.toString()=="true");
-                                        if(inventoryListForRegionFilter.length==totalNoOfRegions){
-                                            var stock=0;
-                                            inventoryListForRegionFilter.map(item=>{
-                                                stock+=Number(item.actualQty)*Number(item.multiplier)
-                                            })
-                                            var batchQty=0;
-                                            var batchInfoList=batchInventoryListFilter[0].batchList;
-                                            batchInfoList.map(item=>{
-                                                batchQty+=Number(item.qty)
-                                            })
-                                            if(Number(Number(stock).toFixed(8))==Number(Number(batchQty).toFixed(8))){
-                                                useInventoryCalculations=true;
-                                            }
-                                            batchInfoList.map(item=>{
-                                                var index = myArray.findIndex(c => c.batchNo == item.batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.batch.expiryDate).format("YYYY-MM"));
+                                                batchInfoList.map(item => {
+                                                    var index = myArray.findIndex(c => c.batchNo == item.batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.batch.expiryDate).format("YYYY-MM"));
                                                     if (index == -1) {
                                                         var bd = batchDetailsFromProgramJson.filter(c => c.batchNo == item.batch.batchNo && moment(c.expiryDate).format("YYYY-MM") == moment(item.batch.expiryDate).format("YYYY-MM"));
                                                         if (bd.length > 0) {
@@ -661,990 +661,996 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
                                                             myArray.push(json);
                                                         }
                                                     }
-                                            })
-                                        }
-                                    }
-                                    myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
-                                    if(useInventoryCalculations){
-                                        for(var a=0;a<myArray.length;a++){
-                                            var batchListForInventory=batchInventoryListFilter[0].batchList.filter(c=>c.batch.batchNo==myArray[a].batchNo && moment(c.batch.expiryDate).format("YYYY-MM")==moment(myArray[a].expiryDate).format("YYYY-MM"));
-                                            myArray[a].closingBalance=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0;
-                                            myArray[a].closingBalanceWps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                                            myArray[a].closingBalanceWtbdps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                                            myArray[a].qty=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0;
-                                            myArray[a].qtyWps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                                            myArray[a].qtyWtbdps=batchListForInventory.length>0?Number(batchListForInventory[0].qty):0
-                                            myArray[a].unallocatedFEFO=0;
-                                            myArray[a].unallocatedFEFOWps=0;
-                                            myArray[a].unallocatedFEFOWtbdps=0;
-                                            myArray[a].unallocatedLEFO=0;
-                                            myArray[a].unallocatedLEFOWps=0;
-                                            myArray[a].unallocatedLEFOWtbdps=0;
-                                            myArray[a].calculatedFEFO=0;
-                                            myArray[a].calculatedFEFOWps=0;
-                                            myArray[a].calculatedFEFOWtbdps=0;
-                                            myArray[a].calculatedLEFO=0;
-                                            myArray[a].calculatedLEFOWps=0;
-                                            myArray[a].calculatedLEFOWtbdps=0;
-                                        }
-                                    }else{
-                                    var unallocatedFEFO = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedLEFO = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedFEFOWps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedFEFOWtbdps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedLEFOWps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    var unallocatedLEFOWtbdps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
-                                    for (var a = 0; a < myArray.length; a++) {
-                                        var bd = myArray[a];
-                                        var tempOB = Number(myArray[a].openingBalance)
-                                            - Number(myArray[a].expiredQty)
-                                            + Number(myArray[a].shipment);
-                                        var consumption = Number(myArray[a].consumption);
-                                        var adjustment = Number(myArray[a].adjustment);
-                                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
-                                                unallocatedLEFO += Number(adjustment);
-                                            } else {
-                                                unallocatedLEFO -= Number(tempOB);
-                                            }
-                                        } else {
-                                            if ((Number(tempOB) + Number(adjustment)) >= 0) {
-                                                unallocatedFEFO += Number(adjustment);
-                                            } else {
-                                                unallocatedFEFO -= Number(tempOB);
+                                                })
                                             }
                                         }
-                                        if ((Number(tempOB) - Number(consumption) + Number(adjustment)) >= 0) {
-                                            unallocatedFEFO -= Number(consumption);
-                                        } else {
-                                            unallocatedFEFO -= (Number(tempOB) + Number(adjustment)) > 0 ? Number(tempOB) + Number(adjustment) : 0;
-                                        }
-                                        if ((Number(tempOB) - Number(consumption) + Number(adjustment)) > 0) {
-                                            myArray[a].closingBalance = (Number(tempOB) - Number(consumption) + Number(adjustment));
-                                        } else {
-                                            myArray[a].closingBalance = 0;
-                                        }
-                                        var tempOBWps = Number(myArray[a].openingBalanceWps)
-                                            - Number(myArray[a].expiredQtyWps)
-                                            + Number(myArray[a].shipmentWps);
-                                        var consumptionWps = Number(myArray[a].consumption);
-                                        var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
-                                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
-                                                unallocatedLEFOWps += Number(adjustmentWps);
-                                            } else {
-                                                unallocatedLEFOWps -= Number(tempOBWps);
+                                        myArray = myArray.sort(function (a, b) { return ((new Date(a.expiryDate) - new Date(b.expiryDate)) || (a.batchId - b.batchId)) })
+                                        if (useInventoryCalculations) {
+                                            for (var a = 0; a < myArray.length; a++) {
+                                                var batchListForInventory = batchInventoryListFilter[0].batchList.filter(c => c.batch.batchNo == myArray[a].batchNo && moment(c.batch.expiryDate).format("YYYY-MM") == moment(myArray[a].expiryDate).format("YYYY-MM"));
+                                                myArray[a].closingBalance = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0;
+                                                myArray[a].closingBalanceWps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                                                myArray[a].closingBalanceWtbdps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                                                myArray[a].qty = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0;
+                                                myArray[a].qtyWps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                                                myArray[a].qtyWtbdps = batchListForInventory.length > 0 ? Number(batchListForInventory[0].qty) : 0
+                                                myArray[a].unallocatedFEFO = 0;
+                                                myArray[a].unallocatedFEFOWps = 0;
+                                                myArray[a].unallocatedFEFOWtbdps = 0;
+                                                myArray[a].unallocatedLEFO = 0;
+                                                myArray[a].unallocatedLEFOWps = 0;
+                                                myArray[a].unallocatedLEFOWtbdps = 0;
+                                                myArray[a].calculatedFEFO = 0;
+                                                myArray[a].calculatedFEFOWps = 0;
+                                                myArray[a].calculatedFEFOWtbdps = 0;
+                                                myArray[a].calculatedLEFO = 0;
+                                                myArray[a].calculatedLEFOWps = 0;
+                                                myArray[a].calculatedLEFOWtbdps = 0;
                                             }
                                         } else {
-                                            if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
-                                                unallocatedFEFOWps += Number(adjustmentWps);
-                                            } else {
-                                                unallocatedFEFOWps -= Number(tempOBWps);
-                                            }
-                                        }
-                                        if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) >= 0) {
-                                            unallocatedFEFOWps -= Number(consumptionWps);
-                                        } else {
-                                            unallocatedFEFOWps -= (Number(tempOBWps) + Number(adjustmentWps)) > 0 ? Number(tempOBWps) + Number(adjustmentWps) : 0;
-                                        }
-                                        if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) > 0) {
-                                            myArray[a].closingBalanceWps = (Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps));
-                                        } else {
-                                            myArray[a].closingBalanceWps = 0;
-                                        }
-                                        var tempOBWtbdps = Number(myArray[a].openingBalanceWtbdps)
-                                            - Number(myArray[a].expiredQtyWtbdps)
-                                            + Number(myArray[a].shipmentWtbdps);
-                                        var consumptionWtbdps = Number(myArray[a].consumption);
-                                        var adjustmentWtbdps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
-                                        if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
-                                            if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                                                unallocatedLEFOWtbdps += Number(adjustmentWtbdps);
-                                            } else {
-                                                unallocatedLEFOWtbdps -= Number(tempOBWtbdps);
-                                            }
-                                        } else {
-                                            if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                                                unallocatedFEFOWtbdps += Number(adjustmentWtbdps);
-                                            } else {
-                                                unallocatedFEFOWtbdps -= Number(tempOBWtbdps);
-                                            }
-                                        }
-                                        if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) >= 0) {
-                                            unallocatedFEFOWtbdps -= Number(consumptionWtbdps);
-                                        } else {
-                                            unallocatedFEFOWtbdps -= (Number(tempOBWtbdps) + Number(adjustmentWtbdps)) > 0 ? Number(tempOBWtbdps) + Number(adjustmentWtbdps) : 0;
-                                        }
-                                        if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) > 0) {
-                                            myArray[a].closingBalanceWtbdps = (Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps));
-                                        } else {
-                                            myArray[a].closingBalanceWtbdps = 0;
-                                        }
-                                    }
-                                    if (Number(unallocatedLEFO) != 0) {
-                                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                                            if (Number(unallocatedLEFO) != 0) {
-                                                var tempCB = Number(myArray[a].closingBalance);
-                                                myArray[a].unallocatedLEFO = Number(unallocatedLEFO);
-                                                if (Number(tempCB) >= Number(unallocatedLEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                                    myArray[a].closingBalance = Number(tempCB) - Number(unallocatedLEFO);
-                                                    myArray[a].calculatedLEFO = Number(unallocatedLEFO);
-                                                    unallocatedLEFO = 0;
+                                            var unallocatedFEFO = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            var unallocatedLEFO = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            var unallocatedFEFOWps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            var unallocatedFEFOWtbdps = Number(consumptionQty) - Math.min(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            var unallocatedLEFOWps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            var unallocatedLEFOWtbdps = 0 - Math.max(0, Number(adjustmentQty) + Number(nationalAdjustment));
+                                            for (var a = 0; a < myArray.length; a++) {
+                                                var bd = myArray[a];
+                                                var tempOB = Number(myArray[a].openingBalance)
+                                                    - Number(myArray[a].expiredQty)
+                                                    + Number(myArray[a].shipment);
+                                                var consumption = Number(myArray[a].consumption);
+                                                var adjustment = Number(myArray[a].adjustment);
+                                                if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                                    if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                                        unallocatedLEFO += Number(adjustment);
+                                                    } else {
+                                                        unallocatedLEFO -= Number(tempOB);
+                                                    }
+                                                } else {
+                                                    if ((Number(tempOB) + Number(adjustment)) >= 0) {
+                                                        unallocatedFEFO += Number(adjustment);
+                                                    } else {
+                                                        unallocatedFEFO -= Number(tempOB);
+                                                    }
+                                                }
+                                                if ((Number(tempOB) - Number(consumption) + Number(adjustment)) >= 0) {
+                                                    unallocatedFEFO -= Number(consumption);
+                                                } else {
+                                                    unallocatedFEFO -= (Number(tempOB) + Number(adjustment)) > 0 ? Number(tempOB) + Number(adjustment) : 0;
+                                                }
+                                                if ((Number(tempOB) - Number(consumption) + Number(adjustment)) > 0) {
+                                                    myArray[a].closingBalance = (Number(tempOB) - Number(consumption) + Number(adjustment));
                                                 } else {
                                                     myArray[a].closingBalance = 0;
-                                                    myArray[a].calculatedLEFO = Number(tempCB);
-                                                    unallocatedLEFO -= Number(tempCB);
+                                                }
+                                                var tempOBWps = Number(myArray[a].openingBalanceWps)
+                                                    - Number(myArray[a].expiredQtyWps)
+                                                    + Number(myArray[a].shipmentWps);
+                                                var consumptionWps = Number(myArray[a].consumption);
+                                                var adjustmentWps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                                if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                                    if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                                        unallocatedLEFOWps += Number(adjustmentWps);
+                                                    } else {
+                                                        unallocatedLEFOWps -= Number(tempOBWps);
+                                                    }
+                                                } else {
+                                                    if ((Number(tempOBWps) + Number(adjustmentWps)) >= 0) {
+                                                        unallocatedFEFOWps += Number(adjustmentWps);
+                                                    } else {
+                                                        unallocatedFEFOWps -= Number(tempOBWps);
+                                                    }
+                                                }
+                                                if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) >= 0) {
+                                                    unallocatedFEFOWps -= Number(consumptionWps);
+                                                } else {
+                                                    unallocatedFEFOWps -= (Number(tempOBWps) + Number(adjustmentWps)) > 0 ? Number(tempOBWps) + Number(adjustmentWps) : 0;
+                                                }
+                                                if ((Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps)) > 0) {
+                                                    myArray[a].closingBalanceWps = (Number(tempOBWps) - Number(consumptionWps) + Number(adjustmentWps));
+                                                } else {
+                                                    myArray[a].closingBalanceWps = 0;
+                                                }
+                                                var tempOBWtbdps = Number(myArray[a].openingBalanceWtbdps)
+                                                    - Number(myArray[a].expiredQtyWtbdps)
+                                                    + Number(myArray[a].shipmentWtbdps);
+                                                var consumptionWtbdps = Number(myArray[a].consumption);
+                                                var adjustmentWtbdps = (Number(myArray[a].stock) == 0 ? Number(myArray[a].adjustment) : 0);
+                                                if (Number(adjustmentQty) + Number(nationalAdjustment) > 0) {
+                                                    if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                                        unallocatedLEFOWtbdps += Number(adjustmentWtbdps);
+                                                    } else {
+                                                        unallocatedLEFOWtbdps -= Number(tempOBWtbdps);
+                                                    }
+                                                } else {
+                                                    if ((Number(tempOBWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                                        unallocatedFEFOWtbdps += Number(adjustmentWtbdps);
+                                                    } else {
+                                                        unallocatedFEFOWtbdps -= Number(tempOBWtbdps);
+                                                    }
+                                                }
+                                                if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) >= 0) {
+                                                    unallocatedFEFOWtbdps -= Number(consumptionWtbdps);
+                                                } else {
+                                                    unallocatedFEFOWtbdps -= (Number(tempOBWtbdps) + Number(adjustmentWtbdps)) > 0 ? Number(tempOBWtbdps) + Number(adjustmentWtbdps) : 0;
+                                                }
+                                                if ((Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps)) > 0) {
+                                                    myArray[a].closingBalanceWtbdps = (Number(tempOBWtbdps) - Number(consumptionWtbdps) + Number(adjustmentWtbdps));
+                                                } else {
+                                                    myArray[a].closingBalanceWtbdps = 0;
+                                                }
+                                            }
+                                            if (Number(unallocatedLEFO) != 0) {
+                                                for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                                    if (Number(unallocatedLEFO) != 0) {
+                                                        var tempCB = Number(myArray[a].closingBalance);
+                                                        myArray[a].unallocatedLEFO = Number(unallocatedLEFO);
+                                                        if (Number(tempCB) >= Number(unallocatedLEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedLEFO);
+                                                            myArray[a].calculatedLEFO = Number(unallocatedLEFO);
+                                                            unallocatedLEFO = 0;
+                                                        } else {
+                                                            myArray[a].closingBalance = 0;
+                                                            myArray[a].calculatedLEFO = Number(tempCB);
+                                                            unallocatedLEFO -= Number(tempCB);
+                                                        }
+                                                        myArray[a].qty = Number(myArray[a].closingBalance);
+                                                    }
+                                                }
+                                            }
+                                            if (Number(unallocatedLEFOWps) != 0) {
+                                                for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                                    if (Number(unallocatedLEFOWps) != 0) {
+                                                        var tempCB = Number(myArray[a].closingBalanceWps);
+                                                        myArray[a].unallocatedLEFOWps = Number(unallocatedLEFOWps);
+                                                        if (Number(tempCB) >= Number(unallocatedLEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedLEFOWps);
+                                                            myArray[a].calculatedLEFOWps = Number(unallocatedLEFOWps);
+                                                            unallocatedLEFOWps = 0;
+                                                        } else {
+                                                            myArray[a].closingBalanceWps = 0;
+                                                            myArray[a].calculatedLEFOWps = Number(tempCB);
+                                                            unallocatedLEFOWps -= Number(tempCB);
+                                                        }
+                                                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
+                                                    }
+                                                }
+                                            }
+                                            if (Number(unallocatedLEFOWtbdps) != 0) {
+                                                for (var a = (myArray.length) - 1; a >= 0; a--) {
+                                                    if (Number(unallocatedLEFOWtbdps) != 0) {
+                                                        var tempCB = Number(myArray[a].closingBalanceWtbdps);
+                                                        myArray[a].unallocatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
+                                                        if (Number(tempCB) >= Number(unallocatedLEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                            myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedLEFOWtbdps);
+                                                            myArray[a].calculatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
+                                                            unallocatedLEFOWtbdps = 0;
+                                                        } else {
+                                                            myArray[a].closingBalanceWtbdps = 0;
+                                                            myArray[a].calculatedLEFOWtbdps = Number(tempCB);
+                                                            unallocatedLEFOWtbdps -= Number(tempCB);
+                                                        }
+                                                        myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
+                                                    }
+                                                }
+                                            }
+                                            if (Number(unallocatedLEFO) < 0 || Number(unallocatedLEFOWps) < 0 || Number(unallocatedLEFOWtbdps) < 0) {
+                                                var checkIfBatchExists = batchDetailsFromProgramJson.findIndex(c => moment(c.createdDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD") && moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"));
+                                                if (checkIfBatchExists == -1) {
+                                                    var batchNo = (BATCH_PREFIX).concat(paddingZero(generalProgramJson.programId, 0, 6)).concat(paddingZero(programPlanningUnitList[ppL].planningUnit.id, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
+                                                    var json = {
+                                                        batchId: 0,
+                                                        batchNo: batchNo,
+                                                        autoGenerated: true,
+                                                        openingBalance: 0,
+                                                        openingBalanceWps: 0,
+                                                        openingBalanceWtbdps: 0,
+                                                        consumption: 0,
+                                                        adjustment: 0,
+                                                        stock: 0,
+                                                        shipment: 0,
+                                                        shipmentWps: 0,
+                                                        shipmentWtbdps: 0,
+                                                        expiredQty: 0,
+                                                        expiredQtyWps: 0,
+                                                        expiredQtyWtbdps: 0,
+                                                        shelfLife: programPlanningUnitList[ppL].shelfLife,
+                                                        expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
+                                                        createdDate: moment(startDate).format("YYYY-MM-DD"),
+                                                        openingBalance: 0,
+                                                        openingBalanceWps: 0,
+                                                        openingBalanceWtbdps: 0,
+                                                        unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                                        calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                                        unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                                        unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                                        calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                                        calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                                        closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                                        closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                                        closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                                        qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                                        qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                                        qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                                    }
+                                                    myArray.push(json);
+                                                    var coreBatch = {
+                                                        batchId: 0,
+                                                        batchNo: batchNo,
+                                                        autoGenerated: true,
+                                                        planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
+                                                        expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
+                                                        createdDate: moment(startDate).format("YYYY-MM-DD")
+                                                    }
+                                                    coreBatchDetails.push(coreBatch)
+                                                } else {
+                                                    var json = {
+                                                        batchId: batchDetailsFromProgramJson[checkIfBatchExists].batchId,
+                                                        batchNo: batchDetailsFromProgramJson[checkIfBatchExists].batchNo,
+                                                        autoGenerated: batchDetailsFromProgramJson[checkIfBatchExists].autoGenerated,
+                                                        openingBalance: 0,
+                                                        openingBalanceWps: 0,
+                                                        openingBalanceWtbdps: 0,
+                                                        consumption: 0,
+                                                        adjustment: 0,
+                                                        stock: 0,
+                                                        shipment: 0,
+                                                        shipmentWps: 0,
+                                                        shipmentWtbdps: 0,
+                                                        expiredQty: 0,
+                                                        expiredQtyWps: 0,
+                                                        expiredQtyWtbdps: 0,
+                                                        shelfLife: programPlanningUnitList[ppL].shelfLife,
+                                                        expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
+                                                        createdDate: moment(startDate).format("YYYY-MM-DD"),
+                                                        openingBalance: 0,
+                                                        openingBalanceWps: 0,
+                                                        openingBalanceWtbdps: 0,
+                                                        unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                                        calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
+                                                        unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                                        unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                                        calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
+                                                        calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
+                                                        closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                                        closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                                        closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                                        qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
+                                                        qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
+                                                        qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
+                                                    }
+                                                    myArray.push(json);
+                                                }
+                                            }
+                                            for (var a = 0; a < myArray.length; a++) {
+                                                var tempCB = Number(myArray[a].closingBalance);
+                                                myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
+                                                if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                    myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
+                                                    myArray[a].calculatedFEFO = Number(unallocatedFEFO);
+                                                    unallocatedFEFO = 0;
+                                                } else {
+                                                    myArray[a].closingBalance = 0;
+                                                    myArray[a].calculatedFEFO = Number(tempCB);
+                                                    unallocatedFEFO -= Number(tempCB);
                                                 }
                                                 myArray[a].qty = Number(myArray[a].closingBalance);
                                             }
-                                        }
-                                    }
-                                    if (Number(unallocatedLEFOWps) != 0) {
-                                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                                            if (Number(unallocatedLEFOWps) != 0) {
+                                            for (var a = 0; a < myArray.length; a++) {
                                                 var tempCB = Number(myArray[a].closingBalanceWps);
-                                                myArray[a].unallocatedLEFOWps = Number(unallocatedLEFOWps);
-                                                if (Number(tempCB) >= Number(unallocatedLEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                                    myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedLEFOWps);
-                                                    myArray[a].calculatedLEFOWps = Number(unallocatedLEFOWps);
-                                                    unallocatedLEFOWps = 0;
+                                                myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
+                                                if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                    myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
+                                                    myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
+                                                    unallocatedFEFOWps = 0;
                                                 } else {
                                                     myArray[a].closingBalanceWps = 0;
-                                                    myArray[a].calculatedLEFOWps = Number(tempCB);
-                                                    unallocatedLEFOWps -= Number(tempCB);
+                                                    myArray[a].calculatedFEFOWps = Number(tempCB);
+                                                    unallocatedFEFOWps -= Number(tempCB);
                                                 }
                                                 myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
-                                            }
-                                        }
-                                    }
-                                    if (Number(unallocatedLEFOWtbdps) != 0) {
-                                        for (var a = (myArray.length) - 1; a >= 0; a--) {
-                                            if (Number(unallocatedLEFOWtbdps) != 0) {
                                                 var tempCB = Number(myArray[a].closingBalanceWtbdps);
-                                                myArray[a].unallocatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
-                                                if (Number(tempCB) >= Number(unallocatedLEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                                    myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedLEFOWtbdps);
-                                                    myArray[a].calculatedLEFOWtbdps = Number(unallocatedLEFOWtbdps);
-                                                    unallocatedLEFOWtbdps = 0;
+                                                myArray[a].unallocatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
+                                                if (Number(tempCB) >= Number(unallocatedFEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
+                                                    myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedFEFOWtbdps);
+                                                    myArray[a].calculatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
+                                                    unallocatedFEFOWtbdps = 0;
                                                 } else {
                                                     myArray[a].closingBalanceWtbdps = 0;
-                                                    myArray[a].calculatedLEFOWtbdps = Number(tempCB);
-                                                    unallocatedLEFOWtbdps -= Number(tempCB);
+                                                    myArray[a].calculatedFEFOWtbdps = Number(tempCB);
+                                                    unallocatedFEFOWtbdps -= Number(tempCB);
                                                 }
                                                 myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
                                             }
                                         }
-                                    }
-                                    if (Number(unallocatedLEFO) < 0 || Number(unallocatedLEFOWps) < 0 || Number(unallocatedLEFOWtbdps) < 0) {
-                                        var checkIfBatchExists = batchDetailsFromProgramJson.findIndex(c => moment(c.createdDate).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD") && moment(c.expiryDate).format("YYYY-MM-DD") == moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"));
-                                        if (checkIfBatchExists == -1) {
-                                            var batchNo = (BATCH_PREFIX).concat(paddingZero(generalProgramJson.programId, 0, 6)).concat(paddingZero(programPlanningUnitList[ppL].planningUnit.id, 0, 8)).concat(moment(Date.now()).format("YYMMDD")).concat(generateRandomAplhaNumericCode(3));
-                                            var json = {
-                                                batchId: 0,
-                                                batchNo: batchNo,
-                                                autoGenerated: true,
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                openingBalanceWtbdps: 0,
-                                                consumption: 0,
-                                                adjustment: 0,
-                                                stock: 0,
-                                                shipment: 0,
-                                                shipmentWps: 0,
-                                                shipmentWtbdps: 0,
-                                                expiredQty: 0,
-                                                expiredQtyWps: 0,
-                                                expiredQtyWtbdps: 0,
-                                                shelfLife: programPlanningUnitList[ppL].shelfLife,
-                                                expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
-                                                createdDate: moment(startDate).format("YYYY-MM-DD"),
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                openingBalanceWtbdps: 0,
-                                                unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                                calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                                unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                                unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                                calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                                calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                                closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                                closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                                closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                                qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                                qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                                qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                            }
-                                            myArray.push(json);
-                                            var coreBatch = {
-                                                batchId: 0,
-                                                batchNo: batchNo,
-                                                autoGenerated: true,
-                                                planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
-                                                expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
-                                                createdDate: moment(startDate).format("YYYY-MM-DD")
-                                            }
-                                            coreBatchDetails.push(coreBatch)
+                                        myArray = myArray.filter(c => (
+                                            (c.openingBalance != 0 && c.openingBalance != undefined) ||
+                                            (c.consumption != 0 && c.consumption != undefined) ||
+                                            (c.shipment != 0 && c.shipment != undefined) ||
+                                            (c.stock != 0 && c.stock != undefined) ||
+                                            (c.adjustment != 0 && c.adjustment != undefined) ||
+                                            (c.calculatedLEFO != 0 && c.calculatedLEFO != undefined) ||
+                                            (c.calculatedFEFO != 0 && c.calculatedFEFO != undefined) ||
+                                            (c.closingBalance != 0 && c.closingBalance != undefined) ||
+                                            (c.openingBalanceWps != 0 && c.openingBalanceWps != undefined) ||
+                                            (c.openingBalanceWtbdps != 0 && c.openingBalanceWtbdps != undefined) ||
+                                            (c.consumptionWps != 0 && c.consumptionWps != undefined) ||
+                                            (c.consumptionWtbdps != 0 && c.consumptionWtbdps != undefined) ||
+                                            (c.shipmentWps != 0 && c.shipmentWps != undefined) ||
+                                            (c.shipmentWtbdps != 0 && c.shipmentWtbdps != undefined) ||
+                                            (c.stockWps != 0 && c.stockWps != undefined) ||
+                                            (c.stockWtbdps != 0 && c.stockWtbdps != undefined) ||
+                                            (c.adjustmentWps != 0 && c.adjustmentWps != undefined) ||
+                                            (c.adjustmentWtbdps != 0 && c.adjustmentWtbdps != undefined) ||
+                                            (c.calculatedLEFOWps != 0 && c.calculatedLEFOWps != undefined) ||
+                                            (c.calculatedLEFOWtbdps != 0 && c.calculatedLEFOWtbdps != undefined) ||
+                                            (c.calculatedFEFOWps != 0 && c.calculatedFEFOWps != undefined) ||
+                                            (c.calculatedFEFOWtbdps != 0 && c.calculatedFEFOWtbdps != undefined) ||
+                                            (c.closingBalanceWps != 0 && c.closingBalanceWps != undefined)
+                                        ));
+                                        var finalBatchDetails = []
+                                        if (cutOffDate != "" && moment(createdDate).format("YYYY-MM") <= moment(cutOffDate).format("YYYY-MM") && currentMonthSupplyPlan.length > 0) {
+                                            finalBatchDetails = currentMonthSupplyPlan[0].batchDetails;
+                                            myArray = currentMonthSupplyPlan[0].batchDetails;
                                         } else {
-                                            var json = {
-                                                batchId: batchDetailsFromProgramJson[checkIfBatchExists].batchId,
-                                                batchNo: batchDetailsFromProgramJson[checkIfBatchExists].batchNo,
-                                                autoGenerated: batchDetailsFromProgramJson[checkIfBatchExists].autoGenerated,
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                openingBalanceWtbdps: 0,
-                                                consumption: 0,
-                                                adjustment: 0,
-                                                stock: 0,
-                                                shipment: 0,
-                                                shipmentWps: 0,
-                                                shipmentWtbdps: 0,
-                                                expiredQty: 0,
-                                                expiredQtyWps: 0,
-                                                expiredQtyWtbdps: 0,
-                                                shelfLife: programPlanningUnitList[ppL].shelfLife,
-                                                expiryDate: moment(startDate).add(programPlanningUnitList[ppL].shelfLife, 'months').format("YYYY-MM-DD"),
-                                                createdDate: moment(startDate).format("YYYY-MM-DD"),
-                                                openingBalance: 0,
-                                                openingBalanceWps: 0,
-                                                openingBalanceWtbdps: 0,
-                                                unallocatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                                calculatedLEFO: Number(unallocatedLEFO) < 0 ? Number(unallocatedLEFO) : 0,
-                                                unallocatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                                unallocatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                                calculatedLEFOWps: Number(unallocatedLEFOWps) < 0 ? Number(unallocatedLEFOWps) : 0,
-                                                calculatedLEFOWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? Number(unallocatedLEFOWtbdps) : 0,
-                                                closingBalance: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                                closingBalanceWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                                closingBalanceWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                                qty: Number(unallocatedLEFO) < 0 ? 0 - Number(unallocatedLEFO) : 0,
-                                                qtyWps: Number(unallocatedLEFOWps) < 0 ? 0 - Number(unallocatedLEFOWps) : 0,
-                                                qtyWtbdps: Number(unallocatedLEFOWtbdps) < 0 ? 0 - Number(unallocatedLEFOWtbdps) : 0,
-                                            }
-                                            myArray.push(json);
-                                        }
-                                    }
-                                    for (var a = 0; a < myArray.length; a++) {
-                                        var tempCB = Number(myArray[a].closingBalance);
-                                        myArray[a].unallocatedFEFO = Number(unallocatedFEFO);
-                                        if (Number(tempCB) >= Number(unallocatedFEFO) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            myArray[a].closingBalance = Number(tempCB) - Number(unallocatedFEFO);
-                                            myArray[a].calculatedFEFO = Number(unallocatedFEFO);
-                                            unallocatedFEFO = 0;
-                                        } else {
-                                            myArray[a].closingBalance = 0;
-                                            myArray[a].calculatedFEFO = Number(tempCB);
-                                            unallocatedFEFO -= Number(tempCB);
-                                        }
-                                        myArray[a].qty = Number(myArray[a].closingBalance);
-                                    }
-                                    for (var a = 0; a < myArray.length; a++) {
-                                        var tempCB = Number(myArray[a].closingBalanceWps);
-                                        myArray[a].unallocatedFEFOWps = Number(unallocatedFEFOWps);
-                                        if (Number(tempCB) >= Number(unallocatedFEFOWps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            myArray[a].closingBalanceWps = Number(tempCB) - Number(unallocatedFEFOWps);
-                                            myArray[a].calculatedFEFOWps = Number(unallocatedFEFOWps);
-                                            unallocatedFEFOWps = 0;
-                                        } else {
-                                            myArray[a].closingBalanceWps = 0;
-                                            myArray[a].calculatedFEFOWps = Number(tempCB);
-                                            unallocatedFEFOWps -= Number(tempCB);
-                                        }
-                                        myArray[a].qtyWps = Number(myArray[a].closingBalanceWps);
-                                        var tempCB = Number(myArray[a].closingBalanceWtbdps);
-                                        myArray[a].unallocatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
-                                        if (Number(tempCB) >= Number(unallocatedFEFOWtbdps) && moment(myArray[a].expiryDate).format("YYYY-MM") > moment(startDate).format("YYYY-MM")) {
-                                            myArray[a].closingBalanceWtbdps = Number(tempCB) - Number(unallocatedFEFOWtbdps);
-                                            myArray[a].calculatedFEFOWtbdps = Number(unallocatedFEFOWtbdps);
-                                            unallocatedFEFOWtbdps = 0;
-                                        } else {
-                                            myArray[a].closingBalanceWtbdps = 0;
-                                            myArray[a].calculatedFEFOWtbdps = Number(tempCB);
-                                            unallocatedFEFOWtbdps -= Number(tempCB);
-                                        }
-                                        myArray[a].qtyWtbdps = Number(myArray[a].closingBalanceWtbdps);
-                                    }
-                                }
-                                    myArray = myArray.filter(c => (
-                                        (c.openingBalance != 0 && c.openingBalance != undefined) ||
-                                        (c.consumption != 0 && c.consumption != undefined) ||
-                                        (c.shipment != 0 && c.shipment != undefined) ||
-                                        (c.stock != 0 && c.stock != undefined) ||
-                                        (c.adjustment != 0 && c.adjustment != undefined) ||
-                                        (c.calculatedLEFO != 0 && c.calculatedLEFO != undefined) ||
-                                        (c.calculatedFEFO != 0 && c.calculatedFEFO != undefined) ||
-                                        (c.closingBalance != 0 && c.closingBalance != undefined) ||
-                                        (c.openingBalanceWps != 0 && c.openingBalanceWps != undefined) ||
-                                        (c.openingBalanceWtbdps != 0 && c.openingBalanceWtbdps != undefined) ||
-                                        (c.consumptionWps != 0 && c.consumptionWps != undefined) ||
-                                        (c.consumptionWtbdps != 0 && c.consumptionWtbdps != undefined) ||
-                                        (c.shipmentWps != 0 && c.shipmentWps != undefined) ||
-                                        (c.shipmentWtbdps != 0 && c.shipmentWtbdps != undefined) ||
-                                        (c.stockWps != 0 && c.stockWps != undefined) ||
-                                        (c.stockWtbdps != 0 && c.stockWtbdps != undefined) ||
-                                        (c.adjustmentWps != 0 && c.adjustmentWps != undefined) ||
-                                        (c.adjustmentWtbdps != 0 && c.adjustmentWtbdps != undefined) ||
-                                        (c.calculatedLEFOWps != 0 && c.calculatedLEFOWps != undefined) ||
-                                        (c.calculatedLEFOWtbdps != 0 && c.calculatedLEFOWtbdps != undefined) ||
-                                        (c.calculatedFEFOWps != 0 && c.calculatedFEFOWps != undefined) ||
-                                        (c.calculatedFEFOWtbdps != 0 && c.calculatedFEFOWtbdps != undefined) ||
-                                        (c.closingBalanceWps != 0 && c.closingBalanceWps != undefined)
-                                    ));
-                                    var finalBatchDetails = []
-                                    for (var ma = 0; ma < myArray.length; ma++) {
-                                        var finalBatch = {
-                                            batchId: myArray[ma].batchId,
-                                            batchNo: myArray[ma].batchNo,
-                                            expiryDate: myArray[ma].expiryDate,
-                                            autoGenerated: myArray[ma].autoGenerated,
-                                            qty: Number(myArray[ma].qty),
-                                            qtyWps: Number(myArray[ma].qtyWps),
-                                            qtyWtbdps: Number(myArray[ma].qtyWtbdps),
-                                            expiredQty: Number(myArray[ma].expiredQty),
-                                            expiredQtyWps: Number(myArray[ma].expiredQtyWps),
-                                            expiredQtyWtbdps: Number(myArray[ma].expiredQtyWtbdps),
-                                            createdDate: myArray[ma].createdDate,
-                                            openingBalance: myArray[ma].openingBalance,
-                                            unallocatedQty: Number(myArray[ma].calculatedFEFO) + (myArray[ma].calculatedLEFO != undefined && myArray[ma].calculatedLEFO != "" && myArray[ma].calculatedLEFO != null ? myArray[ma].calculatedLEFO : 0),
-                                            consumptionQty: myArray[ma].consumption == 0 ? null : myArray[ma].consumption,
-                                            adjustmentQty: myArray[ma].adjustment == 0 ? null : myArray[ma].adjustment,
-                                            stockQty: myArray[ma].stock == 0 ? null : myArray[ma].stock,
-                                            shipmentQty: myArray[ma].shipment,
-                                            openingBalanceWps: myArray[ma].openingBalanceWps,
-                                            openingBalanceWtbdps: myArray[ma].openingBalanceWtbdps,
-                                            unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
-                                            unallocatedQtyWtbdps: Number(myArray[ma].calculatedFEFOWtbdps) + (myArray[ma].calculatedLEFOWtbdps != undefined && myArray[ma].calculatedLEFOWtbdps != "" && myArray[ma].calculatedLEFOWtbdps != null ? myArray[ma].calculatedLEFOWtbdps : 0),
-                                            shipmentQtyWps: myArray[ma].shipmentWps,
-                                            shipmentQtyWtbdps: myArray[ma].shipmentWtbdps
-                                        }
-                                        finalBatchDetails.push(finalBatch)
-                                    }
-                                    adjustmentQty = adjustmentQty + nationalAdjustment;
-                                    if (inventoryList.length == 0) {
-                                        adjustmentQty = ""
-                                    }
-                                    batchDetails = myArray;
-                                    var amcTotal = 0;
-                                    var totalMonths = 0;
-                                    for (var ap = 1; ap <= monthsInPastForAmc; ap++) {
-                                        var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
-                                        var actualConsumptionQtyAmc = 0;
-                                        var forecastedConsumptionQtyAmc = 0;
-                                        var consumptionQtyAmc = 0;
-                                        var regionsReportingActualConsumptionAmc = []
-                                        var noOfRegionsReportingActualConsumptionAmc = []
-                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                        for (var c = 0; c < amcFilter.length; c++) {
-                                            if (amcFilter[c].actualFlag.toString() == "true") {
-                                                var daysPerMonthPast = moment(amcDate).daysInMonth();
-                                                var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                                var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
-                                                var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
-                                                actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
-                                                var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
-                                                if (index == -1) {
-                                                    regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
+                                            for (var ma = 0; ma < myArray.length; ma++) {
+                                                var finalBatch = {
+                                                    batchId: myArray[ma].batchId,
+                                                    batchNo: myArray[ma].batchNo,
+                                                    expiryDate: myArray[ma].expiryDate,
+                                                    autoGenerated: myArray[ma].autoGenerated,
+                                                    qty: Number(myArray[ma].qty),
+                                                    qtyWps: Number(myArray[ma].qtyWps),
+                                                    qtyWtbdps: Number(myArray[ma].qtyWtbdps),
+                                                    expiredQty: Number(myArray[ma].expiredQty),
+                                                    expiredQtyWps: Number(myArray[ma].expiredQtyWps),
+                                                    expiredQtyWtbdps: Number(myArray[ma].expiredQtyWtbdps),
+                                                    createdDate: myArray[ma].createdDate,
+                                                    openingBalance: myArray[ma].openingBalance,
+                                                    unallocatedQty: Number(myArray[ma].calculatedFEFO) + (myArray[ma].calculatedLEFO != undefined && myArray[ma].calculatedLEFO != "" && myArray[ma].calculatedLEFO != null ? myArray[ma].calculatedLEFO : 0),
+                                                    consumptionQty: myArray[ma].consumption == 0 ? null : myArray[ma].consumption,
+                                                    adjustmentQty: myArray[ma].adjustment == 0 ? null : myArray[ma].adjustment,
+                                                    stockQty: myArray[ma].stock == 0 ? null : myArray[ma].stock,
+                                                    shipmentQty: myArray[ma].shipment,
+                                                    openingBalanceWps: myArray[ma].openingBalanceWps,
+                                                    openingBalanceWtbdps: myArray[ma].openingBalanceWtbdps,
+                                                    unallocatedQtyWps: Number(myArray[ma].calculatedFEFOWps) + (myArray[ma].calculatedLEFOWps != undefined && myArray[ma].calculatedLEFOWps != "" && myArray[ma].calculatedLEFOWps != null ? myArray[ma].calculatedLEFOWps : 0),
+                                                    unallocatedQtyWtbdps: Number(myArray[ma].calculatedFEFOWtbdps) + (myArray[ma].calculatedLEFOWtbdps != undefined && myArray[ma].calculatedLEFOWtbdps != "" && myArray[ma].calculatedLEFOWtbdps != null ? myArray[ma].calculatedLEFOWtbdps : 0),
+                                                    shipmentQtyWps: myArray[ma].shipmentWps,
+                                                    shipmentQtyWtbdps: myArray[ma].shipmentWtbdps
                                                 }
-                                            } else {
-                                                forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
+                                                finalBatchDetails.push(finalBatch)
                                             }
                                         }
-                                        noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
-                                        if (amcFilter.length == 0) {
-                                            consumptionQtyAmc = "";
-                                        } else if (totalNoOfRegions == noOfRegionsReportingActualConsumptionAmc || actualConsumptionQtyAmc > forecastedConsumptionQtyAmc) {
-                                            consumptionQtyAmc = actualConsumptionQtyAmc;
-                                        } else {
-                                            consumptionQtyAmc = forecastedConsumptionQtyAmc;
+                                        adjustmentQty = adjustmentQty + nationalAdjustment;
+                                        if (inventoryList.length == 0) {
+                                            adjustmentQty = ""
                                         }
-                                        if (amcFilter.length > 0) {
-                                            amcTotal += (consumptionQtyAmc !== "" ? Number(consumptionQtyAmc) : 0);
-                                            if (consumptionQtyAmc !== "") {
-                                                totalMonths += 1;
-                                            }
-                                        }
-                                    }
-                                    for (var ap = 0; ap < monthsInFutureForAmc; ap++) {
-                                        var amcDate = moment(startDate).add(ap, 'months').startOf('month').format("YYYY-MM-DD");
-                                        var actualConsumptionQtyAmc = 0;
-                                        var forecastedConsumptionQtyAmc = 0;
-                                        var consumptionQtyAmc = 0;
-                                        var regionsReportingActualConsumptionAmc = []
-                                        var noOfRegionsReportingActualConsumptionAmc = []
-                                        var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
-                                        for (var c = 0; c < amcFilter.length; c++) {
-                                            if (amcFilter[c].actualFlag.toString() == "true") {
-                                                var daysPerMonthPast = moment(amcDate).daysInMonth();
-                                                var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
-                                                var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
-                                                var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
-                                                actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
-                                                var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
-                                                if (index == -1) {
-                                                    regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
+                                        batchDetails = myArray;
+                                        var amcTotal = 0;
+                                        var totalMonths = 0;
+                                        for (var ap = 1; ap <= monthsInPastForAmc; ap++) {
+                                            var amcDate = moment(startDate).subtract(ap, 'months').startOf('month').format("YYYY-MM-DD");
+                                            var actualConsumptionQtyAmc = 0;
+                                            var forecastedConsumptionQtyAmc = 0;
+                                            var consumptionQtyAmc = 0;
+                                            var regionsReportingActualConsumptionAmc = []
+                                            var noOfRegionsReportingActualConsumptionAmc = []
+                                            var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                            for (var c = 0; c < amcFilter.length; c++) {
+                                                if (amcFilter[c].actualFlag.toString() == "true") {
+                                                    var daysPerMonthPast = moment(amcDate).daysInMonth();
+                                                    var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
+                                                    var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
+                                                    var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
+                                                    actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
+                                                    var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
+                                                    if (index == -1) {
+                                                        regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
+                                                    }
+                                                } else {
+                                                    forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
                                                 }
+                                            }
+                                            noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
+                                            if (amcFilter.length == 0) {
+                                                consumptionQtyAmc = "";
+                                            } else if (totalNoOfRegions == noOfRegionsReportingActualConsumptionAmc || actualConsumptionQtyAmc > forecastedConsumptionQtyAmc) {
+                                                consumptionQtyAmc = actualConsumptionQtyAmc;
                                             } else {
-                                                forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
+                                                consumptionQtyAmc = forecastedConsumptionQtyAmc;
+                                            }
+                                            if (amcFilter.length > 0) {
+                                                amcTotal += (consumptionQtyAmc !== "" ? Number(consumptionQtyAmc) : 0);
+                                                if (consumptionQtyAmc !== "") {
+                                                    totalMonths += 1;
+                                                }
                                             }
                                         }
-                                        noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
-                                        if (amcFilter.length == 0) {
-                                            consumptionQtyAmc = "";
-                                        } else if (totalNoOfRegions == noOfRegionsReportingActualConsumptionAmc || actualConsumptionQtyAmc > forecastedConsumptionQtyAmc) {
-                                            consumptionQtyAmc = actualConsumptionQtyAmc;
+                                        for (var ap = 0; ap < monthsInFutureForAmc; ap++) {
+                                            var amcDate = moment(startDate).add(ap, 'months').startOf('month').format("YYYY-MM-DD");
+                                            var actualConsumptionQtyAmc = 0;
+                                            var forecastedConsumptionQtyAmc = 0;
+                                            var consumptionQtyAmc = 0;
+                                            var regionsReportingActualConsumptionAmc = []
+                                            var noOfRegionsReportingActualConsumptionAmc = []
+                                            var amcFilter = (programJsonForStoringTheResult.consumptionList).filter(c => (c.consumptionDate >= amcDate && c.consumptionDate <= amcDate) && c.planningUnit.id == programPlanningUnitList[ppL].planningUnit.id && c.active.toString() == "true");
+                                            for (var c = 0; c < amcFilter.length; c++) {
+                                                if (amcFilter[c].actualFlag.toString() == "true") {
+                                                    var daysPerMonthPast = moment(amcDate).daysInMonth();
+                                                    var daysOfDataPast = daysPerMonthPast - Number(amcFilter[c].dayOfStockOut);
+                                                    var trueDemandPerDayPast = Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8)) / daysOfDataPast;
+                                                    var trueDemandPerMonth1 = Number(Number(trueDemandPerDayPast * daysPerMonthPast).toFixed(8));
+                                                    actualConsumptionQtyAmc += daysOfDataPast > 0 ? trueDemandPerMonth1 : 0;
+                                                    var index = regionsReportingActualConsumptionAmc.findIndex(f => f == amcFilter[c].region.id);
+                                                    if (index == -1) {
+                                                        regionsReportingActualConsumptionAmc.push(amcFilter[c].region.id);
+                                                    }
+                                                } else {
+                                                    forecastedConsumptionQtyAmc += Number(Number(Math.round(amcFilter[c].consumptionRcpuQty) * Number(amcFilter[c].multiplier)).toFixed(8));
+                                                }
+                                            }
+                                            noOfRegionsReportingActualConsumptionAmc = regionsReportingActualConsumptionAmc.length;
+                                            if (amcFilter.length == 0) {
+                                                consumptionQtyAmc = "";
+                                            } else if (totalNoOfRegions == noOfRegionsReportingActualConsumptionAmc || actualConsumptionQtyAmc > forecastedConsumptionQtyAmc) {
+                                                consumptionQtyAmc = actualConsumptionQtyAmc;
+                                            } else {
+                                                consumptionQtyAmc = forecastedConsumptionQtyAmc;
+                                            }
+                                            if (amcFilter.length > 0) {
+                                                amcTotal += (consumptionQtyAmc !== "" ? Number(consumptionQtyAmc) : 0);
+                                                if (consumptionQtyAmc !== "") {
+                                                    totalMonths += 1;
+                                                }
+                                            }
+                                        }
+                                        var amc = "";
+                                        if (totalMonths == 0) {
+                                            amc = null;
                                         } else {
-                                            consumptionQtyAmc = forecastedConsumptionQtyAmc;
+                                            amc = Number(Number((Number(amcTotal) / Number(totalMonths))).toFixed(8));
                                         }
-                                        if (amcFilter.length > 0) {
-                                            amcTotal += (consumptionQtyAmc !== "" ? Number(consumptionQtyAmc) : 0);
-                                            if (consumptionQtyAmc !== "") {
-                                                totalMonths += 1;
-                                            }
-                                        }
-                                    }
-                                    var amc = "";
-                                    if (totalMonths == 0) {
-                                        amc = null;
-                                    } else {
-                                        amc = Number(Number((Number(amcTotal) / Number(totalMonths))).toFixed(8));
-                                    }
-                                    // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
-                                    // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
+                                        // var cutOffDate=generalProgramJson.cutOffDate!=undefined&&generalProgramJson.cutOffDate!=null&&generalProgramJson.cutOffDate!=""?generalProgramJson.cutOffDate:"";
+                                        // if(cutOffDate!="" && moment(createdDate).format("YYYY-MM")<=moment(cutOffDate).add(monthsInPastForAmc-1,'months').format("YYYY-MM")){
                                         // amc=null;
-                                    // }
-                                    var maxForMonths = 0;
-                                    var realm = generalProgramJson.realmCountry.realm;
-                                    var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
-                                    var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
-                                    if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnitList[ppL].minMonthsOfStock) {
-                                        maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
-                                    } else if (programPlanningUnitList[ppL].minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
-                                        maxForMonths = programPlanningUnitList[ppL].minMonthsOfStock
-                                    } else {
-                                        maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
-                                    }
-                                    var minStockMoSQty = Number(maxForMonths);
-                                    var minForMonths = 0;
-                                    var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
-                                    if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + programPlanningUnitList[ppL].reorderFrequencyInMonths)) {
-                                        minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
-                                    } else {
-                                        minForMonths = (maxForMonths + programPlanningUnitList[ppL].reorderFrequencyInMonths);
-                                    }
-                                    var maxStockMoSQty = Number(minForMonths);
-                                    var minStock = 0;
-                                    var maxStock = 0;
-                                    if (programPlanningUnitList[ppL].planBasedOn == 2) {
-                                        minStock = programPlanningUnitList[ppL].minQty;
-                                        maxStock = Number(Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)).toFixed(8));
-                                        minStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)).toFixed(8));
-                                        maxStockMoSQty = Number(Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths)).toFixed(8));
-                                    } else {
-                                        minStock = Number(Number(Number(amc) * Number(minStockMoSQty)).toFixed(8));
-                                        maxStock = Number(Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8));
-                                    }
-                                    var closingBalance = 0;
-                                    var closingBalanceWps = 0;
-                                    var closingBalanceWtbdps = 0;
-                                    var unmetDemandQty = "";
-                                    var unmetDemandQtyWps = "";
-                                    var unmetDemandQtyWtbdps = "";
-                                    if (regionsReportingActualInventory == totalNoOfRegions) {
-                                        closingBalance = actualStockCount;
-                                    } else if (regionsReportingActualInventory != 0 && actualStockCount > expectedStock + nationalAdjustment) {
-                                        closingBalance = actualStockCount
-                                    } else {
-                                        closingBalance = expectedStock + nationalAdjustment;
-                                    }
-                                    if (regionsReportingActualInventory == totalNoOfRegions) {
-                                        closingBalanceWps = actualStockCount;
-                                    } else if (actualStockCount > expectedStockWps + nationalAdjustmentWps) {
-                                        closingBalanceWps = actualStockCount
-                                    } else {
-                                        closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
-                                    }
-                                    if (regionsReportingActualInventory == totalNoOfRegions) {
-                                        closingBalanceWtbdps = actualStockCount;
-                                    } else if (actualStockCount > expectedStockWtbdps + nationalAdjustmentWtbdps) {
-                                        closingBalanceWtbdps = actualStockCount
-                                    } else {
-                                        closingBalanceWtbdps = expectedStockWtbdps + nationalAdjustmentWtbdps;
-                                    }
-                                    var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
-                                    if (regionsReportingActualInventory != totalNoOfRegions) {
-                                        if (closingBalance <= 0) {
-                                            unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
-                                            closingBalance = 0;
+                                        // }
+                                        var maxForMonths = 0;
+                                        var realm = generalProgramJson.realmCountry.realm;
+                                        var DEFAULT_MIN_MONTHS_OF_STOCK = realm.minMosMinGaurdrail;
+                                        var DEFAULT_MIN_MAX_MONTHS_OF_STOCK = realm.minMosMaxGaurdrail;
+                                        if (DEFAULT_MIN_MONTHS_OF_STOCK > programPlanningUnitList[ppL].minMonthsOfStock) {
+                                            maxForMonths = DEFAULT_MIN_MONTHS_OF_STOCK
+                                        } else if (programPlanningUnitList[ppL].minMonthsOfStock < DEFAULT_MIN_MAX_MONTHS_OF_STOCK) {
+                                            maxForMonths = programPlanningUnitList[ppL].minMonthsOfStock
+                                        } else {
+                                            maxForMonths = DEFAULT_MIN_MAX_MONTHS_OF_STOCK
+                                        }
+                                        var minStockMoSQty = Number(maxForMonths);
+                                        var minForMonths = 0;
+                                        var DEFAULT_MAX_MONTHS_OF_STOCK = realm.maxMosMaxGaurdrail;
+                                        if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonths + programPlanningUnitList[ppL].reorderFrequencyInMonths)) {
+                                            minForMonths = DEFAULT_MAX_MONTHS_OF_STOCK
+                                        } else {
+                                            minForMonths = (maxForMonths + programPlanningUnitList[ppL].reorderFrequencyInMonths);
+                                        }
+                                        var maxStockMoSQty = Number(minForMonths);
+                                        var minStock = 0;
+                                        var maxStock = 0;
+                                        if (programPlanningUnitList[ppL].planBasedOn == 2) {
+                                            minStock = programPlanningUnitList[ppL].minQty;
+                                            maxStock = Number(Number(Number(programPlanningUnitList[ppL].minQty) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths) * Number(amc)).toFixed(8));
+                                            minStockMoSQty = Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)).toFixed(8));
+                                            maxStockMoSQty = Number(Number(Number(Number(programPlanningUnitList[ppL].minQty) / Number(amc)) + Number(programPlanningUnitList[ppL].reorderFrequencyInMonths)).toFixed(8));
+                                        } else {
+                                            minStock = Number(Number(Number(amc) * Number(minStockMoSQty)).toFixed(8));
+                                            maxStock = Number(Number(Number(amc) * Number(maxStockMoSQty)).toFixed(8));
+                                        }
+                                        var closingBalance = 0;
+                                        var closingBalanceWps = 0;
+                                        var closingBalanceWtbdps = 0;
+                                        var unmetDemandQty = "";
+                                        var unmetDemandQtyWps = "";
+                                        var unmetDemandQtyWtbdps = "";
+                                        if (regionsReportingActualInventory == totalNoOfRegions) {
+                                            closingBalance = actualStockCount;
+                                        } else if (regionsReportingActualInventory != 0 && actualStockCount > expectedStock + nationalAdjustment) {
+                                            closingBalance = actualStockCount
+                                        } else {
+                                            closingBalance = expectedStock + nationalAdjustment;
+                                        }
+                                        if (regionsReportingActualInventory == totalNoOfRegions) {
+                                            closingBalanceWps = actualStockCount;
+                                        } else if (actualStockCount > expectedStockWps + nationalAdjustmentWps) {
+                                            closingBalanceWps = actualStockCount
+                                        } else {
+                                            closingBalanceWps = expectedStockWps + nationalAdjustmentWps;
+                                        }
+                                        if (regionsReportingActualInventory == totalNoOfRegions) {
+                                            closingBalanceWtbdps = actualStockCount;
+                                        } else if (actualStockCount > expectedStockWtbdps + nationalAdjustmentWtbdps) {
+                                            closingBalanceWtbdps = actualStockCount
+                                        } else {
+                                            closingBalanceWtbdps = expectedStockWtbdps + nationalAdjustmentWtbdps;
+                                        }
+                                        var diffBetweenTrueDemandAndConsumption = Number(trueDemandPerMonth) - (consumptionQty !== "" ? Number(consumptionQty) : 0);
+                                        if (regionsReportingActualInventory != totalNoOfRegions) {
+                                            if (closingBalance <= 0) {
+                                                unmetDemandQty = 0 - expectedStock + diffBetweenTrueDemandAndConsumption;
+                                                closingBalance = 0;
+                                            } else {
+                                                unmetDemandQty = diffBetweenTrueDemandAndConsumption;
+                                            }
+                                            if (closingBalanceWps <= 0) {
+                                                unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
+                                                closingBalanceWps = 0;
+                                            } else {
+                                                unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
+                                            }
+                                            if (closingBalanceWtbdps <= 0) {
+                                                unmetDemandQtyWtbdps = 0 - expectedStockWtbdps + diffBetweenTrueDemandAndConsumption;
+                                                closingBalanceWtbdps = 0;
+                                            } else {
+                                                unmetDemandQtyWtbdps = diffBetweenTrueDemandAndConsumption;
+                                            }
                                         } else {
                                             unmetDemandQty = diffBetweenTrueDemandAndConsumption;
-                                        }
-                                        if (closingBalanceWps <= 0) {
-                                            unmetDemandQtyWps = 0 - expectedStockWps + diffBetweenTrueDemandAndConsumption;
-                                            closingBalanceWps = 0;
-                                        } else {
                                             unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
-                                        }
-                                        if (closingBalanceWtbdps <= 0) {
-                                            unmetDemandQtyWtbdps = 0 - expectedStockWtbdps + diffBetweenTrueDemandAndConsumption;
-                                            closingBalanceWtbdps = 0;
-                                        } else {
                                             unmetDemandQtyWtbdps = diffBetweenTrueDemandAndConsumption;
                                         }
-                                    } else{
-                                        unmetDemandQty = diffBetweenTrueDemandAndConsumption;
-                                        unmetDemandQtyWps = diffBetweenTrueDemandAndConsumption;
-                                        unmetDemandQtyWtbdps = diffBetweenTrueDemandAndConsumption;
+                                        var mos = "";
+                                        if (closingBalance != 0 && amc != 0 && amc != null) {
+                                            mos = Number(Number(closingBalance / amc).toFixed(8));
+                                        } else if (amc == 0 || amc == null) {
+                                            mos = null;
+                                        } else {
+                                            mos = 0;
+                                        }
+                                        var mosWps = "";
+                                        if (closingBalanceWps != 0 && amc != 0 && amc != null) {
+                                            mosWps = Number(Number(closingBalanceWps / amc).toFixed(8));
+                                        } else if (amc == 0 || amc == null) {
+                                            mosWps = null;
+                                        } else {
+                                            mosWps = 0;
+                                        }
+                                        var mosWtbdps = "";
+                                        if (closingBalanceWtbdps != 0 && amc != 0 && amc != null) {
+                                            mosWtbdps = Number(Number(closingBalanceWtbdps / amc).toFixed(8));
+                                        } else if (amc == 0 || amc == null) {
+                                            mosWtbdps = null;
+                                        } else {
+                                            mosWtbdps = 0;
+                                        }
+                                        var json = {
+                                            programId: generalProgramJson.programId,
+                                            versionId: generalProgramJson.currentVersion.versionId,
+                                            planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
+                                            transDate: startDate,
+                                            stockQty: actualStockCount === "" ? null : actualStockCount,
+                                            adjustmentQty: adjustmentQty === "" ? null : adjustmentQty,
+                                            actualFlag: consumptionType == "" ? null : consumptionType,
+                                            consumptionQty: consumptionQty === "" ? null : consumptionQty,
+                                            shipmentTotalQty: shipmentTotalQty,
+                                            shipmentTotalQtyWps: shipmentTotalQtyWps,
+                                            shipmentTotalQtyWtbdps: shipmentTotalQtyWtbdps,
+                                            manualTotalQty: manualTotalQty,
+                                            receivedShipmentsTotalData: receivedShipmentsTotalData,
+                                            shippedShipmentsTotalData: shippedShipmentsTotalData,
+                                            approvedShipmentsTotalData: approvedShipmentsTotalData,
+                                            submittedShipmentsTotalData: submittedShipmentsTotalData,
+                                            plannedShipmentsTotalData: plannedShipmentsTotalData,
+                                            plannedShipmentsTotalWtbdData: plannedShipmentsTotalWtbdData,
+                                            onholdShipmentsTotalData: onholdShipmentsTotalData,
+                                            erpTotalQty: erpTotalQty,
+                                            receivedErpShipmentsTotalData: receivedErpShipmentsTotalData,
+                                            shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
+                                            approvedErpShipmentsTotalData: approvedErpShipmentsTotalData,
+                                            submittedErpShipmentsTotalData: submittedErpShipmentsTotalData,
+                                            plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
+                                            plannedErpShipmentsTotalWtbdData: plannedErpShipmentsTotalWtbdData,
+                                            onholdErpShipmentsTotalData: onholdErpShipmentsTotalData,
+                                            amc: amc,
+                                            amcCount: totalMonths,
+                                            minStock: minStock,
+                                            maxStock: maxStock,
+                                            minStockMoS: minStockMoSQty,
+                                            maxStockMoS: maxStockMoSQty,
+                                            expiredStock: expiredStock,
+                                            expiredStockWps: expiredStockWps,
+                                            expiredStockWtbdps: expiredStockWtbdps,
+                                            batchDetails: finalBatchDetails,
+                                            openingBalance: openingBalance,
+                                            openingBalanceWps: openingBalanceWps,
+                                            openingBalanceWtbdps: openingBalanceWtbdps,
+                                            closingBalance: closingBalance,
+                                            closingBalanceWps: closingBalanceWps,
+                                            closingBalanceWtbdps: closingBalanceWtbdps,
+                                            unmetDemand: unmetDemandQty === "" ? null : unmetDemandQty,
+                                            unmetDemandWps: unmetDemandQtyWps === "" ? null : unmetDemandQtyWps,
+                                            unmetDemandWtbdps: unmetDemandQtyWtbdps === "" ? null : unmetDemandQtyWtbdps,
+                                            mos: mos,
+                                            mosWps: mosWps,
+                                            mosWtbdps: mosWtbdps,
+                                            nationalAdjustment: nationalAdjustment,
+                                            nationalAdjustmentWps: nationalAdjustmentWps,
+                                            nationalAdjustmentWtbdps: nationalAdjustmentWtbdps,
+                                            expectedStock: expectedStock,
+                                            expectedStockWps: expectedStockWps,
+                                            expectedStockWtbdps: expectedStockWtbdps,
+                                            regionCountForStock: regionsReportingActualInventory,
+                                            regionCount: totalNoOfRegions
+                                        }
+                                        supplyPlanData.push(json);
                                     }
-                                    var mos = "";
-                                    if (closingBalance != 0 && amc != 0 && amc != null) {
-                                        mos = Number(Number(closingBalance / amc).toFixed(8));
-                                    } else if (amc == 0 || amc == null) {
-                                        mos = null;
-                                    } else {
-                                        mos = 0;
-                                    }
-                                    var mosWps = "";
-                                    if (closingBalanceWps != 0 && amc != 0 && amc != null) {
-                                        mosWps = Number(Number(closingBalanceWps / amc).toFixed(8));
-                                    } else if (amc == 0 || amc == null) {
-                                        mosWps = null;
-                                    } else {
-                                        mosWps = 0;
-                                    }
-                                    var mosWtbdps = "";
-                                    if (closingBalanceWtbdps != 0 && amc != 0 && amc != null) {
-                                        mosWtbdps = Number(Number(closingBalanceWtbdps / amc).toFixed(8));
-                                    } else if (amc == 0 || amc == null) {
-                                        mosWtbdps = null;
-                                    } else {
-                                        mosWtbdps = 0;
-                                    }
-                                    var json = {
-                                        programId: generalProgramJson.programId,
-                                        versionId: generalProgramJson.currentVersion.versionId,
-                                        planningUnitId: programPlanningUnitList[ppL].planningUnit.id,
-                                        transDate: startDate,
-                                        stockQty: actualStockCount === "" ? null : actualStockCount,
-                                        adjustmentQty: adjustmentQty === "" ? null : adjustmentQty,
-                                        actualFlag: consumptionType == "" ? null : consumptionType,
-                                        consumptionQty: consumptionQty === "" ? null : consumptionQty,
-                                        shipmentTotalQty: shipmentTotalQty,
-                                        shipmentTotalQtyWps: shipmentTotalQtyWps,
-                                        shipmentTotalQtyWtbdps: shipmentTotalQtyWtbdps,
-                                        manualTotalQty: manualTotalQty,
-                                        receivedShipmentsTotalData: receivedShipmentsTotalData,
-                                        shippedShipmentsTotalData: shippedShipmentsTotalData,
-                                        approvedShipmentsTotalData: approvedShipmentsTotalData,
-                                        submittedShipmentsTotalData: submittedShipmentsTotalData,
-                                        plannedShipmentsTotalData: plannedShipmentsTotalData,
-                                        plannedShipmentsTotalWtbdData: plannedShipmentsTotalWtbdData,
-                                        onholdShipmentsTotalData: onholdShipmentsTotalData,
-                                        erpTotalQty: erpTotalQty,
-                                        receivedErpShipmentsTotalData: receivedErpShipmentsTotalData,
-                                        shippedErpShipmentsTotalData: shippedErpShipmentsTotalData,
-                                        approvedErpShipmentsTotalData: approvedErpShipmentsTotalData,
-                                        submittedErpShipmentsTotalData: submittedErpShipmentsTotalData,
-                                        plannedErpShipmentsTotalData: plannedErpShipmentsTotalData,
-                                        plannedErpShipmentsTotalWtbdData: plannedErpShipmentsTotalWtbdData,
-                                        onholdErpShipmentsTotalData: onholdErpShipmentsTotalData,
-                                        amc: amc,
-                                        amcCount: totalMonths,
-                                        minStock: minStock,
-                                        maxStock: maxStock,
-                                        minStockMoS: minStockMoSQty,
-                                        maxStockMoS: maxStockMoSQty,
-                                        expiredStock: expiredStock,
-                                        expiredStockWps: expiredStockWps,
-                                        expiredStockWtbdps: expiredStockWtbdps,
-                                        batchDetails: finalBatchDetails,
-                                        openingBalance: openingBalance,
-                                        openingBalanceWps: openingBalanceWps,
-                                        openingBalanceWtbdps: openingBalanceWtbdps,
-                                        closingBalance: closingBalance,
-                                        closingBalanceWps: closingBalanceWps,
-                                        closingBalanceWtbdps: closingBalanceWtbdps,
-                                        unmetDemand: unmetDemandQty === "" ? null : unmetDemandQty,
-                                        unmetDemandWps: unmetDemandQtyWps === "" ? null : unmetDemandQtyWps,
-                                        unmetDemandWtbdps: unmetDemandQtyWtbdps === "" ? null : unmetDemandQtyWtbdps,
-                                        mos: mos,
-                                        mosWps: mosWps,
-                                        mosWtbdps: mosWtbdps,
-                                        nationalAdjustment: nationalAdjustment,
-                                        nationalAdjustmentWps: nationalAdjustmentWps,
-                                        nationalAdjustmentWtbdps: nationalAdjustmentWtbdps,
-                                        expectedStock: expectedStock,
-                                        expectedStockWps: expectedStockWps,
-                                        expectedStockWtbdps: expectedStockWtbdps,
-                                        regionCountForStock: regionsReportingActualInventory,
-                                        regionCount: totalNoOfRegions
-                                    }
-                                    supplyPlanData.push(json);
-                                }
-                                programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
-                                programJsonForStoringTheResult.supplyPlan = supplyPlanData;
-                                var dashboardData=generalProgramJson.dashboardData;
-                                if(dashboardData!=undefined){
-                                var dashboardStartDateBottom = dashboardData.startDateBottom;
-                                var dashboardStopDateBottom = dashboardData.stopDateBottom;
-                                var dashboardStartDateBottomScore = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
-                                var dashboardStopDateBottomScore = moment(Date.now()).add(17, 'months').endOf('month').format("YYYY-MM-DD");
-                                var dashboardStartDateTop = dashboardData.startDateTop;
-                                var dashboardStopDateTop = dashboardData.stopDateTop;
-                                if (dashboardStartDateBottom == undefined) {
-                                    dashboardStartDateBottom = "2023-01-01";
-                                    dashboardStopDateBottom = "2023-12-31";
-                                    dashboardStartDateTop = "2023-01-01";
-                                    dashboardStopDateTop = "2023-12-31";
-                                }
-                                var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
-                                var spFilteredForDashboardBottom = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM"));
-                                var spFilteredForDashboardBottomScore = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottomScore).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottomScore).format("YYYY-MM"));
-                                var maxForMonthsForDashboard = 0;
-                                var realmForDashboard = generalProgramJson.realmCountry.realm;
-                                var DEFAULT_MIN_MONTHS_OF_STOCKForDashboard = realmForDashboard.minMosMinGaurdrail;
-                                if (DEFAULT_MIN_MONTHS_OF_STOCKForDashboard > programPlanningUnitList[ppL].minMonthsOfStock) {
-                                    maxForMonthsForDashboard = DEFAULT_MIN_MONTHS_OF_STOCKForDashboard
-                                } else {
-                                    maxForMonthsForDashboard = programPlanningUnitList[ppL].minMonthsOfStock
-                                }
-                                var minMoSForDashboard = Number(maxForMonthsForDashboard);
-                                var minForMonthsForDashboard = 0;
-                                var DEFAULT_MAX_MONTHS_OF_STOCKForDashboard = realm.maxMosMaxGaurdrail;
-                                if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonthsForDashboard + programPlanningUnitList[ppL].reorderFrequencyInMonths)) {
-                                    minForMonthsForDashboard = DEFAULT_MAX_MONTHS_OF_STOCKForDashboard
-                                } else {
-                                    minForMonthsForDashboard = (maxForMonthsForDashboard + programPlanningUnitList[ppL].reorderFrequencyInMonths);
-                                }
-                                var maxMoSForDashboard = Number(minForMonthsForDashboard);
-                                var stockOut = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) == 0).length;
-                                var underStock = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) < (planBasedOn == 1 ? Number(minMoSForDashboard) : Number(c.minStock)))).length;
-                                var adequate = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) >= (planBasedOn == 1 ? Number(minMoSForDashboard) : Number(c.minStock))) && (Number(c.mos) <= (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
-                                var overStock = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) > (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
-                                var monthCount = moment(dashboardStopDateBottomScore).diff(moment(dashboardStartDateBottomScore), 'months')+1;
-                                var na = Number(monthCount) - Number(stockOut) - Number(underStock) - Number(adequate) - Number(overStock);
-                                var stockOutPerc = Number(stockOut) / Number(monthCount);
-                                var underStockPerc = Number(underStock) / Number(monthCount);
-                                var adequatePerc = Number(adequate) / Number(monthCount);
-                                var overStockPerc = Number(overStock) / Number(monthCount);
-                                var naPerc = Number(na) / Number(monthCount);
-                                var expiriesList = [];
-                                spFilteredForDashboardBottom.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
-                                    var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
-                                    var expiryJson = {
-                                        "expDate": moment(item.expiryDate).format("YYYY-MM-DD"),
-                                        "batchId": item.batchId,
-                                        "batchNo": item.batchNo,
-                                        "autoGenerated": item.autoGenerated,
-                                        "expiringQty": item.expiredQty,
-                                        "price": price,
-                                        "expiryAmt": Number(price)*Number(item.expiredQty)
-                                    }
-                                    expiriesList.push(expiryJson)
-                                })
-                                var shipmentListFiltered=shipmentList.filter(c => c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (moment(c.receivedDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.receivedDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")) : (moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")));
-                                var shipmentDetailsByFundingSource=Object.values(shipmentListFiltered.reduce((acc, { fundingSource, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
-                                    const { id, label, code } = fundingSource; // Destructure id and label
-                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
-                                    acc[id].quantity += shipmentQty;
-                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
-                                    acc[id].orderCount += 1;
-                                    return acc;
-                                }, {}));
-                                var shipmentDetailsByProcurementAgent=Object.values(shipmentListFiltered.reduce((acc, { procurementAgent, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
-                                    const { id, label, code } = procurementAgent; // Destructure id and label
-                                    var pa=paJson.filter(c=>c.procurementAgentId==id)[0];
-                                    acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode:pa.colorHtmlCode, colorHtmlDarkCode:pa.colorHtmlDarkCode };
-                                    acc[id].quantity += shipmentQty;
-                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
-                                    acc[id].orderCount += 1;
-                                    return acc;
-                                }, {}));
-                                var shipmentDetailsByShipmentStatus=Object.values(shipmentListFiltered.reduce((acc, { shipmentStatus, shipmentQty, freightCost , productCost, currency :{ conversionRateToUsd} }) => {
-                                    const { id, label } = shipmentStatus; // Destructure id and label
-                                    acc[id] = acc[id] || { reportBy: { id, label, code:"" }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
-                                    acc[id].quantity += shipmentQty;
-                                    acc[id].cost += Number(Number(freightCost)+Number(productCost))*Number(conversionRateToUsd);
-                                    acc[id].orderCount += 1;
-                                    return acc;
-                                }, {}));
+                                    programJsonForStoringTheResult.batchInfoList = coreBatchDetails;
+                                    programJsonForStoringTheResult.supplyPlan = supplyPlanData;
+                                    var dashboardData = generalProgramJson.dashboardData;
+                                    if (dashboardData != undefined) {
+                                        var dashboardStartDateBottom = dashboardData.startDateBottom;
+                                        var dashboardStopDateBottom = dashboardData.stopDateBottom;
+                                        var dashboardStartDateBottomScore = moment(Date.now()).startOf('month').format("YYYY-MM-DD");
+                                        var dashboardStopDateBottomScore = moment(Date.now()).add(17, 'months').endOf('month').format("YYYY-MM-DD");
+                                        var dashboardStartDateTop = dashboardData.startDateTop;
+                                        var dashboardStopDateTop = dashboardData.stopDateTop;
+                                        if (dashboardStartDateBottom == undefined) {
+                                            dashboardStartDateBottom = "2023-01-01";
+                                            dashboardStopDateBottom = "2023-12-31";
+                                            dashboardStartDateTop = "2023-01-01";
+                                            dashboardStopDateTop = "2023-12-31";
+                                        }
+                                        var planBasedOn = programPlanningUnitList[ppL].planBasedOn;
+                                        var spFilteredForDashboardBottom = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM"));
+                                        var spFilteredForDashboardBottomScore = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateBottomScore).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateBottomScore).format("YYYY-MM"));
+                                        var maxForMonthsForDashboard = 0;
+                                        var realmForDashboard = generalProgramJson.realmCountry.realm;
+                                        var DEFAULT_MIN_MONTHS_OF_STOCKForDashboard = realmForDashboard.minMosMinGaurdrail;
+                                        if (DEFAULT_MIN_MONTHS_OF_STOCKForDashboard > programPlanningUnitList[ppL].minMonthsOfStock) {
+                                            maxForMonthsForDashboard = DEFAULT_MIN_MONTHS_OF_STOCKForDashboard
+                                        } else {
+                                            maxForMonthsForDashboard = programPlanningUnitList[ppL].minMonthsOfStock
+                                        }
+                                        var minMoSForDashboard = Number(maxForMonthsForDashboard);
+                                        var minForMonthsForDashboard = 0;
+                                        var DEFAULT_MAX_MONTHS_OF_STOCKForDashboard = realm.maxMosMaxGaurdrail;
+                                        if (DEFAULT_MAX_MONTHS_OF_STOCK < (maxForMonthsForDashboard + programPlanningUnitList[ppL].reorderFrequencyInMonths)) {
+                                            minForMonthsForDashboard = DEFAULT_MAX_MONTHS_OF_STOCKForDashboard
+                                        } else {
+                                            minForMonthsForDashboard = (maxForMonthsForDashboard + programPlanningUnitList[ppL].reorderFrequencyInMonths);
+                                        }
+                                        var maxMoSForDashboard = Number(minForMonthsForDashboard);
+                                        var stockOut = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) == 0).length;
+                                        var underStock = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) < (planBasedOn == 1 ? Number(minMoSForDashboard) : Number(c.minStock)))).length;
+                                        var adequate = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) >= (planBasedOn == 1 ? Number(minMoSForDashboard) : Number(c.minStock))) && (Number(c.mos) <= (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
+                                        var overStock = spFilteredForDashboardBottomScore.filter(c => c.mos != null && Number(c.mos) != 0 && (Number(c.mos) > (planBasedOn == 1 ? Number(maxMoSForDashboard) : Number(c.maxStock)))).length;
+                                        var monthCount = moment(dashboardStopDateBottomScore).diff(moment(dashboardStartDateBottomScore), 'months') + 1;
+                                        var na = Number(monthCount) - Number(stockOut) - Number(underStock) - Number(adequate) - Number(overStock);
+                                        var stockOutPerc = Number(stockOut) / Number(monthCount);
+                                        var underStockPerc = Number(underStock) / Number(monthCount);
+                                        var adequatePerc = Number(adequate) / Number(monthCount);
+                                        var overStockPerc = Number(overStock) / Number(monthCount);
+                                        var naPerc = Number(na) / Number(monthCount);
+                                        var expiriesList = [];
+                                        spFilteredForDashboardBottom.flatMap(item => item.batchDetails).filter(c => Number(c.expiredQty) > 0).map(item => {
+                                            var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
+                                            var expiryJson = {
+                                                "expDate": moment(item.expiryDate).format("YYYY-MM-DD"),
+                                                "batchId": item.batchId,
+                                                "batchNo": item.batchNo,
+                                                "autoGenerated": item.autoGenerated,
+                                                "expiringQty": item.expiredQty,
+                                                "price": price,
+                                                "expiryAmt": Number(price) * Number(item.expiredQty)
+                                            }
+                                            expiriesList.push(expiryJson)
+                                        })
+                                        var shipmentListFiltered = shipmentList.filter(c => c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS && (c.receivedDate != "" && c.receivedDate != null && c.receivedDate != undefined && c.receivedDate != "Invalid date") ? (moment(c.receivedDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.receivedDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")) : (moment(c.expectedDeliveryDate).format("YYYY-MM") >= moment(dashboardStartDateBottom).format("YYYY-MM") && moment(c.expectedDeliveryDate).format("YYYY-MM") <= moment(dashboardStopDateBottom).format("YYYY-MM")));
+                                        var shipmentDetailsByFundingSource = Object.values(shipmentListFiltered.reduce((acc, { fundingSource, shipmentQty, freightCost, productCost, currency: { conversionRateToUsd } }) => {
+                                            const { id, label, code } = fundingSource; // Destructure id and label
+                                            acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
+                                            acc[id].quantity += shipmentQty;
+                                            acc[id].cost += Number(Number(freightCost) + Number(productCost)) * Number(conversionRateToUsd);
+                                            acc[id].orderCount += 1;
+                                            return acc;
+                                        }, {}));
+                                        var shipmentDetailsByProcurementAgent = Object.values(shipmentListFiltered.reduce((acc, { procurementAgent, shipmentQty, freightCost, productCost, currency: { conversionRateToUsd } }) => {
+                                            const { id, label, code } = procurementAgent; // Destructure id and label
+                                            var pa = paJson.filter(c => c.procurementAgentId == id)[0];
+                                            acc[id] = acc[id] || { reportBy: { id, label, code }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: pa.colorHtmlCode, colorHtmlDarkCode: pa.colorHtmlDarkCode };
+                                            acc[id].quantity += shipmentQty;
+                                            acc[id].cost += Number(Number(freightCost) + Number(productCost)) * Number(conversionRateToUsd);
+                                            acc[id].orderCount += 1;
+                                            return acc;
+                                        }, {}));
+                                        var shipmentDetailsByShipmentStatus = Object.values(shipmentListFiltered.reduce((acc, { shipmentStatus, shipmentQty, freightCost, productCost, currency: { conversionRateToUsd } }) => {
+                                            const { id, label } = shipmentStatus; // Destructure id and label
+                                            acc[id] = acc[id] || { reportBy: { id, label, code: "" }, quantity: 0, cost: 0, orderCount: 0, colorHtmlCode: null, colorHtmlDarkCode: null };
+                                            acc[id].quantity += shipmentQty;
+                                            acc[id].cost += Number(Number(freightCost) + Number(productCost)) * Number(conversionRateToUsd);
+                                            acc[id].orderCount += 1;
+                                            return acc;
+                                        }, {}));
 
-                                var dashboardBottom = {
-                                    "stockStatus": {
-                                        "stockOut": stockOut,
-                                        "underStock": underStock,
-                                        "adequate": adequate,
-                                        "overStock": overStock,
-                                        "na": na,
-                                        "total": monthCount,
-                                        "naPerc": naPerc,
-                                        "underStockPerc": underStockPerc,
-                                        "stockOutPerc": stockOutPerc,
-                                        "overStockPerc": overStockPerc,
-                                        "adequatePerc": adequatePerc
-                                    },
-                                    "expiriesList":expiriesList,
-                                    "shipmentDetailsByFundingSource":shipmentDetailsByFundingSource,
-                                    "shipmentDetailsByProcurementAgent":shipmentDetailsByProcurementAgent,
-                                    "shipmentDetailsByShipmentStatus":shipmentDetailsByShipmentStatus,
-                                    "countOfTbdFundingSource":shipmentListFiltered.filter(c=>c.fundingSource.id==TBD_FUNDING_SOURCE).length,
-                                    "forecastError":0,
-                                    "forecastConsumptionQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].forecastConsumptionQplPassed:false,
-                                    "inventoryQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].inventoryQplPassed:false,
-                                    "shipmentQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].shipmentQplPassed:false,
-                                    "actualConsumptionQplPassed":generalProgramJson.dashboardData.bottomPuData!=undefined && generalProgramJson.dashboardData.bottomPuData!="" && generalProgramJson.dashboardData.bottomPuData[planningUnitId]!=undefined?generalProgramJson.dashboardData.bottomPuData[planningUnitId].actualConsumptionQplPassed:false,
-                                }
-                                if(generalProgramJson.dashboardData.bottomPuData==undefined || generalProgramJson.dashboardData.bottomPuData==""){
-                                    generalProgramJson.dashboardData.bottomPuData=[];
-                                }
-                                generalProgramJson.dashboardData.bottomPuData[programPlanningUnitList[ppL].planningUnit.id]=dashboardBottom;
-                                var spFilteredForDashboardTop = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateTop).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateTop).format("YYYY-MM"));
-                                var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos) == 0).length>0?true:false;
+                                        var dashboardBottom = {
+                                            "stockStatus": {
+                                                "stockOut": stockOut,
+                                                "underStock": underStock,
+                                                "adequate": adequate,
+                                                "overStock": overStock,
+                                                "na": na,
+                                                "total": monthCount,
+                                                "naPerc": naPerc,
+                                                "underStockPerc": underStockPerc,
+                                                "stockOutPerc": stockOutPerc,
+                                                "overStockPerc": overStockPerc,
+                                                "adequatePerc": adequatePerc
+                                            },
+                                            "expiriesList": expiriesList,
+                                            "shipmentDetailsByFundingSource": shipmentDetailsByFundingSource,
+                                            "shipmentDetailsByProcurementAgent": shipmentDetailsByProcurementAgent,
+                                            "shipmentDetailsByShipmentStatus": shipmentDetailsByShipmentStatus,
+                                            "countOfTbdFundingSource": shipmentListFiltered.filter(c => c.fundingSource.id == TBD_FUNDING_SOURCE).length,
+                                            "forecastError": 0,
+                                            "forecastConsumptionQplPassed": generalProgramJson.dashboardData.bottomPuData != undefined && generalProgramJson.dashboardData.bottomPuData != "" && generalProgramJson.dashboardData.bottomPuData[planningUnitId] != undefined ? generalProgramJson.dashboardData.bottomPuData[planningUnitId].forecastConsumptionQplPassed : false,
+                                            "inventoryQplPassed": generalProgramJson.dashboardData.bottomPuData != undefined && generalProgramJson.dashboardData.bottomPuData != "" && generalProgramJson.dashboardData.bottomPuData[planningUnitId] != undefined ? generalProgramJson.dashboardData.bottomPuData[planningUnitId].inventoryQplPassed : false,
+                                            "shipmentQplPassed": generalProgramJson.dashboardData.bottomPuData != undefined && generalProgramJson.dashboardData.bottomPuData != "" && generalProgramJson.dashboardData.bottomPuData[planningUnitId] != undefined ? generalProgramJson.dashboardData.bottomPuData[planningUnitId].shipmentQplPassed : false,
+                                            "actualConsumptionQplPassed": generalProgramJson.dashboardData.bottomPuData != undefined && generalProgramJson.dashboardData.bottomPuData != "" && generalProgramJson.dashboardData.bottomPuData[planningUnitId] != undefined ? generalProgramJson.dashboardData.bottomPuData[planningUnitId].actualConsumptionQplPassed : false,
+                                        }
+                                        if (generalProgramJson.dashboardData.bottomPuData == undefined || generalProgramJson.dashboardData.bottomPuData == "") {
+                                            generalProgramJson.dashboardData.bottomPuData = [];
+                                        }
+                                        generalProgramJson.dashboardData.bottomPuData[programPlanningUnitList[ppL].planningUnit.id] = dashboardBottom;
+                                        var spFilteredForDashboardTop = programJsonForStoringTheResult.supplyPlan.filter(c => moment(c.transDate).format("YYYY-MM") >= moment(dashboardStartDateTop).format("YYYY-MM") && moment(c.transDate).format("YYYY-MM") <= moment(dashboardStopDateTop).format("YYYY-MM"));
+                                        var stockOutFlag = spFilteredForDashboardTop.filter(c => c.mos != null && Number(c.mos) == 0).length > 0 ? true : false;
 
-                                var valueOfExpiredStock = 0;
-                                spFilteredForDashboardTop.flatMap(item=>item.batchDetails).filter(c=>Number(c.expiredQty)>0).map(item => {
-                                    var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
-                                    valueOfExpiredStock+= (Number(price)*Number(item.expiredQty));
-                                })
-                                if(generalProgramJson.dashboardData.topPuData==undefined || generalProgramJson.dashboardData.topPuData==""){
-                                    generalProgramJson.dashboardData.topPuData=[];
-                                }
-                                if(generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=undefined && generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]!=""){
-                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut=stockOutFlag;
-                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock=valueOfExpiredStock;
-                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].linkedShipmentsCount=programJsonForStoringTheResult.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length
-                                }else{
-                                    generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id]={
-                                        "stockOut":stockOutFlag,
-                                        "valueOfExpiredStock":valueOfExpiredStock,
-                                        "linkedShipmentsCount":programJsonForStoringTheResult.shipmentList.filter(c=>c.erpFlag.toString()=="true" && c.active.toString()=="true" && c.accountFlag.toString()=="true" && c.shipmentStatus.id!=CANCELLED_SHIPMENT_STATUS).length
+                                        var valueOfExpiredStock = 0;
+                                        spFilteredForDashboardTop.flatMap(item => item.batchDetails).filter(c => Number(c.expiredQty) > 0).map(item => {
+                                            var price = programJsonForStoringTheResult.shipmentList.find(s => s.batchInfoList.some(b => b.batch.batchNo == item.batchNo && moment(b.batch.expiryDate).format("YYYY-MM") == moment(item.expiryDate).format("YYYY-MM")))?.rate ?? null;
+                                            valueOfExpiredStock += (Number(price) * Number(item.expiredQty));
+                                        })
+                                        if (generalProgramJson.dashboardData.topPuData == undefined || generalProgramJson.dashboardData.topPuData == "") {
+                                            generalProgramJson.dashboardData.topPuData = [];
+                                        }
+                                        if (generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id] != undefined && generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id] != "") {
+                                            generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].stockOut = stockOutFlag;
+                                            generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].valueOfExpiredStock = valueOfExpiredStock;
+                                            generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id].linkedShipmentsCount = programJsonForStoringTheResult.shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS).length
+                                        } else {
+                                            generalProgramJson.dashboardData.topPuData[programPlanningUnitList[ppL].planningUnit.id] = {
+                                                "stockOut": stockOutFlag,
+                                                "valueOfExpiredStock": valueOfExpiredStock,
+                                                "linkedShipmentsCount": programJsonForStoringTheResult.shipmentList.filter(c => c.erpFlag.toString() == "true" && c.active.toString() == "true" && c.accountFlag.toString() == "true" && c.shipmentStatus.id != CANCELLED_SHIPMENT_STATUS).length
+                                            }
+                                        }
+                                    }
+                                    if (planningUnitDataIndex != -1) {
+                                        planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
+                                    } else {
+                                        planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString() });
                                     }
                                 }
+                            } catch (err) {
+                                props.fetchData(1, programId)
                             }
-                                if (planningUnitDataIndex != -1) {
-                                    planningUnitDataList[planningUnitDataIndex].planningUnitData = (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString();
-                                } else {
-                                    planningUnitDataList.push({ planningUnitId: planningUnitId, planningUnitData: (CryptoJS.AES.encrypt(JSON.stringify(programJsonForStoringTheResult), SECRET_KEY)).toString() });
-                                }
-                            }
-                        } catch (err) {
-                            props.fetchData(1, programId)
-                        }
-                        programDataJson.planningUnitDataList = planningUnitDataList;
-                        programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
-                        programRequest.result.programData = programDataJson;
-                        var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
-                        var programDataOs = programDataTransaction.objectStore(objectStoreName);
-                        var putRequest = programDataOs.put(programRequest.result);
-                        putRequest.onerror = function (event) {
-                        }.bind(this);
-                        putRequest.onsuccess = function (event) {
-                            var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
-                            var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
-                            var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
-                            programQPLDetailsRequest1.onsuccess = function (event) {
-                                if (page == "consumption") {
-                                    props.updateState("message", i18n.t('static.message.consumptionSaved'));
-                                    props.updateState("color", 'green');
-                                    props.updateState("consumptionChangedFlag", 0);
-                                    if (props.consumptionPage != "consumptionDataEntry") {
-                                        props.toggleLarge('Consumption');
-                                        if (props.consumptionPage != "supplyPlanCompare") {
-                                            props.updateState("programJson", programJsonForStoringTheResult);
-                                            props.updateState("planningUnitDataList", planningUnitDataList);
-                                            props.formSubmit(props.items.planningUnit, props.items.monthCount);
-                                        } else {
-                                            props.formSubmit(props.items.monthCount);
-                                        }
-                                    }
-                                    if (props.consumptionPage == "consumptionDataEntry") {
-                                        props.formSubmit(props.items.planningUnit, props.items.rangeValue);
-                                    }
-                                    if (props.consumptionPage == "whatIf") {
-                                        props.updateState("programModified", 1);
-                                    }
-                                    props.updateState("loading", false);
-                                    props.hideFirstComponent();
-                                } else if (page == "inventory") {
-                                    props.updateState("color", 'green');
-                                    props.updateState("inventoryChangedFlag", 0);
-                                    if (props.inventoryPage != "inventoryDataEntry") {
-                                        if (props.items== undefined || props.items.inventoryType == 1) {
-                                            props.updateState("message", i18n.t('static.message.inventorySaved'));
-                                        } else {
-                                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
-                                        }
-                                        props.toggleLarge('Adjustments');
-                                        if (props.inventoryPage != "supplyPlanCompare") {
-                                            props.updateState("programJson", programJsonForStoringTheResult);
-                                            props.updateState("planningUnitDataList", planningUnitDataList);
-                                            props.formSubmit(props.items.planningUnit, props.items.monthCount);
-                                        } else {
-                                            props.formSubmit(props.items.monthCount);
-                                        }
-                                    }
-                                    if (props.inventoryPage == "inventoryDataEntry") {
-                                        if (props.items.inventoryType == 1) {
-                                            props.updateState("message", i18n.t('static.message.inventorySaved'));
-                                        } else {
-                                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
-                                        }
-                                        props.formSubmit(props.items.planningUnit, props.items.rangeValue);
-                                    }
-                                    if (props.inventoryPage == "whatIf") {
-                                        props.updateState("programModified", 1);
-                                    }
-                                    props.updateState("loading", false);
-                                    props.hideFirstComponent();
-                                } else if (page == "actualInventory") {
-                                    props.updateState("color", 'green');
-                                    props.updateState("inventoryChangedFlag", 0);
-                                    if (props.inventoryPage != "inventoryDataEntry") {
-                                        if (props.items== undefined || props.items.inventoryType == 1) {
-                                            props.updateState("message", i18n.t('static.message.inventorySaved'));
-                                        } else {
-                                            props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
-                                        }
-                                    }
-                                    props.updateState("programJson", programJsonForStoringTheResult);
-                                    props.updateState("generalProgramJson", generalProgramJson);
-                                    props.updateState("planningUnitDataList", planningUnitDataList);
-                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
-                                    props.updateState("actualInventoryChanged", false);
-                                    props.updateState("loading", false);
-                                    props.hideFirstComponent();
-                                } else if (page == "shipment") {
-                                    props.updateState("message", i18n.t('static.message.shipmentsSaved'));
-                                    props.updateState("color", 'green');
-                                    props.updateState("shipmentChangedFlag", 0);
-                                    props.updateState("budgetChangedFlag", 0);
-                                    props.updateState("shipmentsEl", "");
-                                    if (props.shipmentPage != "shipmentDataEntry") {
-                                        props.toggleLarge('shipments');
-                                        if (props.shipmentPage != "supplyPlanCompare") {
-                                            props.updateState("programJson", programJsonForStoringTheResult);
-                                            props.updateState("planningUnitDataList", planningUnitDataList);
-                                            props.formSubmit(props.items.planningUnit, props.items.monthCount);
-                                        } else {
-                                            props.formSubmit(props.items.monthCount);
-                                        }
-                                    }
-                                    if (props.shipmentPage == "shipmentDataEntry") {
-                                        props.formSubmit(props.items.planningUnit, props.items.rangeValue);
-                                    }
-                                    if (props.shipmentPage == "whatIf") {
-                                        props.updateState("programModified", 1);
-                                    }
-                                    props.updateState("loading", false);
-                                    props.hideFirstComponent()
-                                } else if (page == "shipment1") {
-                                    props.updateState("shipmentsEl", "");
-                                    if (props.shipmentPage != "shipmentDataEntry") {
-                                        if (props.shipmentPage != undefined) {
-                                            props.toggleLarge('shipments');
-                                        }
-                                        if (props.shipmentPage != "supplyPlanCompare") {
-                                            var programDataJson1 = programRequest.result.programData;
-                                            var planningUnitDataList1 = programDataJson1.planningUnitDataList;
-                                            var planningUnitDataIndex1 = (planningUnitDataList1).findIndex(c => c.planningUnitId == props.state.planningUnit.value);
-                                            var programJson1 = {};
-                                            if (planningUnitDataIndex1 != -1) {
-                                                var planningUnitData1 = ((planningUnitDataList1).filter(c => c.planningUnitId == props.state.planningUnit.value))[0];
-                                                var programDataBytes1 = CryptoJS.AES.decrypt(planningUnitData1.planningUnitData, SECRET_KEY);
-                                                var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
-                                                programJson1 = JSON.parse(programData1);
+                            programDataJson.planningUnitDataList = planningUnitDataList;
+                            programDataJson.generalData = (CryptoJS.AES.encrypt(JSON.stringify(generalProgramJson), SECRET_KEY)).toString()
+                            programRequest.result.programData = programDataJson;
+                            var programDataTransaction = db1.transaction([objectStoreName], 'readwrite');
+                            var programDataOs = programDataTransaction.objectStore(objectStoreName);
+                            var putRequest = programDataOs.put(programRequest.result);
+                            putRequest.onerror = function (event) {
+                            }.bind(this);
+                            putRequest.onsuccess = function (event) {
+                                var programQPLDetailsTransaction1 = db1.transaction(['programQPLDetails'], 'readwrite');
+                                var programQPLDetailsOs1 = programQPLDetailsTransaction1.objectStore('programQPLDetails');
+                                var programQPLDetailsRequest1 = programQPLDetailsOs1.put(programQPLDetailsJson);
+                                programQPLDetailsRequest1.onsuccess = function (event) {
+                                    if (page == "consumption") {
+                                        props.updateState("message", i18n.t('static.message.consumptionSaved'));
+                                        props.updateState("color", 'green');
+                                        props.updateState("consumptionChangedFlag", 0);
+                                        if (props.consumptionPage != "consumptionDataEntry") {
+                                            props.toggleLarge('Consumption');
+                                            if (props.consumptionPage != "supplyPlanCompare") {
+                                                props.updateState("programJson", programJsonForStoringTheResult);
+                                                props.updateState("planningUnitDataList", planningUnitDataList);
+                                                props.formSubmit(props.items.planningUnit, props.items.monthCount);
                                             } else {
-                                                programJson1 = {
-                                                    consumptionList: [],
-                                                    inventoryList: [],
-                                                    shipmentList: [],
-                                                    batchInfoList: [],
-                                                    supplyPlan: []
+                                                props.formSubmit(props.items.monthCount);
+                                            }
+                                        }
+                                        if (props.consumptionPage == "consumptionDataEntry") {
+                                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                        }
+                                        if (props.consumptionPage == "whatIf") {
+                                            props.updateState("programModified", 1);
+                                        }
+                                        props.updateState("loading", false);
+                                        props.hideFirstComponent();
+                                    } else if (page == "inventory") {
+                                        props.updateState("color", 'green');
+                                        props.updateState("inventoryChangedFlag", 0);
+                                        if (props.inventoryPage != "inventoryDataEntry") {
+                                            if (props.items == undefined || props.items.inventoryType == 1) {
+                                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                                            } else {
+                                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                                            }
+                                            props.toggleLarge('Adjustments');
+                                            if (props.inventoryPage != "supplyPlanCompare") {
+                                                props.updateState("programJson", programJsonForStoringTheResult);
+                                                props.updateState("planningUnitDataList", planningUnitDataList);
+                                                props.formSubmit(props.items.planningUnit, props.items.monthCount);
+                                            } else {
+                                                props.formSubmit(props.items.monthCount);
+                                            }
+                                        }
+                                        if (props.inventoryPage == "inventoryDataEntry") {
+                                            if (props.items.inventoryType == 1) {
+                                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                                            } else {
+                                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                                            }
+                                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                        }
+                                        if (props.inventoryPage == "whatIf") {
+                                            props.updateState("programModified", 1);
+                                        }
+                                        props.updateState("loading", false);
+                                        props.hideFirstComponent();
+                                    } else if (page == "actualInventory") {
+                                        props.updateState("color", 'green');
+                                        props.updateState("inventoryChangedFlag", 0);
+                                        if (props.inventoryPage != "inventoryDataEntry") {
+                                            if (props.items == undefined || props.items.inventoryType == 1) {
+                                                props.updateState("message", i18n.t('static.message.inventorySaved'));
+                                            } else {
+                                                props.updateState("message", i18n.t('static.message.adjustmentsSaved'));
+                                            }
+                                        }
+                                        props.updateState("programJson", programJsonForStoringTheResult);
+                                        props.updateState("generalProgramJson", generalProgramJson);
+                                        props.updateState("planningUnitDataList", planningUnitDataList);
+                                        props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                        props.updateState("actualInventoryChanged", false);
+                                        props.updateState("loading", false);
+                                        props.hideFirstComponent();
+                                    } else if (page == "shipment") {
+                                        props.updateState("message", i18n.t('static.message.shipmentsSaved'));
+                                        props.updateState("color", 'green');
+                                        props.updateState("shipmentChangedFlag", 0);
+                                        props.updateState("budgetChangedFlag", 0);
+                                        props.updateState("shipmentsEl", "");
+                                        if (props.shipmentPage != "shipmentDataEntry") {
+                                            props.toggleLarge('shipments');
+                                            if (props.shipmentPage != "supplyPlanCompare") {
+                                                props.updateState("programJson", programJsonForStoringTheResult);
+                                                props.updateState("planningUnitDataList", planningUnitDataList);
+                                                props.formSubmit(props.items.planningUnit, props.items.monthCount);
+                                            } else {
+                                                props.formSubmit(props.items.monthCount);
+                                            }
+                                        }
+                                        if (props.shipmentPage == "shipmentDataEntry") {
+                                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                        }
+                                        if (props.shipmentPage == "whatIf") {
+                                            props.updateState("programModified", 1);
+                                        }
+                                        props.updateState("loading", false);
+                                        props.hideFirstComponent()
+                                    } else if (page == "shipment1") {
+                                        props.updateState("shipmentsEl", "");
+                                        if (props.shipmentPage != "shipmentDataEntry") {
+                                            if (props.shipmentPage != undefined) {
+                                                props.toggleLarge('shipments');
+                                            }
+                                            if (props.shipmentPage != "supplyPlanCompare") {
+                                                var programDataJson1 = programRequest.result.programData;
+                                                var planningUnitDataList1 = programDataJson1.planningUnitDataList;
+                                                var planningUnitDataIndex1 = (planningUnitDataList1).findIndex(c => c.planningUnitId == props.state.planningUnit.value);
+                                                var programJson1 = {};
+                                                if (planningUnitDataIndex1 != -1) {
+                                                    var planningUnitData1 = ((planningUnitDataList1).filter(c => c.planningUnitId == props.state.planningUnit.value))[0];
+                                                    var programDataBytes1 = CryptoJS.AES.decrypt(planningUnitData1.planningUnitData, SECRET_KEY);
+                                                    var programData1 = programDataBytes1.toString(CryptoJS.enc.Utf8);
+                                                    programJson1 = JSON.parse(programData1);
+                                                } else {
+                                                    programJson1 = {
+                                                        consumptionList: [],
+                                                        inventoryList: [],
+                                                        shipmentList: [],
+                                                        batchInfoList: [],
+                                                        supplyPlan: []
+                                                    }
+                                                }
+                                                props.updateState("programJson", programJson1);
+                                                props.updateState("planningUnitDataList", planningUnitDataList1);
+                                                try {
+                                                    props.formSubmit(props.items.planningUnit, props.items.monthCount);
+                                                } catch (err) {
                                                 }
                                             }
-                                            props.updateState("programJson", programJson1);
-                                            props.updateState("planningUnitDataList", planningUnitDataList1);
+                                        }
+                                        if (props.shipmentPage == "shipmentDataEntry") {
+                                            props.formSubmit(props.items.planningUnit, props.items.rangeValue);
+                                        }
+                                        if (page == "shipment1") {
                                             try {
-                                                props.formSubmit(props.items.planningUnit, props.items.monthCount);
+                                                props.formSubmit(props.state.planningUnit, props.state.rangeValue);
                                             } catch (err) {
                                             }
                                         }
-                                    }
-                                    if (props.shipmentPage == "shipmentDataEntry") {
-                                        props.formSubmit(props.items.planningUnit, props.items.rangeValue);
-                                    }
-                                    if (page == "shipment1") {
-                                        try {
-                                            props.formSubmit(props.state.planningUnit, props.state.rangeValue);
-                                        } catch (err) {
+                                        if (props.shipmentPage == "whatIf") {
+                                            props.updateState("programModified", 1);
                                         }
+                                        props.updateState("showPlanningUnitAndQty", 1)
+                                        props.updateState("loading", false);
+                                        props.hideFirstComponent()
                                     }
-                                    if (props.shipmentPage == "whatIf") {
-                                        props.updateState("programModified", 1);
-                                    }
-                                    props.updateState("showPlanningUnitAndQty", 1)
-                                    props.updateState("loading", false);
-                                    props.hideFirstComponent()
-                                }
-                                else if (page == "whatIf") {
-                                    if (props.state.scenarioId != 7) {
-                                        props.updateState("programJson", programJsonForStoringTheResult);
-                                        props.updateState("planningUnitDataList", planningUnitDataList);
-                                        props.updateState("message", i18n.t('static.whatIf.scenarioAdded'));
+                                    else if (page == "whatIf") {
+                                        if (props.state.scenarioId != 7) {
+                                            props.updateState("programJson", programJsonForStoringTheResult);
+                                            props.updateState("planningUnitDataList", planningUnitDataList);
+                                            props.updateState("message", i18n.t('static.whatIf.scenarioAdded'));
+                                            props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                            props.updateState("loading", false);
+                                        } else {
+                                            var programDataJson2 = programRequest.result.programData;
+                                            var planningUnitDataList2 = programDataJson2.planningUnitDataList;
+                                            var rangeValue = props.state.rangeValue1;
+                                            let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
+                                            if (rangeValue.from.month <= 9) {
+                                                startDate = rangeValue.from.year + '-0' + rangeValue.from.month + '-01';
+                                            }
+                                            let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                            if (rangeValue.to.month <= 9) {
+                                                stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                            }
+                                            convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson2, programRequest, monthsInPastForAmc, monthsInFutureForAmc)
+                                        }
+                                    } else if (page == "supplyPlan") {
+                                        props.formSubmit(props.state.planningUnit, props.state.monthCount);
+                                    } else if (page == "supplyPlanCompare") {
+                                        props.formSubmit(props.state.monthCount);
+                                    } else if (page == "whatIfFormSubmit") {
                                         props.formSubmit(props.state.planningUnit, props.state.monthCount);
                                         props.updateState("loading", false);
-                                    } else {
-                                        var programDataJson2 = programRequest.result.programData;
-                                        var planningUnitDataList2 = programDataJson2.planningUnitDataList;
-                                        var rangeValue = props.state.rangeValue1;
-                                        let startDate = rangeValue.from.year + '-' + rangeValue.from.month + '-01';
-                                        if (rangeValue.from.month <= 9) {
-                                            startDate = rangeValue.from.year + '-0' + rangeValue.from.month + '-01';
+                                    } else if (page == 'syncPage') {
+                                    } else if (page == 'quantimedImport') {
+                                        props.updateState("loading", false);
+                                        props.redirectToDashbaord();
+                                    } else if (page == 'masterDataSync') {
+                                        if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
+                                            problemListChild.qatProblemActions(programId, "loading", true);
+                                        } else {
+                                            props.fetchData(1, programId)
                                         }
-                                        let stopDate = rangeValue.to.year + '-' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
-                                        if (rangeValue.to.month <= 9) {
-                                            stopDate = rangeValue.to.year + '-0' + rangeValue.to.month + '-' + new Date(rangeValue.to.year, rangeValue.to.month, 0).getDate();
+                                    } else if (page == 'erp') {
+                                        props.getLocalProgramList(props.state.active3 ? 1 : 0)
+                                        props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
+                                        props.updateState("color", "green");
+                                        props.updateState("loading1", false);
+                                        props.updateState("planningUnitIdUpdated", "");
+                                        props.toggleLarge();
+                                        // props.hideSecondComponent();
+                                        if (props.state.active1) {
+                                            props.getVersionList()
+                                        } else {
                                         }
-                                        convertSuggestedShipmentsIntoPlannedShipments(startDate, stopDate, programJsonForStoringTheResult, generalProgramJson, props, planningUnitId, programPlanningUnitList.filter(c => c.planningUnit.id == planningUnitId)[0], regionListFiltered, programId, programJsonForStoringTheResult, programDataJson2, programRequest,monthsInPastForAmc,monthsInFutureForAmc)
-                                    }
-                                } else if (page == "supplyPlan") {
-                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
-                                } else if (page == "supplyPlanCompare") {
-                                    props.formSubmit(props.state.monthCount);
-                                } else if (page == "whatIfFormSubmit") {
-                                    props.formSubmit(props.state.planningUnit, props.state.monthCount);
-                                    props.updateState("loading", false);
-                                } else if (page == 'syncPage') {
-                                } else if (page == 'quantimedImport') {
-                                    props.updateState("loading", false);
-                                    props.redirectToDashbaord();
-                                } else if (page == 'masterDataSync') {
-                                    if (problemListChild != undefined && problemListChild != "undefined" && rebuildQPL) {
-                                        problemListChild.qatProblemActions(programId, "loading", true);
-                                    } else {
-                                        props.fetchData(1, programId)
-                                    }
-                                } else if (page == 'erp') {
-                                    props.getLocalProgramList(props.state.active3 ? 1 : 0)
-                                    props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
-                                    props.updateState("color", "green");
-                                    props.updateState("loading1", false);
-                                    props.updateState("planningUnitIdUpdated", "");
-                                    props.toggleLarge();
-                                    // props.hideSecondComponent();
-                                    if (props.state.active1) {
-                                        props.getVersionList()
-                                    } else {
-                                    }
-                                } else if (page == 'erpDelink') {
-                                    props.getLocalProgramList(props.state.active3 ? 1 : 0)
-                                    props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
-                                    props.updateState("color", "green");
-                                    props.updateState("changedDataForTab2", false);
-                                    props.updateState("loading", false);
-                                    props.updateState("planningUnitIdUpdated", "");
-                                    // props.hideSecondComponent();
-                                    if (props.state.active1 || props.state.active2) {
-                                        props.getVersionList()
-                                    } else {
+                                    } else if (page == 'erpDelink') {
+                                        props.getLocalProgramList(props.state.active3 ? 1 : 0)
+                                        props.updateState("message", (props.state.active2 ? i18n.t('static.mt.linkingUpdateSuccess') : i18n.t('static.shipment.linkingsuccess')))
+                                        props.updateState("color", "green");
+                                        props.updateState("changedDataForTab2", false);
+                                        props.updateState("loading", false);
+                                        props.updateState("planningUnitIdUpdated", "");
+                                        // props.hideSecondComponent();
+                                        if (props.state.active1 || props.state.active2) {
+                                            props.getVersionList()
+                                        } else {
+                                        }
                                     }
                                 }
                             }
@@ -1654,5 +1660,4 @@ export function calculateSupplyPlan(programId, planningUnitId, objectStoreName, 
             }
         }
     }
-}
 }

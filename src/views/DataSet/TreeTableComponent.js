@@ -82,7 +82,7 @@ const validationSchemaNodeData = function (values) {
         percentageOfParent: Yup.string()
             .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
-                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
+                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,10}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -5460,66 +5460,84 @@ export default class TreeTable extends Component {
         var usagePeriodId;
         var usageTypeId;
         var usageFrequency;
-        var nodeTypeId = currentItemConfig.context.payload.nodeType.id;
+        var nodeTypeId = currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeType ? currentItemConfig.context.payload.nodeType.id : "";
         var scenarioId = this.state.selectedScenario;
         var repeatUsagePeriodId;
         var oneTimeUsage;
         if (nodeTypeId == 5) {
-            usageTypeId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
-            usagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId : "";
-            usageFrequency = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+            var parentItem = (currentItemConfig && currentItemConfig.parentItem) ? currentItemConfig.parentItem : (currentItemConfig && currentItemConfig.context ? this.state.items.filter(c => c.id == currentItemConfig.context.parent)[0] : null);
+            var parentNodeData = (parentItem && parentItem.payload && parentItem.payload.nodeDataMap && parentItem.payload.nodeDataMap[scenarioId]) ? parentItem.payload.nodeDataMap[scenarioId][0] : null;
+            usageTypeId = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.usageType ? parentNodeData.fuNode.usageType.id : "";
+            usagePeriodId = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.usagePeriod != null ? parentNodeData.fuNode.usagePeriod.usagePeriodId : "";
+            usageFrequency = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.usageFrequency != null ? parentNodeData.fuNode.usageFrequency.toString().replaceAll(",", "") : "";
             if (usageTypeId == 1) {
-                oneTimeUsage = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+                oneTimeUsage = parentNodeData && parentNodeData.fuNode ? parentNodeData.fuNode.oneTimeUsage : "";
             }
         } else if (nodeTypeId == 4) {
-            usageTypeId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageType.id;
+            var contextNodeData = (currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeDataMap && currentItemConfig.context.payload.nodeDataMap[scenarioId]) ? currentItemConfig.context.payload.nodeDataMap[scenarioId][0] : null;
+            usageTypeId = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.usageType ? contextNodeData.fuNode.usageType.id : "";
             if (usageTypeId == 1) {
-                oneTimeUsage = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.oneTimeUsage;
+                oneTimeUsage = contextNodeData && contextNodeData.fuNode ? contextNodeData.fuNode.oneTimeUsage : "";
             }
             if (usageTypeId == 2 || (oneTimeUsage != null && oneTimeUsage !== "" && oneTimeUsage.toString() == "false")) {
-                usagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usagePeriod.usagePeriodId;
+                usagePeriodId = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.usagePeriod ? contextNodeData.fuNode.usagePeriod.usagePeriodId : "";
             }
-            usageFrequency = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency != null ? (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.usageFrequency.toString().replaceAll(",", "") : "";
+            usageFrequency = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.usageFrequency != null ? contextNodeData.fuNode.usageFrequency.toString().replaceAll(",", "") : "";
         }
         var noOfMonthsInUsagePeriod = 0;
+        var noFURequired;
         if ((usagePeriodId != null && usagePeriodId != "") && (usageTypeId == 2 || (oneTimeUsage == "false" || oneTimeUsage == false))) {
-            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth;
+            var convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId)).length > 0 ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == usagePeriodId))[0].convertToMonth : 0;
             if (usageTypeId == 2) {
                 var div = (convertToMonth * usageFrequency);
                 if (div != 0) {
                     noOfMonthsInUsagePeriod = usageFrequency / convertToMonth;
                 }
             } else {
-                var noOfFUPatient;
-                if (currentItemConfig.context.payload.nodeType.id == 4) {
-                    noOfFUPatient = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                var noOfFUPatient = 0;
+                if (currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeType && currentItemConfig.context.payload.nodeType.id == 4) {
+                    let contextNodeData = (currentItemConfig.context.payload.nodeDataMap && currentItemConfig.context.payload.nodeDataMap[scenarioId]) ? currentItemConfig.context.payload.nodeDataMap[scenarioId][0] : null;
+                    noOfFUPatient = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.noOfForecastingUnitsPerPerson != null && contextNodeData.fuNode.noOfPersons ? contextNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / contextNodeData.fuNode.noOfPersons.toString().replaceAll(",", "") : 0;
                 } else {
-                    noOfFUPatient = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                    var parentItem = (currentItemConfig && currentItemConfig.parentItem) ? currentItemConfig.parentItem : (currentItemConfig && currentItemConfig.context ? this.state.items.filter(c => c.id == currentItemConfig.context.parent)[0] : null);
+                    let parentNodeData = (parentItem && parentItem.payload && parentItem.payload.nodeDataMap && parentItem.payload.nodeDataMap[scenarioId]) ? parentItem.payload.nodeDataMap[scenarioId][0] : null;
+                    noOfFUPatient = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.noOfForecastingUnitsPerPerson != null && parentNodeData.fuNode.noOfPersons ? parentNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeData.fuNode.noOfPersons.toString().replaceAll(",", "") : 0;
                 }
                 noOfMonthsInUsagePeriod = convertToMonth * usageFrequency * noOfFUPatient;
             }
             if (oneTimeUsage != "true" && oneTimeUsage != true && usageTypeId == 1) {
-                if (currentItemConfig.context.payload.nodeType.id == 4) {
-                    repeatUsagePeriodId = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                if (currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeType && currentItemConfig.context.payload.nodeType.id == 4) {
+                    let contextNodeData = (currentItemConfig.context.payload.nodeDataMap && currentItemConfig.context.payload.nodeDataMap[scenarioId]) ? currentItemConfig.context.payload.nodeDataMap[scenarioId][0] : null;
+                    repeatUsagePeriodId = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.repeatUsagePeriod ? contextNodeData.fuNode.repeatUsagePeriod.usagePeriodId : "";
                 } else {
-                    repeatUsagePeriodId = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatUsagePeriod.usagePeriodId;
+                    var parentItem = (currentItemConfig && currentItemConfig.parentItem) ? currentItemConfig.parentItem : (currentItemConfig && currentItemConfig.context ? this.state.items.filter(c => c.id == currentItemConfig.context.parent)[0] : null);
+                    let parentNodeData = (parentItem && parentItem.payload && parentItem.payload.nodeDataMap && parentItem.payload.nodeDataMap[scenarioId]) ? parentItem.payload.nodeDataMap[scenarioId][0] : null;
+                    repeatUsagePeriodId = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.repeatUsagePeriod ? parentNodeData.fuNode.repeatUsagePeriod.usagePeriodId : "";
                 }
-                if (repeatUsagePeriodId != "") {
-                    convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth;
+                if (repeatUsagePeriodId != "" && repeatUsagePeriodId != null) {
+                    convertToMonth = (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId)).length > 0 ? (this.state.usagePeriodList.filter(c => c.usagePeriodId == repeatUsagePeriodId))[0].convertToMonth : 0;
                 } else {
                     convertToMonth = 0;
                 }
             }
-            if (currentItemConfig.context.payload.nodeType.id == 4) {
-                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+            if (currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeType && currentItemConfig.context.payload.nodeType.id == 4) {
+                let contextNodeData = (currentItemConfig.context.payload.nodeDataMap && currentItemConfig.context.payload.nodeDataMap[scenarioId]) ? currentItemConfig.context.payload.nodeDataMap[scenarioId][0] : null;
+                var repeatCount = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.repeatCount != null ? contextNodeData.fuNode.repeatCount.toString().replaceAll(",", "") : 0;
+                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((repeatCount != null ? repeatCount : 0) / (convertToMonth || 1)) * noOfMonthsInUsagePeriod) : noOfFUPatient;
             } else {
-                var noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount != null ? ((currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount).toString().replaceAll(",", "") : (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.repeatCount) / convertToMonth) * noOfMonthsInUsagePeriod : noOfFUPatient;
+                var parentItem = (currentItemConfig && currentItemConfig.parentItem) ? currentItemConfig.parentItem : (currentItemConfig && currentItemConfig.context ? this.state.items.filter(c => c.id == currentItemConfig.context.parent)[0] : null);
+                let parentNodeData = (parentItem && parentItem.payload && parentItem.payload.nodeDataMap && parentItem.payload.nodeDataMap[scenarioId]) ? parentItem.payload.nodeDataMap[scenarioId][0] : null;
+                var repeatCount = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.repeatCount != null ? parentNodeData.fuNode.repeatCount.toString().replaceAll(",", "") : 0;
+                noFURequired = oneTimeUsage != "true" && oneTimeUsage != true ? (((repeatCount != null ? repeatCount : 0) / (convertToMonth || 1)) * noOfMonthsInUsagePeriod) : noOfFUPatient;
             }
         } else if (usageTypeId == 1 && oneTimeUsage != null && (oneTimeUsage == "true" || oneTimeUsage == true)) {
-            if (currentItemConfig.context.payload.nodeType.id == 4) {
-                noFURequired = (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.context.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+            if (currentItemConfig && currentItemConfig.context && currentItemConfig.context.payload && currentItemConfig.context.payload.nodeType && currentItemConfig.context.payload.nodeType.id == 4) {
+                let contextNodeData = (currentItemConfig.context.payload.nodeDataMap && currentItemConfig.context.payload.nodeDataMap[scenarioId]) ? currentItemConfig.context.payload.nodeDataMap[scenarioId][0] : null;
+                noFURequired = contextNodeData && contextNodeData.fuNode && contextNodeData.fuNode.noOfForecastingUnitsPerPerson != null && contextNodeData.fuNode.noOfPersons ? contextNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / contextNodeData.fuNode.noOfPersons.toString().replaceAll(",", "") : 0;
             } else {
-                noFURequired = (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / (currentItemConfig.parentItem.payload.nodeDataMap[scenarioId])[0].fuNode.noOfPersons.toString().replaceAll(",", "");
+                var parentItem = (currentItemConfig && currentItemConfig.parentItem) ? currentItemConfig.parentItem : (currentItemConfig && currentItemConfig.context ? this.state.items.filter(c => c.id == currentItemConfig.context.parent)[0] : null);
+                let parentNodeData = (parentItem && parentItem.payload && parentItem.payload.nodeDataMap && parentItem.payload.nodeDataMap[scenarioId]) ? parentItem.payload.nodeDataMap[scenarioId][0] : null;
+                noFURequired = parentNodeData && parentNodeData.fuNode && parentNodeData.fuNode.noOfForecastingUnitsPerPerson != null && parentNodeData.fuNode.noOfPersons ? parentNodeData.fuNode.noOfForecastingUnitsPerPerson.toString().replaceAll(",", "") / parentNodeData.fuNode.noOfPersons.toString().replaceAll(",", "") : 0;
             }
         }
         return { noFURequired, noOfMonthsInUsagePeriod };

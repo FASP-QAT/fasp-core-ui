@@ -1791,13 +1791,13 @@ export default class PlanningUnitSetting extends Component {
      */
     disablePUConsumptionData(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
-        for (var i = 0; i < datasetList1.length; i++) {
-            var programs = [];
-            var program = datasetList1[i];
-            var programData = decryptFCData(program.programData);
+        for (let i = 0; i < datasetList1.length; i++) {
+            let programs = [];
+            let program = datasetList1[i];
+            let programData = decryptFCData(program.programData);
             let actualConsumptionList = programData.actualConsumptionList;
-            for (var j = 0; j < listOfDisablePuNode.length; j++) {
-                for (var k = 0; k < actualConsumptionList.length; k++) {
+            for (let j = 0; j < listOfDisablePuNode.length; j++) {
+                for (let k = 0; k < actualConsumptionList.length; k++) {
                     if (parseInt(listOfDisablePuNode[j]) == actualConsumptionList[k].planningUnit.id) {
                         actualConsumptionList[k].amount = 0;
                     }
@@ -1807,9 +1807,9 @@ export default class PlanningUnitSetting extends Component {
             programData = encryptFCData(programData);
             program.programData = programData;
             programs.push(program);
-            var db1;
+            let db1;
             getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            let openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
@@ -1819,20 +1819,20 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var programTransaction = transaction.objectStore('datasetData');
+                let transaction = db1.transaction(['datasetData'], 'readwrite');
+                let programTransaction = transaction.objectStore('datasetData');
                 programs.forEach(program => {
                     var programRequest = programTransaction.put(program);
                 })
                 transaction.oncomplete = function (event) {
                     db1 = e.target.result;
-                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    let detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    let datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    let datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
                     datasetDetailsRequest.onsuccess = function (e) {
-                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        let datasetDetailsRequestJson = datasetDetailsRequest.result;
                         datasetDetailsRequestJson.changed = 1;
-                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        let datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
                         datasetDetailsRequest1.onsuccess = function (event) {
                         }
                     }
@@ -1854,33 +1854,50 @@ export default class PlanningUnitSetting extends Component {
      */
     disablePUNode(listOfDisablePuNode) {
         let datasetList1 = this.state.datasetList1;
-        for (var i = 0; i < datasetList1.length; i++) {
-            var programs = [];
-            var program = datasetList1[i];
-            var programData = decryptFCData(program.programData);
+        for (let i = 0; i < datasetList1.length; i++) {
+            let programs = [];
+            let program = datasetList1[i];
+            let programData = decryptFCData(program.programData);
             let treeListForSelectedProgram = programData.treeList;
-            for (var j = 0; j < listOfDisablePuNode.length; j++) {
-                for (var k = 0; k < treeListForSelectedProgram.length; k++) {
+            for (let j = 0; j < listOfDisablePuNode.length; j++) {
+                for (let k = 0; k < treeListForSelectedProgram.length; k++) {
                     let flatlist = treeListForSelectedProgram[k].tree.flatList;
                     let listContainNodeType5 = flatlist.filter(c => c.payload.nodeType.id == 5);
-                    for (var l = 0; l < listContainNodeType5.length; l++) {
+                    for (let l = 0; l < listContainNodeType5.length; l++) {
                         let nodeDataMap = listContainNodeType5[l].payload.nodeDataMap;
                         let nodeDataMapKeys = Object.keys(listContainNodeType5[l].payload.nodeDataMap);
-                        for (var m = 0; m < nodeDataMapKeys.length; m++) {
+                        for (let m = 0; m < nodeDataMapKeys.length; m++) {
                             let insideArrayOfNodeDataMap = nodeDataMap[nodeDataMapKeys[m]];
-                            if (insideArrayOfNodeDataMap[0].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
-                                var sameParentList = flatlist.filter(c => c.parent == listContainNodeType5[l].parent);
-                                for (let l = 0; l < sameParentList.length; l++) {
-                                    var nodeDataModelingList = sameParentList[l].payload.nodeDataMap[nodeDataMapKeys[m]][0].nodeDataModelingList;
-                                    var result = nodeDataModelingList.filter(c => c.transferNodeDataId == nodeDataMap[nodeDataMapKeys[m]][0].nodeDataId);
-                                    if (result.length > 0) {
-                                        for (let r = 0; r < result.length; r++) {
-                                            var findNodeDataIdIndex = nodeDataModelingList.findIndex(n => n.transferNodeDataId == result[r].transferNodeDataId);
-                                            nodeDataModelingList.splice(findNodeDataIdIndex, 1);
+                            if (insideArrayOfNodeDataMap && 
+                                insideArrayOfNodeDataMap[0] && 
+                                insideArrayOfNodeDataMap[0].puNode && 
+                                insideArrayOfNodeDataMap[0].puNode.planningUnit && 
+                                insideArrayOfNodeDataMap[0].puNode.planningUnit.id == parseInt(listOfDisablePuNode[j])) {
+                                
+                                let sameParentList = flatlist.filter(c => c.parent == listContainNodeType5[l].parent);
+                                for (let s = 0; s < sameParentList.length; s++) {
+                                    if (sameParentList[s].payload && 
+                                        sameParentList[s].payload.nodeDataMap && 
+                                        sameParentList[s].payload.nodeDataMap[nodeDataMapKeys[m]] && 
+                                        sameParentList[s].payload.nodeDataMap[nodeDataMapKeys[m]][0] && 
+                                        sameParentList[s].payload.nodeDataMap[nodeDataMapKeys[m]][0].nodeDataModelingList) {
+                                        
+                                        let nodeDataModelingList = sameParentList[s].payload.nodeDataMap[nodeDataMapKeys[m]][0].nodeDataModelingList;
+                                        if (nodeDataMap[nodeDataMapKeys[m]][0] && nodeDataMap[nodeDataMapKeys[m]][0].nodeDataId) {
+                                            let targetNodeDataId = nodeDataMap[nodeDataMapKeys[m]][0].nodeDataId;
+                                            let result = nodeDataModelingList.filter(c => c.transferNodeDataId == targetNodeDataId);
+                                            if (result.length > 0) {
+                                                for (let r = 0; r < result.length; r++) {
+                                                    let findNodeDataIdIndex = nodeDataModelingList.findIndex(n => n.transferNodeDataId == result[r].transferNodeDataId);
+                                                    if (findNodeDataIdIndex != -1) {
+                                                        nodeDataModelingList.splice(findNodeDataIdIndex, 1);
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                                var findNodeIndex = flatlist.findIndex(n => n.id == listContainNodeType5[l].id);
+                                let findNodeIndex = flatlist.findIndex(n => n.id == listContainNodeType5[l].id);
                                 if (findNodeIndex != -1) {
                                     treeListForSelectedProgram[k].generateMom = 1;
                                     flatlist.splice(findNodeIndex, 1);
@@ -1894,9 +1911,9 @@ export default class PlanningUnitSetting extends Component {
             programData = encryptFCData(programData);
             program.programData = programData;
             programs.push(program);
-            var db1;
+            let db1;
             getDatabase();
-            var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
+            let openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
             openRequest.onerror = function (event) {
                 this.setState({
                     message: i18n.t('static.program.errortext'),
@@ -1906,20 +1923,20 @@ export default class PlanningUnitSetting extends Component {
             }.bind(this);
             openRequest.onsuccess = function (e) {
                 db1 = e.target.result;
-                var transaction = db1.transaction(['datasetData'], 'readwrite');
-                var programTransaction = transaction.objectStore('datasetData');
+                let transaction = db1.transaction(['datasetData'], 'readwrite');
+                let programTransaction = transaction.objectStore('datasetData');
                 programs.forEach(program => {
                     programTransaction.put(program);
                 })
                 transaction.oncomplete = function (event) {
                     db1 = e.target.result;
-                    var detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
-                    var datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
-                    var datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
+                    let detailTransaction = db1.transaction(['datasetDetails'], 'readwrite');
+                    let datasetDetailsTransaction = detailTransaction.objectStore('datasetDetails');
+                    let datasetDetailsRequest = datasetDetailsTransaction.get(this.state.datasetId);
                     datasetDetailsRequest.onsuccess = function (e) {
-                        var datasetDetailsRequestJson = datasetDetailsRequest.result;
+                        let datasetDetailsRequestJson = datasetDetailsRequest.result;
                         datasetDetailsRequestJson.changed = 1;
-                        var datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
+                        let datasetDetailsRequest1 = datasetDetailsTransaction.put(datasetDetailsRequestJson);
                         datasetDetailsRequest1.onsuccess = function (event) {
                         }
                     }
