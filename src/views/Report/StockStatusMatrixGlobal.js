@@ -1015,7 +1015,6 @@ class StockStatusMatrixGlobal extends Component {
     fetchData = () => {
         let realmId = AuthenticationService.getRealmId()
         let CountryIds = this.state.countryValues.map(ele => (ele.value).toString());
-        let includePlanningShipments = !this.state.removePlannedShipments;
         let programIds = this.state.programValues.map(ele => (ele.value).toString());
         let planningUnitIds = this.state.planningUnitId.length == this.state.planningUnits.length ? [] : this.state.planningUnitId.map(ele => (ele.value).toString());
         let startDate = this.state.rangeValue.from.year + '-' + this.state.rangeValue.from.month + '-01';
@@ -1036,7 +1035,7 @@ class StockStatusMatrixGlobal extends Component {
                 equivalencyUnitId: this.state.yaxisEquUnit == -1 ? 0 : this.state.yaxisEquUnit,
                 planningUnitIds: planningUnitIds,
                 stockStatusConditions: this.state.stockStatusValues.length == legendcolor.length ? [] : this.state.stockStatusValues.map(ele => ele.value).join(','),
-                removePlannedShipments: this.state.removeTbdFundingSource ? 2 : includePlanningShipments ? 0 : 1,
+                removePlannedShipments: this.state.removePlannedShipments ? 1 :this.state.removeTbdFundingSource ? 2 : 0,
                 reportView: this.state.aggregateCountries ? 2 : 1,
                 showByQty: this.state.viewBy == 1 ? false : true
             }
