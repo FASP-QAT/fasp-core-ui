@@ -99,7 +99,7 @@ const validationSchemaNodeData = function (values) {
         percentageOfParent: Yup.string()
             .test('percentageOfParent', i18n.t('static.tree.decimalValidation10&2'),
                 function (value) {
-                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,3}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
+                    var testNumber = document.getElementById("percentageOfParent").value != "" ? (/^\d{0,10}(\.\d{1,4})?$/).test(document.getElementById("percentageOfParent").value) : false;
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 4 || parseInt(document.getElementById("nodeTypeId").value) == 5) && (document.getElementById("percentageOfParent").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -7405,8 +7405,9 @@ export default class BuildTree extends Component {
         var tempDownwardAggregationList = [];
         var downwardAggregationList = [];
         // this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (x.treeId != this.state.treeId ? (tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId})) : (t.level == (this.state.addNodeFlag ? this.state.currentItemConfig.context.level : this.state.currentItemConfig.context.level - 1) ? tempDownwardAggregationList.push({label: x.label.label_en+"~"+t.payload.label.label_en, value: x.treeId+"~"+t.payload.nodeId}) : "" ))))
-        this.state.treeData.map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({ label: x.label.label_en + "~" + t.payload.label.label_en, value: x.treeId + "~" + t.id }))))
+        this.state.treeData.filter(x => x.tree != null && x.tree.flatList != null).map(x => x.tree.flatList.filter(t => t.payload.downwardAggregationAllowed).map(t => (tempDownwardAggregationList.push({ label: x.label.label_en + "~" + t.payload.label.label_en, value: x.treeId + "~" + t.id }))))
         for (var i = 0; i < this.state.treeData.length; i++) {
+            if (this.state.treeData[i].tree == null || this.state.treeData[i].tree.flatList == null) continue;
             for (var j = 0; j < this.state.treeData[i].scenarioList.length; j++) {
                 if (this.state.treeData[i].scenarioList[j].active) {
                     tempDownwardAggregationList.filter(x => x.value.split("~")[0] == this.state.treeData[i].treeId).map(x => downwardAggregationList.push({
@@ -7416,7 +7417,8 @@ export default class BuildTree extends Component {
                 }
             }
         }
-        var funnelChildNodes = this.state.dataSetObj.programData.treeList.filter(t => t.treeId == this.state.treeId)[0].tree.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x => x.id.toString())
+        var matchedTree = this.state.dataSetObj.programData.treeList.filter(t => t.treeId == this.state.treeId)[0];
+        var funnelChildNodes = (matchedTree != null && matchedTree.tree != null && matchedTree.tree.flatList != null) ? matchedTree.tree.flatList.filter(x => x.sortOrder.startsWith(this.state.currentItemConfig.context.sortOrder)).map(x => x.id.toString()) : []
         downwardAggregationList = downwardAggregationList.filter(x => (x.value.split("~")[0] == this.state.treeId && !funnelChildNodes.includes(x.value.split("~")[2])) || x.value.split("~")[0] != this.state.treeId)
         downwardAggregationList = downwardAggregationList.sort(function (a, b) {
             a = a.label.toLowerCase();
@@ -9874,7 +9876,7 @@ export default class BuildTree extends Component {
         const { context: item } = data;
         if (item != null) {
             var sourceNodeUsageList = [];
-            this.state.dataSetObj.programData.treeList.map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && da.scenarioId == this.state.selectedScenario && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.targetScenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
+            this.state.dataSetObj.programData.treeList.filter(tl => tl.tree != null && tl.tree.flatList != null).map(tl => tl.tree.flatList.map(f => f.payload.downwardAggregationList ? (f.payload.downwardAggregationList.map(da => (da.treeId == this.state.treeId && da.nodeId == data.context.payload.nodeId && da.scenarioId == this.state.selectedScenario && data.context.payload.downwardAggregationAllowed) ? sourceNodeUsageList.push({ treeId: tl.treeId, scenarioId: da.targetScenarioId, nodeId: da.nodeId, treeName: tl.label.label_en, isScenarioVisible: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(s => s.active), scenarioName: this.state.dataSetObj.programData.treeList.filter(tl2 => tl2.treeId == da.treeId)[0].scenarioList.filter(sl => sl.id == da.scenarioId)[0].label.label_en, nodeName: f.payload.label.label_en, parentName: tl.tree.flatList.filter(f2 => f2.id == f.parent).length > 0 ? tl.tree.flatList.filter(f2 => f2.id == f.parent)[0].payload.label.label_en : "" }) : "")) : ""))
             this.setState({
                 sourceNodeUsageList: sourceNodeUsageList,
                 viewMonthlyData: true,
@@ -11034,12 +11036,12 @@ export default class BuildTree extends Component {
                                                         {this.state.level0 &&
                                                             <>
                                                                 <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
                                                                         <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
                                                                     </Popover>
                                                                 </div>
                                                                 <FormGroup className="col-md-4">
-                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                                    <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2_5" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
                                                                         name="parent"
                                                                         bsSize="sm"
@@ -11052,12 +11054,12 @@ export default class BuildTree extends Component {
                                                                 </FormGroup>
                                                             </>}
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3_5" trigger="hover" toggle={this.toggleNodeTitle}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.NodeTitle')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4">
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeTitle')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover3_5" onClick={this.toggleNodeTitle} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="nodeTitle"
                                                                 name="nodeTitle"
@@ -11071,7 +11073,7 @@ export default class BuildTree extends Component {
                                                             <FormFeedback className="red">{errors.nodeTitle}</FormFeedback>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4" trigger="hover" toggle={this.toggleNodeType}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeType} target="Popover4_5" trigger="hover" toggle={this.toggleNodeType}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.NodeType')}</PopoverBody>
                                                             </Popover>
                                                         </div>
@@ -11082,7 +11084,7 @@ export default class BuildTree extends Component {
                                                             value={JSON.stringify(errors) != '{}'}
                                                         />
                                                         <FormGroup className={"col-md-4"}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeType')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover4_5" onClick={this.toggleNodeType} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input
                                                                 type="select"
                                                                 id="nodeTypeId"
@@ -11128,12 +11130,12 @@ export default class BuildTree extends Component {
                                                             </div>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6" trigger="hover" toggle={this.toggleParentValue}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenParentValue} target="Popover6_5" trigger="hover" toggle={this.toggleParentValue}>
                                                                 <PopoverBody>{i18n.t('static.tooltip.ParentValue')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} in {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.parentValue')} in {moment(this.state.currentScenario.month).format(`MMM-YYYY`)} <i class="fa fa-info-circle icons pl-lg-2" id="Popover6_5" onClick={this.toggleParentValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="parentValue"
                                                                 name="parentValue"
@@ -11155,12 +11157,12 @@ export default class BuildTree extends Component {
                                                             ></Input>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5" trigger="hover" toggle={this.togglePercentageOfParent}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenPercentageOfParent} target="Popover5_5" trigger="hover" toggle={this.togglePercentageOfParent}>
+                                                                 <PopoverBody>{i18n.t('static.tooltip.PercentageOfParent')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.numberNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.percentageOfParent')}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover5_5" onClick={this.togglePercentageOfParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <InputGroup>
                                                                 <Input type="number"
                                                                     id="percentageOfParent"
@@ -11181,12 +11183,12 @@ export default class BuildTree extends Component {
                                                             </InputGroup>
                                                         </FormGroup>
                                                         <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7_5" trigger="hover" toggle={this.toggleNodeValue}>
                                                                 <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
                                                             </Popover>
                                                         </div>
                                                         <FormGroup className="col-md-4 PUNodemarginTop" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
-                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
+                                                            <Label htmlFor="currencyId">{i18n.t('static.tree.nodeValue')}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7_5" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
                                                                 id="nodeValue"
                                                                 name="nodeValue"

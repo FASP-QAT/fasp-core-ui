@@ -395,6 +395,17 @@ class CompareAndSelectScenario extends Component {
             let stopDate = moment(datasetJson.currentVersion.forecastStopDate).format("YYYY-MM-DD")
             var rangeValue = { from: { year: Number(moment(actualMinDate).startOf('month').format("YYYY")), month: Number(moment(actualMinDate).startOf('month').format("M")) }, to: { year: Number(moment(stopDate).startOf('month').format("YYYY")), month: Number(moment(stopDate).startOf('month').format("M")) } }
             var treeScenarioList = [];
+            var programId = this.state.datasetId.split('_')[0];
+            var planningUnitId = this.state.planningUnitId;
+            var regionId = this.state.regionId;
+            var storageKey = "sesStickyCompareSelectDisplay_" + programId + "_" + planningUnitId + "_" + regionId;
+            var stickyDisplayMap = {};
+            try {
+                var stored = localStorage.getItem(storageKey);
+                if (stored) {
+                    stickyDisplayMap = JSON.parse(stored);
+                }
+            } catch (e) {}
             var treeList = datasetJson.treeList.filter(c => c.active.toString() == "true");
             var colourArray = ["#002F6C", "#BA0C2F", "#118B70", "#EDB944", "#A7C6ED", "#651D32", "#6C6463", "#F48521", "#49A4A1", "#212721"]
             var colourArrayCount = 0;
@@ -409,7 +420,12 @@ class CompareAndSelectScenario extends Component {
                     }
                     minActualMonth = consumptionExtrapolation[ce].jsonProperties.startDate;
                     maxActualMonth = consumptionExtrapolation[ce].jsonProperties.stopDate;
-                    treeScenarioList.push({ id: consumptionExtrapolation[ce].consumptionExtrapolationId, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: true, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
+                    var checkedVal = true;
+                    var itemKey = consumptionExtrapolation[ce].consumptionExtrapolationId;
+                    if (stickyDisplayMap[itemKey] !== undefined) {
+                        checkedVal = stickyDisplayMap[itemKey];
+                    }
+                    treeScenarioList.push({ id: itemKey, tree: consumptionExtrapolation[ce], scenario: consumptionExtrapolation[ce], checked: checkedVal, color: colourArray[colourArrayCount], type: "C", data: consumptionExtrapolation[ce].extrapolationDataList, readonly: false });
                     colourArrayCount += 1;
                 }
             }
@@ -449,7 +465,12 @@ class CompareAndSelectScenario extends Component {
                                 a[month].calculatedMmdValue += calculatedMmdValue;
                             return a;
                         }, {}));
-                        treeScenarioList.push({ id: treeList[tl].treeId + "~" + scenarioList[sl].id, tree: treeList[tl], scenario: scenarioList[sl], checked: readonly ? false : true, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
+                        var itemKey = treeList[tl].treeId + "~" + scenarioList[sl].id;
+                        var checkedVal = readonly ? false : true;
+                        if (stickyDisplayMap[itemKey] !== undefined) {
+                            checkedVal = stickyDisplayMap[itemKey];
+                        }
+                        treeScenarioList.push({ id: itemKey, tree: treeList[tl], scenario: scenarioList[sl], checked: checkedVal, color: colourArray[colourArrayCount], type: "T", data: resultTrue, readonly: readonly });
                         colourArrayCount += 1;
                         count += 1;
                     }
@@ -1696,6 +1717,19 @@ class CompareAndSelectScenario extends Component {
             var treeScenarioList = this.state.treeScenarioList;
             var index = this.state.treeScenarioList.findIndex(c => c.id == elInstance.getRowData(y)[8]);
             treeScenarioList[index].checked = !treeScenarioList[index].checked;
+            var programId = this.state.datasetId.split('_')[0];
+            var planningUnitId = this.state.planningUnitId;
+            var regionId = this.state.regionId;
+            var storageKey = "sesStickyCompareSelectDisplay_" + programId + "_" + planningUnitId + "_" + regionId;
+            var stickyDisplayMap = {};
+            try {
+                var stored = localStorage.getItem(storageKey);
+                if (stored) {
+                    stickyDisplayMap = JSON.parse(stored);
+                }
+            } catch (e) {}
+            stickyDisplayMap[treeScenarioList[index].id] = treeScenarioList[index].checked;
+            localStorage.setItem(storageKey, JSON.stringify(stickyDisplayMap));
             this.setState({
                 treeScenarioList: treeScenarioList,
                 loading: true
