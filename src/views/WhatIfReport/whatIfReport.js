@@ -6263,14 +6263,14 @@ export default class WhatIfReportComponent extends React.Component {
                     pointStyle: 'line',
                     pointRadius: 0,
                     showInLegend: true,
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption === null || item.consumption === '' || typeof item.consumption === 'undefined' ? null : item.consumption))
                 },
                 {
                     label: i18n.t('static.report.actualConsumption'),
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? (item.consumptionQty === null || item.consumptionQty === '' || typeof item.consumptionQty === 'undefined' ? null : item.consumptionQty) : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,

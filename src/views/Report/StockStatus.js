@@ -1305,12 +1305,12 @@ class StockStatus extends Component {
               }
               var ppuResult = ppuRequest.result;
               var planningUnitArray = [...new Set(this.state.planningUnitIdExport).map(c => Number(c.value))];
-              var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(c.planningUnit.id));
+              var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(Number(c.planningUnit.id)));
               let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
               let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
               for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
                 let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
-                var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+                var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && c.active.toString() == "true");
                 conList.map(item => {
                   item.program = {
                     id: this.state.programId[0].value,
@@ -1320,7 +1320,7 @@ class StockStatus extends Component {
                     code: this.state.programId[0].label
                   }
                 })
-                var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+                var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && c.active.toString() == "true");
                 invList.map(item => {
                   item.program = {
                     id: this.state.programId[0].value,
@@ -1330,7 +1330,7 @@ class StockStatus extends Component {
                     code: this.state.programId[0].label
                   }
                 })
-                var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+                var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && (c.shipmentId == 0 || (c.active.toString() == "true" && c.accountFlag.toString() == "true")));
                 shipList.map(item => {
                   item.program = {
                     id: this.state.programId[0].value,
@@ -1471,7 +1471,7 @@ class StockStatus extends Component {
                 var stockStatusVertical = [];
                 for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
                   let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
-                  var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+                  var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && Number(c.planningUnit.id) == Number(planningUnitList[pu].value) && (c.shipmentId == 0 || (c.active.toString() == "true" && c.accountFlag.toString() == "true")));
                   shipList.map(item => {
                     item.program = {
                       id: this.state.programId[0].value,
@@ -1482,8 +1482,8 @@ class StockStatus extends Component {
                     }
                   })
                   var multiplier = 1;
-                  var conListPU = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true");
-                  var invListPU = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && c.planningUnit.id == planningUnitList[pu].value && c.active.toString() == "true");
+                  var conListPU = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && Number(c.planningUnit.id) == Number(planningUnitList[pu].value) && c.active.toString() == "true");
+                  var invListPU = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && Number(c.planningUnit.id) == Number(planningUnitList[pu].value) && c.active.toString() == "true");
                   stockStatusVertical.push(
                     {
                       "dt": m + "-01",
@@ -3504,12 +3504,12 @@ class StockStatus extends Component {
             }
             var ppuResult = ppuRequest.result;
             var planningUnitArray = [...new Set(this.state.planningUnitId).map(c => Number(c.value))];
-            var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(c.planningUnit.id));
+            var ppu = ppuResult.filter(c => c.program.id == this.state.programId[0].value && planningUnitArray.includes(Number(c.planningUnit.id)));
             let startDate = moment(this.state.rangeValue.from.year + '-' + (this.state.rangeValue.from.month <= 9 ? "0" + this.state.rangeValue.from.month : this.state.rangeValue.from.month) + '-01').startOf('month').format('YYYY-MM-DD');
             let stopDate = this.state.rangeValue.to.year + '-' + this.state.rangeValue.to.month + '-' + new Date(this.state.rangeValue.to.year, this.state.rangeValue.to.month, 0).getDate();
             for (let m = moment(startDate).format("YYYY-MM"); moment(m).format("YYYY-MM") <= moment(stopDate).format("YYYY-MM"); m = moment(m).add(1, "months").format("YYYY-MM")) {
               let sp = supplyPlanList.filter(x => moment(x.transDate).format("YYYY-MM") == moment(m).format("YYYY-MM"))
-              var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+              var conList = consumptionList.filter(c => moment(c.consumptionDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && c.active.toString() == "true");
               conList.map(item => {
                 item.program = {
                   id: this.state.programId[0].value,
@@ -3519,7 +3519,7 @@ class StockStatus extends Component {
                   code: this.state.programId[0].label
                 }
               })
-              var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true");
+              var invList = inventoryList.filter(c => moment(c.inventoryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && c.active.toString() == "true");
               invList.map(item => {
                 item.program = {
                   id: this.state.programId[0].value,
@@ -3529,7 +3529,7 @@ class StockStatus extends Component {
                   code: this.state.programId[0].label
                 }
               })
-              var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(c.planningUnit.id) && c.active.toString() == "true" && c.accountFlag.toString() == "true");
+              var shipList = shipmentList.filter(c => moment(c.receivedDate != null && c.receivedDate != "" && c.receivedDate != undefined ? c.receivedDate : c.expectedDeliveryDate).format("YYYY-MM") == moment(m).format("YYYY-MM") && planningUnitArray.includes(Number(c.planningUnit.id)) && c.active.toString() == "true" && c.accountFlag.toString() == "true");
               shipList.map(item => {
                 item.program = {
                   id: this.state.programId[0].value,
