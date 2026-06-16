@@ -1685,14 +1685,14 @@ export default class SupplyPlanComponent extends React.Component {
                     showInLegend: true,
                     pointBackgroundColor: '#ba0c2f',
                     pointBorderColor: '#ba0c2f',
-                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption))
+                    data: this.state.jsonArrForGraph.map((item, index) => (item.consumption === null || item.consumption === '' || typeof item.consumption === 'undefined' ? null : item.consumption))
                 },
                 {
                     label: i18n.t('static.report.actualConsumption'),
                     yAxisID: 'A',
                     type: 'line',
                     stack: 7,
-                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                    data: this.state.consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? (item.consumptionQty === null || item.consumptionQty === '' || typeof item.consumptionQty === 'undefined' ? null : item.consumptionQty) : null)),
                     fill: false,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
@@ -6209,14 +6209,14 @@ export default class SupplyPlanComponent extends React.Component {
                                             pointStyle: 'line',
                                             pointRadius: 0,
                                             showInLegend: true,
-                                            data: jsonArrForGraph.map((item, index) => (item.consumption))
+                                            data: jsonArrForGraph.map((item, index) => (item.consumption === null || item.consumption === '' || typeof item.consumption === 'undefined' ? null : item.consumption))
                                         },
                                         {
                                             label: i18n.t('static.report.actualConsumption'),
                                             yAxisID: 'A',
                                             type: 'line',
                                             stack: 7,
-                                            data: consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? item.consumptionQty : null)),
+                                            data: consumptionTotalData.map((item, index) => (item.consumptionType == 1 ? (item.consumptionQty === null || item.consumptionQty === '' || typeof item.consumptionQty === 'undefined' ? null : item.consumptionQty) : null)),
                                             fill: false,
                                             borderColor: 'rgb(75, 192, 192)',
                                             tension: 0.1,
