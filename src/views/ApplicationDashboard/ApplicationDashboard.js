@@ -2651,7 +2651,7 @@ class ApplicationDashboard extends Component {
         },
         {
           status: i18n.t("static.report.shipped"),
-          color: "#F48521"
+          color: "#49A4A1"
         },
         {
           status: i18n.t("static.report.hold"),
@@ -2681,7 +2681,7 @@ class ApplicationDashboard extends Component {
         },
         {
           status: i18n.t("static.report.shipped"),
-          color: "#F48521"
+          color: "#49A4A1"
         },
         {
           status: i18n.t("static.report.hold"),
