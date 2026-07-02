@@ -565,7 +565,7 @@ class Login extends Component {
               </Col>
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
-                  <p className="Login-p">
+                  <p className="Login-p">The U.S. Government Global Health Supply Chain Program-Procurement and Supply Management (GHSC-PSM) project connects technical solutions and proven commercial processes to promote efficient and cost-effective health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health commodities to save lives and create a healthier future for all. The project purchases and delivers health commodities, offers comprehensive technical assistance to strengthen national supply chain systems, and provides global supply chain leadership. For more information, visit <a className='DarkModeTexta' href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not official U.S. government information and does not represent the views or positions of the U.S. government.
                   </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
