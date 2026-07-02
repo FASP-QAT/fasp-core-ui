@@ -10,7 +10,7 @@ import { Button, ButtonDropdown, CardBody, CardGroup, Col, Container, DropdownIt
 import * as Yup from 'yup';
 // import InnerBgImg from '../../../../src/assets/img/bg-image/bg-login.jpg';
 import LoginService from '../../../api/LoginService';
-import image3 from '../../../assets/img/PEPFAR-logo.png';
+import usaFlag from '../../../assets/img/usa-flag.png';
 import imageHelp from '../../../assets/img/help-icon-login.png';
 import i18n from '../../../i18n';
 import axios from 'axios';
@@ -20,8 +20,6 @@ import getLabelText from '../../../CommonComponent/getLabelText';
 import { API_URL, APP_VERSION_REACT, INDEXED_DB_NAME, INDEXED_DB_VERSION, JEXCEL_DEFAULT_PAGINATION, SECRET_KEY, QAT_HELPDESK_CUSTOMER_PORTAL_URL } from '../../../Constants.js';
 import MasterSyncService from '../../../api/MasterSyncService.js';
 import image1 from '../../../assets/img/QAT-login-logo.png';
-import image4 from '../../../assets/img/USAID-presidents-malaria-initiative.png';
-import image2 from '../../../assets/img/wordmark.png';
 import AuthenticationService from '../../Common/AuthenticationService.js';
 // Initial values for form fields
 const initialValues = {
@@ -567,32 +565,13 @@ class Login extends Component {
               </Col>
               <Col xs="12" className="Login-bttom ">
                 <CardBody>
-                  <p className="Login-p">The USAID Global Health Supply Chain Program-Procurement and Supply
-                    Management (GHSC-PSM) project is funded under USAID Contract No. AID-OAA-I-15-0004. GHSC-PSM connects
-                    technical solutions and proven commercial processes to promote efficient and cost-effective
-                    health supply chains worldwide. Our goal is to ensure uninterrupted supplies of health
-                    commodities to save lives and create a healthier future for all. The project purchases
-                    and delivers health commodities, offers comprehensive technical assistance to strengthen
-                    national supply chain systems, and provides global supply chain leadership. For more
-                    information, visit <a className='DarkModeTexta' href="https://www.ghsupplychain.org/" target="_blank">ghsupplychain.org</a>. The information provided in this tool is not
-                    official U.S. government information and does not represent the views or positions of the
-                    Agency for International Development or the U.S. government.
+                  <p className="Login-p">
                   </p>
                 </CardBody>
                 <Row className="text-center Login-bttom-logo">
-                  <Col md="4">
+                  <Col md="12">
                     <CardBody>
-                      <img src={image2} className="img-fluid bottom-logo-img" />
-                    </CardBody>
-                  </Col>
-                  <Col md="4">
-                    <CardBody>
-                      <img src={image3} className="img-fluid bottom-logo-img" />
-                    </CardBody>
-                  </Col>
-                  <Col md="4">
-                    <CardBody>
-                      <img src={image4} className="img-fluid bottom-logo-img" />
+                      <img src={usaFlag} className="img-fluid bottom-logo-img" alt="USA Flag" />
                     </CardBody>
                   </Col>
                 </Row>
