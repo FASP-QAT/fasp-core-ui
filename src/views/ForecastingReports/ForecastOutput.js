@@ -788,6 +788,7 @@ class ForecastOutput extends Component {
                                 for (let i = 0; i < selectedPlanningUnit.length; i++) {
                                     let nodeDataMomList = [];
                                     let planningUniObj = planningUnitList.filter(c => c.planningUnit.id == selectedPlanningUnit[i].value)[0];
+                                    if (!planningUniObj) continue;
                                     let selectedForecastMap = planningUniObj.selectedForecastMap;
                                     let keys = Object.keys(selectedForecastMap);
                                     if (keys.length > 0) {
