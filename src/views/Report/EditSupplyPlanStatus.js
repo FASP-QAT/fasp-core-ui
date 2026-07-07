@@ -4257,7 +4257,7 @@ class EditSupplyPlanStatus extends Component {
                     problemReportFilterList = problemReportFilterList.filter(c => (c.problemType.id == problemTypeId));
                 }
                 if (problemCategoryId != -1) {
-                    problemReportFilterList = problemReportFilterList.filter(c => (c.problemCategory.id == problemCategoryId));
+                    problemReportFilterList = problemReportFilterList.filter(c => ((c.problemType.id == 1 ? c.problemCategory.id : (c.realmProblem.criticality.id == 1 ? 4 : (c.realmProblem.criticality.id == 2 ? 5 : 6))) == problemCategoryId));
                 }
                 this.setState({
                     problemList: problemReportFilterList,
