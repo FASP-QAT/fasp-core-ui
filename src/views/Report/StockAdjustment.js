@@ -548,9 +548,10 @@ class StockAdjustmentComponent extends Component {
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(","))
         }
-        var csvString = csvRow.join("%0A")
+        var csvString = csvRow.join("\r\n")
         var a = document.createElement("a")
-        a.href = 'data:attachment/csv,' + csvString
+        var blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvString], { type: "text/csv;charset=utf-8" });
+        a.href = URL.createObjectURL(blob);
         a.target = "_Blank"
         a.download = i18n.t('static.report.stockAdjustment') + "-" + this.state.rangeValue.from.year + this.state.rangeValue.from.month + i18n.t('static.report.consumptionTo') + this.state.rangeValue.to.year + this.state.rangeValue.to.month + ".csv"
         document.body.appendChild(a)
