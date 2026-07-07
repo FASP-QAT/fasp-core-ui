@@ -1707,6 +1707,10 @@ class ModelingValidation extends Component {
             from: 'From', to: 'To',
         }
         const { rangeValue } = this.state
+        let selectedYear = rangeValue && rangeValue.from ? rangeValue.from.year : new Date().getFullYear();
+        let shortYear = selectedYear.toString().slice(-2);
+        let prevShortYear = (selectedYear - 1).toString().slice(-2);
+        let nextYear = (selectedYear + 1);
         const makeText = m => {
             if (m && m.year && m.month) return (pickerLang.months[m.month - 1] + '. ' + m.year)
             return '?'
@@ -1936,18 +1940,18 @@ class ModelingValidation extends Component {
                                                         >
                                                             <option value="1">{i18n.t('static.ManageTree.Month')}</option>
                                                             <option value="2">{i18n.t('static.modelingValidation.calendarYear')}</option>
-                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul')}</option>
-                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug')}</option>
-                                                            <option value="5">{i18n.t('static.modelingValidation.fySep')}</option>
-                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct')}</option>
-                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov')}</option>
-                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec')}</option>
-                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan')}</option>
-                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb')}</option>
-                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar')}</option>
-                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr')}</option>
-                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay')}</option>
-                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun')}</option>
+                                                            <option value="3">{i18n.t('static.modelingValidation.fyJul', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="4">{i18n.t('static.modelingValidation.fyAug', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="5">{i18n.t('static.modelingValidation.fySep', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="6">{i18n.t('static.modelingValidation.fyOct', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="7">{i18n.t('static.modelingValidation.fyNov', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="8">{i18n.t('static.modelingValidation.fyDec', { year: selectedYear, shortYear: prevShortYear })}</option>
+                                                            <option value="9">{i18n.t('static.modelingValidation.fyJan', { year: selectedYear, shortYear: shortYear })}</option>
+                                                            <option value="10">{i18n.t('static.modelingValidation.fyFeb', { year: selectedYear, shortYear: shortYear })}</option>
+                                                            <option value="11">{i18n.t('static.modelingValidation.fyMar', { year: selectedYear, shortYear: shortYear })}</option>
+                                                            <option value="12">{i18n.t('static.modelingValidation.fyApr', { year: selectedYear, shortYear: shortYear })}</option>
+                                                            <option value="13">{i18n.t('static.modelingValidation.fyMay', { year: selectedYear, shortYear: shortYear })}</option>
+                                                            <option value="14">{i18n.t('static.modelingValidation.fyJun', { year: selectedYear, shortYear: shortYear })}</option>
                                                         </Input>
                                                     </InputGroup>
                                                 </div>
