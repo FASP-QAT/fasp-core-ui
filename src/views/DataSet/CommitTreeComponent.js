@@ -1646,10 +1646,10 @@ export default class CommitTreeComponent extends React.Component {
                                         var count1=0;
                                         for(var tas1=0;tas1<treeAndScenario1.length;tas1++){
                                             var tsListFilter1 = datasetData1.treeList.filter(c => c.treeId == treeAndScenario1[tas1].treeId);
-                                            if (tsListFilter1.length > 0) {
+                                            if (tsListFilter1.length > 0 && pu1.length > 0) {
                                                 count1+=1;
                                                 var flatList1 = tsListFilter1[0].tree.flatList;
-                                                var flatListFilter1 = flatList1.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
+                                                var flatListFilter1 = flatList1.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].puNode.planningUnit.id == pu1[0].planningUnit.id);
                                                 var nodeDataMomList1 = [];
                                                 for (var fl1 = 0; fl1 < flatListFilter1.length; fl1++) {
                                                     nodeDataMomList1 = nodeDataMomList1.concat(flatListFilter1[fl1].payload.nodeDataMap[treeAndScenario1[tas1].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData1.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData1.currentVersion.forecastStopDate).format("YYYY-MM")));
@@ -1699,10 +1699,10 @@ export default class CommitTreeComponent extends React.Component {
                                         var count2=0;
                                         for(var tas2=0;tas2<treeAndScenario2.length;tas2++){
                                             var tsListFilter2 = datasetData2.treeList.filter(c => c.treeId == treeAndScenario2[tas2].treeId);
-                                            if (tsListFilter2.length > 0) {
+                                            if (tsListFilter2.length > 0 && pu2.length > 0) {
                                                 count2+=1;
                                                 var flatList2 = tsListFilter2[0].tree.flatList;
-                                                var flatListFilter2 = flatList2.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode.planningUnit.id == pu[0].planningUnit.id);
+                                                var flatListFilter2 = flatList2.filter(c => c.payload.nodeType.id == 5 && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode != null && c.payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].puNode.planningUnit.id == pu2[0].planningUnit.id);
                                                 var nodeDataMomList2 = [];
                                                 for (var fl2 = 0; fl2 < flatListFilter2.length; fl2++) {
                                                     nodeDataMomList2 = nodeDataMomList2.concat(flatListFilter2[fl2].payload.nodeDataMap[treeAndScenario2[tas2].scenarioId][0].nodeDataMomList.filter(c => moment(c.month).format("YYYY-MM") >= moment(datasetData2.currentVersion.forecastStartDate).format("YYYY-MM") && moment(c.month).format("YYYY-MM") <= moment(datasetData2.currentVersion.forecastStopDate).format("YYYY-MM")));
