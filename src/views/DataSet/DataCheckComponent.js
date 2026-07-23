@@ -319,8 +319,8 @@ export function buildJxl1(props) {
                 data[0] = curDate;
                 for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                     var child = childrenList.filter(c => c.id == nodeWithPercentageChildren[nwp].id && c.month == curDate);
-                    data[nwp + 1] = child.length > 0 ? (child[0].percentage).toFixed(2) : '';
-                    nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (child[0].percentage).toFixed(2) != 100) ? 1 : 0 : 1;
+                    data[nwp + 1] = child.length > 0 ? (Number(child[0].percentage)).toFixed(2) : '';
+                    nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (Number(child[0].percentage)).toFixed(2) != 100) ? 1 : 0 : 1;
                 }
                 childrenArray.push(data);
             }
@@ -374,8 +374,8 @@ export function buildJxl(props) {
                 data[0] = curDate;
                 for (var nwp = 0; nwp < nodeWithPercentageChildren.length; nwp++) {
                     var child = childrenList.filter(c => c.id == nodeWithPercentageChildren[nwp].id && c.month == curDate);
-                    data[nwp + 1] = child.length > 0 ? (child[0].percentage).toFixed(2) : '';
-                    nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (child[0].percentage).toFixed(2) != 100) ? 1 : 0 : 1;
+                    data[nwp + 1] = child.length > 0 ? (Number(child[0].percentage)).toFixed(2) : '';
+                    nodeWithPercentageChildrenWithHundredCent[nwp] = nodeWithPercentageChildrenWithHundredCent[nwp] != 1 ? (child.length > 0 && (Number(child[0].percentage)).toFixed(2) != 100) ? 1 : 0 : 1;
                 }
                 childrenArray.push(data);
             }
