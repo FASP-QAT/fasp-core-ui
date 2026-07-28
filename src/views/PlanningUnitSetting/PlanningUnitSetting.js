@@ -147,31 +147,41 @@ export default class PlanningUnitSetting extends Component {
     checkValidation() {
         var valid = true;
         var json = this.el.getJson(null, false).concat(this.state.outPutListArray2);
-        valid = checkValidation(this.el)
-        for (var y = 0; y < json.length; y++) {
+        valid = checkValidation(this.el);
+        var activeRowsLength = this.el.getJson(null, false).length;
+        for (var y = 0; y < activeRowsLength; y++) {
             //planning unit
             var col = ("B").concat(parseInt(y) + 1);
-            var value = this.el.getRowData(parseInt(y))[1];
-            for (var i = (json.length - 1); i >= 0; i--) {
-                var map = new Map(Object.entries(json[i]));
-                var planningUnitValue = map.get("1");
-                if (planningUnitValue == value && y != i && i > y) {
-                    this.el.setStyle(col, "background-color", "");
-                    this.el.setStyle(col, "background-color", "yellow");
-                    this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
-                    i = -1;
-                    valid = false;
+            var cell = this.el.getCell(col);
+            if (cell) {
+                cell.classList.remove('duplicate-warning');
+            }
+            var value = this.el.getValueFromCoords(1, y);
+            if (value !== "" && value !== null && value !== undefined) {
+                for (var i = (json.length - 1); i >= 0; i--) {
+                    var map = new Map(Object.entries(json[i]));
+                    var planningUnitValue = map.get("1");
+                    if (planningUnitValue == value && y != i) {
+                        this.el.setStyle(col, "background-color", "");
+                        this.el.setStyle(col, "background-color", "yellow");
+                        if (cell) {
+                            cell.classList.add('duplicate-warning');
+                        }
+                        this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
+                        i = -1;
+                        valid = false;
+                    }
                 }
             }
-            if (!valid) {
-                this.setState({
-                    message: i18n.t('static.supplyPlan.validationFailed'),
-                    color: 'red'
-                },
-                    () => {
-                        this.hideSecondComponent();
-                    })
-            }
+        }
+        if (!valid) {
+            this.setState({
+                message: i18n.t('static.supplyPlan.validationFailed'),
+                color: 'red'
+            },
+                () => {
+                    this.hideSecondComponent();
+                })
         }
         return valid;
     }
@@ -400,6 +410,7 @@ export default class PlanningUnitSetting extends Component {
         if (x == 1) {
             var json = this.el.getJson(null, false).concat(this.state.outPutListArray2);
             var col = ("B").concat(parseInt(y) + 1);
+            var cell = this.el.getCell(col);
 
             var jsonLength = parseInt(json.length) - 1;
             for (var i = jsonLength; i >= 0; i--) {
@@ -408,11 +419,17 @@ export default class PlanningUnitSetting extends Component {
                 if (planningUnitValue == value && y != i) {
                     this.el.setStyle(col, "background-color", "");
                     this.el.setStyle(col, "background-color", "yellow");
+                    if (cell) {
+                        cell.classList.add('duplicate-warning');
+                    }
                     this.el.setComments(col, i18n.t('static.message.planningUnitAlreadyExists'));
                     // this.el.setValueFromCoords(11, y, 1, true);
                     i = -1;
                 } else {
                     this.el.setStyle(col, "background-color", "");
+                    if (cell) {
+                        cell.classList.remove('duplicate-warning');
+                    }
                     this.el.setComments(col, "");
                     // this.el.setValueFromCoords(11, y, 1, true);
                 }

@@ -90,9 +90,9 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         nodeValue: Yup.string()
-            .test('nodeValue', 'Please enter a valid number having less then 10 digits.',
+            .test('nodeValue', 'Please enter a valid number having less then 16 digits.',
                 function (value) {
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
                     } else {
@@ -871,7 +871,7 @@ export default class TreeTable extends Component {
         var nodeTypeId = document.getElementById("nodeTypeId").value;
         var nodeTitle = document.getElementById("nodeTitle").value;
         var nodeValue = document.getElementById("nodeValue").value;
-        var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        var testNumber = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
         var testTitle = (/^\S+(?: \S+)*$/).test(nodeTitle);
         if ((nodeTypeId == 3 || nodeTypeId == 2) && document.getElementById("nodeUnitId").value == "") {
             validationFail = 1;
