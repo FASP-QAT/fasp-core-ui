@@ -151,9 +151,9 @@ const validationSchemaNodeData = function (values) {
                     }
                 }),
         nodeValue: Yup.string()
-            .test('nodeValue', 'Please enter a valid number having less than or equal to 10 digits.',
+            .test('nodeValue', 'Please enter a valid number having less than or equal to 16 digits.',
                 function (value) {
-                    var testNumber = (/^(?!$)\d{0,10}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
+                    var testNumber = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
                     if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
                     } else {
