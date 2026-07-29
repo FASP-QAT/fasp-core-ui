@@ -1204,7 +1204,7 @@ export default class CreateTreeTemplate extends Component {
             }
         }
         this.el = jexcel(document.getElementById("missingPUJexcelForCreateTree"), '');
-        jexcel.destroy(document.getElementById("missingPUJexcelForCreateTree"), true);
+        { let el = document.getElementById("missingPUJexcelForCreateTree"); if (el) jexcel.destroy(el, true); }
         var data = dataArray;
         var options = {
             data: data,
@@ -2313,7 +2313,7 @@ export default class CreateTreeTemplate extends Component {
             this.el = "";
         }
         if (document.getElementById("levelReorderJexcel") != null) {
-            jexcel.destroy(document.getElementById("levelReorderJexcel"), true);
+            { let el = document.getElementById("levelReorderJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -4972,7 +4972,7 @@ export default class CreateTreeTemplate extends Component {
             this.el = "";
         }
         if (document.getElementById("momJexcelPer") != null) {
-            jexcel.destroy(document.getElementById("momJexcelPer"), true);
+            { let el = document.getElementById("momJexcelPer"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -5199,7 +5199,7 @@ export default class CreateTreeTemplate extends Component {
             this.el = "";
         }
         if (document.getElementById("momJexcel") != null) {
-            jexcel.destroy(document.getElementById("momJexcel"), true);
+            { let el = document.getElementById("momJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -5446,7 +5446,7 @@ export default class CreateTreeTemplate extends Component {
         }
         this.setState({ scalingTotal });
         if (this.state.modelingEl != null && this.state.modelingEl != undefined && this.state.modelingEl != "") {
-            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+            { let el = document.getElementById("modelingJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -6077,7 +6077,7 @@ export default class CreateTreeTemplate extends Component {
             count++;
         }
         this.el = jexcel(document.getElementById("modelingJexcelPercent"), '');
-        jexcel.destroy(document.getElementById("modelingJexcelPercent"), true);
+        { let el = document.getElementById("modelingJexcelPercent"); if (el) jexcel.destroy(el, true); }
         var data = dataArray;
         var options = {
             data: data,
@@ -9283,7 +9283,7 @@ export default class CreateTreeTemplate extends Component {
                 modelingTabChanged: false,
             }, () => {
                 try {
-                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                    { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                 } catch (err) {
                 }
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
@@ -9439,7 +9439,7 @@ export default class CreateTreeTemplate extends Component {
      * Builds jexcel table for annual target calculator
      */
     buildModelingCalculatorJexcel() {
-        jexcel.destroy(document.getElementById("modelingCalculatorJexcel"), true);
+        { let el = document.getElementById("modelingCalculatorJexcel"); if (el) jexcel.destroy(el, true); }
         var dataArray = [];
         var actualOrTargetValueList = this.state.actualOrTargetValueList;
         var monthListForModelingCalculator = this.state.monthList;
@@ -12461,7 +12461,7 @@ export default class CreateTreeTemplate extends Component {
                                         currentNodeTypeId: ""
                                     }, () => {
                                         try {
-                                            jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                            { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                                         } catch (err) {
                                         }
                                     })
