@@ -10963,11 +10963,6 @@ export default class BuildTree extends Component {
                                                         value={addCommas(this.state.parentValue.toString())}
                                                     ></Input>
                                                 </FormGroup>
-                                                <div>
-                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
-                                                    </Popover>
-                                                </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
                                                         <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? i18n.t('static.tree.numberNodeValue') : i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
@@ -10989,6 +10984,11 @@ export default class BuildTree extends Component {
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
                                                 <FormGroup className="col-md-6 pt-4" style={{ paddingLeft: "36px", display: (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) ? 'block' : 'none' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
