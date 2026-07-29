@@ -10800,11 +10800,6 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                                 {this.state.level0 &&
                                                     <>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
                                                         <FormGroup className="col-md-6">
                                                             <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
@@ -10817,6 +10812,11 @@ export default class BuildTree extends Component {
                                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                             ></Input>
                                                         </FormGroup>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
                                                     </>}
                                                 <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
@@ -11040,11 +11040,6 @@ export default class BuildTree extends Component {
                                                     <div className="row pl-lg-3 pr-lg-3">
                                                         {this.state.level0 &&
                                                             <>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
                                                                 <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2_5" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
@@ -11057,6 +11052,11 @@ export default class BuildTree extends Component {
                                                                             : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                                     ></Input>
                                                                 </FormGroup>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                             </>}
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3_5" trigger="hover" toggle={this.toggleNodeTitle}>
