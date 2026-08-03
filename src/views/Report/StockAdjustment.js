@@ -25,7 +25,7 @@ import pdfIcon from '../../assets/img/pdf.png';
 import i18n from '../../i18n';
 import AuthenticationService from '../Common/AuthenticationService.js';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
-import { addDoubleQuoteToRowContent, filterOptions, formatter, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
+import { filterOptions, formatter, makeText, roundARU } from '../../CommonComponent/JavascriptCommonFunctions';
 const pickerLang = {
     months: [i18n.t('static.month.jan'), i18n.t('static.month.feb'), i18n.t('static.month.mar'), i18n.t('static.month.apr'), i18n.t('static.month.may'), i18n.t('static.month.jun'), i18n.t('static.month.jul'), i18n.t('static.month.aug'), i18n.t('static.month.sep'), i18n.t('static.month.oct'), i18n.t('static.month.nov'), i18n.t('static.month.dec')],
     from: 'From', to: 'To',
@@ -527,26 +527,26 @@ class StockAdjustmentComponent extends Component {
      * @param {array} columns - The columns to be exported.
      */
     exportCSV(columns) {
+        const csvCell = (value) => `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push(csvCell(i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push(csvCell(i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text))
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.report.versionFinal*').replaceAll(' ', '%20') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push(csvCell(i18n.t('static.report.versionFinal*') + '  :  ' + document.getElementById("versionId").selectedOptions[0].text))
         csvRow.push('')
         this.state.planningUnitLabels.map(ele =>
-            csvRow.push('"' + (i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString()).replaceAll(' ', '%20') + '"'))
+            csvRow.push(csvCell(i18n.t('static.planningunit.planningunit') + ' : ' + ele.toString())))
         csvRow.push('')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push(csvCell(i18n.t('static.common.youdatastart')))
         csvRow.push('')
-        const headers = [];
-        columns.map((item, idx) => { headers[idx] = ((item.text).replaceAll(' ', '%20')) });
-        var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.data.map(ele => A.push(addDoubleQuoteToRowContent([(getLabelText(ele.dataSource.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), ele.planningUnit.id, (getLabelText(ele.planningUnit.label, this.state.lang).replaceAll(',', ' ')).replaceAll(' ', '%20'), (new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)).replaceAll(' ', '%20'), Number(ele.stockAdjustemntQty).toFixed(3), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes != null ? (ele.notes).replaceAll(' ', '%20') : ''])));
+        const headers = columns.map(item => item.text);
+        var A = [headers]
+        this.state.data.map(ele => A.push([getLabelText(ele.dataSource.label, this.state.lang), ele.planningUnit.id, getLabelText(ele.planningUnit.label, this.state.lang), new moment(ele.inventoryDate).format(DATE_FORMAT_CAP_FOUR_DIGITS), Number(ele.stockAdjustemntQty).toFixed(3), ele.lastModifiedBy.username, new moment(ele.lastModifiedDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`), ele.notes]));
         for (var i = 0; i < A.length; i++) {
-            csvRow.push(A[i].join(","))
+            csvRow.push(A[i].map(csvCell).join(","))
         }
         var csvString = csvRow.join("\r\n")
         var a = document.createElement("a")

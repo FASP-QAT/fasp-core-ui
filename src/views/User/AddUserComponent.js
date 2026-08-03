@@ -1069,13 +1069,13 @@ class AddUserComponent extends Component {
         };
         programList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      programList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    programList.unshift(paJson);
     this.setState({
       programListForFilter: programList,
     });
@@ -1087,13 +1087,13 @@ class AddUserComponent extends Component {
         };
         countryList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      countryList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    countryList.unshift(paJson);
     if (selOrganisation.length > 0) {
       for (var i = 0; i < selOrganisation.length; i++) {
         var paJson = {
@@ -1102,13 +1102,13 @@ class AddUserComponent extends Component {
         };
         organisationList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      organisationList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    organisationList.unshift(paJson);
     if (selHealthArea.length > 0) {
       for (var i = 0; i < selHealthArea.length; i++) {
         var paJson = {
@@ -1117,13 +1117,13 @@ class AddUserComponent extends Component {
         };
         healthAreaList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      healthAreaList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    healthAreaList.unshift(paJson);
     if (selProcurementAgent.length > 0) {
       for (var i = 0; i < selProcurementAgent.length; i++) {
         var paJson = {
@@ -1132,13 +1132,13 @@ class AddUserComponent extends Component {
         };
         procurementAgentList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      procurementAgentList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    procurementAgentList.unshift(paJson);
     if (selFundingSource.length > 0) {
       for (var i = 0; i < selFundingSource.length; i++) {
         var paJson = {
@@ -1147,13 +1147,13 @@ class AddUserComponent extends Component {
         };
         fundingSourceList[i] = paJson;
       }
-      var paJson = {
-        name: "All",
-        id: -1,
-        active: true,
-      };
-      fundingSourceList.unshift(paJson);
     }
+    var paJson = {
+      name: "All",
+      id: -1,
+      active: true,
+    };
+    fundingSourceList.unshift(paJson);
     if (selRoleList.length > 0) {
       for (var i = 0; i < selRoleList.length; i++) {
         if (selRoleList[i] != undefined) {
