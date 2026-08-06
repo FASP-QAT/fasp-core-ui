@@ -12852,18 +12852,20 @@ export default class BuildTree extends Component {
             }
             if (items[i].payload.nodeType.id == 5) {
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
-                var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
-                var planningUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
-                var planningUnitList = [];
-                if (this.state.programId != null && this.state.programId != "") {
-                    planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
-                    var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.id == planningUnitId && c.active);
-                    if (planningUnitListFilter.length > 0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id == forecastingUnitId) {
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 1
-                    } else {
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = "";
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.idString = "";
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 0
+                if (findNodeIndexFU !== -1) {
+                    var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
+                    var planningUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
+                    var planningUnitList = [];
+                    if (this.state.programId != null && this.state.programId != "") {
+                        planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
+                        var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.id == planningUnitId && c.active);
+                        if (planningUnitListFilter.length > 0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id == forecastingUnitId) {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 1
+                        } else {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = "";
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.idString = "";
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 0
+                        }
                     }
                 }
             }
