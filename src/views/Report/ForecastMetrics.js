@@ -640,12 +640,18 @@ class ForecastMetrics extends Component {
     let monthInCalc = document.getElementById("viewById").value;
     let useApprovedVersion = document.getElementById("includeApprovedVersions").value
     if (this.state.countryValues.length > 0 && this.state.planningUnitValues.length > 0 && this.state.programValues.length > 0 && this.state.tracerCategoryValues.length > 0) {
-      this.setState({ loading: true })
+      this.setState({ loading: true, message: '' })
+      let timeoutId = setTimeout(() => {
+        if (this.state.loading) {
+          this.setState({ message: 'static.reports.forecastMetrics.takingLonger' });
+        }
+      }, 60000);
       var inputjson = {
         "realmCountryIds": CountryIds, "programIds": programIds, "planningUnitIds": planningUnitIds, "startDate": startDate, "previousMonths": monthInCalc, "useApprovedSupplyPlanOnly": useApprovedVersion, "tracerCategoryIds": tracercategory,
       }
       ReportService.getForecastError(inputjson)
         .then(response => {
+          clearTimeout(timeoutId);
           this.setState({
             consumptions: response.data,
             message: ''
@@ -654,6 +660,7 @@ class ForecastMetrics extends Component {
           });
         }).catch(
           error => {
+            clearTimeout(timeoutId);
             this.setState({
               consumptions: [], loading: false
             }, () => {
@@ -681,6 +688,13 @@ class ForecastMetrics extends Component {
                   this.props.history.push(`/accessDenied`)
                   break;
                 case 500:
+                case 502:
+                case 504:
+                  this.setState({
+                    message: 'static.reports.forecastMetrics.tooMuchData',
+                    loading: false
+                  });
+                  break;
                 case 404:
                 case 406:
                   this.setState({
