@@ -48,6 +48,16 @@ const pickerLang = {
     from: 'From', to: 'To',
 }
 
+// Several of the standard series colours are intentionally dark for use on the
+// light theme. Use high-contrast equivalents when they are drawn on the dark
+// chart background so that every forecast remains distinguishable.
+const darkModeSeriesColors = {
+    '#212721': '#E4E5E6'
+};
+
+const getSeriesColor = (color, isDarkMode) =>
+    isDarkMode ? (darkModeSeriesColors[color] || color) : color;
+
 const filterDataByFiscalYear = (data, fiscalStartMonth, rangeValue) => {
     const result = {};
     const getFiscalYear = (dateStr) => {
@@ -415,7 +425,7 @@ class CompareAndSelectScenario extends Component {
             var maxActualMonth = '';
             if (selectedPlanningUnit[0].consuptionForecast.toString() == "true") {
                 for (var ce = 0; ce < consumptionExtrapolation.length; ce++) {
-                    if (colourArrayCount > 10) {
+                    if (colourArrayCount >= colourArray.length) {
                         colourArrayCount = 0;
                     }
                     minActualMonth = consumptionExtrapolation[ce].jsonProperties.startDate;
@@ -440,7 +450,7 @@ class CompareAndSelectScenario extends Component {
                         } catch (err) {
                             flatList = []
                         }
-                        if (colourArrayCount > 10) {
+                        if (colourArrayCount >= colourArray.length) {
                             colourArrayCount = 0;
                         }
                         var readonly = flatList.length > 0 ? false : true;
@@ -770,7 +780,7 @@ class CompareAndSelectScenario extends Component {
                     id: treeScenarioList[tsList].id,
                     checked: treeScenarioList[tsList].checked,
                     readonly: treeScenarioList[tsList].readonly,
-                    color: treeScenarioList[tsList].color,
+                    color: getSeriesColor(treeScenarioList[tsList].color, this.state.isDarkMode),
                     tree: treeScenarioList[tsList].tree,
                     scenario: treeScenarioList[tsList].scenario,
                     totalForecast: treeScenarioList[tsList].readonly ? "" : Number(totalArray[tsList]).toFixed(4),
@@ -851,7 +861,7 @@ class CompareAndSelectScenario extends Component {
                     data[0] = this.state.selectedTreeScenarioId.includes(treeScenarioList1[j].id.toString()) ? true : false
                     data[1] = treeScenarioList1[j].checked;
                     data[2] = treeScenarioList1[j].type == "T" ? i18n.t('static.forecastMethod.tree') : i18n.t('static.compareAndSelect.cons')
-                    data[3] = `<i class="fa fa-circle" style="color:${treeScenarioList1[j].color}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
+                    data[3] = `<i class="fa fa-circle" style="color:${getSeriesColor(treeScenarioList1[j].color, this.state.isDarkMode)}"  aria-hidden="true"></i> ${(treeScenarioList1[j].type == "T" ? getLabelText(treeScenarioList1[j].tree.label, this.state.lang) + " - " + getLabelText(treeScenarioList1[j].scenario.label, this.state.lang) : getLabelText(treeScenarioList1[j].scenario.extrapolationMethod.label, this.state.lang))}`
                     data[4] = `${treeScenarioList1[j].readonly ? "" : Number(totalArray[j]).toFixed(4)}`
                     data[5] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? formatter((((actualDiff[j]) / totalActual) * 100).toFixed(2), 0) : ""
                     data[6] = treeScenarioList1[j].readonly ? i18n.t('static.supplyPlanFormula.na') : countArray.length > 0 && countArray[j] != undefined && totalArray[j] > 0 && actualDiff.length > 0 && useForLowestError[j] ? countArray[j] + 1 : ""
@@ -2643,7 +2653,7 @@ class CompareAndSelectScenario extends Component {
                         type: 'line',
                         stack: idx + 2,
                         backgroundColor: 'transparent',
-                        borderColor: item.color,
+                        borderColor: getSeriesColor(item.color, isDarkMode),
                         ticks: {
                             fontSize: 2,
                             fontColor: 'transparent',
