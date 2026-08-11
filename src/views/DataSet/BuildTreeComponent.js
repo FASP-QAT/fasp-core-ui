@@ -585,7 +585,7 @@ export default class BuildTree extends Component {
             },
             manualChange: true,
             seasonality: true,
-            programId: this.props.match.params.programId,
+            programId: this.props.match.params.programId != null ? this.props.match.params.programId : "",
             showMomDataPercent: false,
             currentTargetChangePercentage: '',
             currentTargetChangeNumber: '',
@@ -1809,7 +1809,7 @@ export default class BuildTree extends Component {
             }
         }
         this.el = jexcel(document.getElementById("missingPUJexcel"), '');
-        jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+        { let el = document.getElementById("missingPUJexcel"); if (el) jexcel.destroy(el, true); }
         var data = dataArray;
         var options = {
             data: data,
@@ -2109,7 +2109,7 @@ export default class BuildTree extends Component {
             });
         } else {
             this.el = jexcel(document.getElementById("missingPUJexcel"), '');
-            jexcel.destroy(document.getElementById("missingPUJexcel"), true);
+            { let el = document.getElementById("missingPUJexcel"); if (el) jexcel.destroy(el, true); }
             this.setState({
                 missingPUList: []
             })
@@ -2457,7 +2457,7 @@ export default class BuildTree extends Component {
             this.el = "";
         }
         if (document.getElementById("levelReorderJexcel") != null) {
-            jexcel.destroy(document.getElementById("levelReorderJexcel"), true);
+            { let el = document.getElementById("levelReorderJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -4357,7 +4357,7 @@ export default class BuildTree extends Component {
             this.el = "";
         }
         if (document.getElementById("momJexcelPer") != null) {
-            jexcel.destroy(document.getElementById("momJexcelPer"), true);
+            { let el = document.getElementById("momJexcelPer"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -4554,7 +4554,7 @@ export default class BuildTree extends Component {
             this.el = "";
         }
         if (document.getElementById("momJexcel") != null) {
-            jexcel.destroy(document.getElementById("momJexcel"), true);
+            { let el = document.getElementById("momJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -4788,12 +4788,12 @@ export default class BuildTree extends Component {
             }, () => {
                 if (this.state.activeTab1[0] == '3') {
                     if (this.state.modelingEl != "") {
-                        jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                        { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                         if (this.state.momEl != "") {
-                            jexcel.destroy(document.getElementById('momJexcel'), true);
+                            { let el = document.getElementById('momJexcel'); if (el) jexcel.destroy(el, true); }
                         }
                         else if (this.state.momElPer != "") {
-                            jexcel.destroy(document.getElementById('momJexcelPer'), true);
+                            { let el = document.getElementById('momJexcelPer'); if (el) jexcel.destroy(el, true); }
                         }
                     }
                     this.refs.extrapolationChild.getExtrapolationMethodList();
@@ -5707,7 +5707,7 @@ export default class BuildTree extends Component {
         this.setState({ scalingTotal }, () => {
         });
         if (this.state.modelingEl != "" && document.getElementById("modelingJexcel")!=null) {
-            jexcel.destroy(document.getElementById("modelingJexcel"), true);
+            { let el = document.getElementById("modelingJexcel"); if (el) jexcel.destroy(el, true); }
         }
         var data = dataArray;
         var options = {
@@ -9031,14 +9031,14 @@ export default class BuildTree extends Component {
             }
             if (tab == 3) {
                 if (this.state.modelingEl != "") {
-                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                    { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                     if (this.state.momEl != "") {
                         if (document.getElementById('momJexcel') != null) {
-                            jexcel.destroy(document.getElementById('momJexcel'), true);
+                            { let el = document.getElementById('momJexcel'); if (el) jexcel.destroy(el, true); }
                         }
                     }
                     else if (this.state.momElPer != "") {
-                        jexcel.destroy(document.getElementById('momJexcelPer'), true);
+                        { let el = document.getElementById('momJexcelPer'); if (el) jexcel.destroy(el, true); }
                     }
                 }
                 this.refs.extrapolationChild.getExtrapolationMethodList();
@@ -9902,7 +9902,7 @@ export default class BuildTree extends Component {
                 currentNodeTypeId: data.context.payload.nodeType.id
             }, () => {
                 try {
-                    jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                    { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                 } catch (err) {
                 }
                 if (data.context.templateName ? data.context.templateName == "contactTemplateMin" ? true : false : false) {
@@ -10062,7 +10062,7 @@ export default class BuildTree extends Component {
      * Builds jexcel table for annual target calculator
      */
     buildModelingCalculatorJexcel() {
-        jexcel.destroy(document.getElementById("modelingCalculatorJexcel"), true);
+        { let el = document.getElementById("modelingCalculatorJexcel"); if (el) jexcel.destroy(el, true); }
         var dataArray = [];
         var actualOrTargetValueList = this.state.actualOrTargetValueList;
         let count = this.state.yearsOfTarget;
@@ -10795,11 +10795,6 @@ export default class BuildTree extends Component {
                                                 </FormGroup>
                                                 {this.state.level0 &&
                                                     <>
-                                                        <div>
-                                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
-                                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                                            </Popover>
-                                                        </div>
                                                         <FormGroup className="col-md-6">
                                                             <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                             <Input type="text"
@@ -10812,6 +10807,11 @@ export default class BuildTree extends Component {
                                                                     : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                             ></Input>
                                                         </FormGroup>
+                                                        <div>
+                                                            <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2" trigger="hover" toggle={this.toggleParent}>
+                                                                <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                            </Popover>
+                                                        </div>
                                                     </>}
                                                 <div>
                                                     <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3" trigger="hover" toggle={this.toggleNodeTitle}>
@@ -10958,11 +10958,6 @@ export default class BuildTree extends Component {
                                                         value={addCommas(this.state.parentValue.toString())}
                                                     ></Input>
                                                 </FormGroup>
-                                                <div>
-                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
-                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
-                                                    </Popover>
-                                                </div>
                                                 <FormGroup className="col-md-6" style={{ display: this.state.aggregationNode ? 'block' : 'none' }}>
                                                     {(this.state.currentItemConfig.context.payload.nodeType.id < 4) &&
                                                         <Label htmlFor="currencyId">{(this.state.currentItemConfig.context.payload.nodeType.id == 2 ? i18n.t('static.tree.numberNodeValue') : i18n.t('static.tree.nodeValue'))}{this.state.numberNode}<span class="red Reqasterisk">*</span> <i class="fa fa-info-circle icons pl-lg-2" id="Popover7" onClick={this.toggleNodeValue} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>}
@@ -10984,6 +10979,11 @@ export default class BuildTree extends Component {
                                                     ></Input>
                                                     <FormFeedback className="red">{errors.nodeValue}</FormFeedback>
                                                 </FormGroup>
+                                                <div>
+                                                    <Popover placement="top" isOpen={this.state.popoverOpenNodeValue} target="Popover7" trigger="hover" toggle={this.toggleNodeValue}>
+                                                        <PopoverBody>{this.state.numberNode ? i18n.t('static.tooltip.NodeValue') : i18n.t('static.tooltip.NumberNodeValue')}</PopoverBody>
+                                                    </Popover>
+                                                </div>
                                                 <FormGroup className="col-md-6 pt-4" style={{ paddingLeft: "36px", display: (this.state.currentItemConfig.context.payload.nodeType.id == 2 || this.state.currentItemConfig.context.payload.nodeType.id == 3) ? 'block' : 'none' }}>
                                                     <Input
                                                         className="form-check-input checkboxMargin"
@@ -11035,11 +11035,6 @@ export default class BuildTree extends Component {
                                                     <div className="row pl-lg-3 pr-lg-3">
                                                         {this.state.level0 &&
                                                             <>
-                                                                <div>
-                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
-                                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
-                                                                    </Popover>
-                                                                </div>
                                                                 <FormGroup className="col-md-4">
                                                                     <Label htmlFor="currencyId">{i18n.t('static.tree.parent')} <i class="fa fa-info-circle icons pl-lg-2" id="Popover2_5" onClick={this.toggleParent} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i></Label>
                                                                     <Input type="text"
@@ -11052,6 +11047,11 @@ export default class BuildTree extends Component {
                                                                             : this.state.currentItemConfig.parentItem.payload.label.label_en}
                                                                     ></Input>
                                                                 </FormGroup>
+                                                                <div>
+                                                                    <Popover placement="top" isOpen={this.state.popoverOpenParent} target="Popover2_5" trigger="hover" toggle={this.toggleParent}>
+                                                                        <PopoverBody>{i18n.t('static.tooltip.Parent')}</PopoverBody>
+                                                                    </Popover>
+                                                                </div>
                                                             </>}
                                                         <div>
                                                             <Popover placement="top" isOpen={this.state.popoverOpenNodeTitle} target="Popover3_5" trigger="hover" toggle={this.toggleNodeTitle}>
@@ -12852,18 +12852,20 @@ export default class BuildTree extends Component {
             }
             if (items[i].payload.nodeType.id == 5) {
                 var findNodeIndexFU = items.findIndex(n => n.id == items[i].parent);
-                var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
-                var planningUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
-                var planningUnitList = [];
-                if (this.state.programId != null && this.state.programId != "") {
-                    planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
-                    var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.id == planningUnitId && c.active);
-                    if (planningUnitListFilter.length > 0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id == forecastingUnitId) {
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 1
-                    } else {
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = "";
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.idString = "";
-                        (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 0
+                if (findNodeIndexFU !== -1) {
+                    var forecastingUnitId = (items[findNodeIndexFU].payload.nodeDataMap[this.state.selectedScenario])[0].fuNode.forecastingUnit.id;
+                    var planningUnitId = (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id;
+                    var planningUnitList = [];
+                    if (this.state.programId != null && this.state.programId != "") {
+                        planningUnitList = this.state.programDataListForPuCheck.filter(c => c.id == this.state.programId)[0].programData.planningUnitList;
+                        var planningUnitListFilter = planningUnitList.filter(c => c.planningUnit.id == planningUnitId && c.active);
+                        if (planningUnitListFilter.length > 0 && planningUnitListFilter[0].planningUnit.forecastingUnit.id == forecastingUnitId) {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 1
+                        } else {
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.id = "";
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].puNode.planningUnit.idString = "";
+                            (items[i].payload.nodeDataMap[this.state.selectedScenario])[0].isPUMappingCorrect = 0
+                        }
                     }
                 }
             }
@@ -13366,7 +13368,7 @@ export default class BuildTree extends Component {
                                         currentNodeTypeId: ""
                                     }, () => {
                                         try {
-                                            jexcel.destroy(document.getElementById('modelingJexcel'), true);
+                                            { let el = document.getElementById('modelingJexcel'); if (el) jexcel.destroy(el, true); }
                                         } catch (err) {
                                         }
                                     })
@@ -14051,7 +14053,7 @@ export default class BuildTree extends Component {
                                         <div style={{ display: !this.state.loading ? "block" : "none" }} class="sample">
                                             <Provider>
                                                 <div className="placeholder TreeTemplateHeight" style={{ clear: 'both', marginTop: '25px', border: '1px solid #a7c6ed' }} >
-                                                    <OrgDiagram centerOnCursor={true} config={config} onCursorChanged={this.onCursoChanged} />
+                                                    <OrgDiagram centerOnCursor={false} config={config} onCursorChanged={this.onCursoChanged} />
                                                 </div>
                                             </Provider>
                                         </div>
