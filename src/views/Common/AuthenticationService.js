@@ -105,8 +105,11 @@ class AuthenticationService {
      * If the user is not logged in or if the user ID is not found, returns an empty string.
      */
     getLoggedInUserId() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        return decryptedCurUser;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            return decryptedCurUser;
+        }
+        return "";
     }
     /**
      * Retrieves the realm ID of the currently logged-in user from local storage.
@@ -128,9 +131,12 @@ class AuthenticationService {
      *                   If the user is not logged in or if the realm object is not found, returns null.
      */
     getLoggedInUserRealm() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
-        return decryptedUser.realm;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem("user-" + decryptedCurUser), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8));
+            return decryptedUser.realm;
+        }
+        return null;
     }
     /**
      * Checks the type of session based on the current URL and the stored session type in local storage.
@@ -185,27 +191,32 @@ class AuthenticationService {
      * @returns {boolean} True if the token has expired, otherwise false.
      */
     checkIfTokenExpired() {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
-        var decoded = jwt_decode(decryptedToken);
-        let tokenExpiryTime = new Date(decoded.exp * 1000);
-        var curDate = new Date();
-        if (new Date(decoded.exp * 1000) > new Date()) {
-            return true;
-        } else {
-            return false;
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedToken = CryptoJS.AES.decrypt(localStorage.getItem('token-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8)
+            var decoded = jwt_decode(decryptedToken);
+            let tokenExpiryTime = new Date(decoded.exp * 1000);
+            var curDate = new Date();
+            if (new Date(decoded.exp * 1000) > new Date()) {
+                return true;
+            } else {
+                return false;
+            }
         }
+        return false;
     }
     /**
      * Updates the user's language preference in local storage.
      * @param {string} languageCode - The language code to set for the user.
      */
     updateUserLanguage(languageCode) {
-        let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
-        let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
-        decryptedUser.language.languageCode = languageCode;
-        localStorage.removeItem('user-' + decryptedCurUser);
-        localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+        if (localStorage.getItem('curUser') != null && localStorage.getItem('curUser') != '') {
+            let decryptedCurUser = CryptoJS.AES.decrypt(localStorage.getItem('curUser').toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8);
+            let decryptedUser = JSON.parse(CryptoJS.AES.decrypt(localStorage.getItem('user-' + decryptedCurUser).toString(), `${SECRET_KEY}`).toString(CryptoJS.enc.Utf8))
+            decryptedUser.language.languageCode = languageCode;
+            localStorage.removeItem('user-' + decryptedCurUser);
+            localStorage.setItem('user-' + decryptedCurUser, CryptoJS.AES.encrypt(JSON.stringify(decryptedUser), `${SECRET_KEY}`));
+        }
     }
 
     /**
