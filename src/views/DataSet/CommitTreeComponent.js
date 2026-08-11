@@ -656,7 +656,6 @@ export default class CommitTreeComponent extends React.Component {
                 for (var i = 0; i < myResult.length; i++) {
                     if (myResult[i].userId == userId) {
                         var datasetJson = decryptFCData(myResult[i].programData);
-                        var lastVersionType = datasetJson.currentVersion.versionType.id
                         var programJson = {
                             name: datasetJson.programCode,
                             id: myResult[i].id,
@@ -687,8 +686,7 @@ export default class CommitTreeComponent extends React.Component {
                 this.setState({
                     programList: programList,
                     loading: false,
-                    programId: programId,
-                    lastVersionType: lastVersionType
+                    programId: programId
                 }, () => {
                     if (programId != "") {
                         this.setProgramId(event);
@@ -778,7 +776,9 @@ export default class CommitTreeComponent extends React.Component {
                     forecastStartDate: programData[0].datasetJson.currentVersion.forecastStartDate,
                     forecastStopDate: programData[0].datasetJson.currentVersion.forecastStopDate,
                     notes: programData[0].datasetJson.currentVersion.notes,
-                    consumptionExtrapolationList: programData[0].datasetJson.consumptionExtrapolation
+                    consumptionExtrapolationList: programData[0].datasetJson.consumptionExtrapolation,
+                    lastVersionType: programData[0].datasetJson.currentVersion.versionType.id,
+                    versionTypeId: programData[0].datasetJson.currentVersion.versionType.id
                 })
                 AuthenticationService.setupAxiosInterceptors();
                 ProgramService.getLatestVersionForProgram((programData[0].datasetJson.programId)).then(response1 => {

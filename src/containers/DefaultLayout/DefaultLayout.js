@@ -602,6 +602,7 @@ class DefaultLayout extends Component {
   componentDidMount() {
     window.addEventListener('blur', this.handleBlur);
     window.addEventListener('click', this.handleFocus);
+    window.addEventListener('keydown', this.handleFocus);
     var curUserBusinessFunctions = AuthenticationService.getLoggedInUserRoleBusinessFunction();
     var bfunction = [];
     if (curUserBusinessFunctions != null && curUserBusinessFunctions != "") {
@@ -662,6 +663,7 @@ class DefaultLayout extends Component {
   componentWillUnmount() {
     window.removeEventListener('blur', this.handleBlur);
     window.removeEventListener('click', this.handleFocus);
+    window.removeEventListener('keydown', this.handleFocus);
   }
   /**
    * Handles blur events on the window object to determine if the session has expired due to user inactivity.

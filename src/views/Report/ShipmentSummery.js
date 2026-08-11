@@ -2595,7 +2595,7 @@ class ShipmentSummery extends Component {
         ? []
         : this.state.procurementAgentValues.map((ele) => ele.value);
     let myBudgetIds =
-      this.state.budgetValues.length == this.state.budgets.length
+      this.state.budgetValues.length == this.state.filteredBudgetList.length
         ? []
         : (this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : []);
     let CountryIds = this.state.countryValues.length == this.state.countrys.length ? [] : this.state.countryValues.map(ele => (ele.value).toString());
@@ -2613,7 +2613,9 @@ class ShipmentSummery extends Component {
         myProcurementAgentIds = this.state.procurementAgentValues.map(
           (ele) => ele.value
         );
-        myBudgetIds = this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : [];
+        myBudgetIds = this.state.budgetValues.length == this.state.filteredBudgetList.length
+          ? []
+          : (this.state.budgetValues.length > 0 ? this.state.budgetValues.map((ele) => ele.value.toString()).join(",").split(",").filter(Boolean).map(x => parseInt(x)) : []);
         var db1;
         getDatabase();
         var openRequest = indexedDB.open(INDEXED_DB_NAME, INDEXED_DB_VERSION);
