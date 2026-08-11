@@ -539,7 +539,7 @@ class LoadDeleteDataSet extends Component {
                                     <ul className="tree">
                                         <li>
                                             <input type="checkbox" id="c1" />
-                                            <label className="tree_label" htmlFor="c1">{AuthenticationService.getLoggedInUserRealm().label.label_en}</label>
+                                            <label className="tree_label" htmlFor="c1">{AuthenticationService.getLoggedInUserRealm() ? AuthenticationService.getLoggedInUserRealm().label.label_en : ''}</label>
                                             <ul>
                                                 {
                                                     this.state.countryList.map(item => (
