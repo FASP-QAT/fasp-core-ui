@@ -585,7 +585,7 @@ export default class BuildTree extends Component {
             },
             manualChange: true,
             seasonality: true,
-            programId: this.props.match.params.programId,
+            programId: this.props.match.params.programId != null ? this.props.match.params.programId : "",
             showMomDataPercent: false,
             currentTargetChangePercentage: '',
             currentTargetChangeNumber: '',
