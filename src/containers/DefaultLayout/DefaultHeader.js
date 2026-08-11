@@ -143,7 +143,14 @@ class DefaultHeader extends Component {
           }
           {checkOnline === 'Online' && <NavItem className="">
             <span className="nav-link">
-              <a href={`https://api.quantificationanalytics.org/file/qatUserGuide`}>
+              <a href={localStorage.getItem('lang') == 'en' ?
+                "https://fasp-qat.github.io/qat-documentation/docs/user/acronyms" :
+                localStorage.getItem('lang') == 'fr' ?
+                  "https://fasp-qat.github.io/qat-documentation/fr/docs/user/acronyms" :
+                  localStorage.getItem('lang') == 'sp' ?
+                    "https://fasp-qat.github.io/qat-documentation/es/docs/user/acronyms" :
+                    "https://fasp-qat.github.io/qat-documentation/pt/docs/user/acronyms"
+              } target="_blank">
                 <img src={imageUsermanual} className="HelpIcon" title={i18n.t('static.user.usermanual')} style={{ width: '30px', height: '30px' }} />
               </a>
             </span>
