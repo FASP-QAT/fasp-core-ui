@@ -3721,5 +3721,7 @@
   "static.common.node": "Node",
   "static.pipeline.pipelineConvertorLinux": "Linux.",
   "static.reports.forecastMetrics.tooMuchData": "You have selected too much data for QAT to display properly. Please try limiting the data using the dropdowns.",
-  "static.reports.forecastMetrics.takingLonger": "Due to the large amount of data, the QAT server is taking longer to process this request. If you don't want to wait, please limit the data using the dropdowns."
+  "static.reports.forecastMetrics.takingLonger": "Due to the large amount of data, the QAT server is taking longer to process this request. If you don't want to wait, please limit the data using the dropdowns.",
+  "static.login.helpdesk": "Helpdesk",
+  "static.login.documentation": "Documentation"
 }
