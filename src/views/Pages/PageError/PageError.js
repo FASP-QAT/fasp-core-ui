@@ -69,7 +69,8 @@ class PageError extends Component {
    */
   submitBug(e) {
     let userComments = document.getElementById("userComments").value;
-    let desc = "\nUser Comments - " + userComments + "\nError Page - " + e.location.state.errorPage + "\nError Stack - " + e.location.state.errorStack;
+    let errorStack = e.location.state.errorStack ? e.location.state.errorStack.substring(0, 5000) : "";
+    let desc = "\nUser Comments - " + userComments + "\nError Page - " + e.location.state.errorPage + "\nError Stack - " + errorStack;
     let { bugReport } = this.state;
     bugReport.summary = e.location.state.errorMessage;
     bugReport.description = desc;
@@ -79,10 +80,10 @@ class PageError extends Component {
       bugReport
     },
       () => { });
-    JiraTikcetService.addBugReportIssue(this.state.bugReport).then(response => {
+    JiraTikcetService.addBugReportIssue({ ...this.state.bugReport }).then(response => {
       if (response.status == 200 || response.status == 201) {
         var msg = response.data.key;
-        JiraTikcetService.addIssueAttachment(this.state.bugReport, response.data.id).then(response => {
+        JiraTikcetService.addIssueAttachment({ ...this.state.bugReport }, response.data.id).then(response => {
         });
         this.setState({
           message: msg, loading: false
@@ -112,29 +113,34 @@ class PageError extends Component {
                 loading: false,
                 color: "#BA0C2F",
               });
+              alert(i18n.t('static.common.accessDenied'));
               break;
             case 403:
               this.props.history.push(`/accessDenied`)
               break;
             case 500:
+            case 400:
             case 404:
             case 406:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false
               });
+              alert("Failed to create ticket: " + error.response.data.messageCode);
               break;
             case 412:
               this.setState({
                 message: error.response.data.messageCode,
                 loading: false
               });
+              alert("Failed to create ticket: " + error.response.data.messageCode);
               break;
             default:
               this.setState({
                 message: 'static.unkownError',
                 loading: false
               });
+              alert("An unknown error occurred while submitting the ticket.");
               break;
           }
         }
