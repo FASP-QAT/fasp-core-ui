@@ -3034,6 +3034,9 @@ class StockStatus extends Component {
         planningUnitDetails: "",
         planningUnitDetailsExport: ""
       }, () => {
+        if (this.state.programId.length == 1 && this.state.planningUnitId.length == 1) {
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, this.state.planningUnitId[0].value, false);
+        }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
       })
@@ -3047,6 +3050,9 @@ class StockStatus extends Component {
           consumptionAdjForStockOutId: false,
           loading: false
         }, () => {
+          if (this.state.programId.length == 1 && this.state.planningUnitId.length == 1) {
+            this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, this.state.planningUnitId[0].value, false);
+          }
           if (this.state.planningUnitId.length > 0) {
             this.fetchData();
           } else {
@@ -3256,6 +3262,18 @@ class StockStatus extends Component {
         planningUnitDetails: "",
         planningUnitDetailsExport: ""
       }, () => {
+        if (this.state.programId.length == 1 && this.state.realmCountryPlanningUnitId.length == 1) {
+          var realmCountryPlanningUnitId = this.state.realmCountryPlanningUnitId[0].value;
+          var planningUnitId;
+          if (this.state.versionId.toString().includes("Local")) {
+            var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(realmCountryPlanningUnitId));
+            planningUnitId = Number(rcpu[0].planningUnit.id);
+          } else {
+            var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == realmCountryPlanningUnitId)[0].forecastingUnitId;
+            planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+          }
+          this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId, false);
+        }
         // document.getElementById("consumptionAdjusted").checked = false;
         this.fetchData();
       })
@@ -3269,6 +3287,18 @@ class StockStatus extends Component {
           consumptionAdjForStockOutId: false,
           loading: false
         }, () => {
+          if (this.state.programId.length == 1 && this.state.realmCountryPlanningUnitId.length == 1) {
+            var realmCountryPlanningUnitId = this.state.realmCountryPlanningUnitId[0].value;
+            var planningUnitId;
+            if (this.state.versionId.toString().includes("Local")) {
+              var rcpu = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == Number(realmCountryPlanningUnitId));
+              planningUnitId = Number(rcpu[0].planningUnit.id);
+            } else {
+              var fuId = this.state.realmCountryPlanningUnitListAll.filter(c => c.id == realmCountryPlanningUnitId)[0].forecastingUnitId;
+              planningUnitId = this.state.planningUnitListAll.filter(c => c.forecastingUnitId == fuId)[0].id;
+            }
+            this.getPlanningUnitByProgramIdAndPlanningUnitId(this.state.programId[0].value, planningUnitId, false);
+          }
           // document.getElementById("consumptionAdjusted").checked = false;
           if (this.state.realmCountryPlanningUnitId.length > 0) {
             this.fetchData();
