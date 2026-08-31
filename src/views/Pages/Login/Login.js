@@ -59,7 +59,8 @@ class Login extends Component {
       lang: localStorage.getItem('lastLoggedInUsersLanguage'),
       loginOnline: true,
       popupShown: 0,
-      disableLoginButton: false
+      disableLoginButton: false,
+      isBackupRunning: false
     }
     this.forgotPassword = this.forgotPassword.bind(this);
     this.incorrectPassmessageHide = this.incorrectPassmessageHide.bind(this);
@@ -205,6 +206,17 @@ class Login extends Component {
           this.checkIfApiIsActive();
         }.bind(this), 180000);
       })
+    
+    LoginService.getBackupStatus()
+      .then(response => {
+        if (response != null && response.data != null) {
+          this.setState({ isBackupRunning: response.data });
+        }
+      })
+      .catch(error => {
+        this.setState({ isBackupRunning: false });
+      });
+
     this.setState({
       apiVersionForDisplay: apiVersionForDisplay
     })
@@ -478,6 +490,11 @@ class Login extends Component {
                             <Form onSubmit={handleSubmit} noValidate name="loginForm">
                               <h5 id="div1" className='DarkFontbold'>{i18n.t(this.props.match.params.message)}</h5>
                               <h5 id="div2" className='Colorchangetheme'>{i18n.t(this.state.message)}</h5>
+                              {this.state.isBackupRunning && (
+                                <div style={{ position: 'relative', zIndex: 999, marginBottom: '15px', marginTop: '10px', fontSize: '14px', fontWeight: '500', padding: '15px' }}>
+                                  <p style={{ color: '#BA0C2F', margin: 0, textAlign: 'center' }}>{i18n.t('static.login.databaseBackupRunning')}</p>
+                                </div>
+                              )}
                               <p className="text-muted login-text">{i18n.t('static.login.signintext')}</p>
                               <InputGroup className="mb-3">
                                 <InputGroupAddon addonType="prepend">
