@@ -569,10 +569,21 @@ class Login extends Component {
                   </div>
                 </CardGroup>
                 <div className='row align-items-center'>
-                  <div className='col-md-6 col-sm-6'>
-                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{ color: '#002f6c' }}>
-                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.ticket.header')} style={{ width: '25px', height: '25px' }} />
-                      {" " + i18n.t('static.ticket.header')}
+                  <div className='col-md-6 col-sm-6 d-flex align-items-center'>
+                    <a href={QAT_HELPDESK_CUSTOMER_PORTAL_URL} target="_blank" title={i18n.t('static.ticket.help')} style={{ color: '#002f6c', marginRight: '15px', display: 'flex', alignItems: 'center' }}>
+                      <img src={imageHelp} className="HelpIcon" title={i18n.t('static.login.helpdesk')} style={{ width: '25px', height: '25px', marginRight: '5px' }} />
+                      <span>{i18n.t('static.login.helpdesk')}</span>
+                    </a>
+                    <a href={localStorage.getItem('lang') == 'en' ?
+                        "https://fasp-qat.github.io/qat-documentation/docs/user/acronyms" :
+                        localStorage.getItem('lang') == 'fr' ?
+                          "https://fasp-qat.github.io/qat-documentation/fr/docs/user/acronyms" :
+                          localStorage.getItem('lang') == 'sp' ?
+                            "https://fasp-qat.github.io/qat-documentation/es/docs/user/acronyms" :
+                            "https://fasp-qat.github.io/qat-documentation/pt/docs/user/acronyms"
+                      } target="_blank" title={i18n.t('static.login.documentation')} style={{ color: '#002f6c', display: 'flex', alignItems: 'center' }}>
+                      <i className="fa fa-question-circle-o" style={{ fontSize: '25px', marginRight: '5px' }}></i>
+                      <span>{i18n.t('static.login.documentation')}</span>
                     </a>
                   </div>
                   <div className='col-md-6 col-sm-12'>
