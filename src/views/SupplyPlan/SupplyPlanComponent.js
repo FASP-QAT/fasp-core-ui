@@ -2206,24 +2206,24 @@ export default class SupplyPlanComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        {this.state.planBasedOn == 1 && <tr>
+                                        <tr style={{ display: this.state.planBasedOn == 1 ? '' : 'none' }}>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
-                                                this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : roundAMC(item1) == 0 ? "#BA0C2F" : roundAMC(item1) < this.state.minStockMoSQty ? "#f48521" : roundAMC(item1) > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                this.state.monthsOfStockArray.map((item1, count) => (
+                                                    <td key={count} align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : roundAMC(item1) == 0 ? "#BA0C2F" : roundAMC(item1) < this.state.minStockMoSQty ? "#f48521" : roundAMC(item1) > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
-                                        </tr>}
-                                        {this.state.planBasedOn == 2 && <tr>
+                                        </tr>
+                                        <tr style={{ display: this.state.planBasedOn == 2 ? '' : 'none' }}>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.maxQty')}</b></td>
                                             {
-                                                this.state.maxQtyArray.map(item1 => (
-                                                    <td align="right">{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : ""}</td>
+                                                this.state.maxQtyArray.map((item1, count) => (
+                                                    <td key={count} align="right">{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : ""}</td>
                                                 ))
                                             }
-                                        </tr>}
+                                        </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}
