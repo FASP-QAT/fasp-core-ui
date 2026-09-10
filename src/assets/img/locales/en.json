@@ -3463,6 +3463,7 @@
   "static.common.for": "For",
   "static.loading.loading": "Loading...",
   "static.unit.conversionMethod": "Conversion Method",
+  "static.login.databaseBackupRunning": "A database backup is currently in progress. The system will only run in offline mode.",
   "static.CompareSelect.TabularData": "Tabular Data Table",
   "static.report.excess": "Excess Stock",
   "static.Tooltip.ExistingShipments": "User-entered in the Planning Unit Settings screen",
