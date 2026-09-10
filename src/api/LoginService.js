@@ -8,5 +8,9 @@ class LoginService {
         return axios.get(`${API_URL}/actuator/info`, {
         });
     }
+    getBackupStatus() {
+        return axios.get(`${API_URL}/api/application/backup-status`, {
+        });
+    }
 }
 export default new LoginService()
