@@ -3463,6 +3463,7 @@
   "static.common.for": "Pour",
   "static.loading.loading": "Chargement...",
   "static.unit.conversionMethod": "Méthode de conversion",
+  "static.login.databaseBackupRunning": "Une sauvegarde de la base de données est en cours. Le système ne fonctionnera qu'en mode hors ligne.",
   "static.CompareSelect.TabularData": "Tableau de données",
   "static.report.excess": "Stock excessif",
   "static.Tooltip.ExistingShipments": "Saisie par l'utilisateur dans le menu Paramètres les unités de planification",
