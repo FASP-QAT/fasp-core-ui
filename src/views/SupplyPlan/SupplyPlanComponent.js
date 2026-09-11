@@ -2206,24 +2206,24 @@ export default class SupplyPlanComponent extends React.Component {
                                                 })
                                             }
                                         </tr>
-                                        {this.state.planBasedOn == 1 && <tr>
+                                        <tr style={{ display: this.state.planBasedOn == 1 ? '' : 'none' }}>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.monthsOfStock')}</b></td>
                                             {
-                                                this.state.monthsOfStockArray.map(item1 => (
-                                                    <td align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : roundAMC(item1) == 0 ? "#BA0C2F" : roundAMC(item1) < this.state.minStockMoSQty ? "#f48521" : roundAMC(item1) > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
+                                                this.state.monthsOfStockArray.map((item1, count) => (
+                                                    <td key={count} align="right" className='darkModeclrblack' style={{ backgroundColor: item1 == null ? "#cfcdc9" : roundAMC(item1) == 0 ? "#BA0C2F" : roundAMC(item1) < this.state.minStockMoSQty ? "#f48521" : roundAMC(item1) > this.state.maxStockMoSQty ? "#edb944" : "#118b70" }}>{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={roundAMC(item1)} /> : i18n.t('static.supplyPlanFormula.na')}</td>
                                                 ))
                                             }
-                                        </tr>}
-                                        {this.state.planBasedOn == 2 && <tr>
+                                        </tr>
+                                        <tr style={{ display: this.state.planBasedOn == 2 ? '' : 'none' }}>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone"><b>{i18n.t('static.supplyPlan.maxQty')}</b></td>
                                             {
-                                                this.state.maxQtyArray.map(item1 => (
-                                                    <td align="right">{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : ""}</td>
+                                                this.state.maxQtyArray.map((item1, count) => (
+                                                    <td key={count} align="right">{item1 != null ? <NumberFormat displayType={'text'} thousandSeparator={true} value={item1} /> : ""}</td>
                                                 ))
                                             }
-                                        </tr>}
+                                        </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
                                             <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}
@@ -5167,16 +5167,16 @@ export default class SupplyPlanComponent extends React.Component {
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
                                         <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.planningUnitSettings")}<i class="fa fa-info-circle icons pl-lg-2" id="Popover2" title={i18n.t("static.tooltip.planningUnitSettings")} aria-hidden="true" style={{ color: '#002f6c', cursor: 'pointer' }}></i> : </b></span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></li>
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b> : {this.state.shelfLife}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b> : {this.state.minStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b> : {this.formatter(this.state.minQtyPpu)}</span></li>}
-                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b> : {this.state.reorderFrequency}</span></li>
-                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b> : {this.state.maxStockMoSQty}</span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b> : {this.formatter(this.state.distributionLeadTime)}</span></li>}
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.amcPastOrFuture")}</b><span> : {this.state.monthsInPastForAMC}/{this.state.monthsInFutureForAMC}</span></span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.report.shelfLife")}</b><span> : {this.state.shelfLife}</span></span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.minStockMos")}</b><span> : {this.state.minStockMoSQty}</span></span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.minQuantity")}</b><span> : {this.formatter(this.state.minQtyPpu)}</span></span></li>}
+                                        <li><span className="lightgreenlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.reorderInterval")}</b><span> : {this.state.reorderFrequency}</span></span></li>
+                                        {this.state.planBasedOn == 1 ? <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.supplyPlan.maxStockMos")}</b><span> : {this.state.maxStockMoSQty}</span></span></li> : <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.product.distributionLeadTime")}</b><span> : {this.formatter(this.state.distributionLeadTime)}</span></span></li>}
                                     </ul>
                                 </FormGroup>
                                 {this.state.planningUnitNotes != null && this.state.planningUnitNotes != undefined && this.state.planningUnitNotes.length > 0 && <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>
                                     <ul className="legendcommitversion list-group">
-                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b>{this.state.planningUnitNotes}</span></li>
+                                        <li><span className="redlegend "></span> <span className="legendcommitversionText"><b>{i18n.t("static.program.notes")} : </b><span>{this.state.planningUnitNotes}</span></span></li>
                                     </ul>
                                 </FormGroup>}
                                 <FormGroup className="col-md-12 pl-0" style={{ marginLeft: '-8px', display: this.state.display }}>

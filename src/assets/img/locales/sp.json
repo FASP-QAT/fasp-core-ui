@@ -3463,6 +3463,7 @@
   "static.common.for": "para",
   "static.loading.loading": "Cargando...",
   "static.unit.conversionMethod": "Método de conversión",
+  "static.login.databaseBackupRunning": "Se está realizando una copia de seguridad de la base de datos. El sistema solo se ejecutará en modo sin conexión.",
   "static.CompareSelect.TabularData": "Tabla de datos",
   "static.report.excess": "Exceso de stock",
   "static.Tooltip.ExistingShipments": "Introducido manualmente en la pantalla Configuración de productos",
