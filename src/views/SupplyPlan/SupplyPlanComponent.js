@@ -1873,8 +1873,8 @@ export default class SupplyPlanComponent extends React.Component {
                             </div>
                         </Row>
                         <div className="col-md-12">
-                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                            <span className="supplyplan-larrow" onClick={this.leftClicked}> <i className="cui-arrow-left icons " > </i> <span>{i18n.t('static.supplyPlan.scrollToLeft')}</span> </span>
+                            <span className="supplyplan-rarrow" onClick={this.rightClicked}> <span>{i18n.t('static.supplyPlan.scrollToRight')}</span> <i className="cui-arrow-right icons" ></i> </span>
                         </div>
                         <div className="table-scroll mt-2">
                             <div className="table-wrap table-responsive fixTableHeadSupplyPlan">
@@ -2226,7 +2226,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}>{i18n.t('static.supplyPlan.amc')}
+                                            <td align="left" className="sticky-col first-col clone" title={i18n.t('static.supplyplan.amcmessage')}><span>{i18n.t('static.supplyPlan.amc')}</span>
                                                 <i title={i18n.t("static.supplyPlanFormula.amcDef")} class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
                                             </td>
                                             {
@@ -2237,7 +2237,7 @@ export default class SupplyPlanComponent extends React.Component {
                                         </tr>
                                         <tr>
                                             <td className="BorderNoneSupplyPlan sticky-col first-col clone1"></td>
-                                            <td align="left" className="sticky-col first-col clone">{i18n.t('static.supplyPlan.unmetDemandStr')}
+                                            <td align="left" className="sticky-col first-col clone"><span>{i18n.t('static.supplyPlan.unmetDemandStr')}</span>
                                                 <i title={i18n.t("static.supplyPlan.unmetDemandDef")} class="fa fa-info-circle icons pl-lg-2" style={{ color: '#002f6c' }}></i>
                                             </td>
                                             {
@@ -2295,8 +2295,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <ModalBody>
                                 <h6 className="red" id="div2">{this.state.consumptionDuplicateError || this.state.consumptionNoStockError || this.state.consumptionError}</h6>
                                 <div className="col-md-12">
-                                    <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedConsumption}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedConsumption}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                    <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedConsumption}> <i className="cui-arrow-left icons " > </i> <span>{i18n.t('static.supplyPlan.scrollToLeft')}</span> </span>
+                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedConsumption}> <span>{i18n.t('static.supplyPlan.scrollToRight')}</span> <i className="cui-arrow-right icons" ></i> </span>
                                 </div>
                                 <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                     <thead>
@@ -2395,8 +2395,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <ModalBody>
                                 <h6 className="red" id="div2">{this.state.inventoryDuplicateError || this.state.inventoryNoStockError || this.state.inventoryError}</h6>
                                 <div className="col-md-12">
-                                    <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                    <span className="supplyplan-larrow-dataentry-adjustment" onClick={this.leftClickedAdjustments}> <i className="cui-arrow-left icons " > </i> <span>{i18n.t('static.supplyPlan.scrollToLeft')}</span> </span>
+                                    <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedAdjustments}> <span>{i18n.t('static.supplyPlan.scrollToRight')}</span> <i className="cui-arrow-right icons" ></i> </span>
                                 </div>
                                 <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                     <thead>
@@ -2656,8 +2656,8 @@ export default class SupplyPlanComponent extends React.Component {
                             <ModalBody>
                                 <div>
                                     <div className="col-md-12">
-                                        <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedShipments}> <i className="cui-arrow-left icons " > </i> {i18n.t('static.supplyPlan.scrollToLeft')} </span>
-                                        <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedShipments}> {i18n.t('static.supplyPlan.scrollToRight')} <i className="cui-arrow-right icons" ></i> </span>
+                                        <span className="supplyplan-larrow-dataentry" onClick={this.leftClickedShipments}> <i className="cui-arrow-left icons " > </i> <span>{i18n.t('static.supplyPlan.scrollToLeft')}</span> </span>
+                                        <span className="supplyplan-rarrow-dataentry" onClick={this.rightClickedShipments}> <span>{i18n.t('static.supplyPlan.scrollToRight')}</span> <i className="cui-arrow-right icons" ></i> </span>
                                     </div>
                                     <Table className="table-bordered text-center mt-2" bordered responsive size="sm" options={this.options}>
                                         <thead>
