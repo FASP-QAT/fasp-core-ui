@@ -327,10 +327,10 @@ class Login extends Component {
                 </div>
               </Col>
               <Col md="12">
-                <div className="upper-logo logo-MarginTop">
+                {/* <div className="upper-logo logo-MarginTop">
                   <img src={image1} className="img-fluid " />
-                </div>
-                {/* <Row className='pb-lg-5'>
+                </div> */}
+                <Row className='pb-lg-5'>
                   <Col md="4">
                     <div className="upper-logo logo-MarginTop">
                       <img src={image1} className="img-fluid " />
@@ -338,17 +338,17 @@ class Login extends Component {
                   </Col>
                   <Col md="5" lg="5">
                     <div style={{ marginBottom: '20px', marginTop: '40px', fontSize:'14px',fontWeight:'500' }}>
-                      {this.state.lang === 'en' ?
-                        <p style={{color:'#BA0C2F'}}>QAT will be experiencing downtime on April 11, 2026 from 02:30 to 04:30 GMT a part of a routine maintenance upgrade. We apologize for the inconvenience.</p>:
+                      {this.state.lang === 'pt' ?
+                        <p style={{color:'#BA0C2F'}}>Preencha a pesquisa de usuários do QAT! <br/> <a href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=piQffDl9LEWCNwcm47Gac8kch5CzXWFEnVkMnIrtQdBUQ0FXWlk4UVhZTFZOR0NXR09PM1YwTTU2RyQlQCN0PWcu&route=shorturl" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color:'blue' }}>Preencher | Quantification Analytics Tool (QAT) User Survey</a></p>:
                         this.state.lang === 'sp' ?
-                        <p style={{color:'#BA0C2F'}}>QAT experimentará una interrupción del servicio el 11 de abril de 2026 de 02:30 a 04:30 GMT como parte de una actualización de mantenimiento de rutina. Pedimos disculpas por las molestias.</p>:
+                        <p style={{color:'#BA0C2F'}}>¡Complete la encuesta de usuarios de QAT! <br/> <a href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=piQffDl9LEWCNwcm47Gac8kch5CzXWFEnVkMnIrtQdBUQ0FXWlk4UVhZTFZOR0NXR09PM1YwTTU2RyQlQCN0PWcu&route=shorturl" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color:'blue' }}>Llenar | Quantification Analytics Tool (QAT) User Survey</a></p>:
                         this.state.lang === 'fr' ?
-                        <p style={{color:'#BA0C2F'}}>QAT sera en maintenance le 11 avril 2026 de 02h30 à 04h30 GMT dans le cadre d'une mise à jour de maintenance de routine. Nous nous excusons pour la gêne occasionnée.</p>:
-                        <p style={{color:'#BA0C2F'}}>O QAT ficará fora do ar no dia 11 de abril de 2026, das 02:30 às 04:30 GMT, como parte de uma atualização de manutenção de rotina. Pedimos desculpas pelo inconveniente.</p>
+                        <p style={{color:'#BA0C2F'}}>Veuillez compléter le sondage utilisateur QAT ! <br/> <a href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=piQffDl9LEWCNwcm47Gac8kch5CzXWFEnVkMnIrtQdBUQ0FXWlk4UVhZTFZOR0NXR09PM1YwTTU2RyQlQCN0PWcu&route=shorturl" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color:'blue' }}>Remplir | Quantification Analytics Tool (QAT) User Survey</a></p>:
+                        <p style={{color:'#BA0C2F'}}>Please complete the QAT User Survey! <br/> <a href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=piQffDl9LEWCNwcm47Gac8kch5CzXWFEnVkMnIrtQdBUQ0FXWlk4UVhZTFZOR0NXR09PM1YwTTU2RyQlQCN0PWcu&route=shorturl" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'underline', color:'blue' }}>Fill | Quantification Analytics Tool (QAT) User Survey</a></p>
                       }
                     </div>
                   </Col>
-                </Row> */}
+                </Row>
               </Col>
               <Col lg="5" md="7" xl="4">
                 <CardGroup>
@@ -574,13 +574,13 @@ class Login extends Component {
                       <img src={imageHelp} className="HelpIcon" title={i18n.t('static.login.helpdesk')} style={{ width: '25px', height: '25px', marginRight: '5px' }} />
                       <span>{i18n.t('static.login.helpdesk')}</span>
                     </a>
-                    <a href={localStorage.getItem('lang') == 'en' ?
-                        "https://fasp-qat.github.io/qat-documentation/docs/user/acronyms" :
+                    <a href={localStorage.getItem('lang') == 'pt' ?
+                        "https://fasp-qat.github.io/qat-documentation/pt/docs/user/acronyms" :
                         localStorage.getItem('lang') == 'fr' ?
                           "https://fasp-qat.github.io/qat-documentation/fr/docs/user/acronyms" :
                           localStorage.getItem('lang') == 'sp' ?
                             "https://fasp-qat.github.io/qat-documentation/es/docs/user/acronyms" :
-                            "https://fasp-qat.github.io/qat-documentation/pt/docs/user/acronyms"
+                            "https://fasp-qat.github.io/qat-documentation/docs/user/acronyms"
                       } target="_blank" title={i18n.t('static.login.documentation')} style={{ color: '#002f6c', display: 'flex', alignItems: 'center' }}>
                       <i className="fa fa-question-circle-o" style={{ fontSize: '25px', marginRight: '5px' }}></i>
                       <span>{i18n.t('static.login.documentation')}</span>

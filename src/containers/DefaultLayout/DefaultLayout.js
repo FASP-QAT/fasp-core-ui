@@ -634,6 +634,7 @@ class DefaultLayout extends Component {
       },
         () => {
           if (localStorage.getItem('sessionType') === 'Online') {
+            AuthenticationService.setupAxiosInterceptors();
             DashboardService.openIssues()
               .then(response => {
                 this.setState({
