@@ -1208,7 +1208,8 @@ class AuthenticationService {
                         }
                         break;
                     case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
-                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT") && bfunction.includes('ROLE_BF_DROPDOWN_FC')) {
+                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
+                        if (bfunction.includes("ROLE_BF_SUPPLY_PLAN_IMPORT")) {
                             return true;
                         }
                         break;
@@ -1260,8 +1261,6 @@ class AuthenticationService {
                         break;
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan":
                     case "/importFromQATSupplyPlan/listImportFromQATSupplyPlan/:color/:message":
-                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan":
-                    case "/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan/:color/:message":
                         if (bfunction.includes("ROLE_BF_LIST_IMPORT_FROM_QAT_SUPPLY_PLAN")) {
                             return true;
                         }
