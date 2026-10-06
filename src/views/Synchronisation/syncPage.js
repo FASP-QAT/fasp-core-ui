@@ -4198,6 +4198,26 @@ export default class syncPage extends Component {
                 programJson.batchInventoryList=[];
               }
               programJson.batchInventoryList = programJson.batchInventoryList.filter(c=>c.batchInventoryId>0 || (c.batchInventoryId==0 && c.batchList.length>0));
+              
+              let currentUserId = AuthenticationService.getLoggedInUserId();
+              if (currentUserId == 0 || currentUserId == null) {
+                currentUserId = 1;
+              }
+              const listsToUpdateUser = [
+                'consumptionList', 'inventoryList', 'shipmentList',
+                'batchInfoList', 'batchInventoryList', 'actionList',
+                'shipmentLinkingList', 'problemReportList', 'planningUnitList',
+                'supplyPlan'
+              ];
+              listsToUpdateUser.forEach(listName => {
+                if (programJson[listName]) {
+                  programJson[listName].map(c => {
+                    if (c.createdBy && c.createdBy.userId == 0) c.createdBy.userId = currentUserId;
+                    if (c.lastModifiedBy && c.lastModifiedBy.userId == 0) c.lastModifiedBy.userId = currentUserId;
+                  });
+                }
+              });
+
               delete programJson.dashboardData;
               const compressedData = isCompress(programJson);
               ProgramService.saveProgramData(compressedData, this.state.comparedLatestVersion).then(response => {
