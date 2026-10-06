@@ -1850,7 +1850,7 @@ class DefaultLayout extends Component {
                               url: '/importIntoQATSupplyPlan/listImportIntoQATSupplyPlan',
                               icon: 'fa cui-cloud-download',
                               attributes: {
-                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.businessFunctions.includes('ROLE_BF_DROPDOWN_FC') && this.state.activeTab == 2) ? false : true),
+                                hidden: ((this.state.businessFunctions.includes('ROLE_BF_SUPPLY_PLAN_IMPORT') && this.state.activeTab == 2) ? false : true),
                                 onClick: e => {
                                   this.refreshPage();
                                 }
