@@ -2401,10 +2401,6 @@ export default class TreeTable extends Component {
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(38, y, 1, true);
         let nodeId = this.el.getValueFromCoords(37, y);
-        if (x == 4) {
-            let tempMonth = new Date(value);
-            this.el.setValueFromCoords(4, y, tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01", true);
-        }
         // if (x == 5) {
         //     this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (value / 100), true);
         // }
@@ -6914,11 +6910,12 @@ export default class TreeTable extends Component {
             this.setState({
                 isTabDataChanged: false
             }, () => {
-                var date = value.year + "-" + value.month + "-" + "01"
-                this.updateTreeData(date);
+                var month = parseInt(value.month) < 10 ? "0" + parseInt(value.month) : value.month;
+                var date = value.year + "-" + month + "-01";
                 if (moment(date).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") && moment(date).format("YYYY-MM") <= moment(this.state.forecastStopDate).format("YYYY-MM")) {
-                    this.setState({ singleValue2: value, }, () => {
-                    })
+                    this.setState({ singleValue2: value }, () => {
+                        this.updateTreeData(date);
+                    });
                 } else {
                     if (type == 1) {
                         alert("Please select date within forecast range");
