@@ -2401,10 +2401,6 @@ export default class TreeTable extends Component {
         var json = this.el.getJson(null, false);
         this.el.setValueFromCoords(38, y, 1, true);
         let nodeId = this.el.getValueFromCoords(37, y);
-        if (x == 4) {
-            let tempMonth = new Date(value);
-            this.el.setValueFromCoords(4, y, tempMonth.getFullYear() + "-" + (tempMonth.getMonth() + 1) + "-01", true);
-        }
         // if (x == 5) {
         //     this.el.setValueFromCoords(7, y, this.el.getValueFromCoords(6, y) * (value / 100), true);
         // }
@@ -6780,40 +6776,40 @@ export default class TreeTable extends Component {
     tabPane1() {
         return (
             <>
-                <TabPane tabId="1" style={{ paddingBottom: "50px" }}>
+                <TabPane tabId="1">
                     <div className="TreeTable">
                         <div id="tableDiv" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
-                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0 d-flex justify-content-end my-2">
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="success" className="mr-1" onClick={(e) => this.updateTab1Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="warning" onClick={(e) => this.resetTab1Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                     </div>}
                 </TabPane>
-                <TabPane tabId="2" style={{ paddingBottom: "50px" }}>
+                <TabPane tabId="2">
                     <div className="TreeTable">
                         <div id="tableDiv2" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
-                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0 d-flex justify-content-end my-2">
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="success" className="mr-1" onClick={(e) => this.updateTab2Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="warning" onClick={(e) => this.resetTab2Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                     </div>}
                 </TabPane>
-                <TabPane tabId="3" style={{ paddingBottom: "50px" }}>
+                <TabPane tabId="3">
                     <div className="TreeTable">
                         <div id="tableDiv3" style={{ display: this.state.loading || this.state.treeTableLoading ? "none" : "block" }}>
                         </div>
                     </div>
-                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0">
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="warning" className="float-right mr-1" onClick={(e) => this.resetTab3Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
-                        {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE') && this.props.match.params.isLocal != 2 && this.state.currentItemConfig.context.payload.nodeType.id != 1 &&
-                            <Button type="button" size="md" color="success" className="float-right mr-1" onClick={(e) => this.updateTab3Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                    {this.state.isTabDataChanged && <div className="col-md-12 pr-lg-0 d-flex justify-content-end my-2">
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="success" className="mr-1" onClick={(e) => this.updateTab3Data(e)}><i className="fa fa-check"></i> {i18n.t('static.common.update')}</Button>}
+                        {(AuthenticationService.checkUserACL([this.state.programId.split("_")[0].toString()], 'ROLE_BF_EDIT_TREE') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_TREE')) && this.props.match.params.isLocal != 2 &&
+                            <Button type="button" size="md" color="warning" onClick={(e) => this.resetTab3Data(e)}><i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}</Button>}
                     </div>}
                 </TabPane>
             </>
@@ -6914,11 +6910,12 @@ export default class TreeTable extends Component {
             this.setState({
                 isTabDataChanged: false
             }, () => {
-                var date = value.year + "-" + value.month + "-" + "01"
-                this.updateTreeData(date);
+                var month = parseInt(value.month) < 10 ? "0" + parseInt(value.month) : value.month;
+                var date = value.year + "-" + month + "-01";
                 if (moment(date).format("YYYY-MM") >= moment(this.state.forecastStartDate).format("YYYY-MM") && moment(date).format("YYYY-MM") <= moment(this.state.forecastStopDate).format("YYYY-MM")) {
-                    this.setState({ singleValue2: value, }, () => {
-                    })
+                    this.setState({ singleValue2: value }, () => {
+                        this.updateTreeData(date);
+                    });
                 } else {
                     if (type == 1) {
                         alert("Please select date within forecast range");
