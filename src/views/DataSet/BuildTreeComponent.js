@@ -105,12 +105,33 @@ const validationSchemaNodeData = function (values) {
                     } else {
                         return true;
                     }
+                })
+            .test('percentageOfParentNodeValue', i18n.t('static.tree.calculatedNodeValue16DigitLimit'),
+                function (value) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 3) {
+                        var nodeValue = "";
+                        if (document.getElementById("parentValue") && document.getElementById("percentageOfParent")) {
+                            var parentVal = (document.getElementById("parentValue").value).replaceAll(",", "");
+                            var percVal = (value != null && value !== "") ? value.toString().replaceAll(",", "") : (document.getElementById("percentageOfParent").value).replaceAll(",", "");
+                            if (parentVal != "" && percVal != "" && !isNaN(parentVal) && !isNaN(percVal)) {
+                                nodeValue = ((Number(percVal) * Number(parentVal)) / 100).toFixed(8);
+                            }
+                        }
+                        if (nodeValue == "" && document.getElementById("nodeValue")) {
+                            nodeValue = (document.getElementById("nodeValue").value).replaceAll(",", "");
+                        }
+                        var testNumber = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test(nodeValue);
+                        if (nodeValue == "" || testNumber == false) {
+                            return false;
+                        }
+                    }
+                    return true;
                 }),
         nodeValue: Yup.string()
             .test('nodeValue', 'Please enter a valid number having less then 16 digits.',
                 function (value) {
                     var testNumber = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test((document.getElementById("nodeValue").value).replaceAll(",", ""));
-                    if ((parseInt(document.getElementById("nodeTypeId").value) == 3 || parseInt(document.getElementById("nodeTypeId").value) == 2) && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
+                    if (parseInt(document.getElementById("nodeTypeId").value) == 2 && (document.getElementById("nodeValue").value == "" || testNumber == false)) {
                         return false;
                     } else {
                         return true;
@@ -3068,9 +3089,14 @@ export default class BuildTree extends Component {
             validationFail = 1;
             document.getElementById("nodeTitle").className = "form-control is-invalid"
         }
-        if ((nodeTypeId == 3 || nodeTypeId == 2) && (nodeValue == "" || testNumber == false)) {
+        if (nodeTypeId == 2 && (nodeValue == "" || testNumber == false)) {
             validationFail = 1;
             document.getElementById("nodeValue").className = "form-control is-invalid"
+        }
+        var testNumber16 = (/^(?!$)\d{0,16}(?:\.\d{1,8})?$/).test(nodeValue.replaceAll(",", ""));
+        if (nodeTypeId == 3 && (nodeValue == "" || testNumber16 == false)) {
+            validationFail = 1;
+            document.getElementById("percentageOfParent").className = "form-control is-invalid"
         }
         return validationFail > 0 ? false : true;
 
