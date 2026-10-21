@@ -17098,19 +17098,10 @@ label.arrow_label:before {
   top: 0;
 }
 
-.TreeTable .jexcel_content {
-  max-height: calc(100vh - 300px) !important;
-  overflow-x: auto;
-}
-
-.TreeTable .jexcel_content {
-  max-height: calc(100vh - 262px) !important;
-  overflow: scroll !important;
-}
-
+.TreeTable .jexcel_content,
 .TreeTable .jss_content {
-  max-height: calc(100vh - 262px) !important;
-  overflow: scroll !important;
+  max-height: calc(100vh - 360px) !important;
+  overflow: auto !important;
 }
 
 .momJexcelPagination.jss_pagination>div {
