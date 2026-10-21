@@ -859,21 +859,21 @@ class SupplyPlanVersionAndReview extends Component {
      */
     exportCSV(columns) {
         var csvRow = [];
-        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.report.dateRange') + ' : ' + makeText(this.state.rangeValue.from) + ' ~ ' + makeText(this.state.rangeValue.to)).replaceAll('#', '%23').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.dashboard.country') + ' : ' + document.getElementById("countryId").selectedOptions[0].text).replaceAll('#', '%23').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.program.program') + ' : ' + document.getElementById("programId").selectedOptions[0].text).replaceAll('#', '%23').replaceAll('#', '%23') + '"')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.status') + ' : ' + document.getElementById("versionStatusId").selectedOptions[0].text).replaceAll('#', '%23').replaceAll('#', '%23') + '"')
         csvRow.push('')
         csvRow.push('')
-        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll(' ', '%20') + '"')
+        csvRow.push('"' + (i18n.t('static.common.youdatastart')).replaceAll('#', '%23').replaceAll('#', '%23') + '"')
         csvRow.push('')
         const headers = [];
-        columns.map((item, idx) => { headers[idx] = item.text.replaceAll(' ', '%20') });
+        columns.map((item, idx) => { headers[idx] = item.text.replaceAll('#', '%23').replaceAll('#', '%23') });
         var A = [addDoubleQuoteToRowContent(headers)]
-        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll(' ', '%20'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`)).replaceAll(' ', '%20'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll(' ', '%20'), elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`).replaceAll(' ', '%20') : '') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll(' ', '%20') : ''
+        this.state.matricsList.map(elt => A.push(addDoubleQuoteToRowContent([(elt.program.label.label_en.replaceAll(',', '%20')).replaceAll('#', '%23').replaceAll('#', '%23'), elt.versionId, (elt.versionType.label.label_en.replaceAll(',', '%20')).replaceAll('#', '%23').replaceAll('#', '%23'), (moment(elt.createdDate).format(`${DATE_FORMAT_CAP_FOUR_DIGITS}`)).replaceAll('#', '%23').replaceAll('#', '%23'), elt.createdBy.username, elt.versionStatus.label.label_en.replaceAll('#', '%23').replaceAll('#', '%23'), elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? elt.lastModifiedBy.username : '', elt.versionStatus.id == 2 || elt.versionStatus.id == 3 ? (elt.lastModifiedDate ? moment(elt.lastModifiedDate).format(`${DATE_FORMAT_CAP} HH:mm`).replaceAll('#', '%23').replaceAll('#', '%23') : '') : '', elt.notes != null ? (elt.notes.replaceAll(',', '%20')).replaceAll('#', '%23').replaceAll('#', '%23') : ''
         ])));
         for (var i = 0; i < A.length; i++) {
             csvRow.push(A[i].join(','))
