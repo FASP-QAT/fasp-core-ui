@@ -8055,14 +8055,19 @@ h6 {
   background-color: #20a8d8;
 }
 
-.modal-info-Headher.close {
+.modal-info-Headher .close {
   float: right;
   font-size: 1.3125rem;
   font-weight: 700;
   line-height: 1;
   color: #fff !important;
-  text-shadow: 0 1px 0 #fff;
-  opacity: 0 !important;
+  text-shadow: none !important;
+  opacity: 0.85 !important;
+}
+
+.modal-info-Headher .close:hover {
+  color: #fff !important;
+  opacity: 1 !important;
 }
 
 .modal-content {
@@ -17789,6 +17794,15 @@ label.arrow_label:before {
   margin-top: 3px;
 }
 
+.ShowdecimalClr .MuiSwitch-switchBase.Mui-disabled {
+  color: #fff !important;
+}
+
+.ShowdecimalClr .MuiSwitch-switchBase.Mui-disabled + .MuiSwitch-track {
+  opacity: 0.45 !important;
+  background-color: #23a8d8 !important;
+}
+
 .MuiIconButton-root:hover {
   background-color: transparent !important;
 }
@@ -18579,3 +18593,81 @@ label.arrow_label:before {
   background-position: top 0 right -1px !important;
   background-repeat: no-repeat !important;
 }
+
+.broadcast-toolbar .btn {
+  background-color: #f8f9fa !important;
+  border: 1px solid #c4c9d0 !important;
+  color: #212529 !important;
+  font-weight: 600;
+  min-width: 36px;
+  height: 30px;
+  padding: 2px 8px;
+}
+
+.broadcast-toolbar .btn:hover {
+  background-color: #20a8d8 !important;
+  border-color: #20a8d8 !important;
+  color: #fff !important;
+}
+
+.broadcast-toolbar .btn:hover i,
+.broadcast-toolbar .btn:hover b,
+.broadcast-toolbar .btn:hover strong,
+.broadcast-toolbar .btn:hover u,
+.broadcast-toolbar .btn:hover s {
+  color: #fff !important;
+}
+
+.broadcast-editor {
+  min-height: 220px;
+  max-height: 450px;
+  overflow-y: auto;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.6;
+  background-color: #fff;
+  cursor: text;
+}
+
+.broadcast-editor:focus {
+  border-color: #8ad4ee;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(32, 168, 216, 0.25);
+}
+
+.broadcast-editor:empty:before,
+.broadcast-editor[data-empty="true"]:before {
+  content: attr(data-placeholder);
+  color: #8c9ba5;
+  cursor: text;
+  pointer-events: none;
+}
+
+.broadcast-editor ul {
+  list-style-type: disc !important;
+  padding-left: 24px !important;
+  margin-top: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.broadcast-editor ol {
+  list-style-type: decimal !important;
+  padding-left: 24px !important;
+  margin-top: 4px !important;
+  margin-bottom: 8px !important;
+}
+
+.broadcast-editor h3 {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+  color: #23282c !important;
+}
+
+.broadcast-editor a {
+  color: #20a8d8 !important;
+  text-decoration: underline !important;
+}
+
+

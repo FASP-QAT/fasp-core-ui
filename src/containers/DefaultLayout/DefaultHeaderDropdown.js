@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalHeader, ModalBody, ModalFooter, Button, Alert, Table, Badge } from 'reactstrap';
 import { getDatabase } from "../../CommonComponent/IndexedDbFunctions";
 import getLabelText from '../../CommonComponent/getLabelText';
 import {
@@ -15,7 +15,7 @@ import image6 from '../../assets/img/avatars/6.jpg';
 import i18n from '../../i18n';
 import AuthenticationService from '../../views/Common/AuthenticationService';
 import InitialTicketPageComponent from '../../views/Ticket/InitialTicketPageComponent';
-import { Input, Switch } from '@material-ui/core';
+import { Switch } from '@material-ui/core';
 
 const propTypes = {
   notif: PropTypes.bool,
@@ -88,8 +88,18 @@ class DefaultHeaderDropdown extends Component {
       roleList: AuthenticationService.getLoggedInUserRole(),
       lang: localStorage.getItem('lang'),
       languageList: [],
-      message: ""
+      message: "",
+      notificationModalOpen: false,
+      notificationPreferences: [],
+      loadingPreferences: false,
+      savingPreferences: false,
+      notificationSuccessMsg: '',
+      notificationErrorMsg: ''
     };
+    this.toggleNotificationPreferencesModal = this.toggleNotificationPreferencesModal.bind(this);
+    this.loadNotificationPreferences = this.loadNotificationPreferences.bind(this);
+    this.handlePreferenceToggle = this.handlePreferenceToggle.bind(this);
+    this.saveNotificationPreferences = this.saveNotificationPreferences.bind(this);
   }
   /**
    * Retrieves the list of languages from the IndexedDB.
@@ -217,6 +227,62 @@ class DefaultHeaderDropdown extends Component {
       setLight();
     }
   };
+  toggleNotificationPreferencesModal() {
+    this.setState({
+      notificationModalOpen: !this.state.notificationModalOpen,
+      notificationSuccessMsg: '',
+      notificationErrorMsg: ''
+    }, () => {
+      if (this.state.notificationModalOpen) {
+        this.loadNotificationPreferences();
+      }
+    });
+  }
+
+  loadNotificationPreferences() {
+    this.setState({ loadingPreferences: true, notificationErrorMsg: '' });
+    UserService.getNotificationPreferences()
+      .then(response => {
+        this.setState({
+          notificationPreferences: response.data,
+          loadingPreferences: false
+        });
+      })
+      .catch(err => {
+        this.setState({
+          loadingPreferences: false,
+          notificationErrorMsg: 'Failed to load notification preferences.'
+        });
+      });
+  }
+
+  handlePreferenceToggle(categoryId) {
+    const updated = this.state.notificationPreferences.map(p => {
+      if (p.categoryId === categoryId && p.allowOptOut) {
+        return { ...p, optedOut: !p.optedOut };
+      }
+      return p;
+    });
+    this.setState({ notificationPreferences: updated });
+  }
+
+  saveNotificationPreferences() {
+    this.setState({ savingPreferences: true, notificationSuccessMsg: '', notificationErrorMsg: '' });
+    UserService.updateNotificationPreferences(this.state.notificationPreferences)
+      .then(response => {
+        this.setState({
+          savingPreferences: false,
+          notificationSuccessMsg: 'Notification preferences updated successfully.'
+        });
+      })
+      .catch(err => {
+        this.setState({
+          savingPreferences: false,
+          notificationErrorMsg: 'Failed to save preferences. Please try again.'
+        });
+      });
+  }
+
   /**
    * Renders the user profile dropdown.
    * @returns {JSX.Element} The rendered JSX element.
@@ -247,6 +313,7 @@ class DefaultHeaderDropdown extends Component {
             )}
           </DropdownItem>
           {checkOnline === 'Online' && <DropdownItem onClick={this.props.onChangePassword}><i className="fa fa-key"></i>{i18n.t('static.dashboard.changepassword')}</DropdownItem>}
+          {checkOnline === 'Online' && <DropdownItem onClick={this.toggleNotificationPreferencesModal}><i className="fa fa-bell-o"></i>{i18n.t('static.broadcast.notificationPreferences', 'Notification Preferences')}</DropdownItem>}
           {checkOnline === 'Online' ? <DropdownItem onClick={this.props.goOffline}><i class="fa fa-solid fa-circle fa-lg" style={{ color: "#BA0C2F" }}></i>{i18n.t("static.login.goOffline")}</DropdownItem> : <DropdownItem onClick={this.props.goOnline}><i class="fa fa-solid fa-circle fa-lg" style={{ color: "#4dbd74" }}></i>{i18n.t("static.login.goOnline")}</DropdownItem>}
           <DropdownItem header tag="div" className="text-center"><b>{i18n.t('static.language.preferredlng')}</b></DropdownItem>
           {this.state.languageList != null && this.state.languageList != '' && this.state.languageList.filter(c => c.active).map(
@@ -284,6 +351,85 @@ class DefaultHeaderDropdown extends Component {
               </div>
             </DropdownItem>}
         </DropdownMenu>
+
+        <Modal isOpen={this.state.notificationModalOpen} toggle={this.toggleNotificationPreferencesModal} className="modal-lg modal-dialog-centered">
+          <ModalHeader toggle={this.toggleNotificationPreferencesModal} className="ModalHead modal-info-Headher">
+            <strong className="TextWhite"><i className="fa fa-bell-o mr-2"></i>{i18n.t('static.broadcast.notificationPreferences', 'Notification Preferences')}</strong>
+          </ModalHeader>
+          <ModalBody>
+            {this.state.notificationSuccessMsg && <Alert color="success">{this.state.notificationSuccessMsg}</Alert>}
+            {this.state.notificationErrorMsg && <Alert color="danger">{this.state.notificationErrorMsg}</Alert>}
+            <p className="text-muted mb-3">
+              {i18n.t('static.broadcast.notificationPrefHelp', 'Manage your email subscription preferences for notifications and announcements sent by QAT.')}
+            </p>
+            {this.state.loadingPreferences ? (
+              <div className="d-flex align-items-center justify-content-center py-4">
+                <div className="spinner-border blue" role="status"></div>
+              </div>
+            ) : (
+              <Table className="table-striped table-bordered text-center mt-2" bordered responsive size="sm">
+                <thead>
+                  <tr>
+                    <th style={{ width: '22%' }} className="text-left">{i18n.t('static.broadcast.category', 'Category')}</th>
+                    <th style={{ width: '48%' }} className="text-left">{i18n.t('static.message.description', 'Description')}</th>
+                    <th style={{ width: '15%' }}>{i18n.t('static.common.status', 'Status')}</th>
+                    <th style={{ width: '15%' }}>{i18n.t('static.broadcast.receiveEmails', 'Receive Emails')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {this.state.notificationPreferences && this.state.notificationPreferences.map(pref => {
+                    const isMandatory = !pref.allowOptOut;
+                    const isSubscribed = isMandatory || !pref.optedOut;
+                    return (
+                      <tr key={pref.categoryId}>
+                        <td className="text-left align-middle font-weight-bold">
+                          {pref.label ? getLabelText(pref.label, this.state.lang) : pref.categoryName}
+                        </td>
+                        <td className="text-left align-middle">
+                          {pref.categoryCode === 'SYSTEM_UPDATE' && (
+                            i18n.t('static.broadcast.systemUpdateDesc', 'System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). No opt out.')
+                          )}
+                          {pref.categoryCode === 'PROMOTIONAL' && (
+                            i18n.t('static.broadcast.promotionalDesc', 'Newsletters and general announcements. Default is to receive; user can opt out.')
+                          )}
+                          {pref.categoryCode === 'TRANSACTIONAL' && (
+                            i18n.t('static.broadcast.transactionalDesc', 'Workflow notifications (e.g. supply plan approved, sent back, or upload notifications). Default is to receive; user can opt out.')
+                          )}
+                        </td>
+                        <td className="align-middle">
+                          {isMandatory ? (
+                            <Badge color="secondary" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.common.mandatory', 'Mandatory')}</Badge>
+                          ) : isSubscribed ? (
+                            <Badge color="success" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.broadcast.subscribed', 'Subscribed')}</Badge>
+                          ) : (
+                            <Badge color="danger" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.broadcast.optedOut', 'Opted Out')}</Badge>
+                          )}
+                        </td>
+                        <td className="align-middle text-center ShowdecimalClr">
+                          <Switch
+                            className="form-check form-switch"
+                            checked={isSubscribed}
+                            disabled={isMandatory}
+                            color="primary"
+                            onChange={() => this.handlePreferenceToggle(pref.categoryId)}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button type="button" size="md" color="danger" className="mr-1 text-white" onClick={this.toggleNotificationPreferencesModal}>
+              <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+            </Button>
+            <Button type="button" size="md" color="success" className="mr-1 text-white" onClick={this.saveNotificationPreferences} disabled={this.state.savingPreferences || this.state.loadingPreferences}>
+              <i className="fa fa-check"></i> {this.state.savingPreferences ? <i className="fa fa-spinner fa-spin mr-1"></i> : null}{i18n.t('static.common.save', 'Save')}
+            </Button>
+          </ModalFooter>
+        </Modal>
       </Dropdown>
 
     );
