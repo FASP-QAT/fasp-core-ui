@@ -82,5 +82,8 @@ class UserService {
         return axios.get(`${API_URL}/api/user/accessControls`, {}
         );
     }
+    activateAutoInactivatedUser(userId) {
+        return axios.post(`${API_URL}/api/user/activateAutoInactivatedUser/${userId}`, {}, {});
+    }
 }
 export default new UserService()

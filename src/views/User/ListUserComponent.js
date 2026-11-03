@@ -517,6 +517,8 @@ class ListUserComponent extends Component {
             data[8] = userList[j].lastModifiedBy.username;
             data[9] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[10] = userList[j].active;
+            data[11] = userList[j].notes || '';
+            data[12] = (!userList[j].active && userList[j].autoInactivated) ? true : false;
             userArray[count] = data;
             count++;
         }
@@ -579,6 +581,20 @@ class ListUserComponent extends Component {
                         { id: true, name: i18n.t('static.common.active') },
                         { id: false, name: i18n.t('static.dataentry.inactive') }
                     ]
+                },
+                {
+                    title: i18n.t('static.user.notes'),
+                    type: 'text',
+                    width: 150,
+                },
+                {
+                    type: 'dropdown',
+                    title: i18n.t('static.user.autoInactivatedStatus'),
+                    source: [
+                        { id: true, name: i18n.t('static.program.yes') },
+                        { id: false, name: i18n.t('static.realm.no') }
+                    ],
+                    width: 120,
                 },
             ],
             onload: this.loaded,
