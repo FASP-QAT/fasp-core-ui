@@ -421,6 +421,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/broadcast/broadcastMessage":
+                        if (bfunction.includes("ROLE_BF_BROADCAST_MESSAGE")) {
+                            return true;
+                        }
+                        break;
                     case "/role/addRole":
                         if (bfunction.includes("ROLE_BF_ADD_ROLE")) {
                             return true;

@@ -1858,9 +1858,11 @@ export default class syncPage extends Component {
                                           if (responseLinking.status == 200) {
                                             var oldProgramData = programJson;
                                             var checkIfThereIsUnMappedBudget = 0;
+                                            console.log("oldProgramData.shipmentList Test@123",oldProgramData.shipmentList);
                                             oldProgramData.shipmentList.filter(c => c.budget != null && c.budget.id > 0 && c.active.toString() == "true").map(item => {
                                               var budgetFilter = bResult.filter(c => c.budgetId == item.budget.id);
                                               if (budgetFilter.length == 0 || (budgetFilter.length > 0 && ![...new Set(budgetFilter[0].programs.map(ele => ele.id))].includes(parseInt(programJson.programId)))) {
+                                                console.log("item Test@123",item);
                                                 checkIfThereIsUnMappedBudget = 1;
                                               }
                                             })

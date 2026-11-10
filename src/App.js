@@ -17,6 +17,7 @@ const MasterDataSyncForTree = React.lazy(() => import('./views/SyncMasterData/Sy
 const SyncProgram = React.lazy(() => import('./views/SyncMasterData/SyncProgram'));
 const UpdateExpiredPassword = React.lazy(() => import('./views/Pages/Login/UpdateExpiredPasswordComponent'));
 const ResetPassword = React.lazy(() => import('./views/Pages/Login/ResetPasswordComponent'));
+const UnsubscribeComponent = React.lazy(() => import('./views/Pages/Public/UnsubscribeComponent'));
 const Page500 = React.lazy(() => import('./views/Pages/Page500/Page500.js'));
 const PageError = React.lazy(() => import('./views/Pages/PageError/PageError.js'));
 
@@ -44,6 +45,7 @@ class App extends Component {
             <Route exact path="/syncProgram" name="Sync Program" render={props => <SyncProgram {...props} />} />
             <Route exact path="/updateExpiredPassword" name="Update expired password" render={props => <UpdateExpiredPassword {...props} />} />
             <Route exact path="/resetPassword/:emailId/:token" name="Reset password" render={props => <ResetPassword {...props} />} />
+            <Route exact path="/unsubscribe" name="Unsubscribe" render={props => <UnsubscribeComponent {...props} />} />
             <Route exact path="/userAgreement" render={props => <UserAgreement {...props} />} />
             <Route path="/" name={i18n.t('static.home')} render={props => <DefaultLayout {...props} />} />
           </Switch>

@@ -82,5 +82,11 @@ class UserService {
         return axios.get(`${API_URL}/api/user/accessControls`, {}
         );
     }
+    getNotificationPreferences() {
+        return axios.get(`${API_URL}/api/user/notificationPreference`, {});
+    }
+    updateNotificationPreferences(preferences) {
+        return axios.post(`${API_URL}/api/user/notificationPreference`, preferences, {});
+    }
 }
 export default new UserService()

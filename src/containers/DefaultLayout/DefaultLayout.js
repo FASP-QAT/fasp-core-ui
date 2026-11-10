@@ -198,6 +198,7 @@ const PlanningUnitSetting = React.lazy(() => import('../../views/PlanningUnitSet
 const ImportIntoQATSupplyPlan = React.lazy(() => import('../../views/Consumption/ImportIntoQATSupplyPlan'));
 const ForecastOutput = React.lazy(() => import('../../views/ForecastingReports/ForecastOutput'));
 const ForecastSummary = React.lazy(() => import('../../views/ForecastingReports/ForecastSummary'));
+const BroadcastMessageComponent = React.lazy(() => import('../../views/Broadcast/BroadcastMessageComponent'));
 /**
  * Array of all the routes
  */
@@ -331,6 +332,7 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'static.breadcrum.list', entityname: 'static.userHead.user', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'static.breadcrum.add', entityname: 'static.userHead.user', component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.userHead.user', component: EditUser },
+  { path: '/broadcast/broadcastMessage', exact: true, name: 'Broadcast Message', component: BroadcastMessageComponent },
   { path: '/accessDenied', exact: true, component: AccessDenied },
   { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
@@ -1033,7 +1035,7 @@ class DefaultLayout extends Component {
                           name: i18n.t('static.dashboard.applicationmaster'),
                           icon: 'fa fa-list',
                           attributes: {
-                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE')) || (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')))) ? false : true)
                           },
@@ -1119,6 +1121,17 @@ class DefaultLayout extends Component {
                               attributes: {
                                 hidden: (this.state.businessFunctions.includes('ROLE_BF_LIST_USER') ? false : true),
                                 onClick: e => {
+                                }
+                              }
+                            },
+                            {
+                              name: 'Broadcast Message',
+                              url: '/broadcast/broadcastMessage',
+                              icon: 'fa fa-bullhorn',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage('/broadcast/broadcastMessage');
                                 }
                               }
                             },
