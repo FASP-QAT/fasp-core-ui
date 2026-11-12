@@ -51,6 +51,7 @@ export default class PlanningUnitListComponent extends Component {
             forecastingUnitExportAutocompelete:null,
         }
         this.addNewPlanningUnit = this.addNewPlanningUnit.bind(this);
+        this.bulkEditPlanningUnit = this.bulkEditPlanningUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.buildJExcel = this.buildJExcel.bind(this);
@@ -586,6 +587,19 @@ export default class PlanningUnitListComponent extends Component {
         }
     }
     /**
+     * Redirects to the bulk edit planning unit screen.
+     */
+    bulkEditPlanningUnit(e) {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
+        if (localStorage.getItem("sessionType") === 'Online') {
+            this.props.history.push(`/planningUnit/editAllPlanningUnit`)
+        } else {
+            alert(i18n.t('static.common.online'))
+        }
+    }
+    /**
      * This function is called when user clicks on export to excel and shows the filters for user to select
      */
     toggleExport() {
@@ -804,7 +818,8 @@ export default class PlanningUnitListComponent extends Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewPlanningUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void(0);" title={i18n.t('static.common.addEntity', { entityname })} onClick={(e) => { e.preventDefault(); this.addNewPlanningUnit(); }}><i className="fa fa-plus-square"></i></a>}
+                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT')) && <a href="javascript:void(0);" className="ml-2" title={i18n.t('static.bulk.editAllEntity', { entityname })} onClick={(e) => { e.preventDefault(); this.bulkEditPlanningUnit(e); }}><i className="fa fa-pencil-square-o"></i></a>}
                                 <img className='ml-2' style={{ height: '25px', width: '25px', cursor: 'Pointer', marginTop: '-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport()} />
                             </div>
                         </div>

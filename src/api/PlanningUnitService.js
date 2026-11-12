@@ -79,5 +79,9 @@ class PlanningUnitService {
         return axios.get(`${API_URL}/api/planningUnit/${planningUnitId}/withPrograms`, {}
         );
     }
+    addPlanningUnitBulk(json) {
+        return axios.post(`${API_URL}/api/planningUnit/bulk`, json, {}
+        );
+    }
 }
 export default new PlanningUnitService();

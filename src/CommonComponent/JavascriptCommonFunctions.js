@@ -149,19 +149,27 @@ export function isCompress(str) {
  * Hides the message in div1 after 30 seconds.
  */
 export function hideFirstComponent() {
-  document.getElementById('div1').style.display = 'block';
-  setTimeout(function () {
-    document.getElementById('div1').style.display = 'none';
-  }, 30000);
+  var el = document.getElementById('div1');
+  if (el) {
+    el.style.display = 'block';
+    setTimeout(function () {
+      var elem = document.getElementById('div1');
+      if (elem) elem.style.display = 'none';
+    }, 30000);
+  }
 }
 /**
  * Hides the message in div2 after 30 seconds.
  */
 export function hideSecondComponent() {
-  document.getElementById('div2').style.display = 'block';
-  setTimeout(function () {
-    document.getElementById('div2').style.display = 'none';
-  }, 30000);
+  var el = document.getElementById('div2');
+  if (el) {
+    el.style.display = 'block';
+    setTimeout(function () {
+      var elem = document.getElementById('div2');
+      if (elem) elem.style.display = 'none';
+    }, 30000);
+  }
 }
 /**
  * Capitalizes the first letter of the role name.
