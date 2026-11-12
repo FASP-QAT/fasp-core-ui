@@ -1858,7 +1858,10 @@ export default class syncPage extends Component {
                                           if (responseLinking.status == 200) {
                                             var oldProgramData = programJson;
                                             var checkIfThereIsUnMappedBudget = 0;
-                                            oldProgramData.shipmentList.filter(c => c.budget != null && c.budget.id > 0 && c.active.toString() == "true").map(item => {
+                                            var activeProgramPlanningUnitList = (latestProgramData.planningUnitList ? latestProgramData.planningUnitList : (oldProgramData.planningUnitList ? oldProgramData.planningUnitList : []))
+                                              .filter(c => c.active.toString() == "true" || c.active == true || c.active == 1)
+                                              .map(c => parseInt(c.id != null ? c.id : (c.planningUnit != null ? c.planningUnit.id : 0)));
+                                            oldProgramData.shipmentList.filter(c => c.budget != null && c.budget.id > 0 && c.active.toString() == "true" && c.planningUnit != null && activeProgramPlanningUnitList.includes(parseInt(c.planningUnit.id))).map(item => {
                                               var budgetFilter = bResult.filter(c => c.budgetId == item.budget.id);
                                               if (budgetFilter.length == 0 || (budgetFilter.length > 0 && ![...new Set(budgetFilter[0].programs.map(ele => ele.id))].includes(parseInt(programJson.programId)))) {
                                                 checkIfThereIsUnMappedBudget = 1;
