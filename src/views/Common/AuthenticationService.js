@@ -796,6 +796,11 @@ class AuthenticationService {
                             return true;
                         }
                         break;
+                    case "/forecastingUnit/editAllForecastingUnit":
+                        if (bfunction.includes("ROLE_BF_EDIT_FORECASTING_UNIT") || bfunction.includes("ROLE_BF_ADD_FORECASTING_UNIT")) {
+                            return true;
+                        }
+                        break;
                     case "/forecastingUnit/listForecastingUnit":
                     case "/forecastingUnit/listForecastingUnit/:message":
                     case "/forecastingUnit/listForecastingUnit/:color/:message":
@@ -810,6 +815,11 @@ class AuthenticationService {
                         break;
                     case "/planningUnit/editPlanningUnit/:planningUnitId":
                         if (bfunction.includes("ROLE_BF_EDIT_PLANNING_UNIT")) {
+                            return true;
+                        }
+                        break;
+                    case "/planningUnit/editAllPlanningUnit":
+                        if (bfunction.includes("ROLE_BF_EDIT_PLANNING_UNIT") || bfunction.includes("ROLE_BF_ADD_PLANNING_UNIT")) {
                             return true;
                         }
                         break;

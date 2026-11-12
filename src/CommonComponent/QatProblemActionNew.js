@@ -1389,6 +1389,7 @@ export default class QatProblemActionNew extends Component {
                                                                                         }
                                                                                     }
                                                                                 }
+                                                                                console.log("Test@123",moment(m).format('MMM-YY'), toleranceNoOfMonthsBelowMin, toleranceCutoffMinMoS, toleranceNoOfMonthsOverMax, mos, maxForMonths, minForMonths);
                                                                             }
                                                                             var cause = {};
                                                                             cause["underMinMonths"] = underMinMonths;
@@ -1421,6 +1422,7 @@ export default class QatProblemActionNew extends Component {
                                                                                     incomplianceProblem(index, username, userId, problemActionList, incomplianceProblemStatusObj);
                                                                                 }
                                                                             }
+                                                                            console.log("Test@123 cause",cause)
                                                                         }
                                                                         break;
                                                                     default:

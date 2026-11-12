@@ -117,9 +117,11 @@ const ManualTagging = React.lazy(() => import('../../views/ManualTagging/ManualT
 const AddForecastingUnit = React.lazy(() => import('../../views/ForecastingUnit/AddForecastingUnitComponent'));
 const ForecastingUnitList = React.lazy(() => import('../../views/ForecastingUnit/ForecastingUnitListComponent'));
 const EditForecastingUnit = React.lazy(() => import('../../views/ForecastingUnit/EditForecastingUnitComponent'));
+const BulkForecastingUnit = React.lazy(() => import('../../views/ForecastingUnit/BulkForecastingUnitComponent'));
 const AddPlanningUnit = React.lazy(() => import('../../views/PlanningUnit/AddPlanningUnit'));
 const PlanningUnitList = React.lazy(() => import('../../views/PlanningUnit/PlanningUnitListComponent'));
 const EditPlanningUnit = React.lazy(() => import('../../views/PlanningUnit/EditPlanningUnitComponent'));
+const BulkPlanningUnit = React.lazy(() => import('../../views/PlanningUnit/BulkPlanningUnitComponent'));
 const ListProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/ListProcurementUnit'))
 const AddProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/AddProcurementUnit'))
 const EditProcurementUnit = React.lazy(() => import('../../views/ProcurementUnit/EditProcurementUnit'))
@@ -375,9 +377,11 @@ const routes = [
   { path: '/forecastingUnit/listForecastingUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.forecastingunit', component: ForecastingUnitList },
   { path: '/forecastingUnit/listForecastingUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.forecastingunit', component: ForecastingUnitList },
   { path: '/forecastingUnit/editForecastingUnit/:forecastingUnitId', name: 'static.breadcrum.edit', entityname: 'static.dashboard.forecastingunit', component: EditForecastingUnit },
+  { path: '/forecastingUnit/editAllForecastingUnit', exact: true, name: 'static.bulk.editAll', entityname: 'static.dashboard.forecastingunit', component: BulkForecastingUnit },
   { path: '/planningUnit/addPlanningUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.planningunitheader', component: AddPlanningUnit },
   { path: '/planningUnit/listPlanningUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
   { path: '/planningUnit/listPlanningUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.dashboard.planningunit', component: PlanningUnitList },
+  { path: '/planningUnit/editAllPlanningUnit', exact: true, name: 'static.bulk.editAll', entityname: 'static.dashboard.planningunit', component: BulkPlanningUnit },
   { path: '/procurementUnit/addProcurementUnit', name: 'static.breadcrum.add', entityname: 'static.dashboard.procurementUnitheader', component: AddProcurementUnit },
   { path: '/procurementUnit/listProcurementUnit', exact: true, name: 'static.breadcrum.list', entityname: 'static.procurementUnit.procurementUnit', component: ListProcurementUnit },
   { path: '/procurementUnit/listProcurementUnit/:color/:message', name: 'static.breadcrum.list', entityname: 'static.procurementUnit.procurementUnit', component: ListProcurementUnit },

@@ -40,6 +40,7 @@ export default class ForecastingUnitListComponent extends Component {
             loadingModal:false
         }
         this.addNewForecastingUnit = this.addNewForecastingUnit.bind(this);
+        this.bulkEditForecastingUnit = this.bulkEditForecastingUnit.bind(this);
         this.filterData = this.filterData.bind(this);
         this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.getProductCategories = this.getProductCategories.bind(this);
@@ -476,6 +477,19 @@ export default class ForecastingUnitListComponent extends Component {
         }
     }
     /**
+     * Redirects to the bulk edit forecasting unit screen.
+     */
+    bulkEditForecastingUnit(e) {
+        if (e && e.preventDefault) {
+            e.preventDefault();
+        }
+        if (localStorage.getItem("sessionType") === 'Online') {
+            this.props.history.push(`/forecastingUnit/editAllForecastingUnit`)
+        } else {
+            alert(i18n.t('static.common.online'))
+        }
+    }
+    /**
      * This function is called when user clicks on export to excel and shows the filters for user to select
      */
     toggleExport() {
@@ -674,7 +688,8 @@ export default class ForecastingUnitListComponent extends Component {
                     <div className="Card-header-addicon">
                         <div className="card-header-actions">
                             <div className="card-header-action">
-                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT') && <a href="javascript:void();" title={i18n.t('static.common.addEntity', { entityname })} onClick={this.addNewForecastingUnit}><i className="fa fa-plus-square"></i></a>}
+                                {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT') && <a href="javascript:void(0);" title={i18n.t('static.common.addEntity', { entityname })} onClick={(e) => { e.preventDefault(); this.addNewForecastingUnit(); }}><i className="fa fa-plus-square"></i></a>}
+                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_FORECASTING_UNIT') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_FORECASTING_UNIT')) && <a href="javascript:void(0);" className="ml-2" title={i18n.t('static.bulk.editAll')} onClick={(e) => { e.preventDefault(); this.bulkEditForecastingUnit(e); }}><i className="fa fa-pencil-square-o"></i></a>}
                                 <img className='ml-2' style={{ height: '25px', width: '25px', cursor: 'Pointer', marginTop: '-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport()} />
                             </div>
                         </div>
