@@ -72,7 +72,18 @@ class BroadcastMessageComponent extends Component {
         this.loadRoles();
         this.loadLanguages();
         this.loadHistory();
+        window.addEventListener('popstate', this.handlePopState);
     }
+
+    componentWillUnmount() {
+        window.removeEventListener('popstate', this.handlePopState);
+    }
+
+    handlePopState = () => {
+        if (this.state.viewMode === 'compose') {
+            this.switchToList();
+        }
+    };
 
     loadCategories = () => {
         BroadcastService.getCategories()
@@ -179,6 +190,9 @@ class BroadcastMessageComponent extends Component {
     };
 
     openNewMessage = () => {
+        try {
+            window.history.pushState({ broadcastView: 'compose' }, '');
+        } catch (e) {}
         const firstCat = this.state.categories.length > 0 ? this.state.categories[0].categoryId : 1;
         this.setState({
             viewMode: 'compose',
@@ -192,7 +206,7 @@ class BroadcastMessageComponent extends Component {
             successMessage: ''
         }, () => {
             if (this.editorRef.current) {
-                this.editorRef.current.innerHTML = '';
+                this.editorRef.current.innerHTML = '<p><br></p>';
                 this.editorRef.current.setAttribute('data-empty', 'true');
             }
             this.calculateRecipientCount();
@@ -200,16 +214,39 @@ class BroadcastMessageComponent extends Component {
     };
 
     switchToList = () => {
+        if (this.editorRef.current) {
+            this.editorRef.current.innerHTML = '<p><br></p>';
+            this.editorRef.current.setAttribute('data-empty', 'true');
+        }
+        try {
+            if (window.history.state && window.history.state.broadcastView === 'compose') {
+                window.history.replaceState(null, '');
+            }
+        } catch (e) {}
         this.setState({
             viewMode: 'list',
             editingBroadcastId: null,
+            subject: '',
+            messageBody: '',
             errorMessage: ''
         }, () => {
             this.loadHistory();
         });
     };
 
+    normalizeEditorHtml = (html) => {
+        if (!html || html.trim() === '') return '<p><br></p>';
+        if (!/<(p|h[1-6]|ul|ol|table|blockquote|div)[\s>]/i.test(html)) {
+            const lines = html.split(/<br\s*[\/]?>/i);
+            return lines.map(line => `<p>${line || '<br>'}</p>`).join('');
+        }
+        return html;
+    };
+
     editDraft = (item) => {
+        try {
+            window.history.pushState({ broadcastView: 'compose' }, '');
+        } catch (e) {}
         const matchedRoles = [];
         if (item.targetRoles && item.targetRoles.length > 0) {
             item.targetRoles.forEach(rId => {
@@ -221,6 +258,7 @@ class BroadcastMessageComponent extends Component {
         }
 
         const selLang = (item.targetLanguages && item.targetLanguages.length > 0) ? String(item.targetLanguages[0]) : '';
+        const normalizedHtml = this.normalizeEditorHtml(item.bodyHtml || '');
 
         this.setState({
             viewMode: 'compose',
@@ -234,7 +272,7 @@ class BroadcastMessageComponent extends Component {
             successMessage: ''
         }, () => {
             if (this.editorRef.current) {
-                this.editorRef.current.innerHTML = item.bodyHtml || '';
+                this.editorRef.current.innerHTML = normalizedHtml;
                 if (item.bodyHtml && item.bodyHtml.trim() !== '') {
                     this.editorRef.current.removeAttribute('data-empty');
                 } else {
@@ -261,6 +299,18 @@ class BroadcastMessageComponent extends Component {
         this.setState({ subject: e.target.value });
     };
 
+    handleEditorFocus = () => {
+        try {
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+        } catch (e) {}
+        if (this.editorRef.current) {
+            const html = this.editorRef.current.innerHTML;
+            if (!html || html.trim() === '' || html === '<br>') {
+                this.editorRef.current.innerHTML = '<p><br></p>';
+            }
+        }
+    };
+
     handleBodyInput = () => {
         if (this.editorRef.current) {
             const textOnly = this.editorRef.current.innerText || '';
@@ -280,6 +330,72 @@ class BroadcastMessageComponent extends Component {
             this.editorRef.current.focus();
         }
         document.execCommand(command, false, value);
+        this.handleBodyInput();
+    };
+
+    applyHeadingOrNormal = (type) => {
+        if (this.editorRef.current) {
+            this.editorRef.current.focus();
+        }
+        try {
+            document.execCommand('defaultParagraphSeparator', false, 'p');
+        } catch (e) {}
+
+        const selection = window.getSelection();
+        if (!selection || selection.rangeCount === 0) {
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+        const selectedText = selection.toString();
+
+        // Find enclosing block element within the editor
+        let block = range.commonAncestorContainer;
+        if (block && block.nodeType === 3) {
+            block = block.parentNode;
+        }
+
+        while (block && block !== this.editorRef.current && !/^(P|H[1-6]|LI|DIV|BLOCKQUOTE)$/i.test(block.nodeName)) {
+            block = block.parentNode;
+        }
+
+        // Inside a list item (LI): avoid formatBlock because it breaks the list structure
+        const isInsideList = block && block.nodeName === 'LI';
+
+        // Check if user selected partial inline text inside a block
+        let isInline = false;
+        if (!selection.isCollapsed && selectedText.trim().length > 0 && block && block !== this.editorRef.current) {
+            const blockText = (block.innerText || block.textContent || '').trim();
+            if (selectedText.trim() !== blockText) {
+                isInline = true;
+            }
+        }
+
+        if (isInsideList || isInline) {
+            // Apply inline heading or normal styling to selected text
+            if (type === 'heading') {
+                document.execCommand('fontSize', false, '4');
+                document.execCommand('bold', false, null);
+            } else {
+                document.execCommand('fontSize', false, '3');
+                if (document.queryCommandState('bold')) {
+                    document.execCommand('bold', false, null);
+                }
+            }
+        } else {
+            // Block-level heading vs paragraph
+            if (type === 'heading') {
+                if (block && /^H[1-6]$/i.test(block.nodeName)) {
+                    document.execCommand('formatBlock', false, '<p>');
+                } else {
+                    document.execCommand('formatBlock', false, '<h3>');
+                }
+            } else {
+                document.execCommand('formatBlock', false, '<p>');
+                document.execCommand('fontSize', false, '3');
+            }
+        }
+
         this.handleBodyInput();
     };
 
@@ -334,6 +450,11 @@ class BroadcastMessageComponent extends Component {
             bodyHtml: messageBody || ''
         })
             .then(res => {
+                try {
+                    if (window.history.state && window.history.state.broadcastView === 'compose') {
+                        window.history.replaceState(null, '');
+                    }
+                } catch (e) {}
                 this.setState({
                     savingDraft: false,
                     viewMode: 'list',
@@ -400,6 +521,11 @@ class BroadcastMessageComponent extends Component {
             bodyHtml: messageBody
         })
             .then(res => {
+                try {
+                    if (window.history.state && window.history.state.broadcastView === 'compose') {
+                        window.history.replaceState(null, '');
+                    }
+                } catch (e) {}
                 if (this.editorRef.current) {
                     this.editorRef.current.innerHTML = '';
                     this.editorRef.current.setAttribute('data-empty', 'true');
@@ -478,7 +604,7 @@ class BroadcastMessageComponent extends Component {
 
     resetClicked() {
         if (this.editorRef.current) {
-            this.editorRef.current.innerHTML = '';
+            this.editorRef.current.innerHTML = '<p><br></p>';
             this.editorRef.current.setAttribute('data-empty', 'true');
         }
         const firstCat = this.state.categories.length > 0 ? this.state.categories[0].categoryId : 1;
@@ -548,9 +674,22 @@ class BroadcastMessageComponent extends Component {
                                         color="primary"
                                         size="sm"
                                         type="button"
+                                        className="btn-primary text-white"
+                                        style={{
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#ffffff',
+                                            backgroundColor: '#20a8d8',
+                                            borderColor: '#20a8d8',
+                                            padding: '4px 12px',
+                                            fontSize: '12px'
+                                        }}
                                         onClick={this.openNewMessage}
                                     >
-                                        <i className="fa fa-plus mr-1"></i> {i18n.t('static.broadcast.newMessage', 'New Message')}
+                                        <i className="fa fa-plus mr-1" style={{ color: '#ffffff' }}></i>
+                                        <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.broadcast.newMessage', 'New Message')}</span>
                                     </Button>
                                 </CardHeader>
 
@@ -563,8 +702,26 @@ class BroadcastMessageComponent extends Component {
                                         <div className="text-center py-5 text-muted">
                                             <i className="fa fa-inbox fa-3x mb-2"></i>
                                             <p>{i18n.t('static.common.noDataFound', 'No data found')}</p>
-                                            <Button color="primary" size="sm" onClick={this.openNewMessage}>
-                                                <i className="fa fa-plus mr-1"></i> {i18n.t('static.broadcast.newMessage', 'New Message')}
+                                            <Button
+                                                color="primary"
+                                                size="sm"
+                                                type="button"
+                                                className="btn-primary text-white"
+                                                style={{
+                                                    whiteSpace: 'nowrap',
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: '#ffffff',
+                                                    backgroundColor: '#20a8d8',
+                                                    borderColor: '#20a8d8',
+                                                    padding: '4px 12px',
+                                                    fontSize: '12px'
+                                                }}
+                                                onClick={this.openNewMessage}
+                                            >
+                                                <i className="fa fa-plus mr-1" style={{ color: '#ffffff' }}></i>
+                                                <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.broadcast.newMessage', 'New Message')}</span>
                                             </Button>
                                         </div>
                                     ) : (
@@ -574,13 +731,13 @@ class BroadcastMessageComponent extends Component {
                                                     <th style={{ width: '4%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>#</th>
                                                     <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.date', 'Date')}</th>
                                                     <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.time', 'Time')}</th>
-                                                    <th className="text-left" style={{ width: '28%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.subject', 'Subject')}</th>
+                                                    <th className="text-left" style={{ width: '30%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.subject', 'Subject')}</th>
                                                     <th style={{ width: '13%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.category', 'Category')}</th>
                                                     <th style={{ width: '9%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.estimatedRecipients', 'Recipients')}</th>
                                                     <th style={{ width: '6%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.batches', 'Batches')}</th>
                                                     <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.sentBy', 'Sent By')}</th>
                                                     <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.status', 'Status')}</th>
-                                                    <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.action', 'Action')}</th>
+                                                    <th style={{ width: '8%', minWidth: '90px', whiteSpace: 'nowrap', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.action', 'Action')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -591,13 +748,22 @@ class BroadcastMessageComponent extends Component {
                                                     const timeFormatted = item.createdDate ? moment(item.createdDate).format('hh:mm A') : '-';
 
                                                     return (
-                                                        <tr key={item.broadcastId}>
+                                                        <tr
+                                                            key={item.broadcastId}
+                                                            style={{ cursor: isDraft ? 'pointer' : 'default' }}
+                                                            onClick={() => {
+                                                                if (isDraft) {
+                                                                    this.editDraft(item);
+                                                                }
+                                                            }}
+                                                            title={isDraft ? i18n.t('static.broadcast.editDraft', 'Edit Draft') : ''}
+                                                        >
                                                             <td className="align-middle">{item.broadcastId}</td>
                                                             <td className="align-middle">{dateFormatted}</td>
                                                             <td className="align-middle text-muted" style={{ fontSize: '12px' }}>{timeFormatted}</td>
                                                             <td className="text-left align-middle">
                                                                 {isDraft ? (
-                                                                    <span style={{ fontStyle: 'italic', color: '#6c757d', fontWeight: '600' }}>
+                                                                    <span style={{ fontStyle: 'italic', color: '#0056b3', fontWeight: '600' }}>
                                                                         <i className="fa fa-file-text-o mr-1"></i>(draft) {item.subject}
                                                                     </span>
                                                                 ) : (
@@ -621,16 +787,18 @@ class BroadcastMessageComponent extends Component {
                                                                     {catName}
                                                                 </span>
                                                             </td>
-                                                            <td className="align-middle">
+                                                            <td className="align-middle" onClick={(e) => e.stopPropagation()}>
                                                                 <Button
                                                                     color="link"
                                                                     className="p-0 font-weight-bold"
                                                                     style={{ color: '#0284c7', textDecoration: 'none', fontSize: '13px' }}
-                                                                    onClick={() => this.openRecipientsModal(item)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        this.openRecipientsModal(item);
+                                                                    }}
                                                                     title={i18n.t('static.broadcast.viewRecipientsTooltip', 'Click to view recipients list')}
                                                                 >
                                                                     {item.totalRecipients}
-                                                                    <i className="fa fa-external-link ml-1" style={{ fontSize: '10px' }}></i>
                                                                 </Button>
                                                             </td>
                                                             <td className="align-middle text-muted">{item.batchCount}</td>
@@ -652,33 +820,30 @@ class BroadcastMessageComponent extends Component {
                                                                     {isDraft ? i18n.t('static.broadcast.draft', 'Draft') : (item.status === 'SAVED' || item.status === 'QUEUED' ? i18n.t('static.broadcast.statusQueued', 'Queued') : (item.status === 'COMPLETED' ? i18n.t('static.broadcast.statusCompleted', 'Completed') : item.status))}
                                                                 </span>
                                                             </td>
-                                                            <td className="align-middle">
-                                                                {isDraft && (
-                                                                    <Button
-                                                                        color="warning"
-                                                                        size="sm"
-                                                                        className="mr-1 text-dark"
-                                                                        style={{ padding: '3px 8px', fontSize: '12px' }}
-                                                                        onClick={() => this.editDraft(item)}
-                                                                        title={i18n.t('static.broadcast.editDraft', 'Edit Draft')}
-                                                                    >
-                                                                        <i className="fa fa-pencil"></i>
-                                                                    </Button>
-                                                                )}
+                                                            <td className="align-middle text-nowrap" style={{ whiteSpace: 'nowrap' }} onClick={(e) => e.stopPropagation()}>
                                                                 <Button
                                                                     color="info"
                                                                     size="sm"
-                                                                    className="text-white"
+                                                                    className="btn-info text-white"
                                                                     style={{
-                                                                        backgroundColor: '#17a2b8',
-                                                                        borderColor: '#17a2b8',
-                                                                        padding: '3px 10px',
+                                                                        whiteSpace: 'nowrap',
+                                                                        display: 'inline-flex',
+                                                                        alignItems: 'center',
+                                                                        justifyContent: 'center',
+                                                                        color: '#ffffff',
+                                                                        backgroundColor: '#20a8d8',
+                                                                        borderColor: '#20a8d8',
+                                                                        padding: '4px 12px',
                                                                         fontSize: '12px'
                                                                     }}
-                                                                    onClick={() => this.viewHistoryDetails(item)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        this.viewHistoryDetails(item);
+                                                                    }}
                                                                     title={i18n.t('static.common.view', 'View Details')}
                                                                 >
-                                                                    <i className="fa fa-eye mr-1"></i> {i18n.t('static.common.view', 'View')}
+                                                                    <i className="fa fa-eye mr-1" style={{ color: '#ffffff' }}></i>
+                                                                    <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.common.view', 'View')}</span>
                                                                 </Button>
                                                             </td>
                                                         </tr>
@@ -707,9 +872,20 @@ class BroadcastMessageComponent extends Component {
                                         color="secondary"
                                         size="sm"
                                         type="button"
+                                        className="btn-secondary text-white"
+                                        style={{
+                                            whiteSpace: 'nowrap',
+                                            display: 'inline-flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            color: '#ffffff',
+                                            padding: '4px 12px',
+                                            fontSize: '12px'
+                                        }}
                                         onClick={this.switchToList}
                                     >
-                                        <i className="fa fa-arrow-left mr-1"></i> {i18n.t('static.broadcast.backToList', 'Back to Messages')}
+                                        <i className="fa fa-arrow-left mr-1" style={{ color: '#ffffff' }}></i>
+                                        <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.broadcast.backToList', 'Back to Messages')}</span>
                                     </Button>
                                 </CardHeader>
 
@@ -840,7 +1016,7 @@ class BroadcastMessageComponent extends Component {
                                                                     color="light"
                                                                     className="border font-weight-bold"
                                                                     style={{ fontSize: '11px', padding: '3px 8px' }}
-                                                                    onMouseDown={(e) => { e.preventDefault(); this.handleFormatBlock('<p>'); }}
+                                                                    onMouseDown={(e) => { e.preventDefault(); this.applyHeadingOrNormal('normal'); }}
                                                                     title={i18n.t('static.broadcast.normalText', 'Normal Text (Paragraph)')}
                                                                 >
                                                                     {i18n.t('static.broadcast.normalText', 'Normal')}
@@ -850,7 +1026,7 @@ class BroadcastMessageComponent extends Component {
                                                                     color="light"
                                                                     className="border font-weight-bold"
                                                                     style={{ fontSize: '11px', padding: '3px 8px' }}
-                                                                    onMouseDown={(e) => { e.preventDefault(); this.handleFormatBlock('<h3>'); }}
+                                                                    onMouseDown={(e) => { e.preventDefault(); this.applyHeadingOrNormal('heading'); }}
                                                                     title={i18n.t('static.broadcast.heading', 'Heading')}
                                                                 >
                                                                     H
@@ -1075,6 +1251,7 @@ class BroadcastMessageComponent extends Component {
                                                         ref={this.editorRef}
                                                         contentEditable
                                                         suppressContentEditableWarning
+                                                        onFocus={this.handleEditorFocus}
                                                         onInput={this.handleBodyInput}
                                                         data-placeholder={i18n.t('static.broadcast.bodyPlaceholder', 'Compose your announcement message here...')}
                                                         className="form-control"
