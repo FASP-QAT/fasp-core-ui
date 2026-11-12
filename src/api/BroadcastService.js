@@ -15,6 +15,14 @@ class BroadcastService {
         return axios.post(`${API_URL}/api/broadcast/send`, json, {});
     }
 
+    saveDraft(json) {
+        return axios.post(`${API_URL}/api/broadcast/draft`, json, {});
+    }
+
+    getRecipientsByBroadcastId(broadcastId) {
+        return axios.get(`${API_URL}/api/broadcast/${broadcastId}/recipients`, {});
+    }
+
     getBroadcastHistory() {
         return axios.get(`${API_URL}/api/broadcast/history`, {});
     }
