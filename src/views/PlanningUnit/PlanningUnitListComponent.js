@@ -819,7 +819,7 @@ export default class PlanningUnitListComponent extends Component {
                         <div className="card-header-actions">
                             <div className="card-header-action">
                                 {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT') && <a href="javascript:void(0);" title={i18n.t('static.common.addEntity', { entityname })} onClick={(e) => { e.preventDefault(); this.addNewPlanningUnit(); }}><i className="fa fa-plus-square"></i></a>}
-                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT')) && <a href="javascript:void(0);" className="ml-2" title={i18n.t('static.bulk.editAll')} onClick={(e) => { e.preventDefault(); this.bulkEditPlanningUnit(e); }}><i className="fa fa-pencil-square-o"></i></a>}
+                                {(AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_EDIT_PLANNING_UNIT') || AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_ADD_PLANNING_UNIT')) && <a href="javascript:void(0);" className="ml-2" title={i18n.t('static.bulk.editAllEntity', { entityname })} onClick={(e) => { e.preventDefault(); this.bulkEditPlanningUnit(e); }}><i className="fa fa-pencil-square-o"></i></a>}
                                 <img className='ml-2' style={{ height: '25px', width: '25px', cursor: 'Pointer', marginTop: '-10px' }} src={csvicon} title={i18n.t('static.report.exportCsv')} onClick={() => this.toggleExport()} />
                             </div>
                         </div>

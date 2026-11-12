@@ -3727,6 +3727,7 @@
   "static.planningUnit.bulkEdit": "Bulk Edit / Create Planning Units",
   "static.forecastingUnit.bulkEdit": "Bulk Edit / Create Forecasting Units",
   "static.bulk.editAll": "Modifier tout",
+  "static.bulk.editAllEntity": "Modifier tout - {{entityname}}",
   "static.bulk.newCreatedName": "Nom de l'unité nouvellement créée",
   "static.bulk.submissionSummary": "Résumé de soumission en masse",
   "static.bulk.unitsEdited": "Nombre d'unités modifiées",

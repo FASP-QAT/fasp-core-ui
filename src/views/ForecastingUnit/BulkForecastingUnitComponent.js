@@ -346,6 +346,36 @@ export default class BulkForecastingUnitComponent extends Component {
                     this.el.setValueFromCoords(7, y, 1, true);
                     this.changedRows.add(y);
                 }
+                let pcVal = json[y][1];
+                if (pcVal && isNaN(parseInt(pcVal))) {
+                    let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcVal).trim().toLowerCase());
+                    if (found) {
+                        this.el.setValueFromCoords(1, y, found.id, true);
+                    }
+                }
+                let tcVal = json[y][2];
+                if (tcVal && isNaN(parseInt(tcVal))) {
+                    let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcVal).trim().toLowerCase());
+                    if (found) {
+                        this.el.setValueFromCoords(2, y, found.id, true);
+                    }
+                }
+                let uVal = json[y][3];
+                if (uVal && isNaN(parseInt(uVal))) {
+                    let found = this.state.units.find(u => u.name.toLowerCase() === String(uVal).trim().toLowerCase());
+                    if (found) {
+                        this.el.setValueFromCoords(3, y, found.id, true);
+                    }
+                }
+                let stVal = json[y][6];
+                if (stVal !== undefined && stVal !== null && stVal !== '') {
+                    let stLower = String(stVal).toLowerCase();
+                    if (stLower === 'active' || stLower === '1') {
+                        this.el.setValueFromCoords(6, y, '1', true);
+                    } else if (stLower === 'disabled' || stLower === 'inactive' || stLower === '0') {
+                        this.el.setValueFromCoords(6, y, '0', true);
+                    }
+                }
             }
         }, 100);
     }
@@ -374,6 +404,32 @@ export default class BulkForecastingUnitComponent extends Component {
         let sheetName = i18n.t('static.forecastingUnit.bulkEdit').replace(/[*?:\\/[\]]/g, ' ').substring(0, 31).trim();
         let worksheet = workbook.addWorksheet(sheetName);
 
+        // Add hidden LookupData sheet for dropdown validation
+        let lookupSheet = workbook.addWorksheet('LookupData');
+        lookupSheet.state = 'hidden';
+
+        let pcList = this.state.productCategories.map(pc => pc.name).filter(Boolean);
+        let tcList = this.state.tracerCategories.map(tc => tc.name).filter(Boolean);
+        let uList = this.state.units.map(u => u.name).filter(Boolean);
+        let statusList = ['Active', 'Disabled'];
+
+        lookupSheet.columns = [
+            { header: 'Product Categories', key: 'pc', width: 30 },
+            { header: 'Tracer Categories', key: 'tc', width: 30 },
+            { header: 'Units', key: 'unit', width: 25 },
+            { header: 'Status', key: 'status', width: 15 }
+        ];
+
+        let maxRows = Math.max(pcList.length, tcList.length, uList.length, statusList.length);
+        for (let r = 0; r < maxRows; r++) {
+            lookupSheet.addRow([
+                pcList[r] || '',
+                tcList[r] || '',
+                uList[r] || '',
+                statusList[r] || ''
+            ]);
+        }
+
         worksheet.columns = [
             { header: i18n.t('static.forecastingUnit.forecastingUnitId') + ' (0 for new)', key: 'id', width: 22 },
             { header: i18n.t('static.productcategory.productcategory') + ' *', key: 'pc', width: 30 },
@@ -394,7 +450,45 @@ export default class BulkForecastingUnitComponent extends Component {
             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         });
 
-        worksheet.addRow([0, 'Select / Paste Product Category', 'Select / Paste Tracer Category', 'Select / Paste Unit', 'Example Generic Name', 'Example Forecasting Unit Name', 'Active']);
+        // Add Data Validation dropdowns for rows 2 to 2000
+        if (pcList.length > 0) {
+            worksheet.dataValidations.add('B2:B2000', {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`LookupData!$A$2:$A$${pcList.length + 1}`],
+                showErrorMessage: true
+            });
+        }
+
+        if (tcList.length > 0) {
+            worksheet.dataValidations.add('C2:C2000', {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`LookupData!$B$2:$B$${tcList.length + 1}`],
+                showErrorMessage: true
+            });
+        }
+
+        if (uList.length > 0) {
+            worksheet.dataValidations.add('D2:D2000', {
+                type: 'list',
+                allowBlank: true,
+                formulae: [`LookupData!$C$2:$C$${uList.length + 1}`],
+                showErrorMessage: true
+            });
+        }
+
+        worksheet.dataValidations.add('G2:G2000', {
+            type: 'list',
+            allowBlank: true,
+            formulae: [`LookupData!$D$2:$D$${statusList.length + 1}`],
+            showErrorMessage: true
+        });
+
+        let samplePc = pcList.length > 0 ? pcList[0] : 'Sample Category';
+        let sampleTc = tcList.length > 0 ? tcList[0] : 'Sample Tracer';
+        let sampleU = uList.length > 0 ? uList[0] : 'Sample Unit';
+        worksheet.addRow([0, samplePc, sampleTc, sampleU, 'Example Generic Name', 'Example Forecasting Unit Name', 'Active']);
 
         workbook.xlsx.writeBuffer().then(data => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -430,8 +524,20 @@ export default class BulkForecastingUnitComponent extends Component {
             }
 
             let pcId = row[1];
+            if (pcId && isNaN(parseInt(pcId))) {
+                let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcId).trim().toLowerCase());
+                if (found) pcId = found.id;
+            }
             let tcId = row[2];
+            if (tcId && isNaN(parseInt(tcId))) {
+                let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcId).trim().toLowerCase());
+                if (found) tcId = found.id;
+            }
             let unitId = row[3];
+            if (unitId && isNaN(parseInt(unitId))) {
+                let found = this.state.units.find(u => u.name.toLowerCase() === String(unitId).trim().toLowerCase());
+                if (found) unitId = found.id;
+            }
             let fuName = row[5] ? row[5].toString().trim() : '';
 
             let identifier = fuId > 0
@@ -560,11 +666,23 @@ export default class BulkForecastingUnitComponent extends Component {
 
             if (isRowChanged) {
                 let pcId = parseInt(row[1]);
+                if (isNaN(pcId) && row[1]) {
+                    let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(row[1]).trim().toLowerCase());
+                    if (found) pcId = found.id;
+                }
                 let tcId = parseInt(row[2]);
+                if (isNaN(tcId) && row[2]) {
+                    let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(row[2]).trim().toLowerCase());
+                    if (found) tcId = found.id;
+                }
                 let uId = parseInt(row[3]);
+                if (isNaN(uId) && row[3]) {
+                    let found = this.state.units.find(u => u.name.toLowerCase() === String(row[3]).trim().toLowerCase());
+                    if (found) uId = found.id;
+                }
                 let genericName = row[4] ? row[4].toString().trim() : '';
                 let fuName = row[5] ? row[5].toString().trim() : '';
-                let isActive = row[6] === 1 || row[6] === '1' || row[6] === true || row[6] === 'true';
+                let isActive = row[6] === 1 || row[6] === '1' || row[6] === true || row[6] === 'true' || String(row[6]).toLowerCase() === 'active';
 
                 let fuObj = {
                     forecastingUnitId: fuId,
