@@ -110,6 +110,8 @@ class EditUserComponent extends Component {
         username: "",
         emailId: "",
         orgAndCountry: "",
+        notes: "",
+        autoInactivated: false,
         roleList: [],
       },
       message: "",
@@ -127,7 +129,8 @@ class EditUserComponent extends Component {
       selOrganisation: [],
       selHealthArea: [],
       selProcurementAgent: [],
-      selFundingSource: []
+      selFundingSource: [],
+      initialAutoInactivated: false,
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -184,8 +187,13 @@ class EditUserComponent extends Component {
     if (event.target.name == "languageId") {
       user.language.languageId = event.target.value;
     }
+    if (event.target.name == "notes") {
+      user.notes = event.target.value;
+    }
     if (event.target.name == "active") {
-      user.active = event.target.id === "active2" ? false : true;
+      const isInactive = event.target.id === "active2" || String(event.target.value) === "false";
+      user.active = !isInactive;
+      user.autoInactivated = user.active ? false : Boolean(this.state.initialAutoInactivated);
     }
     this.setState(
       {
@@ -1695,9 +1703,12 @@ class EditUserComponent extends Component {
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
         if (response.status == 200) {
+          const isAutoInactivated = !response.data.active && Boolean(response.data.autoInactivated);
+          const user = { ...response.data, autoInactivated: isAutoInactivated };
           this.setState(
             {
-              user: response.data,
+              user,
+              initialAutoInactivated: isAutoInactivated,
               rows: response.data.userAclList,
               loading: false,
             },
@@ -1953,6 +1964,7 @@ class EditUserComponent extends Component {
                   realmId: this.state.user.realm.realmId,
                   emailId: this.state.user.emailId,
                   orgAndCountry: this.state.user.orgAndCountry,
+                  notes: this.state.user.notes,
                   roles: this.state.user.roleList,
                   languageId: this.state.user.language.languageId,
                   // roleId: this.state.user.roleList,
@@ -2265,6 +2277,25 @@ class EditUserComponent extends Component {
                         </FormFeedback>
                       </FormGroup>
                       <FormGroup>
+                        <Label for="notes">{i18n.t("static.user.notes")}</Label>
+                        <Input
+                          type="textarea"
+                          name="notes"
+                          id="notes"
+                          bsSize="sm"
+                          readOnly={!this.state.user.editable}
+                          onChange={(e) => {
+                            handleChange(e);
+                            this.dataChange(e);
+                          }}
+                          onBlur={handleBlur}
+                          maxLength={2000}
+                          rows="3"
+                          placeholder={i18n.t("static.user.notesPlaceholder")}
+                          value={this.state.user.notes || ""}
+                        />
+                      </FormGroup>
+                      <FormGroup>
                         <Label htmlFor="languageId">
                           {i18n.t("static.language.language")}
                           <span class="red Reqasterisk">*</span>
@@ -2306,7 +2337,7 @@ class EditUserComponent extends Component {
                             className="form-check-input"
                             type="radio"
                             id="active1"
-                            disabled={!this.state.user.editable}
+                            disabled={!this.state.user.editable || (Boolean(this.state.initialAutoInactivated) && !AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes("ROLE_BF_ACTIVATE_AUTO_INACTIVATED_USER"))}
                             name="active"
                             value={true}
                             checked={this.state.user.active === true}
@@ -2318,7 +2349,7 @@ class EditUserComponent extends Component {
                           <Label
                             className="form-check-label"
                             check
-                            htmlFor="inline-radio1"
+                            htmlFor="active1"
                           >
                             {i18n.t("static.common.active")}
                           </Label>
@@ -2340,11 +2371,24 @@ class EditUserComponent extends Component {
                           <Label
                             className="form-check-label"
                             check
-                            htmlFor="inline-radio2"
+                            htmlFor="active2"
                           >
                             {i18n.t("static.dataentry.inactive")}
                           </Label>
                         </FormGroup>
+                        {!this.state.user.active && this.state.initialAutoInactivated && (
+                          <span
+                            className="badge badge-danger"
+                            style={{
+                              marginLeft: "15px",
+                              fontSize: "12px",
+                              padding: "4px 8px",
+                              verticalAlign: "middle",
+                            }}
+                          >
+                            {i18n.t("static.user.autoInactivatedStatus")}
+                          </span>
+                        )}
                       </FormGroup>
                       <FormGroup>
                         <h5>
@@ -2495,9 +2539,12 @@ class EditUserComponent extends Component {
     }, () => {
       UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
+        const isAutoInactivated = !response.data.active && Boolean(response.data.autoInactivated);
+        const user = { ...response.data, autoInactivated: isAutoInactivated };
         this.setState(
           {
-            user: response.data,
+            user,
+            initialAutoInactivated: isAutoInactivated,
             rows: response.data.userAclList,
           },
           () => {

@@ -3796,5 +3796,19 @@
   "static.bulk.edited": "Edited",
   "static.bulk.changes": "Details of Changes",
   "static.bulk.reviewChanges": "Review Changes",
-  "static.bulk.reviewPrompt": "Please review the proposed changes below. Click OK to update or Cancel to return."
+  "static.bulk.reviewPrompt": "Please review the proposed changes below. Click OK to update or Cancel to return.",
+  "static.realm.noOfDaysForInactivityReminder": "Days of inactivity before reminder email",
+  "static.realm.noOfDaysForInactivityReminderText": "Enter number of days of inactivity before sending reminder email",
+  "static.realm.noOfDaysToLockUser": "Days of inactivity to lock user out",
+  "static.realm.noOfDaysToLockUserText": "Enter number of days of inactivity before locking user out",
+  "static.realm.lockDaysMustBeGreaterThanReminder": "Lock-out days must be greater than reminder days",
+  "static.user.notes": "Notes",
+  "static.user.notesPlaceholder": "Enter internal comments (e.g., who approved or requested this account)",
+  "static.user.activateAutoInactivatedUser": "Activate Account",
+  "static.user.autoInactivatedStatus": "Auto-Inactivated",
+  "static.message.login.autoInactivated": "Your account has been deactivated due to inactivity. Please contact your Realm Administrator or Application Administrator to reactivate your account.",
+  "static.user.confirmActivate": "Are you sure you want to activate this auto-inactivated account?",
+  "static.user.activateAutoInactivatedUserSuccess": "User account has been activated successfully",
+  "static.validated.noOfDaysForInactivityReminder": "Please enter days of inactivity before reminder email",
+  "static.validated.noOfDaysToLockUser": "Please enter days of inactivity before locking user out"
 }

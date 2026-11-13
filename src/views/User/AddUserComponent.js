@@ -39,6 +39,7 @@ let initialValues = {
   realmId: [],
   emailId: "",
   orgAndCountry: "",
+  notes: "",
   languageId: [],
   // roleId: [],
 };
@@ -112,6 +113,7 @@ class AddUserComponent extends Component {
         username: "",
         emailId: "",
         orgAndCountry: "",
+        notes: '',
       },
       loading: true,
       roleId: "",
@@ -204,6 +206,9 @@ class AddUserComponent extends Component {
     }
     if (event.target.name == "languageId") {
       user.language.languageId = event.target.value;
+    }
+    if (event.target.name == "notes") {
+      user.notes = event.target.value;
     }
     this.setState(
       {
@@ -2230,6 +2235,24 @@ class AddUserComponent extends Component {
                         </FormFeedback>
                       </FormGroup>
                       <FormGroup>
+                        <Label for="notes">{i18n.t("static.user.notes")}</Label>
+                        <Input
+                          type="textarea"
+                          name="notes"
+                          id="notes"
+                          bsSize="sm"
+                          onChange={(e) => {
+                            handleChange(e);
+                            this.dataChange(e);
+                          }}
+                          onBlur={handleBlur}
+                          maxLength={2000}
+                          rows="3"
+                          placeholder={i18n.t("static.user.notesPlaceholder")}
+                          value={this.state.user.notes || ""}
+                        />
+                      </FormGroup>
+                      <FormGroup>
                         <Label htmlFor="languageId">
                           {i18n.t("static.language.language")}
                           <span class="red Reqasterisk">*</span>
@@ -2413,6 +2436,7 @@ class AddUserComponent extends Component {
     }
     user.emailId = "";
     user.orgAndCountry = "";
+    user.notes = "";
     user.language.languageId = "";
     this.state.roleId = "";
     this.setState(

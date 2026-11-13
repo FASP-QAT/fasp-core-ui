@@ -88,5 +88,8 @@ class UserService {
     updateNotificationPreferences(preferences) {
         return axios.post(`${API_URL}/api/user/notificationPreference`, preferences, {});
     }
+    activateAutoInactivatedUser(userId) {
+        return axios.post(`${API_URL}/api/user/activateAutoInactivatedUser/${userId}`, {}, {});
+    }
 }
 export default new UserService()

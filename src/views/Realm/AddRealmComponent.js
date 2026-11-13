@@ -29,7 +29,9 @@ const initialValues = {
     noOfMonthsInFutureForBottomDashboard: 18,
     noOfMonthsInPastForTopDashboard: 0,
     noOfMonthsInFutureForTopDashboard: 18,
-    supplyPlanScoreThresholdPerc: 70
+    supplyPlanScoreThresholdPerc: 70,
+    noOfDaysForInactivityReminder: 60,
+    noOfDaysToLockUser: 90,
 }
 /**
  * Defines the validation schema for realm details.
@@ -132,6 +134,19 @@ const validationSchema = function (values) {
             .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
             .required(i18n.t('static.validated.minPercForMode'))
             .min(0, i18n.t('static.program.validvaluetext')),
+        noOfDaysForInactivityReminder: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .min(1, i18n.t('static.program.validvaluetext'))
+            .required(i18n.t('static.realm.noOfDaysForInactivityReminderText')),
+        noOfDaysToLockUser: Yup.number()
+            .typeError(i18n.t('static.procurementUnit.validNumberText'))
+            .positive(i18n.t('static.realm.negativeNumberNotAllowed'))
+            .integer(i18n.t('static.realm.decimalNotAllow'))
+            .min(1, i18n.t('static.program.validvaluetext'))
+            .required(i18n.t('static.realm.noOfDaysToLockUserText'))
+            .test('greater-than-reminder', i18n.t('static.realm.lockDaysMustBeGreaterThanReminder'), function(val) { return !val || !this.parent.noOfDaysForInactivityReminder || val > this.parent.noOfDaysForInactivityReminder; }),
     })
 }
 /**
@@ -166,7 +181,9 @@ export default class AddRealmComponent extends Component {
                 noOfMonthsInFutureForBottomDashboard: 18,
                 noOfMonthsInPastForTopDashboard: 0,
                 noOfMonthsInFutureForTopDashboard: 18,
-                supplyPlanScoreThresholdPerc: 70
+                supplyPlanScoreThresholdPerc: 70,
+                noOfDaysForInactivityReminder: 60,
+                noOfDaysToLockUser: 90,
             },
             message: ''
         }
@@ -236,6 +253,12 @@ export default class AddRealmComponent extends Component {
         }
         if (event.target.name === "supplyPlanScoreThresholdPerc") {
             realm.supplyPlanScoreThresholdPerc = event.target.value
+        }
+        if (event.target.name === "noOfDaysForInactivityReminder") {
+            realm.noOfDaysForInactivityReminder = event.target.value
+        }
+        if (event.target.name === "noOfDaysToLockUser") {
+            realm.noOfDaysToLockUser = event.target.value
         }
         this.setState(
             {
@@ -613,6 +636,36 @@ export default class AddRealmComponent extends Component {
                                                         value={this.state.realm.supplyPlanScoreThresholdPerc}
                                                         required />
                                                     <FormFeedback className="red">{errors.supplyPlanScoreThresholdPerc}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="noOfDaysForInactivityReminder">{i18n.t('static.realm.noOfDaysForInactivityReminder')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        min="1"
+                                                        name="noOfDaysForInactivityReminder"
+                                                        id="noOfDaysForInactivityReminder"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfDaysForInactivityReminder && this.state.realm.noOfDaysForInactivityReminder != ''}
+                                                        invalid={touched.noOfDaysForInactivityReminder && !!errors.noOfDaysForInactivityReminder}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfDaysForInactivityReminder}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfDaysForInactivityReminder}</FormFeedback>
+                                                </FormGroup>
+                                                <FormGroup>
+                                                    <Label for="noOfDaysToLockUser">{i18n.t('static.realm.noOfDaysToLockUser')}<span class="red Reqasterisk">*</span></Label>
+                                                    <Input type="number"
+                                                        min="1"
+                                                        name="noOfDaysToLockUser"
+                                                        id="noOfDaysToLockUser"
+                                                        bsSize="sm"
+                                                        valid={!errors.noOfDaysToLockUser && this.state.realm.noOfDaysToLockUser != ''}
+                                                        invalid={touched.noOfDaysToLockUser && !!errors.noOfDaysToLockUser}
+                                                        onChange={(e) => { handleChange(e); this.dataChange(e) }}
+                                                        onBlur={handleBlur}
+                                                        value={this.state.realm.noOfDaysToLockUser}
+                                                        required />
+                                                    <FormFeedback className="red">{errors.noOfDaysToLockUser}</FormFeedback>
                                                 </FormGroup>
                                                 <FormGroup>
                                                     <Label className="P-absltRadio">{i18n.t('static.realm.default')}  </Label>
