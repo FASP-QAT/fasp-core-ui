@@ -74,9 +74,11 @@ export default class ReactListComponent extends Component {
                             data[16] = realmList[j].noOfMonthsInPastForBottomDashboard;
                             data[17] = realmList[j].noOfMonthsInFutureForBottomDashboard;
                             data[18] = realmList[j].supplyPlanScoreThresholdPerc * 100;
-                            data[19] = realmList[j].lastModifiedBy.username;
-                            data[20] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
-                            data[21] = realmList[j].active;
+                            data[19] = realmList[j].noOfDaysForInactivityReminder;
+                            data[20] = realmList[j].noOfDaysToLockUser;
+                            data[21] = realmList[j].lastModifiedBy.username;
+                            data[22] = (realmList[j].lastModifiedDate ? moment(realmList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
+                            data[23] = realmList[j].active;
                             realmArray[count] = data;
                             count++;
                         }
@@ -164,6 +166,14 @@ export default class ReactListComponent extends Component {
                                 {
                                     title: "Supply Plan Score Threshold",
                                     type: 'numeric', mask: '#,##.00', decimal: '.'
+                                },
+                                {
+                                    title: i18n.t('static.realm.noOfDaysForInactivityReminder'),
+                                    type: 'numeric', mask: '#,##'
+                                },
+                                {
+                                    title: i18n.t('static.realm.noOfDaysToLockUser'),
+                                    type: 'numeric', mask: '#,##'
                                 },
                                 {
                                     title: i18n.t('static.common.lastModifiedBy'),
