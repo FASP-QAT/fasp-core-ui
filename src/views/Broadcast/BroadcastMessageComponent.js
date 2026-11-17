@@ -184,7 +184,14 @@ class BroadcastMessageComponent extends Component {
             const data = [];
             data[0] = item.broadcastId;
             data[1] = item.createdDate ? moment(item.createdDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '-';
-            data[2] = item.status === 'DRAFT' ? `(draft) ${item.subject}` : item.subject;
+            const safeSubject = (item.subject || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            const draftLabel = i18n.t('static.broadcast.draft', 'draft').toLowerCase();
+            data[2] = item.status === 'DRAFT'
+                ? `<span style="font-style:italic;color:#6c757d;margin-right:6px;">(${draftLabel})</span><span style="font-weight:600;">${safeSubject}</span>`
+                : `<span style="font-weight:600;">${safeSubject}</span>`;
             data[3] = item.label ? getLabelText(item.label, lang) : (item.categoryName || 'Broadcast');
             data[4] = this.getRolesFormatted(item.targetRoles);
             data[5] = this.getLanguagesFormatted(item.targetLanguages);
@@ -224,12 +231,12 @@ class BroadcastMessageComponent extends Component {
         const options = {
             data: historyArray,
             columnDrag: false,
-            colWidths: [0, 150, 240, 120, 150, 120, 90, 70, 100, 100, 90],
+            colWidths: [0, 150, 450, 120, 150, 120, 90, 70, 100, 100, 90],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 { title: 'broadcastId', type: 'hidden' },
                 { title: i18n.t('static.common.dateTime', 'Date / Time'), type: 'text' },
-                { title: i18n.t('static.broadcast.subject', 'Subject'), type: 'text' },
+                { title: i18n.t('static.broadcast.subject', 'Subject'), type: 'html' },
                 { title: i18n.t('static.broadcast.category', 'Category'), type: 'text' },
                 { title: i18n.t('static.broadcast.targetRoles', 'Roles'), type: 'text' },
                 { title: i18n.t('static.broadcast.targetLanguages', 'Languages'), type: 'text' },
