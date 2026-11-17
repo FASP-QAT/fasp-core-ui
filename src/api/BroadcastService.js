@@ -11,6 +11,10 @@ class BroadcastService {
         return axios.post(`${API_URL}/api/broadcast/recipientCount`, json, {});
     }
 
+    previewRecipients(json) {
+        return axios.post(`${API_URL}/api/broadcast/previewRecipients`, json, {});
+    }
+
     sendBroadcast(json) {
         return axios.post(`${API_URL}/api/broadcast/send`, json, {});
     }

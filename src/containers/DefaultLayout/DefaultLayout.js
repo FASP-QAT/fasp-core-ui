@@ -1039,7 +1039,7 @@ class DefaultLayout extends Component {
                           name: i18n.t('static.dashboard.applicationmaster'),
                           icon: 'fa fa-list',
                           attributes: {
-                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE')) || (this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_UPLOAD_USER_MANUAL')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_CURRENCY'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_DIMENSION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_LANGUAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ROLE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_USER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_USAGE_PERIOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_UNIT')))) ? false : true)
                           },
@@ -1129,17 +1129,6 @@ class DefaultLayout extends Component {
                               }
                             },
                             {
-                              name: 'Broadcast Message',
-                              url: '/broadcast/broadcastMessage',
-                              icon: 'fa fa-bullhorn',
-                              attributes: {
-                                hidden: (this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE') ? false : true),
-                                onClick: e => {
-                                  this.refreshPage('/broadcast/broadcastMessage');
-                                }
-                              }
-                            },
-                            {
                               name: i18n.t('static.usagePeriod.usagePeriod'),
                               url: '/usagePeriod/listUsagePeriod',
                               icon: 'fa fa-calendar',
@@ -1168,13 +1157,24 @@ class DefaultLayout extends Component {
                           name: i18n.t('static.dashboard.realmlevelmaster'),
                           icon: 'fa fa-list',
                           attributes: {
-                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
+                            hidden: ((((this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_REALM_COUNTRY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_DATA_SOURCE_TYPE'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_FUNDING_SOURCE')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_SUPPLIER')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_ORGANIZATION_TYPE'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_AGENT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECASTING_UNIT')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_PRODUCT_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PLANNING_UNIT_CAPACITY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_PROCUREMENT_UNIT'))
                               || (this.state.businessFunctions.includes('ROLE_BF_LIST_TRACER_CATEGORY')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_EQUIVALENCY_UNIT_MAPPING')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_HEALTH_AREA')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_FORECAST_METHOD')) || (this.state.businessFunctions.includes('ROLE_BF_LIST_INTEGRATION')))) ? false : true)
                           },
                           children: [
+                            {
+                              name: i18n.t('static.broadcast.broadcastMessage', 'Broadcast Message'),
+                              url: '/broadcast/broadcastMessage',
+                              icon: 'fa fa-bullhorn',
+                              attributes: {
+                                hidden: (this.state.businessFunctions.includes('ROLE_BF_BROADCAST_MESSAGE') ? false : true),
+                                onClick: e => {
+                                  this.refreshPage('/broadcast/broadcastMessage');
+                                }
+                              }
+                            },
                             {
                               name: i18n.t('static.dashboard.realmcountry'),
                               url: '/realmCountry/listRealmCountry',

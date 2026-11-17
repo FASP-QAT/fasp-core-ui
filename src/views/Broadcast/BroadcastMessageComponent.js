@@ -42,7 +42,7 @@ class BroadcastMessageComponent extends Component {
             roleList: [],
             categoryId: 1,
             selectedRoles: [],
-            selectedLanguage: '',
+            selectedLanguages: [],
             subject: '',
             messageBody: '',
             recipientCount: 0,
@@ -60,6 +60,9 @@ class BroadcastMessageComponent extends Component {
             selectedRecipientsList: [],
             loadingRecipients: false,
             selectedRecipientsBroadcast: null,
+            searchText: '',
+            showTextColorMenu: false,
+            showHighlightColorMenu: false,
             lang: localStorage.getItem('lang') || 'en'
         };
 
@@ -73,11 +76,21 @@ class BroadcastMessageComponent extends Component {
         this.loadLanguages();
         this.loadHistory();
         window.addEventListener('popstate', this.handlePopState);
+        document.addEventListener('click', this.handleDocumentClick);
     }
 
     componentWillUnmount() {
         window.removeEventListener('popstate', this.handlePopState);
+        document.removeEventListener('click', this.handleDocumentClick);
     }
+
+    handleDocumentClick = (e) => {
+        if (this.state.showTextColorMenu || this.state.showHighlightColorMenu) {
+            if (!e.target.closest || !e.target.closest('.color-picker-dropdown')) {
+                this.setState({ showTextColorMenu: false, showHighlightColorMenu: false });
+            }
+        }
+    };
 
     handlePopState = () => {
         if (this.state.viewMode === 'compose') {
@@ -130,7 +143,7 @@ class BroadcastMessageComponent extends Component {
             .then(res => {
                 if (res.status === 200 && res.data) {
                     const list = res.data.map(l => ({
-                        languageId: l.languageId,
+                        value: l.languageId,
                         label: getLabelText(l.label, this.state.lang) || (l.label && l.label.label_en) || l.languageCode
                     }));
                     list.sort((a, b) => {
@@ -138,7 +151,10 @@ class BroadcastMessageComponent extends Component {
                         const itemB = b.label ? b.label.toUpperCase() : '';
                         return itemA.localeCompare(itemB);
                     });
-                    this.setState({ languages: list });
+                    this.setState({
+                        languages: list,
+                        selectedLanguages: list
+                    });
                 }
             })
             .catch(err => {
@@ -162,14 +178,15 @@ class BroadcastMessageComponent extends Component {
     };
 
     calculateRecipientCount = () => {
-        const { categoryId, selectedRoles, roleList, selectedLanguage } = this.state;
-        if (!selectedRoles || selectedRoles.length === 0) {
+        const { categoryId, selectedRoles, roleList, selectedLanguages, languages } = this.state;
+        if (!selectedRoles || selectedRoles.length === 0 || !selectedLanguages || selectedLanguages.length === 0) {
             this.setState({ recipientCount: 0, loadingCount: false });
             return;
         }
         const isAllRoles = selectedRoles.length === roleList.length;
         const targetRoles = isAllRoles ? [] : selectedRoles.map(r => r.value);
-        const targetLanguages = selectedLanguage ? [parseInt(selectedLanguage)] : [];
+        const isAllLanguages = selectedLanguages.length === languages.length;
+        const targetLanguages = isAllLanguages ? [] : selectedLanguages.map(l => l.value);
 
         this.setState({ loadingCount: true });
         BroadcastService.getRecipientCount({
@@ -189,6 +206,41 @@ class BroadcastMessageComponent extends Component {
             });
     };
 
+    previewCurrentRecipients = () => {
+        const { categoryId, selectedRoles, roleList, selectedLanguages, languages, subject } = this.state;
+        const isAllRoles = !selectedRoles || selectedRoles.length === 0 || selectedRoles.length === roleList.length;
+        const targetRoles = isAllRoles ? [] : selectedRoles.map(r => r.value);
+        const isAllLanguages = !selectedLanguages || selectedLanguages.length === 0 || selectedLanguages.length === languages.length;
+        const targetLanguages = isAllLanguages ? [] : selectedLanguages.map(l => l.value);
+
+        this.setState({
+            recipientsModalOpen: true,
+            selectedRecipientsBroadcast: {
+                subject: subject || i18n.t('static.broadcast.previewRecipientsTitle', 'Target Recipients Preview'),
+                categoryId: parseInt(categoryId),
+                categoryName: ''
+            },
+            selectedRecipientsList: [],
+            loadingRecipients: true
+        });
+
+        BroadcastService.previewRecipients({
+            categoryId: parseInt(categoryId),
+            targetRoles: targetRoles,
+            targetLanguages: targetLanguages
+        })
+            .then(res => {
+                this.setState({
+                    selectedRecipientsList: res.data || [],
+                    loadingRecipients: false
+                });
+            })
+            .catch(err => {
+                console.error('Failed to preview recipients', err);
+                this.setState({ loadingRecipients: false });
+            });
+    };
+
     openNewMessage = () => {
         try {
             window.history.pushState({ broadcastView: 'compose' }, '');
@@ -199,7 +251,7 @@ class BroadcastMessageComponent extends Component {
             editingBroadcastId: null,
             categoryId: firstCat,
             selectedRoles: this.state.roleList,
-            selectedLanguage: '',
+            selectedLanguages: this.state.languages,
             subject: '',
             messageBody: '',
             errorMessage: '',
@@ -257,7 +309,16 @@ class BroadcastMessageComponent extends Component {
             matchedRoles.push(...this.state.roleList);
         }
 
-        const selLang = (item.targetLanguages && item.targetLanguages.length > 0) ? String(item.targetLanguages[0]) : '';
+        const matchedLanguages = [];
+        if (item.targetLanguages && item.targetLanguages.length > 0) {
+            item.targetLanguages.forEach(lId => {
+                const found = this.state.languages.find(l => l.value === lId);
+                if (found) matchedLanguages.push(found);
+            });
+        } else {
+            matchedLanguages.push(...this.state.languages);
+        }
+
         const normalizedHtml = this.normalizeEditorHtml(item.bodyHtml || '');
 
         this.setState({
@@ -265,7 +326,7 @@ class BroadcastMessageComponent extends Component {
             editingBroadcastId: item.broadcastId,
             categoryId: item.categoryId || 1,
             selectedRoles: matchedRoles,
-            selectedLanguage: selLang,
+            selectedLanguages: matchedLanguages,
             subject: item.subject || '',
             messageBody: item.bodyHtml || '',
             errorMessage: '',
@@ -291,8 +352,8 @@ class BroadcastMessageComponent extends Component {
         this.setState({ selectedRoles: selected || [] }, this.calculateRecipientCount);
     };
 
-    handleLanguageChange = (e) => {
-        this.setState({ selectedLanguage: e.target.value }, this.calculateRecipientCount);
+    handleLanguageChange = (selected) => {
+        this.setState({ selectedLanguages: selected || [] }, this.calculateRecipientCount);
     };
 
     handleSubjectChange = (e) => {
@@ -381,18 +442,35 @@ class BroadcastMessageComponent extends Component {
                 if (document.queryCommandState('bold')) {
                     document.execCommand('bold', false, null);
                 }
+                document.execCommand('removeFormat', false, null);
             }
         } else {
             // Block-level heading vs paragraph
             if (type === 'heading') {
                 if (block && /^H[1-6]$/i.test(block.nodeName)) {
-                    document.execCommand('formatBlock', false, '<p>');
+                    const p = document.createElement('p');
+                    p.innerHTML = block.innerHTML;
+                    block.parentNode.replaceChild(p, block);
                 } else {
                     document.execCommand('formatBlock', false, '<h3>');
                 }
             } else {
-                document.execCommand('formatBlock', false, '<p>');
+                if (block && /^H[1-6]$/i.test(block.nodeName)) {
+                    const p = document.createElement('p');
+                    p.innerHTML = block.innerHTML;
+                    block.parentNode.replaceChild(p, block);
+                    const newRange = document.createRange();
+                    newRange.selectNodeContents(p);
+                    newRange.collapse(false);
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+                } else {
+                    document.execCommand('formatBlock', false, '<p>');
+                }
                 document.execCommand('fontSize', false, '3');
+                if (document.queryCommandState('bold')) {
+                    document.execCommand('bold', false, null);
+                }
             }
         }
 
@@ -427,7 +505,7 @@ class BroadcastMessageComponent extends Component {
         if (e && e.preventDefault) {
             e.preventDefault();
         }
-        const { subject, messageBody, selectedRoles, categoryId, roleList, selectedLanguage, editingBroadcastId } = this.state;
+        const { subject, messageBody, selectedRoles, categoryId, roleList, selectedLanguages, languages, editingBroadcastId } = this.state;
         if (!subject || subject.trim() === '') {
             this.setState({ errorMessage: i18n.t('static.broadcast.subjectRequired', 'Subject line is required to save a draft.') }, () => {
                 hideSecondComponent();
@@ -439,7 +517,8 @@ class BroadcastMessageComponent extends Component {
 
         const isAllRoles = !selectedRoles || selectedRoles.length === 0 || selectedRoles.length === roleList.length;
         const targetRoles = isAllRoles ? [] : selectedRoles.map(r => r.value);
-        const targetLanguages = selectedLanguage ? [parseInt(selectedLanguage)] : [];
+        const isAllLanguages = !selectedLanguages || selectedLanguages.length === 0 || selectedLanguages.length === languages.length;
+        const targetLanguages = isAllLanguages ? [] : selectedLanguages.map(l => l.value);
 
         BroadcastService.saveDraft({
             broadcastId: editingBroadcastId || 0,
@@ -485,9 +564,15 @@ class BroadcastMessageComponent extends Component {
         if (e && e.preventDefault) {
             e.preventDefault();
         }
-        const { subject, messageBody, selectedRoles, editingBroadcastId, categoryId, roleList, selectedLanguage } = this.state;
+        const { subject, messageBody, selectedRoles, editingBroadcastId, categoryId, roleList, selectedLanguages, languages } = this.state;
         if (!selectedRoles || selectedRoles.length === 0) {
             this.setState({ errorMessage: i18n.t('static.broadcast.roleRequired', 'Please select at least one role in Target Audience.') }, () => {
+                hideSecondComponent();
+            });
+            return;
+        }
+        if (!selectedLanguages || selectedLanguages.length === 0) {
+            this.setState({ errorMessage: i18n.t('static.broadcast.languageRequired', 'Please select at least one language.') }, () => {
                 hideSecondComponent();
             });
             return;
@@ -508,9 +593,10 @@ class BroadcastMessageComponent extends Component {
 
         this.setState({ sending: true, successMessage: '', errorMessage: '' });
 
-        const isAllRoles = !selectedRoles || selectedRoles.length === 0 || selectedRoles.length === roleList.length;
+        const isAllRoles = selectedRoles.length === roleList.length;
         const targetRoles = isAllRoles ? [] : selectedRoles.map(r => r.value);
-        const targetLanguages = selectedLanguage ? [parseInt(selectedLanguage)] : [];
+        const isAllLanguages = selectedLanguages.length === languages.length;
+        const targetLanguages = isAllLanguages ? [] : selectedLanguages.map(l => l.value);
 
         BroadcastService.sendBroadcast({
             broadcastId: editingBroadcastId || 0,
@@ -534,7 +620,7 @@ class BroadcastMessageComponent extends Component {
                     sending: false,
                     viewMode: 'list',
                     editingBroadcastId: null,
-                    successMessage: i18n.t('static.broadcast.sentSuccess', 'Broadcast message sent successfully'),
+                    successMessage: i18n.t('static.broadcast.queuedSuccess', 'Broadcast message queued for delivery successfully'),
                     subject: '',
                     messageBody: ''
                 }, () => {
@@ -611,7 +697,7 @@ class BroadcastMessageComponent extends Component {
         this.setState({
             categoryId: firstCat,
             selectedRoles: this.state.roleList,
-            selectedLanguage: '',
+            selectedLanguages: this.state.languages,
             subject: '',
             messageBody: '',
             errorMessage: '',
@@ -628,7 +714,7 @@ class BroadcastMessageComponent extends Component {
             roleList,
             categoryId,
             selectedRoles,
-            selectedLanguage,
+            selectedLanguages,
             subject,
             messageBody,
             recipientCount,
@@ -645,6 +731,9 @@ class BroadcastMessageComponent extends Component {
             selectedRecipientsList,
             loadingRecipients,
             selectedRecipientsBroadcast,
+            searchText,
+            showTextColorMenu,
+            showHighlightColorMenu,
             lang
         } = this.state;
 
@@ -654,6 +743,45 @@ class BroadcastMessageComponent extends Component {
             : '';
 
         const textOnly = messageBody ? messageBody.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim() : '';
+
+        const getRolesFormatted = (targetRoles) => {
+            if (!targetRoles || targetRoles.length === 0 || targetRoles.length === roleList.length) {
+                return i18n.t('static.broadcast.allRoles', 'All Roles');
+            }
+            return targetRoles.map(rId => {
+                const r = roleList.find(role => role.value === rId);
+                return r ? r.label : rId;
+            }).join(', ');
+        };
+
+        const getLanguagesFormatted = (targetLanguages) => {
+            if (!targetLanguages || targetLanguages.length === 0 || targetLanguages.length === languages.length) {
+                return i18n.t('static.broadcast.allLanguages', 'All Languages');
+            }
+            return targetLanguages.map(lId => {
+                const l = languages.find(lng => lng.value === lId);
+                return l ? l.label : lId;
+            }).join(', ');
+        };
+
+        const searchLower = (searchText || '').trim().toLowerCase();
+        const filteredHistoryList = historyList.filter(item => {
+            if (!searchLower) return true;
+            const catName = (item.label ? getLabelText(item.label, lang) : (item.categoryName || '')).toLowerCase();
+            const subj = (item.subject || '').toLowerCase();
+            const sender = (item.createdBy ? item.createdBy.username : '').toLowerCase();
+            const status = (item.status || '').toLowerCase();
+            const bodyClean = (item.bodyHtml || '').replace(/<[^>]*>/g, ' ').toLowerCase();
+            const rolesStr = getRolesFormatted(item.targetRoles).toLowerCase();
+            const langsStr = getLanguagesFormatted(item.targetLanguages).toLowerCase();
+            return subj.includes(searchLower) ||
+                   catName.includes(searchLower) ||
+                   sender.includes(searchLower) ||
+                   status.includes(searchLower) ||
+                   bodyClean.includes(searchLower) ||
+                   rolesStr.includes(searchLower) ||
+                   langsStr.includes(searchLower);
+        });
 
         return (
             <div className="animated fadeIn">
@@ -694,6 +822,38 @@ class BroadcastMessageComponent extends Component {
                                 </CardHeader>
 
                                 <CardBody className="p-3">
+                                    {/* Search Input Filter */}
+                                    <Row className="mb-2">
+                                        <Col md="4" sm="6" className="ml-auto">
+                                            <div className="input-group input-group-sm">
+                                                <div className="input-group-prepend">
+                                                    <span className="input-group-text"><i className="fa fa-search"></i></span>
+                                                </div>
+                                                <Input
+                                                    type="text"
+                                                    bsSize="sm"
+                                                    value={searchText}
+                                                    placeholder={i18n.t('static.broadcast.searchPlaceholder', 'Search by subject, message content, category, or sender...')}
+                                                    onChange={(e) => this.setState({ searchText: e.target.value })}
+                                                />
+                                                {searchText && (
+                                                    <div className="input-group-append">
+                                                        <Button
+                                                            color="light"
+                                                            size="sm"
+                                                            className="border"
+                                                            type="button"
+                                                            onClick={() => this.setState({ searchText: '' })}
+                                                            title={i18n.t('static.common.clear', 'Clear')}
+                                                        >
+                                                            <i className="fa fa-times"></i>
+                                                        </Button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </Col>
+                                    </Row>
+
                                     {loadingHistory ? (
                                         <div className="d-flex align-items-center justify-content-center" style={{ height: "300px" }}>
                                             <div className="spinner-border blue" role="status"></div>
@@ -724,28 +884,44 @@ class BroadcastMessageComponent extends Component {
                                                 <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.broadcast.newMessage', 'New Message')}</span>
                                             </Button>
                                         </div>
+                                    ) : filteredHistoryList.length === 0 ? (
+                                        <div className="text-center py-5 text-muted">
+                                            <i className="fa fa-search fa-2x mb-2"></i>
+                                            <p>{i18n.t('static.common.noDataFound', 'No messages matching search criteria')}</p>
+                                            <Button
+                                                color="secondary"
+                                                size="sm"
+                                                type="button"
+                                                onClick={() => this.setState({ searchText: '' })}
+                                            >
+                                                {i18n.t('static.common.clear', 'Clear Search')}
+                                            </Button>
+                                        </div>
                                     ) : (
                                         <Table className="table-striped table-bordered text-center mb-0" bordered responsive size="sm">
                                             <thead style={{ backgroundColor: '#e4e7ea', color: '#23282c' }}>
                                                 <tr>
                                                     <th style={{ width: '4%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>#</th>
-                                                    <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.date', 'Date')}</th>
-                                                    <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.time', 'Time')}</th>
-                                                    <th className="text-left" style={{ width: '30%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.subject', 'Subject')}</th>
-                                                    <th style={{ width: '13%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.category', 'Category')}</th>
-                                                    <th style={{ width: '9%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.estimatedRecipients', 'Recipients')}</th>
-                                                    <th style={{ width: '6%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.batches', 'Batches')}</th>
-                                                    <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.sentBy', 'Sent By')}</th>
-                                                    <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.status', 'Status')}</th>
-                                                    <th style={{ width: '8%', minWidth: '90px', whiteSpace: 'nowrap', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.action', 'Action')}</th>
+                                                    <th style={{ width: '12%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.dateTime', 'Date / Time')}</th>
+                                                    <th className="text-left" style={{ width: '22%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.subject', 'Subject')}</th>
+                                                    <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.category', 'Category')}</th>
+                                                    <th style={{ width: '12%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.targetRoles', 'Roles')}</th>
+                                                    <th style={{ width: '10%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.targetLanguages', 'Languages')}</th>
+                                                    <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.estimatedRecipients', 'Recipients')}</th>
+                                                    <th style={{ width: '5%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.broadcast.batches', 'Batches')}</th>
+                                                    <th style={{ width: '8%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.sentBy', 'Sent By')}</th>
+                                                    <th style={{ width: '7%', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.status', 'Status')}</th>
+                                                    <th style={{ width: '8%', minWidth: '85px', whiteSpace: 'nowrap', verticalAlign: 'middle', borderBottom: '2px solid #c8ced3' }}>{i18n.t('static.common.action', 'Action')}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {historyList.map(item => {
+                                                {filteredHistoryList.map(item => {
                                                     const catName = item.label ? getLabelText(item.label, lang) : (item.categoryName || 'Broadcast');
                                                     const isDraft = item.status === 'DRAFT';
                                                     const dateFormatted = item.createdDate ? moment(item.createdDate).format(DATE_FORMAT_CAP) : '-';
                                                     const timeFormatted = item.createdDate ? moment(item.createdDate).format('hh:mm A') : '-';
+                                                    const rolesFormatted = getRolesFormatted(item.targetRoles);
+                                                    const languagesFormatted = getLanguagesFormatted(item.targetLanguages);
 
                                                     return (
                                                         <tr
@@ -759,8 +935,10 @@ class BroadcastMessageComponent extends Component {
                                                             title={isDraft ? i18n.t('static.broadcast.editDraft', 'Edit Draft') : ''}
                                                         >
                                                             <td className="align-middle">{item.broadcastId}</td>
-                                                            <td className="align-middle">{dateFormatted}</td>
-                                                            <td className="align-middle text-muted" style={{ fontSize: '12px' }}>{timeFormatted}</td>
+                                                            <td className="align-middle">
+                                                                <div>{dateFormatted}</div>
+                                                                <div className="text-muted small">{timeFormatted}</div>
+                                                            </td>
                                                             <td className="text-left align-middle">
                                                                 {isDraft ? (
                                                                     <span style={{ fontStyle: 'italic', color: '#0056b3', fontWeight: '600' }}>
@@ -774,8 +952,8 @@ class BroadcastMessageComponent extends Component {
                                                                 <span
                                                                     style={{
                                                                         display: 'inline-block',
-                                                                        padding: '4px 10px',
-                                                                        fontSize: '12px',
+                                                                        padding: '4px 8px',
+                                                                        fontSize: '11px',
                                                                         fontWeight: '600',
                                                                         borderRadius: '4px',
                                                                         backgroundColor: item.categoryId === 1 ? '#e8f4fd' : (item.categoryId === 2 ? '#e2e3e5' : '#fff3cd'),
@@ -786,6 +964,16 @@ class BroadcastMessageComponent extends Component {
                                                                 >
                                                                     {catName}
                                                                 </span>
+                                                            </td>
+                                                            <td className="align-middle text-muted small" title={rolesFormatted}>
+                                                                <div style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: '0 auto' }}>
+                                                                    {rolesFormatted}
+                                                                </div>
+                                                            </td>
+                                                            <td className="align-middle text-muted small" title={languagesFormatted}>
+                                                                <div style={{ maxWidth: '110px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: '0 auto' }}>
+                                                                    {languagesFormatted}
+                                                                </div>
                                                             </td>
                                                             <td className="align-middle" onClick={(e) => e.stopPropagation()}>
                                                                 <Button
@@ -807,8 +995,8 @@ class BroadcastMessageComponent extends Component {
                                                                 <span
                                                                     style={{
                                                                         display: 'inline-block',
-                                                                        padding: '4px 10px',
-                                                                        fontSize: '12px',
+                                                                        padding: '4px 8px',
+                                                                        fontSize: '11px',
                                                                         fontWeight: '600',
                                                                         borderRadius: '4px',
                                                                         backgroundColor: item.status === 'COMPLETED' ? '#d4edda' : (item.status === 'QUEUED' || item.status === 'SAVED' ? '#e8f4fd' : '#fff3cd'),
@@ -821,30 +1009,57 @@ class BroadcastMessageComponent extends Component {
                                                                 </span>
                                                             </td>
                                                             <td className="align-middle text-nowrap" style={{ whiteSpace: 'nowrap' }} onClick={(e) => e.stopPropagation()}>
-                                                                <Button
-                                                                    color="info"
-                                                                    size="sm"
-                                                                    className="btn-info text-white"
-                                                                    style={{
-                                                                        whiteSpace: 'nowrap',
-                                                                        display: 'inline-flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        color: '#ffffff',
-                                                                        backgroundColor: '#20a8d8',
-                                                                        borderColor: '#20a8d8',
-                                                                        padding: '4px 12px',
-                                                                        fontSize: '12px'
-                                                                    }}
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        this.viewHistoryDetails(item);
-                                                                    }}
-                                                                    title={i18n.t('static.common.view', 'View Details')}
-                                                                >
-                                                                    <i className="fa fa-eye mr-1" style={{ color: '#ffffff' }}></i>
-                                                                    <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.common.view', 'View')}</span>
-                                                                </Button>
+                                                                {isDraft ? (
+                                                                    <Button
+                                                                        color="warning"
+                                                                        size="sm"
+                                                                        className="btn-warning text-white font-weight-bold"
+                                                                        style={{
+                                                                            whiteSpace: 'nowrap',
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            color: '#ffffff',
+                                                                            backgroundColor: '#f8b115',
+                                                                            borderColor: '#f8b115',
+                                                                            padding: '4px 10px',
+                                                                            fontSize: '12px'
+                                                                        }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            this.editDraft(item);
+                                                                        }}
+                                                                        title={i18n.t('static.broadcast.editDraft', 'Edit Draft')}
+                                                                    >
+                                                                        <i className="fa fa-pencil mr-1" style={{ color: '#ffffff' }}></i>
+                                                                        <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.broadcast.editDraft', 'Edit Draft')}</span>
+                                                                    </Button>
+                                                                ) : (
+                                                                    <Button
+                                                                        color="info"
+                                                                        size="sm"
+                                                                        className="btn-info text-white"
+                                                                        style={{
+                                                                            whiteSpace: 'nowrap',
+                                                                            display: 'inline-flex',
+                                                                            alignItems: 'center',
+                                                                            justifyContent: 'center',
+                                                                            color: '#ffffff',
+                                                                            backgroundColor: '#20a8d8',
+                                                                            borderColor: '#20a8d8',
+                                                                            padding: '4px 10px',
+                                                                            fontSize: '12px'
+                                                                        }}
+                                                                        onClick={(e) => {
+                                                                            e.stopPropagation();
+                                                                            this.viewHistoryDetails(item);
+                                                                        }}
+                                                                        title={i18n.t('static.common.view', 'View Details')}
+                                                                    >
+                                                                        <i className="fa fa-eye mr-1" style={{ color: '#ffffff' }}></i>
+                                                                        <span style={{ color: '#ffffff', whiteSpace: 'nowrap' }}>{i18n.t('static.common.view', 'View')}</span>
+                                                                    </Button>
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     );
@@ -939,38 +1154,52 @@ class BroadcastMessageComponent extends Component {
                                             </Col>
                                             <Col md={3} sm={6}>
                                                 <FormGroup>
-                                                    <Label htmlFor="selectedLanguage">
+                                                    <Label htmlFor="targetLanguages">
                                                         {i18n.t('static.broadcast.preferredLanguage', 'Preferred Language')}
                                                     </Label>
-                                                    <Input
-                                                        type="select"
-                                                        id="selectedLanguage"
-                                                        name="selectedLanguage"
+                                                    <MultiSelect
                                                         bsSize="sm"
-                                                        value={selectedLanguage}
+                                                        name="targetLanguages"
+                                                        id="targetLanguages"
+                                                        value={selectedLanguages}
                                                         onChange={this.handleLanguageChange}
-                                                    >
-                                                        <option value="">{i18n.t('static.common.all', 'All')}</option>
-                                                        {languages.map(l => (
-                                                            <option key={l.languageId} value={l.languageId}>
-                                                                {l.label}
-                                                            </option>
-                                                        ))}
-                                                    </Input>
+                                                        options={languages}
+                                                        filterOptions={filterOptions}
+                                                        disabled={this.state.loading}
+                                                        overrideStrings={{
+                                                            allItemsAreSelected: i18n.t('static.common.allitemsselected', 'All items are selected.'),
+                                                            selectSomeItems: i18n.t('static.common.select')
+                                                        }}
+                                                    />
                                                 </FormGroup>
                                             </Col>
                                             <Col md={3} sm={6}>
                                                 <FormGroup>
-                                                    <Label htmlFor="recipientCount">
-                                                        {i18n.t('static.broadcast.estimatedRecipients', 'Estimated Recipients')}
-                                                    </Label>
+                                                    <div className="d-flex justify-content-between align-items-center">
+                                                        <Label htmlFor="recipientCount" className="mb-0">
+                                                            {i18n.t('static.broadcast.estimatedRecipients', 'Estimated Recipients')}
+                                                        </Label>
+                                                        {recipientCount > 0 && (
+                                                            <Button
+                                                                color="link"
+                                                                size="sm"
+                                                                className="p-0 text-primary"
+                                                                style={{ fontSize: '11px', textDecoration: 'underline' }}
+                                                                type="button"
+                                                                onClick={this.previewCurrentRecipients}
+                                                                title={i18n.t('static.broadcast.previewRecipients', 'Preview Recipients')}
+                                                            >
+                                                                <i className="fa fa-users mr-1"></i>{i18n.t('static.broadcast.previewRecipients', 'Preview')}
+                                                            </Button>
+                                                        )}
+                                                    </div>
                                                     <Input
                                                         type="text"
                                                         id="recipientCount"
                                                         name="recipientCount"
                                                         bsSize="sm"
                                                         readOnly
-                                                        className="form-control-readonly"
+                                                        className="form-control-readonly mt-1"
                                                         value={loadingCount ? i18n.t('static.common.loading', 'Loading...') : `${recipientCount} ${i18n.t('static.broadcast.activeUsers', 'Active Users')}`}
                                                     />
                                                 </FormGroup>
@@ -1077,34 +1306,135 @@ class BroadcastMessageComponent extends Component {
                                                                 </Button>
                                                             </ButtonGroup>
 
-                                                            {/* Color & Highlight */}
-                                                            <label
-                                                                className="btn btn-sm btn-light border mb-0 mr-1"
-                                                                style={{ cursor: 'pointer', padding: '3px 7px', fontSize: '12px', position: 'relative' }}
-                                                                title={i18n.t('static.broadcast.textColor', 'Text Color')}
-                                                            >
-                                                                <i className="fa fa-font" style={{ color: '#d9534f' }}></i>
-                                                                <input
-                                                                    type="color"
-                                                                    defaultValue="#000000"
-                                                                    style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
-                                                                    onChange={(e) => this.formatText('foreColor', e.target.value)}
-                                                                />
-                                                            </label>
+                                                            {/* Text Color with Presets */}
+                                                            <div className="btn-group mr-1 color-picker-dropdown" style={{ position: 'relative' }}>
+                                                                <Button
+                                                                    type="button"
+                                                                    color="light"
+                                                                    size="sm"
+                                                                    className="border"
+                                                                    style={{ padding: '3px 7px', fontSize: '12px' }}
+                                                                    onClick={() => this.setState({ showTextColorMenu: !showTextColorMenu, showHighlightColorMenu: false })}
+                                                                    title={i18n.t('static.broadcast.textColor', 'Text Color')}
+                                                                >
+                                                                    <i className="fa fa-font" style={{ color: '#d9534f' }}></i>
+                                                                    <i className="fa fa-caret-down ml-1 text-muted" style={{ fontSize: '9px' }}></i>
+                                                                </Button>
+                                                                {showTextColorMenu && (
+                                                                    <div
+                                                                        className="shadow-sm border rounded p-2 bg-white"
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '100%',
+                                                                            left: 0,
+                                                                            zIndex: 1050,
+                                                                            minWidth: '150px'
+                                                                        }}
+                                                                    >
+                                                                        <div className="small font-weight-bold mb-1 text-muted" style={{ fontSize: '11px' }}>
+                                                                            {i18n.t('static.broadcast.presetColors', 'Preset Colors')}
+                                                                        </div>
+                                                                        <div className="d-flex flex-wrap mb-2" style={{ width: '130px', gap: '4px' }}>
+                                                                            {['#000000', '#495057', '#6c757d', '#0056b3', '#28a745', '#d9534f', '#f0ad4e', '#6f42c1', '#17a2b8', '#e83e8c'].map(col => (
+                                                                                <div
+                                                                                    key={col}
+                                                                                    onMouseDown={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        this.formatText('foreColor', col);
+                                                                                        this.setState({ showTextColorMenu: false });
+                                                                                    }}
+                                                                                    style={{
+                                                                                        backgroundColor: col,
+                                                                                        width: '20px',
+                                                                                        height: '20px',
+                                                                                        borderRadius: '3px',
+                                                                                        cursor: 'pointer',
+                                                                                        border: '1px solid #ced4da'
+                                                                                    }}
+                                                                                    title={col}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                        <div className="d-flex align-items-center pt-1 border-top">
+                                                                            <span className="small text-muted mr-2" style={{ fontSize: '11px' }}>{i18n.t('static.broadcast.customColor', 'Custom')}:</span>
+                                                                            <input
+                                                                                type="color"
+                                                                                defaultValue="#000000"
+                                                                                style={{ width: '28px', height: '22px', cursor: 'pointer', padding: 0, border: 'none' }}
+                                                                                onChange={(e) => {
+                                                                                    this.formatText('foreColor', e.target.value);
+                                                                                    this.setState({ showTextColorMenu: false });
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
 
-                                                            <label
-                                                                className="btn btn-sm btn-light border mb-0 mr-1"
-                                                                style={{ cursor: 'pointer', padding: '3px 7px', fontSize: '12px', position: 'relative' }}
-                                                                title={i18n.t('static.broadcast.highlightColor', 'Highlight Color')}
-                                                            >
-                                                                <i className="fa fa-pencil" style={{ color: '#eab308' }}></i>
-                                                                <input
-                                                                    type="color"
-                                                                    defaultValue="#ffff00"
-                                                                    style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
-                                                                    onChange={(e) => this.formatText('hiliteColor', e.target.value)}
-                                                                />
-                                                            </label>
+                                                            {/* Highlight Color with Presets */}
+                                                            <div className="btn-group mr-1 color-picker-dropdown" style={{ position: 'relative' }}>
+                                                                <Button
+                                                                    type="button"
+                                                                    color="light"
+                                                                    size="sm"
+                                                                    className="border"
+                                                                    style={{ padding: '3px 7px', fontSize: '12px' }}
+                                                                    onClick={() => this.setState({ showHighlightColorMenu: !showHighlightColorMenu, showTextColorMenu: false })}
+                                                                    title={i18n.t('static.broadcast.highlightColor', 'Highlight Color')}
+                                                                >
+                                                                    <i className="fa fa-pencil" style={{ color: '#eab308' }}></i>
+                                                                    <i className="fa fa-caret-down ml-1 text-muted" style={{ fontSize: '9px' }}></i>
+                                                                </Button>
+                                                                {showHighlightColorMenu && (
+                                                                    <div
+                                                                        className="shadow-sm border rounded p-2 bg-white"
+                                                                        style={{
+                                                                            position: 'absolute',
+                                                                            top: '100%',
+                                                                            left: 0,
+                                                                            zIndex: 1050,
+                                                                            minWidth: '150px'
+                                                                        }}
+                                                                    >
+                                                                        <div className="small font-weight-bold mb-1 text-muted" style={{ fontSize: '11px' }}>
+                                                                            {i18n.t('static.broadcast.presetColors', 'Preset Colors')}
+                                                                        </div>
+                                                                        <div className="d-flex flex-wrap mb-2" style={{ width: '130px', gap: '4px' }}>
+                                                                            {['#ffffff', '#fff3cd', '#d4edda', '#d1ecf1', '#ffeeba', '#f8d7da', '#e2e3e5', '#e0cffc'].map(col => (
+                                                                                <div
+                                                                                    key={col}
+                                                                                    onMouseDown={(e) => {
+                                                                                        e.preventDefault();
+                                                                                        this.formatText('hiliteColor', col);
+                                                                                        this.setState({ showHighlightColorMenu: false });
+                                                                                    }}
+                                                                                    style={{
+                                                                                        backgroundColor: col,
+                                                                                        width: '20px',
+                                                                                        height: '20px',
+                                                                                        borderRadius: '3px',
+                                                                                        cursor: 'pointer',
+                                                                                        border: '1px solid #ced4da'
+                                                                                    }}
+                                                                                    title={col}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                        <div className="d-flex align-items-center pt-1 border-top">
+                                                                            <span className="small text-muted mr-2" style={{ fontSize: '11px' }}>{i18n.t('static.broadcast.customColor', 'Custom')}:</span>
+                                                                            <input
+                                                                                type="color"
+                                                                                defaultValue="#ffff00"
+                                                                                style={{ width: '28px', height: '22px', cursor: 'pointer', padding: 0, border: 'none' }}
+                                                                                onChange={(e) => {
+                                                                                    this.formatText('hiliteColor', e.target.value);
+                                                                                    this.setState({ showHighlightColorMenu: false });
+                                                                                }}
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                            </div>
 
                                                             {/* Increase / Decrease Text Size */}
                                                             <ButtonGroup size="sm" className="mr-1">
@@ -1398,6 +1728,24 @@ class BroadcastMessageComponent extends Component {
                                 </div>
                             </div>
 
+                            {/* Roles & Languages Box */}
+                            <div className="row mb-3 mx-0 border rounded p-2 bg-white shadow-sm">
+                                <div className="col-sm-6 py-1 border-right">
+                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">
+                                        <i className="fa fa-users text-muted mr-1"></i>
+                                        {i18n.t('static.broadcast.targetRoles', 'Roles')}
+                                    </span>
+                                    <span className="text-dark small font-weight-600">{getRolesFormatted(selectedHistoryItem.targetRoles)}</span>
+                                </div>
+                                <div className="col-sm-6 py-1">
+                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">
+                                        <i className="fa fa-language text-muted mr-1"></i>
+                                        {i18n.t('static.broadcast.targetLanguages', 'Languages')}
+                                    </span>
+                                    <span className="text-dark small font-weight-600">{getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</span>
+                                </div>
+                            </div>
+
                             {/* Message Body Section */}
                             <div className="mb-1">
                                 <span className="text-muted small text-uppercase font-weight-bold">
@@ -1420,6 +1768,22 @@ class BroadcastMessageComponent extends Component {
                             />
                         </ModalBody>
                         <ModalFooter>
+                            {selectedHistoryItem.status === 'DRAFT' && (
+                                <Button
+                                    type="button"
+                                    size="md"
+                                    color="warning"
+                                    className="mr-1 text-white font-weight-bold"
+                                    style={{ backgroundColor: '#f8b115', borderColor: '#f8b115' }}
+                                    onClick={() => {
+                                        const itemToEdit = selectedHistoryItem;
+                                        this.toggleHistoryViewModal();
+                                        this.editDraft(itemToEdit);
+                                    }}
+                                >
+                                    <i className="fa fa-pencil mr-1"></i> {i18n.t('static.broadcast.editDraft', 'Edit Draft')}
+                                </Button>
+                            )}
                             <Button type="button" size="md" color="danger" className="mr-1 text-white" onClick={this.toggleHistoryViewModal}>
                                 <i className="fa fa-times"></i> {i18n.t('static.common.close', 'Close')}
                             </Button>
