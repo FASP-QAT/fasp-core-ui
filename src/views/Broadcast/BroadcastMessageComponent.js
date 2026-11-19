@@ -127,26 +127,8 @@ class BroadcastMessageComponent extends Component {
         } catch (e) {}
     }.bind(this);
 
-    selected = function (instance, cell, x, y, value, e) {
-        if (e && e.buttons == 1) {
-            if (e.target && (e.target.closest('button') || e.target.closest('a'))) {
-                return;
-            }
-            let rowIdx = (y !== undefined && y !== null) ? y : x;
-            let bId = this.el ? this.el.getValueFromCoords(0, rowIdx) : null;
-            let item = this.state.historyList.find(b => b.broadcastId == bId);
-            if (!item && this.el) {
-                bId = this.el.getValueFromCoords(0, x);
-                item = this.state.historyList.find(b => b.broadcastId == bId);
-            }
-            if (item) {
-                if (item.status === 'DRAFT') {
-                    this.editDraft(item);
-                } else {
-                    this.viewHistoryDetails(item);
-                }
-            }
-        }
+    selected = function () {
+        // Row click disabled per client request - button click only
     }.bind(this);
 
     getRolesFormatted = (targetRoles) => {
@@ -198,22 +180,22 @@ class BroadcastMessageComponent extends Component {
                 .replace(/>/g, '&gt;');
             const draftLabel = i18n.t('static.broadcast.draft', 'draft').toLowerCase();
             data[2] = item.status === 'DRAFT'
-                ? `<span style="font-style:italic;color:#6c757d;margin-right:6px;">(${draftLabel})</span><span style="font-weight:600;">${safeSubject}</span>`
-                : `<span style="font-weight:600;">${safeSubject}</span>`;
+                ? `<span style="font-style:italic;color:#73818f;margin-right:6px;">(${draftLabel})</span>${safeSubject}`
+                : `${safeSubject}`;
             data[3] = item.label ? getLabelText(item.label, lang) : (item.categoryName || 'Broadcast');
             data[4] = this.getRolesFormatted(item.targetRoles);
             data[5] = this.getLanguagesFormatted(item.targetLanguages);
-            data[6] = `<a href="javascript:void(0);" style="color:#0284c7;font-weight:bold;text-decoration:none;" onclick="window.viewBroadcastRecipients(${item.broadcastId});">${item.totalRecipients}</a>`;
+            data[6] = `<a href="javascript:void(0);" style="color:#20a8d8;text-decoration:underline;" onclick="window.viewBroadcastRecipients(${item.broadcastId});">${item.totalRecipients}</a>`;
             data[7] = item.batchCount;
             data[8] = item.createdBy ? item.createdBy.username : '-';
 
             let statusHtml = '';
             if (item.status === 'DRAFT') {
-                statusHtml = `<span style="display:inline-block;padding:2px 8px;font-size:11px;font-weight:600;border-radius:4px;background-color:#fff3cd;color:#856404;border:1px solid #ffeeba;">${i18n.t('static.broadcast.draft', 'Draft')}</span>`;
+                statusHtml = `<span class="badge badge-warning text-white" style="padding:4px 8px;">${i18n.t('static.broadcast.draft', 'Draft')}</span>`;
             } else if (item.status === 'SAVED' || item.status === 'QUEUED') {
-                statusHtml = `<span style="display:inline-block;padding:2px 8px;font-size:11px;font-weight:600;border-radius:4px;background-color:#e8f4fd;color:#0056b3;border:1px solid #b8daff;">${i18n.t('static.broadcast.statusQueued', 'Queued')}</span>`;
+                statusHtml = `<span class="badge badge-primary text-white" style="padding:4px 8px;">${i18n.t('static.broadcast.statusQueued', 'Queued')}</span>`;
             } else if (item.status === 'COMPLETED') {
-                statusHtml = `<span style="display:inline-block;padding:2px 8px;font-size:11px;font-weight:600;border-radius:4px;background-color:#d4edda;color:#155724;border:1px solid #c3e6cb;">${i18n.t('static.broadcast.statusCompleted', 'Completed')}</span>`;
+                statusHtml = `<span class="badge badge-success text-white" style="padding:4px 8px;">${i18n.t('static.broadcast.statusCompleted', 'Completed')}</span>`;
             } else {
                 statusHtml = item.status;
             }
@@ -221,9 +203,9 @@ class BroadcastMessageComponent extends Component {
 
             let actionHtml = '';
             if (item.status === 'DRAFT') {
-                actionHtml = `<button type="button" class="btn btn-warning btn-sm text-white font-weight-bold" style="padding:2px 10px;font-size:11px;background-color:#f8b115;border-color:#f8b115;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;" onclick="window.editBroadcastDraft(${item.broadcastId});"><i class="fa fa-pencil mr-1 text-white"></i><span style="color:#ffffff;">${i18n.t('static.broadcast.editDraft', 'Edit')}</span></button>`;
+                actionHtml = `<button type="button" class="btn btn-warning btn-sm text-white" style="padding:2px 10px;white-space:nowrap;" onclick="window.editBroadcastDraft(${item.broadcastId});"><i class="fa fa-pencil mr-1 text-white"></i><span style="color:#ffffff;">${i18n.t('static.broadcast.editDraft', 'Edit Draft')}</span></button>`;
             } else {
-                actionHtml = `<button type="button" class="btn btn-info btn-sm text-white" style="padding:2px 10px;font-size:11px;background-color:#20a8d8;border-color:#20a8d8;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;" onclick="window.viewBroadcastDetails(${item.broadcastId});"><i class="fa fa-eye mr-1 text-white"></i><span style="color:#ffffff;">${i18n.t('static.common.view', 'View')}</span></button>`;
+                actionHtml = `<button type="button" class="btn btn-info btn-sm text-white" style="padding:2px 10px;white-space:nowrap;" onclick="window.viewBroadcastDetails(${item.broadcastId});"><i class="fa fa-eye mr-1 text-white"></i><span style="color:#ffffff;">${i18n.t('static.common.view', 'View')}</span></button>`;
             }
             data[10] = actionHtml;
 
@@ -239,20 +221,20 @@ class BroadcastMessageComponent extends Component {
         const options = {
             data: historyArray,
             columnDrag: false,
-            colWidths: [0, 150, 450, 120, 150, 120, 90, 70, 100, 100, 90],
+            colWidths: [0, 140, 420, 130, 130, 110, 85, 65, 95, 85, 95],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 { title: 'broadcastId', type: 'hidden' },
-                { title: i18n.t('static.common.dateTime', 'Date / Time'), type: 'text' },
-                { title: i18n.t('static.broadcast.subject', 'Subject'), type: 'html' },
-                { title: i18n.t('static.broadcast.category', 'Category'), type: 'text' },
-                { title: i18n.t('static.broadcast.targetRoles', 'Roles'), type: 'text' },
-                { title: i18n.t('static.broadcast.targetLanguages', 'Languages'), type: 'text' },
-                { title: i18n.t('static.broadcast.recipients', 'Recipients'), type: 'html' },
-                { title: i18n.t('static.broadcast.batches', 'Batches'), type: 'text' },
-                { title: i18n.t('static.common.sentBy', 'Sent By'), type: 'text' },
-                { title: i18n.t('static.common.status', 'Status'), type: 'html' },
-                { title: i18n.t('static.common.action', 'Action'), type: 'html' }
+                { title: i18n.t('static.common.dateTime', 'Date / Time'), type: 'text', width: 140 },
+                { title: i18n.t('static.broadcast.subject', 'Subject'), type: 'html', width: 420 },
+                { title: i18n.t('static.broadcast.category', 'Category'), type: 'text', width: 130 },
+                { title: i18n.t('static.broadcast.targetRoles', 'Roles'), type: 'text', width: 130 },
+                { title: i18n.t('static.broadcast.targetLanguages', 'Languages'), type: 'text', width: 110 },
+                { title: i18n.t('static.broadcast.recipients', 'Recipients'), type: 'html', width: 85 },
+                { title: i18n.t('static.broadcast.batches', 'Batches'), type: 'text', width: 65 },
+                { title: i18n.t('static.common.sentBy', 'Sent By'), type: 'text', width: 95 },
+                { title: i18n.t('static.common.status', 'Status'), type: 'html', width: 85 },
+                { title: i18n.t('static.common.action', 'Action'), type: 'html', width: 95 }
             ],
             editable: false,
             onload: this.loaded,
@@ -263,7 +245,6 @@ class BroadcastMessageComponent extends Component {
             allowInsertColumn: false,
             allowManualInsertColumn: false,
             allowDeleteRow: false,
-            onselection: this.selected,
             copyCompatibility: true,
             allowExport: false,
             paginationOptions: JEXCEL_PAGINATION_OPTION,
@@ -1005,8 +986,25 @@ class BroadcastMessageComponent extends Component {
                                 </CardHeader>
 
                                 <CardBody className="pt-md-1 pb-md-1 table-responsive">
+                                    <style>{`
+                                        #tableDiv .jss {
+                                            font-family: Arial, Helvetica, sans-serif !important;
+                                            font-size: 0.775rem !important;
+                                            min-width: 1350px !important;
+                                        }
+                                        #tableDiv .jss>tbody>tr>td {
+                                            font-family: Arial, Helvetica, sans-serif !important;
+                                            font-size: 0.775rem !important;
+                                        }
+                                        #tableDiv .jss>thead>tr>td {
+                                            font-family: Arial, Helvetica, sans-serif !important;
+                                        }
+                                        #tableDiv .jss_search {
+                                            font-family: Arial, Helvetica, sans-serif !important;
+                                        }
+                                    `}</style>
                                     <div className='consumptionDataEntryTable'>
-                                        <div id="tableDiv" className="jexcelremoveReadonlybackground RowClickable" style={{ display: loadingHistory ? "none" : "block" }}>
+                                        <div id="tableDiv" className="jexcelremoveReadonlybackground" style={{ display: loadingHistory ? "none" : "block" }}>
                                         </div>
                                     </div>
                                     <div style={{ display: loadingHistory ? "block" : "none" }}>
@@ -1127,7 +1125,7 @@ class BroadcastMessageComponent extends Component {
                                                 <FormGroup>
                                                     <div className="d-flex justify-content-between align-items-center">
                                                         <Label htmlFor="recipientCount" className="mb-0">
-                                                            {i18n.t('static.broadcast.estimatedRecipients', 'Estimated Recipients')}
+                                                            {i18n.t('static.broadcast.recipients', 'Recipients')}
                                                         </Label>
                                                         {recipientCount > 0 && (
                                                             <Button
@@ -1610,112 +1608,59 @@ class BroadcastMessageComponent extends Component {
                                 {i18n.t('static.broadcast.historyDetails', 'Broadcast Details')} #{selectedHistoryItem.broadcastId}
                             </strong>
                         </ModalHeader>
-                        <ModalBody className="p-3">
-                            {/* Subject & Status Banner */}
-                            <div className="d-flex align-items-center justify-content-between p-3 mb-3 rounded" style={{ backgroundColor: '#f0f3f5', borderLeft: '4px solid #20a8d8' }}>
-                                <div>
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block">{i18n.t('static.broadcast.subject', 'Subject')}</span>
-                                    <h5 className="mb-0 font-weight-bold text-dark mt-1">{selectedHistoryItem.subject}</h5>
-                                </div>
-                                <div>
-                                    <span
-                                        style={{
-                                            display: 'inline-block',
-                                            padding: '4px 12px',
-                                            fontSize: '12px',
-                                            fontWeight: '600',
-                                            borderRadius: '4px',
-                                            backgroundColor: selectedHistoryItem.status === 'COMPLETED' ? '#d4edda' : (selectedHistoryItem.status === 'SAVED' || selectedHistoryItem.status === 'QUEUED' ? '#e8f4fd' : '#fff3cd'),
-                                            color: selectedHistoryItem.status === 'COMPLETED' ? '#155724' : (selectedHistoryItem.status === 'SAVED' || selectedHistoryItem.status === 'QUEUED' ? '#0056b3' : '#856404'),
-                                            border: `1px solid ${selectedHistoryItem.status === 'COMPLETED' ? '#c3e6cb' : (selectedHistoryItem.status === 'SAVED' || selectedHistoryItem.status === 'QUEUED' ? '#b8daff' : '#ffeeba')}`
-                                        }}
-                                    >
-                                        {selectedHistoryItem.status === 'DRAFT' ? i18n.t('static.broadcast.draft', 'Draft') : (selectedHistoryItem.status === 'SAVED' || selectedHistoryItem.status === 'QUEUED' ? i18n.t('static.broadcast.statusQueued', 'Queued') : (selectedHistoryItem.status === 'COMPLETED' ? i18n.t('static.broadcast.statusCompleted', 'Completed') : selectedHistoryItem.status))}
-                                    </span>
-                                </div>
-                            </div>
+                        <ModalBody className="p-3" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            <Table bordered size="sm" className="mb-3" style={{ fontSize: '0.775rem' }}>
+                                <tbody>
+                                    <tr>
+                                        <th style={{ width: '18%', backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.subject', 'Subject')}</th>
+                                        <td colSpan="3" style={{ verticalAlign: 'middle' }}><strong>{selectedHistoryItem.subject}</strong></td>
+                                    </tr>
+                                    <tr>
+                                        <th style={{ width: '18%', backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.category', 'Category')}</th>
+                                        <td style={{ width: '32%', verticalAlign: 'middle' }}>{selectedHistoryItem.label ? getLabelText(selectedHistoryItem.label, lang) : (selectedHistoryItem.categoryName || 'Broadcast')}</td>
+                                        <th style={{ width: '18%', backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.common.status', 'Status')}</th>
+                                        <td style={{ width: '32%', verticalAlign: 'middle' }}>
+                                            <span className={`badge ${selectedHistoryItem.status === 'COMPLETED' ? 'badge-success' : (selectedHistoryItem.status === 'DRAFT' ? 'badge-warning' : 'badge-primary')} text-white`} style={{ padding: '4px 8px' }}>
+                                                {selectedHistoryItem.status === 'DRAFT' ? i18n.t('static.broadcast.draft', 'Draft') : (selectedHistoryItem.status === 'SAVED' || selectedHistoryItem.status === 'QUEUED' ? i18n.t('static.broadcast.statusQueued', 'Queued') : (selectedHistoryItem.status === 'COMPLETED' ? i18n.t('static.broadcast.statusCompleted', 'Completed') : selectedHistoryItem.status))}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.common.dateTime', 'Date / Time')}</th>
+                                        <td style={{ verticalAlign: 'middle' }}>{selectedHistoryItem.createdDate ? moment(selectedHistoryItem.createdDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '-'}</td>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.common.sentBy', 'Sent By')}</th>
+                                        <td style={{ verticalAlign: 'middle' }}>{selectedHistoryItem.createdBy ? selectedHistoryItem.createdBy.username : '-'}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.targetRoles', 'Roles')}</th>
+                                        <td style={{ verticalAlign: 'middle' }}>{this.getRolesFormatted(selectedHistoryItem.targetRoles)}</td>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.targetLanguages', 'Languages')}</th>
+                                        <td style={{ verticalAlign: 'middle' }}>{this.getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</td>
+                                    </tr>
+                                    <tr>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.recipients', 'Recipients')}</th>
+                                        <td colSpan="3" style={{ verticalAlign: 'middle' }}>
+                                            <span className="text-primary font-weight-bold">{selectedHistoryItem.totalRecipients}</span>
+                                            <span className="text-muted ml-2">({selectedHistoryItem.batchCount} {selectedHistoryItem.batchCount === 1 ? 'batch' : 'batches'})</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </Table>
 
-                            {/* Metadata 4-Box Grid */}
-                            <div className="row mb-3 mx-0 border rounded p-2 bg-white shadow-sm">
-                                <div className="col-sm-6 col-md-3 py-1 border-right">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">{i18n.t('static.broadcast.category', 'Category')}</span>
-                                    <span
-                                        style={{
-                                            display: 'inline-block',
-                                            padding: '3px 8px',
-                                            fontSize: '11px',
-                                            fontWeight: '600',
-                                            borderRadius: '4px',
-                                            backgroundColor: selectedHistoryItem.categoryId === 1 ? '#e8f4fd' : (selectedHistoryItem.categoryId === 2 ? '#e2e3e5' : '#fff3cd'),
-                                            color: selectedHistoryItem.categoryId === 1 ? '#0056b3' : (selectedHistoryItem.categoryId === 2 ? '#383d41' : '#856404'),
-                                            border: `1px solid ${selectedHistoryItem.categoryId === 1 ? '#b8daff' : (selectedHistoryItem.categoryId === 2 ? '#d6d8db' : '#ffeeba')}`
-                                        }}
-                                    >
-                                        {selectedHistoryItem.label ? getLabelText(selectedHistoryItem.label, lang) : (selectedHistoryItem.categoryName || 'Broadcast')}
-                                    </span>
-                                </div>
-                                <div className="col-sm-6 col-md-3 py-1 border-right">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">{i18n.t('static.common.date', 'Date Sent')}</span>
-                                    <span className="font-weight-600 text-dark" style={{ fontSize: '13px' }}>
-                                        <i className="fa fa-calendar-o text-muted mr-1"></i>
-                                        {selectedHistoryItem.createdDate ? moment(selectedHistoryItem.createdDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '-'}
-                                    </span>
-                                </div>
-                                <div className="col-sm-6 col-md-3 py-1 border-right">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">{i18n.t('static.broadcast.estimatedRecipients', 'Recipients')}</span>
-                                    <span className="font-weight-bold text-primary" style={{ fontSize: '13px' }}>
-                                        <i className="fa fa-users text-muted mr-1"></i>
-                                        {selectedHistoryItem.totalRecipients}{' '}
-                                        <span className="small text-muted font-weight-normal">({selectedHistoryItem.batchCount} {selectedHistoryItem.batchCount === 1 ? 'batch' : 'batches'})</span>
-                                    </span>
-                                </div>
-                                <div className="col-sm-6 col-md-3 py-1">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">{i18n.t('static.common.sentBy', 'Sent By')}</span>
-                                    <span className="font-weight-600 text-dark" style={{ fontSize: '13px' }}>
-                                        <i className="fa fa-user-circle-o text-muted mr-1"></i>
-                                        {selectedHistoryItem.createdBy ? selectedHistoryItem.createdBy.username : '-'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            {/* Roles & Languages Box */}
-                            <div className="row mb-3 mx-0 border rounded p-2 bg-white shadow-sm">
-                                <div className="col-sm-6 py-1 border-right">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">
-                                        <i className="fa fa-users text-muted mr-1"></i>
-                                        {i18n.t('static.broadcast.targetRoles', 'Roles')}
-                                    </span>
-                                    <span className="text-dark small font-weight-600">{this.getRolesFormatted(selectedHistoryItem.targetRoles)}</span>
-                                </div>
-                                <div className="col-sm-6 py-1">
-                                    <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">
-                                        <i className="fa fa-language text-muted mr-1"></i>
-                                        {i18n.t('static.broadcast.targetLanguages', 'Languages')}
-                                    </span>
-                                    <span className="text-dark small font-weight-600">{this.getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</span>
-                                </div>
-                            </div>
-
-                            {/* Message Body Section */}
-                            <div className="mb-1">
-                                <span className="text-muted small text-uppercase font-weight-bold">
-                                    <i className="fa fa-align-left mr-1"></i>
-                                    {i18n.t('static.broadcast.body', 'Message Body')}
-                                </span>
-                            </div>
-                            <div
-                                className="p-3 border rounded bg-white"
-                                style={{
-                                    minHeight: '140px',
-                                    maxHeight: '360px',
-                                    overflowY: 'auto',
-                                    lineHeight: '1.6',
-                                    fontSize: '13.5px',
-                                    color: '#212529',
-                                    boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.03)'
-                                }}
-                                dangerouslySetInnerHTML={{ __html: selectedHistoryItem.bodyHtml }}
-                            />
+                            <FormGroup className="mb-0">
+                                <Label><strong>{i18n.t('static.broadcast.body', 'Message Body')}</strong></Label>
+                                <div
+                                    className="p-3 border rounded bg-white"
+                                    style={{
+                                        minHeight: '140px',
+                                        maxHeight: '360px',
+                                        overflowY: 'auto',
+                                        lineHeight: '1.5',
+                                        fontSize: '0.775rem'
+                                    }}
+                                    dangerouslySetInnerHTML={{ __html: selectedHistoryItem.bodyHtml }}
+                                />
+                            </FormGroup>
                         </ModalBody>
                         <ModalFooter>
                             {selectedHistoryItem.status === 'DRAFT' && (
@@ -1751,7 +1696,7 @@ class BroadcastMessageComponent extends Component {
                                 {selectedRecipientsBroadcast ? ` - ${selectedRecipientsBroadcast.subject}` : ''}
                             </strong>
                         </ModalHeader>
-                        <ModalBody className="p-3">
+                        <ModalBody className="p-3" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
                             <div className="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border">
                                 <div>
                                     <span className="text-muted small font-weight-bold text-uppercase">{i18n.t('static.broadcast.category', 'Category')}: </span>
@@ -1814,7 +1759,7 @@ class BroadcastMessageComponent extends Component {
                                             {filteredRecipients.map((rec, idx) => (
                                                 <tr key={rec.userId || idx}>
                                                     <td className="align-middle">{idx + 1}</td>
-                                                    <td className="text-left align-middle font-weight-600 text-dark">
+                                                    <td className="text-left align-middle text-dark">
                                                         <i className="fa fa-user text-muted mr-2"></i>{rec.username}
                                                     </td>
                                                     <td className="text-left align-middle text-muted">

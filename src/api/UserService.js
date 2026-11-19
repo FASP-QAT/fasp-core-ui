@@ -85,6 +85,9 @@ class UserService {
     getNotificationPreferences() {
         return axios.get(`${API_URL}/api/user/notificationPreference`, {});
     }
+    getNotificationPreferencesByUserId(userId) {
+        return axios.get(`${API_URL}/api/user/notificationPreference/${userId}`, {});
+    }
     updateNotificationPreferences(preferences) {
         return axios.post(`${API_URL}/api/user/notificationPreference`, preferences, {});
     }
