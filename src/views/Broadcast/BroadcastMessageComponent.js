@@ -151,22 +151,30 @@ class BroadcastMessageComponent extends Component {
 
     getRolesFormatted = (targetRoles) => {
         const { roleList } = this.state;
-        if (!targetRoles || targetRoles.length === 0 || targetRoles.length === roleList.length) {
+        if (!targetRoles) {
             return i18n.t('static.broadcast.allRoles', 'All Roles');
         }
-        return targetRoles.map(rId => {
-            const r = roleList.find(role => role.value === rId);
+        const roleArr = Array.isArray(targetRoles) ? targetRoles : [targetRoles];
+        if (roleArr.length === 0 || (roleList && roleList.length > 0 && roleArr.length === roleList.length)) {
+            return i18n.t('static.broadcast.allRoles', 'All Roles');
+        }
+        return roleArr.map(rId => {
+            const r = roleList ? roleList.find(role => String(role.value) === String(rId)) : null;
             return r ? r.label : rId;
         }).join(', ');
     };
 
     getLanguagesFormatted = (targetLanguages) => {
         const { languages } = this.state;
-        if (!targetLanguages || targetLanguages.length === 0 || targetLanguages.length === languages.length) {
+        if (!targetLanguages) {
             return i18n.t('static.broadcast.allLanguages', 'All Languages');
         }
-        return targetLanguages.map(lId => {
-            const l = languages.find(lng => lng.value === lId);
+        const langArr = Array.isArray(targetLanguages) ? targetLanguages : [targetLanguages];
+        if (langArr.length === 0 || (languages && languages.length > 0 && langArr.length === languages.length)) {
+            return i18n.t('static.broadcast.allLanguages', 'All Languages');
+        }
+        return langArr.map(lId => {
+            const l = languages ? languages.find(lng => String(lng.value) === String(lId)) : null;
             return l ? l.label : lId;
         }).join(', ');
     };
@@ -240,7 +248,7 @@ class BroadcastMessageComponent extends Component {
                 { title: i18n.t('static.broadcast.category', 'Category'), type: 'text' },
                 { title: i18n.t('static.broadcast.targetRoles', 'Roles'), type: 'text' },
                 { title: i18n.t('static.broadcast.targetLanguages', 'Languages'), type: 'text' },
-                { title: i18n.t('static.broadcast.estimatedRecipients', 'Recipients'), type: 'html' },
+                { title: i18n.t('static.broadcast.recipients', 'Recipients'), type: 'html' },
                 { title: i18n.t('static.broadcast.batches', 'Batches'), type: 'text' },
                 { title: i18n.t('static.common.sentBy', 'Sent By'), type: 'text' },
                 { title: i18n.t('static.common.status', 'Status'), type: 'html' },
@@ -316,6 +324,10 @@ class BroadcastMessageComponent extends Component {
                     this.setState({
                         roleList: roles,
                         selectedRoles: roles
+                    }, () => {
+                        if (this.state.viewMode === 'list' && this.state.historyList.length > 0) {
+                            this.buildJExcel();
+                        }
                     });
                 }
             })
@@ -340,6 +352,10 @@ class BroadcastMessageComponent extends Component {
                     this.setState({
                         languages: list,
                         selectedLanguages: list
+                    }, () => {
+                        if (this.state.viewMode === 'list' && this.state.historyList.length > 0) {
+                            this.buildJExcel();
+                        }
                     });
                 }
             })
@@ -811,7 +827,7 @@ class BroadcastMessageComponent extends Component {
                     sending: false,
                     viewMode: 'list',
                     editingBroadcastId: null,
-                    successMessage: i18n.t('static.broadcast.queuedSuccess', 'Broadcast message queued for delivery successfully'),
+                    successMessage: i18n.t('static.broadcast.queuedSuccess', 'Successfully queued for delivery'),
                     subject: '',
                     messageBody: ''
                 }, () => {
@@ -1669,14 +1685,14 @@ class BroadcastMessageComponent extends Component {
                                         <i className="fa fa-users text-muted mr-1"></i>
                                         {i18n.t('static.broadcast.targetRoles', 'Roles')}
                                     </span>
-                                    <span className="text-dark small font-weight-600">{getRolesFormatted(selectedHistoryItem.targetRoles)}</span>
+                                    <span className="text-dark small font-weight-600">{this.getRolesFormatted(selectedHistoryItem.targetRoles)}</span>
                                 </div>
                                 <div className="col-sm-6 py-1">
                                     <span className="text-muted small text-uppercase font-weight-bold d-block mb-1">
                                         <i className="fa fa-language text-muted mr-1"></i>
                                         {i18n.t('static.broadcast.targetLanguages', 'Languages')}
                                     </span>
-                                    <span className="text-dark small font-weight-600">{getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</span>
+                                    <span className="text-dark small font-weight-600">{this.getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</span>
                                 </div>
                             </div>
 
