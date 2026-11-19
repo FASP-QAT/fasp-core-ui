@@ -16,7 +16,8 @@ import {
   FormGroup,
   Input,
   Label,
-  Row
+  Row,
+  Table
 } from "reactstrap";
 import * as Yup from "yup";
 import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
@@ -127,7 +128,9 @@ class EditUserComponent extends Component {
       selOrganisation: [],
       selHealthArea: [],
       selProcurementAgent: [],
-      selFundingSource: []
+      selFundingSource: [],
+      notificationPreferences: [],
+      loadingNotificationPreferences: true
     };
     this.cancelClicked = this.cancelClicked.bind(this);
     this.dataChange = this.dataChange.bind(this);
@@ -1692,6 +1695,20 @@ class EditUserComponent extends Component {
    */
   componentDidMount() {
     // document.getElementById("roleValid").value = false;
+    UserService.getNotificationPreferencesByUserId(this.props.match.params.userId)
+      .then((res) => {
+        if (res.status === 200) {
+          this.setState({
+            notificationPreferences: res.data,
+            loadingNotificationPreferences: false,
+          });
+        } else {
+          this.setState({ loadingNotificationPreferences: false });
+        }
+      })
+      .catch((err) => {
+        this.setState({ loadingNotificationPreferences: false });
+      });
     UserService.getUserByUserId(this.props.match.params.userId)
       .then((response) => {
         if (response.status == 200) {
@@ -2345,6 +2362,63 @@ class EditUserComponent extends Component {
                             {i18n.t("static.dataentry.inactive")}
                           </Label>
                         </FormGroup>
+                      </FormGroup>
+                      <FormGroup>
+                        <Label>
+                          <strong>{i18n.t("static.broadcast.notificationPreferences", "Notification Preferences")}</strong>
+                        </Label>
+                        <div style={{ maxWidth: "600px" }}>
+                          {this.state.notificationPreferences && this.state.notificationPreferences.length > 0 ? (
+                            <Table bordered size="sm" className="mb-0 bg-white" style={{ fontSize: "0.775rem", fontFamily: "Arial, Helvetica, sans-serif" }}>
+                              <thead>
+                                <tr style={{ backgroundColor: "#f0f3f5" }}>
+                                  <th style={{ width: "65%", verticalAlign: "middle" }}>
+                                    {i18n.t("static.broadcast.category", "Category")}
+                                  </th>
+                                  <th style={{ width: "35%", verticalAlign: "middle", textAlign: "center" }}>
+                                    {i18n.t("static.common.status", "Status")}
+                                  </th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {this.state.notificationPreferences.map((pref) => {
+                                  const isOptedOut = pref.optedOut === true;
+                                  return (
+                                    <tr key={pref.categoryId}>
+                                      <td style={{ verticalAlign: "middle" }}>
+                                        <span>
+                                          {pref.label ? getLabelText(pref.label, this.state.lang) : pref.categoryName}
+                                        </span>
+                                        {!pref.allowOptOut && (
+                                          <span className="badge badge-light border ml-2 text-muted" style={{ fontWeight: "normal" }}>
+                                            {i18n.t("static.common.mandatory", "Mandatory")}
+                                          </span>
+                                        )}
+                                      </td>
+                                      <td style={{ verticalAlign: "middle", textAlign: "center" }}>
+                                        {isOptedOut ? (
+                                          <span className="badge badge-secondary" style={{ padding: "4px 8px" }}>
+                                            {i18n.t("static.broadcast.optedOut", "Opted Out")}
+                                          </span>
+                                        ) : (
+                                          <span className="badge badge-success text-white" style={{ padding: "4px 8px" }}>
+                                            {i18n.t("static.broadcast.optedIn", "Opted In")}
+                                          </span>
+                                        )}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </Table>
+                          ) : (
+                            <div className="text-muted small">
+                              {this.state.loadingNotificationPreferences
+                                ? i18n.t("static.common.loading", "Loading...")
+                                : i18n.t("static.common.noDataAvailable", "No data available")}
+                            </div>
+                          )}
+                        </div>
                       </FormGroup>
                       <FormGroup>
                         <h5>
