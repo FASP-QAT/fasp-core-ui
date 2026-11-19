@@ -332,7 +332,7 @@ const routes = [
   { path: '/user/listUser', exact: true, name: 'static.breadcrum.list', entityname: 'static.userHead.user', component: ListUser },
   { path: '/user/addUser', exact: true, name: 'static.breadcrum.add', entityname: 'static.userHead.user', component: AddUser },
   { path: '/user/editUser/:userId', exact: true, name: 'static.breadcrum.edit', entityname: 'static.userHead.user', component: EditUser },
-  { path: '/broadcast/broadcastMessage', exact: true, name: 'Broadcast Message', component: BroadcastMessageComponent },
+  { path: '/broadcast/broadcastMessage', exact: true, name: 'static.broadcast.broadcastMessage', component: BroadcastMessageComponent },
   { path: '/accessDenied', exact: true, component: AccessDenied },
   { path: '/program/downloadProgram', name: 'static.loadDeleteProgram.loadDeleteProgram', component: ProgramTree },
   { path: '/program/syncPage', name: "static.dashboard.commitVersion", component: syncPage },
