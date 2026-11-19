@@ -17,6 +17,32 @@ import { getDatabase } from "../src/CommonComponent/IndexedDbFunctions";
 import { saveProgram } from '../src/CommonComponent/IndexedDbFunctions';
 const loading = () => <div className="animated fadeIn pt-3 text-center"><div className="sk-spinner sk-spinner-pulse"></div></div>;
 
+// Fix for React NotFoundError: Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.
+// This occurs when browser translation (e.g. Google Translate) or third-party extensions modify the DOM tree outside React's control.
+if (typeof Node === 'function' && Node.prototype) {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function (child) {
+    if (child.parentNode !== this) {
+      if (console) {
+        console.warn('Cannot remove child: not a child of this node', this, child);
+      }
+      return child;
+    }
+    return originalRemoveChild.apply(this, arguments);
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function (newNode, referenceNode) {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      if (console) {
+        console.warn('Cannot insert before: reference node is not a child of this node', this, referenceNode);
+      }
+      return newNode;
+    }
+    return originalInsertBefore.apply(this, arguments);
+  };
+}
+
 
 ReactDOM.render(<React.Suspense fallback={loading()}><App /></React.Suspense>, document.getElementById('root'));
 getDatabase();
