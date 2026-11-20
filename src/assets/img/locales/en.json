@@ -3799,5 +3799,6 @@
   "static.broadcast.languageRequired": "Please select at least one language.",
   "static.broadcast.presetColors": "Preset Colors",
   "static.broadcast.customColor": "Custom",
-  "static.broadcast.previewRecipientsTitle": "Target Recipients Preview"
+  "static.broadcast.previewRecipientsTitle": "Target Recipients Preview",
+  "static.broadcast.messageQueuedTime": "Message queued time"
 }

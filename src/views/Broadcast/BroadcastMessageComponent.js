@@ -78,10 +78,7 @@ class BroadcastMessageComponent extends Component {
     }
 
     componentDidMount() {
-        this.loadCategories();
-        this.loadRoles();
-        this.loadLanguages();
-        this.loadHistory();
+        this.loadInitialData();
         window.addEventListener('popstate', this.handlePopState);
         document.addEventListener('click', this.handleDocumentClick);
 
@@ -142,7 +139,7 @@ class BroadcastMessageComponent extends Component {
         }
         return roleArr.map(rId => {
             const r = roleList ? roleList.find(role => String(role.value) === String(rId)) : null;
-            return r ? r.label : rId;
+            return (r && r.label) ? r.label : rId;
         }).join(', ');
     };
 
@@ -208,6 +205,8 @@ class BroadcastMessageComponent extends Component {
                 actionHtml = `<button type="button" class="btn btn-info btn-sm text-white" style="padding:2px 10px;white-space:nowrap;" onclick="window.viewBroadcastDetails(${item.broadcastId});"><i class="fa fa-eye mr-1 text-white"></i><span style="color:#ffffff;">${i18n.t('static.common.view', 'View')}</span></button>`;
             }
             data[10] = actionHtml;
+            const plainBody = (item.bodyHtml || '').replace(/<[^>]*>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+            data[11] = plainBody;
 
             historyArray[count] = data;
             count++;
@@ -221,11 +220,11 @@ class BroadcastMessageComponent extends Component {
         const options = {
             data: historyArray,
             columnDrag: false,
-            colWidths: [0, 140, 420, 130, 130, 110, 85, 65, 95, 85, 95],
+            colWidths: [0, 150, 420, 130, 130, 110, 85, 65, 95, 85, 95, 0],
             colHeaderClasses: ["Reqasterisk"],
             columns: [
                 { title: 'broadcastId', type: 'hidden' },
-                { title: i18n.t('static.common.dateTime', 'Date / Time'), type: 'text', width: 140 },
+                { title: i18n.t('static.broadcast.messageQueuedTime', 'Message queued time'), type: 'text', width: 150 },
                 { title: i18n.t('static.broadcast.subject', 'Subject'), type: 'html', width: 420 },
                 { title: i18n.t('static.broadcast.category', 'Category'), type: 'text', width: 130 },
                 { title: i18n.t('static.broadcast.targetRoles', 'Roles'), type: 'text', width: 130 },
@@ -234,7 +233,8 @@ class BroadcastMessageComponent extends Component {
                 { title: i18n.t('static.broadcast.batches', 'Batches'), type: 'text', width: 65 },
                 { title: i18n.t('static.common.sentBy', 'Sent By'), type: 'text', width: 95 },
                 { title: i18n.t('static.common.status', 'Status'), type: 'html', width: 85 },
-                { title: i18n.t('static.common.action', 'Action'), type: 'html', width: 95 }
+                { title: i18n.t('static.common.action', 'Action'), type: 'html', width: 95 },
+                { title: 'body', type: 'hidden' }
             ],
             editable: false,
             onload: this.loaded,
@@ -273,6 +273,58 @@ class BroadcastMessageComponent extends Component {
         }
     };
 
+    loadInitialData = () => {
+        this.setState({ loading: true, loadingHistory: true });
+        Promise.all([
+            BroadcastService.getCategories(),
+            UserService.getRoleList(),
+            LanguageService.getLanguageListActive()
+        ])
+            .then(([catRes, roleRes, langRes]) => {
+                const cats = catRes.data || [];
+                let roles = [];
+                if (roleRes.status === 200 && roleRes.data) {
+                    roles = roleRes.data.map(r => ({
+                        value: r.roleId,
+                        label: getLabelText(r.label, this.state.lang) || (r.label && r.label.label_en) || r.roleId
+                    }));
+                    roles.sort((a, b) => {
+                        const itemA = a.label ? a.label.toUpperCase() : '';
+                        const itemB = b.label ? b.label.toUpperCase() : '';
+                        return itemA.localeCompare(itemB);
+                    });
+                }
+                let langs = [];
+                if (langRes.status === 200 && langRes.data) {
+                    langs = langRes.data.map(l => ({
+                        value: l.languageId,
+                        label: getLabelText(l.label, this.state.lang) || (l.label && l.label.label_en) || l.languageCode
+                    }));
+                    langs.sort((a, b) => {
+                        const itemA = a.label ? a.label.toUpperCase() : '';
+                        const itemB = b.label ? b.label.toUpperCase() : '';
+                        return itemA.localeCompare(itemB);
+                    });
+                }
+                this.setState({
+                    categories: cats,
+                    categoryId: cats.length > 0 ? cats[0].categoryId : 1,
+                    roleList: roles,
+                    selectedRoles: roles,
+                    languages: langs,
+                    selectedLanguages: langs,
+                    loading: false
+                }, () => {
+                    this.loadHistory();
+                });
+            })
+            .catch(err => {
+                console.error('Failed to load initial metadata', err);
+                this.setState({ loading: false });
+                this.loadHistory();
+            });
+    };
+
     loadCategories = () => {
         BroadcastService.getCategories()
             .then(res => {
@@ -295,7 +347,7 @@ class BroadcastMessageComponent extends Component {
                 if (res.status === 200 && res.data) {
                     const roles = res.data.map(r => ({
                         value: r.roleId,
-                        label: getLabelText(r.label, this.state.lang)
+                        label: getLabelText(r.label, this.state.lang) || (r.label && r.label.label_en) || r.roleId
                     }));
                     roles.sort((a, b) => {
                         const itemA = a.label ? a.label.toUpperCase() : '';
@@ -1626,7 +1678,7 @@ class BroadcastMessageComponent extends Component {
                                         </td>
                                     </tr>
                                     <tr>
-                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.common.dateTime', 'Date / Time')}</th>
+                                        <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.messageQueuedTime', 'Message queued time')}</th>
                                         <td style={{ verticalAlign: 'middle' }}>{selectedHistoryItem.createdDate ? moment(selectedHistoryItem.createdDate).format(`${DATE_FORMAT_CAP} hh:mm A`) : '-'}</td>
                                         <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.common.sentBy', 'Sent By')}</th>
                                         <td style={{ verticalAlign: 'middle' }}>{selectedHistoryItem.createdBy ? selectedHistoryItem.createdBy.username : '-'}</td>

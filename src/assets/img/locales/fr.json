@@ -3799,5 +3799,6 @@
   "static.broadcast.languageRequired": "Veuillez sélectionner au moins une langue.",
   "static.broadcast.presetColors": "Couleurs prédéfinies",
   "static.broadcast.customColor": "Personnalisé",
-  "static.broadcast.previewRecipientsTitle": "Aperçu des destinataires cibles"
+  "static.broadcast.previewRecipientsTitle": "Aperçu des destinataires cibles",
+  "static.broadcast.messageQueuedTime": "Heure de mise en file d'attente du message"
 }
