@@ -128,30 +128,36 @@ class BroadcastMessageComponent extends Component {
         // Row click disabled per client request - button click only
     }.bind(this);
 
-    getRolesFormatted = (targetRoles) => {
+    getRolesFormatted = (targetRoles, targetRoleList) => {
+        if (targetRoleList && targetRoleList.length > 0) {
+            return targetRoleList.map(r => getLabelText(r.label, this.state.lang) || (r.label && r.label.label_en) || r.roleId).join(', ');
+        }
+        if (!targetRoles || targetRoles.length === 0) {
+            return i18n.t('static.broadcast.allRoles', 'All Roles');
+        }
         const { roleList } = this.state;
-        if (!targetRoles) {
+        if (roleList && roleList.length > 0 && targetRoles.length === roleList.length) {
             return i18n.t('static.broadcast.allRoles', 'All Roles');
         }
         const roleArr = Array.isArray(targetRoles) ? targetRoles : [targetRoles];
-        if (roleArr.length === 0 || (roleList && roleList.length > 0 && roleArr.length === roleList.length)) {
-            return i18n.t('static.broadcast.allRoles', 'All Roles');
-        }
         return roleArr.map(rId => {
             const r = roleList ? roleList.find(role => String(role.value) === String(rId)) : null;
             return (r && r.label) ? r.label : rId;
         }).join(', ');
     };
 
-    getLanguagesFormatted = (targetLanguages) => {
+    getLanguagesFormatted = (targetLanguages, targetLanguageList) => {
+        if (targetLanguageList && targetLanguageList.length > 0) {
+            return targetLanguageList.map(l => getLabelText(l.label, this.state.lang) || (l.label && l.label.label_en) || l.languageCode).join(', ');
+        }
+        if (!targetLanguages || targetLanguages.length === 0) {
+            return i18n.t('static.broadcast.allLanguages', 'All Languages');
+        }
         const { languages } = this.state;
-        if (!targetLanguages) {
+        if (languages && languages.length > 0 && targetLanguages.length === languages.length) {
             return i18n.t('static.broadcast.allLanguages', 'All Languages');
         }
         const langArr = Array.isArray(targetLanguages) ? targetLanguages : [targetLanguages];
-        if (langArr.length === 0 || (languages && languages.length > 0 && langArr.length === languages.length)) {
-            return i18n.t('static.broadcast.allLanguages', 'All Languages');
-        }
         return langArr.map(lId => {
             const l = languages ? languages.find(lng => String(lng.value) === String(lId)) : null;
             return l ? l.label : lId;
@@ -180,8 +186,8 @@ class BroadcastMessageComponent extends Component {
                 ? `<span style="font-style:italic;color:#73818f;margin-right:6px;">(${draftLabel})</span>${safeSubject}`
                 : `${safeSubject}`;
             data[3] = item.label ? getLabelText(item.label, lang) : (item.categoryName || 'Broadcast');
-            data[4] = this.getRolesFormatted(item.targetRoles);
-            data[5] = this.getLanguagesFormatted(item.targetLanguages);
+            data[4] = this.getRolesFormatted(item.targetRoles, item.targetRoleList);
+            data[5] = this.getLanguagesFormatted(item.targetLanguages, item.targetLanguageList);
             data[6] = `<a href="javascript:void(0);" style="color:#20a8d8;text-decoration:underline;" onclick="window.viewBroadcastRecipients(${item.broadcastId});">${item.totalRecipients}</a>`;
             data[7] = item.batchCount;
             data[8] = item.createdBy ? item.createdBy.username : '-';
@@ -1685,9 +1691,9 @@ class BroadcastMessageComponent extends Component {
                                     </tr>
                                     <tr>
                                         <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.targetRoles', 'Roles')}</th>
-                                        <td style={{ verticalAlign: 'middle' }}>{this.getRolesFormatted(selectedHistoryItem.targetRoles)}</td>
+                                        <td style={{ verticalAlign: 'middle' }}>{this.getRolesFormatted(selectedHistoryItem.targetRoles, selectedHistoryItem.targetRoleList)}</td>
                                         <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.targetLanguages', 'Languages')}</th>
-                                        <td style={{ verticalAlign: 'middle' }}>{this.getLanguagesFormatted(selectedHistoryItem.targetLanguages)}</td>
+                                        <td style={{ verticalAlign: 'middle' }}>{this.getLanguagesFormatted(selectedHistoryItem.targetLanguages, selectedHistoryItem.targetLanguageList)}</td>
                                     </tr>
                                     <tr>
                                         <th style={{ backgroundColor: '#f0f3f5', verticalAlign: 'middle' }}>{i18n.t('static.broadcast.recipients', 'Recipients')}</th>
