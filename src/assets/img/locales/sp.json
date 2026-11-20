@@ -3816,5 +3816,6 @@
   "static.broadcast.languageRequired": "Seleccione al menos un idioma.",
   "static.broadcast.presetColors": "Colores preestablecidos",
   "static.broadcast.customColor": "Personalizado",
-  "static.broadcast.previewRecipientsTitle": "Vista previa de destinatarios seleccionados"
+  "static.broadcast.previewRecipientsTitle": "Vista previa de destinatarios seleccionados",
+  "static.broadcast.messageQueuedTime": "Hora del mensaje en cola"
 }
