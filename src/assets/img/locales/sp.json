@@ -3745,5 +3745,14 @@
   "static.bulk.edited": "Editado",
   "static.bulk.changes": "Detalles de los cambios",
   "static.bulk.reviewChanges": "Revisar cambios",
-  "static.bulk.reviewPrompt": "Por favor, revise los cambios propuestos a continuación. Haga clic en Aceptar para actualizar o en Cancelar para regresar."
+  "static.bulk.reviewPrompt": "Por favor, revise los cambios propuestos a continuación. Haga clic en Aceptar para actualizar o en Cancelar para regresar.",
+  "static.bulk.downloadTemplateBulkAdding": "Descargar plantilla para agregar en masa",
+  "static.bulk.uploadTemplate": "Subir plantilla",
+  "static.bulk.addRows": "Agregar filas",
+  "static.bulk.rowsAdded": "filas agregadas",
+  "static.bulk.importSuccess": "filas importadas con éxito desde la plantilla",
+  "static.bulk.importError": "Error al analizar el archivo de plantilla. Asegúrese de que coincida con el formato de plantilla descargado.",
+  "static.program.viewProgramsUsingEntity": "Ver programas que usan {{entityname}}",
+  "static.program.programsUsingEntity": "Programas que usan {{entityname}}",
+  "static.program.noProgramsFound": "Actualmente ningún programa está utilizando esta unidad."
 }

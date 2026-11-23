@@ -3745,5 +3745,14 @@
   "static.bulk.edited": "Editado",
   "static.bulk.changes": "Detalhes das alterações",
   "static.bulk.reviewChanges": "Rever alterações",
-  "static.bulk.reviewPrompt": "Por favor, reveja as alterações propostas abaixo. Clique em OK para atualizar ou em Cancelar para voltar."
+  "static.bulk.reviewPrompt": "Por favor, reveja as alterações propostas abaixo. Clique em OK para atualizar ou em Cancelar para voltar.",
+  "static.bulk.downloadTemplateBulkAdding": "Baixar modelo para adição em massa",
+  "static.bulk.uploadTemplate": "Carregar modelo",
+  "static.bulk.addRows": "Adicionar linhas",
+  "static.bulk.rowsAdded": "linhas adicionadas",
+  "static.bulk.importSuccess": "linhas importadas com sucesso a partir do modelo",
+  "static.bulk.importError": "Falha ao analisar o arquivo de modelo. Certifique-se de que corresponda ao formato do modelo baixado.",
+  "static.program.viewProgramsUsingEntity": "Ver programas usando {{entityname}}",
+  "static.program.programsUsingEntity": "Programas usando {{entityname}}",
+  "static.program.noProgramsFound": "Nenhum programa está usando esta unidade no momento."
 }

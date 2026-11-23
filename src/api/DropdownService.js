@@ -33,8 +33,14 @@ class DropdownService {
   getPlanningUnitDropDownList() {
     return axios.get(`${API_URL}/api/dropdown/planningUnit`, {});
   }
+  getPlanningUnitDropdownList() {
+    return this.getPlanningUnitDropDownList();
+  }
   getForecastingUnitDropDownList() {
     return axios.get(`${API_URL}/api/dropdown/forecastingUnit`, {});
+  }
+  getForecastingUnitDropdownList() {
+    return this.getForecastingUnitDropDownList();
   }
   getRealmCountryDropdownList(realmId) {
     return axios.get(

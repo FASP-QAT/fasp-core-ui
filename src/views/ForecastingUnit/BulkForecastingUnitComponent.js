@@ -58,12 +58,18 @@ export default class BulkForecastingUnitComponent extends Component {
             pendingIndexMap: [],
             totalEdited: 0,
             totalCreated: 0,
-            submittedSummaryList: []
+            submittedSummaryList: [],
+            programsModal: false,
+            programsLoading: false,
+            selectedEntityName: '',
+            programList: []
         };
         this.el = null;
         this.changedRows = new Set();
+        this.loadingTable = false;
         this.buildJexcel = this.buildJexcel.bind(this);
         this.addRow = this.addRow.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
         this.changed = this.changed.bind(this);
         this.oneditionend = this.oneditionend.bind(this);
         this.onPaste = this.onPaste.bind(this);
@@ -73,6 +79,8 @@ export default class BulkForecastingUnitComponent extends Component {
         this.exportTemplate = this.exportTemplate.bind(this);
         this.dataChangeForRealm = this.dataChangeForRealm.bind(this);
         this.toggleReviewModal = this.toggleReviewModal.bind(this);
+        this.toggleProgramsModal = this.toggleProgramsModal.bind(this);
+        this.openProgramsModal = this.openProgramsModal.bind(this);
         this.goToError = this.goToError.bind(this);
         this.cancelClicked = this.cancelClicked.bind(this);
     }
@@ -113,10 +121,6 @@ export default class BulkForecastingUnitComponent extends Component {
             ForecastingUnitService.getForcastingUnitByRealmId(realmId)
         ])
             .then(([unitRes, pcRes, tcRes, fuRes]) => {
-                console.log("BulkForecastingUnit dependencies loaded:", { unitRes, pcRes, tcRes, fuRes });
-                if (fuRes.status === 'rejected') {
-                    console.error("fuRes rejected:", fuRes.reason);
-                }
                 let units = (unitRes.status === 'fulfilled' && unitRes.value.data) ? unitRes.value.data : [];
                 units.sort((a, b) => {
                     let labelA = a && a.payload ? a.payload.label : (a && a.label);
@@ -165,7 +169,6 @@ export default class BulkForecastingUnitComponent extends Component {
                     };
                 }).filter(c => c.id !== undefined && c.id !== null && c.name !== '');
 
-                // Handle 404/Empty result gracefully (empty array when no FUs exist for this realm)
                 let forecastingUnits = [];
                 if (fuRes.status === 'fulfilled' && fuRes.value.data) {
                     forecastingUnits = Array.isArray(fuRes.value.data) ? fuRes.value.data : [];
@@ -192,7 +195,6 @@ export default class BulkForecastingUnitComponent extends Component {
                     productCategories: productCategoryList,
                     tracerCategories: tracerCategoryList,
                     forecastingUnitList: forecastingUnits,
-                    isChanged: false,
                     loading: false
                 }, () => {
                     this.buildJexcel();
@@ -216,6 +218,10 @@ export default class BulkForecastingUnitComponent extends Component {
             jexcel.destroy(container, true);
         }
 
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
         let data = [];
         let { forecastingUnitList } = this.state;
         for (let i = 0; i < forecastingUnitList.length; i++) {
@@ -225,13 +231,15 @@ export default class BulkForecastingUnitComponent extends Component {
             let pcId = fu.productCategory ? (fu.productCategory.id !== undefined ? fu.productCategory.id : fu.productCategory.productCategoryId) : '';
             let tcId = fu.tracerCategory ? (fu.tracerCategory.id !== undefined ? fu.tracerCategory.id : fu.tracerCategory.tracerCategoryId) : '';
             let uId = fu.unit ? (fu.unit.id !== undefined ? fu.unit.id : fu.unit.unitId) : '';
+            // Row follows manual entry order:
+            // 0: ID, 1: Tracer Category, 2: Product Category, 3: Forecasting Unit, 4: Generic Name, 5: Unit, 6: Status, 7: isChanged
             let row = [
                 fu.forecastingUnitId,
-                pcId !== undefined && pcId !== null ? pcId : '',
                 tcId !== undefined && tcId !== null ? tcId : '',
-                uId !== undefined && uId !== null ? uId : '',
-                genericName,
+                pcId !== undefined && pcId !== null ? pcId : '',
                 fuName,
+                genericName,
+                uId !== undefined && uId !== null ? uId : '',
                 fu.active ? '1' : '0',
                 0 // isChanged: 0
             ];
@@ -242,12 +250,12 @@ export default class BulkForecastingUnitComponent extends Component {
             data: data,
             columnDrag: false,
             columns: [
-                { title: i18n.t('static.forecastingUnit.forecastingUnitId'), type: 'text', readOnly: true, width: 110 },
-                { title: `${i18n.t('static.productcategory.productcategory')} *`, type: 'dropdown', source: this.state.productCategories, width: 220, autocomplete: true },
+                { title: i18n.t('static.forecastingUnit.forecastingUnitId'), type: 'text', readOnly: true, width: 100 },
                 { title: `${i18n.t('static.tracercategory.tracercategory')} *`, type: 'dropdown', source: this.state.tracerCategories, width: 220, autocomplete: true },
-                { title: `${i18n.t('static.unit.unit')} *`, type: 'dropdown', source: this.state.units, width: 180, autocomplete: true },
-                { title: i18n.t('static.product.productgenericname'), type: 'text', width: 240 },
+                { title: `${i18n.t('static.productcategory.productcategory')} *`, type: 'dropdown', source: this.state.productCategories, width: 220, autocomplete: true },
                 { title: `${i18n.t('static.forecastingunit.forecastingunit')} *`, type: 'text', width: 280 },
+                { title: i18n.t('static.product.productgenericname'), type: 'text', width: 240 },
+                { title: `${i18n.t('static.unit.unit')} *`, type: 'dropdown', source: this.state.units, width: 180, autocomplete: true },
                 { title: i18n.t('static.common.status'), type: 'dropdown', source: [{ id: '1', name: i18n.t('static.common.active') }, { id: '0', name: i18n.t('static.dataentry.inactive') }], width: 110 },
                 { title: 'isChanged', type: 'hidden' }
             ],
@@ -274,10 +282,20 @@ export default class BulkForecastingUnitComponent extends Component {
                 items.push({
                     title: i18n.t('static.common.addRow'),
                     onclick: function () {
-                        this.addRow();
+                        this.addRow(1);
                     }.bind(this)
                 });
                 if (y != null) {
+                    let rowId = obj.getValueFromCoords(0, y);
+                    let rowName = obj.getValueFromCoords(3, y);
+                    if (rowId && parseInt(rowId) > 0) {
+                        items.push({
+                            title: i18n.t('static.program.viewProgramsUsingEntity', { entityname: i18n.t('static.forecastingunit.forecastingunit') }),
+                            onclick: function () {
+                                this.openProgramsModal(parseInt(rowId), rowName);
+                            }.bind(this)
+                        });
+                    }
                     items.push({
                         title: i18n.t('static.common.deleterow'),
                         onclick: function () {
@@ -308,15 +326,36 @@ export default class BulkForecastingUnitComponent extends Component {
                 return items;
             }.bind(this),
             onchange: this.changed,
-            oneditionend: this.oneditionend,
+            onbeforepaste: function (instance, data, x, y) {
+                if (data && data.length > 0) {
+                    let targetY = y !== undefined && y !== null ? parseInt(y) : 0;
+                    let totalRows = instance.getJson(null, false).length;
+                    let neededRows = (targetY + data.length) - totalRows;
+                    if (neededRows > 0) {
+                        for (let k = 0; k < neededRows; k++) {
+                            instance.insertRow([0, '', '', '', '', '', '1', 1]);
+                        }
+                    }
+                }
+                return data;
+            }.bind(this),
             onpaste: this.onPaste,
-            onload: jExcelLoadedFunction
+            onload: function (instance) {
+                jExcelLoadedFunction(instance);
+                let filter = document.querySelector('#forecastingUnitTableDiv .jss_pagination .order-1');
+                if (filter) {
+                    filter.classList.add('mr-2');
+                }
+                this.loadingTable = false;
+            }.bind(this)
         };
 
+        this.loadingTable = true;
         this.el = jexcel(document.getElementById("forecastingUnitTableDiv"), options);
     }
 
     changed(instance, cell, x, y, value) {
+        if (this.loadingTable) return;
         if (x !== 7) {
             this.changedRows.add(parseInt(y));
             this.el.setValueFromCoords(7, y, 1, true);
@@ -327,13 +366,7 @@ export default class BulkForecastingUnitComponent extends Component {
     }
 
     oneditionend(instance, cell, x, y, value) {
-        if (x !== 7) {
-            this.changedRows.add(parseInt(y));
-            this.el.setValueFromCoords(7, y, 1, true);
-            if (!this.state.isChanged) {
-                this.setState({ isChanged: true });
-            }
-        }
+        // Handled cleanly via onchange
     }
 
     onPaste() {
@@ -346,27 +379,31 @@ export default class BulkForecastingUnitComponent extends Component {
                     this.el.setValueFromCoords(7, y, 1, true);
                     this.changedRows.add(y);
                 }
-                let pcVal = json[y][1];
-                if (pcVal && isNaN(parseInt(pcVal))) {
-                    let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcVal).trim().toLowerCase());
+                // Col 1: Tracer Category
+                let tcVal = json[y][1];
+                if (tcVal && isNaN(parseInt(tcVal))) {
+                    let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcVal).trim().toLowerCase());
                     if (found) {
                         this.el.setValueFromCoords(1, y, found.id, true);
                     }
                 }
-                let tcVal = json[y][2];
-                if (tcVal && isNaN(parseInt(tcVal))) {
-                    let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcVal).trim().toLowerCase());
+                // Col 2: Product Category
+                let pcVal = json[y][2];
+                if (pcVal && isNaN(parseInt(pcVal))) {
+                    let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcVal).trim().toLowerCase());
                     if (found) {
                         this.el.setValueFromCoords(2, y, found.id, true);
                     }
                 }
-                let uVal = json[y][3];
+                // Col 5: Unit
+                let uVal = json[y][5];
                 if (uVal && isNaN(parseInt(uVal))) {
                     let found = this.state.units.find(u => u.name.toLowerCase() === String(uVal).trim().toLowerCase());
                     if (found) {
-                        this.el.setValueFromCoords(3, y, found.id, true);
+                        this.el.setValueFromCoords(5, y, found.id, true);
                     }
                 }
+                // Col 6: Status
                 let stVal = json[y][6];
                 if (stVal !== undefined && stVal !== null && stVal !== '') {
                     let stLower = String(stVal).toLowerCase();
@@ -375,28 +412,52 @@ export default class BulkForecastingUnitComponent extends Component {
                     } else if (stLower === 'disabled' || stLower === 'inactive' || stLower === '0') {
                         this.el.setValueFromCoords(6, y, '0', true);
                     }
+                } else {
+                    this.el.setValueFromCoords(6, y, '1', true);
                 }
             }
         }, 100);
     }
 
-    addRow() {
-        let row = [
-            0,
-            '',
-            '',
-            '',
-            '',
-            '',
-            '1',
-            1
-        ];
-        this.el.insertRow(row, 0, 1);
-        let updatedSet = new Set();
-        this.changedRows.forEach(idx => updatedSet.add(idx + 1));
-        updatedSet.add(0);
-        this.changedRows = updatedSet;
+    addRow(count = 1) {
+        let n = parseInt(count);
+        if (isNaN(n) || n <= 0) n = 1;
+        let totalRows = this.el.getJson(null, false).length;
+        for (let i = 0; i < n; i++) {
+            let row = [
+                0,   // 0: ID
+                '',  // 1: Tracer Category
+                '',  // 2: Product Category
+                '',  // 3: Forecasting Unit Name
+                '',  // 4: Generic Name
+                '',  // 5: Unit
+                '1', // 6: Status
+                1    // 7: isChanged
+            ];
+            this.el.insertRow(row);
+            this.changedRows.add(totalRows + i);
+        }
         this.setState({ isChanged: true });
+
+        setTimeout(() => {
+            let pageSize = 50;
+            let pageSelect = document.getElementsByClassName('jss_pagination_dropdown')[0];
+            if (pageSelect && pageSelect.value && !isNaN(parseInt(pageSelect.value))) {
+                pageSize = parseInt(pageSelect.value);
+            }
+            let newTotal = totalRows + n;
+            let targetPage = Math.floor((newTotal - 1) / pageSize);
+            if (this.el && typeof this.el.page === 'function') {
+                this.el.page(targetPage);
+            }
+        }, 50);
+    }
+
+    resetClicked() {
+        this.changedRows = new Set();
+        this.setState({ isChanged: false, validationErrors: [] }, () => {
+            this.buildJexcel();
+        });
     }
 
     exportTemplate() {
@@ -404,40 +465,35 @@ export default class BulkForecastingUnitComponent extends Component {
         let sheetName = i18n.t('static.forecastingUnit.bulkEdit').replace(/[*?:\\/[\]]/g, ' ').substring(0, 31).trim();
         let worksheet = workbook.addWorksheet(sheetName);
 
-        // Add hidden LookupData sheet for dropdown validation
         let lookupSheet = workbook.addWorksheet('LookupData');
         lookupSheet.state = 'hidden';
 
-        let pcList = this.state.productCategories.map(pc => pc.name).filter(Boolean);
         let tcList = this.state.tracerCategories.map(tc => tc.name).filter(Boolean);
+        let pcList = this.state.productCategories.map(pc => pc.name).filter(Boolean);
         let uList = this.state.units.map(u => u.name).filter(Boolean);
-        let statusList = ['Active', 'Disabled'];
 
         lookupSheet.columns = [
-            { header: 'Product Categories', key: 'pc', width: 30 },
             { header: 'Tracer Categories', key: 'tc', width: 30 },
-            { header: 'Units', key: 'unit', width: 25 },
-            { header: 'Status', key: 'status', width: 15 }
+            { header: 'Product Categories', key: 'pc', width: 30 },
+            { header: 'Units', key: 'unit', width: 25 }
         ];
 
-        let maxRows = Math.max(pcList.length, tcList.length, uList.length, statusList.length);
+        let maxRows = Math.max(tcList.length, pcList.length, uList.length);
         for (let r = 0; r < maxRows; r++) {
             lookupSheet.addRow([
-                pcList[r] || '',
                 tcList[r] || '',
-                uList[r] || '',
-                statusList[r] || ''
+                pcList[r] || '',
+                uList[r] || ''
             ]);
         }
 
+        // Ordered exactly as manual entry screen, NO ID, NO Status
         worksheet.columns = [
-            { header: i18n.t('static.forecastingUnit.forecastingUnitId') + ' (0 for new)', key: 'id', width: 22 },
-            { header: i18n.t('static.productcategory.productcategory') + ' *', key: 'pc', width: 30 },
             { header: i18n.t('static.tracercategory.tracercategory') + ' *', key: 'tc', width: 30 },
-            { header: i18n.t('static.unit.unit') + ' *', key: 'unit', width: 25 },
-            { header: i18n.t('static.product.productgenericname'), key: 'generic', width: 30 },
+            { header: i18n.t('static.productcategory.productcategory') + ' *', key: 'pc', width: 30 },
             { header: i18n.t('static.forecastingunit.forecastingunit') + ' *', key: 'name', width: 35 },
-            { header: i18n.t('static.common.status') + ' (Active/Disabled)', key: 'status', width: 20 }
+            { header: i18n.t('static.product.productgenericname'), key: 'generic', width: 30 },
+            { header: i18n.t('static.unit.unit') + ' *', key: 'unit', width: 25 }
         ];
 
         worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell) => {
@@ -450,27 +506,27 @@ export default class BulkForecastingUnitComponent extends Component {
             cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
         });
 
-        // Add Data Validation dropdowns for rows 2 to 2000
-        if (pcList.length > 0) {
-            worksheet.dataValidations.add('B2:B2000', {
+        // Dropdowns for rows 2 to 2000
+        if (tcList.length > 0) {
+            worksheet.dataValidations.add('A2:A2000', {
                 type: 'list',
                 allowBlank: true,
-                formulae: [`LookupData!$A$2:$A$${pcList.length + 1}`],
+                formulae: [`LookupData!$A$2:$A$${tcList.length + 1}`],
                 showErrorMessage: true
             });
         }
 
-        if (tcList.length > 0) {
-            worksheet.dataValidations.add('C2:C2000', {
+        if (pcList.length > 0) {
+            worksheet.dataValidations.add('B2:B2000', {
                 type: 'list',
                 allowBlank: true,
-                formulae: [`LookupData!$B$2:$B$${tcList.length + 1}`],
+                formulae: [`LookupData!$B$2:$B$${pcList.length + 1}`],
                 showErrorMessage: true
             });
         }
 
         if (uList.length > 0) {
-            worksheet.dataValidations.add('D2:D2000', {
+            worksheet.dataValidations.add('E2:E2000', {
                 type: 'list',
                 allowBlank: true,
                 formulae: [`LookupData!$C$2:$C$${uList.length + 1}`],
@@ -478,22 +534,53 @@ export default class BulkForecastingUnitComponent extends Component {
             });
         }
 
-        worksheet.dataValidations.add('G2:G2000', {
-            type: 'list',
-            allowBlank: true,
-            formulae: [`LookupData!$D$2:$D$${statusList.length + 1}`],
-            showErrorMessage: true
-        });
-
-        let samplePc = pcList.length > 0 ? pcList[0] : 'Sample Category';
         let sampleTc = tcList.length > 0 ? tcList[0] : 'Sample Tracer';
+        let samplePc = pcList.length > 0 ? pcList[0] : 'Sample Category';
         let sampleU = uList.length > 0 ? uList[0] : 'Sample Unit';
-        worksheet.addRow([0, samplePc, sampleTc, sampleU, 'Example Generic Name', 'Example Forecasting Unit Name', 'Active']);
+        worksheet.addRow([sampleTc, samplePc, 'Example Forecasting Unit Name', 'Example Generic Name', sampleU]);
 
         workbook.xlsx.writeBuffer().then(data => {
             let blob = new Blob([data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
             fs.saveAs(blob, `${i18n.t('static.forecastingUnit.bulkEdit')}_Template.xlsx`);
         });
+    }
+
+    openProgramsModal(fuId, fuName) {
+        this.setState({
+            programsModal: true,
+            programsLoading: true,
+            selectedEntityName: fuName || '',
+            programList: []
+        });
+        ForecastingUnitService.getForcastingUnitByIdWithPrograms(fuId)
+            .then(response => {
+                if (response.status === 200 && response.data) {
+                    let list = [];
+                    (response.data.spProgramListActive || []).forEach(p => {
+                        list.push({ code: p.code, module: 'Supply Planning', status: 1 });
+                    });
+                    (response.data.fcProgramListActive || []).forEach(p => {
+                        list.push({ code: p.code, module: 'Forecasting', status: 1 });
+                    });
+                    (response.data.spProgramListDisabled || []).forEach(p => {
+                        list.push({ code: p.code, module: 'Supply Planning', status: 0 });
+                    });
+                    (response.data.fcProgramListDisabled || []).forEach(p => {
+                        list.push({ code: p.code, module: 'Forecasting', status: 0 });
+                    });
+                    list.sort((a, b) => (a.code || '').localeCompare(b.code || ''));
+                    this.setState({ programList: list, programsLoading: false });
+                } else {
+                    this.setState({ programsLoading: false });
+                }
+            })
+            .catch(err => {
+                this.setState({ programsLoading: false });
+            });
+    }
+
+    toggleProgramsModal() {
+        this.setState({ programsModal: !this.state.programsModal });
     }
 
     checkValidation() {
@@ -515,61 +602,52 @@ export default class BulkForecastingUnitComponent extends Component {
             let fuId = row[0] ? parseInt(row[0]) : 0;
             let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[7] === 1 || row[7] === '1' || parseInt(this.el.getValueFromCoords(7, y)) === 1;
 
+            let tcId = row[1];
+            if (tcId && isNaN(parseInt(tcId))) {
+                let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcId).trim().toLowerCase());
+                if (found) tcId = found.id;
+            }
+            let pcId = row[2];
+            if (pcId && isNaN(parseInt(pcId))) {
+                let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcId).trim().toLowerCase());
+                if (found) pcId = found.id;
+            }
+            let fuName = row[3] ? row[3].toString().trim() : '';
+            let genericName = row[4] ? row[4].toString().trim() : '';
+            let unitId = row[5];
+            if (unitId && isNaN(parseInt(unitId))) {
+                let found = this.state.units.find(u => u.name.toLowerCase() === String(unitId).trim().toLowerCase());
+                if (found) unitId = found.id;
+            }
+
+            // Ignore completely blank new rows
+            let isCompletelyEmpty = (!tcId || tcId === '') && (!pcId || pcId === '') && (fuName === '') && (!unitId || unitId === '') && (genericName === '');
+            if (fuId === 0 && isCompletelyEmpty) {
+                continue;
+            }
+
             if (!isRowChanged) {
-                let existingName = row[5] ? row[5].toString().trim().toLowerCase() : '';
+                let existingName = fuName.toLowerCase();
                 if (existingName !== '') {
                     seenNames.set(existingName, y);
                 }
                 continue;
             }
 
-            let pcId = row[1];
-            if (pcId && isNaN(parseInt(pcId))) {
-                let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(pcId).trim().toLowerCase());
-                if (found) pcId = found.id;
-            }
-            let tcId = row[2];
-            if (tcId && isNaN(parseInt(tcId))) {
-                let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(tcId).trim().toLowerCase());
-                if (found) tcId = found.id;
-            }
-            let unitId = row[3];
-            if (unitId && isNaN(parseInt(unitId))) {
-                let found = this.state.units.find(u => u.name.toLowerCase() === String(unitId).trim().toLowerCase());
-                if (found) unitId = found.id;
-            }
-            let fuName = row[5] ? row[5].toString().trim() : '';
-
             let identifier = fuId > 0
                 ? `${i18n.t('static.bulk.id')}: ${fuId}`
                 : (fuName !== '' ? `${i18n.t('static.bulk.name')}: "${fuName}"` : `${i18n.t('static.bulk.row')}: ${y + 1}`);
 
-            // Clear previous styles for this row
+            // Clear previous styles for this row (Cols 1 to 5)
             for (let c = 1; c <= 5; c++) {
                 let cellCoord = colLetters[c] + (y + 1);
                 this.el.setStyle(cellCoord, "background-color", "transparent");
                 this.el.setComments(cellCoord, "");
             }
 
-            // Col 1: Product Category required
-            if (pcId === '' || pcId === null || pcId === undefined) {
-                let cellCoord = "B" + (y + 1);
-                this.el.setStyle(cellCoord, "background-color", "yellow");
-                this.el.setComments(cellCoord, i18n.t('static.label.fieldRequired'));
-                errors.push({
-                    page: pageNum,
-                    row: y + 1,
-                    identifier: identifier,
-                    field: i18n.t('static.productcategory.productcategory'),
-                    message: i18n.t('static.label.fieldRequired'),
-                    coord: cellCoord
-                });
-                valid = false;
-            }
-
-            // Col 2: Tracer Category required
+            // Col 1: Tracer Category required
             if (tcId === '' || tcId === null || tcId === undefined) {
-                let cellCoord = "C" + (y + 1);
+                let cellCoord = "B" + (y + 1);
                 this.el.setStyle(cellCoord, "background-color", "yellow");
                 this.el.setComments(cellCoord, i18n.t('static.label.fieldRequired'));
                 errors.push({
@@ -583,25 +661,25 @@ export default class BulkForecastingUnitComponent extends Component {
                 valid = false;
             }
 
-            // Col 3: Unit required
-            if (unitId === '' || unitId === null || unitId === undefined) {
-                let cellCoord = "D" + (y + 1);
+            // Col 2: Product Category required
+            if (pcId === '' || pcId === null || pcId === undefined) {
+                let cellCoord = "C" + (y + 1);
                 this.el.setStyle(cellCoord, "background-color", "yellow");
                 this.el.setComments(cellCoord, i18n.t('static.label.fieldRequired'));
                 errors.push({
                     page: pageNum,
                     row: y + 1,
                     identifier: identifier,
-                    field: i18n.t('static.unit.unit'),
+                    field: i18n.t('static.productcategory.productcategory'),
                     message: i18n.t('static.label.fieldRequired'),
                     coord: cellCoord
                 });
                 valid = false;
             }
 
-            // Col 5: Forecasting Unit Name required and unique
+            // Col 3: Forecasting Unit Name required and unique
             if (fuName === '') {
-                let cellCoord = "F" + (y + 1);
+                let cellCoord = "D" + (y + 1);
                 this.el.setStyle(cellCoord, "background-color", "yellow");
                 this.el.setComments(cellCoord, i18n.t('static.label.fieldRequired'));
                 errors.push({
@@ -617,7 +695,7 @@ export default class BulkForecastingUnitComponent extends Component {
                 let lowerName = fuName.toLowerCase();
                 if (seenNames.has(lowerName)) {
                     let prevRow = seenNames.get(lowerName);
-                    let cellCoord = "F" + (y + 1);
+                    let cellCoord = "D" + (y + 1);
                     this.el.setStyle(cellCoord, "background-color", "yellow");
                     let dupMsg = `${i18n.t('static.bulk.duplicateInSheet')} (${i18n.t('static.bulk.row')} ${prevRow + 1})`;
                     this.el.setComments(cellCoord, dupMsg);
@@ -633,6 +711,22 @@ export default class BulkForecastingUnitComponent extends Component {
                 } else {
                     seenNames.set(lowerName, y);
                 }
+            }
+
+            // Col 5: Unit required
+            if (unitId === '' || unitId === null || unitId === undefined) {
+                let cellCoord = "F" + (y + 1);
+                this.el.setStyle(cellCoord, "background-color", "yellow");
+                this.el.setComments(cellCoord, i18n.t('static.label.fieldRequired'));
+                errors.push({
+                    page: pageNum,
+                    row: y + 1,
+                    identifier: identifier,
+                    field: i18n.t('static.unit.unit'),
+                    message: i18n.t('static.label.fieldRequired'),
+                    coord: cellCoord
+                });
+                valid = false;
             }
         }
 
@@ -664,55 +758,36 @@ export default class BulkForecastingUnitComponent extends Component {
             let fuId = row[0] ? parseInt(row[0]) : 0;
             let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[7] === 1 || row[7] === '1' || parseInt(this.el.getValueFromCoords(7, y)) === 1;
 
+            let tcId = parseInt(row[1]);
+            if (isNaN(tcId) && row[1]) {
+                let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(row[1]).trim().toLowerCase());
+                if (found) tcId = found.id;
+            }
+            let pcId = parseInt(row[2]);
+            if (isNaN(pcId) && row[2]) {
+                let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(row[2]).trim().toLowerCase());
+                if (found) pcId = found.id;
+            }
+            let fuName = row[3] ? row[3].toString().trim() : '';
+            let genericName = row[4] ? row[4].toString().trim() : '';
+            let uId = parseInt(row[5]);
+            if (isNaN(uId) && row[5]) {
+                let found = this.state.units.find(u => u.name.toLowerCase() === String(row[5]).trim().toLowerCase());
+                if (found) uId = found.id;
+            }
+            let isActive = row[6] === 1 || row[6] === '1' || row[6] === true || row[6] === 'true' || String(row[6]).toLowerCase() === 'active';
+
+            // Ignore completely blank new rows
+            let isCompletelyEmpty = (isNaN(tcId) || !tcId) && (isNaN(pcId) || !pcId) && (fuName === '') && (isNaN(uId) || !uId) && (genericName === '');
+            if (fuId === 0 && isCompletelyEmpty) {
+                continue;
+            }
+
             if (isRowChanged) {
-                let pcId = parseInt(row[1]);
-                if (isNaN(pcId) && row[1]) {
-                    let found = this.state.productCategories.find(pc => pc.name.toLowerCase() === String(row[1]).trim().toLowerCase());
-                    if (found) pcId = found.id;
-                }
-                let tcId = parseInt(row[2]);
-                if (isNaN(tcId) && row[2]) {
-                    let found = this.state.tracerCategories.find(tc => tc.name.toLowerCase() === String(row[2]).trim().toLowerCase());
-                    if (found) tcId = found.id;
-                }
-                let uId = parseInt(row[3]);
-                if (isNaN(uId) && row[3]) {
-                    let found = this.state.units.find(u => u.name.toLowerCase() === String(row[3]).trim().toLowerCase());
-                    if (found) uId = found.id;
-                }
-                let genericName = row[4] ? row[4].toString().trim() : '';
-                let fuName = row[5] ? row[5].toString().trim() : '';
-                let isActive = row[6] === 1 || row[6] === '1' || row[6] === true || row[6] === 'true' || String(row[6]).toLowerCase() === 'active';
-
-                let fuObj = {
-                    forecastingUnitId: fuId,
-                    realm: {
-                        id: currentRealmId
-                    },
-                    productCategory: {
-                        id: pcId
-                    },
-                    tracerCategory: {
-                        id: tcId
-                    },
-                    unit: {
-                        id: uId
-                    },
-                    genericLabel: {
-                        label_en: genericName
-                    },
-                    label: {
-                        label_en: fuName
-                    },
-                    active: isActive
-                };
-                changedList.push(fuObj);
-                indexMap.push(y);
-
-                let pcObj = this.state.productCategories.find(pc => pc.id === pcId);
-                let pcName = pcObj ? pcObj.name : pcId;
                 let tcObj = this.state.tracerCategories.find(tc => tc.id === tcId);
                 let tcName = tcObj ? tcObj.name : tcId;
+                let pcObj = this.state.productCategories.find(pc => pc.id === pcId);
+                let pcName = pcObj ? pcObj.name : pcId;
                 let uObj = this.state.units.find(u => u.id === uId);
                 let uName = uObj ? uObj.name : uId;
                 let statusName = isActive ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive');
@@ -721,58 +796,84 @@ export default class BulkForecastingUnitComponent extends Component {
                 let isNew = fuId === 0;
 
                 if (isNew) {
-                    changes.push({ field: i18n.t('static.productcategory.productcategory'), newVal: pcName });
                     changes.push({ field: i18n.t('static.tracercategory.tracercategory'), newVal: tcName });
-                    changes.push({ field: i18n.t('static.unit.unit'), newVal: uName });
+                    changes.push({ field: i18n.t('static.productcategory.productcategory'), newVal: pcName });
+                    changes.push({ field: i18n.t('static.forecastingunit.forecastingunit'), newVal: fuName });
                     if (genericName) {
                         changes.push({ field: i18n.t('static.product.productgenericname'), newVal: genericName });
                     }
+                    changes.push({ field: i18n.t('static.unit.unit'), newVal: uName });
                     changes.push({ field: i18n.t('static.common.status'), newVal: statusName });
                 } else {
                     let orig = this.state.forecastingUnitList.find(f => f.forecastingUnitId === fuId);
                     if (orig) {
-                        let origFuName = orig.label ? (orig.label.label_en || getLabelText(orig.label, this.state.lang) || '') : '';
-                        let origPcId = orig.productCategory ? (orig.productCategory.id !== undefined ? orig.productCategory.id : orig.productCategory.productCategoryId) : '';
                         let origTcId = orig.tracerCategory ? (orig.tracerCategory.id !== undefined ? orig.tracerCategory.id : orig.tracerCategory.tracerCategoryId) : '';
+                        let origPcId = orig.productCategory ? (orig.productCategory.id !== undefined ? orig.productCategory.id : orig.productCategory.productCategoryId) : '';
                         let origUId = orig.unit ? (orig.unit.id !== undefined ? orig.unit.id : orig.unit.unitId) : '';
-                        let origGen = orig.genericLabel ? (orig.genericLabel.label_en || getLabelText(orig.genericLabel, this.state.lang) || '') : '';
+                        let origFuName = orig.label ? (orig.label.label_en || getLabelText(orig.label, this.state.lang) || '') : '';
+                        let origGeneric = orig.genericLabel ? (orig.genericLabel.label_en || getLabelText(orig.genericLabel, this.state.lang) || '') : '';
                         let origActive = !!orig.active;
 
-                        if (origFuName !== fuName) {
-                            changes.push({ field: i18n.t('static.forecastingunit.forecastingunit'), oldVal: origFuName, newVal: fuName });
-                        }
-                        if (parseInt(origPcId) !== pcId) {
-                            let oldPcObj = this.state.productCategories.find(pc => pc.id === parseInt(origPcId));
-                            changes.push({ field: i18n.t('static.productcategory.productcategory'), oldVal: oldPcObj ? oldPcObj.name : origPcId, newVal: pcName });
-                        }
-                        if (parseInt(origTcId) !== tcId) {
-                            let oldTcObj = this.state.tracerCategories.find(tc => tc.id === parseInt(origTcId));
+                        if (parseInt(origTcId) !== parseInt(tcId)) {
+                            let oldTcObj = this.state.tracerCategories.find(tc => tc.id === origTcId);
                             changes.push({ field: i18n.t('static.tracercategory.tracercategory'), oldVal: oldTcObj ? oldTcObj.name : origTcId, newVal: tcName });
                         }
-                        if (parseInt(origUId) !== uId) {
-                            let oldUObj = this.state.units.find(u => u.id === parseInt(origUId));
+                        if (parseInt(origPcId) !== parseInt(pcId)) {
+                            let oldPcObj = this.state.productCategories.find(pc => pc.id === origPcId);
+                            changes.push({ field: i18n.t('static.productcategory.productcategory'), oldVal: oldPcObj ? oldPcObj.name : origPcId, newVal: pcName });
+                        }
+                        if (origFuName.trim() !== fuName.trim()) {
+                            changes.push({ field: i18n.t('static.forecastingunit.forecastingunit'), oldVal: origFuName, newVal: fuName });
+                        }
+                        if (origGeneric.trim() !== genericName.trim()) {
+                            changes.push({ field: i18n.t('static.product.productgenericname'), oldVal: origGeneric, newVal: genericName });
+                        }
+                        if (parseInt(origUId) !== parseInt(uId)) {
+                            let oldUObj = this.state.units.find(u => u.id === origUId);
                             changes.push({ field: i18n.t('static.unit.unit'), oldVal: oldUObj ? oldUObj.name : origUId, newVal: uName });
                         }
-                        if (origGen.trim() !== genericName.trim()) {
-                            changes.push({ field: i18n.t('static.product.productgenericname'), oldVal: origGen || '-', newVal: genericName || '-' });
-                        }
                         if (origActive !== isActive) {
-                            changes.push({
-                                field: i18n.t('static.common.status'),
-                                oldVal: origActive ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'),
-                                newVal: statusName
-                            });
+                            changes.push({ field: i18n.t('static.common.status'), oldVal: origActive ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive'), newVal: statusName });
                         }
                     }
+
+                    // If existing unit has NO actual field changes, skip it!
                     if (changes.length === 0) {
-                        changes.push({ field: i18n.t('static.common.status'), newVal: statusName });
+                        this.changedRows.delete(y);
+                        this.el.setValueFromCoords(7, y, 0, true);
+                        continue;
                     }
                 }
 
+                let fuObj = {
+                    forecastingUnitId: fuId,
+                    realm: {
+                        id: currentRealmId
+                    },
+                    tracerCategory: {
+                        id: tcId
+                    },
+                    productCategory: {
+                        id: pcId
+                    },
+                    genericLabel: {
+                        label_en: genericName
+                    },
+                    label: {
+                        label_en: fuName
+                    },
+                    unit: {
+                        id: uId
+                    },
+                    active: isActive
+                };
+                changedList.push(fuObj);
+                indexMap.push(y);
+
                 submittedSummaryList.push({
                     id: fuId,
-                    name: fuName,
-                    isNew: isNew,
+                    name: fuName || `(${i18n.t('static.bulk.newCreatedName')})`,
+                    action: isNew ? 'created' : 'edited',
                     changes: changes
                 });
             }
@@ -780,128 +881,106 @@ export default class BulkForecastingUnitComponent extends Component {
 
         if (changedList.length === 0) {
             this.setState({
-                message: 'static.bulk.noChanges',
-                color: 'red'
+                message: i18n.t('static.bulk.noChanges'),
+                color: 'danger'
+            }, () => {
+                hideSecondComponent();
             });
-            hideSecondComponent();
             return;
         }
 
-        let totalCreated = changedList.filter(item => item.forecastingUnitId === 0).length;
-        let totalEdited = changedList.length - totalCreated;
+        let totalCreated = submittedSummaryList.filter(s => s.action === 'created').length;
+        let totalEdited = submittedSummaryList.filter(s => s.action === 'edited').length;
 
         this.setState({
+            reviewModal: true,
             pendingChangedList: changedList,
             pendingIndexMap: indexMap,
-            submittedSummaryList: submittedSummaryList,
             totalCreated: totalCreated,
             totalEdited: totalEdited,
-            reviewModal: true,
-            validationErrors: []
+            submittedSummaryList: submittedSummaryList
         });
     }
 
     confirmUpdate() {
-        let { pendingChangedList, pendingIndexMap } = this.state;
-        if (!pendingChangedList || pendingChangedList.length === 0) {
-            this.setState({ reviewModal: false });
-            return;
-        }
-
-        this.setState({ loading: true });
-        ForecastingUnitService.addForecastingUnitBulk(pendingChangedList)
+        this.setState({ reviewModal: false, loading: true });
+        ForecastingUnitService.addForecastingUnitBulk(this.state.pendingChangedList)
             .then(response => {
                 if (response.status === 200) {
-                    let result = response.data;
-                    let savedUnits = result.savedUnits || [];
-                    let updatedFuList = [...this.state.forecastingUnitList];
-
-                    for (let k = 0; k < savedUnits.length; k++) {
-                        let rowIndex = pendingIndexMap[k];
-                        let unit = savedUnits[k];
-                        // Update forecastingUnitId in col 0
-                        this.el.setValueFromCoords(0, rowIndex, unit.forecastingUnitId, true);
-                        // Reset isChanged in col 7
-                        this.el.setValueFromCoords(7, rowIndex, 0, true);
-                        let existingIdx = updatedFuList.findIndex(f => f.forecastingUnitId === unit.forecastingUnitId);
-                        if (existingIdx !== -1) {
-                            updatedFuList[existingIdx] = unit;
-                        } else {
-                            updatedFuList.push(unit);
-                        }
-                    }
-
-                    this.changedRows = new Set();
                     this.setState({
-                        loading: false,
                         isChanged: false,
-                        reviewModal: false,
-                        pendingChangedList: [],
-                        pendingIndexMap: [],
-                        submittedSummaryList: [],
-                        forecastingUnitList: updatedFuList,
-                        validationErrors: [],
                         message: 'static.message.updateSuccess',
-                        color: 'green'
+                        color: 'green',
+                        loading: false
+                    }, () => {
+                        this.props.history.push(`/forecastingUnit/listForecastingUnit/green/${this.state.message}`);
                     });
-                    hideSecondComponent();
                 } else {
                     this.setState({
-                        loading: false,
-                        message: response.data.messageCode || 'static.unkownError',
-                        color: 'red'
+                        message: response.data ? response.data.messageCode : 'static.actionFailed',
+                        color: 'red',
+                        loading: false
+                    }, () => {
+                        hideSecondComponent();
                     });
-                    hideSecondComponent();
                 }
             })
             .catch(error => {
-                this.setState({ loading: false, reviewModal: false });
                 this.handleError(error);
             });
     }
 
     toggleReviewModal() {
-        if (!this.state.loading) {
-            this.setState({ reviewModal: !this.state.reviewModal });
-        }
-    }
-
-    handleError(error) {
-        console.error("BulkForecastingUnitComponent error:", error);
-        let msg = 'static.unkownError';
-        if (error.message === "Network Error") {
-            msg = API_URL.includes("uat") ? i18n.t("static.common.uatNetworkErrorMessage") : (API_URL.includes("demo") ? i18n.t("static.common.demoNetworkErrorMessage") : i18n.t("static.common.prodNetworkErrorMessage"));
-        } else if (error.response) {
-            console.error("Error response status:", error.response.status, "data:", error.response.data);
-            switch (error.response.status) {
-                case 401:
-                    this.props.history.push(`/login/static.message.sessionExpired`);
-                    return;
-                case 403:
-                    this.props.history.push(`/accessDenied`);
-                    return;
-                case 406:
-                    msg = error.response.data && error.response.data.messageCode ? error.response.data.messageCode : 'static.message.forecastingUnitAlreadyExists';
-                    break;
-                default:
-                    msg = error.response.data && error.response.data.messageCode ? error.response.data.messageCode : 'static.unkownError';
-                    break;
-            }
-        }
-        this.setState({
-            message: msg,
-            loading: false,
-            color: 'red'
-        });
-        hideSecondComponent();
+        this.setState({ reviewModal: !this.state.reviewModal });
     }
 
     cancelClicked() {
-        this.props.history.push('/forecastingUnit/listForecastingUnit');
+        this.props.history.push(`/forecastingUnit/listForecastingUnit`);
+    }
+
+    handleError(error) {
+        if (error.message === "Network Error") {
+            this.setState({
+                message: API_URL.includes("uat")
+                    ? i18n.t("static.common.uatNetworkErrorMessage")
+                    : (API_URL.includes("demo")
+                        ? i18n.t("static.common.demoNetworkErrorMessage")
+                        : i18n.t("static.common.prodNetworkErrorMessage")),
+                loading: false,
+                color: 'red'
+            });
+        } else {
+            switch (error.response ? error.response.status : "") {
+                case 401:
+                    this.props.history.push(`/login/static.message.sessionExpired`);
+                    break;
+                case 409:
+                    this.setState({
+                        message: i18n.t('static.common.accessDenied'),
+                        loading: false,
+                        color: "red",
+                    });
+                    break;
+                case 403:
+                    this.props.history.push(`/accessDenied`);
+                    break;
+                default:
+                    this.setState({
+                        message: (error.response && error.response.data && error.response.data.messageCode) ? error.response.data.messageCode : 'static.unkownError',
+                        loading: false,
+                        color: 'red'
+                    });
+                    break;
+            }
+        }
     }
 
     render() {
-        const { realms, realmId, validationErrors } = this.state;
+        jexcel.setDictionary({
+            Show: " ",
+            entries: " ",
+        });
+        const { realms, realmId, validationErrors, submittedSummaryList } = this.state;
         let realmList = realms.length > 0 && realms.map((item, i) => (
             <option key={i} value={item.realmId}>
                 {getLabelText(item.label, this.state.lang)}
@@ -910,75 +989,84 @@ export default class BulkForecastingUnitComponent extends Component {
 
         return (
             <div className="animated fadeIn">
-                <AuthenticationServiceComponent history={this.props.history} />
-                <h5 className={this.props.match.params.color} id="div1">{this.props.match.params.message ? i18n.t(this.props.match.params.message, { entityname }) : ''}</h5>
-                <h5 className={this.state.color} id="div2">{i18n.t(this.state.message, { entityname })}</h5>
+                <AuthenticationServiceComponent
+                    history={this.props.history}
+                    message={(message) => this.setState({ message })}
+                    loading={(loading) => this.setState({ loading })}
+                />
+                <h5 className={this.state.color} id="div2">
+                    {i18n.t(this.state.message, { entityname })}
+                </h5>
 
                 {validationErrors.length > 0 && (
                     <Alert color="danger" className="mb-3">
-                        <h6 className="font-weight-bold">
-                            <i className="fa fa-exclamation-triangle mr-2"></i>
-                            {i18n.t('static.bulk.validationErrors')} ({validationErrors.length})
+                        <h6 className="alert-heading">
+                            <strong>{i18n.t('static.bulk.validationErrors')} ({validationErrors.length}):</strong>
                         </h6>
-                        <ul className="mb-0 pl-3" style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                            {validationErrors.map((err, idx) => (
-                                <li key={idx} className="mb-1">
-                                    <span className="font-weight-bold">[{i18n.t('static.bulk.page')} {err.page}, {i18n.t('static.bulk.row')} {err.row}]</span>
-                                    {' '}<span>{err.identifier}</span> - <span>{err.field}</span>: <span className="text-dark">{err.message}</span>
-                                    <Button
-                                        color="link"
-                                        size="sm"
-                                        className="p-0 ml-2 text-danger font-weight-bold"
-                                        onClick={() => this.goToError(err)}
-                                    >
-                                        <i className="fa fa-arrow-circle-right mr-1"></i>{i18n.t('static.bulk.goToPage')} {err.page}
-                                    </Button>
+                        <ul className="mb-0 pl-3">
+                            {validationErrors.slice(0, 10).map((err, idx) => (
+                                <li key={idx} style={{ cursor: 'pointer' }} onClick={() => this.goToError(err)}>
+                                    <span className="badge badge-warning mr-2">
+                                        {i18n.t('static.bulk.page')} {err.page}, {i18n.t('static.bulk.row')} {err.row}
+                                    </span>
+                                    <strong>{err.identifier}</strong>: {err.field} - {err.message}
+                                    <span className="ml-2 text-primary"><u>[{i18n.t('static.bulk.goToPage')}]</u></span>
                                 </li>
                             ))}
+                            {validationErrors.length > 10 && (
+                                <li className="text-muted mt-1">...and {validationErrors.length - 10} more error(s).</li>
+                            )}
                         </ul>
                     </Alert>
                 )}
 
                 <Card>
-                    <CardBody className="pb-lg-2 pt-lg-2">
-                        <Row className="mb-3">
-                            <Col md="4" id="realmDiv" style={{ display: AuthenticationService.getRealmId() === -1 ? 'block' : 'none' }}>
-                                <FormGroup>
-                                    <Label htmlFor="realmId">{i18n.t('static.realm.realm')}</Label>
-                                    <InputGroup>
-                                        <Input
-                                            type="select"
-                                            name="realmId"
-                                            id="realmId"
-                                            bsSize="sm"
-                                            value={realmId}
-                                            onChange={this.dataChangeForRealm}
-                                        >
-                                            <option value="0">{i18n.t('static.common.select')}</option>
-                                            {realmList}
-                                        </Input>
-                                    </InputGroup>
-                                </FormGroup>
-                            </Col>
-                            <Col md="8" className="d-flex align-items-center justify-content-end ml-auto">
-                                <Button
-                                    color="info"
-                                    size="md"
-                                    className="float-right mr-1"
+                    <div className="Card-header-addicon">
+                        <div className="card-header-actions">
+                            <div className="card-header-action">
+                                <a
+                                    href="javascript:void(0);"
+                                    style={{ textDecoration: 'none', cursor: 'pointer' }}
+                                    title={i18n.t('static.bulk.downloadTemplateBulkAdding')}
                                     onClick={this.exportTemplate}
-                                    title={i18n.t('static.dataentry.downloadTemplate')}
                                 >
-                                    <i className="fa fa-download mr-1"></i>{i18n.t('static.dataentry.downloadTemplate')}
-                                </Button>
+                                    <small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <CardBody className="pb-lg-2 pt-lg-0">
+                        {AuthenticationService.getRealmId() === -1 && (
+                            <Col md="3 pl-0">
+                                <div className="d-md-flex Selectdiv2">
+                                    <FormGroup className="mt-md-2 mb-md-2" id="realmDiv">
+                                        <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
+                                        <div className="controls SelectGo">
+                                            <InputGroup>
+                                                <Input
+                                                    type="select"
+                                                    name="realmId"
+                                                    id="realmId"
+                                                    bsSize="sm"
+                                                    value={realmId}
+                                                    onChange={this.dataChangeForRealm}
+                                                >
+                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    {realmList}
+                                                </Input>
+                                            </InputGroup>
+                                        </div>
+                                    </FormGroup>
+                                </div>
                             </Col>
-                        </Row>
+                        )}
 
                         <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="forecastingUnitTableDiv"></div>
                         </div>
 
                         <div style={{ display: this.state.loading ? "block" : "none" }}>
-                            <div className="d-flex align-items-center justify-content-center" style={{ height: "400px" }}>
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "500px" }}>
                                 <div className="align-items-center">
                                     <h4><strong>{i18n.t('static.common.loading')}</strong></h4>
                                     <div className="spinner-border blue ml-4" role="status"></div>
@@ -990,133 +1078,180 @@ export default class BulkForecastingUnitComponent extends Component {
                         <FormGroup className="mb-0">
                             <Button
                                 type="button"
-                                color="danger"
-                                className="mr-1 float-right"
                                 size="md"
+                                color="danger"
+                                className="float-right mr-1"
                                 onClick={this.cancelClicked}
                                 disabled={this.state.loading}
                             >
                                 <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
                             </Button>
-                            {this.state.isChanged && (
-                                <Button
-                                    type="button"
-                                    color="success"
-                                    className="mr-1 float-right"
-                                    size="md"
-                                    onClick={this.formSubmit}
-                                >
-                                    <i className="fa fa-check"></i> {i18n.t('static.common.submit')}
-                                </Button>
-                            )}
+                            <Button
+                                type="button"
+                                size="md"
+                                color="warning"
+                                className="float-right mr-1 text-white"
+                                onClick={this.resetClicked}
+                                disabled={this.state.loading}
+                            >
+                                <i className="fa fa-refresh"></i> {i18n.t('static.common.reset')}
+                            </Button>
+                            <Button
+                                type="submit"
+                                size="md"
+                                color="success"
+                                className="float-right mr-1"
+                                onClick={this.formSubmit}
+                                disabled={!this.state.isChanged || this.state.loading}
+                            >
+                                <i className="fa fa-check"></i> {i18n.t('static.common.submit')}
+                            </Button>
                             <Button
                                 color="info"
                                 size="md"
                                 className="float-right mr-1"
                                 type="button"
-                                onClick={this.addRow}
+                                onClick={() => this.addRow(1)}
                                 disabled={this.state.loading}
                             >
                                 <i className="fa fa-plus"></i> {i18n.t('static.common.addRow')}
                             </Button>
+                            &nbsp;
                         </FormGroup>
                     </CardFooter>
                 </Card>
 
-                {/* Review Changes Modal */}
-                <Modal isOpen={this.state.reviewModal} toggle={this.toggleReviewModal} className="modal-lg">
-                    <ModalHeader toggle={this.toggleReviewModal} className="bg-primary text-white">
-                        <i className="fa fa-list-alt mr-2"></i>{i18n.t('static.bulk.reviewChanges')}
+                {/* Programs Modal (Point 1) */}
+                <Modal isOpen={this.state.programsModal} toggle={this.toggleProgramsModal} className="modal-md">
+                    <ModalHeader toggle={this.toggleProgramsModal}>
+                        <strong>{i18n.t('static.program.programsUsingEntity', { entityname: this.state.selectedEntityName })}</strong>
                     </ModalHeader>
                     <ModalBody>
-                        <div className="p-2">
-                            <p className="mb-3 text-muted" style={{ fontSize: '14px' }}>
-                                <i className="fa fa-info-circle mr-2 text-primary"></i>
-                                {i18n.t('static.bulk.reviewPrompt')}
-                            </p>
-                            <div className="d-flex mb-3">
-                                <div className="mr-3">
-                                    <span className="badge badge-primary p-2" style={{ fontSize: '13px' }}>
-                                        {i18n.t('static.bulk.unitsEdited')}: <strong>{this.state.totalEdited}</strong>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span className="badge badge-success p-2" style={{ fontSize: '13px' }}>
-                                        {i18n.t('static.bulk.unitsCreated')}: <strong>{this.state.totalCreated}</strong>
-                                    </span>
-                                </div>
+                        {this.state.programsLoading ? (
+                            <div className="d-flex align-items-center justify-content-center" style={{ height: "150px" }}>
+                                <div className="spinner-border blue" role="status"></div>
                             </div>
-
-                            {this.state.submittedSummaryList && this.state.submittedSummaryList.length > 0 && (
-                                <div className="table-responsive" style={{ maxHeight: '380px', overflowY: 'auto', border: '1px solid #dee2e6' }}>
-                                    <Table hover size="sm" className="mb-0">
-                                        <thead className="thead-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
+                        ) : (
+                            <div>
+                                {this.state.programList.length === 0 ? (
+                                    <p className="text-muted text-center my-3">{i18n.t('static.program.noProgramsFound')}</p>
+                                ) : (
+                                    <Table hover responsive size="sm" className="table-bordered mt-2">
+                                        <thead className="thead-light">
                                             <tr>
-                                                <th style={{ width: '15%' }}>{i18n.t('static.bulk.action')}</th>
-                                                <th style={{ width: '35%' }}>{i18n.t('static.bulk.name')}</th>
-                                                <th style={{ width: '50%' }}>{i18n.t('static.bulk.changes')}</th>
+                                                <th>{i18n.t('static.program.programMaster')}</th>
+                                                <th>{i18n.t('static.realm.module')}</th>
+                                                <th>{i18n.t('static.common.status')}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {this.state.submittedSummaryList.map((item, idx) => (
+                                            {this.state.programList.map((item, idx) => (
                                                 <tr key={idx}>
-                                                    <td className="align-middle">
-                                                        {item.isNew ? (
-                                                            <span className="badge badge-success">{i18n.t('static.bulk.created')}</span>
-                                                        ) : (
-                                                            <span className="badge badge-primary">{i18n.t('static.bulk.edited')}</span>
-                                                        )}
-                                                    </td>
-                                                    <td className="align-middle font-weight-bold">
-                                                        {item.name}
-                                                        {item.id > 0 && <small className="text-muted d-block">ID: {item.id}</small>}
-                                                    </td>
-                                                    <td className="align-middle">
-                                                        {item.changes && item.changes.length > 0 ? (
-                                                            <ul className="list-unstyled mb-0" style={{ fontSize: '12px' }}>
-                                                                {item.changes.map((ch, cIdx) => (
-                                                                    <li key={cIdx}>
-                                                                        <strong>{ch.field}:</strong>{' '}
-                                                                        {ch.oldVal !== undefined ? (
-                                                                            <>
-                                                                                <span className="text-danger"><del>{ch.oldVal}</del></span>
-                                                                                {' → '}
-                                                                                <span className="text-success font-weight-bold">{ch.newVal}</span>
-                                                                            </>
-                                                                        ) : (
-                                                                            <span>{ch.newVal}</span>
-                                                                        )}
-                                                                    </li>
-                                                                ))}
-                                                            </ul>
-                                                        ) : (
-                                                            <span className="text-muted" style={{ fontSize: '12px' }}>-</span>
-                                                        )}
+                                                    <td><strong>{item.code}</strong></td>
+                                                    <td>{item.module}</td>
+                                                    <td>
+                                                        <span className={`badge ${item.status === 1 ? 'badge-success' : 'badge-secondary'}`}>
+                                                            {item.status === 1 ? i18n.t('static.common.active') : i18n.t('static.dataentry.inactive')}
+                                                        </span>
                                                     </td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </Table>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        )}
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="secondary" onClick={this.toggleReviewModal} disabled={this.state.loading}>
-                            <i className="fa fa-times mr-1"></i> {i18n.t('static.common.cancel')}
+                        <Button
+                            type="button"
+                            size="md"
+                            color="danger"
+                            className="float-right mr-1"
+                            onClick={this.toggleProgramsModal}
+                        >
+                            <i className="fa fa-times"></i> {i18n.t('static.common.close')}
                         </Button>
-                        <Button color="success" onClick={this.confirmUpdate} disabled={this.state.loading}>
-                            {this.state.loading ? (
-                                <>
-                                    <i className="fa fa-spinner fa-spin mr-1"></i>
-                                    {i18n.t('static.common.loading')}
-                                </>
-                            ) : (
-                                <>
-                                    <i className="fa fa-check mr-1"></i>
-                                    {i18n.t('static.common.ok')}
-                                </>
-                            )}
+                    </ModalFooter>
+                </Modal>
+
+                {/* Submission Review Modal */}
+                <Modal isOpen={this.state.reviewModal} toggle={this.toggleReviewModal} className="modal-lg">
+                    <ModalHeader toggle={this.toggleReviewModal}>
+                        <strong>{i18n.t('static.bulk.reviewChanges')}</strong>
+                    </ModalHeader>
+                    <ModalBody style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                        <p>{i18n.t('static.bulk.reviewPrompt')}</p>
+                        <Row className="mb-3">
+                            <Col md="6">
+                                <Alert color="info" className="mb-0">
+                                    <strong>{i18n.t('static.bulk.unitsEdited')}:</strong> {this.state.totalEdited}
+                                </Alert>
+                            </Col>
+                            <Col md="6">
+                                <Alert color="success" className="mb-0">
+                                    <strong>{i18n.t('static.bulk.unitsCreated')}:</strong> {this.state.totalCreated}
+                                </Alert>
+                            </Col>
+                        </Row>
+                        <Table hover responsive size="sm" className="table-bordered">
+                            <thead className="thead-light">
+                                <tr>
+                                    <th style={{ width: '80px' }}>{i18n.t('static.bulk.id')}</th>
+                                    <th>{i18n.t('static.bulk.name')}</th>
+                                    <th style={{ width: '100px' }}>{i18n.t('static.bulk.action')}</th>
+                                    <th>{i18n.t('static.bulk.changes')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {submittedSummaryList.map((item, idx) => (
+                                    <tr key={idx}>
+                                        <td>{item.id > 0 ? item.id : '-'}</td>
+                                        <td><strong>{item.name}</strong></td>
+                                        <td>
+                                            <span className={`badge ${item.action === 'created' ? 'badge-success' : 'badge-primary'}`}>
+                                                {item.action === 'created' ? i18n.t('static.bulk.created') : i18n.t('static.bulk.edited')}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <ul className="mb-0 pl-3">
+                                                {item.changes.map((chg, chgIdx) => (
+                                                    <li key={chgIdx}>
+                                                        <strong>{chg.field}:</strong>{' '}
+                                                        {chg.oldVal !== undefined && (
+                                                            <span>
+                                                                <del className="text-muted">{chg.oldVal || '(empty)'}</del>{' '}
+                                                                &rarr;{' '}
+                                                            </span>
+                                                        )}
+                                                        <span className="text-success">{chg.newVal || '(empty)'}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button
+                            type="button"
+                            size="md"
+                            color="danger"
+                            className="float-right mr-1"
+                            onClick={this.toggleReviewModal}
+                        >
+                            <i className="fa fa-times"></i> {i18n.t('static.common.cancel')}
+                        </Button>
+                        <Button
+                            type="button"
+                            size="md"
+                            color="success"
+                            className="float-right mr-1"
+                            onClick={this.confirmUpdate}
+                        >
+                            <i className="fa fa-check"></i> {i18n.t('static.report.ok')}
                         </Button>
                     </ModalFooter>
                 </Modal>
@@ -1124,4 +1259,3 @@ export default class BulkForecastingUnitComponent extends Component {
         );
     }
 }
-
