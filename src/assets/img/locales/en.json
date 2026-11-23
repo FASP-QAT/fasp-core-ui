@@ -3745,7 +3745,7 @@
   "static.bulk.edited": "Edited",
   "static.bulk.changes": "Details of Changes",
   "static.bulk.reviewChanges": "Review Changes",
-  "static.bulk.reviewPrompt": "Please review the proposed changes below. Click OK to update or Cancel to return.",
+  "static.bulk.reviewPrompt": "Please review the proposed changes below. Click Okay to update or Cancel to return.",
   "static.bulk.downloadTemplateBulkAdding": "Download template for bulk adding",
   "static.bulk.uploadTemplate": "Upload Template",
   "static.bulk.addRows": "Add Rows",
