@@ -17,7 +17,7 @@ import "../../../node_modules/jspreadsheet/dist/jspreadsheet.css";
 import "../../../node_modules/jsuites/dist/jsuites.css";
 import { jExcelLoadedFunction } from '../../CommonComponent/JExcelCommonFunctions.js';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
+import { API_URL, DATE_FORMAT_CAP_FOUR_DIGITS, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants.js';
 import RealmService from "../../api/RealmService";
 import UserService from "../../api/UserService";
 import i18n from '../../i18n';
@@ -518,7 +518,11 @@ class ListUserComponent extends Component {
             data[9] = (userList[j].lastModifiedDate ? moment(userList[j].lastModifiedDate).format("YYYY-MM-DD") : null)
             data[10] = userList[j].active;
             data[11] = userList[j].notes || '';
-            data[12] = (!userList[j].active && userList[j].autoInactivated) ? true : false;
+            data[12] = (!userList[j].active && userList[j].autoInactivated)
+                ? (userList[j].lastModifiedDate && moment(userList[j].lastModifiedDate).isValid()
+                    ? `${i18n.t('static.program.yes')} (${moment(userList[j].lastModifiedDate).format(DATE_FORMAT_CAP_FOUR_DIGITS)})`
+                    : i18n.t('static.program.yes'))
+                : i18n.t('static.program.no');
             userArray[count] = data;
             count++;
         }
@@ -588,13 +592,9 @@ class ListUserComponent extends Component {
                     width: 150,
                 },
                 {
-                    type: 'dropdown',
                     title: i18n.t('static.user.autoInactivatedStatus'),
-                    source: [
-                        { id: true, name: i18n.t('static.program.yes') },
-                        { id: false, name: i18n.t('static.realm.no') }
-                    ],
-                    width: 120,
+                    type: 'text',
+                    width: 150,
                 },
             ],
             onload: this.loaded,

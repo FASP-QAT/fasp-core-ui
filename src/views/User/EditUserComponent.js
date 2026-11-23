@@ -2384,6 +2384,8 @@ class EditUserComponent extends Component {
                               fontSize: "12px",
                               padding: "4px 8px",
                               verticalAlign: "middle",
+                              position: "relative",
+                              top: "-2px",
                             }}
                           >
                             {i18n.t("static.user.autoInactivatedStatus")}
