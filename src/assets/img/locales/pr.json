@@ -3804,5 +3804,14 @@
   "static.broadcast.presetColors": "Cores predefinidas",
   "static.broadcast.customColor": "Personalizado",
   "static.broadcast.previewRecipientsTitle": "Pré-visualização de destinatários selecionados",
-  "static.broadcast.messageQueuedTime": "Hora da mensagem na fila"
+  "static.broadcast.messageQueuedTime": "Hora da mensagem na fila",
+  "static.bulk.downloadTemplateBulkAdding": "Baixar modelo para adição em massa",
+  "static.bulk.uploadTemplate": "Carregar modelo",
+  "static.bulk.addRows": "Adicionar linhas",
+  "static.bulk.rowsAdded": "linhas adicionadas",
+  "static.bulk.importSuccess": "linhas importadas com sucesso a partir do modelo",
+  "static.bulk.importError": "Falha ao analisar o arquivo de modelo. Certifique-se de que corresponda ao formato do modelo baixado.",
+  "static.program.viewProgramsUsingEntity": "Ver programas usando {{entityname}}",
+  "static.program.programsUsingEntity": "Programas usando {{entityname}}",
+  "static.program.noProgramsFound": "Nenhum programa está usando esta unidade no momento."
 }

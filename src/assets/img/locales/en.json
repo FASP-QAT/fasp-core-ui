@@ -3838,5 +3838,14 @@
   "static.broadcast.presetColors": "Preset Colors",
   "static.broadcast.customColor": "Custom",
   "static.broadcast.previewRecipientsTitle": "Target Recipients Preview",
-  "static.broadcast.messageQueuedTime": "Message queued time"
+  "static.broadcast.messageQueuedTime": "Message queued time",
+  "static.bulk.downloadTemplateBulkAdding": "Download template for bulk adding",
+  "static.bulk.uploadTemplate": "Upload Template",
+  "static.bulk.addRows": "Add Rows",
+  "static.bulk.rowsAdded": "rows added",
+  "static.bulk.importSuccess": "rows successfully imported from template",
+  "static.bulk.importError": "Failed to parse template file. Please ensure it matches the downloaded template format.",
+  "static.program.viewProgramsUsingEntity": "View Programs using {{entityname}}",
+  "static.program.programsUsingEntity": "Programs using {{entityname}}",
+  "static.program.noProgramsFound": "No programs are currently using this unit."
 }
