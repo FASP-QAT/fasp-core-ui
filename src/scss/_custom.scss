@@ -15098,6 +15098,12 @@ label.arrow_label:before {
   // overflow:scroll!important;
 }
 
+.consumptionDataEntryTable .jss > tbody > tr > td.readonly,
+.consumptionDataEntryTable .jexcel > tbody > tr > td.readonly {
+  background-color: #f2f2f2 !important;
+  color: #495057 !important;
+}
+
 .shipmentDataEntryTable .jss_content {
   max-height: calc(100vh - 213px) !important;
   // overflow: scroll !important;
