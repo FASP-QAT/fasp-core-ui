@@ -3744,7 +3744,7 @@
   "static.broadcast.mandatory": "Mandatory system announcement (no opt-out)",
   "static.broadcast.notificationPreferences": "Notification Preferences",
   "static.broadcast.notificationPrefHelp": "Manage your email subscription preferences for notifications and announcements sent by QAT.",
-  "static.broadcast.systemUpdateDesc": "System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). No opt out.",
+  "static.broadcast.systemUpdateDesc": "System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). Auto-workflow notifications (e.g. supply plan approved, sent back, or upload notifications).",
   "static.broadcast.promotionalDesc": "Newsletters and general announcements. Default is to receive; user can opt out.",
   "static.broadcast.transactionalDesc": "Workflow notifications (e.g. supply plan approved, sent back, or upload notifications). Default is to receive; user can opt out.",
   "static.broadcast.receiveEmails": "Receive Emails",
@@ -3847,5 +3847,7 @@
   "static.bulk.importError": "Failed to parse template file. Please ensure it matches the downloaded template format.",
   "static.program.viewProgramsUsingEntity": "View Programs using {{entityname}}",
   "static.program.programsUsingEntity": "Programs using {{entityname}}",
-  "static.program.noProgramsFound": "No programs are currently using this unit."
+  "static.program.noProgramsFound": "No programs are currently using this unit.",
+  "static.broadcast.bouncebackNotice": "Bouncebacks are not tracked in QAT. Please check the noreply@quantificationanalytics.org email inbox for bounceback emails where delivery failed and update users accordingly.",
+  "static.broadcast.communityDesc": "Newsletters and general announcements (new features, routine QMT/QGC updates)"
 }

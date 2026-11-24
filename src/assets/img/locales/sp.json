@@ -3737,7 +3737,7 @@
   "static.broadcast.mandatory": "Anuncio obligatorio del sistema (sin exclusión voluntaria)",
   "static.broadcast.notificationPreferences": "Preferencias de notificación",
   "static.broadcast.notificationPrefHelp": "Administre sus preferencias de suscripción para las notificaciones y comunicados enviados por QAT.",
-  "static.broadcast.systemUpdateDesc": "Actualizaciones del sistema, mantenimiento y plazos obligatorios. Sin exclusión voluntaria.",
+  "static.broadcast.systemUpdateDesc": "Actualizaciones del sistema, tiempo de inactividad por mantenimiento y fechas límite obligatorias. Notificaciones automáticas de flujo de trabajo.",
   "static.broadcast.promotionalDesc": "Boletines y anuncios generales. Predeterminado recibir; exclusión opcional.",
   "static.broadcast.transactionalDesc": "Notificaciones de flujo de trabajo (p. ej., plan aprobado, devuelto). Predeterminado recibir; exclusión opcional.",
   "static.broadcast.receiveEmails": "Recibir correos",
@@ -3826,5 +3826,7 @@
   "static.bulk.importError": "Error al analizar el archivo de plantilla. Asegúrese de que coincida con el formato de plantilla descargado.",
   "static.program.viewProgramsUsingEntity": "Ver programas que usan {{entityname}}",
   "static.program.programsUsingEntity": "Programas que usan {{entityname}}",
-  "static.program.noProgramsFound": "Actualmente ningún programa está utilizando esta unidad."
+  "static.program.noProgramsFound": "Actualmente ningún programa está utilizando esta unidad.",
+  "static.broadcast.bouncebackNotice": "Los rebotes no se rastrean en QAT. Verifique la bandeja de entrada de noreply@quantificationanalytics.org para ver los correos no entregados y actualice los usuarios en consecuencia.",
+  "static.broadcast.communityDesc": "Boletines y anuncios generales (nuevas funciones, actualizaciones periódicas de QMT/QGC)"
 }

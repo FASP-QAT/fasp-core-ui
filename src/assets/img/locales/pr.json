@@ -3724,7 +3724,7 @@
   "static.broadcast.mandatory": "Anúncio obrigatório do sistema (sem cancelamento)",
   "static.broadcast.notificationPreferences": "Preferências de notificação",
   "static.broadcast.notificationPrefHelp": "Gerencie suas preferências de assinatura de notificações e comunicados do QAT.",
-  "static.broadcast.systemUpdateDesc": "Atualizações do sistema, manutenção e prazos obrigatórios. Sem cancelamento.",
+  "static.broadcast.systemUpdateDesc": "Atualizações do sistema, tempo de inatividade para manutenção e prazos obrigatórios. Notificações automáticas de fluxo de trabalho.",
   "static.broadcast.promotionalDesc": "Boletins informativos e anúncios gerais. Padrão receber; cancelamento opcional.",
   "static.broadcast.transactionalDesc": "Notificações de fluxo de trabalho (ex.: plano aprovado, reenviado). Padrão receber; cancelamento opcional.",
   "static.broadcast.receiveEmails": "Receber e-mails",
@@ -3813,5 +3813,7 @@
   "static.bulk.importError": "Falha ao analisar o arquivo de modelo. Certifique-se de que corresponda ao formato do modelo baixado.",
   "static.program.viewProgramsUsingEntity": "Ver programas usando {{entityname}}",
   "static.program.programsUsingEntity": "Programas usando {{entityname}}",
-  "static.program.noProgramsFound": "Nenhum programa está usando esta unidade no momento."
+  "static.program.noProgramsFound": "Nenhum programa está usando esta unidade no momento.",
+  "static.broadcast.bouncebackNotice": "As devoluções não são rastreadas no QAT. Verifique a caixa de entrada noreply@quantificationanalytics.org para e-mails devolvidos e atualize os usuários adequadamente.",
+  "static.broadcast.communityDesc": "Boletins informativos e anúncios gerais (novos recursos, atualizações de rotina do QMT/QGC)"
 }
