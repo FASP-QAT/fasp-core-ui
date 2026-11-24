@@ -3742,7 +3742,7 @@
   "static.broadcast.mandatory": "Anuncio obligatorio del sistema (sin exclusión voluntaria)",
   "static.broadcast.notificationPreferences": "Preferencias de notificación",
   "static.broadcast.notificationPrefHelp": "Administre sus preferencias de suscripción para las notificaciones y comunicados enviados por QAT.",
-  "static.broadcast.systemUpdateDesc": "Actualizaciones del sistema, mantenimiento y plazos obligatorios. Sin exclusión voluntaria.",
+  "static.broadcast.systemUpdateDesc": "Actualizaciones del sistema, tiempo de inactividad por mantenimiento y fechas límite obligatorias. Notificaciones automáticas de flujo de trabajo.",
   "static.broadcast.promotionalDesc": "Boletines y anuncios generales. Predeterminado recibir; exclusión opcional.",
   "static.broadcast.transactionalDesc": "Notificaciones de flujo de trabajo (p. ej., plan aprobado, devuelto). Predeterminado recibir; exclusión opcional.",
   "static.broadcast.receiveEmails": "Recibir correos",
@@ -3800,5 +3800,7 @@
   "static.broadcast.presetColors": "Colores preestablecidos",
   "static.broadcast.customColor": "Personalizado",
   "static.broadcast.previewRecipientsTitle": "Vista previa de destinatarios seleccionados",
-  "static.broadcast.messageQueuedTime": "Hora del mensaje en cola"
+  "static.broadcast.messageQueuedTime": "Hora del mensaje en cola",
+  "static.broadcast.bouncebackNotice": "Los rebotes no se rastrean en QAT. Verifique la bandeja de entrada de noreply@quantificationanalytics.org para ver los correos no entregados y actualice los usuarios en consecuencia.",
+  "static.broadcast.communityDesc": "Boletines y anuncios generales (nuevas funciones, actualizaciones periódicas de QMT/QGC)"
 }

@@ -10,7 +10,10 @@ import {
     Row
 } from 'reactstrap';
 import BroadcastService from '../../../api/BroadcastService';
+import UserService from '../../../api/UserService';
+import AuthenticationService from '../../Common/AuthenticationService.js';
 import getLabelText from '../../../CommonComponent/getLabelText';
+import i18n from '../../../i18n';
 
 class UnsubscribeComponent extends Component {
     constructor(props) {
@@ -20,6 +23,7 @@ class UnsubscribeComponent extends Component {
             preferences: [],
             loading: true,
             saving: false,
+            isLoggedInUser: false,
             successMessage: '',
             errorMessage: '',
             lang: localStorage.getItem('lang') || 'en'
@@ -29,19 +33,23 @@ class UnsubscribeComponent extends Component {
     componentDidMount() {
         const query = new URLSearchParams(this.props.location.search);
         const token = query.get('token') || '';
-        this.setState({ token }, () => {
+        const loggedIn = Boolean(AuthenticationService.getLoggedInUsername());
+
+        this.setState({ token, isLoggedInUser: loggedIn }, () => {
             if (token) {
-                this.loadPreferences(token);
+                this.loadPreferencesByToken(token);
+            } else if (loggedIn) {
+                this.loadPreferencesForLoggedInUser();
             } else {
                 this.setState({
                     loading: false,
-                    errorMessage: 'No unsubscribe token provided. Please use the link provided in your email or log in to QAT to manage your notification preferences.'
+                    errorMessage: 'To manage your email preferences, please log in to QAT or use the personalized unsubscribe link provided in your email.'
                 });
             }
         });
     }
 
-    loadPreferences = (token) => {
+    loadPreferencesByToken = (token) => {
         BroadcastService.getPreferencesByToken(token)
             .then(res => {
                 this.setState({
@@ -57,33 +65,92 @@ class UnsubscribeComponent extends Component {
             });
     };
 
-    handleToggle = (categoryId) => {
-        const updated = this.state.preferences.map(p => {
-            if (p.categoryId === categoryId && p.allowOptOut) {
-                return { ...p, optedOut: !p.optedOut };
-            }
-            return p;
-        });
-        this.setState({ preferences: updated });
+    loadPreferencesForLoggedInUser = () => {
+        UserService.getNotificationPreferences()
+            .then(res => {
+                this.setState({
+                    preferences: res.data || [],
+                    loading: false
+                });
+            })
+            .catch(err => {
+                this.setState({
+                    loading: false,
+                    errorMessage: 'Failed to load your notification preferences. Please try again or log in.'
+                });
+            });
     };
 
     handleUnsubscribeCategory = (categoryId) => {
         this.setState({ saving: true, successMessage: '', errorMessage: '' });
-        BroadcastService.unsubscribeByToken({
-            token: this.state.token,
-            categoryId: categoryId
-        })
-            .then(() => {
-                const updated = this.state.preferences.map(p => {
-                    if (p.categoryId === categoryId) {
-                        return { ...p, optedOut: true };
-                    }
-                    return p;
+        const { token, isLoggedInUser, preferences } = this.state;
+
+        if (token) {
+            BroadcastService.unsubscribeByToken({
+                token: token,
+                categoryId: categoryId
+            })
+                .then(() => {
+                    const updated = preferences.map(p => {
+                        if (p.categoryId === categoryId) {
+                            return { ...p, optedOut: true };
+                        }
+                        return p;
+                    });
+                    this.setState({
+                        saving: false,
+                        preferences: updated,
+                        successMessage: 'You have been successfully unsubscribed from this email category.'
+                    });
+                })
+                .catch(err => {
+                    this.setState({
+                        saving: false,
+                        errorMessage: 'Failed to update preference. Please try again.'
+                    });
                 });
+        } else if (isLoggedInUser) {
+            const updated = preferences.map(p => {
+                if (p.categoryId === categoryId) {
+                    return { ...p, optedOut: true };
+                }
+                return p;
+            });
+            UserService.updateNotificationPreferences(updated)
+                .then(() => {
+                    this.setState({
+                        saving: false,
+                        preferences: updated,
+                        successMessage: 'You have been successfully unsubscribed from this email category.'
+                    });
+                })
+                .catch(err => {
+                    this.setState({
+                        saving: false,
+                        errorMessage: 'Failed to update preference. Please try again.'
+                    });
+                });
+        }
+    };
+
+    handleResubscribeCategory = (categoryId) => {
+        const { isLoggedInUser, preferences } = this.state;
+        if (!isLoggedInUser) return;
+
+        this.setState({ saving: true, successMessage: '', errorMessage: '' });
+        const updated = preferences.map(p => {
+            if (p.categoryId === categoryId) {
+                return { ...p, optedOut: false };
+            }
+            return p;
+        });
+
+        UserService.updateNotificationPreferences(updated)
+            .then(() => {
                 this.setState({
                     saving: false,
                     preferences: updated,
-                    successMessage: 'You have been successfully unsubscribed from this email category.'
+                    successMessage: 'You have been resubscribed to this email category.'
                 });
             })
             .catch(err => {
@@ -95,7 +162,7 @@ class UnsubscribeComponent extends Component {
     };
 
     render() {
-        const { preferences, loading, saving, successMessage, errorMessage } = this.state;
+        const { preferences, loading, saving, successMessage, errorMessage, isLoggedInUser, token } = this.state;
 
         return (
             <div className="app flex-row align-items-center" style={{ backgroundColor: '#f0f4f8', minHeight: '100vh', padding: '40px 15px' }}>
@@ -136,14 +203,28 @@ class UnsubscribeComponent extends Component {
                                                             </div>
                                                             <small className="text-muted d-block mt-1">
                                                                 {!pref.allowOptOut
-                                                                    ? 'Mandatory system and downtime announcements.'
+                                                                    ? (pref.categoryCode === 'SYSTEM_UPDATE'
+                                                                        ? i18n.t('static.broadcast.systemUpdateDesc', 'System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). Auto-workflow notifications (e.g. supply plan approved, sent back, or upload notifications).')
+                                                                        : 'Mandatory system and downtime announcements.')
                                                                     : (pref.optedOut ? 'Currently unsubscribed.' : 'Currently subscribed.')}
                                                             </small>
                                                         </div>
                                                         <div>
                                                             {pref.allowOptOut ? (
                                                                 pref.optedOut ? (
-                                                                    <span className="badge badge-warning p-2">Unsubscribed</span>
+                                                                    isLoggedInUser ? (
+                                                                        <Button
+                                                                            color="success"
+                                                                            size="sm"
+                                                                            outline
+                                                                            onClick={() => this.handleResubscribeCategory(pref.categoryId)}
+                                                                            disabled={saving}
+                                                                        >
+                                                                            Subscribe
+                                                                        </Button>
+                                                                    ) : (
+                                                                        <span className="badge badge-warning p-2">Unsubscribed</span>
+                                                                    )
                                                                 ) : (
                                                                     <Button
                                                                         color="danger"
@@ -168,6 +249,12 @@ class UnsubscribeComponent extends Component {
                                                     Need further assistance? Contact <a href="mailto:support@quantificationanalytics.org">support@quantificationanalytics.org</a>
                                                 </small>
                                             </div>
+                                        </div>
+                                    ) : (!token && !isLoggedInUser) ? (
+                                        <div className="text-center mt-3">
+                                            <Button color="primary" onClick={() => { window.location.href = '#/login'; }}>
+                                                <i className="fa fa-sign-in mr-2"></i>Log In to QAT
+                                            </Button>
                                         </div>
                                     ) : null}
                                 </CardBody>

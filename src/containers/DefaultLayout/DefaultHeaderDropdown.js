@@ -387,10 +387,10 @@ class DefaultHeaderDropdown extends Component {
                         </td>
                         <td className="text-left align-middle">
                           {pref.categoryCode === 'SYSTEM_UPDATE' && (
-                            i18n.t('static.broadcast.systemUpdateDesc', 'System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). No opt out.')
+                            i18n.t('static.broadcast.systemUpdateDesc', 'System updates, maintenance downtime, and mandatory deadlines (e.g., you must upload by X date). Auto-workflow notifications (e.g. supply plan approved, sent back, or upload notifications).')
                           )}
-                          {pref.categoryCode === 'PROMOTIONAL' && (
-                            i18n.t('static.broadcast.promotionalDesc', 'Newsletters and general announcements. Default is to receive; user can opt out.')
+                          {(pref.categoryCode === 'COMMUNITY' || pref.categoryCode === 'PROMOTIONAL') && (
+                            i18n.t('static.broadcast.communityDesc', 'Newsletters and general announcements (new features, routine QMT/QGC updates)')
                           )}
                           {pref.categoryCode === 'TRANSACTIONAL' && (
                             i18n.t('static.broadcast.transactionalDesc', 'Workflow notifications (e.g. supply plan approved, sent back, or upload notifications). Default is to receive; user can opt out.')

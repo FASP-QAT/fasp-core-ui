@@ -35,6 +35,7 @@ import getLabelText from '../../CommonComponent/getLabelText';
 import { filterOptions, hideSecondComponent } from '../../CommonComponent/JavascriptCommonFunctions';
 import i18n from '../../i18n';
 import AuthenticationServiceComponent from '../Common/AuthenticationServiceComponent';
+import AuthenticationService from '../Common/AuthenticationService.js';
 
 class BroadcastMessageComponent extends Component {
     constructor(props) {
@@ -621,13 +622,36 @@ class BroadcastMessageComponent extends Component {
     handleBodyInput = () => {
         if (this.editorRef.current) {
             const textOnly = this.editorRef.current.innerText || '';
-            const isEmpty = textOnly.trim() === '';
+            const hasImg = this.editorRef.current.querySelector('img') !== null;
+            const isEmpty = textOnly.trim() === '' && !hasImg;
             if (isEmpty) {
                 this.editorRef.current.setAttribute('data-empty', 'true');
                 this.setState({ messageBody: '' });
             } else {
                 this.editorRef.current.removeAttribute('data-empty');
                 this.setState({ messageBody: this.editorRef.current.innerHTML });
+            }
+        }
+    };
+
+    handleEditorPaste = (e) => {
+        const clipboardData = e.clipboardData || window.clipboardData;
+        if (!clipboardData) return;
+        const items = clipboardData.items;
+        if (items) {
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    e.preventDefault();
+                    const file = items[i].getAsFile();
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const base64Data = event.target.result;
+                        document.execCommand('insertHTML', false, `<p><img src="${base64Data}" style="max-width: 100%; height: auto; border: 1px solid #ddd; margin: 8px 0; border-radius: 4px;" /></p>`);
+                        this.handleBodyInput();
+                    };
+                    reader.readAsDataURL(file);
+                    return;
+                }
             }
         }
     };
@@ -829,8 +853,9 @@ class BroadcastMessageComponent extends Component {
             });
             return;
         }
+        const hasImg = this.editorRef.current && this.editorRef.current.querySelector('img') !== null;
         const textOnly = messageBody ? messageBody.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim() : '';
-        if (!textOnly) {
+        if (!textOnly && !hasImg) {
             this.setState({ errorMessage: i18n.t('static.broadcast.bodyRequired', 'Message body cannot be empty.') }, () => {
                 hideSecondComponent();
             });
@@ -1589,6 +1614,7 @@ class BroadcastMessageComponent extends Component {
                                                         suppressContentEditableWarning
                                                         onFocus={this.handleEditorFocus}
                                                         onInput={this.handleBodyInput}
+                                                        onPaste={this.handleEditorPaste}
                                                         data-placeholder={i18n.t('static.broadcast.bodyPlaceholder', 'Compose your announcement message here...')}
                                                         className="form-control"
                                                         style={{
@@ -1755,6 +1781,12 @@ class BroadcastMessageComponent extends Component {
                             </strong>
                         </ModalHeader>
                         <ModalBody className="p-3" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>
+                            {AuthenticationService.getLoggedInUserRoleBusinessFunctionArray().includes('ROLE_BF_BROADCAST_BOUNCEBACK_INFO') && (
+                                <div className="alert alert-info py-2 px-3 mb-3 d-flex align-items-center" role="alert" style={{ fontSize: '0.825rem' }}>
+                                    <i className="fa fa-info-circle mr-2" style={{ fontSize: '1.2rem', minWidth: '20px' }}></i>
+                                    <span>{i18n.t('static.broadcast.bouncebackNotice', 'Bouncebacks are not tracked in QAT. Please check the noreply@quantificationanalytics.org email inbox for bounceback emails where delivery failed and update users accordingly.')}</span>
+                                </div>
+                            )}
                             <div className="d-flex justify-content-between align-items-center mb-3 p-2 bg-light rounded border">
                                 <div>
                                     <span className="text-muted small font-weight-bold text-uppercase">{i18n.t('static.broadcast.category', 'Category')}: </span>
