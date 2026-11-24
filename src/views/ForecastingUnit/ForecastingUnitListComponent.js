@@ -24,7 +24,7 @@ import {
     Table
 } from 'reactstrap';
 import getLabelText from '../../CommonComponent/getLabelText';
-import { API_URL, DATE_FORMAT_CAP, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
+import { API_URL, DATE_FORMAT_CAP, JEXCEL_DATE_FORMAT_SM, JEXCEL_PAGINATION_OPTION, JEXCEL_PRO_KEY } from '../../Constants';
 import ForecastingUnitService from '../../api/ForecastingUnitService';
 import ProductCategoryService from '../../api/PoroductCategoryService';
 import TracerCategoryService from '../../api/TracerCategoryService';
@@ -236,8 +236,12 @@ export default class ForecastingUnitListComponent extends Component {
             let pcId = fu.productCategory ? (fu.productCategory.id !== undefined ? fu.productCategory.id : fu.productCategory.productCategoryId) : '';
             let tcId = fu.tracerCategory ? (fu.tracerCategory.id !== undefined ? fu.tracerCategory.id : fu.tracerCategory.tracerCategoryId) : '';
             let uId = fu.unit ? (fu.unit.id !== undefined ? fu.unit.id : fu.unit.unitId) : '';
-            // Row follows manual entry order:
-            // 0: ID, 1: Tracer Category, 2: Product Category, 3: Forecasting Unit, 4: Generic Name, 5: Unit, 6: Status, 7: isChanged
+            let countPrograms = (fu.countOfSpPrograms || 0) + (fu.countOfFcPrograms || 0);
+            let lastModBy = fu.lastModifiedBy ? fu.lastModifiedBy.username : '';
+            let lastModDate = fu.lastModifiedDate ? moment(fu.lastModifiedDate).format('YYYY-MM-DD') : null;
+            // Row follows manual entry order + reference columns:
+            // 0: ID, 1: Tracer Category, 2: Product Category, 3: Forecasting Unit, 4: Generic Name, 5: Unit, 6: Status,
+            // 7: # Programs Using FU, 8: Last Updated By, 9: Last Updated Date, 10: isChanged
             let row = [
                 fu.forecastingUnitId,
                 tcId !== undefined && tcId !== null ? tcId : '',
@@ -246,6 +250,9 @@ export default class ForecastingUnitListComponent extends Component {
                 genericName,
                 uId !== undefined && uId !== null ? uId : '',
                 fu.active ? '1' : '0',
+                countPrograms,
+                lastModBy,
+                lastModDate,
                 0 // isChanged: 0
             ];
             data.push(row);
@@ -257,13 +264,16 @@ export default class ForecastingUnitListComponent extends Component {
             data: data,
             columnDrag: false,
             columns: [
-                { title: i18n.t('static.forecastingUnit.forecastingUnitId'), type: 'text', readOnly: true, width: 100 },
-                { title: `${i18n.t('static.tracercategory.tracercategory')} *`, type: 'dropdown', source: this.state.tracerCategories, width: 220, autocomplete: true },
-                { title: `${i18n.t('static.productcategory.productcategory')} *`, type: 'dropdown', source: this.state.productCategories, width: 220, autocomplete: true },
-                { title: `${i18n.t('static.forecastingunit.forecastingunit')} *`, type: 'text', width: 280 },
-                { title: i18n.t('static.product.productgenericname'), type: 'text', width: 240 },
-                { title: `${i18n.t('static.unit.unit')} *`, type: 'dropdown', source: this.state.units, width: 180, autocomplete: true },
-                { title: i18n.t('static.common.status'), type: 'dropdown', source: [{ id: '1', name: i18n.t('static.common.active') }, { id: '0', name: i18n.t('static.dataentry.inactive') }], width: 110 },
+                { title: i18n.t('static.forecastingUnit.forecastingUnitId'), type: 'text', readOnly: true, width: 80 },
+                { title: `${i18n.t('static.tracercategory.tracercategory')} *`, type: 'dropdown', source: this.state.tracerCategories, width: 200, autocomplete: true },
+                { title: `${i18n.t('static.productcategory.productcategory')} *`, type: 'dropdown', source: this.state.productCategories, width: 200, autocomplete: true },
+                { title: `${i18n.t('static.forecastingunit.forecastingunit')} *`, type: 'text', width: 250 },
+                { title: i18n.t('static.product.productgenericname'), type: 'text', width: 200 },
+                { title: `${i18n.t('static.unit.unit')} *`, type: 'dropdown', source: this.state.units, width: 140, autocomplete: true },
+                { title: i18n.t('static.common.status'), type: 'dropdown', source: [{ id: '1', name: i18n.t('static.common.active') }, { id: '0', name: i18n.t('static.dataentry.inactive') }], width: 100 },
+                { title: i18n.t('static.program.noOfProgramsUsingFU'), type: 'text', readOnly: true, width: 120 },
+                { title: i18n.t('static.common.lastModifiedBy'), type: 'text', readOnly: true, width: 120 },
+                { title: i18n.t('static.common.lastModifiedDate'), type: 'calendar', options: { format: JEXCEL_DATE_FORMAT_SM }, readOnly: true, width: 130 },
                 { title: 'isChanged', type: 'hidden' }
             ],
             editable: isEditable,
@@ -345,7 +355,7 @@ export default class ForecastingUnitListComponent extends Component {
                     let neededRows = (targetY + data.length) - totalRows;
                     if (neededRows > 0) {
                         for (let k = 0; k < neededRows; k++) {
-                            instance.insertRow([0, '', '', '', '', '', '1', 1]);
+                            instance.insertRow([0, '', '', '', '', '', '1', 0, '', null, 1]);
                         }
                     }
                 }
@@ -374,7 +384,7 @@ export default class ForecastingUnitListComponent extends Component {
         let rowId = instance.getValueFromCoords(0, y);
         if (!rowId || parseInt(rowId) === 0) {
             // newly added row
-            instance.setValueFromCoords(7, y, 1, true);
+            instance.setValueFromCoords(10, y, 1, true);
             this.changedRows.add(y);
             this.setState({ isChanged: true });
             return;
@@ -408,11 +418,11 @@ export default class ForecastingUnitListComponent extends Component {
             }
         }
         if (isDifferent) {
-            instance.setValueFromCoords(7, y, 1, true);
+            instance.setValueFromCoords(10, y, 1, true);
             this.changedRows.add(y);
             this.setState({ isChanged: true });
         } else {
-            instance.setValueFromCoords(7, y, 0, true);
+            instance.setValueFromCoords(10, y, 0, true);
             this.changedRows.delete(y);
             let hasChanges = false;
             let allData = instance.getJson(null, false);
@@ -438,7 +448,7 @@ export default class ForecastingUnitListComponent extends Component {
             for (let y = 0; y < json.length; y++) {
                 if (!json[y][0] || json[y][0] === '' || json[y][0] === 0 || json[y][0] === '0') {
                     this.el.setValueFromCoords(0, y, 0, true);
-                    this.el.setValueFromCoords(7, y, 1, true);
+                    this.el.setValueFromCoords(10, y, 1, true);
                     this.changedRows.add(y);
                 }
                 // Col 1: Tracer Category
@@ -494,7 +504,10 @@ export default class ForecastingUnitListComponent extends Component {
                 '',  // 4: Generic Name
                 '',  // 5: Unit
                 '1', // 6: Status
-                1    // 7: isChanged
+                0,   // 7: # Programs Using FU
+                '',  // 8: Last Updated By
+                null,// 9: Last Updated Date
+                1    // 10: isChanged
             ];
             this.el.insertRow(row);
             this.changedRows.add(totalRows + i);
@@ -516,7 +529,7 @@ export default class ForecastingUnitListComponent extends Component {
     }
 
     resetClicked() {
-        let confirmReset = window.confirm(i18n.t('static.bulk.resetConfirm') || 'Are you sure you want to reset all changes?');
+        let confirmReset = window.confirm(i18n.t('static.program.resetConfirm') || 'Are you sure you want to reset all changes?');
         if (confirmReset) {
             this.changedRows.clear();
             this.setState({ isChanged: false, validationErrors: [] }, () => {
@@ -576,8 +589,7 @@ export default class ForecastingUnitListComponent extends Component {
             { header: `${i18n.t('static.productcategory.productcategory')} *`, key: 'pc', width: 25 },
             { header: `${i18n.t('static.forecastingunit.forecastingunit')} *`, key: 'fu', width: 35 },
             { header: i18n.t('static.product.productgenericname'), key: 'gen', width: 30 },
-            { header: `${i18n.t('static.unit.unit')} *`, key: 'unit', width: 20 },
-            { header: i18n.t('static.common.status'), key: 'status', width: 15 }
+            { header: `${i18n.t('static.unit.unit')} *`, key: 'unit', width: 20 }
         ];
 
         worksheet.getRow(1).font = { bold: true };
@@ -605,12 +617,6 @@ export default class ForecastingUnitListComponent extends Component {
                     formulae: [`LookupData!$C$2:$C$${uList.length + 1}`]
                 };
             }
-            worksheet.getCell(`F${rowNum}`).dataValidation = {
-                type: 'list',
-                allowBlank: true,
-                formulae: ['"Active,Inactive"']
-            };
-            worksheet.getCell(`F${rowNum}`).value = 'Active';
         }
 
         workbook.xlsx.writeBuffer().then(buffer => {
@@ -626,16 +632,58 @@ export default class ForecastingUnitListComponent extends Component {
             programList: []
         });
 
-        ForecastingUnitService.getProgramsUsingForecastingUnit(fuId)
+        ForecastingUnitService.getForcastingUnitByIdWithPrograms(fuId)
             .then(res => {
-                if (res.status === 200) {
-                    let list = res.data || [];
-                    let mapped = list.map(item => ({
-                        code: item.programCode || (item.program ? item.program.code : (item.code || '-')),
-                        module: item.module || (item.realmCountryPlanningUnit ? 'Supply Plan' : 'Forecast / Supply Plan'),
-                        status: item.active !== undefined ? (item.active ? 1 : 0) : 1
-                    }));
-                    this.setState({ programList: mapped, programsLoading: false });
+                if (res.status === 200 && res.data) {
+                    let combinedProgramList = [];
+
+                    if (res.data.spProgramListActive) {
+                        res.data.spProgramListActive.forEach(item => {
+                            combinedProgramList.push({
+                                code: item.code || (item.program ? item.program.code : '-'),
+                                module: i18n.t('static.supplyPlan.supplyPlan'),
+                                status: 1
+                            });
+                        });
+                    }
+
+                    if (res.data.fcProgramListActive) {
+                        res.data.fcProgramListActive.forEach(item => {
+                            combinedProgramList.push({
+                                code: item.code || (item.program ? item.program.code : '-'),
+                                module: i18n.t('static.dashboard.forecasting'),
+                                status: 1
+                            });
+                        });
+                    }
+
+                    combinedProgramList.sort((a, b) => ((a.code || '') > (b.code || '') ? 1 : -1));
+
+                    let inActivePrograms = [];
+                    if (res.data.spProgramListDisabled) {
+                        res.data.spProgramListDisabled.forEach(item => {
+                            inActivePrograms.push({
+                                code: item.code || (item.program ? item.program.code : '-'),
+                                module: i18n.t('static.supplyPlan.supplyPlan'),
+                                status: 0
+                            });
+                        });
+                    }
+
+                    if (res.data.fcProgramListDisabled) {
+                        res.data.fcProgramListDisabled.forEach(item => {
+                            inActivePrograms.push({
+                                code: item.code || (item.program ? item.program.code : '-'),
+                                module: i18n.t('static.dashboard.forecasting'),
+                                status: 0
+                            });
+                        });
+                    }
+
+                    inActivePrograms.sort((a, b) => ((a.code || '') > (b.code || '') ? 1 : -1));
+
+                    let finalProgramList = [...combinedProgramList, ...inActivePrograms];
+                    this.setState({ programList: finalProgramList, programsLoading: false });
                 } else {
                     this.setState({ programsLoading: false });
                 }
@@ -666,7 +714,7 @@ export default class ForecastingUnitListComponent extends Component {
             let row = json[y];
             let pageNum = Math.floor(y / pageSize) + 1;
             let fuId = row[0] ? parseInt(row[0]) : 0;
-            let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[7] === 1 || row[7] === '1' || parseInt(this.el.getValueFromCoords(7, y)) === 1;
+            let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[10] === 1 || row[10] === '1' || parseInt(this.el.getValueFromCoords(10, y)) === 1;
 
             let tcId = row[1];
             if (tcId && isNaN(parseInt(tcId))) {
@@ -821,7 +869,7 @@ export default class ForecastingUnitListComponent extends Component {
         for (let y = 0; y < json.length; y++) {
             let row = json[y];
             let fuId = row[0] ? parseInt(row[0]) : 0;
-            let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[7] === 1 || row[7] === '1' || parseInt(this.el.getValueFromCoords(7, y)) === 1;
+            let isRowChanged = this.changedRows.has(y) || fuId === 0 || row[10] === 1 || row[10] === '1' || parseInt(this.el.getValueFromCoords(10, y)) === 1;
 
             let tcId = parseInt(row[1]);
             if (isNaN(tcId) && row[1]) {
@@ -868,7 +916,6 @@ export default class ForecastingUnitListComponent extends Component {
                         changes.push({ field: i18n.t('static.product.productgenericname'), newVal: genericName });
                     }
                     changes.push({ field: i18n.t('static.unit.unit'), newVal: uName });
-                    changes.push({ field: i18n.t('static.common.status'), newVal: statusName });
                 } else {
                     let orig = this.state.forecastingUnitList.find(f => f.forecastingUnitId === fuId);
                     if (orig) {
@@ -905,7 +952,7 @@ export default class ForecastingUnitListComponent extends Component {
                     // If existing unit has NO actual field changes, skip it!
                     if (changes.length === 0) {
                         this.changedRows.delete(y);
-                        this.el.setValueFromCoords(7, y, 0, true);
+                        this.el.setValueFromCoords(10, y, 0, true);
                         continue;
                     }
                 }
@@ -1263,11 +1310,10 @@ export default class ForecastingUnitListComponent extends Component {
                                     <a
                                         href="javascript:void(0);"
                                         className="ml-2 d-flex align-items-center"
-                                        style={{ textDecoration: 'none', cursor: 'pointer' }}
                                         title={i18n.t('static.bulk.downloadTemplateBulkAdding')}
-                                        onClick={this.exportTemplate}
+                                        onClick={(e) => { e.preventDefault(); this.exportTemplate(); }}
                                     >
-                                        <small className="supplyplanformulas">{i18n.t('static.dataentry.downloadTemplate')}</small>
+                                        <i className="fa fa-pencil-square-o"></i>
                                     </a>
                                 )}
                                 <img
