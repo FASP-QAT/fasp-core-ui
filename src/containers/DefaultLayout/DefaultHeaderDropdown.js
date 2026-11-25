@@ -372,8 +372,8 @@ class DefaultHeaderDropdown extends Component {
                   <tr>
                     <th style={{ width: '22%' }} className="text-left">{i18n.t('static.broadcast.category', 'Category')}</th>
                     <th style={{ width: '48%' }} className="text-left">{i18n.t('static.message.description', 'Description')}</th>
-                    <th style={{ width: '15%' }}>{i18n.t('static.common.status', 'Status')}</th>
-                    <th style={{ width: '15%' }}>{i18n.t('static.broadcast.receiveEmails', 'Receive Emails')}</th>
+                    <th style={{ width: '15%', verticalAlign: 'middle', textAlign: 'center' }}>{i18n.t('static.common.status', 'Status')}</th>
+                    <th style={{ width: '15%', verticalAlign: 'middle', textAlign: 'center' }}>{i18n.t('static.broadcast.receiveEmails', 'Receive Emails')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -396,23 +396,25 @@ class DefaultHeaderDropdown extends Component {
                             i18n.t('static.broadcast.transactionalDesc', 'Workflow notifications (e.g. supply plan approved, sent back, or upload notifications). Default is to receive; user can opt out.')
                           )}
                         </td>
-                        <td className="align-middle">
+                        <td className="align-middle text-center" style={{ verticalAlign: 'middle', textAlign: 'center' }}>
                           {isMandatory ? (
-                            <Badge color="secondary" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.common.mandatory', 'Mandatory')}</Badge>
+                            <Badge color="secondary" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500', display: 'inline-block' }}>{i18n.t('static.common.mandatory', 'Mandatory')}</Badge>
                           ) : isSubscribed ? (
-                            <Badge color="success" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.broadcast.subscribed', 'Subscribed')}</Badge>
+                            <Badge color="success" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500', display: 'inline-block' }}>{i18n.t('static.broadcast.subscribed', 'Subscribed')}</Badge>
                           ) : (
-                            <Badge color="danger" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500' }}>{i18n.t('static.broadcast.optedOut', 'Opted Out')}</Badge>
+                            <Badge color="danger" style={{ fontSize: '12px', padding: '5px 10px', fontWeight: '500', display: 'inline-block' }}>{i18n.t('static.broadcast.optedOut', 'Opted Out')}</Badge>
                           )}
                         </td>
-                        <td className="align-middle text-center ShowdecimalClr">
-                          <Switch
-                            className="form-check form-switch"
-                            checked={isSubscribed}
-                            disabled={isMandatory}
-                            color="primary"
-                            onChange={() => this.handlePreferenceToggle(pref.categoryId)}
-                          />
+                        <td className="align-middle text-center ShowdecimalClr" style={{ verticalAlign: 'middle', textAlign: 'center' }}>
+                          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <Switch
+                              className="form-check form-switch"
+                              checked={isSubscribed}
+                              disabled={isMandatory}
+                              color="primary"
+                              onChange={() => this.handlePreferenceToggle(pref.categoryId)}
+                            />
+                          </div>
                         </td>
                       </tr>
                     );
