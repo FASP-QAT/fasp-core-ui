@@ -41,6 +41,7 @@ class BroadcastMessageComponent extends Component {
     constructor(props) {
         super(props);
         this.editorRef = React.createRef();
+        this.imageInputRef = React.createRef();
         this.state = {
             viewMode: 'list', // 'list' (default) or 'compose'
             editingBroadcastId: null,
@@ -654,6 +655,23 @@ class BroadcastMessageComponent extends Component {
                 }
             }
         }
+    };
+
+    handleImageFileSelect = (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const base64Data = event.target.result;
+                if (this.editorRef.current) {
+                    this.editorRef.current.focus();
+                }
+                document.execCommand('insertHTML', false, `<p><img src="${base64Data}" style="max-width: 100%; height: auto; border: 1px solid #ddd; margin: 8px 0; border-radius: 4px;" /></p>`);
+                this.handleBodyInput();
+            };
+            reader.readAsDataURL(file);
+        }
+        e.target.value = '';
     };
 
     formatText = (command, value = null) => {
@@ -1603,7 +1621,24 @@ class BroadcastMessageComponent extends Component {
                                                                 >
                                                                     <i className="fa fa-link"></i>
                                                                 </Button>
+                                                                <Button
+                                                                    type="button"
+                                                                    color="light"
+                                                                    className="border"
+                                                                    style={{ fontSize: '11px', padding: '3px 7px' }}
+                                                                    onMouseDown={(e) => { e.preventDefault(); if (this.imageInputRef.current) this.imageInputRef.current.click(); }}
+                                                                    title={i18n.t('static.broadcast.insertImage', 'Attach / Insert Image')}
+                                                                >
+                                                                    <i className="fa fa-picture-o"></i>
+                                                                </Button>
                                                             </ButtonGroup>
+                                                            <input
+                                                                type="file"
+                                                                ref={this.imageInputRef}
+                                                                accept="image/*"
+                                                                style={{ display: 'none' }}
+                                                                onChange={this.handleImageFileSelect}
+                                                            />
                                                         </div>
                                                     </div>
 
