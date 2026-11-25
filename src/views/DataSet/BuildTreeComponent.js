@@ -2145,11 +2145,79 @@ export default class BuildTree extends Component {
         var items = this.state.items;
         var item = items.filter(x => x.id == this.state.currentItemConfig.context.id);
         if (item.length > 0) {
-            var momList = item[0].payload.nodeDataMap[this.state.selectedScenario][0].nodeDataMomList;
-            if (momList.length > 0) {
-                var mom = momList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
-                if (mom.length > 0) {
-                    startValue = mom[0].startValue;
+            var currentScenario = item[0].payload.nodeDataMap[this.state.selectedScenario][0];
+            var targetMonth = moment(startDate).startOf('month');
+            if (this.state.modelingEl && typeof this.state.modelingEl.getJson === 'function' && currentScenario.month) {
+                var baseMonth = moment(currentScenario.month).startOf('month');
+                var baseVal = parseFloat((currentScenario.dataValue || "0").toString().replaceAll(",", ""));
+                var runningValue = isNaN(baseVal) ? 0 : baseVal;
+                if (targetMonth.isAfter(baseMonth, 'month')) {
+                    var tableJson = this.state.modelingEl.getJson(null, false) || [];
+                    var excludeRow = this.state.showCalculatorFields ? this.state.currentRowIndex : -1;
+                    var intervalStartValues = {};
+                    for (var r = 0; r < tableJson.length; r++) {
+                        if (r === excludeRow) continue;
+                        var rStart = tableJson[r]["1"];
+                        if (rStart && moment(rStart).isSameOrBefore(baseMonth, 'month')) {
+                            intervalStartValues[r] = runningValue;
+                        }
+                    }
+                    var overrideList = currentScenario.nodeDataOverrideList || [];
+                    var cursor = baseMonth.clone().add(1, 'months');
+                    while (cursor.isBefore(targetMonth, 'month')) {
+                        for (var r = 0; r < tableJson.length; r++) {
+                            if (r === excludeRow) continue;
+                            var rStart = tableJson[r]["1"];
+                            if (rStart && moment(rStart).isSame(cursor, 'month')) {
+                                intervalStartValues[r] = runningValue;
+                            }
+                        }
+                        var monthDelta = 0;
+                        for (var r = 0; r < tableJson.length; r++) {
+                            if (r === excludeRow) continue;
+                            var row = tableJson[r];
+                            var rStart = row["1"];
+                            var rStop = row["2"];
+                            var mType = parseInt(row["4"]);
+                            if (!rStart || !rStop || isNaN(mType)) continue;
+                            if (cursor.isBetween(moment(rStart).startOf('month'), moment(rStop).startOf('month'), 'month', '[]')) {
+                                var sign = parseInt(row["5"]) == -1 ? -1 : 1;
+                                var rawVal = mType == 2 ? row["7"] : row["6"];
+                                var val = parseFloat((rawVal !== undefined && rawVal !== null ? rawVal : "").toString().replaceAll(",", "").replaceAll("%", ""));
+                                if (!isNaN(val)) {
+                                    if (mType == 2 || mType == 5) {
+                                        monthDelta += sign * val;
+                                    } else if (mType == 3) {
+                                        var refVal = intervalStartValues[r] !== undefined ? intervalStartValues[r] : runningValue;
+                                        monthDelta += sign * (refVal * val) / 100;
+                                    } else if (mType == 4) {
+                                        monthDelta += sign * (runningValue * val) / 100;
+                                    }
+                                }
+                            }
+                        }
+                        runningValue += monthDelta;
+                        var cursorMonthStr = cursor.format("YYYY-MM");
+                        var ov = overrideList.filter(o => o.active !== false && moment(o.month).format("YYYY-MM") == cursorMonthStr);
+                        if (ov.length > 0 && ov[0].manualChange !== undefined && ov[0].manualChange !== null && ov[0].manualChange !== "") {
+                            var mc = parseFloat(ov[0].manualChange.toString().replaceAll(",", ""));
+                            if (!isNaN(mc)) {
+                                runningValue += mc;
+                            }
+                        }
+                        cursor.add(1, 'months');
+                    }
+                }
+                startValue = Number(runningValue.toFixed(6));
+            } else {
+                var momList = currentScenario.nodeDataMomList;
+                if (momList.length > 0) {
+                    var mom = momList.filter(x => moment(x.month).format("YYYY-MM-DD") == moment(startDate).format("YYYY-MM-DD"));
+                    if (mom.length > 0) {
+                        startValue = mom[0].startValue;
+                    }
+                } else {
+                    startValue = currentScenario.dataValue;
                 }
             }
         } else {
@@ -5226,10 +5294,12 @@ export default class BuildTree extends Component {
      */
     acceptValue1() {
         var elInstance = this.state.modelingEl;
+        var td = this.state.currentTransferData;
+        var hasNoTransfer = (td == "" || td == null || td == "_T" || td == "_F" || td == "null_T" || td == "undefined_T" || td == "null_F" || td == "undefined_F");
         if (this.state.currentItemConfig.context.payload.nodeType.id > 2) {
             if (this.state.currentModelingType == 5) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, 5, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
+                if (hasNoTransfer) {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentCalculatedMomChange) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -5242,7 +5312,7 @@ export default class BuildTree extends Component {
         } else {
             if (this.state.currentModelingType == 2) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
+                if (hasNoTransfer) {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.currentTargetChangeNumber) < 0 ? -1 : 1, true);
                 }
                 var startDate = this.state.currentCalculatorStartDate;
@@ -5256,7 +5326,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 3) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
+                if (hasNoTransfer) {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -5267,7 +5337,7 @@ export default class BuildTree extends Component {
                 elInstance.setValueFromCoords(14, this.state.currentRowIndex, 0, true);
             } else if (this.state.currentModelingType == 4) {
                 elInstance.setValueFromCoords(4, this.state.currentRowIndex, this.state.currentModelingType, true);
-                if (this.state.currentTransferData == "" || this.state.currentTransferData == "_T" || this.state.currentTransferData == "_F") {
+                if (hasNoTransfer) {
                     elInstance.setValueFromCoords(5, this.state.currentRowIndex, parseFloat(this.state.percentForOneMonth) < 0 ? -1 : 1, true);
                 }
                 elInstance.setValueFromCoords(1, this.state.currentRowIndex, this.state.currentCalculatorStartDate, true);
@@ -5673,7 +5743,7 @@ export default class BuildTree extends Component {
                 data[0] = scalingList[j].notes
                 data[1] = scalingList[j].startDate
                 data[2] = scalingList[j].stopDate
-                data[3] = scalingList[j].transferNodeDataId + "_T"
+                data[3] = (scalingList[j].transferNodeDataId != null && scalingList[j].transferNodeDataId != "" && scalingList[j].transferNodeDataId != "null") ? scalingList[j].transferNodeDataId + "_T" : ""
                 data[4] = scalingList[j].modelingType.id
                 data[5] = scalingList[j].increaseDecrease
                 data[6] = scalingList[j].modelingType.id != 2 ? (scalingList[j].dataValue != '' ? parseFloat(scalingList[j].dataValue).toFixed(4) : '') : '';
