@@ -1,1 +1,2 @@
-export { default } from './PlanningUnitListComponent';
+import PlanningUnitListComponent from './PlanningUnitListComponent';
+export default PlanningUnitListComponent;

@@ -1,1 +1,2 @@
-export { default } from './ForecastingUnitListComponent';
+import ForecastingUnitListComponent from './ForecastingUnitListComponent';
+export default ForecastingUnitListComponent;

@@ -51,6 +51,7 @@ export default class ForecastingUnitListComponent extends Component {
             units: [],
             productCategories: [],
             tracerCategories: [],
+            rawProductCategories: [],
             forecastingUnitList: [],
             loading: true,
             isChanged: false,
@@ -78,6 +79,8 @@ export default class ForecastingUnitListComponent extends Component {
         this.changedRows = new Set();
         this.loadingTable = false;
         this.buildJexcel = this.buildJexcel.bind(this);
+        this.filterData = this.filterData.bind(this);
+        this.filterDataForRealm = this.filterDataForRealm.bind(this);
         this.addRow = this.addRow.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.changed = this.changed.bind(this);
@@ -138,10 +141,9 @@ export default class ForecastingUnitListComponent extends Component {
         Promise.allSettled([
             UnitService.getUnitListAll(),
             ProductCategoryService.getProductCategoryListByRealmId(realmId),
-            TracerCategoryService.getTracerCategoryByRealmId(realmId),
-            ForecastingUnitService.getForcastingUnitByRealmId(realmId)
+            TracerCategoryService.getTracerCategoryByRealmId(realmId)
         ])
-            .then(([unitRes, pcRes, tcRes, fuRes]) => {
+            .then(([unitRes, pcRes, tcRes]) => {
                 let units = (unitRes.status === 'fulfilled' && unitRes.value.data) ? unitRes.value.data : [];
                 units.sort((a, b) => {
                     let labelA = a && a.payload ? a.payload.label : (a && a.label);
@@ -158,7 +160,8 @@ export default class ForecastingUnitListComponent extends Component {
                     };
                 }).filter(c => c.id !== undefined && c.id !== null && c.name !== '');
 
-                let pcs = (pcRes.status === 'fulfilled' && pcRes.value.data) ? pcRes.value.data : [];
+                let rawPcs = (pcRes.status === 'fulfilled' && pcRes.value.data) ? pcRes.value.data : [];
+                let pcs = [...rawPcs];
                 pcs.sort((a, b) => {
                     let labelA = a && a.payload ? a.payload.label : (a && a.label);
                     let labelB = b && b.payload ? b.payload.label : (b && b.label);
@@ -190,20 +193,69 @@ export default class ForecastingUnitListComponent extends Component {
                     };
                 }).filter(c => c.id !== undefined && c.id !== null && c.name !== '');
 
-                let fuList = (fuRes.status === 'fulfilled' && fuRes.value.data) ? fuRes.value.data : [];
-
                 this.changedRows.clear();
                 this.setState({
                     units: unitList,
+                    rawProductCategories: rawPcs,
                     productCategories: productCategoryList,
                     tracerCategories: tracerCategoryList,
-                    forecastingUnitList: fuList,
+                    forecastingUnitList: [],
                     loading: false,
                     isChanged: false,
                     validationErrors: []
                 }, () => {
                     this.buildJexcel();
                 });
+            })
+            .catch(error => {
+                this.handleError(error);
+            });
+    }
+
+    filterDataForRealm() {
+        let realmElem = document.getElementById("realmId");
+        let realmId = realmElem ? realmElem.value : this.state.realmId;
+        if (realmId && realmId !== '-1' && realmId !== '0') {
+            this.setState({ realmId: realmId, isChanged: false, validationErrors: [] }, () => {
+                this.loadDependencies(realmId);
+            });
+        }
+    }
+
+    filterData() {
+        let pcElem = document.getElementById("productCategoryId");
+        let tcElem = document.getElementById("tracerCategoryId");
+        let productCategorySortOrder = pcElem ? pcElem.value : '';
+        let tracerCategoryId = tcElem ? tcElem.value : '';
+
+        this.setState({ loading: true });
+        var json = {
+            productCategorySortOrder: productCategorySortOrder,
+            tracerCategoryId: tracerCategoryId
+        };
+        ForecastingUnitService.getForecastingUnitListByProductCategoryAndTracerCategory(json)
+            .then(response => {
+                if (response.status === 200) {
+                    this.changedRows.clear();
+                    this.setState({
+                        forecastingUnitList: response.data || [],
+                        loading: false,
+                        isChanged: false,
+                        validationErrors: []
+                    }, () => {
+                        this.buildJexcel();
+                    });
+                } else {
+                    this.changedRows.clear();
+                    this.setState({
+                        forecastingUnitList: [],
+                        loading: false,
+                        isChanged: false,
+                        validationErrors: []
+                    }, () => {
+                        this.buildJexcel();
+                    });
+                }
             })
             .catch(error => {
                 this.handleError(error);
@@ -1026,7 +1078,7 @@ export default class ForecastingUnitListComponent extends Component {
                         color: 'green',
                         loading: false
                     }, () => {
-                        this.loadDependencies(this.state.realmId);
+                        this.filterData();
                     });
                 } else {
                     this.setState({
@@ -1226,10 +1278,28 @@ export default class ForecastingUnitListComponent extends Component {
             Show: " ",
             entries: " ",
         });
-        const { realms, realmId, validationErrors, submittedSummaryList, productCategories, tracerCategories } = this.state;
+        const { realms, realmId, validationErrors, submittedSummaryList, productCategories, rawProductCategories, tracerCategories } = this.state;
         let realmList = realms.length > 0 && realms.map((item, i) => (
             <option key={i} value={item.realmId}>
                 {getLabelText(item.label, this.state.lang)}
+            </option>
+        ));
+
+        let productCategoryFilterList = (rawProductCategories && rawProductCategories.length > 0)
+            ? rawProductCategories.map((item, i) => (
+                <option key={i} value={item.sortOrder}>
+                    {getLabelText(item.payload.label, this.state.lang)}
+                </option>
+            ))
+            : (productCategories.length > 0 && productCategories.map((item, i) => (
+                <option key={i} value={item.id}>
+                    {item.name}
+                </option>
+            )));
+
+        let tracercategoryFilterList = tracerCategories.length > 0 && tracerCategories.map((item, i) => (
+            <option key={i} value={item.id}>
+                {item.name}
             </option>
         ));
 
@@ -1328,12 +1398,12 @@ export default class ForecastingUnitListComponent extends Component {
                         </div>
                     </div>
                     <CardBody className="pb-lg-2 pt-lg-0">
-                        {showRealmColumn && (
-                            <Col md="3 pl-0">
-                                <div className="d-md-flex Selectdiv2">
-                                    <FormGroup className="mt-md-2 mb-md-2" id="realmDiv">
+                        <Col md="9 pl-0">
+                            <div className="d-md-flex Selectdiv2">
+                                {showRealmColumn && (
+                                    <FormGroup className="mt-md-2 mb-md-0">
                                         <Label htmlFor="appendedInputButton">{i18n.t('static.realm.realm')}</Label>
-                                        <div className="controls SelectGo">
+                                        <div className="controls SelectField">
                                             <InputGroup>
                                                 <Input
                                                     type="select"
@@ -1341,17 +1411,57 @@ export default class ForecastingUnitListComponent extends Component {
                                                     id="realmId"
                                                     bsSize="sm"
                                                     value={realmId}
-                                                    onChange={this.dataChangeForRealm}
+                                                    onChange={this.filterDataForRealm}
                                                 >
-                                                    <option value="0">{i18n.t('static.common.select')}</option>
+                                                    <option value="-1">{i18n.t('static.common.all')}</option>
                                                     {realmList}
                                                 </Input>
                                             </InputGroup>
                                         </div>
                                     </FormGroup>
-                                </div>
-                            </Col>
-                        )}
+                                )}
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.productcategory.productcategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="productCategoryId"
+                                                id="productCategoryId"
+                                                bsSize="sm"
+                                            >
+                                                {productCategoryFilterList}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup className="tab-ml-1 mt-md-2 mb-md-0">
+                                    <Label htmlFor="appendedInputButton">{i18n.t('static.tracercategory.tracercategory')}</Label>
+                                    <div className="controls SelectField">
+                                        <InputGroup>
+                                            <Input
+                                                type="select"
+                                                name="tracerCategoryId"
+                                                id="tracerCategoryId"
+                                                bsSize="sm"
+                                            >
+                                                <option value="">{i18n.t('static.common.all')}</option>
+                                                {tracercategoryFilterList}
+                                            </Input>
+                                        </InputGroup>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup>
+                                    <button
+                                        className="btn btn-info btn-md showdatabtn ml-4"
+                                        style={{ marginTop: '28px' }}
+                                        onClick={this.filterData}
+                                    >
+                                        {i18n.t('static.jexcel.search')}
+                                    </button>
+                                </FormGroup>
+                            </div>
+                        </Col>
 
                         <div className="consumptionDataEntryTable" style={{ display: this.state.loading ? "none" : "block" }}>
                             <div id="tableDiv"></div>
